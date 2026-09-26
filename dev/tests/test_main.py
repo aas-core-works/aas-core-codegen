@@ -252,6 +252,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="arithmetic"
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="constrained_primitives"
@@ -408,11 +413,24 @@ class Test_cpp(_TestCase):
             case_name="conflict_between_underlying_of_function_and_class",
         )
 
+    def test_unexpected_conflict_between_verification_function_and_helper(
+        self,
+    ) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="conflict_between_verification_function_and_helper",
+        )
+
 
 class Test_csharp(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="arithmetic"
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -543,11 +561,24 @@ class Test_csharp(_TestCase):
             case_name="conflict_between_transformed_keyword_and_property",
         )
 
+    def test_unexpected_conflict_between_verification_function_and_helper(
+        self,
+    ) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="conflict_between_verification_function_and_helper",
+        )
+
 
 class Test_golang(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="arithmetic"
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -678,11 +709,24 @@ class Test_golang(_TestCase):
             case_name="conflict_between_transformed_keyword_and_property",
         )
 
+    def test_unexpected_conflict_between_verification_function_and_helper(
+        self,
+    ) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="conflict_between_verification_function_and_helper",
+        )
+
 
 class Test_java(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="arithmetic"
         )
 
     def test_expected_constants(self) -> None:
@@ -823,6 +867,11 @@ class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="arithmetic"
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -977,6 +1026,11 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="arithmetic"
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON,
@@ -1110,6 +1164,11 @@ class Test_typescript(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="arithmetic"
         )
 
     def test_expected_conflict_with_utility_types(self) -> None:
@@ -1255,11 +1314,24 @@ class Test_typescript(_TestCase):
             case_name="conflict_between_constructor_arguments",
         )
 
+    def test_unexpected_conflict_between_verification_function_and_helper(
+        self,
+    ) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="conflict_between_verification_function_and_helper",
+        )
+
 
 class Test_xsd(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_arithmetic(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="arithmetic"
         )
 
     def test_expected_constrained_primitives(self) -> None:

@@ -455,6 +455,53 @@ class Sub(Expression):
         visitor.visit_sub(self)
 
 
+class Mod(Expression):
+    """
+    Represent a modulo operation.
+
+    The semantics follows Python: the remainder takes the sign of the divisor
+    (floored division), *e.g.*, ``-7 % 3 == 2``. Most other languages truncate
+    the division instead so that their native remainder takes the sign of
+    the dividend (``-7 % 3 == -1``). The generators need to take care of
+    the difference.
+    """
+
+    def __init__(
+        self, left: Expression, right: Expression, original_node: ast.AST
+    ) -> None:
+        Expression.__init__(self, original_node=original_node)
+        self.left = left
+        self.right = right
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_mod(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_mod(self)
+
+
+class Neg(Expression):
+    """
+    Represent an arithmetic negation (unary minus).
+
+    The negation of a numeric literal is directly parsed as a :py:class:`Constant`.
+    """
+
+    def __init__(self, operand: Expression, original_node: ast.AST) -> None:
+        Expression.__init__(self, original_node=original_node)
+        self.operand = operand
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_neg(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_neg(self)
+
+
 class FormattedValue(Node):
     """Represent a formatted value in a :py:class`JoinedStr`."""
 
@@ -848,6 +895,15 @@ class Visitor(DBC):
         self.visit(node.left)
         self.visit(node.right)
 
+    def visit_mod(self, node: Mod) -> None:
+        """Visit a modulo operation."""
+        self.visit(node.left)
+        self.visit(node.right)
+
+    def visit_neg(self, node: Neg) -> None:
+        """Visit an arithmetic negation."""
+        self.visit(node.operand)
+
     def visit_formatted_value(self, node: FormattedValue) -> None:
         """Visit a formatted value in a joined string."""
         self.visit(node.value)
@@ -1012,6 +1068,16 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_sub(self, node: Sub) -> T:
         """Transform a subtraction into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_mod(self, node: Mod) -> T:
+        """Transform a modulo operation into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_neg(self, node: Neg) -> T:
+        """Transform an arithmetic negation into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -1272,6 +1338,25 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_mod(self, node: Mod) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("left", self.transform(node.left)),
+                stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_neg(self, node: Neg) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("operand", self.transform(node.operand)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_formatted_value(self, node: FormattedValue) -> stringify.Entity:
         return stringify.Entity(
             name=node.__class__.__name__,
@@ -1503,6 +1588,14 @@ class RestrictedTransformer(Transformer[T]):
         """Transform a subtraction into something."""
         raise NotImplementedError(f"{node=}")
 
+    def transform_mod(self, node: Mod) -> T:
+        """Transform a modulo operation into something."""
+        raise NotImplementedError(f"{node=}")
+
+    def transform_neg(self, node: Neg) -> T:
+        """Transform an arithmetic negation into something."""
+        raise NotImplementedError(f"{node=}")
+
     def transform_formatted_value(self, node: FormattedValue) -> T:
         """Transform a formatted value in a joined string into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -1644,6 +1737,15 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         yield node
         yield from self.transform(node.left)
         yield from self.transform(node.right)
+
+    def transform_mod(self, node: Mod) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.left)
+        yield from self.transform(node.right)
+
+    def transform_neg(self, node: Neg) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.operand)
 
     def transform_formatted_value(self, node: FormattedValue) -> Iterator[Node]:
         yield node

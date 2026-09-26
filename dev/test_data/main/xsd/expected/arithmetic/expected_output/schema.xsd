@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="something">
+    <xs:sequence>
+      <xs:element name="even" type="xs:long"/>
+      <xs:element name="offset" type="xs:long"/>
+      <xs:element name="small" type="xs:long"/>
+      <xs:element name="byNegative" type="xs:long"/>
+      <xs:element name="text" type="xs:string"/>
+      <xs:element name="negative" type="xs:long"/>
+      <xs:element name="deviation" type="xs:long"/>
+      <xs:element name="ratio" type="xs:double"/>
+      <xs:element name="alignment" type="xs:long"/>
+      <xs:element name="optionalNumber" type="xs:long" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="optionalRatio" type="xs:double" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="something_t">
+    <xs:sequence>
+      <xs:group ref="something"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="something" type="something_t"/>
+</xs:schema>

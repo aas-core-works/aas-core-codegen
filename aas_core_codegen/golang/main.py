@@ -342,6 +342,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test the arithmetic operations only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                base_rel_path / "verification/test/arithmetic_test.go",
+                lambda: (
+                    golang_tests.generate_arithmetic_test(
+                        symbol_table=verified_ir_table, repo_url=repo_url
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

@@ -612,6 +612,36 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         self.is_pointer_map[node] = False
         return None
 
+    def transform_mod(self, node: parse_tree.Mod) -> Optional[Error]:
+        last_error = None  # type: Optional[Error]
+        for operand in (node.left, node.right):
+            # NOTE (mristin):
+            # Do not immediately return so that other arguments are processed as well.
+            # This way we get a longer list of errors which the caller can report
+            # using :py:prop:`errors`.
+
+            error = self.transform(operand)
+            if error is not None:
+                last_error = error
+
+        if last_error is not None:
+            return last_error
+
+        # NOTE (mristin):
+        # The remainder is always computed as a value, never as a pointer.
+        self.is_pointer_map[node] = False
+        return None
+
+    def transform_neg(self, node: parse_tree.Neg) -> Optional[Error]:
+        error = self.transform(node.operand)
+        if error is not None:
+            return error
+
+        # NOTE (mristin):
+        # The negation is always computed as a value, never as a pointer.
+        self.is_pointer_map[node] = False
+        return None
+
     def transform_formatted_value(
         self, node: parse_tree.FormattedValue
     ) -> Optional[Error]:

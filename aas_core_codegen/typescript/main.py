@@ -418,6 +418,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test the arithmetic operations only if the meta-model uses them, as we
+    # generate the helper function for the modulo only in that case.
+    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                test_rel_path / "verification.arithmetic.spec.ts",
+                lambda: (
+                    typescript_tests.generate_verification_arithmetic_spec(
+                        symbol_table=verified_ir_table,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

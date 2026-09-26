@@ -4,6 +4,7 @@ from aas_core_codegen.python.tests import (
     _generate_common,
     _generate_common_jsonization,
     _generate_common_xmlization,
+    _generate_test_arithmetic,
     _generate_test_descend_and_pass_through_visitor,
     _generate_test_descend_once,
     _generate_test_json_value_verification,
@@ -22,6 +23,7 @@ from aas_core_codegen.python.tests import (
 generate_common = _generate_common.generate
 generate_common_jsonization = _generate_common_jsonization.generate
 generate_common_xmlization = _generate_common_xmlization.generate
+generate_test_arithmetic = _generate_test_arithmetic.generate
 generate_test_descend_and_pass_through_visitor = (
     _generate_test_descend_and_pass_through_visitor.generate
 )

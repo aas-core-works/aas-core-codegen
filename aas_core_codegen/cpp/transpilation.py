@@ -827,6 +827,10 @@ std::make_tuple(
                 node.original_node, "Failed to transpile the comparison", errors
             )
 
+        # NOTE (mristin):
+        # The modulo is transpiled either to a function call or to the native
+        # operator ``%``, and the arithmetic negation to the unary ``-``. Both bind
+        # stronger than the comparison operators in C++.
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,
@@ -835,6 +839,8 @@ std::make_tuple(
             parse_tree.Constant,
             parse_tree.Index,
             parse_tree.Slice,
+            parse_tree.Mod,
+            parse_tree.Neg,
         )
 
         if isinstance(node.left, no_parentheses_types) and isinstance(
@@ -1355,6 +1361,22 @@ common::{contains_function}(
 
                 return Stripped(f"{first_arg}.size()"), None
 
+            elif func_type.func.name == "abs":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # The argument is never optional here as the type inference refuses
+                # the optional arguments, so it has been already de-referenced above
+                # if it had been a narrowed ``common::optional``.
+                #
+                # The overloads of ``std::abs`` for ``int64_t`` live in ``<cstdlib>``,
+                # while the overloads for ``double`` live in ``<cmath>``. We include
+                # both in the verification.
+                return Stripped(f"std::abs({args[0]})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1622,6 +1644,174 @@ common::{contains_function}(
         self, node: parse_tree.Sub
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_add_or_sub(node)
+
+    def _is_non_negative_in_cpp(self, node: parse_tree.Expression) -> bool:
+        """
+        Check that the ``node`` is certainly non-negative in the generated C++ code.
+
+        This is the case for the lengths, which we represent as unsigned ``size_t``,
+        and for the non-negative integer literals.
+        """
+        if (
+            isinstance(node, parse_tree.Constant)
+            and isinstance(node.value, int)
+            and not isinstance(node.value, bool)
+        ):
+            return node.value >= 0
+
+        return (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        )
+
+    def transform_mod(
+        self, node: parse_tree.Mod
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        left, error = self._transform_and_value_if_necessary(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self._transform_and_value_if_necessary(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the modulo operation", errors
+            )
+
+        assert left is not None
+        assert right is not None
+
+        result_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node]
+        )
+        assert result_type in (
+            intermediate_type_inference.PrimitiveType.INT,
+            intermediate_type_inference.PrimitiveType.LENGTH,
+        ), (
+            f"Expected the modulo to be only defined on integers, "
+            f"but got the result type {self.type_map[node]}; "
+            f"this should have been caught before."
+        )
+
+        if (
+            result_type is intermediate_type_inference.PrimitiveType.LENGTH
+            and self._is_non_negative_in_cpp(node.left)
+            and self._is_non_negative_in_cpp(node.right)
+        ):
+            # NOTE (mristin):
+            # The native operator ``%`` is safe here. Both operands are non-negative:
+            # the lengths are unsigned ``size_t``'s, and the literals are
+            # non-negative. The truncated and the floored division coincide
+            # for non-negative operands, so the native remainder equals the remainder
+            # in Python. See below why we can not use the native operator in general.
+            no_parentheses_types_in_this_context = (
+                parse_tree.Member,
+                parse_tree.FunctionCall,
+                parse_tree.MethodCall,
+                parse_tree.Name,
+                parse_tree.Constant,
+                parse_tree.Index,
+            )
+
+            if not isinstance(node.left, no_parentheses_types_in_this_context):
+                left = Stripped(f"({left})")
+
+            if not isinstance(node.right, no_parentheses_types_in_this_context):
+                right = Stripped(f"({right})")
+
+            return Stripped(f"{left} % {right}"), None
+
+        # NOTE (mristin):
+        # We deliberately do not use the native C++ operator ``%`` for the signed
+        # operands. C++ truncates the division towards zero so that its remainder
+        # takes the sign of the dividend (``-7 % 3 == -1``). The meta-model is
+        # written in Python where the division is floored so that the remainder takes
+        # the sign of the divisor (``-7 % 3 == 2``). The two only coincide for
+        # the operands of the same sign, but the invariants must behave the same in
+        # all the SDKs for all the inputs. Hence, we call the helper which computes
+        # the floored remainder, see
+        # :py:data:`aas_core_codegen.cpp.lib._generate_verification.FLOOR_MOD_DEFINITION`.
+        #
+        # The helper works on ``int64_t``'s, so we convert the lengths, which are
+        # unsigned ``size_t``'s in C++. If the meta-model expects a length as
+        # the result, we convert the result back to ``size_t`` so that the comparisons
+        # with other lengths do not trigger the warnings about the signed/unsigned
+        # mismatch.
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node.left])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            left = Stripped(f"static_cast<int64_t>({left})")
+
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node.right])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            right = Stripped(f"static_cast<int64_t>({right})")
+
+        # NOTE (mristin):
+        # We qualify the helper with the namespace as the invariants are transpiled
+        # in the anonymous namespace.
+        function = f"{cpp_common.VERIFICATION_NAMESPACE}::FloorMod"
+
+        call = Stripped(f"{function}({left}, {right})")
+        if "\n" in call or len(call) > 70:
+            call = Stripped(
+                f"""\
+{function}(
+{I}{indent_but_first_line(left, I)},
+{I}{indent_but_first_line(right, I)}
+)"""
+            )
+
+        if result_type is intermediate_type_inference.PrimitiveType.LENGTH:
+            if "\n" in call:
+                return (
+                    Stripped(
+                        f"""\
+static_cast<size_t>(
+{I}{indent_but_first_line(call, I)}
+)"""
+                    ),
+                    None,
+                )
+
+            return Stripped(f"static_cast<size_t>({call})"), None
+
+        return call, None
+
+    def transform_neg(
+        self, node: parse_tree.Neg
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self._transform_and_value_if_necessary(node.operand)
+        if error is not None:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the arithmetic negation",
+                [error],
+            )
+
+        assert operand is not None
+
+        # NOTE (mristin):
+        # We have to put a negative constant in parentheses as well, since ``--1``
+        # would be parsed as a decrement in C++.
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            operand = Stripped(f"({operand})")
+
+        return Stripped(f"-{operand}"), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr

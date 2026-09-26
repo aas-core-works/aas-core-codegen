@@ -357,6 +357,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test the arithmetic operations only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path / "TestArithmetic.cs",
+                lambda: (
+                    csharp_tests.generate_test_arithmetic(
+                        namespace=namespace, symbol_table=context.symbol_table
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 
