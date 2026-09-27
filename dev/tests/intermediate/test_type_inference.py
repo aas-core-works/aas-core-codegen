@@ -1416,6 +1416,59 @@ def some_func(numbers: List[int]) -> bool:
             ),
         )
 
+    def test_continue_in_nested_loops(self) -> None:
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int], text: str) -> bool:
+    for number in numbers:
+        if number == 0:
+            continue
+
+        for i in range(0, number):
+            if text == "skip":
+                continue
+            else:
+                continue
+
+        if number == 1:
+            return False
+
+    return True"""
+            )
+        )
+
+    def test_continue_outside_of_loop_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int]) -> bool:
+    continue
+    return True"""
+            ),
+            expected_joined_message=(
+                "The ``continue`` statement is not within a for-loop"
+            ),
+        )
+
+    def test_continue_in_switch_outside_of_loop_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str) -> bool:
+    if text == "skip":
+        continue
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "The ``continue`` statement is not within a for-loop"
+            ),
+        )
+
 
 class Test_is_instance(unittest.TestCase):
     @staticmethod

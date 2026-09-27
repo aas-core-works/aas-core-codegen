@@ -190,6 +190,46 @@ export class VerificationError {
 }
 
 /**
+ * Compute the remainder of the floored division of `dividend` by `divisor`.
+ *
+ * @remarks
+ *
+ * The remainder takes the sign of the divisor, as the modulo in Python,
+ * in which the meta-model is written.
+ *
+ * We deliberately do not use the native operator `%` which truncates
+ * the division towards zero so that its remainder takes the sign of
+ * the dividend. For example, `-7 % 3 === -1` in TypeScript, while
+ * `-7 % 3 == 2` in Python. The two only coincide when the operands have
+ * the same sign, but the invariants must behave the same in all the SDKs for
+ * all the inputs.
+ *
+ * Unlike the native operator `%`, this function never returns a negative zero.
+ * For example, `-6 % 3` gives `-0` in TypeScript, while this function
+ * gives `0`.
+ *
+ * The `divisor` must not be zero.
+ *
+ * The numbers in TypeScript are double-precision floating-point numbers, so
+ * the result is exact only if the operands are integers within
+ * `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`.
+ *
+ * @param dividend - left operand of the modulo
+ * @param divisor - right operand of the modulo, must not be zero
+ * @returns the remainder with the sign of the divisor
+ */
+export function floorMod(dividend: number, divisor: number): number {
+  const remainder = dividend % divisor;
+  if (remainder !== 0 && (remainder < 0) !== (divisor < 0)) {
+    return remainder + divisor;
+  }
+
+  // NOTE (mristin):
+  // We add zero to turn a negative zero into a positive zero.
+  return remainder + 0;
+}
+
+/**
  * Check the for-each with an unconditional early return.
  */
 export function firstTextIsNotEmpty(
@@ -320,6 +360,48 @@ export function alphaHasNoNegativeNumbers(
 }
 
 /**
+ * Check the for-each with a continue in a switch followed by statements.
+ */
+export function sumOfOddNumbersIsSmall(
+  numbers: Array<number>
+): boolean {
+  let total = 0;
+  for (const number of numbers) {
+    switch (floorMod(number, 2)) {
+      case 0:
+        continue;
+    }
+    total = total + number;
+  }
+  return total < 50;
+}
+
+/**
+ * Check the continue in all the branches of a switch in a nested for-range.
+ */
+export function itemsAreFewAndTextsExpected(
+  items: Array<AasTypes.Item>
+): boolean {
+  let count = 0;
+  for (const item of items) {
+    for (let i = 0; i < item.texts.length; i++) {
+      const text = AasCommon.at(item.texts, i);
+      switch (text) {
+        case "unexpected":
+          return false;
+        case "a":
+        case "b":
+          continue;
+        default:
+          continue;
+      }
+    }
+    count = count + 1;
+  }
+  return count < 3;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -339,6 +421,18 @@ class Verifier
     that: AasTypes.Something,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!itemsAreFewAndTextsExpected(that.items)) {
+      yield new VerificationError(
+        "Items are few and their texts expected"
+      )
+    }
+
+    if (!sumOfOddNumbersIsSmall(that.numbers)) {
+      yield new VerificationError(
+        "Sum of odd numbers is small"
+      )
+    }
+
     if (!alphaHasNoNegativeNumbers(that.kind, that.numbers)) {
       yield new VerificationError(
         "Alpha has no minus two"

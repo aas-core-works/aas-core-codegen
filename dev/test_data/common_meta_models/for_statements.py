@@ -103,6 +103,38 @@ def alpha_has_no_negative_numbers(kind: Kind, numbers: List[int]) -> bool:
     return True
 
 
+@verification
+def sum_of_odd_numbers_is_small(numbers: List[int]) -> bool:
+    """Check the for-each with a continue in a switch followed by statements."""
+    total = 0
+    for number in numbers:
+        if number % 2 == 0:
+            continue
+
+        total = total + number
+
+    return total < 50
+
+
+@verification
+def items_are_few_and_texts_expected(items: List[Item]) -> bool:
+    """Check the continue in all the branches of a switch in a nested for-range."""
+    count = 0
+    for item in items:
+        for i in range(0, len(item.texts)):
+            text = item.texts[i]
+            if text == "unexpected":
+                return False
+            elif text == "a" or text == "b":
+                continue
+            else:
+                continue
+
+        count = count + 1
+
+    return count < 3
+
+
 @invariant(
     lambda self: first_text_is_not_empty(self.texts),
     "The first text must not be empty",
@@ -125,6 +157,14 @@ def alpha_has_no_negative_numbers(kind: Kind, numbers: List[int]) -> bool:
 @invariant(
     lambda self: alpha_has_no_negative_numbers(self.kind, self.numbers),
     "Alpha has no minus two",
+)
+@invariant(
+    lambda self: sum_of_odd_numbers_is_small(self.numbers),
+    "Sum of odd numbers is small",
+)
+@invariant(
+    lambda self: items_are_few_and_texts_expected(self.items),
+    "Items are few and their texts expected",
 )
 class Something(DBC):
     kind: Kind

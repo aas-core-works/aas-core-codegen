@@ -1293,6 +1293,12 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_continue(self, node: parse_tree.Continue) -> str:
+        result = "continue"
+
+        self.representation_map[node] = result
+        return result
+
 
 #: Map a comparator to the comparator which says the same about the flipped operands
 _FLIPPED_COMPARATOR = {
@@ -1472,6 +1478,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # when we leave. A set suffices for the nested for-loops, as a loop
         # variable must not shadow any visible variable, including the loop
         # variables of the enclosing for-loops.
+        #
+        # The set is empty if and only if we are outside of all for-loops, so we
+        # also use it to refuse the ``continue`` statements outside of a loop.
         self._loop_variable_set = set()  # type: Set[Identifier]
 
         self.type_map = dict()
@@ -3680,6 +3689,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self._loop_variable_set.remove(loop_variable)
 
         if not success:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_continue(
+        self, node: parse_tree.Continue
+    ) -> Optional["TypeAnnotationUnion"]:
+        if len(self._loop_variable_set) == 0:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    "The ``continue`` statement is not within a for-loop",
+                )
+            )
             return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)

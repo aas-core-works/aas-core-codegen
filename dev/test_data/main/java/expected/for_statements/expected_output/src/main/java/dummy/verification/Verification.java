@@ -152,6 +152,47 @@ public class Verification {
   }
 
   /**
+   * Check the for-each with a continue in a switch followed by statements.
+   */
+  public static Boolean sumOfOddNumbersIsSmall(
+    List<Long> numbers) {
+    long total = 0;
+    for (var number : numbers) {
+        if ((Math.floorMod(number, 2L)) == 0) {
+            continue;
+        }
+        total = total + number;
+    }
+    return total < 50;
+  }
+
+  /**
+   * Check the continue in all the branches of a switch in a nested for-range.
+   */
+  public static Boolean itemsAreFewAndTextsExpected(
+    List<IItem> items) {
+    long count = 0;
+    for (var item : items) {
+        for (int i = 0; i < item.getTexts().size(); i++) {
+            var text = item.getTexts().get(i);
+            switch (text) {
+                case "unexpected" -> {
+                    return false;
+                }
+                case "a", "b" -> {
+                    continue;
+                }
+                default -> {
+                    continue;
+                }
+            }
+        }
+        count = count + 1;
+    }
+    return count < 3;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -187,6 +228,20 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!itemsAreFewAndTextsExpected(that.getItems())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Items are few and their texts expected")));
+      }
+
+      if (!sumOfOddNumbersIsSmall(that.getNumbers())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Sum of odd numbers is small")));
+      }
 
       if (!(
         alphaHasNoNegativeNumbers(that.getKind(), that.getNumbers()))) {

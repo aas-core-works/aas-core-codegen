@@ -188,6 +188,55 @@ namespace dummy
         }  // public static bool AlphaHasNoNegativeNumbers
 
         /// <summary>
+        /// Check the for-each with a continue in a switch followed by statements.
+        /// </summary>
+        public static bool SumOfOddNumbersIsSmall(
+            List<long> numbers
+        )
+        {
+            long total = 0;
+            foreach (var number in numbers)
+            {
+                switch (Verification.FloorMod(number, 2))
+                {
+                    case 0:
+                        continue;
+                }
+                total = total + number;
+            }
+            return total < 50;
+        }  // public static bool SumOfOddNumbersIsSmall
+
+        /// <summary>
+        /// Check the continue in all the branches of a switch in a nested for-range.
+        /// </summary>
+        public static bool ItemsAreFewAndTextsExpected(
+            List<IItem> items
+        )
+        {
+            long count = 0;
+            foreach (var item in items)
+            {
+                for (int i = 0; i < item.Texts.Count; i++)
+                {
+                    var text = item.Texts[i];
+                    switch (text)
+                    {
+                        case "unexpected":
+                            return false;
+                        case "a":
+                        case "b":
+                            continue;
+                        default:
+                            continue;
+                    }
+                }
+                count = count + 1;
+            }
+            return count < 3;
+        }  // public static bool ItemsAreFewAndTextsExpected
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -388,6 +437,21 @@ namespace dummy
             )
             {
                 if (!(
+                    Verification.ItemsAreFewAndTextsExpected(that.Items)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Items are few and their texts expected");
+                }
+
+                if (!Verification.SumOfOddNumbersIsSmall(that.Numbers))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Sum of odd numbers is small");
+                }
+
+                if (!(
                     Verification.AlphaHasNoNegativeNumbers(that.Kind, that.Numbers)))
                 {
                     yield return new Reporting.Error(
@@ -498,6 +562,45 @@ namespace dummy
                 yield return new Reporting.Error(
                     $"Invalid Kind: {that}");
             }
+        }
+
+        /// <summary>
+        /// Compute the remainder of the floored division of <paramref name="dividend" />
+        /// by <paramref name="divisor" />.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The remainder takes the sign of the divisor, as the modulo in Python,
+        /// in which the meta-model is written.
+        /// </para>
+        /// <para>
+        /// We deliberately do not use the native operator <c>%</c> which truncates
+        /// the division towards zero so that its remainder takes the sign of
+        /// the dividend. For example, <c>-7 % 3 == -1</c> in C#, while
+        /// <c>-7 % 3 == 2</c> in Python. The two only coincide when the operands have
+        /// the same sign, but the invariants must behave the same in all the SDKs for
+        /// all the inputs.
+        /// </para>
+        /// <para>
+        /// The <paramref name="divisor" /> must not be zero.
+        /// </para>
+        /// </remarks>
+        public static long FloorMod(long dividend, long divisor)
+        {
+            // NOTE: The native long.MinValue % -1 overflows in C#, while
+            // every number is divisible by -1 without a remainder.
+            if (divisor == -1)
+            {
+                return 0;
+            }
+
+            long remainder = dividend % divisor;
+            if (remainder != 0 && (remainder < 0) != (divisor < 0))
+            {
+                remainder += divisor;
+            }
+
+            return remainder;
         }
     }  // public static class Verification
 }  // namespace dummy
