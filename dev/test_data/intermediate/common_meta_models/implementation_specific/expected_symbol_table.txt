@@ -115,6 +115,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -249,6 +250,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               default=None,
+              mutable=False,
               parsed=...)],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Color',
@@ -276,6 +278,7 @@ SymbolTable(
                 a_type='STR',
                 parsed=...),
               default=None,
+              mutable=False,
               parsed=...)],
           returns=None,
           description=DescriptionOfSignature(
@@ -301,6 +304,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='color',
@@ -312,6 +316,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -432,6 +437,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='tags',
@@ -441,6 +447,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -543,6 +550,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='items',
@@ -552,6 +560,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -653,6 +662,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -680,6 +690,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -707,6 +718,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

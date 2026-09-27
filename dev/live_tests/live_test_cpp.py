@@ -59,6 +59,7 @@ def _generate_cmake_lists(
     uses_variant: bool,
     uses_string_helpers: bool,
     uses_arithmetic: bool,
+    uses_assignment_targets: bool,
 ) -> Stripped:
     project_name = _cmake_project_name(namespace)
     variable_prefix = _cmake_variable_prefix(namespace)
@@ -121,6 +122,20 @@ def _generate_cmake_lists(
     )
 """
         if uses_arithmetic
+        else ""
+    )
+
+    test_assignment_targets_block = (
+        f"""\
+
+    add_executable(test_assignment_targets test/test_assignment_targets.cpp)
+    target_link_libraries(test_assignment_targets {target_prefix}_static)
+    add_test(
+            NAME test_assignment_targets
+            COMMAND $<TARGET_FILE:test_assignment_targets>
+    )
+"""
+        if uses_assignment_targets
         else ""
     )
 
@@ -518,7 +533,8 @@ if (${{BUILD_TESTS}})
             COMMAND $<TARGET_FILE:test_x_or_default>
     )
     # endregion
-{test_xml_rpc_block}{test_string_helpers_block}{test_arithmetic_block}endif ()"""
+{test_xml_rpc_block}{test_string_helpers_block}{test_arithmetic_block}\
+{test_assignment_targets_block}endif ()"""
     )
 
 
@@ -631,12 +647,25 @@ def prepare_project(
         case_dir / "expected_output" / "test" / "test_arithmetic.cpp"
     ).exists()
 
+    # Likewise, the unit test of the assignments to the properties and the list
+    # items is only generated for the meta-model which defines the corresponding
+    # verification functions.
+    #
+    # NOTE (mristin):
+    # Only C++ executes these assignments in the unit tests, as it copies
+    # the vectors by value, unlike Python and the other targets,
+    # see :py:mod:`aas_core_codegen.cpp.tests._generate_test_assignment_targets`.
+    uses_assignment_targets = (
+        case_dir / "expected_output" / "test" / "test_assignment_targets.cpp"
+    ).exists()
+
     cmake_lists_text = _generate_cmake_lists(
         namespace=namespace,
         uses_xml_rpc=uses_xml_rpc,
         uses_variant=uses_variant,
         uses_string_helpers=uses_string_helpers,
         uses_arithmetic=uses_arithmetic,
+        uses_assignment_targets=uses_assignment_targets,
     )
     (project_dir / "CMakeLists.txt").write_text(cmake_lists_text, encoding="utf-8")
 
@@ -716,6 +745,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     live_tests_common.add_output_dir_argument(parser)
     live_tests_common.add_select_argument(parser)
+    parser.add_argument(
+        "--jobs",
+        help="Number of the parallel jobs to build the C++ code",
+        type=int,
+        default=8,
+    )
     args = parser.parse_args()
 
     select: Optional[Pattern[str]] = args.select
@@ -745,7 +780,7 @@ def main() -> int:
             project_dir = output_dir / case_dir.name
             namespace = prepare_project(case_dir, project_dir, vcpkg_cmake)
 
-            cmd = ["cmake", "--build", "build", "-j", "8"]
+            cmd = ["cmake", "--build", "build", "-j", str(args.jobs)]
             print(
                 f"Running {live_tests_common.escape_and_join_command(cmd)} "
                 f"from {project_dir} ..."

@@ -33,7 +33,8 @@ public class TestCopying {
         that.getText().equals(casted.getText())
         && that.getMaybeText().equals(casted.getMaybeText())
         && that.getMaybeKind().equals(casted.getMaybeKind())
-        && that.getTexts().equals(casted.getTexts()));
+        && that.getTexts().equals(casted.getTexts())
+        && that.getMaybeTexts().equals(casted.getMaybeTexts()));
     }
 
     @Override
@@ -45,7 +46,11 @@ public class TestCopying {
       Something casted = (Something) that;
 
       return (
-        that.getItems().equals(casted.getItems()));
+        that.getItems().equals(casted.getItems())
+        && (that.getMaybeItem().isPresent()
+          ? casted.getMaybeItem().isPresent()
+          && transform( that.getMaybeItem().get(), casted.getMaybeItem().get())
+          : ! casted.getMaybeItem().isPresent()));
     }
   } // class _DeepEqualiser
 
@@ -116,13 +121,16 @@ public class TestCopying {
       that.getText().equals(other.getText())
       && that.getMaybeText().equals(other.getMaybeText())
       && that.getMaybeKind().equals(other.getMaybeKind())
-      && that.getTexts().equals(other.getTexts()));
+      && that.getTexts().equals(other.getTexts())
+      && that.getMaybeTexts().equals(other.getMaybeTexts()));
   }
 
   private static Boolean SomethingShallowEquals(
     Something that,
     Something other) {
-    return that.getItems().equals(other.getItems());
+    return (
+      that.getItems().equals(other.getItems())
+      && that.getMaybeItem().equals(other.getMaybeItem()));
   }
 
   private static Boolean ItemDeepEquals(Item that, Item other) {

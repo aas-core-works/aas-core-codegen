@@ -1,0 +1,1 @@
+The argument 'kind' of the verification function 'is_alpha' is declared as Mutable, but Mutable applies only to the instances of the classes, and makes no sense here, since the literals of the enumeration 'Kind' are immutable values. A function can only re-bind its argument to another literal, which the caller never observes. Please remove Mutable.

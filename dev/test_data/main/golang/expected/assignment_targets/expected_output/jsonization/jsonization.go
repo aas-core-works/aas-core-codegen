@@ -477,6 +477,7 @@ func itemFromMapWithoutDispatch(
 	var theMaybeText *string
 	var theMaybeKind *aastypes.Kind
 	var theTexts []string
+	var theMaybeTexts []string
 
 	foundText := false
 	foundTexts := false
@@ -496,6 +497,9 @@ func itemFromMapWithoutDispatch(
 		case "texts":
 			theTexts, err = parseArray(v, stringFromJsonable)
 			foundTexts = true
+
+		case "maybeTexts":
+			theMaybeTexts, err = parseArray(v, stringFromJsonable)
 
 		default:
 			err = newDeserializationError(
@@ -537,6 +541,9 @@ func itemFromMapWithoutDispatch(
 	result.SetMaybeKind(
 		theMaybeKind,
 	)
+	result.SetMaybeTexts(
+		theMaybeTexts,
+	)
 
 	return
 }
@@ -567,6 +574,7 @@ func somethingFromMapWithoutDispatch(
 	err error,
 ) {
 	var theItems []aastypes.IItem
+	var theMaybeItem aastypes.IItem
 
 	foundItems := false
 
@@ -575,6 +583,9 @@ func somethingFromMapWithoutDispatch(
 		case "items":
 			theItems, err = parseArray(v, ItemFromJsonable)
 			foundItems = true
+
+		case "maybeItem":
+			theMaybeItem, err = ItemFromJsonable(v)
 
 		default:
 			err = newDeserializationError(
@@ -601,6 +612,9 @@ func somethingFromMapWithoutDispatch(
 
 	result = aastypes.NewSomething(
 		theItems,
+	)
+	result.SetMaybeItem(
+		theMaybeItem,
 	)
 
 	return
@@ -862,6 +876,16 @@ func itemToMap(
 		return
 	}
 
+	if that.MaybeTexts() != nil {
+		result["maybeTexts"], err = serializeArray(
+			that.MaybeTexts(), directToJsonable[string],
+		)
+		if err != nil {
+			mustSerializationError(err).prependName("MaybeTexts()")
+			return
+		}
+	}
+
 	return
 }
 
@@ -882,6 +906,14 @@ func somethingToMap(
 	if err != nil {
 		mustSerializationError(err).prependName("Items()")
 		return
+	}
+
+	if that.MaybeItem() != nil {
+		result["maybeItem"], err = ToJsonable(that.MaybeItem())
+		if err != nil {
+			mustSerializationError(err).prependName("MaybeItem()")
+			return
+		}
 	}
 
 	return

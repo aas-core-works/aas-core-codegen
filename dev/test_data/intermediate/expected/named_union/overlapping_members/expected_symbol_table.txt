@@ -232,6 +232,7 @@ SymbolTable(
               our_type='Reference to our type Some_union',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

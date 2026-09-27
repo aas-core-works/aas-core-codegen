@@ -132,6 +132,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -197,6 +198,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -334,6 +336,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='items',
@@ -347,6 +350,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='tricky',
@@ -372,6 +376,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_pair',
@@ -389,6 +394,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -556,6 +562,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='y',
@@ -563,6 +570,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

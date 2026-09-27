@@ -875,6 +875,13 @@ class Argument:
     #: Default value of the argument, if any
     default: Final[Optional[Default]]
 
+    #: Set if the argument has been declared mutable, *i.e.*, as ``List[...]`` or
+    #: ``Mutable[...]``, possibly wrapped in ``Optional[...]``.
+    #:
+    #: The declared mutability matters only for the verification functions, which
+    #: may mutate only their mutable arguments.
+    mutable: Final[bool]
+
     #: Relation to the parse stage
     parsed: Final[parse.Argument]
 
@@ -883,12 +890,14 @@ class Argument:
         name: Identifier,
         type_annotation: TypeAnnotationUnion,
         default: Optional[Default],
+        mutable: bool,
         parsed: parse.Argument,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.default = default
+        self.mutable = mutable
         self.parsed = parsed
 
 

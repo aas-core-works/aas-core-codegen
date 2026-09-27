@@ -330,6 +330,7 @@ function parseItemFromSequence(
   let theMaybeText: string | null = null;
   let theMaybeKind: AasTypes.Kind | null = null;
   let theTexts: Array<string> | null = null;
+  let theMaybeTexts: Array<string> | null = null;
 
   const className = AasTypes.Item.name;
 
@@ -415,6 +416,22 @@ function parseItemFromSequence(
         break;
       }
 
+      case "maybeTexts": {
+        if (theMaybeTexts !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_ListOf_str
+        );
+        propertyError = parsed.error;
+        theMaybeTexts = parsed.value;
+        break;
+      }
+
       default: {
         propertyError = new DeserializationError(
           `Unexpected XML property: ${propertyLocalName}`
@@ -450,7 +467,8 @@ function parseItemFromSequence(
     theText,
     theTexts,
     theMaybeText,
-    theMaybeKind
+    theMaybeKind,
+    theMaybeTexts
   );
   return new AasCommon.Either<AasTypes.Item, DeserializationError>(
     instance,
@@ -472,6 +490,7 @@ function parseSomethingFromSequence(
   cursor: XmlCursor
 ): AasCommon.Either<AasTypes.Something, DeserializationError> {
   let theItems: Array<AasTypes.Item> | null = null;
+  let theMaybeItem: AasTypes.Item | null = null;
 
   const className = AasTypes.Something.name;
 
@@ -509,6 +528,22 @@ function parseSomethingFromSequence(
         break;
       }
 
+      case "maybeItem": {
+        if (theMaybeItem !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parseItemFromSequence
+        );
+        propertyError = parsed.error;
+        theMaybeItem = parsed.value;
+        break;
+      }
+
       default: {
         propertyError = new DeserializationError(
           `Unexpected XML property: ${propertyLocalName}`
@@ -535,7 +570,8 @@ function parseSomethingFromSequence(
   }
 
   const instance = new AasTypes.Something(
-    theItems
+    theItems,
+    theMaybeItem
   );
   return new AasCommon.Either<AasTypes.Something, DeserializationError>(
     instance,
@@ -577,6 +613,12 @@ function writeItemAsSequence(
     that.texts,
     write_ListOf_str
   );
+  writeOptionalProperty(
+    parts,
+    "maybeTexts",
+    that.maybeTexts,
+    write_ListOf_str
+  );
 }
 
 /**
@@ -594,6 +636,12 @@ function writeSomethingAsSequence(
     "items",
     that.items,
     writeListOfInstances
+  );
+  writeOptionalProperty(
+    parts,
+    "maybeItem",
+    that.maybeItem,
+    writeItemAsSequence
   );
 }
 

@@ -432,6 +432,9 @@ namespace dummy
                 AsList<IItem>(
                     ItemFromElement));
 
+            private static readonly ContentReader<IItem> Read_IItem = (
+                ItemFromSequence);
+
             /// <summary>
             /// Deserialize an instance of class Item from a sequence of XML elements.
             /// </summary>
@@ -451,6 +454,7 @@ namespace dummy
                 string? theMaybeText = null;
                 Kind? theMaybeKind = null;
                 List<string>? theTexts = null;
+                List<string>? theMaybeTexts = null;
 
                 if (!isEmptySequence)
                 {
@@ -505,6 +509,15 @@ namespace dummy
                                     break;
                                 }
                                 theTexts = Read_ListOf_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "maybeTexts":
+                                if (theMaybeTexts != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theMaybeTexts = Read_ListOf_string(
                                     reader, isEmptyProperty, out error);
                                 break;
                             default:
@@ -568,7 +581,8 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theMaybeText,
-                    theMaybeKind);
+                    theMaybeKind,
+                    theMaybeTexts);
             }  // internal static Aas.Item? ItemFromSequence
 
             /// <summary>
@@ -587,6 +601,7 @@ namespace dummy
                 error = null;
 
                 List<IItem>? theItems = null;
+                IItem? theMaybeItem = null;
 
                 if (!isEmptySequence)
                 {
@@ -614,6 +629,15 @@ namespace dummy
                                     break;
                                 }
                                 theItems = Read_ListOf_IItem(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "maybeItem":
+                                if (theMaybeItem != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theMaybeItem = Read_IItem(
                                     reader, isEmptyProperty, out error);
                                 break;
                             default:
@@ -664,7 +688,8 @@ namespace dummy
                 return new Aas.Something(
                     theItems
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                            "Unexpected null, had to be handled before"),
+                    theMaybeItem);
             }  // internal static Aas.Something? SomethingFromSequence
         }  // internal static class DeserializeImplementation
 
@@ -994,6 +1019,9 @@ namespace dummy
                 WriteList<IItem>(
                     WriteIClass));
 
+            private static readonly ContentWriter<IItem> Write_IItem = (
+                ItemToSequence);
+
             private static void ItemToSequence(
                 Aas.IItem that,
                 Xml.XmlWriter writer)
@@ -1015,6 +1043,12 @@ namespace dummy
 
                 WriteProperty(
                     "texts", "Texts", that.Texts, writer, Write_ListOf_string);
+
+                if (that.MaybeTexts != null)
+                {
+                    WriteProperty(
+                        "maybeTexts", "MaybeTexts", that.MaybeTexts, writer, Write_ListOf_string);
+                }
             }  // private static void ItemToSequence
 
             public override void VisitItem(
@@ -1036,6 +1070,12 @@ namespace dummy
             {
                 WriteProperty(
                     "items", "Items", that.Items, writer, Write_ListOf_IItem);
+
+                if (that.MaybeItem != null)
+                {
+                    WriteProperty(
+                        "maybeItem", "MaybeItem", that.MaybeItem, writer, Write_IItem);
+                }
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(

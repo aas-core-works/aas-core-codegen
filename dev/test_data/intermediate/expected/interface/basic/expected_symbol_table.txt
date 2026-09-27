@@ -77,6 +77,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

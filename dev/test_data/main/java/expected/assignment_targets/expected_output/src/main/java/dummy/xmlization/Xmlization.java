@@ -276,6 +276,7 @@ public class Xmlization {
       String theMaybeText = null;
       Kind theMaybeKind = null;
       List<String> theTexts = null;
+      List<String> theMaybeTexts = null;
 
       if (!isEmptySequence) {
         while (!atEndOfSequence(reader)) {
@@ -350,6 +351,21 @@ public class Xmlization {
               }
               break;
             }
+            case "maybeTexts": {
+              if (theMaybeTexts != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<List<String>> value =
+                readListOf_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theMaybeTexts = value.getResult();
+              }
+              break;
+            }
             default:
               return unexpectedProperty("Item", elementName);
           }
@@ -380,7 +396,8 @@ public class Xmlization {
         theText,
         theTexts,
         theMaybeText,
-        theMaybeKind));
+        theMaybeKind,
+        theMaybeTexts));
     }
 
     /**
@@ -405,6 +422,7 @@ public class Xmlization {
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IItem> theItems = null;
+      IItem theMaybeItem = null;
 
       if (!isEmptySequence) {
         while (!atEndOfSequence(reader)) {
@@ -434,6 +452,21 @@ public class Xmlization {
               }
               break;
             }
+            case "maybeItem": {
+              if (theMaybeItem != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Item> value =
+                readItemFromSequence(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theMaybeItem = value.getResult();
+              }
+              break;
+            }
             default:
               return unexpectedProperty("Something", elementName);
           }
@@ -457,7 +490,8 @@ public class Xmlization {
       }
 
       return Reporting.Result.success(new Something(
-        theItems));
+        theItems,
+        theMaybeItem));
     }
 
     /**
@@ -733,6 +767,13 @@ public class Xmlization {
         that.getTexts(),
         writer,
         _VisitorWithWriter::writeListOf_stringified);
+
+      writeOptionalProperty(
+        "maybeTexts",
+        "getMaybeTexts()",
+        that.getMaybeTexts(),
+        writer,
+        _VisitorWithWriter::writeListOf_stringified);
     }
 
     @Override
@@ -756,6 +797,13 @@ public class Xmlization {
         that.getItems(),
         writer,
         _VisitorWithWriter::writeListOf_IClass);
+
+      writeOptionalProperty(
+        "maybeItem",
+        "getMaybeItem()",
+        that.getMaybeItem(),
+        writer,
+        _VisitorWithWriter::writeItemAsSequence);
     }
 
     @Override

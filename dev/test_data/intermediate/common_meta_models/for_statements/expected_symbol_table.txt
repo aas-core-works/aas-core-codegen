@@ -55,6 +55,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -154,6 +155,7 @@ SymbolTable(
               our_type='Reference to our type Kind',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='numbers',
@@ -163,6 +165,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='texts',
@@ -172,6 +175,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='items',
@@ -181,6 +185,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -425,6 +430,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -452,6 +458,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -479,6 +486,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -506,6 +514,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -533,6 +542,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -560,6 +570,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -587,6 +598,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -612,6 +624,7 @@ SymbolTable(
             our_type='Reference to our type Kind',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='numbers',
@@ -621,6 +634,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -648,6 +662,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -675,6 +690,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

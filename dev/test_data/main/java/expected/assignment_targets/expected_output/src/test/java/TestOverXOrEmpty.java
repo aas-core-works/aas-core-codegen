@@ -14,7 +14,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 public class TestOverXOrEmpty {
-  
+  @Test
+  public void testItemOverMaybeTextsOrEmpty() throws IOException {
+    for (Item instance : new Item[]
+    {
+      CommonJsonization.loadMinimalItem(),
+      CommonJsonization.loadMaximalItem()
+    }) {
+      int length = instance.getMaybeTexts().map(elem -> elem.size()).orElse(0);
+      AtomicInteger count = new AtomicInteger();
+      instance.overMaybeTextsOrEmpty().forEach(i -> count.getAndIncrement());
+      assertEquals(length , count.get());
+    }
+  } // public void testItemoverMaybeTextsOrEmpty
 } // class TestOverXOrEmpty
 
 // package dummy.tests

@@ -236,13 +236,13 @@ export function setTextThroughAlias(
 }
 
 /**
- * Check the assignment of a list to a property.
+ * Check the assignment of a copy of a list to a property.
  */
 export function setTexts(
   item: AasTypes.Item,
   texts: Array<string>
 ): boolean {
-  item.texts = texts;
+  item.texts = [...texts];
   return true;
 }
 
@@ -322,6 +322,194 @@ export function setTextsInLoops(
 }
 
 /**
+ * Check the mutation of a list argument in place.
+ */
+export function fillTexts(
+  texts: Array<string>,
+  text: string
+): boolean {
+  for (let i = 0; i < texts.length; i++) {
+    AasCommon.setAt(texts, i, text);
+  }
+  return true;
+}
+
+/**
+ * Check passing a property as a mutable list argument.
+ */
+export function fillTextsOfItem(
+  item: AasTypes.Item,
+  text: string
+): boolean {
+  return fillTexts(item.texts, text);
+}
+
+/**
+ * Check passing a local alias of a list as a mutable list argument.
+ */
+export function fillTextsThroughAlias(
+  item: AasTypes.Item,
+  text: string
+): boolean {
+  const texts = item.texts;
+  return fillTexts(texts, text);
+}
+
+/**
+ * Check passing a list argument on as a mutable list argument.
+ */
+export function fillTextsOfArgument(
+  texts: Array<string>,
+  text: string
+): boolean {
+  return fillTexts(texts, text);
+}
+
+/**
+ * Check the mutation of an object argument.
+ */
+export function rename(
+  item: AasTypes.Item,
+  text: string
+): boolean {
+  item.text = text;
+  return true;
+}
+
+/**
+ * Check passing the loop variable as a mutable object argument.
+ */
+export function renameAll(
+  items: Array<AasTypes.Item>,
+  text: string
+): boolean {
+  let result = true;
+  for (const item of items) {
+    result = rename(item, text);
+  }
+  return result;
+}
+
+/**
+ * Check the mutation of the inner lists through a loop variable.
+ */
+export function setFirstTextsOfLists(
+  lists: Array<Array<string>>,
+  text: string
+): boolean {
+  for (const texts of lists) {
+    AasCommon.setAt(texts, 0, text);
+  }
+  return true;
+}
+
+/**
+ * Check the same name defined in sibling loops, both as mutable aliases.
+ */
+export function setFirstTextsInSiblingLoops(
+  items: Array<AasTypes.Item>,
+  others: Array<AasTypes.Item>,
+  text: string
+): boolean {
+  for (const item of items) {
+    const texts = item.texts;
+    AasCommon.setAt(texts, 0, text);
+  }
+  for (const other of others) {
+    const texts = other.texts;
+    AasCommon.setAt(texts, 0, text);
+  }
+  return true;
+}
+
+/**
+ * Check that a local copy of a string is not changed by the setter.
+ */
+export function textCopyIsIndependent(
+  item: AasTypes.Item,
+  text: string
+): boolean {
+  const old = item.text;
+  item.text = text;
+  return old != item.text;
+}
+
+/**
+ * Check that a local copy of a number is not changed by the list mutation.
+ */
+export function numberCopyIsIndependent(
+  numbers: Array<number>
+): boolean {
+  const first = AasCommon.at(numbers, 0);
+  AasCommon.setAt(numbers, 0, first + 1);
+  return (first + 1) == (AasCommon.at(numbers, 0));
+}
+
+/**
+ * Check the assignment of a copy of a list to an optional property.
+ */
+export function setMaybeTexts(
+  item: AasTypes.Item,
+  texts: Array<string>
+): boolean {
+  item.maybeTexts = [...texts];
+  return true;
+}
+
+/**
+ * Check the assignment of an object to an optional property.
+ */
+export function setMaybeItem(
+  something: AasTypes.Something,
+  item: AasTypes.Item
+): boolean {
+  something.maybeItem = item;
+  return true;
+}
+
+/**
+ * Check the re-assignment of a local alias of an object.
+ */
+export function setTextOfReboundAlias(
+  item: AasTypes.Item,
+  other: AasTypes.Item,
+  text: string
+): boolean {
+  let alias = item;
+  alias = other;
+  alias.text = text;
+  return true;
+}
+
+/**
+ * Check the read-only alias of a list property.
+ */
+export function firstTextThroughAliasIs(
+  item: AasTypes.Item,
+  text: string
+): boolean {
+  const texts = item.texts;
+  return AasCommon.at(texts, 0) == text;
+}
+
+/**
+ * Check that no text is empty through a read-only list argument.
+ */
+export function textsAreNotEmpty(
+  items: Array<AasTypes.Item>
+): boolean {
+  for (const item of items) {
+    for (const text of item.texts) {
+      switch (text) {
+        case "":
+          return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -341,6 +529,12 @@ class Verifier
     that: AasTypes.Something,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!textsAreNotEmpty(that.items)) {
+      yield new VerificationError(
+        "Texts are not empty"
+      )
+    }
+
     if (context === true) {
       let itemsIndex = 0;
       for (const item of that.items) {
@@ -360,6 +554,20 @@ class Verifier
           yield error;
         }
         itemsIndex++;
+      }
+
+      if (that.maybeItem !== null) {
+        for (const error of this.transformWithContext(
+            that.maybeItem, context)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "maybeItem"
+            )
+          );
+          yield error;
+        }
       }
     }
   }

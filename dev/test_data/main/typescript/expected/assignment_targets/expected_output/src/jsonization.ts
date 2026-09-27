@@ -557,6 +557,7 @@ function parsePropertiesOfItem(
   let theMaybeText: string | null = null;
   let theMaybeKind: AasTypes.Kind | null = null;
   let theTexts: Array<string> | null = null;
+  let theMaybeTexts: Array<string> | null = null;
 
   for (const key in jsonObject) {
     const jsonableValue = jsonObject[key];
@@ -597,6 +598,16 @@ function parsePropertiesOfItem(
         );
         propertyError = parsed.error;
         theTexts = parsed.value;
+        break;
+      }
+
+      case "maybeTexts": {
+        const parsed = parseArray(
+          jsonableValue,
+          stringFromJsonable
+        );
+        propertyError = parsed.error;
+        theMaybeTexts = parsed.value;
         break;
       }
 
@@ -647,7 +658,8 @@ function parsePropertiesOfItem(
       theText,
       theTexts,
       theMaybeText,
-      theMaybeKind
+      theMaybeKind,
+      theMaybeTexts
     ),
     null
   );
@@ -697,6 +709,7 @@ function parsePropertiesOfSomething(
   DeserializationError
 > {
   let theItems: Array<AasTypes.Item> | null = null;
+  let theMaybeItem: AasTypes.Item | null = null;
 
   for (const key in jsonObject) {
     const jsonableValue = jsonObject[key];
@@ -710,6 +723,15 @@ function parsePropertiesOfSomething(
         );
         propertyError = parsed.error;
         theItems = parsed.value;
+        break;
+      }
+
+      case "maybeItem": {
+        const parsed = itemFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theMaybeItem = parsed.value;
         break;
       }
 
@@ -749,7 +771,8 @@ function parsePropertiesOfSomething(
     DeserializationError
   >(
     new AasTypes.Something(
-      theItems
+      theItems,
+      theMaybeItem
     ),
     null
   );
@@ -892,6 +915,12 @@ function serializeItem(
     prop = "texts";
     jsonable["texts"] =
       Array.from(that.texts);
+
+    if (that.maybeTexts !== null) {
+      prop = "maybeTexts";
+      jsonable["maybeTexts"] =
+        Array.from(that.maybeTexts);
+    }
   } catch (error) {
     if (error instanceof SerializationError) {
       error.prependProperty(prop);
@@ -919,6 +948,12 @@ function serializeSomething(
     prop = "items";
     jsonable["items"] =
       serialize_ListOf_Item(that.items);
+
+    if (that.maybeItem !== null) {
+      prop = "maybeItem";
+      jsonable["maybeItem"] =
+        serializeItem(that.maybeItem);
+    }
   } catch (error) {
     if (error instanceof SerializationError) {
       error.prependProperty(prop);

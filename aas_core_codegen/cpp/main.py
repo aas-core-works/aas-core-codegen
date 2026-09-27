@@ -623,6 +623,27 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # Unlike the other targets, C++ copies the vectors by value, so we execute
+    # the assignments to the properties and to the list items in the unit tests to
+    # make sure that the transpiled code references and copies the vectors as
+    # Python shares them. We generate these tests only for the meta-model which
+    # defines the corresponding verification functions,
+    # see :py:mod:`aas_core_codegen.cpp.tests._generate_test_assignment_targets`.
+    if cpp_tests.defines_assignment_target_verifications(context.symbol_table):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                test_dir / "test_assignment_targets.cpp",
+                lambda: (
+                    cpp_tests.generate_test_assignment_targets_implementation(
+                        symbol_table=context.symbol_table,
+                        library_namespace=library_namespace,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

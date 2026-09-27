@@ -29,6 +29,15 @@ public interface IItem extends IClass {
   List<String> getTexts();
 
   void setTexts(List<String> texts);
+
+  Optional<List<String>> getMaybeTexts();
+
+  void setMaybeTexts(List<String> maybeTexts);
+
+  /**
+   * Iterate over maybeTexts, if set, and otherwise return an empty enumerable.
+   */
+  Iterable<String> overMaybeTextsOrEmpty();
 }
 
 /*

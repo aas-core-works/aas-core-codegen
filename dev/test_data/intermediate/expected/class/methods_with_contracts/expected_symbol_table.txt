@@ -32,6 +32,7 @@ SymbolTable(
                 a_type='INT',
                 parsed=...),
               default=None,
+              mutable=False,
               parsed=...)],
           returns=PrimitiveTypeAnnotation(
             a_type='INT',
@@ -93,6 +94,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

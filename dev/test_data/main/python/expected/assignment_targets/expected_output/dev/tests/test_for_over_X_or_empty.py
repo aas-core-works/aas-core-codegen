@@ -19,6 +19,43 @@ import tests.common
 import tests.common_xmlization
 
 
+class TestItem(unittest.TestCase):
+    def test_over_maybe_texts_or_empty_against_recorded(self) -> None:
+        for minimal_or_maximal in ["minimal", "maximal"]:
+            instance = tests.common_xmlization.must_load(
+                pathlib.Path(
+                    tests.common.TEST_DATA_DIR
+                    / "Xml"
+                    / "Expected"
+                    / 'item'
+                    / f"{minimal_or_maximal}.xml"
+                )
+            )
+
+            assert isinstance(
+                instance,
+                aas_types.Item
+            )
+
+            log = [
+                tests.common.trace(
+                    list(instance.over_maybe_texts_or_empty())
+                )
+            ]
+
+            got_text = tests.common.trace_log_as_text_file_content(log)
+
+            expected_path = pathlib.Path(
+                tests.common.TEST_DATA_DIR
+                / "test_over_X_or_empty"
+                / 'item'
+                / f"on_{minimal_or_maximal}.xml"
+                / 'over_maybe_texts_or_empty.trace'
+            )
+
+            tests.common.record_or_check(expected_path, got_text)
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -73,6 +73,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='name',
@@ -80,6 +81,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -290,6 +292,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -315,6 +318,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -340,6 +344,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -365,6 +370,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -390,6 +396,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -418,6 +425,7 @@ SymbolTable(
             our_type='Reference to our type Non_empty_string',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -443,6 +451,7 @@ SymbolTable(
             our_type='Reference to our type Non_empty_string',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

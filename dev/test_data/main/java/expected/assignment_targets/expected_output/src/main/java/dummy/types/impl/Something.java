@@ -30,10 +30,21 @@ import java.util.Objects;
 public class Something implements ISomething {
   private List<IItem> items;
 
+  private IItem maybeItem;
+
   public Something(List<IItem> items) {
     this.items = Objects.requireNonNull(
       items,
       "Argument \"items\" must be non-null.");
+  }
+
+  public Something(
+    List<IItem> items,
+    IItem maybeItem) {
+    this.items = Objects.requireNonNull(
+      items,
+      "Argument \"items\" must be non-null.");
+    this.maybeItem = maybeItem;
   }
 
   @Override
@@ -46,6 +57,16 @@ public class Something implements ISomething {
     this.items = Objects.requireNonNull(
       items,
       "Argument \"items\" must be non-null.");
+  }
+
+  @Override
+  public Optional<IItem> getMaybeItem() {
+    return Optional.ofNullable(maybeItem);
+  }
+
+  @Override
+  public void setMaybeItem(IItem maybeItem) {
+    this.maybeItem = maybeItem;
   }
 
   /**
@@ -130,6 +151,11 @@ public class Something implements ISomething {
           Something.this.items.stream());
       }
 
+      if (maybeItem != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.<IClass>of(Something.this.maybeItem));
+      }
+
       return memberStream;
     }
   }
@@ -164,6 +190,12 @@ public class Something implements ISomething {
           Something.this.items.stream()
             .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
               StreamSupport.stream(item.descend().spliterator(), false))));
+      }
+
+      if (maybeItem != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.concat(Stream.<IClass>of(Something.this.maybeItem),
+            StreamSupport.stream(Something.this.maybeItem.descend().spliterator(), false)));
       }
 
       return memberStream;

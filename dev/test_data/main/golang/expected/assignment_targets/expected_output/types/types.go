@@ -84,6 +84,12 @@ type IItem interface {
 	SetTexts(
 		value []string,
 	);
+
+	MaybeTexts() []string;
+
+	SetMaybeTexts(
+		value []string,
+	);
 }
 
 // Check whether the instance corresponds to [aastypes.IItem]
@@ -104,6 +110,7 @@ type Item struct {
 	maybeText *string
 	maybeKind *Kind
 	texts []string
+	maybeTexts []string
 }
 
 func (i *Item) Text(
@@ -148,6 +155,17 @@ func (i *Item) SetTexts(
 	value []string,
 ) {
 	i.texts = value
+}
+
+func (i *Item) MaybeTexts(
+) []string {
+	return i.maybeTexts
+}
+
+func (i *Item) SetMaybeTexts(
+	value []string,
+) {
+	i.maybeTexts = value
 }
 
 func (i *Item) ModelType(
@@ -196,6 +214,7 @@ func NewItem(
 		texts: texts,
 		maybeText: nil,
 		maybeKind: nil,
+		maybeTexts: nil,
 	}
 }
 
@@ -206,6 +225,12 @@ type ISomething interface {
 
 	SetItems(
 		value []IItem,
+	);
+
+	MaybeItem() IItem;
+
+	SetMaybeItem(
+		value IItem,
 	);
 }
 
@@ -224,6 +249,7 @@ func IsSomething(
 // Implements ISomething.
 type Something struct {
 	items []IItem
+	maybeItem IItem
 }
 
 func (s *Something) Items(
@@ -235,6 +261,17 @@ func (s *Something) SetItems(
 	value []IItem,
 ) {
 	s.items = value
+}
+
+func (s *Something) MaybeItem(
+) IItem {
+	return s.maybeItem
+}
+
+func (s *Something) SetMaybeItem(
+	value IItem,
+) {
+	s.maybeItem = value
 }
 
 func (s *Something) ModelType(
@@ -255,6 +292,15 @@ func (s *Something) DescendOnce(
 ) (abort bool) {
 	for _, v := range s.items {
 		abort = action(v);
+		if abort {
+			return
+		}
+	}
+
+	if s.maybeItem != nil {
+		abort = action(
+			s.maybeItem,
+		)
 		if abort {
 			return
 		}
@@ -286,6 +332,21 @@ func (s *Something) Descend(
 		}
 	}
 
+	if s.maybeItem != nil {
+		abort = action(
+			s.maybeItem,
+		)
+		if abort {
+			return
+		}
+		abort = s.maybeItem.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
 	return
 }
 
@@ -296,6 +357,7 @@ func NewSomething(
 ) *Something {
 	return &Something{
 		items: items,
+		maybeItem: nil,
 	}
 }
 

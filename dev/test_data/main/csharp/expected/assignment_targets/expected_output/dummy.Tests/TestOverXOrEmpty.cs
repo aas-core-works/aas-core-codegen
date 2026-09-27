@@ -11,7 +11,26 @@ namespace dummy.Tests
 {
     public class TestOverXOrEmpty
     {
-        
+        [Test]
+        public void Test_Item_OverMaybeTextsOrEmpty()
+        {
+            foreach (Aas.Item instance in new[]
+            {
+                Aas.Tests.CommonJsonization.LoadMinimalItem(),
+                Aas.Tests.CommonJsonization.LoadMaximalItem()
+            })
+            {
+                int count = 0;
+                foreach (var _ in instance.OverMaybeTextsOrEmpty())
+                {
+                    count++;
+                }
+
+                Assert.AreEqual(
+                    instance.MaybeTexts?.Count ?? 0,
+                    count);
+            }
+        }  // public void Test_Item_OverMaybeTextsOrEmpty
     }  // class TestOverXOrEmpty
 }  // namespace dummy.Tests
 

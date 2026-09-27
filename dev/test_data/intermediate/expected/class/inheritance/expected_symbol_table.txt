@@ -91,6 +91,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -259,6 +260,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='another_property',
@@ -266,6 +268,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -432,6 +435,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='another_property',
@@ -439,6 +443,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='yet_another_property',
@@ -446,6 +451,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

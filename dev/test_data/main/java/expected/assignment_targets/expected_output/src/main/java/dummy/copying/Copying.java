@@ -59,14 +59,17 @@ public class Copying
                 that.getText(),
                 that.getTexts(),
                 that.getMaybeText().orElse(null),
-                that.getMaybeKind().orElse(null));
+                that.getMaybeKind().orElse(null),
+                that.getMaybeTexts().orElse(null));
         }
 
         @Override
         public IClass transformSomething(
             ISomething that
         ) {
-            return new Something(that.getItems());
+            return new Something(
+                that.getItems(),
+                that.getMaybeItem().orElse(null));
         }
     }
 
@@ -79,11 +82,16 @@ public class Copying
             List<String> theTexts = new ArrayList<>(
                 that.getTexts());
 
+            List<String> theMaybeTexts = that.getMaybeTexts().isPresent()
+                ? new ArrayList<>(that.getMaybeTexts().get())
+                : null;
+
             return new Item(
                 that.getText(),
                 theTexts,
                 that.getMaybeText().orElse(null),
-                that.getMaybeKind().orElse(null)
+                that.getMaybeKind().orElse(null),
+                theMaybeTexts
             );
         }
 
@@ -98,7 +106,8 @@ public class Copying
             }
 
             return new Something(
-                theItems
+                theItems,
+                that.getMaybeItem().orElse(null)
             );
         }
     }

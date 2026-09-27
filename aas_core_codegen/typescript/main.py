@@ -3,7 +3,7 @@
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import run, intermediate, typescript, tests_common
+from aas_core_codegen import run, intermediate, typescript
 from aas_core_codegen.common import Error
 from aas_core_codegen.typescript import lib as typescript_lib, tests as typescript_tests
 
@@ -429,23 +429,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 test_rel_path / "verification.arithmetic.spec.ts",
                 lambda: (
                     typescript_tests.generate_verification_arithmetic_spec(
-                        symbol_table=verified_ir_table,
-                    ),
-                    None,
-                ),
-            ),
-        ]
-
-    # NOTE (mristin):
-    # We test the assignments to the properties and to the list items only for
-    # the meta-model which defines the corresponding verification functions, see
-    # :py:mod:`aas_core_codegen.tests_common`.
-    if tests_common.defines_assignment_target_verifications(verified_ir_table):
-        rel_paths_generators = list(rel_paths_generators) + [
-            (
-                test_rel_path / "verification.assignmentTargets.spec.ts",
-                lambda: (
-                    typescript_tests.generate_verification_assignment_targets_spec(
                         symbol_table=verified_ir_table,
                     ),
                     None,

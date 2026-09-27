@@ -40,6 +40,16 @@ public class EnhancedSomething<EnhancementT>
     instance.setItems(items);
   }
 
+  @Override
+  public Optional<IItem> getMaybeItem() {
+    return instance.getMaybeItem();
+  }
+
+  @Override
+  public void setMaybeItem(IItem maybeItem) {
+    instance.setMaybeItem(maybeItem);
+  }
+
   public Iterable<IClass> descendOnce() {
     return instance.descendOnce();
   }

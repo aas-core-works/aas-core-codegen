@@ -76,6 +76,20 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Item',
           json_name='texts',
           xml_name='texts',
+          parsed=...),
+        Property(
+          name='maybe_texts',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Item',
+          json_name='maybeTexts',
+          xml_name='maybeTexts',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -87,6 +101,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='texts',
@@ -96,6 +111,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='maybe_text',
@@ -107,6 +123,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='maybe_kind',
@@ -118,6 +135,21 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='maybe_texts',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=PrimitiveTypeAnnotation(
+                  a_type='STR',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -147,6 +179,11 @@ SymbolTable(
             AssignArgument(
               name='maybe_kind',
               argument='maybe_kind',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='maybe_texts',
+              argument='maybe_texts',
               default=None)""")],
         inlined_statements=[
           textwrap.dedent("""\
@@ -168,6 +205,11 @@ SymbolTable(
             AssignArgument(
               name='maybe_kind',
               argument='maybe_kind',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='maybe_texts',
+              argument='maybe_texts',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -202,6 +244,18 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Something',
           json_name='items',
           xml_name='items',
+          parsed=...),
+        Property(
+          name='maybe_item',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          json_name='maybeItem',
+          xml_name='maybeItem',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -215,6 +269,19 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='maybe_item',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Item',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -229,14 +296,39 @@ SymbolTable(
             AssignArgument(
               name='items',
               argument='items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='maybe_item',
+              argument='maybe_item',
               default=None)""")],
         inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='items',
               argument='items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='maybe_item',
+              argument='maybe_item',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Texts are not empty',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='texts_are_not_empty',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -271,6 +363,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -278,6 +371,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -303,6 +397,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -310,6 +405,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -335,6 +431,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='other',
@@ -342,6 +439,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -367,6 +465,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -374,6 +473,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -399,6 +499,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='texts',
@@ -408,12 +509,13 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check the assignment of a list to a property.</paragraph>',
+        summary='<paragraph>Check the assignment of a copy of a list to a property.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
@@ -433,6 +535,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -440,6 +543,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -465,6 +569,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -472,6 +577,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -499,6 +605,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='number',
@@ -506,6 +613,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -533,6 +641,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -540,6 +649,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -567,6 +677,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='item',
@@ -574,6 +685,7 @@ SymbolTable(
             our_type='Reference to our type Item',
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -601,6 +713,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=True,
           parsed=...),
         Argument(
           name='text',
@@ -608,12 +721,543 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
         summary='<paragraph>Check the assignment to the properties of the objects iterated over.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='fill_texts',
+      arguments=[
+        Argument(
+          name='texts',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the mutation of a list argument in place.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='fill_texts_of_item',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check passing a property as a mutable list argument.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='fill_texts_through_alias',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check passing a local alias of a list as a mutable list argument.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='fill_texts_of_argument',
+      arguments=[
+        Argument(
+          name='texts',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check passing a list argument on as a mutable list argument.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='rename',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the mutation of an object argument.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='rename_all',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check passing the loop variable as a mutable object argument.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='set_first_texts_of_lists',
+      arguments=[
+        Argument(
+          name='lists',
+          type_annotation=ListTypeAnnotation(
+            items=ListTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the mutation of the inner lists through a loop variable.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='set_first_texts_in_sibling_loops',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='others',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the same name defined in sibling loops, both as mutable aliases.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='text_copy_is_independent',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that a local copy of a string is not changed by the setter.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='number_copy_is_independent',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that a local copy of a number is not changed by the list mutation.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='set_maybe_texts',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='texts',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the assignment of a copy of a list to an optional property.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='set_maybe_item',
+      arguments=[
+        Argument(
+          name='something',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Something',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the assignment of an object to an optional property.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='set_text_of_rebound_alias',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='other',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=True,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the re-assignment of a local alias of an object.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='first_text_through_alias_is',
+      arguments=[
+        Argument(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Item',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the read-only alias of a list property.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='texts_are_not_empty',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that no text is empty through a read-only list argument.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,

@@ -70,6 +70,20 @@ public class EnhancedItem<EnhancementT>
     instance.setTexts(texts);
   }
 
+  @Override
+  public Optional<List<String>> getMaybeTexts() {
+    return instance.getMaybeTexts();
+  }
+
+  @Override
+  public void setMaybeTexts(List<String> maybeTexts) {
+    instance.setMaybeTexts(maybeTexts);
+  }
+
+  public Iterable<String> overMaybeTextsOrEmpty() {
+    return instance.overMaybeTextsOrEmpty();
+  }
+
   public Iterable<IClass> descendOnce() {
     return instance.descendOnce();
   }

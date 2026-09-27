@@ -124,7 +124,7 @@ bool NoItemHasAnEmptyText(
   >& items
 ) {
   for (const std::shared_ptr<types::IItem>& item : items) {
-    auto texts = item->texts();
+    const auto& texts = item->texts();
     for (const std::wstring& text : texts) {
       if (text == L"") {
         return false;

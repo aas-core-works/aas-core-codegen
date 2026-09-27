@@ -111,9 +111,9 @@ def set_texts(
     item: aas_types.Item,
     texts: List[str]
 ) -> bool:
-    """Check the assignment of a list to a property."""
+    """Check the assignment of a copy of a list to a property."""
     # pylint: disable=all
-    item.texts = texts
+    item.texts = texts[:]
     return True
 
 
@@ -190,6 +190,180 @@ def set_texts_in_loops(
     return True
 
 
+def fill_texts(
+    texts: List[str],
+    text: str
+) -> bool:
+    """Check the mutation of a list argument in place."""
+    # pylint: disable=all
+    for i in range(0, len(texts)):
+        texts[i] = text
+    return True
+
+
+def fill_texts_of_item(
+    item: aas_types.Item,
+    text: str
+) -> bool:
+    """Check passing a property as a mutable list argument."""
+    # pylint: disable=all
+    return fill_texts(item.texts, text)
+
+
+def fill_texts_through_alias(
+    item: aas_types.Item,
+    text: str
+) -> bool:
+    """
+    Check passing a local alias of a list as a mutable list argument.
+    """
+    # pylint: disable=all
+    texts = item.texts
+    return fill_texts(texts, text)
+
+
+def fill_texts_of_argument(
+    texts: List[str],
+    text: str
+) -> bool:
+    """Check passing a list argument on as a mutable list argument."""
+    # pylint: disable=all
+    return fill_texts(texts, text)
+
+
+def rename(
+    item: aas_types.Item,
+    text: str
+) -> bool:
+    """Check the mutation of an object argument."""
+    # pylint: disable=all
+    item.text = text
+    return True
+
+
+def rename_all(
+    items: List[aas_types.Item],
+    text: str
+) -> bool:
+    """Check passing the loop variable as a mutable object argument."""
+    # pylint: disable=all
+    result = True
+    for item in items:
+        result = rename(item, text)
+    return result
+
+
+def set_first_texts_of_lists(
+    lists: List[List[str]],
+    text: str
+) -> bool:
+    """Check the mutation of the inner lists through a loop variable."""
+    # pylint: disable=all
+    for texts in lists:
+        texts[0] = text
+    return True
+
+
+def set_first_texts_in_sibling_loops(
+    items: List[aas_types.Item],
+    others: List[aas_types.Item],
+    text: str
+) -> bool:
+    """
+    Check the same name defined in sibling loops, both as mutable aliases.
+    """
+    # pylint: disable=all
+    for item in items:
+        texts = item.texts
+        texts[0] = text
+    for other in others:
+        texts = other.texts
+        texts[0] = text
+    return True
+
+
+def text_copy_is_independent(
+    item: aas_types.Item,
+    text: str
+) -> bool:
+    """
+    Check that a local copy of a string is not changed by the setter.
+    """
+    # pylint: disable=all
+    old = item.text
+    item.text = text
+    return old != item.text
+
+
+def number_copy_is_independent(
+    numbers: List[int]
+) -> bool:
+    """
+    Check that a local copy of a number is not changed by the list mutation.
+    """
+    # pylint: disable=all
+    first = numbers[0]
+    numbers[0] = first + 1
+    return (first + 1) == (numbers[0])
+
+
+def set_maybe_texts(
+    item: aas_types.Item,
+    texts: List[str]
+) -> bool:
+    """
+    Check the assignment of a copy of a list to an optional property.
+    """
+    # pylint: disable=all
+    item.maybe_texts = texts[:]
+    return True
+
+
+def set_maybe_item(
+    something: aas_types.Something,
+    item: aas_types.Item
+) -> bool:
+    """Check the assignment of an object to an optional property."""
+    # pylint: disable=all
+    something.maybe_item = item
+    return True
+
+
+def set_text_of_rebound_alias(
+    item: aas_types.Item,
+    other: aas_types.Item,
+    text: str
+) -> bool:
+    """Check the re-assignment of a local alias of an object."""
+    # pylint: disable=all
+    alias = item
+    alias = other
+    alias.text = text
+    return True
+
+
+def first_text_through_alias_is(
+    item: aas_types.Item,
+    text: str
+) -> bool:
+    """Check the read-only alias of a list property."""
+    # pylint: disable=all
+    texts = item.texts
+    return texts[0] == text
+
+
+def texts_are_not_empty(
+    items: List[aas_types.Item]
+) -> bool:
+    """Check that no text is empty through a read-only list argument."""
+    # pylint: disable=all
+    for item in items:
+        for text in item.texts:
+            if text == '':
+                return False
+    return True
+
+
 class _Transformer(
         aas_types.AbstractTransformer[
             Iterator[Error]
@@ -212,6 +386,11 @@ class _Transformer(
             self,
             that: aas_types.Something
     ) -> Iterator[Error]:
+        if not texts_are_not_empty(that.items):
+            yield Error(
+                'Texts are not empty'
+            )
+
         for i, an_item in enumerate(that.items):
             for error in self.transform(an_item):
                 error.path._prepend(
@@ -224,6 +403,16 @@ class _Transformer(
                     PropertySegment(
                         that,
                         'items'
+                    )
+                )
+                yield error
+
+        if that.maybe_item is not None:
+            for error in self.transform(that.maybe_item):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'maybe_item'
                     )
                 )
                 yield error

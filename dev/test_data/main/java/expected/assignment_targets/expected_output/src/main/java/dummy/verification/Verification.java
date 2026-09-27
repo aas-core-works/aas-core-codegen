@@ -73,12 +73,12 @@ public class Verification {
   }
 
   /**
-   * Check the assignment of a list to a property.
+   * Check the assignment of a copy of a list to a property.
    */
   public static Boolean setTexts(
     IItem item,
     List<String> texts) {
-    item.setTexts(texts);
+    item.setTexts(new java.util.ArrayList<>(texts));
     return true;
   }
 
@@ -154,6 +154,180 @@ public class Verification {
   }
 
   /**
+   * Check the mutation of a list argument in place.
+   */
+  public static Boolean fillTexts(
+    List<String> texts,
+    String text) {
+    for (int i = 0; i < texts.size(); i++) {
+        texts.set(i, text);
+    }
+    return true;
+  }
+
+  /**
+   * Check passing a property as a mutable list argument.
+   */
+  public static Boolean fillTextsOfItem(
+    IItem item,
+    String text) {
+    return fillTexts(item.getTexts(), text);
+  }
+
+  /**
+   * Check passing a local alias of a list as a mutable list argument.
+   */
+  public static Boolean fillTextsThroughAlias(
+    IItem item,
+    String text) {
+    var texts = item.getTexts();
+    return fillTexts(texts, text);
+  }
+
+  /**
+   * Check passing a list argument on as a mutable list argument.
+   */
+  public static Boolean fillTextsOfArgument(
+    List<String> texts,
+    String text) {
+    return fillTexts(texts, text);
+  }
+
+  /**
+   * Check the mutation of an object argument.
+   */
+  public static Boolean rename(
+    IItem item,
+    String text) {
+    item.setText(text);
+    return true;
+  }
+
+  /**
+   * Check passing the loop variable as a mutable object argument.
+   */
+  public static Boolean renameAll(
+    List<IItem> items,
+    String text) {
+    var result = true;
+    for (var item : items) {
+        result = rename(item, text);
+    }
+    return result;
+  }
+
+  /**
+   * Check the mutation of the inner lists through a loop variable.
+   */
+  public static Boolean setFirstTextsOfLists(
+    List<List<String>> lists,
+    String text) {
+    for (var texts : lists) {
+        texts.set(0, text);
+    }
+    return true;
+  }
+
+  /**
+   * Check the same name defined in sibling loops, both as mutable aliases.
+   */
+  public static Boolean setFirstTextsInSiblingLoops(
+    List<IItem> items,
+    List<IItem> others,
+    String text) {
+    for (var item : items) {
+        var texts = item.getTexts();
+        texts.set(0, text);
+    }
+    for (var other : others) {
+        var texts = other.getTexts();
+        texts.set(0, text);
+    }
+    return true;
+  }
+
+  /**
+   * Check that a local copy of a string is not changed by the setter.
+   */
+  public static Boolean textCopyIsIndependent(
+    IItem item,
+    String text) {
+    var old = item.getText();
+    item.setText(text);
+    return !Objects.equals(old, item.getText());
+  }
+
+  /**
+   * Check that a local copy of a number is not changed by the list mutation.
+   */
+  public static Boolean numberCopyIsIndependent(
+    List<Long> numbers) {
+    long first = numbers.get(0);
+    numbers.set(0, first + 1);
+    return (first + 1) == (numbers.get(0));
+  }
+
+  /**
+   * Check the assignment of a copy of a list to an optional property.
+   */
+  public static Boolean setMaybeTexts(
+    IItem item,
+    List<String> texts) {
+    item.setMaybeTexts(new java.util.ArrayList<>(texts));
+    return true;
+  }
+
+  /**
+   * Check the assignment of an object to an optional property.
+   */
+  public static Boolean setMaybeItem(
+    ISomething something,
+    IItem item) {
+    something.setMaybeItem(item);
+    return true;
+  }
+
+  /**
+   * Check the re-assignment of a local alias of an object.
+   */
+  public static Boolean setTextOfReboundAlias(
+    IItem item,
+    IItem other,
+    String text) {
+    var alias = item;
+    alias = other;
+    alias.setText(text);
+    return true;
+  }
+
+  /**
+   * Check the read-only alias of a list property.
+   */
+  public static Boolean firstTextThroughAliasIs(
+    IItem item,
+    String text) {
+    var texts = item.getTexts();
+    return Objects.equals(texts.get(0), text);
+  }
+
+  /**
+   * Check that no text is empty through a read-only list argument.
+   */
+  public static Boolean textsAreNotEmpty(
+    List<IItem> items) {
+    for (var item : items) {
+        for (var text : item.getTexts()) {
+            switch (text) {
+                case "" -> {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -199,6 +373,13 @@ public class Verification {
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
+      if (!textsAreNotEmpty(that.getItems())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts are not empty")));
+      }
+
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Verification.zip(
           IntStream.iterate(0, i -> i + 1).boxed(),
@@ -217,6 +398,17 @@ public class Verification {
               new Reporting.NameSegment("items"));
             return error;
           }));
+
+      if (that.getMaybeItem().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(that.getMaybeItem().get())
+            .flatMap(Verification::verifyToErrorStream)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("maybeItem"));
+                return error;
+              }));
+      }
 
       return errorStream;
     }

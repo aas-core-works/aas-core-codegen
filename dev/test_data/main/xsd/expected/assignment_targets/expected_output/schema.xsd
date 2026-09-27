@@ -12,6 +12,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="maybeTexts" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:group name="something">
@@ -23,6 +30,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="maybeItem" type="item_t" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
   <xs:simpleType name="kind_t">

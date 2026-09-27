@@ -28,7 +28,7 @@ class Item:
 
 @verification
 @implementation_specific
-def check_something(value: Optional[List[Item]]) -> bool:
+def check_something(value: Optional[Sequence[Item]]) -> bool:
     pass
 
 @invariant(
@@ -116,7 +116,7 @@ class Item:
 
 @verification
 @implementation_specific
-def check_something(value: Optional[List[Item]]) -> bool:
+def check_something(value: Optional[Sequence[Item]]) -> bool:
     pass
 
 @invariant(

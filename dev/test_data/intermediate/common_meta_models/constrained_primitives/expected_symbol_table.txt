@@ -209,6 +209,7 @@ SymbolTable(
               our_type='Reference to our type ConstrainedBool',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_int',
@@ -216,6 +217,7 @@ SymbolTable(
               our_type='Reference to our type PositiveInt',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_float',
@@ -223,6 +225,7 @@ SymbolTable(
               our_type='Reference to our type PositiveFloat',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_string',
@@ -230,6 +233,7 @@ SymbolTable(
               our_type='Reference to our type NonEmptyString',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_bytes',
@@ -237,6 +241,7 @@ SymbolTable(
               our_type='Reference to our type NonEmptyBytes',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

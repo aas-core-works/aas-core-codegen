@@ -8,5 +8,9 @@
         "c"
       ]
     }
-  ]
+  ],
+  "maybeItem": {
+    "text": "d",
+    "texts": []
+  }
 }

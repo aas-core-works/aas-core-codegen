@@ -83,6 +83,17 @@ func (ei *enhancedItem[E]) SetTexts(
 	ei.instance.SetTexts(value)
 }
 
+func (ei *enhancedItem[E]) MaybeTexts(
+) []string {
+	return ei.instance.MaybeTexts()
+}
+
+func (ei *enhancedItem[E]) SetMaybeTexts(
+	value []string,
+) {
+	ei.instance.SetMaybeTexts(value)
+}
+
 func (ei *enhancedItem[E]) getEnhancement(
 ) E {
 	return ei.enhancement
@@ -147,6 +158,17 @@ func (es *enhancedSomething[E]) SetItems(
 	es.instance.SetItems(value)
 }
 
+func (es *enhancedSomething[E]) MaybeItem(
+) aastypes.IItem {
+	return es.instance.MaybeItem()
+}
+
+func (es *enhancedSomething[E]) SetMaybeItem(
+	value aastypes.IItem,
+) {
+	es.instance.SetMaybeItem(value)
+}
+
 func (es *enhancedSomething[E]) getEnhancement(
 ) E {
 	return es.enhancement
@@ -182,6 +204,16 @@ func wrapSomething[E any](
 			v,
 			factory,
 		).(aastypes.IItem)
+	}
+
+	theMaybeItem := that.MaybeItem()
+	if theMaybeItem != nil {
+		that.SetMaybeItem(
+			Wrap[E](
+				theMaybeItem,
+				factory,
+			).(aastypes.IItem),
+		)
 	}
 
 	return

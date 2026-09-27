@@ -106,6 +106,15 @@ class Item(Class):
 
     texts: List[str]
 
+    maybe_texts: Optional[List[str]]
+
+    def over_maybe_texts_or_empty(
+            self
+    ) -> Iterator[str]:
+        """Yield from :py:attr:`.maybe_texts` if set."""
+        if self.maybe_texts is not None:
+            yield from self.maybe_texts
+
     def descend_once(self) -> Iterator[Class]:
         """
         Iterate over the instances referenced from this instance.
@@ -169,19 +178,23 @@ class Item(Class):
             text: str,
             texts: List[str],
             maybe_text: Optional[str] = None,
-            maybe_kind: Optional['Kind'] = None
+            maybe_kind: Optional['Kind'] = None,
+            maybe_texts: Optional[List[str]] = None
     ) -> None:
         """Initialize with the given values."""
         self.text = text
         self.texts = texts
         self.maybe_text = maybe_text
         self.maybe_kind = maybe_kind
+        self.maybe_texts = maybe_texts
 
 
 class Something(Class):
     # pylint: disable=missing-class-docstring
 
     items: List['Item']
+
+    maybe_item: Optional['Item']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -193,6 +206,9 @@ class Something(Class):
         """
         yield from self.items
 
+        if self.maybe_item is not None:
+            yield self.maybe_item
+
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
@@ -203,6 +219,11 @@ class Something(Class):
             yield an_item
 
             yield from an_item.descend()
+
+        if self.maybe_item is not None:
+            yield self.maybe_item
+
+            yield from self.maybe_item.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -234,9 +255,14 @@ class Something(Class):
         return transformer.transform_something_with_context(
             self, context)
 
-    def __init__(self, items: List['Item']) -> None:
+    def __init__(
+            self,
+            items: List['Item'],
+            maybe_item: Optional['Item'] = None
+    ) -> None:
         """Initialize with the given values."""
         self.items = items
+        self.maybe_item = maybe_item
 
 
 class AbstractVisitor:

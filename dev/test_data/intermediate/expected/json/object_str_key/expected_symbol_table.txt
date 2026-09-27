@@ -36,6 +36,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
