@@ -7,6 +7,7 @@
 /venv310/
 /deleteme*
 /.gitignore/
+./CLAUDE.local.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
