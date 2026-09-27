@@ -1,19 +1,23 @@
 """Run an integration test on the C++ generated code."""
 
 import argparse
-import contextlib
 import json
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
-import tempfile
-from typing import Optional, Pattern
+from typing import Final, Optional, Pattern
 
 from aas_core_codegen.common import Stripped
 from live_tests import common as live_tests_common
+
+_LIVE_TESTS_CPP_DIR: Final[pathlib.Path] = (
+    pathlib.Path(os.path.realpath(__file__)).parent.parent
+    / "test_data"
+    / "live_tests"
+    / "cpp"
+)
 
 
 def _cmake_project_name(namespace: Stripped) -> Stripped:
@@ -575,35 +579,146 @@ def _environment_variable_prefix(namespace: Stripped) -> Stripped:
     return Stripped("_".join(part.upper() for part in namespace.split("::")))
 
 
+def prepare_project(
+    case_dir: pathlib.Path, project_dir: pathlib.Path, vcpkg_cmake: pathlib.Path
+) -> Stripped:
+    """
+    Copy the generated code of the case to ``project_dir`` and configure it.
+
+    The build is configured in ``project_dir / "build"``, and we also export
+    the compile commands so that the fast check can compile without building.
+    Return the namespace of the generated code.
+    """
+    project_dir.mkdir(exist_ok=True)
+
+    namespace = Stripped(
+        (case_dir / "input" / "snippets" / "namespace.txt")
+        .read_text(encoding="utf-8")
+        .strip()
+    )
+
+    print(f"Generating CMakeLists.txt in {project_dir} ...")
+
+    # NOTE (mristin):
+    # ``xml_rpc`` (and its isolated unit test) is only generated for
+    # a meta-model which actually uses a JSON-able type -- we check
+    # what the generator actually wrote instead of re-deriving that
+    # fact here, so this can never drift out of sync with it.
+    uses_xml_rpc = (case_dir / "expected_output" / "src" / "xml_rpc.hpp").exists()
+
+    # NOTE (mristin):
+    # Likewise, we check whether the generator relies on a variant
+    # (only for the named unions) in what it actually wrote.
+    common_hpp_path = (
+        case_dir
+        / "expected_output"
+        / "include"
+        / namespace.replace("::", "/")
+        / "common.hpp"
+    )
+    uses_variant = "mpark/variant.hpp" in common_hpp_path.read_text(encoding="utf-8")
+
+    # NOTE (mristin):
+    # Likewise, the tests of the string helpers are only generated for
+    # a meta-model which slices strings or calls ``find``.
+    uses_string_helpers = (
+        case_dir / "expected_output" / "test" / "test_string_helpers.cpp"
+    ).exists()
+
+    # Likewise, the unit test of the arithmetic operations is only
+    # generated if the meta-model uses the modulo or ``abs``.
+    uses_arithmetic = (
+        case_dir / "expected_output" / "test" / "test_arithmetic.cpp"
+    ).exists()
+
+    cmake_lists_text = _generate_cmake_lists(
+        namespace=namespace,
+        uses_xml_rpc=uses_xml_rpc,
+        uses_variant=uses_variant,
+        uses_string_helpers=uses_string_helpers,
+        uses_arithmetic=uses_arithmetic,
+    )
+    (project_dir / "CMakeLists.txt").write_text(cmake_lists_text, encoding="utf-8")
+
+    print(f"Generating vcpkg.json in {project_dir} ...")
+    vcpkg_json_text = _generate_vcpkg_json(
+        namespace=namespace, uses_variant=uses_variant
+    )
+    (project_dir / "vcpkg.json").write_text(vcpkg_json_text, encoding="utf-8")
+
+    expected_output_dir = case_dir / "expected_output"
+
+    live_tests_common.copy_expected_output(expected_output_dir, project_dir)
+
+    print(f"Copying Catch2 from {_LIVE_TESTS_CPP_DIR}/boilerplate ...")
+
+    catch_hpp_path = project_dir / "test-external" / "catch2" / "catch.hpp"
+    catch_hpp_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(_LIVE_TESTS_CPP_DIR / "boilerplate/catch.hpp", catch_hpp_path)
+
+    cmd = [
+        "cmake",
+        "-DBUILD_TESTS=ON",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        f"-DCMAKE_TOOLCHAIN_FILE={vcpkg_cmake}",
+        "-S.",
+        "-Bbuild",
+    ]
+    print(
+        f"Running {live_tests_common.escape_and_join_command(cmd)} "
+        f"from {project_dir} ..."
+    )
+    subprocess.check_call(cmd, cwd=project_dir)
+
+    return namespace
+
+
+def find_vcpkg_cmake() -> Optional[pathlib.Path]:
+    """
+    Find the CMake toolchain file of vcpkg based on ``VCPKG_ROOT``.
+
+    Report to STDERR and return ``None`` if it could not be found.
+    """
+    vcpkg_root_var = os.environ.get("VCPKG_ROOT", None)
+    if vcpkg_root_var is None:
+        print(
+            "The environment variable VCPKG_ROOT pointing "
+            "to the VCPKG directory has not been set.",
+            file=sys.stderr,
+        )
+        return None
+
+    vcpkg_root = pathlib.Path(vcpkg_root_var)
+
+    if not vcpkg_root.exists():
+        print(
+            f"The VCPKG directory pointed to by the environment variable "
+            f"VCPKG_ROOT does not exist: {vcpkg_root}",
+            file=sys.stderr,
+        )
+        return None
+
+    vcpkg_cmake = vcpkg_root / "scripts/buildsystems/vcpkg.cmake"
+    if not vcpkg_cmake.exists():
+        print(
+            f"The vcpkg.cmake file does not exist: {vcpkg_cmake}. "
+            f"Is your VCPKG properly set up?",
+            file=sys.stderr,
+        )
+        return None
+
+    return vcpkg_cmake
+
+
 def main() -> int:
     """Execute the main routine."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
     args = parser.parse_args()
 
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
-
-    select_text = str(args.select) if args.select is not None else None
-
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
+    select: Optional[Pattern[str]] = args.select
 
     repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
@@ -613,170 +728,22 @@ def main() -> int:
 
     assert main_cpp_expected_dir.exists() and main_cpp_expected_dir.is_dir()
 
-    live_tests_cpp_dir = repo_root / "dev" / "test_data" / "live_tests" / "cpp"
     assert (
-        live_tests_cpp_dir.exists() and live_tests_cpp_dir.is_dir()
-    ), live_tests_cpp_dir
+        _LIVE_TESTS_CPP_DIR.exists() and _LIVE_TESTS_CPP_DIR.is_dir()
+    ), _LIVE_TESTS_CPP_DIR
 
-    vcpkg_root_var = os.environ.get("VCPKG_ROOT", None)
-    if vcpkg_root_var is None:
-        print(
-            "The environment variable VCPKG_ROOT pointing "
-            "to the VCPKG directory has not been set.",
-            file=sys.stderr,
-        )
+    vcpkg_cmake = find_vcpkg_cmake()
+    if vcpkg_cmake is None:
         return 1
 
-    vcpkg_root = pathlib.Path(vcpkg_root_var) if vcpkg_root_var is not None else None
-
-    if not vcpkg_root.exists():
-        print(
-            f"The VCPKG directory pointed to by the environment variable "
-            f"VCPKG_ROOT does not exist: {vcpkg_root}",
-            file=sys.stderr,
-        )
-        return 1
-
-    vcpkg_cmake = vcpkg_root / "scripts/buildsystems/vcpkg.cmake"
-    if not vcpkg_cmake.exists():
-        print(
-            f"The vcpkg.cmake file does not exist: {vcpkg_cmake}. "
-            f"Is your VCPKG properly set up?",
-            file=sys.stderr,
-        )
-        return 1
-
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
-
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_cpp_expected_dir.iterdir() if path.is_dir()
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        for case_dir in live_tests_common.select_case_dirs(
+            main_cpp_expected_dir, select
         ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
             print(f"Running the live test on {case_dir.name} ...")
 
             project_dir = output_dir / case_dir.name
-            project_dir.mkdir(exist_ok=True)
-
-            namespace = Stripped(
-                (case_dir / "input" / "snippets" / "namespace.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            print(f"Generating CMakeLists.txt in {project_dir} ...")
-
-            # NOTE (mristin):
-            # ``xml_rpc`` (and its isolated unit test) is only generated for
-            # a meta-model which actually uses a JSON-able type -- we check
-            # what the generator actually wrote instead of re-deriving that
-            # fact here, so this can never drift out of sync with it.
-            uses_xml_rpc = (
-                case_dir / "expected_output" / "src" / "xml_rpc.hpp"
-            ).exists()
-
-            # NOTE (mristin):
-            # Likewise, we check whether the generator relies on a variant
-            # (only for the named unions) in what it actually wrote.
-            common_hpp_path = (
-                case_dir
-                / "expected_output"
-                / "include"
-                / namespace.replace("::", "/")
-                / "common.hpp"
-            )
-            uses_variant = "mpark/variant.hpp" in common_hpp_path.read_text(
-                encoding="utf-8"
-            )
-
-            # NOTE (mristin):
-            # Likewise, the tests of the string helpers are only generated for
-            # a meta-model which slices strings or calls ``find``.
-            uses_string_helpers = (
-                case_dir / "expected_output" / "test" / "test_string_helpers.cpp"
-            ).exists()
-
-            # Likewise, the unit test of the arithmetic operations is only
-            # generated if the meta-model uses the modulo or ``abs``.
-            uses_arithmetic = (
-                case_dir / "expected_output" / "test" / "test_arithmetic.cpp"
-            ).exists()
-
-            cmake_lists_text = _generate_cmake_lists(
-                namespace=namespace,
-                uses_xml_rpc=uses_xml_rpc,
-                uses_variant=uses_variant,
-                uses_string_helpers=uses_string_helpers,
-                uses_arithmetic=uses_arithmetic,
-            )
-            (project_dir / "CMakeLists.txt").write_text(
-                cmake_lists_text, encoding="utf-8"
-            )
-
-            print(f"Generating vcpkg.json in {project_dir} ...")
-            vcpkg_json_text = _generate_vcpkg_json(
-                namespace=namespace, uses_variant=uses_variant
-            )
-            (project_dir / "vcpkg.json").write_text(vcpkg_json_text, encoding="utf-8")
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {project_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = project_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary recompilations
-                # due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            print(f"Copying Catch2 from {live_tests_cpp_dir}/boilerplate ...")
-
-            catch_hpp_path = project_dir / "test-external" / "catch2" / "catch.hpp"
-            catch_hpp_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(live_tests_cpp_dir / "boilerplate/catch.hpp", catch_hpp_path)
-
-            cmd = [
-                "cmake",
-                "-DBUILD_TESTS=ON",
-                "-DCMAKE_BUILD_TYPE=Debug",
-                f"-DCMAKE_TOOLCHAIN_FILE={vcpkg_cmake}",
-                "-S.",
-                "-Bbuild",
-            ]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"from {project_dir} ..."
-            )
-            subprocess.check_call(cmd, cwd=project_dir)
+            namespace = prepare_project(case_dir, project_dir, vcpkg_cmake)
 
             cmd = ["cmake", "--build", "build", "-j", "8"]
             print(
@@ -785,7 +752,7 @@ def main() -> int:
             )
             subprocess.check_call(cmd, cwd=project_dir)
 
-            case_test_data_dir = live_tests_cpp_dir / "test_data" / case_dir.name
+            case_test_data_dir = _LIVE_TESTS_CPP_DIR / "test_data" / case_dir.name
 
             if not case_test_data_dir.exists():
                 # NOTE (mristin):

@@ -1,14 +1,11 @@
 """Run integration tests on the C# generated code."""
 
 import argparse
-import contextlib
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from typing import Optional, Pattern
 
 from aas_core_codegen.common import Stripped
@@ -16,105 +13,26 @@ from aas_core_codegen.common import Stripped
 from live_tests import common as live_tests_common
 
 
-def main() -> int:
-    """Execute the main routine."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
-    args = parser.parse_args()
+def prepare_solution(case_dir: pathlib.Path, solution_dir: pathlib.Path) -> Stripped:
+    """
+    Copy the generated code of the case to ``solution_dir`` and set up the solution.
 
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
+    Return the namespace of the generated code.
+    """
+    solution_dir.mkdir(exist_ok=True)
 
-    select_text = str(args.select) if args.select is not None else None
-
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
-
-    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
-
-    main_csharp_expected_dir = (
-        repo_root / "dev" / "test_data" / "main" / "csharp" / "expected"
+    namespace = Stripped(
+        (case_dir / "input" / "snippets" / "namespace.txt")
+        .read_text(encoding="utf-8")
+        .strip()
     )
 
-    assert main_csharp_expected_dir.exists() and main_csharp_expected_dir.is_dir()
+    expected_output_dir = case_dir / "expected_output"
 
-    live_tests_csharp_dir = repo_root / "dev" / "test_data" / "live_tests" / "csharp"
+    live_tests_common.copy_expected_output(expected_output_dir, solution_dir)
 
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
-
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_csharp_expected_dir.iterdir() if path.is_dir()
-        ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
-            print(f"Running the live test on {case_dir.name} ...")
-
-            solution_dir = output_dir / case_dir.name
-            solution_dir.mkdir(exist_ok=True)
-
-            namespace = Stripped(
-                (case_dir / "input" / "snippets" / "namespace.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {solution_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = solution_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary recompilations
-                # due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            (solution_dir / namespace / f"{namespace}.csproj").write_text(
-                """\
+    (solution_dir / namespace / f"{namespace}.csproj").write_text(
+        """\
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -125,13 +43,11 @@ def main() -> int:
   </PropertyGroup>
 </Project>
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (
-                solution_dir / f"{namespace}.Tests" / f"{namespace}.Tests.csproj"
-            ).write_text(
-                f"""\
+    (solution_dir / f"{namespace}.Tests" / f"{namespace}.Tests.csproj").write_text(
+        f"""\
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -169,31 +85,62 @@ def main() -> int:
     </ItemGroup>
 </Project>
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            solution_name = "-".join(part.lower() for part in namespace.split("."))
+    solution_name = "-".join(part.lower() for part in namespace.split("."))
 
-            cmd = ["dotnet", "new", "sln", "-n", solution_name, "--force"]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"in {solution_dir} ..."
-            )
-            subprocess.check_call(cmd, cwd=solution_dir)
+    cmd = ["dotnet", "new", "sln", "-n", solution_name, "--force"]
+    print(
+        f"Running {live_tests_common.escape_and_join_command(cmd)} "
+        f"in {solution_dir} ..."
+    )
+    subprocess.check_call(cmd, cwd=solution_dir)
 
-            cmd = [
-                "dotnet",
-                "sln",
-                f"{solution_name}.sln",
-                "add",
-                f"{namespace}/{namespace}.csproj",
-                f"{namespace}.Tests/{namespace}.Tests.csproj",
-            ]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"in {solution_dir} ..."
-            )
-            subprocess.check_call(cmd, cwd=solution_dir)
+    cmd = [
+        "dotnet",
+        "sln",
+        f"{solution_name}.sln",
+        "add",
+        f"{namespace}/{namespace}.csproj",
+        f"{namespace}.Tests/{namespace}.Tests.csproj",
+    ]
+    print(
+        f"Running {live_tests_common.escape_and_join_command(cmd)} "
+        f"in {solution_dir} ..."
+    )
+    subprocess.check_call(cmd, cwd=solution_dir)
+
+    return namespace
+
+
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
+    args = parser.parse_args()
+
+    select: Optional[Pattern[str]] = args.select
+
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+
+    main_csharp_expected_dir = (
+        repo_root / "dev" / "test_data" / "main" / "csharp" / "expected"
+    )
+
+    assert main_csharp_expected_dir.exists() and main_csharp_expected_dir.is_dir()
+
+    live_tests_csharp_dir = repo_root / "dev" / "test_data" / "live_tests" / "csharp"
+
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        for case_dir in live_tests_common.select_case_dirs(
+            main_csharp_expected_dir, select
+        ):
+            print(f"Running the live test on {case_dir.name} ...")
+
+            solution_dir = output_dir / case_dir.name
+            namespace = prepare_solution(case_dir, solution_dir)
 
             cmd = ["dotnet", "build"]
             print(

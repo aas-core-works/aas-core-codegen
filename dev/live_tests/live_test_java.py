@@ -1,14 +1,12 @@
 """Run integration tests on the Java generated code."""
 
 import argparse
-import contextlib
 import os
 import pathlib
 import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from typing import Optional, Pattern
 
 from aas_core_codegen.common import Stripped
@@ -16,116 +14,29 @@ from aas_core_codegen.common import Stripped
 from live_tests import common as live_tests_common
 
 
-def main() -> int:
-    """Execute the main routine."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
-    args = parser.parse_args()
+def prepare_project(case_dir: pathlib.Path, project_dir: pathlib.Path) -> Stripped:
+    """
+    Copy the generated code of the case to ``project_dir`` and set up Maven.
 
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
+    Return the Java package of the generated code.
+    """
+    project_dir.mkdir(exist_ok=True)
 
-    select_text = str(args.select) if args.select is not None else None
-
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
-
-    if shutil.which("mvn") is None:
-        print(
-            "mvn (Maven) could not be found on your PATH -- "
-            "have you installed Maven?",
-            file=sys.stderr,
-        )
-        return 1
-
-    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
-
-    main_java_expected_dir = (
-        repo_root / "dev" / "test_data" / "main" / "java" / "expected"
+    package = Stripped(
+        (case_dir / "input" / "snippets" / "package.txt")
+        .read_text(encoding="utf-8")
+        .strip()
     )
 
-    assert main_java_expected_dir.exists() and main_java_expected_dir.is_dir()
+    expected_output_dir = case_dir / "expected_output"
 
-    live_tests_java_dir = repo_root / "dev" / "test_data" / "live_tests" / "java"
+    live_tests_common.copy_expected_output(expected_output_dir, project_dir)
 
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
+    group_id = package
+    artifact_id = "-".join(package.split("."))
 
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_java_expected_dir.iterdir() if path.is_dir()
-        ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
-            print(f"Running the live test on {case_dir.name} ...")
-
-            project_dir = output_dir / case_dir.name
-            project_dir.mkdir(exist_ok=True)
-
-            package = Stripped(
-                (case_dir / "input" / "snippets" / "package.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {project_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = project_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary
-                # recompilations due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            group_id = package
-            artifact_id = "-".join(package.split("."))
-
-            (project_dir / "pom.xml").write_text(
-                f"""\
+    (project_dir / "pom.xml").write_text(
+        f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -174,8 +85,47 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
   </build>
 </project>
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
+
+    return package
+
+
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
+    args = parser.parse_args()
+
+    select: Optional[Pattern[str]] = args.select
+
+    if shutil.which("mvn") is None:
+        print(
+            "mvn (Maven) could not be found on your PATH -- "
+            "have you installed Maven?",
+            file=sys.stderr,
+        )
+        return 1
+
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+
+    main_java_expected_dir = (
+        repo_root / "dev" / "test_data" / "main" / "java" / "expected"
+    )
+
+    assert main_java_expected_dir.exists() and main_java_expected_dir.is_dir()
+
+    live_tests_java_dir = repo_root / "dev" / "test_data" / "live_tests" / "java"
+
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        for case_dir in live_tests_common.select_case_dirs(
+            main_java_expected_dir, select
+        ):
+            print(f"Running the live test on {case_dir.name} ...")
+
+            project_dir = output_dir / case_dir.name
+            package = prepare_project(case_dir, project_dir)
 
             cmd = ["mvn", "--batch-mode", "test-compile"]
             print(

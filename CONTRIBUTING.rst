@@ -284,9 +284,25 @@ For every case it:
 4. If a matching sub-directory exists under ``dev/test_data/live_tests/<language>/test_data/<case>/``, copies that test data into the project and runs the generated SDK's own unit test suite.
    The tests are first executed in *record mode* (the ``*_TEST_RECORD_MODE`` environment variable is set to ``1``) so that any missing golden traces are written out.
 
+Fast Checks
+^^^^^^^^^^^
+The live tests are slow since they install the dependencies, bundle the packages and run the full test suites.
+To fail fast, run the fast checks first, which prepare the projects exactly like the live tests, but only compile, type-check and lint them:
+
+* ``dev/live_tests/fast_check_cpp.py`` -- C++ (the compile commands exported by CMake with ``-fsyntax-only``, in parallel)
+* ``dev/live_tests/fast_check_csharp.py`` -- C# (``dotnet build``)
+* ``dev/live_tests/fast_check_golang.py`` -- Go (``go test -exec true``, which compiles the tests without running them)
+* ``dev/live_tests/fast_check_java.py`` -- Java (``javac`` directly, bypassing Maven)
+* ``dev/live_tests/fast_check_python.py`` -- Python (``mypy`` and ``pylint``)
+* ``dev/live_tests/fast_check_typescript.py`` -- TypeScript (``tsc``, ``prettier`` and ``eslint``)
+
+The fast checks and the live test of the same language can share ``--output_dir``, so that the live test re-uses the prepared projects, installed dependencies and incremental builds.
+For TypeScript and Python, both install the dependencies only once, in ``--output_dir``, and share them among all the cases.
+The Python live test still installs the generated package of every case with ``pip install -e``, but in a virtual environment of the case which inherits the packages of the shared virtual environment through a ``.pth`` file. This way, the cases do not clash and can run in parallel.
+
 Command-line Options
 ^^^^^^^^^^^^^^^^^^^^
-All live-test scripts accept the same two options:
+All live-test and fast-check scripts accept the same two options (``fast_check_cpp.py`` additionally accepts ``--jobs``):
 
 ``--output_dir PATH``
     Write the assembled project into ``PATH`` instead of a temporary directory.

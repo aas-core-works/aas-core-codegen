@@ -24,6 +24,11 @@ Summarize the changes with the function signatures, class interfaces and state, 
 * One test module: ``python -m unittest dev/tests/cpp/test_main.py``
 * Re-record golden data: set ``AAS_CORE_CODEGEN_TESTS_RERECORD=1``,
   then review with ``git diff dev/test_data/``.
+* Live-test fast checks (compile, type-check and lint only; no test runs):
+  ``python dev/live_tests/fast_check_<language>.py --select <case> --output_dir <dir>``
+  for ``cpp``, ``csharp``, ``golang``, ``java``, ``python`` and ``typescript``.
+  Always run them first, and run the live tests only once they pass.
+  Pass the same ``--output_dir`` to the live test to re-use the prepared projects.
 * Live test: ``python dev/live_tests/live_test_cpp.py --select <case> --output_dir <dir>``
   (C++: clang with ``-DDEBUG`` only, ``VCPKG_ROOT`` must be set).
 
