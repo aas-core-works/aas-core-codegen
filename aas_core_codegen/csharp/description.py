@@ -287,6 +287,37 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
             None,
         )
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
+        name_of_our_type: str
+
+        if isinstance(element.reference.cls, intermediate.AbstractClass):
+            # We do not generate C# code for abstract classes, so we have to refer
+            # to the interface.
+            name_of_our_type = csharp_naming.interface_name(element.reference.cls.name)
+        elif isinstance(element.reference.cls, intermediate.ConcreteClass):
+            # NOTE (mristin):
+            # Analogous to the properties, we do the best effort here and resolve
+            # the reference to the concrete class, though the writer might actually
+            # want to refer to the *interface*.
+            name_of_our_type = csharp_naming.class_name(element.reference.cls.name)
+        else:
+            assert_never(element.reference.cls)
+
+        method_name = csharp_naming.method_name(element.reference.method.name)
+
+        # NOTE (mristin):
+        # We need to prefix the cref in case there are naming conflicts.
+        prefixed_cref = f"Aas.{name_of_our_type}.{method_name}"
+
+        return (
+            _Element(
+                name="see", attrs=collections.OrderedDict([("cref", prefixed_cref)])
+            ),
+            None,
+        )
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:

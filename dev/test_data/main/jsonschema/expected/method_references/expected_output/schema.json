@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Box"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "Box": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item"
+        },
+        {
+          "properties": {
+            "size": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "Box"
+            }
+          },
+          "required": [
+            "size"
+          ]
+        }
+      ]
+    },
+    "Item": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "label",
+        "modelType"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "Box"
+      ]
+    }
+  }
+}

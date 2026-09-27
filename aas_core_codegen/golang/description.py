@@ -155,6 +155,19 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
         return result, None
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        interface_name = golang_naming.interface_name(element.reference.cls.name)
+        method_name = golang_naming.method_name(element.reference.method.name)
+
+        if self.context.package == golang_common.TYPES_PACKAGE:
+            result = f"[{interface_name}.{method_name}]"
+        else:
+            result = f"[{golang_common.TYPES_PACKAGE}.{interface_name}.{method_name}]"
+
+        return result, None
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[str], Optional[List[str]]]:

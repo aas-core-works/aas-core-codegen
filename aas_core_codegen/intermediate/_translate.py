@@ -255,6 +255,58 @@ def _role_reference_to_attribute(  # type: ignore
     return [node], []
 
 
+class _PlaceholderReferenceToMethod:
+    """
+    Represent a placeholder object masking a proper reference to a method.
+
+    This placeholder needs to be used till we create the symbol table in full, so that
+    we can properly de-reference our types and their methods.
+    """
+
+    @require(lambda path: _REFERENCE_TO_ATTRIBUTE_RE.fullmatch(path))
+    def __init__(self, path: str) -> None:
+        """Initialize with the given values."""
+        self.path = path
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(path={self.path!r})"
+
+
+# noinspection PyUnusedLocal
+def _role_reference_to_method(  # type: ignore
+    role, rawtext, text, lineno, inliner, options=None, content=None
+) -> Any:
+    """Create a reference in the documentation to a method of a class."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    # noinspection PyUnresolvedReferences
+    options = docutils.parsers.rst.roles.normalize_options(options)
+
+    path = _strip_sphinx_formatting_directives_from_reference(text)
+
+    # NOTE (mristin):
+    # We need to create a placeholder as the symbol table might not be fully created
+    # at the point when we translate the documentation.
+    #
+    # We have to resolve the placeholders in the second pass of the translation with
+    # the actual references to the symbol table.
+
+    # noinspection PyTypeChecker
+    node = doc.ReferenceToMethod(
+        _PlaceholderReferenceToMethod(path=path),  # type: ignore
+        rawtext,
+        docutils.utils.unescape(text),
+        refuri=text,
+        **options,
+    )
+    return [node], []
+
+
 # noinspection PyUnusedLocal
 def _role_reference_to_argument(  # type: ignore
     role, rawtext, text, lineno, inliner, options=None, content=None
@@ -407,6 +459,8 @@ def _role_reference_to_verification_function(  # type: ignore
 docutils.parsers.rst.roles.register_local_role("class", _role_reference_to_our_type)
 # noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role("attr", _role_reference_to_attribute)
+# noinspection PyUnresolvedReferences
+docutils.parsers.rst.roles.register_local_role("meth", _role_reference_to_method)
 # noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role("paramref", _role_reference_to_argument)
 # noinspection PyUnresolvedReferences
@@ -4105,6 +4159,115 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
     return errors
 
 
+def _second_pass_to_resolve_references_to_methods_in_the_descriptions_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Resolve the references to methods in the descriptions in-place."""
+    errors = []  # type: List[Error]
+
+    # The ``our_type`` is None if the description is in the context outside our type.
+    for meth_ref_in_doc, description, our_type in _find_all_in_descriptions(
+        element_type=doc.ReferenceToMethod, symbol_table=symbol_table
+    ):
+        # NOTE (mristin):
+        # References to methods can be repeated as docutils will cache them,
+        # so we need to skip them, and translate only the placeholders.
+        if not isinstance(meth_ref_in_doc.reference, _PlaceholderReferenceToMethod):
+            continue
+
+        pth = meth_ref_in_doc.reference.path
+
+        if pth.startswith("."):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"The references with relaxed qualified names to methods "
+                    f"are not allowed as we can not resolve references outside "
+                    f"of the meta-model: {pth}",
+                )
+            )
+            continue
+
+        parts = pth.split(".")
+
+        if any(not IDENTIFIER_RE.fullmatch(part) for part in parts):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"Invalid reference to a method; each part of the path needs "
+                    f"to be an identifier, but it is not: {pth}",
+                )
+            )
+            continue
+
+        target_our_type = None  # type: Optional[OurType]
+        method_identifier: Identifier
+
+        if len(parts) == 1:
+            if our_type is None:
+                errors.append(
+                    Error(
+                        description.parsed.node,
+                        f"The method reference can not be resolved as there "
+                        f"is no encompassing our type in the given context: {pth}",
+                    )
+                )
+                continue
+
+            target_our_type = our_type
+            method_identifier = Identifier(parts[0])
+
+        elif len(parts) == 2:
+            target_our_type = symbol_table.find_our_type(Identifier(parts[0]))
+            if target_our_type is None:
+                errors.append(
+                    Error(
+                        description.parsed.node,
+                        f"Dangling reference to a non-existing our type: {pth}",
+                    )
+                )
+                continue
+
+            method_identifier = Identifier(parts[1])
+
+        else:
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"We did not implement the resolution of such "
+                    f"a reference to a method: {pth}",
+                )
+            )
+            continue
+
+        if not isinstance(target_our_type, (AbstractClass, ConcreteClass)):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"Unexpected reference to a method of our type "
+                    f"{target_our_type.name!r} which is not a class: {pth}",
+                )
+            )
+            continue
+
+        method = target_our_type.methods_by_name.get(method_identifier, None)
+        if method is None:
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"Dangling reference to a non-existing method "
+                    f"of the class {target_our_type.name!r}: {pth}",
+                )
+            )
+            continue
+
+        meth_ref_in_doc.reference = doc.ReferenceToMethodOfClass(
+            cls=target_our_type, method=method
+        )
+
+    return errors
+
+
 # fmt: off
 @require(
     lambda symbol_table:
@@ -4953,6 +5116,11 @@ def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[
 
         def transform_reference_to_attribute_in_doc(
             self, element: doc.ReferenceToAttribute
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_reference_to_method_in_doc(
+            self, element: doc.ReferenceToMethod
         ) -> Tuple[Optional[bool], Optional[List[str]]]:
             return True, None
 
@@ -5943,6 +6111,15 @@ def translate(
     # this second pass only after the properties have been stacked.
     underlying_errors.extend(
         _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_place(
+            symbol_table=symbol_table
+        )
+    )
+
+    # NOTE (mristin):
+    # We might reference inherited methods of our type, so we need to apply
+    # this second pass only after the methods have been stacked.
+    underlying_errors.extend(
+        _second_pass_to_resolve_references_to_methods_in_the_descriptions_in_place(
             symbol_table=symbol_table
         )
     )

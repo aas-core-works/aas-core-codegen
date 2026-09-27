@@ -1,0 +1,340 @@
+SymbolTable(
+  our_types=[
+    AbstractClass(
+      name='Item',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=Interface(
+        base='Reference to AbstractClass Item',
+        name='Item',
+        inheritances=[],
+        implementers=[
+          'Reference to ConcreteClass Box'],
+        properties=[
+          Property(
+            name='label',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            description=None,
+            specified_for='Reference to AbstractClass Item',
+            json_name='label',
+            xml_name='label',
+            parsed=...)],
+        signatures=[
+          Signature(
+            name='describe',
+            arguments=[],
+            returns=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            description=DescriptionOfSignature(
+              summary='<paragraph>Render a human-readable description of the item.</paragraph>',
+              remarks=[],
+              arguments_by_name=[],
+              returns=None,
+              parsed=...),
+            contracts=Contracts(
+              preconditions=[],
+              snapshots=[],
+              postconditions=[]),
+            parsed=...,
+            arguments_by_name=...)],
+        description=DescriptionOfOurType(
+          summary='<paragraph>Represent an item.</paragraph>',
+          remarks=[
+            '<paragraph>See <ReferenceToMethod refuri="describe">describe</ReferenceToMethod> for a human-readable description.</paragraph>'],
+          constraints_by_identifier=[],
+          parsed=...),
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Box'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Box'],
+      properties=[
+        Property(
+          name='label',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='label',
+          xml_name='label',
+          parsed=...)],
+      methods=[
+        ImplementationSpecificMethod(
+          name='describe',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Render a human-readable description of the item.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to AbstractClass Item',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          arguments_by_name=...)],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='label',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='label',
+              argument='label',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='label',
+              argument='label',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=DescriptionOfOurType(
+        summary='<paragraph>Represent an item.</paragraph>',
+        remarks=[
+          '<paragraph>See <ReferenceToMethod refuri="describe">describe</ReferenceToMethod> for a human-readable description.</paragraph>'],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Box',
+      inheritances=[
+        'Reference to AbstractClass Item'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Item'],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='label',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='label',
+          xml_name='label',
+          parsed=...),
+        Property(
+          name='size',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Box',
+          json_name='size',
+          xml_name='size',
+          parsed=...)],
+      methods=[
+        ImplementationSpecificMethod(
+          name='describe',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Render a human-readable description of the item.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to AbstractClass Item',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          arguments_by_name=...),
+        ImplementationSpecificMethod(
+          name='volume',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Compute the volume of the box.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <paragraph>The unqualified reference to the inherited <ReferenceToMethod refuri="describe">describe</ReferenceToMethod> is resolved in
+                the context of the class.</paragraph>""")],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Box',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          arguments_by_name=...)],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='label',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='size',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Item')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='size',
+              argument='size',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='label',
+              argument='label',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='size',
+              argument='size',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description='The size must be positive.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='size',
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Box',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=True),
+      description=DescriptionOfOurType(
+        summary='<paragraph>Represent a box.</paragraph>',
+        remarks=[
+          '<paragraph>Its <ReferenceToMethod refuri="Item.describe">Item.describe</ReferenceToMethod> is complemented by <ReferenceToMethod refuri="Box.volume">Box.volume</ReferenceToMethod>.</paragraph>'],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type Item',
+    'Reference to our type Box'],
+  enumerations=[],
+  constrained_primitives=[],
+  classes=[
+    'Reference to our type Item',
+    'Reference to our type Box'],
+  concrete_classes=[
+    'Reference to our type Box'],
+  named_unions=[],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[
+    TranspilableVerification(
+      name='is_described',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that <ReferenceToArgument refuri="text">text</ReferenceToArgument> is not empty.</paragraph>',
+        remarks=[
+          '<paragraph>This is meant to check the result of <ReferenceToMethod refuri="Item.describe">Item.describe</ReferenceToMethod>.</paragraph>'],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    version='dummy',
+    xml_namespace='https://dummy.com'))
