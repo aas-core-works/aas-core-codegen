@@ -530,10 +530,11 @@ len(
 
     def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
         """
-        Convert the transpiled position ``node`` to an ``int64``.
+        Convert the transpiled position ``node`` to an ``int64`` if it is a length.
 
         The string helpers take the positions as ``int64``'s, our integers,
-        while the lengths are ``int``'s.
+        while the lengths are ``int``'s. The same holds for the integer parameters
+        of our functions and methods.
         """
         type_anno = self.type_map[node]
         if (
@@ -660,10 +661,39 @@ len(
             parse_tree.Neg,
         )
 
-        if not isinstance(node.left, no_parentheses_types):
+        # NOTE (mristin):
+        # The lengths are ``int``'s in Go, while the other integers are ``int64``'s,
+        # and Go does not compare the two. We widen the length if it is compared
+        # against an integer which is not a literal. The integer literals are
+        # untyped constants in Go and need no conversion.
+        left_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.left]
+        )
+        right_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.right]
+        )
+
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+        integer = intermediate_type_inference.PrimitiveType.INT
+
+        if (
+            left_a_type is length
+            and right_a_type is integer
+            and not isinstance(node.right, parse_tree.Constant)
+        ):
+            left = Stripped(f"int64({left})")
+
+        elif not isinstance(node.left, no_parentheses_types):
             left = Stripped(f"({left})")
 
-        if not isinstance(node.right, no_parentheses_types):
+        if (
+            right_a_type is length
+            and left_a_type is integer
+            and not isinstance(node.left, parse_tree.Constant)
+        ):
+            right = Stripped(f"int64({right})")
+
+        elif not isinstance(node.right, no_parentheses_types):
             right = Stripped(f"({right})")
 
         return Stripped(f"{left} {comparator} {right}"), None
@@ -909,6 +939,11 @@ aascommon.MapContains(
 
         method_name = golang_naming.method_name(node.member.name)
 
+        args = [
+            self._as_int64_position(arg_node, arg)
+            for arg_node, arg in zip(node.args, args)
+        ]
+
         args_joined = ", ".join(args)
 
         # Apply heuristic for breaking the lines
@@ -973,6 +1008,11 @@ aascommon.MapContains(
                 return None, error
 
             assert function_name is not None
+
+            args = [
+                self._as_int64_position(arg_node, arg)
+                for arg_node, arg in zip(node.args, args)
+            ]
 
             args_joined = ", ".join(args)
 
@@ -1372,10 +1412,38 @@ aascommon.MapContains(
             parse_tree.Any,
         )
 
-        if not isinstance(node.left, no_parentheses_types_in_this_context):
+        # NOTE (mristin):
+        # The lengths are represented as ``int`` in Go, while the other integers
+        # are ``int64``'s, and Go does not mix the two in arithmetic. If a length is
+        # combined with an integer which is not a literal, the result is an integer,
+        # see :py:func:`aas_core_codegen.intermediate.type_inference._combines_to_length`,
+        # so we widen the length to ``int64``. The integer literals are untyped
+        # constants in Go and need no conversion.
+        is_integer = (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.INT
+        )
+
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+
+        if (
+            is_integer
+            and intermediate_type_inference.try_primitive_type(self.type_map[node.left])
+            is length
+        ):
+            left = Stripped(f"int64({left})")
+        elif not isinstance(node.left, no_parentheses_types_in_this_context):
             left = Stripped(f"({left})")
 
-        if not isinstance(node.right, no_parentheses_types_in_this_context):
+        if (
+            is_integer
+            and intermediate_type_inference.try_primitive_type(
+                self.type_map[node.right]
+            )
+            is length
+        ):
+            right = Stripped(f"int64({right})")
+        elif not isinstance(node.right, no_parentheses_types_in_this_context):
             right = Stripped(f"({right})")
 
         if isinstance(node, parse_tree.Add):
@@ -1619,6 +1687,37 @@ fmt.Sprintf(
             None,
         )
 
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_range_bound(
+        self, node: parse_tree.Expression, loop_variable_go_type: Stripped
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the bound of a range, and convert it to the loop variable type.
+
+        Go does not implicitly convert between ``int`` and ``int64``, so we
+        convert the bound explicitly if its type differs from the type of
+        the loop variable. The integer literals are untyped in Go, so we leave
+        them as-is.
+        """
+        code, error = self._transform_and_dereference_if_necessary(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if isinstance(node, parse_tree.Constant):
+            return code, None
+
+        bound_type = intermediate_type_inference.beneath_optional(self.type_map[node])
+        assert isinstance(
+            bound_type, intermediate_type_inference.PrimitiveTypeAnnotation
+        ), f"{bound_type=}"
+
+        if PRIMITIVE_TYPE_MAP[bound_type.a_type] == loop_variable_go_type:
+            return code, None
+
+        return Stripped(f"{loop_variable_go_type}({code})"), None
+
     def _transform_any_or_all(
         self, node: Union[parse_tree.Any, parse_tree.All]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1634,14 +1733,24 @@ fmt.Sprintf(
                 errors.append(error)
 
         elif isinstance(node.generator, parse_tree.ForRange):
-            start, error = self._transform_and_dereference_if_necessary(
-                node.generator.start
+            # NOTE (mristin):
+            # The helpers ``SomeRange`` and ``AllRange`` are generic, so the bounds
+            # need to match the type of the loop variable exactly.
+            variable_type = self.type_map[node.generator.variable]
+            assert isinstance(
+                variable_type, intermediate_type_inference.PrimitiveTypeAnnotation
+            ), f"{variable_type=}"
+
+            variable_go_type = PRIMITIVE_TYPE_MAP[variable_type.a_type]
+
+            start, error = self._transform_range_bound(
+                node.generator.start, variable_go_type
             )
             if error is not None:
                 errors.append(error)
 
-            end, error = self._transform_and_dereference_if_necessary(
-                node.generator.end
+            end, error = self._transform_range_bound(
+                node.generator.end, variable_go_type
             )
             if error is not None:
                 errors.append(error)
@@ -1813,29 +1922,35 @@ aascommon.{qualifier_function}(
             )
             if error is not None:
                 errors.append(error)
-            elif target_is_pointer and not (
-                isinstance(
-                    node.value,
-                    (parse_tree.Name, parse_tree.Member, parse_tree.Index),
-                )
-                and self._is_pointer_map[node.value]
-            ):
+            else:
                 assert value is not None
 
-                if (
-                    isinstance(node.value, parse_tree.Constant)
-                    and isinstance(node.value.value, int)
-                    and not isinstance(node.value.value, bool)
-                ):
-                    # NOTE (mristin):
-                    # The integer literals are untyped in Go, and ``NewAndPointTo``
-                    # would infer an ``int`` for them, while we represent
-                    # the integers as ``int64``.
-                    value = Stripped(f"int64({value})")
+                # NOTE (mristin):
+                # A length can only be assigned to an integer property, an ``int64``,
+                # while the lengths are ``int``'s.
+                value = self._as_int64_position(node.value, value)
 
-                value = Stripped(
-                    f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({value})"
-                )
+                if target_is_pointer and not (
+                    isinstance(
+                        node.value,
+                        (parse_tree.Name, parse_tree.Member, parse_tree.Index),
+                    )
+                    and self._is_pointer_map[node.value]
+                ):
+                    if (
+                        isinstance(node.value, parse_tree.Constant)
+                        and isinstance(node.value.value, int)
+                        and not isinstance(node.value.value, bool)
+                    ):
+                        # NOTE (mristin):
+                        # The integer literals are untyped in Go, and
+                        # ``NewAndPointTo`` would infer an ``int`` for them, while we
+                        # represent the integers as ``int64``.
+                        value = Stripped(f"int64({value})")
+
+                    value = Stripped(
+                        f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({value})"
+                    )
 
             if len(errors) > 0:
                 return None, Error(
@@ -1911,6 +2026,26 @@ aascommon.{qualifier_function}(
             target = Stripped(f"*{target}")
 
         # NOTE (mristin):
+        # A length can be assigned to an integer variable or an integer item of
+        # a list, which are ``int64``'s, while the lengths are ``int``'s. A variable
+        # defined by a length is an ``int`` itself.
+        if not is_definition:
+            target_type = (
+                self._environment.find(node.target.identifier)
+                if isinstance(node.target, parse_tree.Name)
+                else self.type_map[node.target]
+            )
+
+            if (
+                target_type is not None
+                and intermediate_type_inference.try_primitive_type(
+                    intermediate_type_inference.beneath_optional(target_type)
+                )
+                is intermediate_type_inference.PrimitiveType.INT
+            ):
+                value = self._as_int64_position(node.value, value)
+
+        # NOTE (mristin):
         # The integer literals are untyped in Go, and would be inferred as ``int`` in
         # the short variable declaration, while we represent the integers as
         # ``int64``. Hence, we need to explicitly convert them.
@@ -1961,6 +2096,11 @@ aascommon.{qualifier_function}(
             return None, error
 
         assert value is not None
+
+        # NOTE (mristin):
+        # A length can only be returned from a function returning an integer,
+        # an ``int64``, while the lengths are ``int``'s.
+        value = self._as_int64_position(node.value, value)
 
         # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
@@ -2079,37 +2219,6 @@ return {indent_but_first_line(value, I)}"""
             )
 
         return Stripped(writer.getvalue()), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_range_bound(
-        self, node: parse_tree.Expression, loop_variable_go_type: Stripped
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the bound of a range, and convert it to the loop variable type.
-
-        Go does not implicitly convert between ``int`` and ``int64``, so we
-        convert the bound explicitly if its type differs from the type of
-        the loop variable. The integer literals are untyped in Go, so we leave
-        them as-is.
-        """
-        code, error = self._transform_and_dereference_if_necessary(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if isinstance(node, parse_tree.Constant):
-            return code, None
-
-        bound_type = intermediate_type_inference.beneath_optional(self.type_map[node])
-        assert isinstance(
-            bound_type, intermediate_type_inference.PrimitiveTypeAnnotation
-        ), f"{bound_type=}"
-
-        if PRIMITIVE_TYPE_MAP[bound_type.a_type] == loop_variable_go_type:
-            return code, None
-
-        return Stripped(f"{loop_variable_go_type}({code})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_for(

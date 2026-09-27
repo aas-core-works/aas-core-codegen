@@ -70,6 +70,17 @@ def _generate_argument_type(argument: intermediate.Argument) -> Stripped:
     )
 
 
+def _generate_return_type(verification: intermediate.Verification) -> Stripped:
+    """Generate the C++ return type of the ``verification`` function."""
+    if verification.returns is None:
+        return Stripped("void")
+
+    return cpp_common.generate_type(
+        type_annotation=verification.returns,
+        types_namespace=cpp_common.TYPES_NAMESPACE,
+    )
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_verification_function_definition(
     verification: Union[
@@ -125,10 +136,12 @@ def _generate_verification_function_definition(
         assert comment is not None
         blocks.append(comment)
 
+    return_type = _generate_return_type(verification)
+
     blocks.append(
         Stripped(
             f"""\
-bool {function_name}(
+{return_type} {function_name}(
 {I}{indent_but_first_line(arg_definitions_joined, I)}
 );"""
         )
@@ -906,10 +919,12 @@ def _generate_implementation_of_transpilable_verification(
 
     body_joined = "\n".join(body)
 
+    return_type = _generate_return_type(verification)
+
     return (
         Stripped(
             f"""\
-bool {function_name}(
+{return_type} {function_name}(
 {I}{indent_but_first_line(arg_definitions_joined, I)}
 ) {{
 {I}{indent_but_first_line(body_joined, I)}

@@ -8999,7 +8999,7 @@ namespace AasCore.Aas3_0
                     || (
                         Enumerable.Range(
                             1,
-                            that.Keys.Count - 1
+                            System.Math.Max(0, that.Keys.Count - 1)
                         ).All(
                             i => Aas.Constants.FragmentKeys.Contains(that.Keys[i].Type))
                     )))

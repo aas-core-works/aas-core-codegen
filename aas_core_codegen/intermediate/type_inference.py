@@ -510,13 +510,30 @@ PRIMITIVE_TYPE_MAP = {
 }
 
 
+def _primitive_assignable(
+    target_type: PrimitiveType, value_type: PrimitiveType
+) -> bool:
+    """
+    Check whether the primitive value can be assigned to the primitive target.
+
+    A length can be assigned to an integer, as it only widens. The opposite would
+    narrow the integer in the targets which represent the lengths with narrower
+    types, such as ``int`` in C#, Java and Go.
+    """
+    return target_type == value_type or (
+        target_type is PrimitiveType.INT and value_type is PrimitiveType.LENGTH
+    )
+
+
 def _assignable(
     target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
 ) -> bool:
     """Check whether the value can be assigned to the target."""
     if isinstance(target_type, PrimitiveTypeAnnotation):
         if isinstance(value_type, PrimitiveTypeAnnotation):
-            return target_type.a_type == value_type.a_type
+            return _primitive_assignable(
+                target_type=target_type.a_type, value_type=value_type.a_type
+            )
 
         # NOTE (mristin):
         # We have to be careful about the constrained primitives,
@@ -550,9 +567,9 @@ def _assignable(
             if len(target_type.our_type.invariants) == 0 and isinstance(
                 value_type, PrimitiveTypeAnnotation
             ):
-                return (
-                    PRIMITIVE_TYPE_MAP[target_type.our_type.constrainee]
-                    == value_type.a_type
+                return _primitive_assignable(
+                    target_type=PRIMITIVE_TYPE_MAP[target_type.our_type.constrainee],
+                    value_type=value_type.a_type,
                 )
             else:
                 # NOTE (mristin):
@@ -1317,6 +1334,30 @@ def _is_int_literal(node: parse_tree.Node) -> bool:
         isinstance(node, parse_tree.Constant)
         and isinstance(node.value, int)
         and not isinstance(node.value, bool)
+    )
+
+
+def _combines_to_length(
+    left: parse_tree.Node,
+    left_a_type: Optional[PrimitiveType],
+    right: parse_tree.Node,
+    right_a_type: Optional[PrimitiveType],
+) -> bool:
+    """
+    Check whether the integer operands combine to a length.
+
+    The lengths are represented with narrower types than the integers in some
+    targets, *e.g.*, ``int`` in C#, Java and Go, while the integers are 64-bit.
+    Hence, we keep the result a length only if at least one operand is a length and
+    the other one is a length or an integer literal, *e.g.*, ``len(xs) - 1``.
+    Otherwise, the length is widened to an integer, and the result is an integer,
+    so that we narrow only where the targets require it, *e.g.*, at an index.
+    """
+    return (
+        left_a_type is PrimitiveType.LENGTH or right_a_type is PrimitiveType.LENGTH
+    ) and all(
+        a_type is PrimitiveType.LENGTH or _is_int_literal(operand)
+        for operand, a_type in ((left, left_a_type), (right, right_a_type))
     )
 
 
@@ -3334,20 +3375,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         # fmt: off
         result_type: PrimitiveType
-        if (
-            (
-                left_a_type is PrimitiveType.LENGTH
-                and right_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
-            ) or (
-                right_a_type is PrimitiveType.LENGTH
-                and left_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
-            )
+        if _combines_to_length(
+            left=node.left,
+            left_a_type=left_a_type,
+            right=node.right,
+            right_a_type=right_a_type,
         ):
             result_type = PrimitiveType.LENGTH
 
         elif (
-                left_a_type is PrimitiveType.INT
-                and right_a_type is PrimitiveType.INT
+                left_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+                and right_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
         ):
             result_type = PrimitiveType.INT
 
@@ -3551,29 +3589,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        # region Pick the larger integer type for the type of the loop variable
-        assert isinstance(
-            start_type, PrimitiveTypeAnnotation
-        ) and start_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
-        assert isinstance(end_type, PrimitiveTypeAnnotation) and end_type.a_type in (
-            PrimitiveType.INT,
-            PrimitiveType.LENGTH,
-        )
-
-        loop_variable_type: PrimitiveTypeAnnotation
-        if (
-            start_type.a_type is PrimitiveType.LENGTH
-            or end_type.a_type is PrimitiveType.LENGTH
-        ):
-            loop_variable_type = PrimitiveTypeAnnotation(a_type=PrimitiveType.LENGTH)
-        else:
-            assert (
-                start_type.a_type is PrimitiveType.INT
-                and end_type.a_type is PrimitiveType.INT
+        # NOTE (mristin):
+        # The loop variable is a length only if both bounds combine to a length,
+        # *e.g.*, ``range(0, len(xs))``. Otherwise, it is an integer, so that
+        # the bounds which are integers need not be narrowed.
+        loop_variable_type = PrimitiveTypeAnnotation(
+            a_type=(
+                PrimitiveType.LENGTH
+                if _combines_to_length(
+                    left=node.start,
+                    left_a_type=start_type.a_type,
+                    right=node.end,
+                    right_a_type=end_type.a_type,
+                )
+                else PrimitiveType.INT
             )
-            loop_variable_type = PrimitiveTypeAnnotation(a_type=PrimitiveType.INT)
-
-        # endregion
+        )
 
         self.type_map[node.variable] = loop_variable_type
 

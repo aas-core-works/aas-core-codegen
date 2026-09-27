@@ -947,9 +947,41 @@ std::make_tuple(
             parse_tree.Neg,
         )
 
-        if isinstance(node.left, no_parentheses_types) and isinstance(
-            node.right, no_parentheses_types
+        left_needs_no_parentheses = isinstance(node.left, no_parentheses_types)
+        right_needs_no_parentheses = isinstance(node.right, no_parentheses_types)
+
+        # NOTE (mristin):
+        # The lengths are unsigned ``size_t``'s in C++, while the other integers are
+        # ``int64_t``'s. C++ would compare the two as unsigned, so that a negative
+        # integer compares larger than a length. Hence, we widen the length if it is
+        # compared against an integer which is not a literal.
+        left_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.left]
+        )
+        right_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.right]
+        )
+
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+        integer = intermediate_type_inference.PrimitiveType.INT
+
+        if (
+            left_a_type is length
+            and right_a_type is integer
+            and not isinstance(node.right, parse_tree.Constant)
         ):
+            left = Stripped(f"static_cast<int64_t>({left})")
+            left_needs_no_parentheses = True
+
+        elif (
+            right_a_type is length
+            and left_a_type is integer
+            and not isinstance(node.left, parse_tree.Constant)
+        ):
+            right = Stripped(f"static_cast<int64_t>({right})")
+            right_needs_no_parentheses = True
+
+        if left_needs_no_parentheses and right_needs_no_parentheses:
             return Stripped(f"{left} {comparator} {right}"), None
 
         return Stripped(f"({left}) {comparator} ({right})"), None
@@ -1779,10 +1811,38 @@ common::{contains_function}(
             parse_tree.Any,
         )
 
-        if not isinstance(node.left, no_parentheses_types_in_this_context):
+        # NOTE (mristin):
+        # The lengths are unsigned ``size_t``'s in C++, while the other integers are
+        # ``int64_t``'s. C++ would compute the mix of the two as unsigned, so that
+        # a negative result would wrap around. If a length is combined with
+        # an integer which is not a literal, the result is an integer, see
+        # :py:func:`aas_core_codegen.intermediate.type_inference._combines_to_length`,
+        # so we widen the length to ``int64_t``.
+        is_integer = (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.INT
+        )
+
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+
+        if (
+            is_integer
+            and intermediate_type_inference.try_primitive_type(self.type_map[node.left])
+            is length
+        ):
+            left = Stripped(f"static_cast<int64_t>({left})")
+        elif not isinstance(node.left, no_parentheses_types_in_this_context):
             left = Stripped(f"({left})")
 
-        if not isinstance(node.right, no_parentheses_types_in_this_context):
+        if (
+            is_integer
+            and intermediate_type_inference.try_primitive_type(
+                self.type_map[node.right]
+            )
+            is length
+        ):
+            right = Stripped(f"static_cast<int64_t>({right})")
+        elif not isinstance(node.right, no_parentheses_types_in_this_context):
             right = Stripped(f"({right})")
 
         if isinstance(node, parse_tree.Add):
@@ -2183,10 +2243,14 @@ common::{qualifier_function}(
             assert start is not None
             assert end is not None
 
+            # NOTE (mristin):
+            # The helpers are templated on the integer type of the range, which we
+            # give explicitly so that the integer literals among the bounds are
+            # converted to it.
             return (
                 Stripped(
                     f"""\
-common::{qualifier_function}(
+common::{qualifier_function}<{variable_type_cpp}>(
 {I}[&]({variable_type_cpp} {variable_name_cpp}) -> bool {{
 {II}return {indent_but_first_line(condition, II)};
 {I}}},
@@ -2708,6 +2772,19 @@ for (
                 errors.append(error)
 
             if variable_type_cpp is not None and start is not None and end is not None:
+                # NOTE (mristin):
+                # If the loop variable is an integer, a bound which is a length
+                # needs to be widened, as C++ would compare the unsigned ``size_t``
+                # and the signed ``int64_t`` as unsigned.
+                if (
+                    intermediate_type_inference.try_primitive_type(
+                        variable_type_annotation
+                    )
+                    is intermediate_type_inference.PrimitiveType.INT
+                ):
+                    start = self._as_int64_position(node.generator.start, start)
+                    end = self._as_int64_position(node.generator.end, end)
+
                 if "\n" not in start and "\n" not in end:
                     header = (
                         f"for ({variable_type_cpp} {variable_name_cpp} = {start}; "

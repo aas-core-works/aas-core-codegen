@@ -5569,7 +5569,7 @@ bool Reference_5(
     that->type() == types::ReferenceTypes::kModelReference
     && that->keys().size() > 1
   ))
-  || common::AllRange(
+  || common::AllRange<size_t>(
     [&](size_t i) -> bool {
       return common::Contains(
         constants::kFragmentKeys,
@@ -5591,7 +5591,7 @@ bool Reference_6(
     that->type() == types::ReferenceTypes::kModelReference
     && that->keys().size() > 1
   ))
-  || common::AllRange(
+  || common::AllRange<size_t>(
     [&](size_t i) -> bool {
       return !common::Contains(
         constants::kGenericFragmentKeys,
@@ -5630,7 +5630,7 @@ bool Reference_8(
     that->type() == types::ReferenceTypes::kModelReference
     && that->keys().size() > 2
   ))
-  || common::AllRange(
+  || common::AllRange<size_t>(
     [&](size_t i) -> bool {
       return !(that->keys().at(i)->type() == types::KeyTypes::kSubmodelElementList)
       || verification::MatchesXsNonNegativeInteger(

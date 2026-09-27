@@ -261,6 +261,31 @@ class Transpiler(
             # pylint: disable=invalid-unary-operand-type
             index = Stripped(f"^{-index_as_int}")
 
+        elif (
+            index_as_int is None
+            and intermediate_type_inference.try_primitive_type(
+                self.type_map[node.index]
+            )
+            is intermediate_type_inference.PrimitiveType.INT
+        ):
+            # NOTE (mristin):
+            # The integers of the meta-model are ``long``'s in C#, while the lists
+            # and the JSON arrays are indexed by ``int``'s. We narrow the index
+            # explicitly, and fail loudly instead of silently overflowing.
+            if isinstance(
+                node.index,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                index = Stripped(f"checked((int){index})")
+            else:
+                index = Stripped(f"checked((int)({index}))")
+
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,
@@ -1119,7 +1144,57 @@ class Transpiler(
         # but the invariants must behave the same in all the SDKs for all the inputs.
         # Hence, we call the helper which computes the floored remainder, see
         # :py:data:`aas_core_codegen.csharp.lib._generate_verification.FLOOR_MOD`.
-        return Stripped(f"Verification.FloorMod({left}, {right})"), None
+        #
+        # However, a length is never negative. When the dividend is a length and
+        # the divisor is either a length or a positive integer literal, both operands
+        # are non-negative, so the native operator gives the same remainder as
+        # the floored division. We use the native operator in that case, so that
+        # the remainder is an ``int`` as all the other lengths, *e.g.*,
+        # ``len(text) % 2``.
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+        if intermediate_type_inference.try_primitive_type(
+            self.type_map[node.left]
+        ) is length and (
+            intermediate_type_inference.try_primitive_type(self.type_map[node.right])
+            is length
+            or (
+                isinstance(node.right, parse_tree.Constant)
+                and isinstance(node.right.value, int)
+                and not isinstance(node.right.value, bool)
+                and node.right.value > 0
+            )
+        ):
+            no_parentheses_types_in_this_context = (
+                parse_tree.Member,
+                parse_tree.MethodCall,
+                parse_tree.FunctionCall,
+                parse_tree.Constant,
+                parse_tree.Name,
+                parse_tree.Index,
+            )
+
+            if not isinstance(node.left, no_parentheses_types_in_this_context):
+                left = Stripped(f"({left})")
+
+            if not isinstance(node.right, no_parentheses_types_in_this_context):
+                right = Stripped(f"({right})")
+
+            return Stripped(f"{left} % {right}"), None
+
+        code = Stripped(f"Verification.FloorMod({left}, {right})")
+
+        # NOTE (mristin):
+        # The helper always returns a ``long``. If the result is a length, *e.g.*,
+        # ``len(text) % -2``, we narrow it to ``int`` so that it can be used as
+        # a length, *e.g.*, as an index. The narrowing fails loudly instead of
+        # silently overflowing.
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is length
+        ):
+            code = Stripped(f"checked((int){code})")
+
+        return code, None
 
     def _transform_add_or_sub(
         self, node: Union[parse_tree.Add, parse_tree.Sub]
@@ -1355,16 +1430,41 @@ class Transpiler(
             assert start is not None
             assert end is not None
 
-            if start == "0":
-                end_minus_start = end
+            is_integer_range = (
+                intermediate_type_inference.try_primitive_type(
+                    self.type_map[node.generator.variable]
+                )
+                is intermediate_type_inference.PrimitiveType.INT
+            )
+
+            # NOTE (mristin):
+            # ``Enumerable.Range`` expects the count instead of the end, and throws
+            # on a negative count, while the range in Python is simply empty if
+            # the end precedes the start. Hence, we clamp the count at zero, unless
+            # the range goes from zero to a length, which is never negative.
+            if start == "0" and not is_integer_range:
+                count = end
             else:
-                end_minus_start = Stripped(f"{end} - {start}")
+                zero = "0L" if is_integer_range else "0"
+                count = Stripped(f"System.Math.Max({zero}, {end} - {start})")
+
+            # NOTE (mristin):
+            # ``Enumerable.Range`` works only on ``int``'s, while the integers
+            # of the meta-model are ``long``'s. We narrow the start and the count
+            # explicitly, and fail loudly instead of silently overflowing.
+            if is_integer_range:
+                if isinstance(node.generator.start, parse_tree.Name):
+                    start = Stripped(f"checked((int){start})")
+                elif not isinstance(node.generator.start, parse_tree.Constant):
+                    start = Stripped(f"checked((int)({start}))")
+
+                count = Stripped(f"checked((int){count})")
 
             source = Stripped(
                 f"""\
 Enumerable.Range(
 {I}{indent_but_first_line(start, I)},
-{I}{indent_but_first_line(end_minus_start, I)}
+{I}{indent_but_first_line(count, I)}
 )"""
             )
 
