@@ -1465,6 +1465,49 @@ AasCommon.range(
                     identifier=node.target.identifier, type_annotation=type_anno
                 )
 
+        if isinstance(node.target, parse_tree.Index):
+            # NOTE (mristin):
+            # The type inference allows only the items of a list as index targets.
+            # We can not assign to ``AasCommon.at``, while the plain assignment
+            # would not resolve the negative indices, and would silently grow
+            # the array on an out-of-bound index.
+            collection, error = self.transform(node.target.collection)
+            if error is not None:
+                errors.append(error)
+
+            index, error = self.transform(node.target.index)
+            if error is not None:
+                errors.append(error)
+
+            if len(errors) > 0:
+                return None, Error(
+                    node.original_node, "Failed to transpile the assignment", errors
+                )
+
+            assert collection is not None
+            assert index is not None
+            assert value is not None
+
+            # NOTE (mristin):
+            # Poor man's re-flow
+            if "\n" not in value and len(collection) + len(index) + len(value) < 50:
+                return (
+                    Stripped(f"AasCommon.setAt({collection}, {index}, {value});"),
+                    None,
+                )
+
+            return (
+                Stripped(
+                    f"""\
+AasCommon.setAt(
+{I}{indent_but_first_line(collection, I)},
+{I}{indent_but_first_line(index, I)},
+{I}{indent_but_first_line(value, I)}
+);"""
+                ),
+                None,
+            )
+
         target, error = self.transform(node=node.target)
         if error is not None:
             errors.append(error)

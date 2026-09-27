@@ -3435,8 +3435,90 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             target_type = self._environment.find(node.target.identifier)
             if target_type is None:
                 is_new_variable = True
-        else:
+        elif isinstance(node.target, parse_tree.Member):
             target_type = self.transform(node.target)
+            if target_type is None:
+                return None
+
+            instance_type = self.type_map[node.target.instance]
+
+            message = None  # type: Optional[str]
+            if isinstance(instance_type, EnumerationAsTypeTypeAnnotation):
+                message = (
+                    f"The enumeration literal "
+                    f"{instance_type.enumeration.name}.{node.target.name} "
+                    f"can not be assigned to."
+                )
+            elif isinstance(target_type, BuiltinMethodTypeAnnotation):
+                message = (
+                    f"The method {node.target.name!r} of strings "
+                    f"can not be assigned to."
+                )
+            elif isinstance(target_type, MethodTypeAnnotation):
+                message = (
+                    f"The method {node.target.name!r} of {instance_type} "
+                    f"can not be assigned to."
+                )
+            elif not (
+                isinstance(instance_type, OurTypeAnnotation)
+                and isinstance(instance_type.our_type, _types.Class)
+                and node.target.name in instance_type.our_type.properties_by_name
+            ):
+                message = (
+                    f"Only a property of a class can be assigned to, "
+                    f"but the member {node.target.name!r} of {instance_type} "
+                    f"is not a property."
+                )
+
+            if message is not None:
+                self.errors.append(Error(node.target.original_node, message))
+                return None
+
+        elif isinstance(node.target, parse_tree.Index):
+            target_type = self.transform(node.target)
+            if target_type is None:
+                return None
+
+            collection_type = self.type_map[node.target.collection]
+
+            message = None
+            if isinstance(collection_type, TupleTypeAnnotation):
+                message = (
+                    f"Tuples are immutable in Python, so the item "
+                    f"of {collection_type} can not be assigned to."
+                )
+            elif isinstance(
+                collection_type,
+                (
+                    JsonValueTypeAnnotation,
+                    JsonArrayTypeAnnotation,
+                    JsonObjectTypeAnnotation,
+                ),
+            ):
+                message = (
+                    f"We do not support mutating JSON-able values, so the item "
+                    f"of {collection_type} can not be assigned to."
+                )
+            elif not isinstance(collection_type, ListTypeAnnotation):
+                message = (
+                    f"Only an item of a list can be assigned to, but "
+                    f"the collection is inferred to be {collection_type}."
+                )
+
+            if message is not None:
+                self.errors.append(Error(node.target.original_node, message))
+                return None
+
+        else:
+            self.errors.append(
+                Error(
+                    node.target.original_node,
+                    f"Expected the target of an assignment to be a variable, "
+                    f"a property of a class or an item of a list, "
+                    f"but got: {type(node.target).__name__}",
+                )
+            )
+            return None
 
         value_type = self.transform(node.value)
 

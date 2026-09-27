@@ -64,28 +64,19 @@ func AllRange(condition func(int) bool, start int, end int) bool {
 	return true
 }
 
-// Create a new instance of the `value` and return the pointer to it.
-func NewBool(value bool) *bool {
-	return &value
-}
-
-// Create a new instance of the `value` and return the pointer to it.
-func NewInt(value int) *int {
-	return &value
-}
-
-// Create a new instance of the `value` and return the pointer to it.
-func NewInt64(value int64) *int64 {
-	return &value
-}
-
-// Create a new instance of the `value` and return the pointer to it.
-func NewFloat64(value float64) *float64 {
-	return &value
-}
-
-// Create a new instance of the `value` and return the pointer to it.
-func NewString(value string) *string {
+// Copy the `value` to a new variable, and return the pointer to it.
+//
+// We represent the optional values which are not nilable, such as strings,
+// numbers and enumeration literals, as pointers. Go does not allow to take
+// the address of a literal or of an expression, such as `&"something"`
+// or `&(x + 1)`, so we need a function to hold the value in a variable of its
+// own. Moreover, taking the address of a variable directly, such as `&text`,
+// would alias the variable, so that a later assignment to the variable would
+// also change the value pointed to.
+//
+// Mind that Go infers `int` for an untyped integer constant, so you need to
+// convert it explicitly, for example, `NewAndPointTo(int64(1))`.
+func NewAndPointTo[T any](value T) *T {
 	return &value
 }
 

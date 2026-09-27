@@ -1541,6 +1541,166 @@ def some_func(text: str) -> bool:
         )
 
 
+class Test_assignment_target(unittest.TestCase):
+    @staticmethod
+    def source_with_verification(verification: str) -> str:
+        return f"""\
+class Kind(Enum):
+    Alpha = "alpha"
+    Beta = "beta"
+
+
+class Item(DBC):
+    text: str
+    texts: List[str]
+    pair: Tuple[str, int]
+    values: JSONArray
+    mapping: JSONObject[str]
+
+    @implementation_specific
+    @non_mutating
+    def do_something(self) -> bool:
+        pass
+
+    def __init__(
+        self,
+        text: str,
+        texts: List[str],
+        pair: Tuple[str, int],
+        values: JSONArray,
+        mapping: JSONObject[str],
+    ) -> None:
+        self.text = text
+        self.texts = texts
+        self.pair = pair
+        self.values = values
+        self.mapping = mapping
+
+
+{verification}
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    def test_property_and_list_items(self) -> None:
+        Test_with_smoke.execute(
+            Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Item], text: str) -> bool:
+    items[0].text = text
+    items[-1].texts[0] = text
+    texts = items[0].texts
+    texts[-1] = text
+    return True"""
+            )
+        )
+
+    def test_tuple_item_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    item.pair[0] = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "Tuples are immutable in Python, so the item of "
+                "Tuple[str, int] can not be assigned to."
+            ),
+        )
+
+    def test_json_array_item_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    item.values[0] = item.mapping
+    return True"""
+            ),
+            expected_joined_message=(
+                "We do not support mutating JSON-able values, so the item of "
+                "JSONArray can not be assigned to."
+            ),
+        )
+
+    def test_json_object_item_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    item.mapping["x"] = item.values
+    return True"""
+            ),
+            expected_joined_message=(
+                "We do not support mutating JSON-able values, so the item of "
+                "JSONObject[str] can not be assigned to."
+            ),
+        )
+
+    def test_method_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item, other: Item) -> bool:
+    item.do_something = other.do_something
+    return True"""
+            ),
+            expected_joined_message=(
+                "The method 'do_something' of Item can not be assigned to."
+            ),
+        )
+
+    def test_enumeration_literal_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    Kind.Alpha = Kind.Beta
+    return True"""
+            ),
+            expected_joined_message=(
+                "The enumeration literal Kind.Alpha can not be assigned to."
+            ),
+        )
+
+    def test_string_method_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item, other: Item) -> bool:
+    item.text.find = other.text.find
+    return True"""
+            ),
+            expected_joined_message=(
+                "The method 'find' of strings can not be assigned to."
+            ),
+        )
+
+    def test_slice_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_assignment_target.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    item.text[0:1] = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the target of an assignment to be a variable, "
+                "a property of a class or an item of a list, but got: Slice"
+            ),
+        )
+
+
 class Test_is_instance(unittest.TestCase):
     @staticmethod
     def infer(source: str) -> intermediate_type_inference.InferenceOfInvariant:

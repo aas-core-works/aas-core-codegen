@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "text": "a",
+      "maybeText": "b",
+      "maybeKind": "beta",
+      "texts": [
+        "c"
+      ]
+    }
+  ]
+}
