@@ -80,6 +80,7 @@ from aas_core_codegen.parse._types import (
     ConstantPrimitive,
     ConstantUnion,
     SetLiteral,
+    Visibility,
 )
 
 
@@ -1400,6 +1401,63 @@ def _function_def_to_method(
             ),
         )
 
+    # region Determine the visibility
+
+    # NOTE (mristin):
+    # We follow the Python conventions. A function with a leading underscore is
+    # internal, *i.e.*, visible only within the generated SDK. A method with a single
+    # leading underscore is protected, and a method with two leading underscores is
+    # private.
+
+    visibility = Visibility.PUBLIC
+
+    if name != "__init__":
+        underscore_count = len(name) - len(name.lstrip("_"))
+
+        if underscore_count == len(name):
+            return (
+                None,
+                Error(
+                    node,
+                    f"Expected the name of a function or a method to contain "
+                    f"more than underscores, but got: {name!r}",
+                ),
+            )
+
+        if expect_self:
+            if underscore_count == 1:
+                visibility = Visibility.PROTECTED
+            elif underscore_count == 2:
+                visibility = Visibility.PRIVATE
+            elif underscore_count > 2:
+                return (
+                    None,
+                    Error(
+                        node,
+                        f"Expected at most two leading underscores in the name "
+                        f"of a method, but got: {name!r}",
+                    ),
+                )
+            else:
+                pass
+        else:
+            if underscore_count == 1:
+                visibility = Visibility.INTERNAL
+            elif underscore_count > 1:
+                return (
+                    None,
+                    Error(
+                        node,
+                        f"Expected at most one leading underscore in the name "
+                        f"of a function, since there are no private functions, "
+                        f"but got: {name!r}",
+                    ),
+                )
+            else:
+                pass
+
+    # endregion
+
     preconditions = []  # type: List[Contract]
     postconditions = []  # type: List[Contract]
     snapshots = []  # type: List[Snapshot]
@@ -1695,6 +1753,7 @@ def _function_def_to_method(
             ImplementationSpecificMethod(
                 name=Identifier(name),
                 verification=verification,
+                visibility=visibility,
                 arguments=arguments,
                 returns=returns,
                 description=description,
@@ -1787,6 +1846,7 @@ def _function_def_to_method(
                 UnderstoodMethod(
                     name=Identifier(name),
                     verification=verification,
+                    visibility=visibility,
                     arguments=arguments,
                     returns=returns,
                     description=description,

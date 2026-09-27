@@ -381,6 +381,90 @@ __xml_namespace__ = "https://dummy.com"
             ),
         )
 
+    def test_protected_method_in_invariant_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    self._is_valid(),
+    "Dummy invariant description"
+)
+class Something:
+    value: str
+
+    @implementation_specific
+    @non_mutating
+    def _is_valid(self) -> bool:
+        pass
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The method '_is_valid' of the class 'Something' is protected, "
+                "so it can be only called from the implementation-specific "
+                "methods of the class"
+            ),
+        )
+
+    def test_private_method_in_verification_function_fails(self) -> None:
+        source = """\
+class Something:
+    value: str
+
+    @implementation_specific
+    @non_mutating
+    def __is_valid(self) -> bool:
+        pass
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+@verification
+def is_valid(something: Something) -> bool:
+    return something.__is_valid()
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The method '__is_valid' of the class 'Something' is private, "
+                "so it can be only called from the implementation-specific "
+                "methods of the class"
+            ),
+        )
+
+    def test_internal_function_in_invariant(self) -> None:
+        source = """\
+@verification
+def _is_valid(text: str) -> bool:
+    return len(text) > 0
+
+@invariant(
+    lambda self:
+    _is_valid(self.value),
+    "Dummy invariant description"
+)
+class Something:
+    value: str
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        Test_with_smoke.execute(source=source)
+
     def test_index_on_json_value_fails(self) -> None:
         source = """\
 @invariant(

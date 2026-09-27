@@ -145,6 +145,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -550,6 +551,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='has_small_remainder',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -601,6 +603,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_within_distance',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -661,6 +664,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_negative',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -716,6 +720,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_length_aligned',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -769,6 +774,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='has_remainder_one_by_length',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',

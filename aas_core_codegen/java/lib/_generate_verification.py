@@ -346,9 +346,18 @@ private static Pattern {construct_name}() {{
 
     method_name = java_naming.method_name(verification.name)
 
+    # NOTE (mristin):
+    # The invariants are checked in a class nested in ``Verification``, so they can
+    # call the private static methods.
+    modifier = (
+        "private"
+        if verification.visibility is intermediate.Visibility.INTERNAL
+        else "public"
+    )
+
     writer.write(
         f"""\
-public static Boolean {method_name}(String {arg_name}) {{
+{modifier} static Boolean {method_name}(String {arg_name}) {{
 {I}return {regex_name}.matcher({arg_name}).matches();
 }}"""
     )
@@ -520,6 +529,15 @@ def _transpile_transpilable_verification(
 
     method_name = java_naming.method_name(verification.name)
 
+    # NOTE (mristin):
+    # The invariants are checked in a class nested in ``Verification``, so they can
+    # call the private static methods.
+    modifier = (
+        "private"
+        if verification.visibility is intermediate.Visibility.INTERNAL
+        else "public"
+    )
+
     if verification.returns is None:
         return_type = "void"
     else:
@@ -534,12 +552,12 @@ def _transpile_transpilable_verification(
     if len(arg_defs) == 0:
         writer.write(
             f"""\
-public static {return_type} {method_name}() {{"""
+{modifier} static {return_type} {method_name}() {{"""
         )
     else:
         writer.write(
             f"""\
-public static {return_type} {method_name}(
+{modifier} static {return_type} {method_name}(
 """
         )
 

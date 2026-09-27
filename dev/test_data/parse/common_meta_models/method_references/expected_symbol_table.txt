@@ -17,6 +17,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='describe',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -39,6 +40,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -89,6 +91,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='volume',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -111,6 +114,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -171,6 +175,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_described',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',

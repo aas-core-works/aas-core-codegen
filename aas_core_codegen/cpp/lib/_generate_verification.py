@@ -515,10 +515,19 @@ class RecursiveVerification : public IVerification {{
             ]
         )
 
-    if len(symbol_table.verification_functions) > 0:
+    # NOTE (mristin):
+    # The internal verification functions are declared only in the implementation
+    # file so that they remain invisible to the users of the library.
+    public_verifications = [
+        verification
+        for verification in symbol_table.verification_functions
+        if verification.visibility is intermediate.Visibility.PUBLIC
+    ]
+
+    if len(public_verifications) > 0:
         blocks.append(Stripped("// region Verification functions"))
 
-        for verification in symbol_table.verification_functions:
+        for verification in public_verifications:
             block, error = _generate_verification_function_definition(
                 verification=verification, spec_impls=spec_impls
             )
@@ -3295,15 +3304,50 @@ def generate_implementation(
             ]
         )
 
+    # NOTE (mristin):
+    # The internal verification functions live in the anonymous namespace, so that
+    # they are invisible outside this translation unit. We declare them upfront so
+    # that the other verification functions and the checks can call them regardless
+    # of the order of the definitions.
+    internal_verifications = [
+        verification
+        for verification in symbol_table.verification_functions
+        if verification.visibility is intermediate.Visibility.INTERNAL
+    ]
+
+    if len(internal_verifications) > 0:
+        blocks.append(
+            Stripped("// region Declarations of internal verification functions")
+        )
+        blocks.append(Stripped("namespace {"))
+
+        for verification in internal_verifications:
+            block, error = _generate_verification_function_definition(
+                verification=verification, spec_impls=spec_impls
+            )
+            if error is not None:
+                errors.append(error)
+            else:
+                assert block is not None
+                blocks.append(block)
+
+        blocks.append(Stripped("}  // namespace"))
+        blocks.append(
+            Stripped("// endregion Declarations of internal verification functions")
+        )
+
     if len(symbol_table.verification_functions) > 0:
         blocks.append(Stripped("// region Verification functions"))
 
         for verification in symbol_table.verification_functions:
+            # NOTE (mristin):
+            # The implementation-specific snippet can be empty, *e.g.*, if
+            # the function is templated and defined in the header snippet.
+            definition = None  # type: Optional[Stripped]
+
             if isinstance(verification, intermediate.PatternVerification):
-                blocks.append(
-                    _generate_pattern_verification_implementation(
-                        verification=verification
-                    )
+                definition = _generate_pattern_verification_implementation(
+                    verification=verification
                 )
 
             elif isinstance(verification, intermediate.TranspilableVerification):
@@ -3317,7 +3361,7 @@ def generate_implementation(
                     errors.append(error)
                 else:
                     assert block is not None
-                    blocks.append(block)
+                    definition = block
 
             elif isinstance(
                 verification, intermediate.ImplementationSpecificVerification
@@ -3343,9 +3387,24 @@ def generate_implementation(
                     # no code in the implementation file. For example, the verification
                     # functions which are templated.
                     if len(block.strip()) > 0:
-                        blocks.append(block)
+                        definition = block
             else:
                 assert_never(verification)
+
+            if definition is None:
+                continue
+
+            if verification.visibility is intermediate.Visibility.INTERNAL:
+                blocks.append(
+                    Stripped(
+                        f"""\
+namespace {{
+{definition}
+}}  // namespace"""
+                    )
+                )
+            else:
+                blocks.append(definition)
 
         blocks.append(Stripped("// endregion Verification functions"))
 

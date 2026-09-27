@@ -44,6 +44,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -100,6 +101,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='interface',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',
@@ -129,6 +131,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='void',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',

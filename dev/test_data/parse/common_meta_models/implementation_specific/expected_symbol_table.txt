@@ -33,6 +33,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='describe',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -55,6 +56,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -121,6 +123,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='color_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -143,6 +146,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='resolve_color',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -176,6 +180,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='relabel',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -203,6 +208,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -266,6 +272,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -340,6 +347,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -418,6 +426,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='has_balanced_brackets',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -442,6 +451,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='texts_are_unique',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -470,6 +480,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='items_have_unique_labels',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',

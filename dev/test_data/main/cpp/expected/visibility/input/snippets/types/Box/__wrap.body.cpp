@@ -1,0 +1,1 @@
+return L"[" + text + L"]";

@@ -393,6 +393,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='switch_on_enum_with_a_single_case',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -419,6 +420,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_enum_with_default',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -445,6 +447,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_enum_with_labels_in_tuple',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -471,6 +474,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_enum_with_pass',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -497,6 +501,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_enum_with_variables_in_cases',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -531,6 +536,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_str',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -557,6 +563,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_constrained_str',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -583,6 +590,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_on_int',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -609,6 +617,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='nested_switches',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -643,6 +652,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='switch_with_reassigned_int',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',

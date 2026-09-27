@@ -339,9 +339,15 @@ private static Regex {construct_name}()
 
     method_name = csharp_naming.method_name(verification.name)
 
+    modifier = (
+        "internal"
+        if verification.visibility is intermediate.Visibility.INTERNAL
+        else "public"
+    )
+
     writer.write(
         f"""\
-public static bool {method_name}(string {arg_name})
+{modifier} static bool {method_name}(string {arg_name})
 {{
 {I}return {regex_name}.IsMatch({arg_name});
 }}"""
@@ -486,6 +492,12 @@ def _transpile_transpilable_verification(
 
     method_name = csharp_naming.method_name(verification.name)
 
+    modifier = (
+        "internal"
+        if verification.visibility is intermediate.Visibility.INTERNAL
+        else "public"
+    )
+
     if verification.returns is None:
         return_type = "void"
     else:
@@ -500,13 +512,13 @@ def _transpile_transpilable_verification(
     if len(arg_defs) == 0:
         writer.write(
             f"""\
-public static {return_type} {method_name}()
+{modifier} static {return_type} {method_name}()
 {{"""
         )
     else:
         writer.write(
             f"""\
-public static {return_type} {method_name}(
+{modifier} static {return_type} {method_name}(
 """
         )
 
@@ -524,7 +536,7 @@ public static {return_type} {method_name}(
     if len(body) > 0:
         writer.write("\n")
 
-    writer.write(f"}}  // public static {return_type} {method_name}")
+    writer.write(f"}}  // {modifier} static {return_type} {method_name}")
 
     return Stripped(writer.getvalue()), None
 

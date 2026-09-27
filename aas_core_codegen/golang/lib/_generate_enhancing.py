@@ -158,6 +158,9 @@ func ({receiver} *{enhanced_struct_name}[E]) {setter_name}(
         )
 
     for method in cls.methods:
+        if method.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         result.append(_generate_method_delegation(cls=cls, method=method))
 
     result.append(

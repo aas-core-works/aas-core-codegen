@@ -162,6 +162,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='interface',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',
@@ -183,6 +184,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='void',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',

@@ -26,6 +26,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -83,6 +84,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -154,6 +156,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -221,6 +224,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -297,6 +301,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -442,6 +447,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_english',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='language',
@@ -479,6 +485,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='lang_string_sets_have_english',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lang_string_sets',
@@ -544,6 +551,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='iec_contents_have_definition_in_english',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='specifications',

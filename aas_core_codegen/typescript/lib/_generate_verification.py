@@ -320,7 +320,7 @@ return new RegExp(
     # region Initialize the regex
 
     regex_name = typescript_naming.constant_name(
-        Identifier(f"regexp_{verification.name}")
+        Identifier(f"regexp_{verification.name.lstrip('_')}")
     )
 
     blocks.append(Stripped(f"const {regex_name} = {construct_name}();"))
@@ -367,9 +367,16 @@ return new RegExp(
         writer.write(comment)
         writer.write("\n")
 
+    # NOTE (mristin):
+    # The internal functions are not exported so that they remain invisible to
+    # the users of the SDK.
+    export = (
+        "" if verification.visibility is intermediate.Visibility.INTERNAL else "export "
+    )
+
     writer.write(
         f"""\
-export function {function_name}({arg_name}: string): boolean {{
+{export}function {function_name}({arg_name}: string): boolean {{
 {I}return {regex_name}.test({arg_name});
 }}"""
     )
@@ -529,6 +536,13 @@ def _transpile_transpilable_verification(
 
     function_name = typescript_naming.function_name(verification.name)
 
+    # NOTE (mristin):
+    # The internal functions are not exported so that they remain invisible to
+    # the users of the SDK.
+    export = (
+        "" if verification.visibility is intermediate.Visibility.INTERNAL else "export "
+    )
+
     if verification.returns is None:
         return_type = "void"
     else:
@@ -547,12 +561,12 @@ def _transpile_transpilable_verification(
     if len(arg_defs) == 0:
         writer.write(
             f"""\
-export function {function_name}(): {return_type}:"""
+{export}function {function_name}(): {return_type}:"""
         )
     else:
         writer.write(
             f"""\
-export function {function_name}(
+{export}function {function_name}(
 """
         )
 

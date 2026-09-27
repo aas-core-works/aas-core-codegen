@@ -15,6 +15,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='get_something',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='INT',

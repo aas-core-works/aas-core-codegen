@@ -251,7 +251,7 @@ def _transpile_pattern_verification(
     # We assume that we performed all the checks at the intermediate stage.
 
     construct_name = python_naming.function_name(
-        Identifier(f"_construct_{verification.name}")
+        Identifier(f"_construct_{verification.name.lstrip('_')}")
     )
 
     blocks = []  # type: List[Stripped]
@@ -308,7 +308,9 @@ return re.compile(
 
     # region Initialize the regex
 
-    regex_name = python_naming.constant_name(Identifier(f"_regex_{verification.name}"))
+    regex_name = python_naming.constant_name(
+        Identifier(f"_regex_{verification.name.lstrip('_')}")
+    )
 
     blocks.append(Stripped(f"{regex_name} = {construct_name}()"))
 

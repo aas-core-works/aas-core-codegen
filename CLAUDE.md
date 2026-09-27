@@ -19,11 +19,15 @@ While programming, run fast-fail tests first: mypy and black on code generators.
 Once the code is ready, re-record the goldens over the unit tests. 
 Summarize the changes with the function signatures, class interfaces and state, and concrete code snippets -- then ask for approval before you run live tests.
 
-* Fast checks: ``python dev/continuous_integration/precommit.py --select reformat mypy``
-  (``--overwrite`` reformats in place).
+* Fast checks: ``python dev/continuous_integration/precommit.py --select reformat ssort mypy``
+  (``--overwrite`` reformats and re-sorts in place).
 * One test module: ``python -m unittest dev/tests/cpp/test_main.py``
 * Re-record golden data: set ``AAS_CORE_CODEGEN_TESTS_RERECORD=1``,
   then review with ``git diff dev/test_data/``.
+* Remove the model caches whenever you change ``parse`` or ``intermediate``:
+  ``rm -f /tmp/aas-core-codegen-*/model-*.pickle``.
+  The tests cache the pickled symbol tables keyed only on the meta-model source,
+  so stale pickles otherwise cause spurious failures (*e.g.*, missing attributes).
 * Live-test fast checks (compile, type-check and lint only; no test runs):
   ``python dev/live_tests/fast_check_<language>.py --select <case> --output_dir <dir>``
   for ``cpp``, ``csharp``, ``golang``, ``java``, ``python`` and ``typescript``.

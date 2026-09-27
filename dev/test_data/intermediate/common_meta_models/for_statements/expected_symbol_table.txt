@@ -421,6 +421,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='first_text_is_not_empty',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -449,6 +450,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='no_number_is_zero',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -477,6 +479,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='no_number_is_minus_one',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -505,6 +508,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='no_number_after_the_first_is_one',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -533,6 +537,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='sum_is_small',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -561,6 +566,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='no_item_has_an_empty_text',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -589,6 +595,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_neither_thirteen_nor_unlucky',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -617,6 +624,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='alpha_has_no_negative_numbers',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -653,6 +661,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='sum_of_odd_numbers_is_small',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -681,6 +690,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='items_are_few_and_texts_expected',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',

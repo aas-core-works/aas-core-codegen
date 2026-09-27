@@ -53,7 +53,10 @@ private static void compareOrRerecordValue(Object value, Path expectedPath) thro
 
         x_or_default_methods = []  # type: List[intermediate.MethodUnion]
         for method in concrete_cls.methods:
-            if method.name.endswith("_or_default"):
+            if (
+                method.name.endswith("_or_default")
+                and method.visibility is intermediate.Visibility.PUBLIC
+            ):
                 x_or_default_methods.append(method)
 
         for method in x_or_default_methods:

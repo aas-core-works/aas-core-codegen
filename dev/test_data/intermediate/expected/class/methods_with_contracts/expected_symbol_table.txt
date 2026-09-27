@@ -25,6 +25,7 @@ SymbolTable(
       methods=[
         UnderstoodMethod(
           name='some_func',
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='number',

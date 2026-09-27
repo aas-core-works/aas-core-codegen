@@ -71,6 +71,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='describe',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -172,6 +173,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='describe',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -192,6 +194,7 @@ SymbolTable(
           arguments_by_name=...),
         ImplementationSpecificMethod(
           name='volume',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='INT',
@@ -308,6 +311,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='is_described',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',

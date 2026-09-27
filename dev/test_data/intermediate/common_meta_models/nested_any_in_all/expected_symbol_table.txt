@@ -641,6 +641,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='is_english',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='language',
@@ -667,6 +668,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='lang_string_sets_have_english',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lang_string_sets',
@@ -698,6 +700,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='iec_contents_have_definition_in_english',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='specifications',

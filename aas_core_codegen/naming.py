@@ -26,8 +26,19 @@ def upper_snake_case(identifier: Identifier) -> Identifier:
 
 
 def lower_camel_case(identifier: Identifier) -> Identifier:
-    """Convert the identifier to a ``camelCase``."""
-    parts = identifier.split("_")
+    """
+    Convert the identifier to a ``camelCase``.
+
+    The leading underscores, which signal the visibility in the meta-model, are
+    stripped.
+
+    >>> lower_camel_case(Identifier("do_something"))
+    'doSomething'
+
+    >>> lower_camel_case(Identifier("_do_something"))
+    'doSomething'
+    """
+    parts = identifier.lstrip("_").split("_")
 
     assert len(parts) > 0, "Expected at least one part in the identifier"
 

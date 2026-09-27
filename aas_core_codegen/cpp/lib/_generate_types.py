@@ -709,7 +709,10 @@ virtual void {setter_name}(
             members.append(Stripped("///@}"))
 
     for method in cls.methods:
-        if method.specified_for is not cls:
+        if (
+            method.specified_for is not cls
+            or method.visibility is not intermediate.Visibility.PUBLIC
+        ):
             continue
 
         # noinspection PyTypeChecker
@@ -933,6 +936,12 @@ void {setter_name}(
 
         public_members.append(Stripped("// endregion"))
 
+    # NOTE (mristin):
+    # The non-public methods are not part of the interface, and serve only as
+    # helpers to the implementation-specific methods. As the concrete classes do not
+    # inherit from each other, we make them private.
+    private_members = []  # type: List[Stripped]
+
     for method in cls.methods:
         # noinspection PyTypeChecker
         returns = (
@@ -957,23 +966,31 @@ void {setter_name}(
 
         const_suffix = " const" if method.non_mutating else ""
 
+        is_public = method.visibility is intermediate.Visibility.PUBLIC
+
+        override_suffix = " override" if is_public else ""
+
+        declaration: Stripped
         if len(method.arguments) == 0:
-            public_members.append(
-                Stripped(f"{return_type} {method_name}(){const_suffix} override;")
+            declaration = Stripped(
+                f"{return_type} {method_name}(){const_suffix}{override_suffix};"
             )
         else:
             arguments_definition = ",\n".join(
                 f"{arg_type} {arg_name}" for arg_type, arg_name in arg_types_names
             )
 
-            public_members.append(
-                Stripped(
-                    f"""\
+            declaration = Stripped(
+                f"""\
 {return_type} {method_name}(
 {I}{indent_but_first_line(arguments_definition, I)}
-){const_suffix} override;"""
-                )
+){const_suffix}{override_suffix};"""
             )
+
+        if is_public:
+            public_members.append(declaration)
+        else:
+            private_members.append(declaration)
 
     public_members.append(Stripped(f"~{cls_name}() override = default;"))
 
@@ -981,7 +998,6 @@ void {setter_name}(
 
     interface_name = cpp_naming.interface_name(cls.name)
 
-    private_members = []  # type: List[Stripped]
     for prop in cls.properties:
         value_type = cpp_common.generate_type(type_annotation=prop.type_annotation)
 

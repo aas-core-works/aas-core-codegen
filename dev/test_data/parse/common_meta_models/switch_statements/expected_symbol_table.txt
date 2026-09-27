@@ -99,6 +99,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -313,6 +314,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_enum_with_a_single_case',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -367,6 +369,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_enum_with_default',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -441,6 +444,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_enum_with_labels_in_tuple',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -506,6 +510,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_enum_with_pass',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -588,6 +593,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_enum_with_variables_in_cases',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -699,6 +705,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_str',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -789,6 +796,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_constrained_str',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -842,6 +850,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_on_int',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -928,6 +937,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='nested_switches',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
@@ -1062,6 +1072,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='switch_with_reassigned_int',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='kind',
