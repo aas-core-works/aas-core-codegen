@@ -4171,6 +4171,62 @@ def uses_len_slicing_or_find(symbol_table: SymbolTable) -> bool:
     return False
 
 
+def _over_transpilable_nodes(symbol_table: SymbolTable) -> Iterator[parse_tree.Node]:
+    """
+    Iterate recursively over all the nodes which the generators transpile.
+
+    These are the nodes of the invariants, of the transpilable verification
+    functions and of the understood methods.
+    """
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, (ConstrainedPrimitive, AbstractClass, ConcreteClass)):
+            for an_invariant in our_type.invariants:
+                # NOTE (mristin):
+                # We skip the inherited invariants as they are also listed in
+                # the type which specified them.
+                if an_invariant.specified_for is not our_type:
+                    continue
+
+                yield from parse_tree.over_nodes(an_invariant.body)
+
+        if isinstance(our_type, (AbstractClass, ConcreteClass)):
+            for method in our_type.methods:
+                if isinstance(method, UnderstoodMethod):
+                    for node in method.body:
+                        yield from parse_tree.over_nodes(node)
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, TranspilableVerification):
+            for node in verification.parsed.body:
+                yield from parse_tree.over_nodes(node)
+
+
+def uses_modulo(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model uses the modulo operator in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for the modulo.
+    """
+    return any(
+        isinstance(node, parse_tree.Mod)
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def uses_abs(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls the built-in ``abs`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``abs``.
+    """
+    return any(
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "abs"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
 def collect_ids_of_our_types_in_properties(
     symbol_table: SymbolTable,
 ) -> Set[IdOfOurType]:

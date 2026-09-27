@@ -1936,6 +1936,77 @@ func {function_name}(
     )
 
 
+#: Helper to compute the remainder of the floored division as in Python.
+#:
+#: We deliberately do not transpile the modulo to the native Go operator ``%``.
+#: Go truncates the division towards zero so that its remainder takes the sign of
+#: the dividend (``-7 % 3 == -1``). The meta-model is written in Python where
+#: the division is floored so that the remainder takes the sign of the divisor
+#: (``-7 % 3 == 2``). The two only coincide when the operands have the same sign,
+#: but the invariants must behave the same in all the SDKs for all the inputs.
+#:
+#: Unlike C# or Java, Go defines the remainder of the smallest 64-bit integer by -1
+#: as zero (see the section "Arithmetic operators" of the Go specification), so we
+#: do not need a special guard for it.
+#:
+#: Mind that we must not mention the package ``math`` qualified in the comments,
+#: as the imports are detected by
+#: :py:func:`aas_core_codegen.golang.common.names_package`, and an unused import
+#: does not compile in Go.
+FLOOR_MOD = Stripped(
+    f"""\
+// {golang_transpilation.FLOOR_MOD_FUNCTION_NAME} computes the remainder of the floored division of dividend
+// by divisor.
+//
+// The remainder takes the sign of the divisor, as the modulo in Python,
+// in which the meta-model is written.
+//
+// We deliberately do not use the native operator `%` which truncates the division
+// towards zero so that its remainder takes the sign of the dividend. For example,
+// `-7 % 3 == -1` in Go, while `-7 % 3 == 2` in Python. The two only coincide when
+// the operands have the same sign, but the invariants must behave the same in all
+// the SDKs for all the inputs.
+//
+// The divisor must not be zero.
+func {golang_transpilation.FLOOR_MOD_FUNCTION_NAME}(dividend, divisor int64) int64 {{
+{I}// NOTE: Go defines the remainder of the smallest int64 by -1 as zero,
+{I}// so we need no special guard for that case.
+{I}remainder := dividend % divisor
+{I}if remainder != 0 && (remainder < 0) != (divisor < 0) {{
+{II}remainder += divisor
+{I}}}
+{I}return remainder
+}}"""
+)
+
+#: Helper to compute the absolute value of a 64-bit signed integer.
+#:
+#: Go provides no absolute value of integers in its standard library, as ``math.Abs``
+#: works only on ``float64``. Converting to ``float64`` and back would lose
+#: precision for large integers.
+#:
+#: Mind that we must not mention the package ``math`` qualified in the comments,
+#: as the imports are detected by
+#: :py:func:`aas_core_codegen.golang.common.names_package`, and an unused import
+#: does not compile in Go.
+ABS_INT64 = Stripped(
+    f"""\
+// {golang_transpilation.ABS_INT64_FUNCTION_NAME} computes the absolute value of x.
+//
+// The Go standard library provides the absolute value only for floating-point
+// numbers, so we provide our own for 64-bit integers.
+//
+// The absolute value of the smallest int64 overflows and is the smallest int64
+// itself, as it can not be represented as a positive int64.
+func {golang_transpilation.ABS_INT64_FUNCTION_NAME}(x int64) int64 {{
+{I}if x < 0 {{
+{II}return -x
+{I}}}
+{I}return x
+}}"""
+)
+
+
 #: Stand in for the import block, which is filled in at the very end: it
 #: depends on what the generated code actually names, and an unused import does
 #: not compile in Go.
@@ -2017,6 +2088,23 @@ func (ve *VerificationError) PathString() string {{
 }}"""
         ),
     ]  # type: List[Stripped]
+
+    for verification in symbol_table.verification_functions:
+        verification_name = golang_naming.function_name(verification.name)
+        for helper_name, operation in (
+            (golang_transpilation.FLOOR_MOD_FUNCTION_NAME, "the modulo operation"),
+            (golang_transpilation.ABS_INT64_FUNCTION_NAME, "the absolute value"),
+        ):
+            if verification_name == helper_name:
+                errors.append(
+                    Error(
+                        verification.parsed.node,
+                        f"The name of the verification function "
+                        f"{verification.name!r} collides in Go with the name of "
+                        f"our helper function {helper_name} used to "
+                        f"transpile {operation}",
+                    )
+                )
 
     base_environment = intermediate_type_inference.populate_base_environment(
         symbol_table=symbol_table
@@ -2109,6 +2197,16 @@ func (ve *VerificationError) PathString() string {{
             blocks.append(block)
 
     blocks.append(_generate_verify(symbol_table=symbol_table))
+
+    # NOTE (mristin):
+    # We add the helpers only if the meta-model uses the respective operations so
+    # that we do not clutter the code otherwise. The helpers are exported so that
+    # the clients can rely on them, and so that we can unit-test them.
+    if intermediate.uses_modulo(symbol_table):
+        blocks.append(FLOOR_MOD)
+
+    if intermediate.uses_abs(symbol_table):
+        blocks.append(ABS_INT64)
 
     blocks.append(golang_common.WARNING)
 

@@ -1547,6 +1547,57 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IUnion that)
     )
 
 
+#: Helper to compute the remainder of the floored division as in Python.
+#:
+#: We deliberately do not transpile the modulo to the native C# operator ``%``.
+#: C# truncates the division towards zero so that its remainder takes the sign of
+#: the dividend (``-7 % 3 == -1``). The meta-model is written in Python where
+#: the division is floored so that the remainder takes the sign of the divisor
+#: (``-7 % 3 == 2``). The two only coincide when the operands have the same sign,
+#: but the invariants must behave the same in all the SDKs for all the inputs.
+FLOOR_MOD = Stripped(
+    f"""\
+/// <summary>
+/// Compute the remainder of the floored division of <paramref name="dividend" />
+/// by <paramref name="divisor" />.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The remainder takes the sign of the divisor, as the modulo in Python,
+/// in which the meta-model is written.
+/// </para>
+/// <para>
+/// We deliberately do not use the native operator <c>%</c> which truncates
+/// the division towards zero so that its remainder takes the sign of
+/// the dividend. For example, <c>-7 % 3 == -1</c> in C#, while
+/// <c>-7 % 3 == 2</c> in Python. The two only coincide when the operands have
+/// the same sign, but the invariants must behave the same in all the SDKs for
+/// all the inputs.
+/// </para>
+/// <para>
+/// The <paramref name="divisor" /> must not be zero.
+/// </para>
+/// </remarks>
+public static long FloorMod(long dividend, long divisor)
+{{
+{I}// NOTE: The native long.MinValue % -1 overflows in C#, while
+{I}// every number is divisible by -1 without a remainder.
+{I}if (divisor == -1)
+{I}{{
+{II}return 0;
+{I}}}
+
+{I}long remainder = dividend % divisor;
+{I}if (remainder != 0 && (remainder < 0) != (divisor < 0))
+{I}{{
+{II}remainder += divisor;
+{I}}}
+
+{I}return remainder;
+}}"""
+)
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -1597,6 +1648,17 @@ using System.Linq;  // can't alias"""
 
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
+
+    for verification in symbol_table.verification_functions:
+        if csharp_naming.method_name(verification.name) == "FloorMod":
+            errors.append(
+                Error(
+                    verification.parsed.node,
+                    f"The name of the verification function {verification.name!r} "
+                    f"collides with the name of our helper function FloorMod "
+                    f"used to transpile the modulo operation",
+                )
+            )
 
     base_environment = intermediate_type_inference.populate_base_environment(
         symbol_table=symbol_table
@@ -1728,6 +1790,13 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
 
     if len(symbol_table.named_unions) > 0:
         verification_blocks.append(_generate_union_verify_helper())
+
+    # NOTE (mristin):
+    # We add the helper only if the meta-model uses the modulo so that we do not
+    # clutter the code otherwise. The helper is public so that the clients can
+    # rely on it, and so that we can unit-test it.
+    if intermediate.uses_modulo(symbol_table):
+        verification_blocks.append(FLOOR_MOD)
 
     if len(errors) > 0:
         return None, errors

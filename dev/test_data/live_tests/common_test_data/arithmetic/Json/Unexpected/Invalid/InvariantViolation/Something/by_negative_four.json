@@ -1,0 +1,13 @@
+{
+  "even": -4,
+  "offset": -4,
+  "small": -5,
+  "byNegative": 4,
+  "text": "ab",
+  "negative": -3,
+  "deviation": -10,
+  "ratio": -0.75,
+  "alignment": -2,
+  "optionalNumber": -1,
+  "optionalRatio": -0.25
+}

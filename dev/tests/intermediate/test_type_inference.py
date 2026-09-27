@@ -894,6 +894,237 @@ __xml_namespace__ = "https://dummy.com"
             ),
         )
 
+    def test_modulo_negation_and_abs(self) -> None:
+        source = """\
+@invariant(lambda self: self % 2 == 0, "Even")
+class Even_int(int, DBC):
+    pass
+
+
+@verification
+def has_small_remainder(number: int) -> bool:
+    remainder = number % 7
+    return remainder < 3
+
+
+@invariant(
+    lambda self:
+    self.even % -3 == 0
+    and len(self.text) % 2 == 0
+    and -self.number < 0
+    and -(-self.number) > 0
+    and -self.ratio < 0.0
+    and abs(self.number) + abs(self.even) > 0
+    and abs(self.ratio) < 1.0
+    and has_small_remainder(self.number)
+    and (
+        not (self.optional_number is not None)
+        or (
+            self.optional_number % 5 == 4
+            and -self.optional_number < 0
+            and abs(self.optional_number) < 100
+        )
+    ),
+    "Dummy invariant description"
+)
+class Something:
+    even: Even_int
+    text: str
+    number: int
+    ratio: float
+    optional_number: Optional[int]
+
+    def __init__(
+        self,
+        even: Even_int,
+        text: str,
+        number: int,
+        ratio: float,
+        optional_number: Optional[int] = None
+    ) -> None:
+        self.even = even
+        self.text = text
+        self.number = number
+        self.ratio = ratio
+        self.optional_number = optional_number
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        Test_with_smoke.execute(source=source)
+
+    def test_modulo_on_float_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    self.ratio % 2 == 0,
+    "Dummy invariant description"
+)
+class Something:
+    ratio: float
+
+    def __init__(self, ratio: float) -> None:
+        self.ratio = ratio
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The modulo operation is only defined on integer numbers, "
+                "but got as a left operand: float"
+            ),
+        )
+
+    def test_modulo_on_optional_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    self.number % 2 == 0,
+    "Dummy invariant description"
+)
+class Something:
+    number: Optional[int]
+
+    def __init__(self, number: Optional[int] = None) -> None:
+        self.number = number
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the left operand to be a non-None, but got: Optional[int]"
+            ),
+        )
+
+    def test_negation_of_length_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    -len(self.text) < 0,
+    "Dummy invariant description"
+)
+class Something:
+    text: str
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The arithmetic negation is only defined on integer and "
+                "floating-point numbers, but got: length"
+            ),
+        )
+
+    def test_negation_of_str_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    -self.text == self.text,
+    "Dummy invariant description"
+)
+class Something:
+    text: str
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The arithmetic negation is only defined on integer and "
+                "floating-point numbers, but got: str"
+            ),
+        )
+
+    def test_negation_of_optional_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    -self.number < 0,
+    "Dummy invariant description"
+)
+class Something:
+    number: Optional[int]
+
+    def __init__(self, number: Optional[int] = None) -> None:
+        self.number = number
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operand to be a non-None, but got: Optional[int]"
+            ),
+        )
+
+    def test_abs_of_length_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    abs(len(self.text)) > 0,
+    "Dummy invariant description"
+)
+class Something:
+    text: str
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "The absolute value is only defined on integer and "
+                "floating-point numbers, but got: length"
+            ),
+        )
+
+    def test_abs_of_optional_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    abs(self.number) > 0,
+    "Dummy invariant description"
+)
+class Something:
+    number: Optional[int]
+
+    def __init__(self, number: Optional[int] = None) -> None:
+        self.number = number
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operand to be a non-None, but got: Optional[int]"
+            ),
+        )
+
 
 class Test_for_statement(unittest.TestCase):
     @staticmethod

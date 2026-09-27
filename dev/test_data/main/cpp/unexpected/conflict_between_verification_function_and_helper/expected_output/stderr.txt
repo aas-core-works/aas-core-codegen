@@ -1,0 +1,2 @@
+Failed to generate src/verification.cpp based on <path to meta_model.py>:
+* At line 4 and column 2: The name of the verification function 'floor_mod' collides with the name of our helper function FloorMod used to transpile the modulo operation

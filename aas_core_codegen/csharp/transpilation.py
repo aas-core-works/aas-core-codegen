@@ -663,6 +663,40 @@ class Transpiler(
         else:
             return Stripped(f"{instance}.{method_name}({joined_args})"), None
 
+    def _is_declared_nullable(self, node: parse_tree.Expression) -> bool:
+        """
+        Check whether the ``node`` has been declared as optional.
+
+        The type inference strips ``Optional`` from the types of the nodes which have
+        been narrowed down by a guard such as ``x is not None``. However, C# keeps
+        the declared type, so that a narrowed integer or floating-point number is
+        still a nullable value type (``long?`` or ``double?``) in C#. The lifted
+        operators work on nullable value types, but we need to explicitly unwrap
+        them with ``.Value`` before passing them to a method.
+        """
+        if isinstance(node, parse_tree.Member):
+            instance_type = self.type_map.get(node.instance, None)
+            if isinstance(
+                instance_type, intermediate_type_inference.OurTypeAnnotation
+            ) and isinstance(
+                instance_type.our_type,
+                (intermediate.ConcreteClass, intermediate.AbstractClass),
+            ):
+                prop = instance_type.our_type.properties_by_name.get(node.name, None)
+                return prop is not None and isinstance(
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                )
+
+            return False
+
+        elif isinstance(node, parse_tree.Name):
+            return isinstance(
+                self._environment.find(node.identifier),
+                intermediate_type_inference.OptionalTypeAnnotation,
+            )
+
+        return False
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(
         self, node: parse_tree.FunctionCall
@@ -796,6 +830,19 @@ class Transpiler(
                         f"We do not know how to compute the length on type {arg_type}",
                         errors,
                     )
+
+            elif func_type.func.name == "abs":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                arg = args[0]
+                if self._is_declared_nullable(node.args[0]):
+                    arg = Stripped(f"{arg}.Value")
+
+                return Stripped(f"System.Math.Abs({arg})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1004,6 +1051,50 @@ class Transpiler(
 
         return Stripped(writer.getvalue()), None
 
+    def _transform_as_method_argument(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """Transpile the ``node`` and unwrap it if it is a nullable value type."""
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if self._is_declared_nullable(node):
+            return Stripped(f"{code}.Value"), None
+
+        return code, None
+
+    def transform_mod(
+        self, node: parse_tree.Mod
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        left, error = self._transform_as_method_argument(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self._transform_as_method_argument(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the modulo operation", errors
+            )
+
+        # NOTE (mristin):
+        # We deliberately do not use the native C# operator ``%``. C# truncates
+        # the division towards zero so that its remainder takes the sign of
+        # the dividend (``-7 % 3 == -1``). The meta-model is written in Python where
+        # the division is floored so that the remainder takes the sign of the divisor
+        # (``-7 % 3 == 2``). The two only coincide for the operands of the same sign,
+        # but the invariants must behave the same in all the SDKs for all the inputs.
+        # Hence, we call the helper which computes the floored remainder, see
+        # :py:data:`aas_core_codegen.csharp.lib._generate_verification.FLOOR_MOD`.
+        return Stripped(f"Verification.FloorMod({left}, {right})"), None
+
     def _transform_add_or_sub(
         self, node: Union[parse_tree.Add, parse_tree.Sub]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1064,6 +1155,33 @@ class Transpiler(
         self, node: parse_tree.Sub
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_add_or_sub(node)
+
+    def transform_neg(
+        self, node: parse_tree.Neg
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self.transform(node.operand)
+        if error is not None:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the arithmetic negation",
+                [error],
+            )
+
+        # NOTE (mristin):
+        # We have to put a negative constant in parentheses as well, since ``--1``
+        # would be parsed as a decrement in C#.
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            operand = Stripped(f"({operand})")
+
+        return Stripped(f"-{operand}"), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr

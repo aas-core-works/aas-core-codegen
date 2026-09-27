@@ -553,6 +553,14 @@ not (
 
                 return Stripped(f"len({args[0]})"), None
 
+            elif func_type.func.name == "abs":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                return Stripped(f"abs({args[0]})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -768,8 +776,8 @@ not (
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_and_or_or(node)
 
-    def _transform_add_or_sub(
-        self, node: Union[parse_tree.Add, parse_tree.Sub]
+    def _transform_binary_arithmetic(
+        self, node: Union[parse_tree.Add, parse_tree.Sub, parse_tree.Mod]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -787,6 +795,8 @@ not (
                 operation_name = "the addition"
             elif isinstance(node, parse_tree.Sub):
                 operation_name = "the subtraction"
+            elif isinstance(node, parse_tree.Mod):
+                operation_name = "the modulo operation"
             else:
                 assert_never(node)
 
@@ -815,18 +825,53 @@ not (
             return Stripped(f"{left} + {right}"), None
         elif isinstance(node, parse_tree.Sub):
             return Stripped(f"{left} - {right}"), None
+        elif isinstance(node, parse_tree.Mod):
+            # NOTE (mristin):
+            # The meta-model is written in Python, so the native Python modulo
+            # defines the semantics for all the other targets: the remainder takes
+            # the sign of the divisor (floored division).
+            return Stripped(f"{left} % {right}"), None
         else:
             assert_never(node)
 
     def transform_add(
         self, node: parse_tree.Add
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
 
     def transform_sub(
         self, node: parse_tree.Sub
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
+
+    def transform_mod(
+        self, node: parse_tree.Mod
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self._transform_binary_arithmetic(node)
+
+    def transform_neg(
+        self, node: parse_tree.Neg
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self.transform(node.operand)
+        if error is not None:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the arithmetic negation",
+                [error],
+            )
+
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            operand = Stripped(f"({operand})")
+
+        return Stripped(f"-{operand}"), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr

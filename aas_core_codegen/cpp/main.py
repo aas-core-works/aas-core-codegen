@@ -604,6 +604,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test the arithmetic operations only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                test_dir / "test_arithmetic.cpp",
+                lambda: (
+                    cpp_tests.generate_test_arithmetic_implementation(
+                        symbol_table=context.symbol_table,
+                        library_namespace=library_namespace,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

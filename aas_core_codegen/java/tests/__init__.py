@@ -4,6 +4,7 @@ from aas_core_codegen.java.tests import (
     _generate_common,
     _generate_common_json,
     _generate_common_jsonization,
+    _generate_test_arithmetic,
     _generate_test_copying,
     _generate_test_descend_and_visitor_through,
     _generate_test_descend_once,
@@ -22,6 +23,7 @@ from aas_core_codegen.java.tests import (
 generate_common = _generate_common.generate
 generate_common_json = _generate_common_json.generate
 generate_common_jsonization = _generate_common_jsonization.generate
+generate_test_arithmetic = _generate_test_arithmetic.generate
 generate_test_copying = _generate_test_copying.generate
 generate_test_descend_and_visitor_through = (
     _generate_test_descend_and_visitor_through.generate

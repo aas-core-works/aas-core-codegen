@@ -5,6 +5,7 @@ from aas_core_codegen.cpp.tests import (
     _generate_common_examples,
     _generate_common_jsonization,
     _generate_common_xmlization,
+    _generate_test_arithmetic,
     _generate_test_descent_and_descent_once,
     _generate_test_jsonization_dispatch,
     _generate_test_json_value_verification,
@@ -39,6 +40,9 @@ generate_common_xmlization_implementation = (
     _generate_common_xmlization.generate_implementation
 )
 
+generate_test_arithmetic_implementation = (
+    _generate_test_arithmetic.generate_implementation
+)
 generate_test_descent_and_descent_once_implementation = (
     _generate_test_descent_and_descent_once.generate_implementation
 )

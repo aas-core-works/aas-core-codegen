@@ -51,6 +51,21 @@ PRIMITIVE_TYPE_MAP = {
     intermediate_type_inference.PrimitiveType.LENGTH: Stripped("int"),
 }
 
+#: Name of the helper function in the verification package which computes
+#: the remainder of the floored division as in Python.
+#:
+#: See :py:meth:`Transpiler.transform_mod` and
+#: :py:data:`aas_core_codegen.golang.lib._generate_verification.FLOOR_MOD` on why
+#: we do not use the native Go operator ``%``.
+FLOOR_MOD_FUNCTION_NAME = Identifier("FloorMod")
+
+#: Name of the helper function in the verification package which computes
+#: the absolute value of a 64-bit signed integer.
+#:
+#: Go does not provide an absolute value for integers in its standard library;
+#: ``math.Abs`` works only on ``float64``.
+ABS_INT64_FUNCTION_NAME = Identifier("AbsInt64")
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate_type(
@@ -604,6 +619,10 @@ len(
                 node.original_node, "Failed to transpile the comparison", errors
             )
 
+        # NOTE (mristin):
+        # The modulo is transpiled either as a function call or as the native
+        # operator ``%``, and the negation as the unary ``-``. Both bind stronger
+        # than the comparison in Go, so they need no parentheses.
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,
@@ -616,6 +635,8 @@ len(
             parse_tree.Slice,
             parse_tree.All,
             parse_tree.Any,
+            parse_tree.Mod,
+            parse_tree.Neg,
         )
 
         if not isinstance(node.left, no_parentheses_types):
@@ -987,6 +1008,51 @@ aascommon.MapContains(
 
                 return Stripped(f"{len_function}({args[0]})"), None
 
+            elif func_type.func.name == "abs":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # The type of the result of ``abs`` equals the type of its argument,
+                # and has been inferred at the call site.
+                a_type = intermediate_type_inference.try_primitive_type(
+                    self.type_map[node]
+                )
+
+                abs_function: str
+                if a_type is intermediate_type_inference.PrimitiveType.FLOAT:
+                    abs_function = "math.Abs"
+
+                elif a_type is intermediate_type_inference.PrimitiveType.INT:
+                    # NOTE (mristin):
+                    # Go provides no absolute value of integers in its standard
+                    # library, so we call our own helper, see
+                    # :py:data:`aas_core_codegen.golang.lib._generate_verification.ABS_INT64`.
+                    abs_function = ABS_INT64_FUNCTION_NAME
+
+                else:
+                    return None, Error(
+                        node.original_node,
+                        f"Expected the result of abs to be either an integer or "
+                        f"a floating-point number, but got {self.type_map[node]}; "
+                        f"this should have been caught before",
+                    )
+
+                if "\n" in args[0]:
+                    return (
+                        Stripped(
+                            f"""\
+{abs_function}(
+{I}{indent_but_first_line(args[0], I)},
+)"""
+                        ),
+                        None,
+                    )
+
+                return Stripped(f"{abs_function}({args[0]})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1280,6 +1346,178 @@ aascommon.MapContains(
         self, node: parse_tree.Sub
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_add_or_sub(node)
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_mod(
+        self, node: parse_tree.Mod
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        left, error = self._transform_and_dereference_if_necessary(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self._transform_and_dereference_if_necessary(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the modulo operation", errors
+            )
+
+        assert left is not None
+        assert right is not None
+
+        # NOTE (mristin):
+        # The constrained primitives behave like their constrainees in arithmetic.
+        left_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.left]
+        )
+        right_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.right]
+        )
+        result_a_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node]
+        )
+
+        length = intermediate_type_inference.PrimitiveType.LENGTH
+        integer = intermediate_type_inference.PrimitiveType.INT
+
+        if (
+            left_a_type not in (integer, length)
+            or right_a_type not in (integer, length)
+            or result_a_type not in (integer, length)
+        ):
+            return None, Error(
+                node.original_node,
+                f"Expected the operands and the result of the modulo to be integers "
+                f"or lengths, but got the left operand {self.type_map[node.left]}, "
+                f"the right operand {self.type_map[node.right]} and "
+                f"the result {self.type_map[node]}; "
+                f"this should have been caught before",
+            )
+
+        # NOTE (mristin):
+        # We deliberately do not use the native Go operator ``%`` in general. Go
+        # truncates the division towards zero so that its remainder takes the sign
+        # of the dividend (``-7 % 3 == -1``). The meta-model is written in Python
+        # where the division is floored so that the remainder takes the sign of
+        # the divisor (``-7 % 3 == 2``). The two only coincide when the operands have
+        # the same sign, but the invariants must behave the same in all the SDKs for
+        # all the inputs. Hence, we call the helper which computes the floored
+        # remainder, see
+        # :py:data:`aas_core_codegen.golang.lib._generate_verification.FLOOR_MOD`.
+        #
+        # However, a length is never negative. When the dividend is a length and
+        # the divisor is either a length or a positive integer literal, both operands
+        # are non-negative, so the native operator gives the same remainder as
+        # the floored division. We use the native operator in that case for
+        # readability, *e.g.*, ``len(text) % 2``. Both operands are ``int`` or
+        # untyped constants in that case, so no conversion is necessary either.
+        if left_a_type is length and (
+            right_a_type is length
+            or (
+                isinstance(node.right, parse_tree.Constant)
+                and isinstance(node.right.value, int)
+                and not isinstance(node.right.value, bool)
+                and node.right.value > 0
+            )
+        ):
+            no_parentheses_types_in_this_context = (
+                parse_tree.Member,
+                parse_tree.MethodCall,
+                parse_tree.FunctionCall,
+                parse_tree.Constant,
+                parse_tree.Name,
+                parse_tree.Index,
+            )
+
+            if not isinstance(node.left, no_parentheses_types_in_this_context):
+                left = Stripped(f"({left})")
+
+            if not isinstance(node.right, no_parentheses_types_in_this_context):
+                right = Stripped(f"({right})")
+
+            return Stripped(f"{left} % {right}"), None
+
+        # NOTE (mristin):
+        # The lengths are represented as ``int`` in Go, while the helper works on
+        # ``int64``, so we have to convert them explicitly. The integer literals are
+        # untyped constants in Go and need no conversion.
+        if left_a_type is length:
+            left = Stripped(f"int64({left})")
+
+        if right_a_type is length:
+            right = Stripped(f"int64({right})")
+
+        args_joined = f"{left}, {right}"
+        call: Stripped
+        if "\n" in args_joined or len(args_joined) > 50:
+            call = Stripped(
+                f"""\
+{FLOOR_MOD_FUNCTION_NAME}(
+{I}{indent_but_first_line(left, I)},
+{I}{indent_but_first_line(right, I)},
+)"""
+            )
+        else:
+            call = Stripped(f"{FLOOR_MOD_FUNCTION_NAME}({args_joined})")
+
+        if result_a_type is length:
+            # NOTE (mristin):
+            # The remainder of a length is a length, and lengths are represented as
+            # ``int`` in Go.
+            if "\n" in call:
+                return (
+                    Stripped(
+                        f"""\
+int(
+{I}{indent_but_first_line(call, I)},
+)"""
+                    ),
+                    None,
+                )
+
+            return Stripped(f"int({call})"), None
+
+        return call, None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_neg(
+        self, node: parse_tree.Neg
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self._transform_and_dereference_if_necessary(node.operand)
+        if error is not None:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the arithmetic negation",
+                [error],
+            )
+
+        assert operand is not None
+
+        # NOTE (mristin):
+        # We have to put a negation (or a negative constant) in parentheses as well,
+        # since ``--x`` would be lexed as a decrement in Go.
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            operand = Stripped(f"({operand})")
+
+        elif operand.startswith("*"):
+            # NOTE (mristin):
+            # ``-*x`` is valid Go, but we put the de-referencing in parentheses
+            # for readability.
+            operand = Stripped(f"({operand})")
+
+        return Stripped(f"-{operand}"), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr

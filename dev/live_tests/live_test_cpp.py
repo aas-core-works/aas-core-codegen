@@ -54,6 +54,7 @@ def _generate_cmake_lists(
     uses_xml_rpc: bool,
     uses_variant: bool,
     uses_string_helpers: bool,
+    uses_arithmetic: bool,
 ) -> Stripped:
     project_name = _cmake_project_name(namespace)
     variable_prefix = _cmake_variable_prefix(namespace)
@@ -102,6 +103,20 @@ def _generate_cmake_lists(
     )
 """
         if uses_string_helpers
+        else ""
+    )
+
+    test_arithmetic_block = (
+        f"""\
+
+    add_executable(test_arithmetic test/test_arithmetic.cpp)
+    target_link_libraries(test_arithmetic {target_prefix}_static)
+    add_test(
+            NAME test_arithmetic
+            COMMAND $<TARGET_FILE:test_arithmetic>
+    )
+"""
+        if uses_arithmetic
         else ""
     )
 
@@ -499,7 +514,7 @@ if (${{BUILD_TESTS}})
             COMMAND $<TARGET_FILE:test_x_or_default>
     )
     # endregion
-{test_xml_rpc_block}{test_string_helpers_block}endif ()"""
+{test_xml_rpc_block}{test_string_helpers_block}{test_arithmetic_block}endif ()"""
     )
 
 
@@ -698,11 +713,18 @@ def main() -> int:
                 case_dir / "expected_output" / "test" / "test_string_helpers.cpp"
             ).exists()
 
+            # Likewise, the unit test of the arithmetic operations is only
+            # generated if the meta-model uses the modulo or ``abs``.
+            uses_arithmetic = (
+                case_dir / "expected_output" / "test" / "test_arithmetic.cpp"
+            ).exists()
+
             cmake_lists_text = _generate_cmake_lists(
                 namespace=namespace,
                 uses_xml_rpc=uses_xml_rpc,
                 uses_variant=uses_variant,
                 uses_string_helpers=uses_string_helpers,
+                uses_arithmetic=uses_arithmetic,
             )
             (project_dir / "CMakeLists.txt").write_text(
                 cmake_lists_text, encoding="utf-8"

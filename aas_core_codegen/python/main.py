@@ -365,6 +365,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test the arithmetic operations only if the meta-model uses them so that
+    # the other SDKs, which need helper functions, test the very same cases.
+    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path / "test_arithmetic.py",
+                lambda: (
+                    python_tests.generate_test_arithmetic(
+                        symbol_table=context.symbol_table
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

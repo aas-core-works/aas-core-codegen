@@ -756,6 +756,55 @@ class _ParseAddOrSub(_Parse):
             raise AssertionError(f"Unexpected: {node.op=}")
 
 
+class _ParseMod(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod)
+
+        left, error = ast_node_to_our_node(node.left)
+        if error is not None:
+            return None, error
+
+        assert isinstance(left, tree.Expression), f"{left=}"
+
+        right, error = ast_node_to_our_node(node.right)
+        if error is not None:
+            return None, error
+
+        assert isinstance(right, tree.Expression), f"{right=}"
+
+        return tree.Mod(left=left, right=right, original_node=node), None
+
+
+class _ParseNeg(_Parse):
+    """
+    Parse an arithmetic negation.
+
+    Mind that the negation of a numeric literal has been already parsed as
+    a constant by :py:class:`_ParseConstant`.
+    """
+
+    # noinspection PyUnresolvedReferences
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub)
+
+    # noinspection PyUnresolvedReferences,PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub)
+
+        operand, error = ast_node_to_our_node(node.operand)
+        if error is not None:
+            return None, error
+
+        assert operand is not None
+        assert isinstance(operand, tree.Expression), f"{operand=}"
+
+        return tree.Neg(operand=operand, original_node=node), None
+
+
 class _ParseExpression(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Expr)
@@ -1194,6 +1243,8 @@ _CHAIN_OF_RULES = [
     _ParseNot(),
     _ParseAndOrOr(),
     _ParseAddOrSub(),
+    _ParseMod(),
+    _ParseNeg(),
     _ParseExpression(),
     _ParseJoinedStr(),
     _ParseAssignment(),

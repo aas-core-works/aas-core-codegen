@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ModelType": {
+      "type": "string",
+      "enum": []
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "even": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "small": {
+          "type": "integer"
+        },
+        "byNegative": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        },
+        "negative": {
+          "type": "integer"
+        },
+        "deviation": {
+          "type": "integer"
+        },
+        "ratio": {
+          "type": "number"
+        },
+        "alignment": {
+          "type": "integer"
+        },
+        "optionalNumber": {
+          "type": "integer"
+        },
+        "optionalRatio": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "even",
+        "offset",
+        "small",
+        "byNegative",
+        "text",
+        "negative",
+        "deviation",
+        "ratio",
+        "alignment"
+      ]
+    }
+  }
+}

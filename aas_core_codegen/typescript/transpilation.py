@@ -892,6 +892,24 @@ AasCommon.at(
 
                 return self._generate_len(node.args[0])
 
+            elif func_type.func.name == "abs":
+                assert len(node.args) == 1, (
+                    f"Expected exactly one argument, but got: {node.args}; "
+                    f"this should have been caught before."
+                )
+
+                arg, error = self.transform(node.args[0])
+                if error is not None:
+                    return None, Error(
+                        node.original_node,
+                        "Failed to transpile the argument of abs",
+                        [error],
+                    )
+
+                assert arg is not None
+
+                return Stripped(f"Math.abs({arg})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1156,6 +1174,83 @@ AasCommon.at(
         self, node: parse_tree.Sub
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_add_or_sub(node)
+
+    def transform_mod(
+        self, node: parse_tree.Mod
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        left, error = self.transform(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self.transform(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the modulo operation", errors
+            )
+
+        assert left is not None
+        assert right is not None
+
+        # NOTE (mristin):
+        # We deliberately do not use the native TypeScript operator ``%``. JavaScript
+        # truncates the division towards zero so that its remainder takes the sign of
+        # the dividend (``-7 % 3 == -1``). The meta-model is written in Python where
+        # the division is floored so that the remainder takes the sign of the divisor
+        # (``-7 % 3 == 2``). The two only coincide for the operands of the same sign,
+        # but the invariants must behave the same in all the SDKs for all the inputs.
+        # Hence, we call the helper which computes the floored remainder, see
+        # :py:data:`aas_core_codegen.typescript.lib._generate_verification.FLOOR_MOD`.
+        #
+        # We transpile the modulo only in the verification module, so we refer to
+        # the helper directly by its name, as we do with the verification functions.
+        joined_args = f"{left}, {right}"
+        if "\n" not in joined_args and len(joined_args) <= 50:
+            return Stripped(f"floorMod({joined_args})"), None
+
+        return (
+            Stripped(
+                f"""\
+floorMod(
+{I}{indent_but_first_line(left, I)},
+{I}{indent_but_first_line(right, I)}
+)"""
+            ),
+            None,
+        )
+
+    def transform_neg(
+        self, node: parse_tree.Neg
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self.transform(node.operand)
+        if error is not None:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the arithmetic negation",
+                [error],
+            )
+
+        assert operand is not None
+
+        # NOTE (mristin):
+        # We have to put a negative constant or a nested negation in parentheses
+        # as well, since ``--1`` would be parsed as a decrement in TypeScript.
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            operand = Stripped(f"({operand})")
+
+        return Stripped(f"-{operand}"), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr

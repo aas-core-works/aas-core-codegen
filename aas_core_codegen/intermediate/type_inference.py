@@ -191,6 +191,15 @@ class VerificationTypeAnnotation(FunctionTypeAnnotation):
 class BuiltinFunction:
     """Represent a built-in function."""
 
+    #: Name of the built-in function
+    name: Final[Identifier]
+
+    #: Type of the returned value.
+    #:
+    #: If None, the function either returns nothing, or the returned type depends
+    #: on the arguments and is inferred at the call site (*e.g.*, ``abs``).
+    returns: Final[Optional["TypeAnnotationUnion"]]
+
     def __init__(self, name: Identifier, returns: Optional["TypeAnnotationUnion"]):
         """Initialize with the given values."""
         self.name = name
@@ -1108,7 +1117,9 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
-    def _transform_add_or_sub(self, node: Union[parse_tree.Add, parse_tree.Sub]) -> str:
+    def _transform_binary_arithmetic(
+        self, node: Union[parse_tree.Add, parse_tree.Sub, parse_tree.Mod]
+    ) -> str:
         left_repr = self.transform(node.left)
         if not _Canonicalizer._needs_no_brackets(node.left):
             left_repr = f"({left_repr})"
@@ -1122,6 +1133,8 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
             result = f"{left_repr} + {right_repr}"
         elif isinstance(node, parse_tree.Sub):
             result = f"{left_repr} - {right_repr}"
+        elif isinstance(node, parse_tree.Mod):
+            result = f"{left_repr} % {right_repr}"
         else:
             assert_never(node)
 
@@ -1129,10 +1142,30 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         return result
 
     def transform_add(self, node: parse_tree.Add) -> str:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
 
     def transform_sub(self, node: parse_tree.Sub) -> str:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
+
+    def transform_mod(self, node: parse_tree.Mod) -> str:
+        return self._transform_binary_arithmetic(node)
+
+    def transform_neg(self, node: parse_tree.Neg) -> str:
+        operand_repr = self.transform(node.operand)
+
+        # NOTE (mristin):
+        # We put a negative constant in brackets as well so that we render
+        # ``-(-1)`` instead of the confusing ``--1``.
+        if not _Canonicalizer._needs_no_brackets(node.operand) or (
+            isinstance(node.operand, parse_tree.Constant)
+            and isinstance(node.operand.value, (int, float))
+            and node.operand.value < 0
+        ):
+            operand_repr = f"({operand_repr})"
+
+        result = f"-{operand_repr}"
+        self.representation_map[node] = result
+        return result
 
     def transform_formatted_value(self, node: parse_tree.FormattedValue) -> str:
         result = self.transform(node.value)
@@ -2428,6 +2461,48 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
+    def _check_signed_number_operand(
+        self,
+        operand: parse_tree.Expression,
+        operand_type: "TypeAnnotationUnion",
+        operation_name_with_capital_the: str,
+    ) -> Optional[PrimitiveType]:
+        """
+        Check that the operand of a sign-related operation is a signed number.
+
+        The sign-related operations are the arithmetic negation and ``abs``.
+        Return the primitive type of the operand, or None if the check failed.
+        Errors, if any, are appended to :py:attr:`errors`.
+
+        We refuse lengths as they are unsigned in some target languages (*e.g.*,
+        ``size_t`` in C++) so that their negation would silently wrap around.
+        """
+        if isinstance(operand_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    operand.original_node,
+                    f"Expected the operand to be a non-None, "
+                    f"but got: {operand_type}",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The constrained primitives behave like their constrainees in arithmetic.
+        a_type = try_primitive_type(operand_type)
+
+        if a_type not in (PrimitiveType.INT, PrimitiveType.FLOAT):
+            self.errors.append(
+                Error(
+                    operand.original_node,
+                    f"{operation_name_with_capital_the} is only defined on "
+                    f"integer and floating-point numbers, but got: {operand_type}",
+                )
+            )
+            return None
+
+        return a_type
+
     def transform_function_call(
         self, node: parse_tree.FunctionCall
     ) -> Optional["TypeAnnotationUnion"]:
@@ -2531,6 +2606,26 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                 )
                 return None
+
+        if (
+            isinstance(func_type, BuiltinFunctionTypeAnnotation)
+            and func_type.func.name == "abs"
+            and len(arg_types) == 1
+        ):
+            arg_type = arg_types[0]
+            assert arg_type is not None
+
+            a_type = self._check_signed_number_operand(
+                operand=node.args[0],
+                operand_type=arg_type,
+                operation_name_with_capital_the="The absolute value",
+            )
+            if a_type is None:
+                return None
+
+            # NOTE (mristin):
+            # The type of the result depends on the argument.
+            result = PrimitiveTypeAnnotation(a_type=a_type)
 
         assert result is not None
 
@@ -2802,7 +2897,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
     @staticmethod
     def _binary_operation_name_with_capital_the(
-        node: Union[parse_tree.Add, parse_tree.Sub]
+        node: Union[parse_tree.Add, parse_tree.Sub, parse_tree.Mod]
     ) -> str:
         if isinstance(node, parse_tree.Add):
             return "The addition"
@@ -2810,11 +2905,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         elif isinstance(node, parse_tree.Sub):
             return "The subtraction"
 
+        elif isinstance(node, parse_tree.Mod):
+            return "The modulo operation"
+
         else:
             assert_never(node)
 
-    def _transform_add_or_sub(
-        self, node: Union[parse_tree.Add, parse_tree.Sub]
+    def _transform_binary_arithmetic(
+        self, node: Union[parse_tree.Add, parse_tree.Sub, parse_tree.Mod]
     ) -> Optional["TypeAnnotationUnion"]:
         left_type = self.transform(node.left)
         if left_type is None:
@@ -2849,39 +2947,45 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if not success:
             return None
 
-        if not (
-            isinstance(left_type, PrimitiveTypeAnnotation)
-            and left_type.a_type
-            in (
+        # NOTE (mristin):
+        # We do not support the modulo on floating-point numbers as the native
+        # operators and functions differ considerably among the target languages,
+        # and we have no use case for it at the moment.
+        allowed_operand_types: Tuple[PrimitiveType, ...]
+        allowed_operand_description: str
+        if isinstance(node, parse_tree.Mod):
+            allowed_operand_types = (PrimitiveType.INT, PrimitiveType.LENGTH)
+            allowed_operand_description = "integer numbers"
+        else:
+            allowed_operand_types = (
                 PrimitiveType.INT,
                 PrimitiveType.FLOAT,
                 PrimitiveType.LENGTH,
             )
-        ):
+            allowed_operand_description = "integer and floating-point numbers"
+
+        # NOTE (mristin):
+        # The constrained primitives behave like their constrainees in arithmetic.
+        left_a_type = try_primitive_type(left_type)
+        right_a_type = try_primitive_type(right_type)
+
+        if left_a_type not in allowed_operand_types:
             self.errors.append(
                 Error(
                     node.left.original_node,
                     f"{_Inferrer._binary_operation_name_with_capital_the(node)} is "
-                    f"only defined on integer and floating-point numbers, "
+                    f"only defined on {allowed_operand_description}, "
                     f"but got as a left operand: {left_type}",
                 )
             )
             success = False
 
-        if not (
-            isinstance(right_type, PrimitiveTypeAnnotation)
-            and right_type.a_type
-            in (
-                PrimitiveType.INT,
-                PrimitiveType.FLOAT,
-                PrimitiveType.LENGTH,
-            )
-        ):
+        if right_a_type not in allowed_operand_types:
             self.errors.append(
                 Error(
                     node.right.original_node,
                     f"{_Inferrer._binary_operation_name_with_capital_the(node)} is "
-                    f"only defined on integer and floating-point numbers, "
+                    f"only defined on {allowed_operand_description}, "
                     f"but got as a right operand: {right_type}",
                 )
             )
@@ -2890,17 +2994,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if not success:
             return None
 
-        assert isinstance(left_type, PrimitiveTypeAnnotation)
-        assert isinstance(right_type, PrimitiveTypeAnnotation)
+        assert left_a_type is not None
+        assert right_a_type is not None
 
         # fmt: off
         if (
             (
-                left_type.a_type is PrimitiveType.FLOAT
-                and right_type.a_type is not PrimitiveType.FLOAT
+                left_a_type is PrimitiveType.FLOAT
+                and right_a_type is not PrimitiveType.FLOAT
             ) or (
-                right_type.a_type is PrimitiveType.FLOAT
-                and left_type.a_type is not PrimitiveType.FLOAT
+                right_a_type is PrimitiveType.FLOAT
+                and left_a_type is not PrimitiveType.FLOAT
             )
         ):
             # fmt: on
@@ -2921,24 +3025,24 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         result_type: PrimitiveType
         if (
             (
-                left_type.a_type is PrimitiveType.LENGTH
-                and right_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+                left_a_type is PrimitiveType.LENGTH
+                and right_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
             ) or (
-                right_type.a_type is PrimitiveType.LENGTH
-                and left_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+                right_a_type is PrimitiveType.LENGTH
+                and left_a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
             )
         ):
             result_type = PrimitiveType.LENGTH
 
         elif (
-                left_type.a_type is PrimitiveType.INT
-                and right_type.a_type is PrimitiveType.INT
+                left_a_type is PrimitiveType.INT
+                and right_a_type is PrimitiveType.INT
         ):
             result_type = PrimitiveType.INT
 
         elif (
-                left_type.a_type is PrimitiveType.FLOAT
-                and right_type.a_type is PrimitiveType.FLOAT
+                left_a_type is PrimitiveType.FLOAT
+                and right_a_type is PrimitiveType.FLOAT
         ):
             result_type = PrimitiveType.FLOAT
         else:
@@ -2952,10 +3056,30 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         return result
 
     def transform_add(self, node: parse_tree.Add) -> Optional["TypeAnnotationUnion"]:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
 
     def transform_sub(self, node: parse_tree.Sub) -> Optional["TypeAnnotationUnion"]:
-        return self._transform_add_or_sub(node)
+        return self._transform_binary_arithmetic(node)
+
+    def transform_mod(self, node: parse_tree.Mod) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_binary_arithmetic(node)
+
+    def transform_neg(self, node: parse_tree.Neg) -> Optional["TypeAnnotationUnion"]:
+        operand_type = self.transform(node.operand)
+        if operand_type is None:
+            return None
+
+        a_type = self._check_signed_number_operand(
+            operand=node.operand,
+            operand_type=operand_type,
+            operation_name_with_capital_the="The arithmetic negation",
+        )
+        if a_type is None:
+            return None
+
+        result = PrimitiveTypeAnnotation(a_type=a_type)
+        self.type_map[node] = result
+        return result
 
     def transform_formatted_value(
         self, node: parse_tree.FormattedValue
@@ -3576,7 +3700,13 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
                 name=Identifier("len"),
                 returns=PrimitiveTypeAnnotation(PrimitiveType.LENGTH),
             )
-        )
+        ),
+        # NOTE (mristin):
+        # The return type of ``abs`` depends on the argument, so it is inferred
+        # at the call site.
+        Identifier("abs"): BuiltinFunctionTypeAnnotation(
+            func=BuiltinFunction(name=Identifier("abs"), returns=None)
+        ),
     }
 
     for constant in symbol_table.constants:
