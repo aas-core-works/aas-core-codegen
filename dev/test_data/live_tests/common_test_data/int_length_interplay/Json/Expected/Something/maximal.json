@@ -1,0 +1,14 @@
+{
+  "numbers": [
+    3,
+    4,
+    5,
+    60
+  ],
+  "texts": [
+    "hello",
+    "world"
+  ],
+  "count": 2,
+  "maybeCount": 2
+}

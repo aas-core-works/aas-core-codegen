@@ -44,7 +44,9 @@ func All[V any](condition func(V) bool, l []V) bool {
 }
 
 // Check if some of the elements in the given range satisfy the condition.
-func SomeRange(condition func(int) bool, start int, end int) bool {
+//
+// The range is over the lengths (`int`) or over the integers (`int64`).
+func SomeRange[T int | int64](condition func(T) bool, start T, end T) bool {
 	for i := start; i < end; i++ {
 		if condition(i) {
 			return true
@@ -54,7 +56,9 @@ func SomeRange(condition func(int) bool, start int, end int) bool {
 }
 
 // Check if all the elements in the given range satisfy the condition.
-func AllRange(condition func(int) bool, start int, end int) bool {
+//
+// The range is over the lengths (`int`) or over the integers (`int64`).
+func AllRange[T int | int64](condition func(T) bool, start T, end T) bool {
 	for i := start; i < end; i++ {
 		if !condition(i) {
 			return false

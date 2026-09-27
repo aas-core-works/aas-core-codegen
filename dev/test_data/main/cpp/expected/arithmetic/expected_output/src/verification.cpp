@@ -95,11 +95,9 @@ bool IsLengthAligned(
   int64_t alignment
 ) {
   return (
-    static_cast<size_t>(
-      verification::FloorMod(
-        static_cast<int64_t>(common::LenStr(text)),
-        alignment
-      )
+    verification::FloorMod(
+      static_cast<int64_t>(common::LenStr(text)),
+      alignment
     ) == 0
   );
 }
@@ -109,11 +107,9 @@ bool HasRemainderOneByLength(
   const std::wstring& text
 ) {
   return (
-    static_cast<size_t>(
-      verification::FloorMod(
-        number,
-        static_cast<int64_t>(common::LenStr(text) + (1))
-      )
+    verification::FloorMod(
+      number,
+      static_cast<int64_t>(common::LenStr(text) + (1))
     ) == 1
   );
 }

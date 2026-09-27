@@ -10018,6 +10018,9 @@ bool Some(
 /**
  * Check if all the numbers in the range `[start, end)` satisfy the \p condition.
  *
+ * The `IntegerT` is either `size_t` for the lengths, or `int64_t` for
+ * the integers, and needs to be given explicitly.
+ *
  * \param condition returning a boolean to be checked for each number
  * \param start of the range
  * \param end of the range
@@ -10026,13 +10029,13 @@ bool Some(
  * satisfy the \p condition
  * \endparblock
  */
-template<typename FunctorT>
+template<typename IntegerT, typename FunctorT>
 bool AllRange(
   FunctorT condition,
-  size_t start,
-  size_t end
+  IntegerT start,
+  IntegerT end
 ) {
-  for (size_t i = start; i < end; ++i) {
+  for (IntegerT i = start; i < end; ++i) {
     if (!condition(i)) {
       return false;
     }
@@ -10043,6 +10046,9 @@ bool AllRange(
 /**
  * Check if any number in the range `[start, end)` satisfy the \p condition.
  *
+ * The `IntegerT` is either `size_t` for the lengths, or `int64_t` for
+ * the integers, and needs to be given explicitly.
+ *
  * \param condition returning a boolean to be checked for each number
  * \param start of the range
  * \param end of the range
@@ -10051,13 +10057,13 @@ bool AllRange(
  * \p end (excluded) satisfy the \p condition
  * \endparblock
  */
-template<typename FunctorT>
+template<typename IntegerT, typename FunctorT>
 bool SomeRange(
   FunctorT condition,
-  size_t start,
-  size_t end
+  IntegerT start,
+  IntegerT end
 ) {
-  for (size_t i = start; i < end; ++i) {
+  for (IntegerT i = start; i < end; ++i) {
     if (condition(i)) {
       return true;
     }

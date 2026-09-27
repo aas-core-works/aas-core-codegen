@@ -321,8 +321,7 @@ namespace dummy
                         "By negative must give the remainder -1 when divided by -3");
                 }
 
-                if (!(
-                    (Verification.FloorMod(StringHelpers.Len(that.Text), 2)) == (0)))
+                if (!((StringHelpers.Len(that.Text) % 2) == (0)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +

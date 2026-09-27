@@ -341,6 +341,19 @@ class Transpiler(
             # pylint: disable=invalid-unary-operand-type
             index = Stripped(f"{collection}.size() - {abs(index_as_int)}")
 
+        elif (
+            index_as_int is None
+            and intermediate_type_inference.try_primitive_type(
+                self.type_map[node.index]
+            )
+            is intermediate_type_inference.PrimitiveType.INT
+        ):
+            # NOTE (mristin):
+            # We represent the integers as ``long``, while the lists are indexed
+            # by ``int``'s in Java. We narrow the index explicitly, and fail loudly
+            # instead of silently overflowing.
+            index = Stripped(f"Math.toIntExact({index})")
+
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,
@@ -675,6 +688,48 @@ class Transpiler(
 
         return Stripped(f"{not_antecedent}\n|| {consequent}"), None
 
+    def _transform_as_long(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` such that an integer literal or a length is a ``long``.
+
+        We represent the integers as ``Long`` in Java, while we transpile the integer
+        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
+        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
+        literal or a length as an argument to a method expecting a ``Long``, so we
+        need to suffix the literal with ``L``, and cast the length to ``long``.
+        """
+        if Transpiler._is_int_literal(node):
+            assert isinstance(node, parse_tree.Constant)
+            return Stripped(f"{node.value}L"), None
+
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            if isinstance(
+                node,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                return Stripped(f"(long) {code}"), None
+
+            return Stripped(f"(long) ({code})"), None
+
+        return code, None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
         self, node: parse_tree.MethodCall
@@ -685,9 +740,23 @@ class Transpiler(
         if error is not None:
             errors.append(error)
 
+        member_type = self.type_map[node.member]
+
+        # NOTE (mristin):
+        # Our methods expect the integers as ``Long``'s, so we need to render
+        # the integer literals and the lengths as ``long``'s. See
+        # :py:meth:`_transform_as_long`.
+        transform_arg = (
+            self.transform
+            if isinstance(
+                member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+            )
+            else self._transform_as_long
+        )
+
         args = []  # type: List[Stripped]
         for arg_node in node.args:
-            arg, error = self.transform(arg_node)
+            arg, error = transform_arg(arg_node)
 
             if error is not None:
                 errors.append(error)
@@ -704,7 +773,6 @@ class Transpiler(
 
         assert instance is not None
 
-        member_type = self.type_map[node.member]
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
@@ -749,23 +817,6 @@ class Transpiler(
         else:
             return Stripped(f"{instance}.{method_name}({joined_args})"), None
 
-    def _transform_as_long(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` such that an integer literal becomes a ``long``.
-
-        We represent the integers as ``Long`` in Java, while we transpile the integer
-        literals as ``int`` literals. Java does not convert an ``int`` to ``Long``
-        implicitly, *e.g.*, when passing an integer literal as an argument to
-        a method expecting a ``Long``, so we need to suffix the literal with ``L``.
-        """
-        if Transpiler._is_int_literal(node):
-            assert isinstance(node, parse_tree.Constant)
-            return Stripped(f"{node.value}L"), None
-
-        return self.transform(node)
-
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(
         self, node: parse_tree.FunctionCall
@@ -794,8 +845,9 @@ class Transpiler(
                 func_type, intermediate_type_inference.VerificationTypeAnnotation
             ):
                 # NOTE (mristin):
-                # We need to render the integer literals as ``long`` literals as
-                # Java does not convert an ``int`` to ``Long`` implicitly.
+                # We need to render the integer literals and the lengths as
+                # ``long``'s as Java does not convert an ``int`` to ``Long``
+                # implicitly.
                 self._beneath_call.add(arg_node)
                 arg, error = self._transform_as_long(arg_node)
                 self._beneath_call.remove(arg_node)
@@ -1297,24 +1349,11 @@ class Transpiler(
         # remainder exactly as Python does. We do not need our own helper as
         # in some other targets. Java unboxes the integers (``Long``) automatically
         # to resolve the overloads of ``Math.floorMod``.
-        code = Stripped(f"Math.floorMod({left}, {right})")
-
         # NOTE (mristin):
-        # If the result is a length, but the divisor is an integer (``Long``),
-        # ``Math.floorMod(long, long)`` is resolved, and the result is a ``long``.
-        # We narrow it to ``int`` so that it can be used as a length, *e.g.*, as
-        # an index. The narrowing fails loudly instead of silently overflowing.
-        right_type = intermediate_type_inference.try_primitive_type(
-            self.type_map[node.right]
-        )
-        if (
-            result_type is intermediate_type_inference.PrimitiveType.LENGTH
-            and right_type is intermediate_type_inference.PrimitiveType.INT
-            and not Transpiler._is_int_literal(node.right)
-        ):
-            code = Stripped(f"Math.toIntExact({code})")
-
-        return code, None
+        # If the result is a length, the divisor is a length or an integer literal,
+        # see :py:func:`aas_core_codegen.intermediate.type_inference._combines_to_length`,
+        # so ``Math.floorMod(int, int)`` is resolved and the result is an ``int``.
+        return Stripped(f"Math.floorMod({left}, {right})"), None
 
     def transform_neg(
         self, node: parse_tree.Neg
@@ -1483,9 +1522,21 @@ class Transpiler(
             assert start is not None
             assert end is not None
 
+            # NOTE (mristin):
+            # We represent the lengths as ``int``, and the other integers as ``long``,
+            # so we range over the integers with ``LongStream``.
+            stream = (
+                "java.util.stream.LongStream"
+                if intermediate_type_inference.try_primitive_type(
+                    self.type_map[node.generator.variable]
+                )
+                is intermediate_type_inference.PrimitiveType.INT
+                else "IntStream"
+            )
+
             source = Stripped(
                 f"""\
-IntStream.range(
+{stream}.range(
 {I}{indent_but_first_line(start, I)},
 {I}{indent_but_first_line(end, I)}
 )"""
@@ -1584,6 +1635,17 @@ IntStream.range(
                     # pylint: disable=invalid-unary-operand-type
                     index = Stripped(f"{receiver}.size() - {-index_as_int}")
 
+                elif (
+                    index_as_int is None
+                    and intermediate_type_inference.try_primitive_type(
+                        self.type_map[node.target.index]
+                    )
+                    is intermediate_type_inference.PrimitiveType.INT
+                ):
+                    # NOTE (mristin):
+                    # See the corresponding note in :py:meth:`transform_index`.
+                    index = Stripped(f"Math.toIntExact({index})")
+
                 method_name = Identifier("set")
                 arguments.insert(0, index)
 
@@ -1673,7 +1735,11 @@ IntStream.range(
         if node.value is None:
             return Stripped("return;"), None
 
-        value, error = self.transform(node.value)
+        # NOTE (mristin):
+        # An integer literal or a length can only be returned from a function
+        # returning an integer, which we represent as ``Long``. Java does not convert
+        # an ``int`` to ``Long`` implicitly, so we render them as ``long``'s.
+        value, error = self._transform_as_long(node.value)
         if error is not None:
             return None, error
 

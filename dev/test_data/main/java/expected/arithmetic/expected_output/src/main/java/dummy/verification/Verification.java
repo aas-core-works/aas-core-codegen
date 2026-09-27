@@ -69,7 +69,7 @@ public class Verification {
     String text,
     Long alignment) {
     return (
-        (Math.toIntExact(Math.floorMod(StringHelpers.len(text), alignment))) == (0));
+        (Math.floorMod((long) StringHelpers.len(text), alignment)) == (0));
   }
 
   /**
@@ -81,7 +81,7 @@ public class Verification {
     Long number,
     String text) {
     return (
-        (Math.floorMod(number, StringHelpers.len(text) + 1)) == (1));
+        (Math.floorMod(number, (long) (StringHelpers.len(text) + 1))) == (1));
   }
 
   /**

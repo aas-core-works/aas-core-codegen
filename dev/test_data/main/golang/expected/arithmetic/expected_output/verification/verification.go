@@ -81,7 +81,7 @@ func IsLengthAligned(
 	text string,
 	alignment int64,
 ) bool {
-	return int(FloorMod(int64(aascommon.LenStr(text)), alignment)) == 0
+	return FloorMod(int64(aascommon.LenStr(text)), alignment) == 0
 }
 
 // Check that the number gives the remainder 1 when divided by the length plus one.
@@ -91,7 +91,7 @@ func HasRemainderOneByLength(
 	number int64,
 	text string,
 ) bool {
-	return int(FloorMod(number, int64(aascommon.LenStr(text) + 1))) == 1
+	return FloorMod(number, int64(aascommon.LenStr(text) + 1)) == 1
 }
 
 // Verify `that` instance of [aastypes.ISomething].

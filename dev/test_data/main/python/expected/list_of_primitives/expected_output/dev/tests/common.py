@@ -84,7 +84,9 @@ def trace(
         bytes,
         enum.Enum,
         aas_types.Class,
-        Sequence[aas_types.Class],
+        Sequence[
+            Union[bool, int, float, str, bytes, enum.Enum, aas_types.Class]
+        ],
     ],
 ) -> str:
     """
@@ -105,8 +107,6 @@ def trace(
         writer = io.StringIO()
         writer.write("[\n")
         for i, item in enumerate(that):
-            assert isinstance(item, aas_types.Class)
-
             writer.write(textwrap.indent(trace(item), "  "))
 
             if i < len(that) - 1:
