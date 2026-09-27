@@ -141,6 +141,104 @@ __xml_namespace__ = "https://dummy.com"
             ["AAS-001"], list(some_class.description.constraints_by_identifier.keys())
         )
 
+    def test_method_reference(self) -> None:
+        source = '''\
+@abstract
+class Parent:
+    @implementation_specific
+    @non_mutating
+    def do_something(self) -> str:
+        """Do something."""
+
+
+class Child(Parent):
+    """
+    This is some documentation.
+
+    See :meth:`do_something` and :meth:`Parent.do_something`.
+    """
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+'''
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        assert symbol_table is not None
+
+        parent = symbol_table.must_find_class(Identifier("Parent"))
+        child = symbol_table.must_find_class(Identifier("Child"))
+
+        assert child.description is not None
+        assert len(child.description.remarks) == 1
+
+        references_to_methods = list(
+            child.description.remarks[0].findall(
+                condition=intermediate_doc.ReferenceToMethod
+            )
+        )
+
+        self.assertEqual(2, len(references_to_methods))
+
+        method = parent.methods_by_name[Identifier("do_something")]
+
+        self.assertIs(child, references_to_methods[0].reference.cls)
+        self.assertIs(method, references_to_methods[0].reference.method)
+
+        self.assertIs(parent, references_to_methods[1].reference.cls)
+        self.assertIs(method, references_to_methods[1].reference.method)
+
+    def test_dangling_method_reference(self) -> None:
+        source = '''\
+class Some_class:
+    """
+    This is some documentation.
+
+    See :meth:`do_nothing`.
+    """
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+'''
+
+        _, error = tests.common.translate_source_to_intermediate(source=source)
+        assert error is not None
+
+        self.assertEqual(
+            "Dangling reference to a non-existing method "
+            "of the class 'Some_class': do_nothing",
+            tests.common.most_underlying_messages(error),
+        )
+
+    def test_method_reference_to_non_class(self) -> None:
+        source = '''\
+class Some_enum(Enum):
+    Something = "something"
+
+
+class Some_class:
+    """
+    This is some documentation.
+
+    See :meth:`Some_enum.do_nothing`.
+    """
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+'''
+
+        _, error = tests.common.translate_source_to_intermediate(source=source)
+        assert error is not None
+
+        self.assertEqual(
+            "Unexpected reference to a method of our type 'Some_enum' "
+            "which is not a class: Some_enum.do_nothing",
+            tests.common.most_underlying_messages(error),
+        )
+
     def test_verification_function_reference(self) -> None:
         source = '''\
 @verification

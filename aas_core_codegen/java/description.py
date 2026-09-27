@@ -222,6 +222,35 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
         else:
             assert_never(element.reference)
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[List[_Token]], Optional[List[str]]]:
+        method_name = java_naming.method_name(element.reference.method.name)
+
+        if element.reference.cls is self.context.cls_or_enum:
+            return [_TokenText(f"{{@link #{method_name}}}")], None
+
+        base: Stripped
+        if isinstance(element.reference.cls, intermediate.AbstractClass):
+            # NOTE (mristin):
+            # We do not generate Java code for abstract classes, so we have to refer
+            # to the interface.
+            interface_name = java_naming.interface_name(element.reference.cls.name)
+            base = Stripped(f"types.model.{interface_name}")
+        elif isinstance(element.reference.cls, intermediate.ConcreteClass):
+            # NOTE (mristin):
+            # Analogous to the properties, we do the best effort here and resolve
+            # the reference to the concrete class, though the writer might actually
+            # want to refer to the *interface*.
+            cls_name = java_naming.class_name(element.reference.cls.name)
+            base = Stripped(f"types.impl.{cls_name}")
+        else:
+            assert_never(element.reference.cls)
+
+        return [
+            _TokenText(f"{{@link {self.context.root_package}.{base}#{method_name}}}")
+        ], None
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[List[_Token]], Optional[List[str]]]:

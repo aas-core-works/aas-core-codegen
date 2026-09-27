@@ -145,6 +145,31 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         else:
             assert_never(element.reference)
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        # NOTE (mristin):
+        # We refer to interfaces everywhere where we assume abstract or concrete
+        # classes with descendants.
+        if element.reference.cls.interface is not None:
+            cls_name = typescript_naming.interface_name(element.reference.cls.name)
+        else:
+            cls_name = typescript_naming.class_name(element.reference.cls.name)
+
+        method_name = typescript_naming.method_name(element.reference.method.name)
+
+        if self.context.module == typescript_common.TYPES_MODULE:
+            if self.context.cls_or_enum is element.reference.cls:
+                return f"{{@link {method_name}}}", None
+            else:
+                return f"{{@link {cls_name}.{method_name}}}", None
+        else:
+            return (
+                f"{{@link {typescript_common.TYPES_MODULE}!"
+                f"{cls_name}.{method_name}}}",
+                None,
+            )
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[str], Optional[List[str]]]:

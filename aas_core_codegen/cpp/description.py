@@ -71,6 +71,11 @@ class _IsSingleParagrapher(intermediate_doc.DocutilsElementTransformer[bool]):
     ) -> Tuple[Optional[bool], Optional[List[str]]]:
         return True, None
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[bool], Optional[List[str]]]:
+        return True, None
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[bool], Optional[List[str]]]:
@@ -271,6 +276,19 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 result = f"{cpp_common.TYPES_NAMESPACE}::{enum_name}::{literal_name}"
         else:
             assert_never(element.reference)
+
+        return result, None
+
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        interface_name = cpp_naming.interface_name(element.reference.cls.name)
+        method_name = cpp_naming.method_name(element.reference.method.name)
+
+        if self.context.namespace == cpp_common.TYPES_NAMESPACE:
+            result = f"{interface_name}::{method_name}"
+        else:
+            result = f"{cpp_common.TYPES_NAMESPACE}::{interface_name}::{method_name}"
 
         return result, None
 

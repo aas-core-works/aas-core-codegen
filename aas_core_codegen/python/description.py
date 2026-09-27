@@ -152,6 +152,23 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
         return result, None
 
+    def transform_reference_to_method_in_doc(
+        self, element: intermediate_doc.ReferenceToMethod
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        cls_name = python_naming.class_name(element.reference.cls.name)
+        method_name = python_naming.method_name(element.reference.method.name)
+
+        result: str
+        if self.context.module == "types":
+            if self.context.cls_or_enum is element.reference.cls:
+                result = f":py:meth:`{method_name}`"
+            else:
+                result = f":py:meth:`{cls_name}.{method_name}`"
+        else:
+            result = f":py:meth:`.types.{cls_name}.{method_name}`"
+
+        return result, None
+
     def transform_reference_to_argument_in_doc(
         self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[str], Optional[List[str]]]:

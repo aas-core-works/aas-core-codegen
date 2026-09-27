@@ -184,5 +184,171 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual("{@link matchesSomething}", rendered)
 
 
+class Test_reference_to_method(unittest.TestCase):
+    symbol_table: intermediate.SymbolTable
+    element: intermediate_doc.ReferenceToMethod
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        source = '''\
+@abstract
+class Parent:
+    @implementation_specific
+    @non_mutating
+    def do_something(self) -> str:
+        """Do something."""
+
+
+class Something(Parent):
+    """See :meth:`Parent.do_something`."""
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+'''
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        something = symbol_table.must_find_class(Identifier("Something"))
+        assert something.description is not None
+
+        elements = list(
+            something.description.summary.findall(
+                condition=intermediate_doc.ReferenceToMethod
+            )
+        )
+        assert len(elements) == 1
+
+        cls.symbol_table = symbol_table
+        cls.element = elements[0]
+
+    def test_cpp(self) -> None:
+        # noinspection PyProtectedMember
+        renderer = cpp_description._ElementRenderer(
+            context=cpp_description.Context(
+                namespace=cpp_common.TYPES_NAMESPACE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual("IParent::DoSomething", rendered)
+
+        # noinspection PyProtectedMember
+        renderer = cpp_description._ElementRenderer(
+            context=cpp_description.Context(
+                namespace=cpp_common.VERIFICATION_NAMESPACE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual("types::IParent::DoSomething", rendered)
+
+    def test_csharp(self) -> None:
+        something = self.symbol_table.must_find_class(Identifier("Something"))
+        assert something.description is not None
+
+        code, errors = csharp_description.generate_comment_for_our_type(
+            something.description
+        )
+        assert errors is None, tests.common.most_underlying_messages(errors)
+        self.assertEqual(
+            """\
+/// <summary>
+/// See <see cref="Aas.IParent.DoSomething" />.
+/// </summary>""",
+            code,
+        )
+
+    def test_golang(self) -> None:
+        # noinspection PyProtectedMember
+        renderer = golang_description._ElementRenderer(
+            context=golang_description.Context(
+                package=golang_common.TYPES_PACKAGE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual("[IParent.DoSomething]", rendered)
+
+        # noinspection PyProtectedMember
+        renderer = golang_description._ElementRenderer(
+            context=golang_description.Context(
+                package=golang_common.VERIFICATION_PACKAGE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual(
+            f"[{golang_common.TYPES_PACKAGE}.IParent.DoSomething]", rendered
+        )
+
+    def test_java(self) -> None:
+        something = self.symbol_table.must_find_class(Identifier("Something"))
+        assert something.description is not None
+
+        code, errors = java_description.generate_comment_for_our_type(
+            something.description,
+            context=java_description.Context(
+                package=java_common.PackageIdentifier("aas_core.aas3_0"),
+                cls_or_enum=something,
+            ),
+        )
+        assert errors is None, tests.common.most_underlying_messages(errors)
+        assert code is not None
+        self.assertIn(
+            "{@link aas_core.aas3_0.types.model.IParent#doSomething}",
+            code,
+        )
+
+    def test_python(self) -> None:
+        # noinspection PyProtectedMember
+        renderer = python_description._ElementRenderer(
+            context=python_description.Context(
+                qualified_module_name=python_common.QualifiedModuleName("aas_core"),
+                module=Identifier("types"),
+                cls_or_enum=None,
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual(":py:meth:`Parent.do_something`", rendered)
+
+        # noinspection PyProtectedMember
+        renderer = python_description._ElementRenderer(
+            context=python_description.Context(
+                qualified_module_name=python_common.QualifiedModuleName("aas_core"),
+                module=Identifier("verification"),
+                cls_or_enum=None,
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual(":py:meth:`.types.Parent.do_something`", rendered)
+
+    def test_typescript(self) -> None:
+        # noinspection PyProtectedMember
+        renderer = typescript_description._ElementRenderer(
+            context=typescript_description.Context(
+                module=typescript_common.TYPES_MODULE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual("{@link IParent.doSomething}", rendered)
+
+        # noinspection PyProtectedMember
+        renderer = typescript_description._ElementRenderer(
+            context=typescript_description.Context(
+                module=typescript_common.VERIFICATION_MODULE, cls_or_enum=None
+            )
+        )
+        rendered, errors = renderer.transform(self.element)
+        assert errors is None, errors
+        self.assertEqual("{@link types!IParent.doSomething}", rendered)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -16,6 +16,7 @@ from aas_core_codegen.intermediate._types import (
     ClassUnion,
     ConstantUnion,
     VerificationUnion,
+    MethodUnion,
     runtime_id,
 )
 
@@ -79,6 +80,39 @@ class ReferenceToAttribute(
         **attributes,
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
+        self.reference = reference
+        docutils.nodes.TextElement.__init__(
+            self, rawsource, text, *children, **attributes
+        )
+
+
+class ReferenceToMethodOfClass:
+    """Model a reference to a method of a class, usually used in the docstrings."""
+
+    @require(lambda cls, method: cls.methods_by_name.get(method.name, None) is method)
+    def __init__(self, cls: ClassUnion, method: MethodUnion) -> None:
+        self.cls = cls
+        self.method = method
+
+
+class ReferenceToMethod(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
+    """
+    Represent a reference in the documentation to a method of a class.
+
+    The method, in this context, refers to the role ``:meth:``.
+    """
+
+    def __init__(  # type: ignore
+        self,
+        reference: ReferenceToMethodOfClass,
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
+    ) -> None:
+        """Initialize with the given reference and propagate the rest to the parent."""
         self.reference = reference
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes
@@ -206,6 +240,9 @@ class DocutilsElementTransformer(Generic[T], DBC):
         elif isinstance(element, ReferenceToAttribute):
             return self.transform_reference_to_attribute_in_doc(element)
 
+        elif isinstance(element, ReferenceToMethod):
+            return self.transform_reference_to_method_in_doc(element)
+
         elif isinstance(element, ReferenceToArgument):
             return self.transform_reference_to_argument_in_doc(element)
 
@@ -276,6 +313,14 @@ class DocutilsElementTransformer(Generic[T], DBC):
         self, element: ReferenceToAttribute
     ) -> Tuple[Optional[T], Optional[List[str]]]:
         """Transform a reference to an attribute into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_reference_to_method_in_doc(
+        self, element: ReferenceToMethod
+    ) -> Tuple[Optional[T], Optional[List[str]]]:
+        """Transform a reference to a method into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
