@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from icontract import DBC, invariant
 
@@ -15,7 +15,9 @@ def is_english(language: str) -> bool:
 
 
 @verification
-def lang_string_sets_have_english(lang_string_sets: List["Lang_string_set"]) -> bool:
+def lang_string_sets_have_english(
+    lang_string_sets: Sequence["Lang_string_set"],
+) -> bool:
     """
     Check that every set in :paramref:`lang_string_sets` has at least one
     string in English.
@@ -33,7 +35,7 @@ def lang_string_sets_have_english(lang_string_sets: List["Lang_string_set"]) -> 
 
 @verification
 def iec_contents_have_definition_in_english(
-    specifications: List["Specification"],
+    specifications: Sequence["Specification"],
 ) -> bool:
     """
     Check that the :attr:`Iec_content.definition` is defined at least in English

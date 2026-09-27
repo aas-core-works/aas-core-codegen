@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from icontract import DBC, invariant
 
@@ -27,7 +27,7 @@ def has_balanced_brackets(text: str) -> bool:
 
 @verification
 @implementation_specific
-def texts_are_unique(texts: List[str]) -> bool:
+def texts_are_unique(texts: Sequence[str]) -> bool:
     """Check that the :paramref:`texts` do not repeat."""
     # NOTE (mristin):
     # This implementation will not be transpiled, but is given here as reference.
@@ -43,7 +43,7 @@ def texts_are_unique(texts: List[str]) -> bool:
 
 @verification
 @implementation_specific
-def items_have_unique_labels(items: List["Item"]) -> bool:
+def items_have_unique_labels(items: Sequence["Item"]) -> bool:
     """Check that :attr:`Item.label`'s of the :paramref:`items` do not repeat."""
     # NOTE (mristin):
     # This implementation will not be transpiled, but is given here as reference.

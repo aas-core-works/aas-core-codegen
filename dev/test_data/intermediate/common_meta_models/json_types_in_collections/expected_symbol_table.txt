@@ -56,6 +56,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='tuple_with_json',
@@ -75,6 +76,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

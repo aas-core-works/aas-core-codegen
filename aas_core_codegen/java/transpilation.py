@@ -409,6 +409,27 @@ class Transpiler(
 
         assert collection is not None
 
+        if isinstance(
+            self.type_map[node.collection],
+            intermediate_type_inference.ListTypeAnnotation,
+        ):
+            # NOTE (mristin):
+            # The type inference allows slicing a list only to copy it as a whole,
+            # ``[:]``, which we transpile as a new ``ArrayList``.
+            if not isinstance(
+                node.collection,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                collection = Stripped(f"({collection})")
+
+            return Stripped(f"new java.util.ArrayList<>({collection})"), None
+
         # NOTE (mristin):
         # We do not use the native ``substring`` as it counts the UTF-16 code units
         # instead of the characters, throws on the positions out of range, and does

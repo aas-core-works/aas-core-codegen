@@ -130,12 +130,14 @@ SymbolTable(
             type_annotation=JsonValueTypeAnnotation(
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='values',
             type_annotation=JsonArrayTypeAnnotation(
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='mapping',
@@ -145,6 +147,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='mapping_with_constrained_key',
@@ -154,6 +157,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_value',
@@ -164,6 +168,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_values',
@@ -174,6 +179,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_mapping',
@@ -187,6 +193,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

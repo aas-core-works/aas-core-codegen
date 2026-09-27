@@ -395,6 +395,7 @@ def item_from_jsonable(
     the_maybe_text: Optional[str] = None
     the_maybe_kind: Optional[aas_types.Kind] = None
     the_texts: Optional[List[str]] = None
+    the_maybe_texts: Optional[List[str]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -409,6 +410,8 @@ def item_from_jsonable(
                 the_maybe_kind = kind_from_jsonable(jsonable_value)
             elif key == 'texts':
                 the_texts = _list_of__str_from_jsonable(jsonable_value)
+            elif key == 'maybeTexts':
+                the_maybe_texts = _list_of__str_from_jsonable(jsonable_value)
             else:
                 raise DeserializationException(
                     f"Unexpected property: {key}"
@@ -433,7 +436,8 @@ def item_from_jsonable(
         the_text,
         the_texts,
         the_maybe_text,
-        the_maybe_kind
+        the_maybe_kind,
+        the_maybe_texts
     )
 
 
@@ -451,6 +455,7 @@ def something_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     the_items: Optional[List[aas_types.Item]] = None
+    the_maybe_item: Optional[aas_types.Item] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -459,6 +464,8 @@ def something_from_jsonable(
                 pass
             elif key == 'items':
                 the_items = _list_of__item_from_jsonable(jsonable_value)
+            elif key == 'maybeItem':
+                the_maybe_item = item_from_jsonable(jsonable_value)
             else:
                 raise DeserializationException(
                     f"Unexpected property: {key}"
@@ -475,7 +482,8 @@ def something_from_jsonable(
         )
 
     return aas_types.Something(
-        the_items
+        the_items,
+        the_maybe_item
     )
 
 
@@ -589,6 +597,14 @@ def _item_to_jsonable(
     except SerializationException as exception:
         exception._prepend_property('texts')
         raise
+    if that.maybe_texts is not None:
+        try:
+            jsonable['maybeTexts'] = list(
+                that.maybe_texts
+            )
+        except SerializationException as exception:
+            exception._prepend_property('maybe_texts')
+            raise
     return jsonable
 
 
@@ -604,6 +620,14 @@ def _something_to_jsonable(
     except SerializationException as exception:
         exception._prepend_property('items')
         raise
+    if that.maybe_item is not None:
+        try:
+            jsonable['maybeItem'] = _item_to_jsonable(
+                that.maybe_item
+            )
+        except SerializationException as exception:
+            exception._prepend_property('maybe_item')
+            raise
     return jsonable
 
 

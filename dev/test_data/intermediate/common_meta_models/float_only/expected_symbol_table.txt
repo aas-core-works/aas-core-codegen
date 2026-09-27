@@ -72,6 +72,7 @@ SymbolTable(
               a_type='FLOAT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_floats',
@@ -81,6 +82,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='some_pair',
@@ -94,6 +96,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_optional_float',
@@ -105,6 +108,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

@@ -344,7 +344,7 @@ UnverifiedSymbolTable(
         Argument(
           name='texts',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='str',
@@ -406,7 +406,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -472,7 +472,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -558,7 +558,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -636,7 +636,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -711,7 +711,7 @@ UnverifiedSymbolTable(
         Argument(
           name='items',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Item',
@@ -799,7 +799,7 @@ UnverifiedSymbolTable(
         Argument(
           name='texts',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='str',
@@ -903,7 +903,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -986,7 +986,7 @@ UnverifiedSymbolTable(
         Argument(
           name='numbers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='int',
@@ -1082,7 +1082,7 @@ UnverifiedSymbolTable(
         Argument(
           name='items',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Item',

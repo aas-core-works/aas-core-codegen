@@ -26,6 +26,7 @@ from aas_core_codegen.common import (
     wrap_text_into_lines,
 )
 from aas_core_codegen.cpp import (
+    aliasing as cpp_aliasing,
     common as cpp_common,
     naming as cpp_naming,
     description as cpp_description,
@@ -42,6 +43,31 @@ from aas_core_codegen.cpp.common import (
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.parse import tree as parse_tree
+
+
+def _generate_argument_type(argument: intermediate.Argument) -> Stripped:
+    """
+    Generate the C++ type of the ``argument`` of a verification function.
+
+    The mutable lists are passed in as mutable references so that the caller
+    observes the mutations, as in Python. The instances are always passed in as
+    constant references to the shared pointers, as the instance is mutable through
+    the pointer anyway, and the type inference already refuses to mutate
+    the read-only instances.
+    """
+    if argument.mutable and isinstance(
+        intermediate.beneath_optional(argument.type_annotation),
+        intermediate.ListTypeAnnotation,
+    ):
+        return cpp_common.generate_type_with_ref(
+            type_annotation=argument.type_annotation,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+        )
+
+    return cpp_common.generate_type_with_const_ref_if_applicable(
+        type_annotation=argument.type_annotation,
+        types_namespace=cpp_common.TYPES_NAMESPACE,
+    )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -72,13 +98,7 @@ def _generate_verification_function_definition(
         return code, None
 
     arg_types_names = [
-        (
-            cpp_common.generate_type_with_const_ref_if_applicable(
-                type_annotation=arg.type_annotation,
-                types_namespace=cpp_common.TYPES_NAMESPACE,
-            ),
-            cpp_naming.argument_name(arg.name),
-        )
+        (_generate_argument_type(arg), cpp_naming.argument_name(arg.name))
         for arg in verification.arguments
     ]
 
@@ -736,6 +756,7 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
         environment: intermediate_type_inference.Environment,
         symbol_table: intermediate.SymbolTable,
         verification: intermediate.TranspilableVerification,
+        aliasing: cpp_aliasing.Aliasing,
     ) -> None:
         """Initialize with the given values."""
         cpp_transpilation.Transpiler.__init__(
@@ -746,6 +767,7 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
             is_optional_before_downcast_map=is_optional_before_downcast_map,
             environment=environment,
             types_namespace=cpp_common.TYPES_NAMESPACE,
+            aliasing=aliasing,
         )
 
         self._symbol_table = symbol_table
@@ -808,6 +830,19 @@ def _generate_implementation_of_transpilable_verification(
 
     assert type_inference is not None
 
+    aliasing, aliasing_errors = cpp_aliasing.analyze(
+        verification=verification, type_map=type_inference.type_map
+    )
+    if aliasing_errors is not None:
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to transpile the verification function {verification.name!r} "
+            f"so that its C++ variables alias the values as in Python",
+            aliasing_errors,
+        )
+
+    assert aliasing is not None
+
     optional_inferrer = cpp_optionaling.Inferrer(
         environment=type_inference.environment_with_args,
         type_map=type_inference.type_map,
@@ -834,6 +869,7 @@ def _generate_implementation_of_transpilable_verification(
         environment=type_inference.environment_with_args,
         symbol_table=symbol_table,
         verification=verification,
+        aliasing=aliasing,
     )
 
     body = []  # type: List[Stripped]
@@ -850,13 +886,7 @@ def _generate_implementation_of_transpilable_verification(
         body.append(stmt)
 
     arg_types_names = [
-        (
-            cpp_common.generate_type_with_const_ref_if_applicable(
-                type_annotation=arg.type_annotation,
-                types_namespace=cpp_common.TYPES_NAMESPACE,
-            ),
-            cpp_naming.argument_name(arg.name),
-        )
+        (_generate_argument_type(arg), cpp_naming.argument_name(arg.name))
         for arg in verification.arguments
     ]
 

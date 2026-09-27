@@ -14192,7 +14192,7 @@ UnverifiedSymbolTable(
         Argument(
           name='lang_strings',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Abstract_lang_string',
@@ -14220,7 +14220,7 @@ UnverifiedSymbolTable(
         Argument(
           name='qualifiers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Qualifier',
@@ -17974,7 +17974,7 @@ UnverifiedSymbolTable(
         Argument(
           name='referables',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Referable',
@@ -18005,7 +18005,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               SubscriptedTypeAnnotation(
-                identifier='List',
+                identifier='Sequence',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Operation_variable',
@@ -18020,7 +18020,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               SubscriptedTypeAnnotation(
-                identifier='List',
+                identifier='Sequence',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Operation_variable',
@@ -18035,7 +18035,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               SubscriptedTypeAnnotation(
-                identifier='List',
+                identifier='Sequence',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Operation_variable',
@@ -18064,7 +18064,7 @@ UnverifiedSymbolTable(
         Argument(
           name='extensions',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Extension',
@@ -18092,7 +18092,7 @@ UnverifiedSymbolTable(
         Argument(
           name='elements',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Submodel_element',
@@ -18151,7 +18151,7 @@ UnverifiedSymbolTable(
         Argument(
           name='elements',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Submodel_element',
@@ -18217,7 +18217,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',
@@ -18245,7 +18245,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',
@@ -18273,7 +18273,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',
@@ -18301,7 +18301,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',
@@ -18329,7 +18329,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',
@@ -18357,7 +18357,7 @@ UnverifiedSymbolTable(
         Argument(
           name='embedded_data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Embedded_data_specification',

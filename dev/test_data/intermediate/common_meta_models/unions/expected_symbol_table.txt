@@ -32,6 +32,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -116,6 +117,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -267,6 +269,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -353,6 +356,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -461,6 +465,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -557,6 +562,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='some_child_property',
@@ -564,6 +570,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -677,6 +684,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -779,6 +787,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -863,6 +872,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -1103,6 +1113,7 @@ SymbolTable(
               our_type='Reference to our type Structural_union',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='mixed_property',
@@ -1110,6 +1121,7 @@ SymbolTable(
               our_type='Reference to our type Mixed_union',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='model_typed_property',
@@ -1117,6 +1129,7 @@ SymbolTable(
               our_type='Reference to our type Model_typed_union',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='list_structural_property',
@@ -1126,6 +1139,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='list_mixed_property',
@@ -1135,6 +1149,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='list_model_typed_property',
@@ -1144,6 +1159,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='tuple_property',
@@ -1160,6 +1176,7 @@ SymbolTable(
                   parsed=...)],
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_structural_property',
@@ -1171,6 +1188,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_mixed_property',
@@ -1182,6 +1200,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_model_typed_property',
@@ -1193,6 +1212,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='optional_list_overlapping_property',
@@ -1206,6 +1226,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,

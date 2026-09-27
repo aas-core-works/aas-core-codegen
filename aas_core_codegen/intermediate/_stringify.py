@@ -349,6 +349,7 @@ def _stringify_argument(
             stringify_mod.Property("name", that.name),
             stringify_mod.Property("type_annotation", stringify(that.type_annotation)),
             stringify_mod.Property("default", stringify(that.default)),
+            stringify_mod.Property("mutable", that.mutable),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )

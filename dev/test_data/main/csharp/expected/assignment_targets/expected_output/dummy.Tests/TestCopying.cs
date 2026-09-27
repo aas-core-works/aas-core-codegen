@@ -46,7 +46,11 @@ namespace dummy.Tests
                         ? that.MaybeKind == casted.MaybeKind
                         : !that.MaybeKind.HasValue && !casted.MaybeKind.HasValue)
                     && that.Texts.SequenceEqual(
-                        casted.Texts));
+                        casted.Texts)
+                    && ((that.MaybeTexts != null && casted.MaybeTexts != null)
+                        ? that.MaybeTexts.SequenceEqual(
+                                casted.MaybeTexts)
+                        : that.MaybeTexts == null && casted.MaybeTexts == null));
             }
 
             public override bool TransformSomething(
@@ -65,7 +69,12 @@ namespace dummy.Tests
                             .Zip(
                                 casted.Items,
                                 Transform)
-                            .All(item => item)));
+                            .All(item => item))
+                    && ((that.MaybeItem != null && casted.MaybeItem != null)
+                        ? Transform(
+                                that.MaybeItem,
+                                casted.MaybeItem)
+                        : that.MaybeItem == null && casted.MaybeItem == null));
             }
         }  // internal class DeepEqualiser
 
@@ -79,14 +88,15 @@ namespace dummy.Tests
                 that.Text == other.Text
                 && that.MaybeText == other.MaybeText
                 && that.MaybeKind == other.MaybeKind
-                && that.Texts == other.Texts);
+                && that.Texts == other.Texts
+                && that.MaybeTexts == other.MaybeTexts);
         }
 
         private static bool SomethingShallowEquals(
             Aas.Something that,
             Aas.Something other)
         {
-            return that.Items == other.Items;
+            return that.Items == other.Items && that.MaybeItem == other.MaybeItem;
         }
 
         private static bool ItemDeepEquals(

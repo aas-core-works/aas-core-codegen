@@ -96,7 +96,7 @@ an environment.
 
 from enum import Enum
 from re import match
-from typing import List, Optional, Set
+from typing import List, Optional, Sequence, Set
 
 from icontract import invariant, DBC, ensure
 
@@ -314,7 +314,7 @@ def matches_BCP_47(text: str) -> bool:
 @verification
 @implementation_specific
 def lang_strings_have_unique_languages(
-    lang_strings: List["Abstract_lang_string"],
+    lang_strings: Sequence["Abstract_lang_string"],
 ) -> bool:
     """
     Check that the :paramref:`lang_strings` do not have overlapping
@@ -333,7 +333,7 @@ def lang_strings_have_unique_languages(
 
 @verification
 @implementation_specific
-def qualifier_types_are_unique(qualifiers: List["Qualifier"]) -> bool:
+def qualifier_types_are_unique(qualifiers: Sequence["Qualifier"]) -> bool:
     """
     Check that :attr:`Qualifier.type`'s of :paramref:`qualifiers` are unique.
 
@@ -1082,7 +1082,7 @@ def is_model_reference_to_referable(reference: "Reference") -> bool:
 
 @verification
 @implementation_specific
-def ID_shorts_are_unique(referables: List["Referable"]) -> bool:
+def ID_shorts_are_unique(referables: Sequence["Referable"]) -> bool:
     """
     Check that the :attr:`Referable.ID_short`'s among the :paramref:`referables` are
     unique.
@@ -1103,9 +1103,9 @@ def ID_shorts_are_unique(referables: List["Referable"]) -> bool:
 @verification
 @implementation_specific
 def ID_shorts_of_variables_are_unique(
-    input_variables: Optional[List["Operation_variable"]],
-    output_variables: Optional[List["Operation_variable"]],
-    inoutput_variables: Optional[List["Operation_variable"]],
+    input_variables: Optional[Sequence["Operation_variable"]],
+    output_variables: Optional[Sequence["Operation_variable"]],
+    inoutput_variables: Optional[Sequence["Operation_variable"]],
 ) -> bool:
     """
     Check that the :attr:`Referable.ID_short`'s among all the
@@ -1141,7 +1141,7 @@ def ID_shorts_of_variables_are_unique(
 
 @verification
 @implementation_specific
-def extension_names_are_unique(extensions: List["Extension"]) -> bool:
+def extension_names_are_unique(extensions: Sequence["Extension"]) -> bool:
     """Check that the extension names are unique."""
     # NOTE (mristin, 2022-04-7):
     # This implementation will not be transpiled, but is given here as reference.
@@ -1157,7 +1157,7 @@ def extension_names_are_unique(extensions: List["Extension"]) -> bool:
 @verification
 @implementation_specific
 def submodel_elements_have_identical_semantic_IDs(
-    elements: List["Submodel_element"],
+    elements: Sequence["Submodel_element"],
 ) -> bool:
     """Check that all semantic IDs are identical, if specified."""
     # NOTE (mristin, 2022-04-7):
@@ -1189,7 +1189,7 @@ def submodel_element_is_of_type(
 @verification
 @implementation_specific
 def properties_or_ranges_have_value_type(
-    elements: List["Submodel_element"], value_type: "Data_type_def_XSD"
+    elements: Sequence["Submodel_element"], value_type: "Data_type_def_XSD"
 ) -> bool:
     """Check that all the :paramref:`elements` have the :paramref:`value_type`."""
     # NOTE (mristin, 2022-04-7):
@@ -4068,7 +4068,7 @@ class Capability(Submodel_element):
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_type(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.data_type` is defined
@@ -4097,7 +4097,7 @@ def data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_ty
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_for_reference_have_appropriate_data_type(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.data_type` is defined
@@ -4126,7 +4126,7 @@ def data_specification_IEC_61360s_for_reference_have_appropriate_data_type(
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_for_document_have_appropriate_data_type(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.data_type` is defined
@@ -4155,7 +4155,7 @@ def data_specification_IEC_61360s_for_document_have_appropriate_data_type(
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_have_data_type(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.data_type` is defined for all
@@ -4178,7 +4178,7 @@ def data_specification_IEC_61360s_have_data_type(
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_have_value(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.value` is defined
@@ -4201,7 +4201,7 @@ def data_specification_IEC_61360s_have_value(
 @verification
 @implementation_specific
 def data_specification_IEC_61360s_have_definition_at_least_in_english(
-    embedded_data_specifications: List["Embedded_data_specification"],
+    embedded_data_specifications: Sequence["Embedded_data_specification"],
 ) -> bool:
     """
     Check that the :attr:`Data_specification_IEC_61360.definition` is defined

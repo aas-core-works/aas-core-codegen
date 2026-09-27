@@ -73,6 +73,13 @@ namespace dummy
         public Kind? MaybeKind { get; set; }
 
         public List<string> Texts { get; set; }
+
+        public List<string>? MaybeTexts { get; set; }
+
+        /// <summary>
+        /// Iterate over MaybeTexts, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<string> OverMaybeTextsOrEmpty();
     }
 
     public class Item : IItem
@@ -84,6 +91,17 @@ namespace dummy
         public Kind? MaybeKind { get; set; }
 
         public List<string> Texts { get; set; }
+
+        public List<string>? MaybeTexts { get; set; }
+
+        /// <summary>
+        /// Iterate over MaybeTexts, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<string> OverMaybeTextsOrEmpty()
+        {
+            return MaybeTexts
+                ?? System.Linq.Enumerable.Empty<string>();
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -148,23 +166,29 @@ namespace dummy
             string text,
             List<string> texts,
             string? maybeText = null,
-            Kind? maybeKind = null)
+            Kind? maybeKind = null,
+            List<string>? maybeTexts = null)
         {
             Text = text;
             Texts = texts;
             MaybeText = maybeText;
             MaybeKind = maybeKind;
+            MaybeTexts = maybeTexts;
         }
     }
 
     public interface ISomething : IClass
     {
         public List<IItem> Items { get; set; }
+
+        public IItem? MaybeItem { get; set; }
     }
 
     public class Something : ISomething
     {
         public List<IItem> Items { get; set; }
+
+        public IItem? MaybeItem { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -175,6 +199,11 @@ namespace dummy
             foreach (var anItem in Items)
             {
                 yield return anItem;
+            }
+
+            if (MaybeItem != null)
+            {
+                yield return MaybeItem;
             }
         }
 
@@ -191,6 +220,17 @@ namespace dummy
                 foreach (var anotherItem in anItem.Descend())
                 {
                     yield return anotherItem;
+                }
+            }
+
+            if (MaybeItem != null)
+            {
+                yield return MaybeItem;
+
+                // Recurse
+                foreach (var anItem in MaybeItem.Descend())
+                {
+                    yield return anItem;
                 }
             }
         }
@@ -235,9 +275,12 @@ namespace dummy
             return transformer.TransformSomething(this, context);
         }
 
-        public Something(List<IItem> items)
+        public Something(
+            List<IItem> items,
+            IItem? maybeItem = null)
         {
             Items = items;
+            MaybeItem = maybeItem;
         }
     }
 }  // namespace dummy

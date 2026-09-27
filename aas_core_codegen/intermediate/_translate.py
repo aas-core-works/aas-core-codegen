@@ -1084,16 +1084,30 @@ def _to_type_annotation(
         )
 
     elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
-        if parsed.identifier == "List":
+        if parsed.identifier in ("List", "Sequence"):
             assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the List type annotation, "
-                f"but got: {parsed}; this should have been caught before!"
+                f"Expected exactly one subscript for the {parsed.identifier} type "
+                f"annotation, but got: {parsed}; this should have been caught before!"
             )
 
+            # NOTE (mristin):
+            # A ``Sequence`` is a read-only list. We keep the read-only flag on
+            # the argument, see :py:attr:`Argument.mutable`, so that the generators
+            # need not distinguish the two.
             return ListTypeAnnotation(
                 items=_to_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
+
+        elif parsed.identifier == "Mutable":
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the Mutable type annotation, "
+                f"but got: {parsed}; this should have been caught before!"
+            )
+
+            # NOTE (mristin):
+            # We keep the mutability on the argument, see :py:attr:`Argument.mutable`.
+            return _to_type_annotation(parsed.subscripts[0])
 
         elif parsed.identifier == "Optional":
             assert len(parsed.subscripts) == 1, (
@@ -1165,22 +1179,57 @@ class _DefaultPlaceholder:
         self.parsed = parsed
 
 
+def _mutability_type_beneath_optional(
+    parsed: parse.TypeAnnotation,
+) -> Optional[parse.SubscriptedTypeAnnotation]:
+    """
+    Find ``List``, ``Sequence`` or ``Mutable`` at the top of ``parsed``.
+
+    We look beneath ``Optional``, as ``Optional`` keeps the mutability.
+    """
+    while (
+        isinstance(parsed, parse.SubscriptedTypeAnnotation)
+        and parsed.identifier == "Optional"
+    ):
+        parsed = parsed.subscripts[0]
+
+    if isinstance(parsed, parse.SubscriptedTypeAnnotation) and parsed.identifier in (
+        "List",
+        "Sequence",
+        "Mutable",
+    ):
+        return parsed
+
+    return None
+
+
 def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
     """Translate the arguments of a method in meta-model to the intermediate ones."""
-    return [
-        Argument(
-            name=parsed_arg.name,
-            type_annotation=_to_type_annotation(parsed_arg.type_annotation),
-            default=(
-                _DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
-                if parsed_arg.default is not None
-                else None
-            ),
-            parsed=parsed_arg,
+    result = []  # type: List[Argument]
+    for parsed_arg in parsed:
+        if isinstance(parsed_arg.type_annotation, parse.SelfTypeAnnotation):
+            continue
+
+        mutability_type = _mutability_type_beneath_optional(parsed_arg.type_annotation)
+
+        result.append(
+            Argument(
+                name=parsed_arg.name,
+                type_annotation=_to_type_annotation(parsed_arg.type_annotation),
+                default=(
+                    _DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
+                    if parsed_arg.default is not None
+                    else None
+                ),
+                mutable=(
+                    mutability_type is not None
+                    and mutability_type.identifier in ("List", "Mutable")
+                ),
+                parsed=parsed_arg,
+            )
         )
-        for parsed_arg in parsed
-        if not isinstance(parsed_arg.type_annotation, parse.SelfTypeAnnotation)
-    ]
+
+    return result
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -5367,6 +5416,71 @@ def _assert_all_type_annotations_are_unique_instances(
             observed_set_of_type_anno_ids.add(type_anno_id)
 
 
+def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error]:
+    """Check that ``Mutable[...]`` wraps only the classes."""
+    errors = []  # type: List[Error]
+    for func in symbol_table.verification_functions:
+        for arg in func.arguments:
+            mutability_type = _mutability_type_beneath_optional(
+                arg.parsed.type_annotation
+            )
+            if mutability_type is None or mutability_type.identifier != "Mutable":
+                continue
+
+            type_anno = beneath_optional(arg.type_annotation)
+            if isinstance(type_anno, OurTypeAnnotation) and isinstance(
+                type_anno.our_type, Class
+            ):
+                continue
+
+            # NOTE (mristin):
+            # The parser already refused ``Mutable`` around ``List`` and
+            # ``Sequence``, as it can tell them apart syntactically.
+            assert not isinstance(type_anno, ListTypeAnnotation)
+
+            what = (
+                f"The argument {arg.name!r} of the verification function {func.name!r}"
+            )
+
+            reason: str
+            if isinstance(type_anno, PrimitiveTypeAnnotation) or (
+                isinstance(type_anno, OurTypeAnnotation)
+                and isinstance(type_anno.our_type, ConstrainedPrimitive)
+            ):
+                reason = (
+                    f"the values of type {type_anno} are immutable. A function can "
+                    f"not change such a value in place; it can only re-bind its "
+                    f"argument to another value, which the caller never observes"
+                )
+            elif isinstance(type_anno, OurTypeAnnotation) and isinstance(
+                type_anno.our_type, Enumeration
+            ):
+                reason = (
+                    f"the literals of the enumeration {type_anno.our_type.name!r} "
+                    f"are immutable values. A function can only re-bind its "
+                    f"argument to another literal, which the caller never observes"
+                )
+            elif isinstance(type_anno, TupleTypeAnnotation):
+                reason = (
+                    "the tuples are immutable in Python. If the function mutates "
+                    "the objects held in the tuple, please pass them as separate "
+                    "Mutable arguments"
+                )
+            else:
+                reason = f"we do not support mutating the values of type {type_anno}"
+
+            errors.append(
+                Error(
+                    arg.parsed.node,
+                    f"{what} is declared as Mutable, but Mutable applies only to "
+                    f"the instances of the classes, and makes no sense here, since "
+                    f"{reason}. Please remove Mutable.",
+                )
+            )
+
+    return errors
+
+
 def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Error]:
     """Perform a battery of checks on the consistency of ``symbol_table``."""
     errors = _verify_there_are_no_duplicate_names_of_our_types(
@@ -5426,6 +5540,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_patterns_anchored_at_start_and_end(symbol_table=symbol_table))
 
     errors.extend(_verify_invariant_descriptions_unique(symbol_table=symbol_table))
+
+    errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors

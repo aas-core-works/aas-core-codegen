@@ -42,6 +42,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -49,6 +50,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -126,6 +128,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -253,6 +256,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -354,6 +358,7 @@ SymbolTable(
               our_type='Reference to our type Content',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -443,6 +448,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='lang_string_sets',
@@ -452,6 +458,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='specifications',
@@ -465,6 +472,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -640,6 +648,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -667,6 +676,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -697,6 +707,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

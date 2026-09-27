@@ -1266,6 +1266,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -1279,6 +1280,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -1534,6 +1536,7 @@ SymbolTable(
               our_type='Reference to our type Name_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -1545,6 +1548,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -1558,6 +1562,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value_type',
@@ -1569,6 +1574,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -1580,6 +1586,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='refers_to',
@@ -1593,6 +1600,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -1925,6 +1933,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -2329,6 +2338,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -2340,6 +2350,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -2351,6 +2362,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -2364,6 +2376,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -2377,6 +2390,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -2852,6 +2866,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -2865,6 +2880,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -2876,6 +2892,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -2887,6 +2904,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -2900,6 +2918,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -2913,6 +2932,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='administration',
@@ -2924,6 +2944,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -3306,6 +3327,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -3483,6 +3505,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -3674,6 +3697,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='version',
@@ -3685,6 +3709,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='revision',
@@ -3696,6 +3721,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='creator',
@@ -3707,6 +3733,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='template_ID',
@@ -3718,6 +3745,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -3998,6 +4026,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -4307,6 +4336,7 @@ SymbolTable(
               our_type='Reference to our type Qualifier_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='value_type',
@@ -4314,6 +4344,7 @@ SymbolTable(
               our_type='Reference to our type Data_type_def_XSD',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -4325,6 +4356,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -4338,6 +4370,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='kind',
@@ -4349,6 +4382,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -4360,6 +4394,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value_ID',
@@ -4371,6 +4406,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -4799,6 +4835,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='asset_information',
@@ -4806,6 +4843,7 @@ SymbolTable(
               our_type='Reference to our type Asset_information',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -4819,6 +4857,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -4830,6 +4869,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -4841,6 +4881,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -4854,6 +4895,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -4867,6 +4909,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='administration',
@@ -4878,6 +4921,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -4891,6 +4935,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='derived_from',
@@ -4902,6 +4947,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='submodels',
@@ -4915,6 +4961,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -5438,6 +5485,7 @@ SymbolTable(
               our_type='Reference to our type Asset_kind',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='global_asset_ID',
@@ -5449,6 +5497,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='specific_asset_IDs',
@@ -5462,6 +5511,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='asset_type',
@@ -5473,6 +5523,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='default_thumbnail',
@@ -5484,6 +5535,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -5804,6 +5856,7 @@ SymbolTable(
               our_type='Reference to our type Path_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='content_type',
@@ -5815,6 +5868,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -6008,6 +6062,7 @@ SymbolTable(
               our_type='Reference to our type Label_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -6015,6 +6070,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -6026,6 +6082,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -6039,6 +6096,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='external_subject_ID',
@@ -6050,6 +6108,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -6522,6 +6581,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -6535,6 +6595,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -6546,6 +6607,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -6557,6 +6619,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -6570,6 +6633,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -6583,6 +6647,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='administration',
@@ -6594,6 +6659,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='kind',
@@ -6605,6 +6671,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -6616,6 +6683,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -6629,6 +6697,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -6642,6 +6711,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -6655,6 +6725,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='submodel_elements',
@@ -6668,6 +6739,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -7641,6 +7713,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -7652,6 +7725,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -7663,6 +7737,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -7676,6 +7751,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -7689,6 +7765,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -7700,6 +7777,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -7713,6 +7791,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -7726,6 +7805,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -7739,6 +7819,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -8439,6 +8520,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='second',
@@ -8446,6 +8528,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -8459,6 +8542,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -8470,6 +8554,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -8481,6 +8566,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -8494,6 +8580,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -8507,6 +8594,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -8518,6 +8606,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -8531,6 +8620,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -8544,6 +8634,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -8557,6 +8648,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -9380,6 +9472,7 @@ SymbolTable(
               our_type='Reference to our type AAS_submodel_elements',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -9393,6 +9486,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -9404,6 +9498,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -9415,6 +9510,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -9428,6 +9524,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -9441,6 +9538,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -9452,6 +9550,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -9465,6 +9564,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -9478,6 +9578,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -9491,6 +9592,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='order_relevant',
@@ -9502,6 +9604,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='semantic_ID_list_element',
@@ -9513,6 +9616,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value_type_list_element',
@@ -9524,6 +9628,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -9537,6 +9642,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -10527,6 +10633,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -10538,6 +10645,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -10549,6 +10657,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -10562,6 +10671,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -10575,6 +10685,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -10586,6 +10697,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -10599,6 +10711,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -10612,6 +10725,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -10625,6 +10739,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -10638,6 +10753,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -11450,6 +11566,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -11461,6 +11578,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -11472,6 +11590,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -11485,6 +11604,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -11498,6 +11618,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -11509,6 +11630,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -11522,6 +11644,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -11535,6 +11658,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -11548,6 +11672,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -12264,6 +12389,7 @@ SymbolTable(
               our_type='Reference to our type Data_type_def_XSD',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -12277,6 +12403,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -12288,6 +12415,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -12299,6 +12427,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -12312,6 +12441,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -12325,6 +12455,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -12336,6 +12467,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -12349,6 +12481,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -12362,6 +12495,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -12375,6 +12509,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -12386,6 +12521,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value_ID',
@@ -12397,6 +12533,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -13164,6 +13301,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -13175,6 +13313,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -13186,6 +13325,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -13199,6 +13339,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -13212,6 +13353,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -13223,6 +13365,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -13236,6 +13379,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -13249,6 +13393,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -13262,6 +13407,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -13275,6 +13421,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value_ID',
@@ -13286,6 +13433,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -14075,6 +14223,7 @@ SymbolTable(
               our_type='Reference to our type Data_type_def_XSD',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -14088,6 +14237,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -14099,6 +14249,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -14110,6 +14261,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -14123,6 +14275,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -14136,6 +14289,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -14147,6 +14301,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -14160,6 +14315,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -14173,6 +14329,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -14186,6 +14343,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='min',
@@ -14197,6 +14355,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='max',
@@ -14208,6 +14367,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -14984,6 +15144,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -14995,6 +15156,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -15006,6 +15168,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -15019,6 +15182,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -15032,6 +15196,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -15043,6 +15208,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -15056,6 +15222,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -15069,6 +15236,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -15082,6 +15250,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -15093,6 +15262,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -15803,6 +15973,7 @@ SymbolTable(
               our_type='Reference to our type Content_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -15816,6 +15987,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -15827,6 +15999,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -15838,6 +16011,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -15851,6 +16025,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -15864,6 +16039,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -15875,6 +16051,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -15888,6 +16065,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -15901,6 +16079,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -15914,6 +16093,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -15925,6 +16105,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -16638,6 +16819,7 @@ SymbolTable(
               our_type='Reference to our type Content_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -16651,6 +16833,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -16662,6 +16845,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -16673,6 +16857,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -16686,6 +16871,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -16699,6 +16885,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -16710,6 +16897,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -16723,6 +16911,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -16736,6 +16925,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -16749,6 +16939,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value',
@@ -16760,6 +16951,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -17459,6 +17651,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='second',
@@ -17466,6 +17659,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -17479,6 +17673,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -17490,6 +17685,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -17501,6 +17697,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -17514,6 +17711,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -17527,6 +17725,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -17538,6 +17737,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -17551,6 +17751,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -17564,6 +17765,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -17577,6 +17779,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='annotations',
@@ -17590,6 +17793,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -18353,6 +18557,7 @@ SymbolTable(
               our_type='Reference to our type Entity_type',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -18366,6 +18571,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -18377,6 +18583,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -18388,6 +18595,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -18401,6 +18609,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -18414,6 +18623,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -18425,6 +18635,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -18438,6 +18649,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -18451,6 +18663,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -18464,6 +18677,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='statements',
@@ -18477,6 +18691,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='global_asset_ID',
@@ -18488,6 +18703,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='specific_asset_IDs',
@@ -18501,6 +18717,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -19401,6 +19618,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='observable_reference',
@@ -19408,6 +19626,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='time_stamp',
@@ -19415,6 +19634,7 @@ SymbolTable(
               our_type='Reference to our type Date_time_UTC',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='source_semantic_ID',
@@ -19426,6 +19646,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='observable_semantic_ID',
@@ -19437,6 +19658,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='topic',
@@ -19448,6 +19670,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='subject_ID',
@@ -19459,6 +19682,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='payload',
@@ -19470,6 +19694,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -19881,6 +20106,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -19892,6 +20118,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -19903,6 +20130,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -19916,6 +20144,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -19929,6 +20158,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -19940,6 +20170,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -19953,6 +20184,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -19966,6 +20198,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -19979,6 +20212,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -20739,6 +20973,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='direction',
@@ -20746,6 +20981,7 @@ SymbolTable(
               our_type='Reference to our type Direction',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='state',
@@ -20753,6 +20989,7 @@ SymbolTable(
               our_type='Reference to our type State_of_event',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -20766,6 +21003,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -20777,6 +21015,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -20788,6 +21027,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -20801,6 +21041,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -20814,6 +21055,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -20825,6 +21067,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -20838,6 +21081,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -20851,6 +21095,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -20864,6 +21109,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='message_topic',
@@ -20875,6 +21121,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='message_broker',
@@ -20886,6 +21133,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='last_update',
@@ -20897,6 +21145,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='min_interval',
@@ -20908,6 +21157,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='max_interval',
@@ -20919,6 +21169,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -21735,6 +21986,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -21746,6 +21998,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -21757,6 +22010,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -21770,6 +22024,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -21783,6 +22038,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -21794,6 +22050,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -21807,6 +22064,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -21820,6 +22078,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -21833,6 +22092,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='input_variables',
@@ -21846,6 +22106,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='output_variables',
@@ -21859,6 +22120,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='inoutput_variables',
@@ -21872,6 +22134,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -22447,6 +22710,7 @@ SymbolTable(
               our_type='Reference to our type Submodel_element',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -22727,6 +22991,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -22738,6 +23003,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -22749,6 +23015,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -22762,6 +23029,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -22775,6 +23043,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='semantic_ID',
@@ -22786,6 +23055,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='supplemental_semantic_IDs',
@@ -22799,6 +23069,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='qualifiers',
@@ -22812,6 +23083,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -22825,6 +23097,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -23424,6 +23697,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='extensions',
@@ -23437,6 +23711,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='category',
@@ -23448,6 +23723,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='ID_short',
@@ -23459,6 +23735,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='display_name',
@@ -23472,6 +23749,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='description',
@@ -23485,6 +23763,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='administration',
@@ -23496,6 +23775,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='embedded_data_specifications',
@@ -23509,6 +23789,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='is_case_of',
@@ -23522,6 +23803,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -24234,6 +24516,7 @@ SymbolTable(
               our_type='Reference to our type Reference_types',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='keys',
@@ -24243,6 +24526,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='referred_semantic_ID',
@@ -24254,6 +24538,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -25100,6 +25385,7 @@ SymbolTable(
               our_type='Reference to our type Key_types',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -25107,6 +25393,7 @@ SymbolTable(
               our_type='Reference to our type Identifier',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -25600,6 +25887,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -25607,6 +25895,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -25704,6 +25993,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -25711,6 +26001,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -25822,6 +26113,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -25829,6 +26121,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -25970,6 +26263,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='submodels',
@@ -25983,6 +26277,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='concept_descriptions',
@@ -25996,6 +26291,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -26279,6 +26575,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='data_specification_content',
@@ -26286,6 +26583,7 @@ SymbolTable(
               our_type='Reference to our type Data_specification_content',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -26617,6 +26915,7 @@ SymbolTable(
               a_type='BOOL',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='nom',
@@ -26624,6 +26923,7 @@ SymbolTable(
               a_type='BOOL',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='typ',
@@ -26631,6 +26931,7 @@ SymbolTable(
               a_type='BOOL',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='max',
@@ -26638,6 +26939,7 @@ SymbolTable(
               a_type='BOOL',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -26778,6 +27080,7 @@ SymbolTable(
               our_type='Reference to our type Value_type_IEC_61360',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='value_ID',
@@ -26785,6 +27088,7 @@ SymbolTable(
               our_type='Reference to our type Reference',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -26872,6 +27176,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -26980,6 +27285,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -26987,6 +27293,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -27099,6 +27406,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -27106,6 +27414,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -27217,6 +27526,7 @@ SymbolTable(
               our_type='Reference to our type BCP_47_language_tag',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -27224,6 +27534,7 @@ SymbolTable(
               our_type='Reference to our type Non_empty_XML_serializable_string',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -27514,6 +27825,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='short_name',
@@ -27527,6 +27839,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='unit',
@@ -27538,6 +27851,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='unit_ID',
@@ -27549,6 +27863,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='source_of_definition',
@@ -27560,6 +27875,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='symbol',
@@ -27571,6 +27887,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='data_type',
@@ -27582,6 +27899,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='definition',
@@ -27595,6 +27913,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=True,
             parsed=...),
           Argument(
             name='value_format',
@@ -27606,6 +27925,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value_list',
@@ -27617,6 +27937,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -27628,6 +27949,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...),
           Argument(
             name='level_type',
@@ -27639,6 +27961,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -28558,6 +28881,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28588,6 +28912,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28618,6 +28943,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28648,6 +28974,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28686,6 +29013,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28719,6 +29047,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28757,6 +29086,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28793,6 +29123,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28826,6 +29157,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28855,6 +29187,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28883,6 +29216,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28919,6 +29253,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28955,6 +29290,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -28989,6 +29325,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29023,6 +29360,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29057,6 +29395,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29091,6 +29430,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29123,6 +29463,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29157,6 +29498,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29191,6 +29533,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29225,6 +29568,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29259,6 +29603,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29293,6 +29638,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29327,6 +29673,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29361,6 +29708,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29395,6 +29743,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29429,6 +29778,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29463,6 +29813,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29497,6 +29848,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29531,6 +29883,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29565,6 +29918,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29599,6 +29953,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29633,6 +29988,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29667,6 +30023,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29701,6 +30058,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29735,6 +30093,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29769,6 +30128,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29803,6 +30163,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29837,6 +30198,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29871,6 +30233,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29905,6 +30268,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29939,6 +30303,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -29973,6 +30338,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='value_type',
@@ -29980,6 +30346,7 @@ SymbolTable(
             our_type='Reference to our type Data_type_def_XSD',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30011,6 +30378,7 @@ SymbolTable(
             our_type='Reference to our type Reference',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='expected_type',
@@ -30018,6 +30386,7 @@ SymbolTable(
             our_type='Reference to our type Key_types',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30043,6 +30412,7 @@ SymbolTable(
             our_type='Reference to our type Reference',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30070,6 +30440,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30101,6 +30472,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='output_variables',
@@ -30112,6 +30484,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='inoutput_variables',
@@ -30123,6 +30496,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30153,6 +30527,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30180,6 +30555,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30205,6 +30581,7 @@ SymbolTable(
             our_type='Reference to our type Submodel_element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='element_type',
@@ -30212,6 +30589,7 @@ SymbolTable(
             our_type='Reference to our type AAS_submodel_elements',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30241,6 +30619,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='value_type',
@@ -30248,6 +30627,7 @@ SymbolTable(
             our_type='Reference to our type Data_type_def_XSD',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30273,6 +30653,7 @@ SymbolTable(
             our_type='Reference to our type Reference',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...),
         Argument(
           name='other',
@@ -30280,6 +30661,7 @@ SymbolTable(
             our_type='Reference to our type Reference',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30307,6 +30689,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30336,6 +30719,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30365,6 +30749,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30394,6 +30779,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30423,6 +30809,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30452,6 +30839,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -30479,6 +30867,7 @@ SymbolTable(
             a_type='STR',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

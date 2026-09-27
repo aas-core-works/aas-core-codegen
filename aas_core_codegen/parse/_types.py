@@ -28,6 +28,15 @@ GENERIC_TYPES = {
     Identifier("Optional"),
     Identifier("Tuple"),
     Identifier("JSONObject"),
+    Identifier("Sequence"),
+    Identifier("Mutable"),
+}
+
+#: Generic types which declare the mutability of the parameters of the verification
+#: functions, and are allowed only there
+MUTABILITY_TYPES = {
+    Identifier("Sequence"),
+    Identifier("Mutable"),
 }
 
 #: Name of the special atomic type annotation denoting an arbitrary, open

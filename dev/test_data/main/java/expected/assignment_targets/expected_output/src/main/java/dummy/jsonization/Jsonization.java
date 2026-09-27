@@ -297,6 +297,7 @@ public class Jsonization {
         List<String> theTexts = null;
         String theMaybeText = null;
         Kind theMaybeKind = null;
+        List<String> theMaybeTexts = null;
 
         for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
           final Map.Entry<String, JsonNode> keyValue = iterator.next();
@@ -336,6 +337,14 @@ public class Jsonization {
               theMaybeKind = parsed.getResult();
               break;
             }
+            case "maybeTexts": {
+              final Reporting.Result<List<String>> parsed = parseListOf_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theMaybeTexts = parsed.getResult();
+              break;
+            }
             default:
               return unexpectedProperty(key);
           }
@@ -353,7 +362,8 @@ public class Jsonization {
           theText,
           theTexts,
           theMaybeText,
-          theMaybeKind));
+          theMaybeKind,
+          theMaybeTexts));
       }
 
       /**
@@ -367,6 +377,7 @@ public class Jsonization {
         }
 
         List<IItem> theItems = null;
+        IItem theMaybeItem = null;
 
         for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
           final Map.Entry<String, JsonNode> keyValue = iterator.next();
@@ -382,6 +393,14 @@ public class Jsonization {
               theItems = parsed.getResult();
               break;
             }
+            case "maybeItem": {
+              final Reporting.Result<? extends IItem> parsed = tryItemFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theMaybeItem = parsed.getResult();
+              break;
+            }
             default:
               return unexpectedProperty(key);
           }
@@ -392,7 +411,8 @@ public class Jsonization {
         }
 
         return Reporting.Result.success(new Something(
-          theItems));
+          theItems,
+          theMaybeItem));
       }
     }
 
@@ -686,6 +706,10 @@ public class Jsonization {
           result, "texts", "getTexts()",
           that.getTexts(), _Transformer::serializeListOf_string);
 
+        setOptionalProperty(
+          result, "maybeTexts", "getMaybeTexts()",
+          that.getMaybeTexts(), _Transformer::serializeListOf_string);
+
         return result;
       }
 
@@ -698,6 +722,10 @@ public class Jsonization {
         setProperty(
           result, "items", "getItems()",
           that.getItems(), _Transformer::serializeListOf_IClass);
+
+        setOptionalProperty(
+          result, "maybeItem", "getMaybeItem()",
+          that.getMaybeItem(), _Transformer::transformClass);
 
         return result;
       }

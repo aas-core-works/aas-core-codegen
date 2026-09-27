@@ -62,6 +62,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -137,6 +138,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='text',
@@ -144,6 +146,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -258,6 +261,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='children',
@@ -267,6 +271,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -363,6 +368,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='children',
@@ -372,6 +378,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='is_sorted',
@@ -379,6 +386,7 @@ SymbolTable(
               a_type='BOOL',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -470,6 +478,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='children',
@@ -479,6 +488,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -545,6 +555,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -608,6 +619,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -684,6 +696,7 @@ SymbolTable(
               our_type='Reference to our type Attribute_item',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -747,6 +760,7 @@ SymbolTable(
               a_type='STR',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -810,6 +824,7 @@ SymbolTable(
               a_type='FLOAT',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -935,6 +950,7 @@ SymbolTable(
               our_type='Reference to our type Element',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='value',
@@ -942,6 +958,7 @@ SymbolTable(
               our_type='Reference to our type Value',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...),
           Argument(
             name='values',
@@ -951,6 +968,7 @@ SymbolTable(
                 parsed=...),
               parsed=...),
             default=None,
+            mutable=True,
             parsed=...),
           Argument(
             name='optional_element',
@@ -962,6 +980,7 @@ SymbolTable(
             default=DefaultPrimitive(
               value=None,
               parsed=...),
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,
@@ -1269,6 +1288,7 @@ SymbolTable(
             our_type='Reference to our type Element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1297,6 +1317,7 @@ SymbolTable(
             our_type='Reference to our type Element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1327,6 +1348,7 @@ SymbolTable(
             our_type='Reference to our type Element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1355,6 +1377,7 @@ SymbolTable(
             our_type='Reference to our type Element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1381,6 +1404,7 @@ SymbolTable(
             our_type='Reference to our type Element',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1407,6 +1431,7 @@ SymbolTable(
             our_type='Reference to our type Container',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1432,6 +1457,7 @@ SymbolTable(
             our_type='Reference to our type Value',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',
@@ -1460,6 +1486,7 @@ SymbolTable(
             our_type='Reference to our type Value',
             parsed=...),
           default=None,
+          mutable=False,
           parsed=...)],
       returns=PrimitiveTypeAnnotation(
         a_type='BOOL',

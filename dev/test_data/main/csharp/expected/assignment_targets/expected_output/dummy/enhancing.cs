@@ -68,6 +68,17 @@ namespace dummy
                 set => _instance.Texts = value;
             }
 
+            public List<string>? MaybeTexts
+            {
+                get => _instance.MaybeTexts;
+                set => _instance.MaybeTexts = value;
+            }
+
+            public IEnumerable<string> OverMaybeTextsOrEmpty()
+            {
+                return _instance.OverMaybeTextsOrEmpty();
+            }
+
             public IEnumerable<Aas.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
@@ -123,6 +134,12 @@ namespace dummy
             {
                 get => _instance.Items;
                 set => _instance.Items = value;
+            }
+
+            public IItem? MaybeItem
+            {
+                get => _instance.MaybeItem;
+                set => _instance.MaybeItem = value;
             }
 
             public IEnumerable<Aas.IClass> DescendOnce()
@@ -220,6 +237,20 @@ namespace dummy
                         }
                     )
                 ).ToList();
+
+                if (that.MaybeItem != null)
+                {
+                    var transformedMaybeItem = Transform(
+                        that.MaybeItem
+                    );
+                    var castedMaybeItem = (
+                        transformedMaybeItem as Aas.IItem
+                    ) ?? throw new System.InvalidOperationException(
+                        "Expected the transformed value to be a IItem, " +
+                        $"but got: {transformedMaybeItem}"
+                    );
+                    that.MaybeItem = castedMaybeItem;
+                }
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)

@@ -60,6 +60,26 @@ func deepEqualItem(
 		}
 	}
 
+	thatMaybeTexts := that.MaybeTexts()
+	otherMaybeTexts := other.MaybeTexts()
+	if
+		(thatMaybeTexts == nil && otherMaybeTexts != nil) ||
+		(thatMaybeTexts != nil && otherMaybeTexts == nil) {
+		return false
+	}
+	if thatMaybeTexts != nil {
+		if 
+			len(thatMaybeTexts) !=
+			len(otherMaybeTexts) {
+			return false
+		}
+		for i := range thatMaybeTexts {
+			if thatMaybeTexts[i] != otherMaybeTexts[i] {
+				return false
+			}
+		}
+	}
+
 	return true
 }
 
@@ -81,6 +101,22 @@ func deepEqualSomething(
 		if !DeepEqual(
 			thatItems[i],
 			otherItems[i],
+		) {
+			return false
+		}
+	}
+
+	thatMaybeItem := that.MaybeItem()
+	otherMaybeItem := other.MaybeItem()
+	if
+		(thatMaybeItem == nil && otherMaybeItem != nil) ||
+		(thatMaybeItem != nil && otherMaybeItem == nil) {
+		return false
+	}
+	if thatMaybeItem != nil {
+		if !DeepEqual(
+			thatMaybeItem,
+			otherMaybeItem,
 		) {
 			return false
 		}

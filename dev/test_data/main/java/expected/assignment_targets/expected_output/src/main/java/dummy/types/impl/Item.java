@@ -31,6 +31,8 @@ public class Item implements IItem {
 
   private List<String> texts;
 
+  private List<String> maybeTexts;
+
   public Item(
     String text,
     List<String> texts) {
@@ -46,7 +48,8 @@ public class Item implements IItem {
     String text,
     List<String> texts,
     String maybeText,
-    Kind maybeKind) {
+    Kind maybeKind,
+    List<String> maybeTexts) {
     this.text = Objects.requireNonNull(
       text,
       "Argument \"text\" must be non-null.");
@@ -55,6 +58,7 @@ public class Item implements IItem {
       "Argument \"texts\" must be non-null.");
     this.maybeText = maybeText;
     this.maybeKind = maybeKind;
+    this.maybeTexts = maybeTexts;
   }
 
   @Override
@@ -99,6 +103,24 @@ public class Item implements IItem {
     this.texts = Objects.requireNonNull(
       texts,
       "Argument \"texts\" must be non-null.");
+  }
+
+  @Override
+  public Optional<List<String>> getMaybeTexts() {
+    return Optional.ofNullable(maybeTexts);
+  }
+
+  @Override
+  public void setMaybeTexts(List<String> maybeTexts) {
+    this.maybeTexts = maybeTexts;
+  }
+
+  /**
+   * Iterate over {@link Item#maybeTexts}, if set,
+   * and otherwise return an empty iterator.
+   */
+  public Iterable<String> overMaybeTextsOrEmpty() {
+    return getMaybeTexts().orElseGet(Collections::emptyList);
   }
 
   /**

@@ -20,6 +20,8 @@ public class ItemBuilder {
 
   private List<String> texts;
 
+  private List<String> maybeTexts;
+
   public ItemBuilder(
     String text,
     List<String> texts) {
@@ -41,11 +43,17 @@ public class ItemBuilder {
     return this;
   }
 
+  public ItemBuilder setMaybeTexts(List<String> maybeTexts) {
+    this.maybeTexts = maybeTexts;
+    return this;
+  }
+
   public Item build() {
     return new Item(
       this.text,
       this.texts,
       this.maybeText,
-      this.maybeKind);
+      this.maybeKind,
+      this.maybeTexts);
   }
 }

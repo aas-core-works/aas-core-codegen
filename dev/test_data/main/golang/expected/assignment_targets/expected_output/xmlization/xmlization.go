@@ -335,11 +335,13 @@ func readItemAsSequence(
 	var theMaybeText *string
 	var theMaybeKind *aastypes.Kind
 	var theTexts []string
+	var theMaybeTexts []string
 
 	foundText := false
 	foundMaybeText := false
 	foundMaybeKind := false
 	foundTexts := false
+	foundMaybeTexts := false
 
 	for {
 		var local string
@@ -390,6 +392,15 @@ func readItemAsSequence(
 				decoder, current, readAtV_string,
 			)
 			foundTexts = true
+		case "maybeTexts":
+			if foundMaybeTexts {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theMaybeTexts, current, valueErr = readListOf(
+				decoder, current, readAtV_string,
+			)
+			foundMaybeTexts = true
 		default:
 			valueErr = xmlcommon.NewDeserializationError(
 				"Unexpected property",
@@ -420,6 +431,7 @@ func readItemAsSequence(
 	)
 	instance.SetMaybeText(theMaybeText)
 	instance.SetMaybeKind(theMaybeKind)
+	instance.SetMaybeTexts(theMaybeTexts)
 	return
 }
 
@@ -459,8 +471,10 @@ func readSomethingAsSequence(
 	err error,
 ) {
 	var theItems []aastypes.IItem
+	var theMaybeItem aastypes.IItem
 
 	foundItems := false
+	foundMaybeItem := false
 
 	for {
 		var local string
@@ -484,6 +498,15 @@ func readSomethingAsSequence(
 				decoder, current, readItemDispatched,
 			)
 			foundItems = true
+		case "maybeItem":
+			if foundMaybeItem {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theMaybeItem, current, valueErr = readItemAsSequence(
+				decoder, current,
+			)
+			foundMaybeItem = true
 		default:
 			valueErr = xmlcommon.NewDeserializationError(
 				"Unexpected property",
@@ -506,6 +529,7 @@ func readSomethingAsSequence(
 	instance = aastypes.NewSomething(
 		theItems,
 	)
+	instance.SetMaybeItem(theMaybeItem)
 	return
 }
 
@@ -866,6 +890,16 @@ func writeItemAsSequence(
 		return
 	}
 
+	err = finishProperty(
+		"MaybeTexts()",
+		writeOptionalSlice(
+			encoder, "maybeTexts", that.MaybeTexts(), writeListOf_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -885,6 +919,16 @@ func writeSomethingAsSequence(
 		"Items()",
 		xmlcommon.WriteElement(
 			encoder, "items", that.Items(), writeListOf_IItem,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"MaybeItem()",
+		writeOptionalInstance(
+			encoder, "maybeItem", that.MaybeItem(), writeItemAsSequence,
 		),
 	)
 	if err != nil {

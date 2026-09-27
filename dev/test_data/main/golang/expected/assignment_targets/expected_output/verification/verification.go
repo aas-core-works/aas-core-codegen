@@ -83,12 +83,12 @@ func SetTextThroughAlias(
 	return true
 }
 
-// Check the assignment of a list to a property.
+// Check the assignment of a copy of a list to a property.
 func SetTexts(
 	item aastypes.IItem,
 	texts []string,
 ) bool {
-	item.SetTexts(texts)
+	item.SetTexts(append(texts[:0:0], texts...))
 	return true
 }
 
@@ -155,6 +155,164 @@ func SetTextsInLoops(
 	return true
 }
 
+// Check the mutation of a list argument in place.
+func FillTexts(
+	texts []string,
+	text string,
+) bool {
+	for i := 0; i < len(texts); i++ {
+		texts[i] = text
+	}
+	return true
+}
+
+// Check passing a property as a mutable list argument.
+func FillTextsOfItem(
+	item aastypes.IItem,
+	text string,
+) bool {
+	return FillTexts(item.Texts(), text)
+}
+
+// Check passing a local alias of a list as a mutable list argument.
+func FillTextsThroughAlias(
+	item aastypes.IItem,
+	text string,
+) bool {
+	texts := item.Texts()
+	return FillTexts(texts, text)
+}
+
+// Check passing a list argument on as a mutable list argument.
+func FillTextsOfArgument(
+	texts []string,
+	text string,
+) bool {
+	return FillTexts(texts, text)
+}
+
+// Check the mutation of an object argument.
+func Rename(
+	item aastypes.IItem,
+	text string,
+) bool {
+	item.SetText(text)
+	return true
+}
+
+// Check passing the loop variable as a mutable object argument.
+func RenameAll(
+	items []aastypes.IItem,
+	text string,
+) bool {
+	result := true
+	for _, item := range items {
+		result = Rename(item, text)
+	}
+	return result
+}
+
+// Check the mutation of the inner lists through a loop variable.
+func SetFirstTextsOfLists(
+	lists [][]string,
+	text string,
+) bool {
+	for _, texts := range lists {
+		texts[0] = text
+	}
+	return true
+}
+
+// Check the same name defined in sibling loops, both as mutable aliases.
+func SetFirstTextsInSiblingLoops(
+	items []aastypes.IItem,
+	others []aastypes.IItem,
+	text string,
+) bool {
+	for _, item := range items {
+		texts := item.Texts()
+		texts[0] = text
+	}
+	for _, other := range others {
+		texts := other.Texts()
+		texts[0] = text
+	}
+	return true
+}
+
+// Check that a local copy of a string is not changed by the setter.
+func TextCopyIsIndependent(
+	item aastypes.IItem,
+	text string,
+) bool {
+	old := item.Text()
+	item.SetText(text)
+	return old != item.Text()
+}
+
+// Check that a local copy of a number is not changed by the list mutation.
+func NumberCopyIsIndependent(
+	numbers []int64,
+) bool {
+	first := numbers[0]
+	numbers[0] = first + 1
+	return (first + 1) == numbers[0]
+}
+
+// Check the assignment of a copy of a list to an optional property.
+func SetMaybeTexts(
+	item aastypes.IItem,
+	texts []string,
+) bool {
+	item.SetMaybeTexts(append(texts[:0:0], texts...))
+	return true
+}
+
+// Check the assignment of an object to an optional property.
+func SetMaybeItem(
+	something aastypes.ISomething,
+	item aastypes.IItem,
+) bool {
+	something.SetMaybeItem(item)
+	return true
+}
+
+// Check the re-assignment of a local alias of an object.
+func SetTextOfReboundAlias(
+	item aastypes.IItem,
+	other aastypes.IItem,
+	text string,
+) bool {
+	alias := item
+	alias = other
+	alias.SetText(text)
+	return true
+}
+
+// Check the read-only alias of a list property.
+func FirstTextThroughAliasIs(
+	item aastypes.IItem,
+	text string,
+) bool {
+	texts := item.Texts()
+	return texts[0] == text
+}
+
+// Check that no text is empty through a read-only list argument.
+func TextsAreNotEmpty(
+	items []aastypes.IItem,
+) bool {
+	for _, item := range items {
+		for _, text := range item.Texts() {
+			switch text {
+			case "":
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // Verify `that` instance of [aastypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -210,6 +368,16 @@ func VerifySomething(
 ) (abort bool) {
 	abort = false
 
+	if !TextsAreNotEmpty(that.Items()) {
+		abort = onError(
+			newVerificationError(
+				"Texts are not empty",),
+		)
+		if abort {
+			return
+		}
+	}
+
 	if that.Items() == nil {
 		abort = onError(
 			newVerificationError(
@@ -242,6 +410,23 @@ func VerifySomething(
 			if abort {
 				return
 			}
+		}
+	}
+
+	if that.MaybeItem() != nil {
+		abort = Verify(
+			that.MaybeItem(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "MaybeItem",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

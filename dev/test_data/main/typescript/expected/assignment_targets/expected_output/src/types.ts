@@ -130,6 +130,18 @@ export class Item extends Class {
 
   texts: Array<string>;
 
+  maybeTexts: Array<string> | null;
+
+  /**
+   * Yield from {@link maybeTexts} if it is set, or yield nothing.
+   */
+  *overMaybeTextsOrEmpty(): IterableIterator<string> {
+    if (this.maybeTexts !== null) {
+      yield * this.maybeTexts;
+    }
+    return;
+  }
+
   /**
    * Iterate over the instances referenced from this instance.
    *
@@ -206,13 +218,15 @@ export class Item extends Class {
     text: string,
     texts: Array<string>,
     maybeText: string | null = null,
-    maybeKind: Kind | null = null
+    maybeKind: Kind | null = null,
+    maybeTexts: Array<string> | null = null
   ) {
     super();
     this.text = text;
     this.texts = texts;
     this.maybeText = maybeText;
     this.maybeKind = maybeKind;
+    this.maybeTexts = maybeTexts;
   }
 }
 
@@ -229,6 +243,8 @@ export class Something extends Class {
 
   items: Array<Item>;
 
+  maybeItem: Item | null;
+
   /**
    * Iterate over the instances referenced from this instance.
    *
@@ -238,6 +254,10 @@ export class Something extends Class {
    */
   *descendOnce(): IterableIterator<Class> {
     yield * this.items;
+
+    if (this.maybeItem !== null) {
+      yield this.maybeItem;
+    }
   }
 
   /**
@@ -250,6 +270,12 @@ export class Something extends Class {
       yield anItem;
 
       yield * anItem.descend();
+    }
+
+    if (this.maybeItem !== null) {
+      yield this.maybeItem;
+
+      yield * this.maybeItem.descend();
     }
   }
 
@@ -305,9 +331,13 @@ export class Something extends Class {
     );
   }
 
-  constructor(items: Array<Item>) {
+  constructor(
+    items: Array<Item>,
+    maybeItem: Item | null = null
+  ) {
     super();
     this.items = items;
+    this.maybeItem = maybeItem;
   }
 }
 

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Sequence
 
 from icontract import DBC, invariant
 
@@ -17,7 +17,7 @@ class Item(DBC):
 
 
 @verification
-def first_text_is_not_empty(texts: List[str]) -> bool:
+def first_text_is_not_empty(texts: Sequence[str]) -> bool:
     """Check the for-each with an unconditional early return."""
     for text in texts:
         return len(text) > 0
@@ -26,7 +26,7 @@ def first_text_is_not_empty(texts: List[str]) -> bool:
 
 
 @verification
-def no_number_is_zero(numbers: List[int]) -> bool:
+def no_number_is_zero(numbers: Sequence[int]) -> bool:
     """Check the for-each with an early return in a switch."""
     for number in numbers:
         if number == 0:
@@ -36,7 +36,7 @@ def no_number_is_zero(numbers: List[int]) -> bool:
 
 
 @verification
-def no_number_is_minus_one(numbers: List[int]) -> bool:
+def no_number_is_minus_one(numbers: Sequence[int]) -> bool:
     """Check the for-range with a variable defined in the body of the loop."""
     for i in range(0, len(numbers)):
         number = numbers[i]
@@ -47,7 +47,7 @@ def no_number_is_minus_one(numbers: List[int]) -> bool:
 
 
 @verification
-def no_number_after_the_first_is_one(numbers: List[int]) -> bool:
+def no_number_after_the_first_is_one(numbers: Sequence[int]) -> bool:
     """Check the for-range which does not start at zero."""
     for i in range(1, len(numbers)):
         if numbers[i] == 1:
@@ -57,7 +57,7 @@ def no_number_after_the_first_is_one(numbers: List[int]) -> bool:
 
 
 @verification
-def sum_is_small(numbers: List[int]) -> bool:
+def sum_is_small(numbers: Sequence[int]) -> bool:
     """Check the for-each which assigns to a variable defined before the loop."""
     total = 0
     for number in numbers:
@@ -67,7 +67,7 @@ def sum_is_small(numbers: List[int]) -> bool:
 
 
 @verification
-def no_item_has_an_empty_text(items: List[Item]) -> bool:
+def no_item_has_an_empty_text(items: Sequence[Item]) -> bool:
     """Check the nested for-each loops."""
     for item in items:
         texts = item.texts
@@ -79,7 +79,7 @@ def no_item_has_an_empty_text(items: List[Item]) -> bool:
 
 
 @verification
-def is_neither_thirteen_nor_unlucky(texts: List[str]) -> bool:
+def is_neither_thirteen_nor_unlucky(texts: Sequence[str]) -> bool:
     """Check the loop variable re-used in a sibling loop."""
     for x in texts:
         if x == "thirteen":
@@ -93,7 +93,7 @@ def is_neither_thirteen_nor_unlucky(texts: List[str]) -> bool:
 
 
 @verification
-def alpha_has_no_negative_numbers(kind: Kind, numbers: List[int]) -> bool:
+def alpha_has_no_negative_numbers(kind: Kind, numbers: Sequence[int]) -> bool:
     """Check the for-each in a switch branch."""
     if kind == Kind.Alpha:
         for number in numbers:
@@ -104,7 +104,7 @@ def alpha_has_no_negative_numbers(kind: Kind, numbers: List[int]) -> bool:
 
 
 @verification
-def sum_of_odd_numbers_is_small(numbers: List[int]) -> bool:
+def sum_of_odd_numbers_is_small(numbers: Sequence[int]) -> bool:
     """Check the for-each with a continue in a switch followed by statements."""
     total = 0
     for number in numbers:
@@ -117,7 +117,7 @@ def sum_of_odd_numbers_is_small(numbers: List[int]) -> bool:
 
 
 @verification
-def items_are_few_and_texts_expected(items: List[Item]) -> bool:
+def items_are_few_and_texts_expected(items: Sequence[Item]) -> bool:
     """Check the continue in all the branches of a switch in a nested for-range."""
     count = 0
     for item in items:

@@ -1386,6 +1386,49 @@ TypeAnnotationUnion = Union[
 ]
 
 
+def _can_be_mutated(type_annotation: "TypeAnnotationUnion") -> bool:
+    """
+    Check whether a value of ``type_annotation`` can be mutated in place.
+
+    Only the lists and the instances of the classes can be mutated, possibly
+    reached through a tuple. The primitive values and the enumerations are
+    immutable, and we do not support mutating the JSON-able values.
+    """
+    type_anno = beneath_optional(type_annotation)
+
+    if isinstance(type_anno, ListTypeAnnotation):
+        return True
+
+    if isinstance(type_anno, OurTypeAnnotation):
+        return isinstance(type_anno.our_type, _types.Class)
+
+    if isinstance(type_anno, TupleTypeAnnotation):
+        return any(_can_be_mutated(item) for item in type_anno.items)
+
+    return False
+
+
+def _holds_list(type_annotation: "TypeAnnotationUnion") -> bool:
+    """Check whether a value of ``type_annotation`` is or contains a list."""
+    type_anno = beneath_optional(type_annotation)
+
+    if isinstance(type_anno, ListTypeAnnotation):
+        return True
+
+    if isinstance(type_anno, TupleTypeAnnotation):
+        return any(_holds_list(item) for item in type_anno.items)
+
+    return False
+
+
+def _is_access_path(node: parse_tree.Expression) -> bool:
+    """Check that ``node`` is a chain of member and index accesses on a name."""
+    while isinstance(node, (parse_tree.Member, parse_tree.Index)):
+        node = node.instance if isinstance(node, parse_tree.Member) else node.collection
+
+    return isinstance(node, parse_tree.Name)
+
+
 class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
     """
     Infer the types of the given parse tree.
@@ -1410,13 +1453,41 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self,
         environment: "Environment",
         representation_map: Mapping[parse_tree.Node, str],
+        argument_by_name: Mapping[Identifier, _types.Argument],
     ) -> None:
-        """Initialize with the given values."""
+        """
+        Initialize with the given values.
+
+        The ``argument_by_name`` gives the arguments of the verification function,
+        and is empty for an invariant.
+        """
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
         self._environment = MutableEnvironment(parent=environment)
 
         self._representation_map = representation_map
+
+        self._argument_by_name = argument_by_name
+
+        # NOTE (mristin):
+        # We keep track of the variables whose values can be mutated in place,
+        # *i.e.*, the mutable arguments, and the variables defined from a mutable
+        # value. The mutability is deep, and flows from the variable, which is
+        # the root of an access path, to all the values reached through it.
+        #
+        # The mutability of a variable is fixed at its definition. The names can
+        # not shadow each other, so a set suffices, as long as we remove
+        # the variables of a scope when we leave it,
+        # see :py:meth:`_transform_in_new_scope`.
+        self._mutable_name_set = {
+            arg.name for arg in argument_by_name.values() if arg.mutable
+        }  # type: Set[Identifier]
+
+        # NOTE (mristin):
+        # We keep track of why the read-only variables are read-only so that we can
+        # explain the errors. We remove them as we leave their scope, see
+        # :py:meth:`_transform_in_new_scope`.
+        self._read_only_reason_by_name = dict()  # type: MutableMapping[Identifier, str]
 
         # NOTE (mristin):
         # We need to keep track of the expressions that can be assumed to be non-null.
@@ -1486,6 +1557,101 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map = dict()
         self.downcast_map = dict()
         self.errors = []
+
+    def _is_copy_of_lists(self, node: parse_tree.Expression) -> bool:
+        """
+        Check that all the lists held by ``node`` are copies.
+
+        A copy is a slice ``[:]``, possibly as an item of a tuple literal.
+        """
+        if isinstance(node, parse_tree.Slice):
+            return True
+
+        if isinstance(node, parse_tree.Tuple):
+            return all(
+                not _holds_list(self.type_map[value]) or self._is_copy_of_lists(value)
+                for value in node.values
+            )
+
+        return False
+
+    def _read_only_reason(self, node: parse_tree.Expression) -> Optional[str]:
+        """
+        Explain why the value of ``node`` can not be mutated in place.
+
+        :return: the explanation, or None if the value is mutable
+        """
+        if isinstance(node, parse_tree.Name):
+            identifier = node.identifier
+            if identifier in self._mutable_name_set:
+                return None
+
+            argument = self._argument_by_name.get(identifier, None)
+            if argument is not None:
+                if isinstance(
+                    beneath_optional(convert_type_annotation(argument.type_annotation)),
+                    ListTypeAnnotation,
+                ):
+                    return (
+                        f"the argument {identifier!r} is declared as a Sequence, "
+                        f"which is read-only. Please declare it as a List "
+                        f"if the function mutates it"
+                    )
+
+                return (
+                    f"the argument {identifier!r} is read-only. Please declare it "
+                    f"as Mutable[...] if the function mutates it"
+                )
+
+            if identifier == "self" and len(self._argument_by_name) == 0:
+                return "an invariant must not change the instance it checks"
+
+            if identifier in self._loop_variable_set:
+                return (
+                    f"the loop variable {identifier!r} iterates over "
+                    f"a read-only collection"
+                )
+
+            definition_reason = self._read_only_reason_by_name.get(identifier, None)
+            if definition_reason is not None:
+                return (
+                    f"the variable {identifier!r} has been defined from a read-only "
+                    f"value, and the mutability of a variable is fixed at its "
+                    f"definition; the value was read-only, as {definition_reason}"
+                )
+
+            return f"the variable {identifier!r} is read-only"
+
+        if isinstance(node, parse_tree.Member):
+            return self._read_only_reason(node.instance)
+
+        if isinstance(node, parse_tree.Index):
+            return self._read_only_reason(node.collection)
+
+        if isinstance(node, parse_tree.Tuple):
+            for item in node.values:
+                item_type = self.type_map.get(item, None)
+                if item_type is None or not _can_be_mutated(item_type):
+                    continue
+
+                reason = self._read_only_reason(item)
+                if reason is not None:
+                    return f"the tuple holds a read-only item, as {reason}"
+
+            return None
+
+        if isinstance(node, parse_tree.Slice):
+            # NOTE (mristin):
+            # A copy of a list is a fresh value, and hence mutable.
+            return None
+
+        if isinstance(node, parse_tree.MethodCall):
+            return "the result of a method call is read-only"
+
+        return (
+            "the value is neither a variable, nor a property, nor an item "
+            "of a list or a tuple"
+        )
 
     def _strip_optional_if_non_null(
         self, node: parse_tree.Node, type_annotation: "TypeAnnotationUnion"
@@ -2052,12 +2218,43 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         assert collection_type is not None
 
+        if isinstance(collection_type, ListTypeAnnotation):
+            # NOTE (mristin):
+            # We support slicing the lists only to copy them, as the lists need
+            # to be copied explicitly when they are stored, see
+            # :py:meth:`transform_assignment`.
+            if node.start is not None or node.end is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        "We support slicing a list only to copy it as a whole, "
+                        "with ``[:]``, but got a slice with a start or an end",
+                    )
+                )
+                return None
+
+            if _holds_list(collection_type.items):
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We can not copy the list of type {collection_type} with "
+                        f"``[:]``, since its items hold lists themselves. Python "
+                        f"copies the list shallowly, so that the copy shares "
+                        f"the inner lists, while C++ copies the inner lists as well.",
+                    )
+                )
+                return None
+
+            list_copy_type = ListTypeAnnotation(items=collection_type.items)
+            self.type_map[node] = list_copy_type
+            return list_copy_type
+
         if try_primitive_type(collection_type) is not PrimitiveType.STR:
             self.errors.append(
                 Error(
                     node.collection.original_node,
-                    f"We support slicing only of non-None strings, "
-                    f"but got: {collection_type}",
+                    f"We support slicing only of non-None strings, and copying of "
+                    f"non-None lists with ``[:]``, but got: {collection_type}",
                 )
             )
             success = False
@@ -2459,6 +2656,19 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
+        if not member_type.method.non_mutating:
+            reason = self._read_only_reason(node.member.instance)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The method {node.member.name!r} is not marked "
+                        f"as @non_mutating, so it might mutate its instance, "
+                        f"but {reason}.",
+                    )
+                )
+                return None
+
         result: TypeAnnotationUnion
 
         if member_type.method.returns is None:
@@ -2587,6 +2797,40 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if failed:
             return None
+
+        if isinstance(func_type, VerificationTypeAnnotation):
+            for arg_node, argument in zip(node.args, func_type.func.arguments):
+                if not argument.mutable:
+                    continue
+
+                if not _is_access_path(arg_node):
+                    self.errors.append(
+                        Error(
+                            arg_node.original_node,
+                            f"The argument {argument.name!r} of the verification "
+                            f"function {func_type.func.name!r} is mutable, so we "
+                            f"expect a variable, a property or an item of a list "
+                            f"or a tuple so that the mutation is observable, but "
+                            f"got a temporary value.",
+                        )
+                    )
+                    failed = True
+                    continue
+
+                reason = self._read_only_reason(arg_node)
+                if reason is not None:
+                    self.errors.append(
+                        Error(
+                            arg_node.original_node,
+                            f"The argument {argument.name!r} of the verification "
+                            f"function {func_type.func.name!r} is mutable, "
+                            f"but {reason}.",
+                        )
+                    )
+                    failed = True
+
+            if failed:
+                return None
 
         # NOTE (mristin):
         # The length of a JSON-able value is not a question we can answer: its
@@ -3328,6 +3572,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             return None
 
         loop_variable_type = self.type_map[node.generator.variable]
+
+        if (
+            isinstance(node.generator, parse_tree.ForEach)
+            and _can_be_mutated(loop_variable_type)
+            and self._read_only_reason(node.generator.iteration) is None
+        ):
+            self._mutable_name_set.add(node.generator.variable.identifier)
+
         try:
             self._environment.set(
                 identifier=node.generator.variable.identifier,
@@ -3353,6 +3605,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         finally:
             self._environment.remove(identifier=node.generator.variable.identifier)
+            self._mutable_name_set.discard(node.generator.variable.identifier)
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
@@ -3563,6 +3816,84 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
+        if isinstance(node.target, (parse_tree.Member, parse_tree.Index)):
+            receiver = (
+                node.target.instance
+                if isinstance(node.target, parse_tree.Member)
+                else node.target.collection
+            )
+
+            what = (
+                f"the property {node.target.name!r}"
+                if isinstance(node.target, parse_tree.Member)
+                else "an item of the list"
+            )
+
+            reason = self._read_only_reason(receiver)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.target.original_node,
+                        f"We can not assign to {what} "
+                        f"of {self._representation_map[receiver]}, since {reason}.",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # Python shares a stored list, while C++ copies it, as its lists are
+            # values. We can not faithfully transpile the sharing to C++, so we
+            # require an explicit copy of every stored list, in all the targets.
+            if _holds_list(value_type) and not self._is_copy_of_lists(node.value):
+                self.errors.append(
+                    Error(
+                        node.value.original_node,
+                        f"The value assigned to {what} "
+                        f"of {self._representation_map[receiver]} holds a list, "
+                        f"which Python would share, but C++ would copy. We can not "
+                        f"transpile the sharing to C++, so please assign an explicit "
+                        f"copy of the list, *e.g.*, "
+                        f"``{self._representation_map[node.value]}[:]``.",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # Storing a value in a mutable place makes the value mutable through
+            # the place, so the value needs to be mutable itself. Otherwise,
+            # a read-only argument could be mutated through the alias.
+            if _can_be_mutated(value_type):
+                reason = self._read_only_reason(node.value)
+                if reason is not None:
+                    self.errors.append(
+                        Error(
+                            node.value.original_node,
+                            f"The value assigned to {what} "
+                            f"of {self._representation_map[receiver]} would become "
+                            f"mutable through it, so it needs to be mutable itself, "
+                            f"but {reason}.",
+                        )
+                    )
+                    return None
+
+        elif (
+            not is_new_variable
+            and isinstance(node.target, parse_tree.Name)
+            and node.target.identifier in self._mutable_name_set
+            and _can_be_mutated(value_type)
+        ):
+            reason = self._read_only_reason(node.value)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The variable {node.target.identifier!r} is mutable, "
+                        f"so it can be re-assigned only a mutable value, "
+                        f"but {reason}.",
+                    )
+                )
+                return None
+
         if is_new_variable:
             assert isinstance(node.target, parse_tree.Name)
 
@@ -3574,6 +3905,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 variable=node.target, type_annotation=value_type
             ):
                 return None
+
+            if _can_be_mutated(value_type):
+                reason = self._read_only_reason(node.value)
+                if reason is None:
+                    self._mutable_name_set.add(node.target.identifier)
+                else:
+                    self._read_only_reason_by_name[node.target.identifier] = reason
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
@@ -3681,6 +4019,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self._types_of_variables_in_closed_scopes[-1].update(
                 scope_environment.mapping
             )
+
+            self._mutable_name_set.difference_update(scope_environment.mapping.keys())
+            for identifier in scope_environment.mapping:
+                self._read_only_reason_by_name.pop(identifier, None)
 
             self._environment = parent_environment
 
@@ -3801,6 +4143,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # The generator refused the shadowing, so the loop variable can not be
         # the loop variable of an enclosing for-loop.
         assert loop_variable not in self._loop_variable_set
+
+        # NOTE (mristin):
+        # The loop variable inherits the mutability of the collection. The scope
+        # removes it from the mutable variables once we leave the loop body.
+        if (
+            isinstance(node.generator, parse_tree.ForEach)
+            and _can_be_mutated(self.type_map[node.generator.variable])
+            and self._read_only_reason(node.generator.iteration) is None
+        ):
+            self._mutable_name_set.add(loop_variable)
 
         self._loop_variable_set.add(loop_variable)
         try:
@@ -3938,6 +4290,7 @@ def infer_for_verification(
     type_inferrer = _Inferrer(
         environment=environment,
         representation_map=canonicalizer.representation_map,
+        argument_by_name={arg.name: arg for arg in verification.arguments},
     )
 
     for node in verification.parsed.body:
@@ -4005,6 +4358,7 @@ def infer_for_invariant(
     type_inferrer = _Inferrer(
         environment=environment,
         representation_map=canonicalizer.representation_map,
+        argument_by_name=dict(),
     )
 
     _ = type_inferrer.transform(invariant.body)

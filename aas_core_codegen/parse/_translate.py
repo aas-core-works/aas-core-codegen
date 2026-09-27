@@ -65,6 +65,7 @@ from aas_core_codegen.parse._types import (
     UnverifiedSymbolTable,
     PRIMITIVE_TYPES,
     GENERIC_TYPES,
+    MUTABILITY_TYPES,
     JSON_VALUE_TYPE_NAME,
     JSON_ARRAY_TYPE_NAME,
     Description,
@@ -109,6 +110,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("Annotated", "typing"),
             ("List", "typing"),
             ("Optional", "typing"),
+            ("Sequence", "typing"),
             ("Set", "typing"),
             ("Tuple", "typing"),
             ("Union", "typing"),
@@ -127,6 +129,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("JSONArray", "aas_core_meta.marker"),
             ("JSONObject", "aas_core_meta.marker"),
             ("JSONValue", "aas_core_meta.marker"),
+            ("Mutable", "aas_core_meta.marker"),
         ]
     )
 
@@ -2481,7 +2484,7 @@ def _verify_arity_of_type_annotation_subscript(
 
         return None
 
-    expected_arity_map = {"List": 1, "Optional": 1}
+    expected_arity_map = {"List": 1, "Optional": 1, "Sequence": 1, "Mutable": 1}
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
         raise AssertionError(
@@ -3089,6 +3092,146 @@ def _verify_symbol_table(
 
                         if error is not None:
                             errors.append(error)
+
+    def verify_placement_of_mutability_types(
+        type_annotation: TypeAnnotation, allowed: bool, where: str
+    ) -> Optional[Error]:
+        """
+        Check that ``Sequence`` and ``Mutable`` are placed only where ``allowed``.
+
+        They declare the mutability of an argument of a verification function, so
+        they are allowed only at the top of its type annotation, or directly under
+        ``Optional``. The ``where`` describes the place of ``type_annotation`` in
+        the error messages, *e.g.*, ``the property 'x' of the class 'Y'``.
+
+        :return: error message, if any
+        """
+        if not isinstance(type_annotation, SubscriptedTypeAnnotation):
+            return None
+
+        if type_annotation.identifier in MUTABILITY_TYPES and not allowed:
+            subscripts_text = ", ".join(
+                str(subscript) for subscript in type_annotation.subscripts
+            )
+            replacement = (
+                f"List[{subscripts_text}]"
+                if type_annotation.identifier == "Sequence"
+                else subscripts_text
+            )
+
+            return Error(
+                type_annotation.node,
+                f"The type annotation {type_annotation} is not allowed "
+                f"in {where}. {type_annotation.identifier} declares "
+                f"the mutability of an argument of a verification function, "
+                f"so it is allowed only at the top of the argument's type "
+                f"annotation, or directly under Optional. The properties, "
+                f"the methods and the nested type annotations do not declare "
+                f"mutability. Please use {replacement} instead.",
+            )
+
+        if type_annotation.identifier == "Mutable" and allowed:
+            wrapped = type_annotation.subscripts[0]
+            while (
+                isinstance(wrapped, SubscriptedTypeAnnotation)
+                and wrapped.identifier == "Optional"
+            ):
+                wrapped = wrapped.subscripts[0]
+
+            if isinstance(wrapped, SubscriptedTypeAnnotation) and (
+                wrapped.identifier in ("List", "Sequence")
+            ):
+                items = ", ".join(str(subscript) for subscript in wrapped.subscripts)
+
+                if wrapped.identifier == "Sequence":
+                    return Error(
+                        type_annotation.node,
+                        f"The type annotation {type_annotation} is contradictory: "
+                        f"a Sequence declares a read-only list, while Mutable "
+                        f"declares that the function mutates the argument. "
+                        f"If the function mutates the list, please declare it "
+                        f"as List[{items}], which is mutable. Otherwise, please "
+                        f"declare it as Sequence[{items}] without Mutable.",
+                    )
+
+                return Error(
+                    type_annotation.node,
+                    f"The type annotation {type_annotation} is redundant, since "
+                    f"a List already declares a mutable list. Please declare it "
+                    f"as List[{items}] without Mutable, or as Sequence[{items}] if "
+                    f"the function does not mutate the list.",
+                )
+
+        subscripts_allowed = allowed and type_annotation.identifier == "Optional"
+
+        for subscript in type_annotation.subscripts:
+            error = verify_placement_of_mutability_types(
+                type_annotation=subscript, allowed=subscripts_allowed, where=where
+            )
+            if error is not None:
+                return error
+
+        return None
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, Class):
+            continue
+
+        for prop in our_type.properties:
+            error = verify_placement_of_mutability_types(
+                type_annotation=prop.type_annotation,
+                allowed=False,
+                where=f"the property {prop.name!r} of the class {our_type.name!r}",
+            )
+            if error is not None:
+                errors.append(error)
+
+        for method in our_type.methods:
+            for arg in method.arguments:
+                error = verify_placement_of_mutability_types(
+                    type_annotation=arg.type_annotation,
+                    allowed=False,
+                    where=(
+                        f"the argument {arg.name!r} of the method "
+                        f"{method.name!r} of the class {our_type.name!r}"
+                    ),
+                )
+                if error is not None:
+                    errors.append(error)
+
+            if method.returns is not None:
+                error = verify_placement_of_mutability_types(
+                    type_annotation=method.returns,
+                    allowed=False,
+                    where=(
+                        f"the return type of the method {method.name!r} "
+                        f"of the class {our_type.name!r}"
+                    ),
+                )
+                if error is not None:
+                    errors.append(error)
+
+    for func in symbol_table.verification_functions:
+        for arg in func.arguments:
+            error = verify_placement_of_mutability_types(
+                type_annotation=arg.type_annotation,
+                allowed=True,
+                where=(
+                    f"the argument {arg.name!r} of the verification function "
+                    f"{func.name!r}"
+                ),
+            )
+            if error is not None:
+                errors.append(error)
+
+        if func.returns is not None:
+            error = verify_placement_of_mutability_types(
+                type_annotation=func.returns,
+                allowed=False,
+                where=f"the return type of the verification function {func.name!r}",
+            )
+            if error is not None:
+                errors.append(error)
 
     for constant in symbol_table.constants:
         if isinstance(constant, ConstantPrimitive):

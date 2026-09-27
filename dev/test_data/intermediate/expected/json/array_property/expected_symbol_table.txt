@@ -30,6 +30,7 @@ SymbolTable(
             type_annotation=JsonArrayTypeAnnotation(
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

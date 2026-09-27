@@ -82,14 +82,14 @@ namespace dummy
         }  // public static bool SetTextThroughAlias
 
         /// <summary>
-        /// Check the assignment of a list to a property.
+        /// Check the assignment of a copy of a list to a property.
         /// </summary>
         public static bool SetTexts(
             IItem item,
             List<string> texts
         )
         {
-            item.Texts = texts;
+            item.Texts = texts.ToList();
             return true;
         }  // public static bool SetTexts
 
@@ -175,6 +175,217 @@ namespace dummy
             }
             return true;
         }  // public static bool SetTextsInLoops
+
+        /// <summary>
+        /// Check the mutation of a list argument in place.
+        /// </summary>
+        public static bool FillTexts(
+            List<string> texts,
+            string text
+        )
+        {
+            for (int i = 0; i < texts.Count; i++)
+            {
+                texts[i] = text;
+            }
+            return true;
+        }  // public static bool FillTexts
+
+        /// <summary>
+        /// Check passing a property as a mutable list argument.
+        /// </summary>
+        public static bool FillTextsOfItem(
+            IItem item,
+            string text
+        )
+        {
+            return Verification.FillTexts(item.Texts, text);
+        }  // public static bool FillTextsOfItem
+
+        /// <summary>
+        /// Check passing a local alias of a list as a mutable list argument.
+        /// </summary>
+        public static bool FillTextsThroughAlias(
+            IItem item,
+            string text
+        )
+        {
+            var texts = item.Texts;
+            return Verification.FillTexts(texts, text);
+        }  // public static bool FillTextsThroughAlias
+
+        /// <summary>
+        /// Check passing a list argument on as a mutable list argument.
+        /// </summary>
+        public static bool FillTextsOfArgument(
+            List<string> texts,
+            string text
+        )
+        {
+            return Verification.FillTexts(texts, text);
+        }  // public static bool FillTextsOfArgument
+
+        /// <summary>
+        /// Check the mutation of an object argument.
+        /// </summary>
+        public static bool Rename(
+            IItem item,
+            string text
+        )
+        {
+            item.Text = text;
+            return true;
+        }  // public static bool Rename
+
+        /// <summary>
+        /// Check passing the loop variable as a mutable object argument.
+        /// </summary>
+        public static bool RenameAll(
+            List<IItem> items,
+            string text
+        )
+        {
+            var result = true;
+            foreach (var item in items)
+            {
+                result = Verification.Rename(item, text);
+            }
+            return result;
+        }  // public static bool RenameAll
+
+        /// <summary>
+        /// Check the mutation of the inner lists through a loop variable.
+        /// </summary>
+        public static bool SetFirstTextsOfLists(
+            List<List<string>> lists,
+            string text
+        )
+        {
+            foreach (var texts in lists)
+            {
+                texts[0] = text;
+            }
+            return true;
+        }  // public static bool SetFirstTextsOfLists
+
+        /// <summary>
+        /// Check the same name defined in sibling loops, both as mutable aliases.
+        /// </summary>
+        public static bool SetFirstTextsInSiblingLoops(
+            List<IItem> items,
+            List<IItem> others,
+            string text
+        )
+        {
+            foreach (var item in items)
+            {
+                var texts = item.Texts;
+                texts[0] = text;
+            }
+            foreach (var other in others)
+            {
+                var texts = other.Texts;
+                texts[0] = text;
+            }
+            return true;
+        }  // public static bool SetFirstTextsInSiblingLoops
+
+        /// <summary>
+        /// Check that a local copy of a string is not changed by the setter.
+        /// </summary>
+        public static bool TextCopyIsIndependent(
+            IItem item,
+            string text
+        )
+        {
+            var old = item.Text;
+            item.Text = text;
+            return old != item.Text;
+        }  // public static bool TextCopyIsIndependent
+
+        /// <summary>
+        /// Check that a local copy of a number is not changed by the list mutation.
+        /// </summary>
+        public static bool NumberCopyIsIndependent(
+            List<long> numbers
+        )
+        {
+            long first = numbers[0];
+            numbers[0] = first + 1;
+            return (first + 1) == (numbers[0]);
+        }  // public static bool NumberCopyIsIndependent
+
+        /// <summary>
+        /// Check the assignment of a copy of a list to an optional property.
+        /// </summary>
+        public static bool SetMaybeTexts(
+            IItem item,
+            List<string> texts
+        )
+        {
+            item.MaybeTexts = texts.ToList();
+            return true;
+        }  // public static bool SetMaybeTexts
+
+        /// <summary>
+        /// Check the assignment of an object to an optional property.
+        /// </summary>
+        public static bool SetMaybeItem(
+            ISomething something,
+            IItem item
+        )
+        {
+            something.MaybeItem = item;
+            return true;
+        }  // public static bool SetMaybeItem
+
+        /// <summary>
+        /// Check the re-assignment of a local alias of an object.
+        /// </summary>
+        public static bool SetTextOfReboundAlias(
+            IItem item,
+            IItem other,
+            string text
+        )
+        {
+            var alias = item;
+            alias = other;
+            alias.Text = text;
+            return true;
+        }  // public static bool SetTextOfReboundAlias
+
+        /// <summary>
+        /// Check the read-only alias of a list property.
+        /// </summary>
+        public static bool FirstTextThroughAliasIs(
+            IItem item,
+            string text
+        )
+        {
+            var texts = item.Texts;
+            return texts[0] == text;
+        }  // public static bool FirstTextThroughAliasIs
+
+        /// <summary>
+        /// Check that no text is empty through a read-only list argument.
+        /// </summary>
+        public static bool TextsAreNotEmpty(
+            List<IItem> items
+        )
+        {
+            foreach (var item in items)
+            {
+                foreach (var text in item.Texts)
+                {
+                    switch (text)
+                    {
+                        case "":
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }  // public static bool TextsAreNotEmpty
 
         /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
@@ -401,6 +612,13 @@ namespace dummy
                 Aas.ISomething that
             )
             {
+                if (!Verification.TextsAreNotEmpty(that.Items))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts are not empty");
+                }
+
                 int indexItems = 0;
                 foreach (var item in that.Items)
                 {
@@ -415,6 +633,17 @@ namespace dummy
                         yield return error;
                     }
                     indexItems++;
+                }
+
+                if (that.MaybeItem != null)
+                {
+                    foreach (var error in Verification.Verify(that.MaybeItem))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "maybeItem"));
+                        yield return error;
+                    }
                 }
             }
         }  // private class Transformer

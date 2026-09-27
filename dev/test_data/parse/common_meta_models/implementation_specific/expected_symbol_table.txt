@@ -446,7 +446,7 @@ UnverifiedSymbolTable(
         Argument(
           name='texts',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='str',
@@ -474,7 +474,7 @@ UnverifiedSymbolTable(
         Argument(
           name='items',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Sequence',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Item',

@@ -1701,6 +1701,300 @@ def some_func(item: Item) -> bool:
         )
 
 
+class Test_mutability(unittest.TestCase):
+    @staticmethod
+    def source_with_verification(verification: str) -> str:
+        return f"""\
+class Item(DBC):
+    text: str
+    texts: List[str]
+
+    @implementation_specific
+    @non_mutating
+    def child(self) -> "Item":
+        pass
+
+    @implementation_specific
+    def touch(self) -> bool:
+        pass
+
+    def __init__(self, text: str, texts: List[str]) -> None:
+        self.text = text
+        self.texts = texts
+
+
+@verification
+def fill(texts: List[str], text: str) -> bool:
+    texts[0] = text
+    return True
+
+
+{verification}
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    def test_mutations_of_mutable_values(self) -> None:
+        Test_with_smoke.execute(
+            Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Item], lists: List[List[str]], text: str) -> bool:
+    for item in items:
+        item.text = text
+        item.texts = item.texts[:]
+
+    for texts in lists:
+        texts[0] = text
+
+    alias = items[0]
+    alias.texts[0] = text
+    return fill(items[0].texts, text)"""
+            )
+        )
+
+    def test_index_on_sequence_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    texts[0] = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to an item of the list of texts, since the "
+                "argument 'texts' is declared as a Sequence, which is "
+                "read-only. Please declare it as a List if the function "
+                "mutates it."
+            ),
+        )
+
+    def test_member_on_read_only_object_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    item.text = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to the property 'text' of item, since the "
+                "argument 'item' is read-only. Please declare it as "
+                "Mutable[...] if the function mutates it."
+            ),
+        )
+
+    def test_temporary_to_mutable_argument_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Mutable["Item"]) -> bool:
+    return fill(item.texts[:], "x")"""
+            ),
+            expected_joined_message=(
+                "The argument 'texts' of the verification function 'fill' is "
+                "mutable, so we expect a variable, a property or an item of a "
+                "list or a tuple so that the mutation is observable, but got "
+                "a temporary value."
+            ),
+        )
+
+    def test_read_only_to_mutable_argument_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    return fill(item.texts, "x")"""
+            ),
+            expected_joined_message=(
+                "The argument 'texts' of the verification function 'fill' is "
+                "mutable, but the argument 'item' is read-only. Please "
+                "declare it as Mutable[...] if the function mutates it."
+            ),
+        )
+
+    def test_mutating_method_on_read_only_instance_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    return item.touch()"""
+            ),
+            expected_joined_message=(
+                "The method 'touch' is not marked as @non_mutating, so it "
+                "might mutate its instance, but the argument 'item' is "
+                "read-only. Please declare it as Mutable[...] if the function "
+                "mutates it."
+            ),
+        )
+
+    def test_tuple_with_read_only_item_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Item) -> bool:
+    t = (item, 1)
+    t[0].text = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to the property 'text' of t[0], since the "
+                "variable 't' has been defined from a read-only value, and "
+                "the mutability of a variable is fixed at its definition; the "
+                "value was read-only, as the tuple holds a read-only item, as "
+                "the argument 'item' is read-only. Please declare it as "
+                "Mutable[...] if the function mutates it."
+            ),
+        )
+
+    def test_method_result_is_read_only(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Mutable["Item"]) -> bool:
+    c = item.child()
+    c.text = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to the property 'text' of c, since the "
+                "variable 'c' has been defined from a read-only value, and "
+                "the mutability of a variable is fixed at its definition; the "
+                "value was read-only, as the result of a method call is "
+                "read-only."
+            ),
+        )
+
+    def test_mutable_variable_reassigned_read_only_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(a: List[str], b: Sequence[str]) -> bool:
+    ys = a
+    ys = b
+    return True"""
+            ),
+            expected_joined_message=(
+                "The variable 'ys' is mutable, so it can be re-assigned only "
+                "a mutable value, but the argument 'b' is declared as a "
+                "Sequence, which is read-only. Please declare it as a List if "
+                "the function mutates it."
+            ),
+        )
+
+    def test_read_only_variable_stays_read_only(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(a: List[str], b: Sequence[str]) -> bool:
+    zs = b
+    zs = a
+    zs[0] = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to an item of the list of zs, since the "
+                "variable 'zs' has been defined from a read-only value, and "
+                "the mutability of a variable is fixed at its definition; the "
+                "value was read-only, as the argument 'b' is declared as a "
+                "Sequence, which is read-only. Please declare it as a List if "
+                "the function mutates it."
+            ),
+        )
+
+    def test_storing_read_only_object_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Item], item: Item) -> bool:
+    items[0] = item
+    return True"""
+            ),
+            expected_joined_message=(
+                "The value assigned to an item of the list of items would "
+                "become mutable through it, so it needs to be mutable itself, "
+                "but the argument 'item' is read-only. Please declare it as "
+                "Mutable[...] if the function mutates it."
+            ),
+        )
+
+    def test_storing_reference_to_list_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Mutable["Item"], texts: List[str]) -> bool:
+    item.texts = texts
+    return True"""
+            ),
+            expected_joined_message=(
+                "The value assigned to the property 'texts' of item holds a "
+                "list, which Python would share, but C++ would copy. We can "
+                "not transpile the sharing to C++, so please assign an "
+                "explicit copy of the list, *e.g.*, ``texts[:]``."
+            ),
+        )
+
+    def test_partial_slice_of_list_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Mutable["Item"], texts: List[str]) -> bool:
+    item.texts = texts[1:]
+    return True"""
+            ),
+            expected_joined_message=(
+                "We support slicing a list only to copy it as a whole, with "
+                "``[:]``, but got a slice with a start or an end"
+            ),
+        )
+
+    def test_copy_of_nested_lists_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(lists: List[List[str]]) -> bool:
+    return len(lists[:]) > 0"""
+            ),
+            expected_joined_message=(
+                "We can not copy the list of type List[List[str]] with "
+                "``[:]``, since its items hold lists themselves. Python "
+                "copies the list shallowly, so that the copy shares the inner "
+                "lists, while C++ copies the inner lists as well."
+            ),
+        )
+
+    def test_loop_over_read_only_collection_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Item]) -> bool:
+    for item in items:
+        item.text = "x"
+    return True"""
+            ),
+            expected_joined_message=(
+                "We can not assign to the property 'text' of item, since the "
+                "loop variable 'item' iterates over a read-only collection."
+            ),
+        )
+
+
 class Test_is_instance(unittest.TestCase):
     @staticmethod
     def infer(source: str) -> intermediate_type_inference.InferenceOfInvariant:
@@ -2657,17 +2951,19 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual("str", type_map["self.text[:1]"])
         self.assertEqual("int", type_map["self.text[:1].find('x')"])
 
-    def test_slice_of_a_list_fails(self) -> None:
+    def test_partial_slice_of_a_list_fails(self) -> None:
         self.expect_error(
             "len(self.text[0:1]) == 1",
-            "We support slicing only of non-None strings, but got: List[str]",
+            "We support slicing a list only to copy it as a whole, with ``[:]``, "
+            "but got a slice with a start or an end",
             property_type="List[str]",
         )
 
     def test_slice_of_a_tuple_fails(self) -> None:
         self.expect_error(
             "len(self.text[0:1]) == 1",
-            "We support slicing only of non-None strings, but got: Tuple[int, int]",
+            "We support slicing only of non-None strings, and copying of non-None "
+            "lists with ``[:]``, but got: Tuple[int, int]",
             property_type="Tuple[int, int]",
         )
 
@@ -2691,7 +2987,8 @@ __xml_namespace__ = "https://dummy.com"
             Test_string_slicing_and_find.infer_type_map(source)
 
         self.assertEqual(
-            "We support slicing only of non-None strings, but got: Optional[str]",
+            "We support slicing only of non-None strings, and copying of non-None "
+            "lists with ``[:]``, but got: Optional[str]",
             str(context.exception),
         )
 

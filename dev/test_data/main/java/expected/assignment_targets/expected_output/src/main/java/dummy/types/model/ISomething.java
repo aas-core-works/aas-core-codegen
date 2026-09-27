@@ -17,6 +17,10 @@ public interface ISomething extends IClass {
   List<IItem> getItems();
 
   void setItems(List<IItem> items);
+
+  Optional<IItem> getMaybeItem();
+
+  void setMaybeItem(IItem maybeItem);
 }
 
 /*

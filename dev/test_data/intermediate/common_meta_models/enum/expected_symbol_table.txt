@@ -51,6 +51,7 @@ SymbolTable(
               our_type='Reference to our type Result',
               parsed=...),
             default=None,
+            mutable=False,
             parsed=...)],
         returns=None,
         description=None,

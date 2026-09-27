@@ -69,6 +69,19 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       }).collect(Collectors.toList());
     that.setItems(transformedItems);
 
+    if (that.getMaybeItem().isPresent()) {
+      IItem maybeItem = that.getMaybeItem().get();
+      IClass transformedMaybeItem = transform(maybeItem);
+      if (!(transformedMaybeItem instanceof IItem)) {
+        throw new UnsupportedOperationException(
+          "Expected the transformed value to be a IItem " +
+          ", but got: " + transformedMaybeItem
+        );
+      }
+      IItem castedMaybeItem = (IItem) transformedMaybeItem;
+      that.setMaybeItem(castedMaybeItem);
+    }
+
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
       ? that

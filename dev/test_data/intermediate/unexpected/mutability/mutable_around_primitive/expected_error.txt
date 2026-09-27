@@ -1,0 +1,1 @@
+The argument 'text' of the verification function 'is_short' is declared as Mutable, but Mutable applies only to the instances of the classes, and makes no sense here, since the values of type str are immutable. A function can not change such a value in place; it can only re-bind its argument to another value, which the caller never observes. Please remove Mutable.

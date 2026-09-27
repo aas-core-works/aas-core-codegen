@@ -55,14 +55,15 @@ namespace dummy
                     that.Text,
                     that.Texts,
                     that.MaybeText,
-                    that.MaybeKind);
+                    that.MaybeKind,
+                    that.MaybeTexts);
             }
 
             public override Aas.IClass TransformSomething(
                 Aas.ISomething that
             )
             {
-                return new Aas.Something(that.Items);
+                return new Aas.Something(that.Items, that.MaybeItem);
             }
         }  // internal class ShallowCopier
 
@@ -75,11 +76,19 @@ namespace dummy
                 var theTexts = new List<string>(
                     that.Texts);
 
+                List<string>? theMaybeTexts = null;
+                if (that.MaybeTexts != null)
+                {
+                    theMaybeTexts = new List<string>(
+                        that.MaybeTexts);
+                }
+
                 return new Aas.Item(
                     that.Text,
                     theTexts,
                     that.MaybeText,
-                    that.MaybeKind
+                    that.MaybeKind,
+                    theMaybeTexts
                 );
             }
 
@@ -95,7 +104,10 @@ namespace dummy
                 }
 
                 return new Aas.Something(
-                    theItems
+                    theItems,
+                    (that.MaybeItem != null)
+                        ? Deep(that.MaybeItem)
+                        : null
                 );
             }
         }  // internal class DeepCopier

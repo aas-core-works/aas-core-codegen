@@ -29,6 +29,7 @@ from aas_core_codegen.cpp.common import (
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.cpp import (
+    aliasing as cpp_aliasing,
     common as cpp_common,
     naming as cpp_naming,
 )
@@ -404,6 +405,7 @@ class Transpiler(
         is_optional_before_downcast_map: Mapping[parse_tree.Node, bool],
         environment: intermediate_type_inference.Environment,
         types_namespace: Optional[Identifier] = None,
+        aliasing: Optional[cpp_aliasing.Aliasing] = None,
     ) -> None:
         """
         Initialize with the given values.
@@ -413,7 +415,11 @@ class Transpiler(
         from :py:class:`aas_core_codegen.cpp.optionaling.Inferrer`.
 
         If ``types_namespace`` is specified, it is prepended to all our types.
+
+        The ``aliasing`` specifies how to declare the variables. If not specified,
+        we declare them by default, as there are no assignments in the invariants.
         """
+        self._aliasing = aliasing
         self.type_map = type_map
         self.is_optional_map = is_optional_map
         self.downcast_map = downcast_map
@@ -467,6 +473,126 @@ class Transpiler(
                 return Stripped(f"*{code}"), None
 
             return Stripped(f"(*({code}))"), None
+
+        return code, None
+
+    def _declaration(self, definition: parse_tree.Node) -> cpp_aliasing.Declaration:
+        """Look up how to declare the variable defined at ``definition``."""
+        if self._aliasing is None:
+            return cpp_aliasing.Declaration.DEFAULT
+
+        return self._aliasing.declaration_by_definition.get(
+            definition, cpp_aliasing.Declaration.DEFAULT
+        )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_item_access(
+        self, collection: Stripped, index_node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """Access the item of the list ``collection`` at ``index_node``."""
+        index, error = self._transform_and_value_if_necessary(index_node)
+        if error is not None:
+            return None, error
+        assert index is not None
+
+        index_as_int = None  # type: Optional[int]
+        try:
+            index_as_int = int(index)
+        except ValueError:
+            pass
+
+        if index_as_int is not None and index_as_int == -1:
+            return Stripped(f"{collection}.back()"), None
+
+        if index_as_int is not None and index_as_int < -1:
+            # pylint: disable=invalid-unary-operand-type
+            index = Stripped(f"{collection}.size() - {-index_as_int}")
+
+        if "\n" in index:
+            return (
+                Stripped(
+                    f"""\
+{collection}.at(
+{I}{indent_but_first_line(index, I)}
+)"""
+                ),
+                None,
+            )
+
+        return Stripped(f"{collection}.at({index})"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_mutable_path(
+        self, node: parse_tree.Expression, dereference: bool
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the access path ``node`` so that it can be mutated in place.
+
+        We access the properties with the mutable getters, and the items of the lists
+        on their mutable containers. If ``dereference`` is set, we dereference
+        the ``common::optional`` at the end of the path.
+        """
+        code: Optional[Stripped]
+
+        if isinstance(node, parse_tree.Name):
+            code, error = self.transform_name(node)
+            if error is not None:
+                return None, error
+
+        elif isinstance(node, parse_tree.Member):
+            # NOTE (mristin):
+            # The instance is a shared pointer, which gives us a mutable instance
+            # even if it is held as a constant.
+            instance, error = self._transform_and_value_if_necessary(node.instance)
+            if error is not None:
+                return None, error
+
+            code = Stripped(
+                f"{instance}->{cpp_naming.mutable_getter_name(node.name)}()"
+            )
+
+        elif isinstance(node, parse_tree.Index):
+            collection, error = self._transform_mutable_path(
+                node.collection, dereference=True
+            )
+            if error is not None:
+                return None, error
+            assert collection is not None
+
+            collection_type = intermediate_type_inference.beneath_optional(
+                self.type_map[node.collection]
+            )
+            if isinstance(
+                collection_type, intermediate_type_inference.TupleTypeAnnotation
+            ):
+                assert isinstance(node.index, parse_tree.Constant) and isinstance(
+                    node.index.value, int
+                )
+
+                index_value = node.index.value
+                if index_value < 0:
+                    index_value += len(collection_type.items)
+
+                code = Stripped(f"std::get<{index_value}>({collection})")
+            else:
+                code, error = self._transform_item_access(
+                    collection=collection, index_node=node.index
+                )
+                if error is not None:
+                    return None, error
+
+        else:
+            return None, Error(
+                node.original_node,
+                f"Expected a variable, a property or an item of a list as a path "
+                f"to be mutated, but got: {parse_tree.dump(node)}; this should have "
+                f"been caught in the type inference.",
+            )
+
+        assert code is not None
+
+        if dereference and self.is_optional_map[node]:
+            return Stripped(f"(*{code})"), None
 
         return code, None
 
@@ -717,15 +843,17 @@ class Transpiler(
         if error is not None:
             return None, error
 
-        index, error = self._transform_and_value_if_necessary(node.index)
-        if error is not None:
-            return None, error
-        assert index is not None
+        assert collection is not None
 
         if isinstance(
             intermediate_type_inference.beneath_optional(collection_type),
             intermediate_type_inference.JsonObjectTypeAnnotation,
         ):
+            index, error = self._transform_and_value_if_necessary(node.index)
+            if error is not None:
+                return None, error
+            assert index is not None
+
             # NOTE (mristin):
             # The keys of a ``nlohmann::json`` object are UTF-8 encoded, while
             # a string in the transpiled code is a wide string, so the key has
@@ -745,31 +873,7 @@ class Transpiler(
                 None,
             )
 
-        index_as_int = None  # type: Optional[int]
-        try:
-            index_as_int = int(index)
-        except ValueError:
-            pass
-
-        if index_as_int is not None and index_as_int == -1:
-            return Stripped(f"{collection}.back()"), None
-
-        if index_as_int is not None and index_as_int < -1:
-            # pylint: disable=invalid-unary-operand-type
-            index = Stripped(f"{collection}.size() - {-index_as_int}")
-
-        if "\n" in index:
-            return (
-                Stripped(
-                    f"""\
-{collection}.at(
-{I}{indent_but_first_line(index, I)}
-)"""
-                ),
-                None,
-            )
-
-        return Stripped(f"{collection}.at({index})"), None
+        return self._transform_item_access(collection=collection, index_node=node.index)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
@@ -1105,6 +1209,28 @@ common::{contains_function}(
 
         assert collection is not None
 
+        if isinstance(
+            self.type_map[node.collection],
+            intermediate_type_inference.ListTypeAnnotation,
+        ):
+            # NOTE (mristin):
+            # The type inference allows slicing a list only to copy it as a whole,
+            # ``[:]``, which we transpile as an explicit copy of the vector.
+            list_type, error_msg = generate_type(
+                type_annotation=self.type_map[node],
+                types_namespace=self._types_namespace,
+            )
+            if error_msg is not None:
+                return None, Error(node.original_node, error_msg)
+
+            assert list_type is not None
+            return (
+                _generate_call_with_single_argument(
+                    function=list_type, argument=collection
+                ),
+                None,
+            )
+
         if node.start is not None:
             assert start is not None
             start = self._as_int64_position(node.start, start)
@@ -1245,6 +1371,21 @@ common::{contains_function}(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
+        func_type = self.type_map[node.name]
+
+        mutable_arg_set = set()  # type: Set[parse_tree.Expression]
+        if isinstance(
+            func_type, intermediate_type_inference.VerificationTypeAnnotation
+        ):
+            for arg_node, argument in zip(node.args, func_type.func.arguments):
+                if argument.mutable and isinstance(
+                    intermediate_type_inference.beneath_optional(
+                        self.type_map[arg_node]
+                    ),
+                    intermediate_type_inference.ListTypeAnnotation,
+                ):
+                    mutable_arg_set.add(arg_node)
+
         args = []  # type: List[Stripped]
         for arg_node in node.args:
             arg_type = self.type_map[arg_node]
@@ -1257,7 +1398,19 @@ common::{contains_function}(
             # The problem here is that the actual type of the argument in C++ changes
             # depending on whether we check for its nullness before with an implication.
             arg: Optional[Stripped]
-            if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
+            if arg_node in mutable_arg_set:
+                # NOTE (mristin):
+                # The mutable lists are passed in as mutable references, so we
+                # need a mutable path to them.
+                arg, error = self._transform_mutable_path(
+                    arg_node,
+                    dereference=not isinstance(
+                        arg_type, intermediate_type_inference.OptionalTypeAnnotation
+                    ),
+                )
+            elif isinstance(
+                arg_type, intermediate_type_inference.OptionalTypeAnnotation
+            ):
                 arg, error = self.transform(arg_node)
             else:
                 arg, error = self._transform_and_value_if_necessary(arg_node)
@@ -1279,8 +1432,6 @@ common::{contains_function}(
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
         # have to test for argument arity here.
-
-        func_type = self.type_map[node.name]
 
         if not isinstance(
             func_type, intermediate_type_inference.FunctionTypeAnnotationUnionAsTuple
@@ -1919,10 +2070,25 @@ common::{concat}(
         variable_type_annotation = self.type_map[node.generator.variable]
 
         variable_name_cpp = cpp_naming.variable_name(variable_name)
-        variable_type_cpp, error_msg = generate_type_with_const_ref_if_applicable(
-            type_annotation=variable_type_annotation,
-            types_namespace=self._types_namespace,
+
+        # NOTE (mristin):
+        # The aliasing analysis refuses the loop variables which need to be
+        # mutable, as we would need to pass them to the lambda as mutable references.
+        assert self._declaration(node.generator) is not (
+            cpp_aliasing.Declaration.MUT_REF
         )
+
+        variable_type_cpp: Optional[Stripped]
+        if self._declaration(node.generator) is cpp_aliasing.Declaration.COPY:
+            variable_type_cpp, error_msg = generate_type(
+                type_annotation=variable_type_annotation,
+                types_namespace=self._types_namespace,
+            )
+        else:
+            variable_type_cpp, error_msg = generate_type_with_const_ref_if_applicable(
+                type_annotation=variable_type_annotation,
+                types_namespace=self._types_namespace,
+            )
         if error_msg is not None:
             errors.append(Error(node.generator.variable.original_node, error_msg))
 
@@ -2076,16 +2242,47 @@ common::{qualifier_function}(
                 target, error = self.transform(node=node.target)
                 if error is not None:
                     errors.append(error)
-        else:
+        elif isinstance(node.target, parse_tree.Member):
             # NOTE (mristin):
-            # The local variables copy the vectors, and the parameters are passed
-            # in as constant references in C++, so that the naive assignments to
-            # the properties and to the items of the lists would silently diverge
-            # from the semantics of the meta-model.
+            # The type inference allows only the properties of a class as member
+            # targets, which we set with the setters.
+            instance, error = self._transform_and_value_if_necessary(
+                node.target.instance
+            )
+            if error is not None:
+                errors.append(error)
+            else:
+                assert instance is not None
+                target = Stripped(
+                    f"{instance}->{cpp_naming.setter_name(node.target.name)}"
+                )
+
+            target_type = self.type_map[node.target]
+
+        elif isinstance(node.target, parse_tree.Index):
+            # NOTE (mristin):
+            # The type inference allows only the items of a list as index targets,
+            # which we access on the mutable list.
+            collection, error = self._transform_mutable_path(
+                node.target.collection, dereference=True
+            )
+            if error is not None:
+                errors.append(error)
+            else:
+                assert collection is not None
+                target, error = self._transform_item_access(
+                    collection=collection, index_node=node.target.index
+                )
+                if error is not None:
+                    errors.append(error)
+
+            target_type = self.type_map[node.target]
+
+        else:
             return None, Error(
-                node.original_node,
-                "The assignment to a property or to an item of a list "
-                "is not supported yet in C++",
+                node.target.original_node,
+                f"Unexpected target of the assignment: {parse_tree.dump(node.target)}; "
+                f"this should have been caught in the type inference.",
             )
 
         if len(errors) > 0:
@@ -2096,9 +2293,17 @@ common::{qualifier_function}(
         assert target is not None
         assert target_type is not None
 
+        declaration = (
+            self._declaration(node)
+            if is_definition
+            else cpp_aliasing.Declaration.DEFAULT
+        )
+
         value: Optional[Stripped]
 
-        if isinstance(
+        if declaration is cpp_aliasing.Declaration.MUT_REF:
+            value, error = self._transform_mutable_path(node.value, dereference=False)
+        elif isinstance(
             target_type, intermediate_type_inference.OptionalTypeAnnotation
         ) and isinstance(
             value_type, intermediate_type_inference.OptionalTypeAnnotation
@@ -2120,20 +2325,48 @@ common::{qualifier_function}(
             return None, error
         assert value is not None
 
+        if isinstance(node.target, parse_tree.Member):
+            # NOTE (mristin):
+            # This is a rudimentary heuristic for basic line breaks, but works well
+            # in practice.
+            if "\n" in value or len(value) > 50:
+                return (
+                    Stripped(
+                        f"""\
+{target}(
+{I}{indent_but_first_line(value, I)}
+);"""
+                    ),
+                    None,
+                )
+
+            return Stripped(f"{target}({value});"), None
+
         maybe_definition_prefix = ""
         if is_definition:
-            # NOTE (mristin):
-            # We spell out the primitive types, as ``auto`` would deduce the type
-            # from the literal, *e.g.*, ``int`` instead of ``int64_t`` for ``0``, or
-            # ``const wchar_t*`` instead of ``std::wstring`` for ``L"..."``.
-            if isinstance(
-                value_type, intermediate_type_inference.PrimitiveTypeAnnotation
-            ) and value_type.a_type is not (
-                intermediate_type_inference.PrimitiveType.NONE
-            ):
-                maybe_definition_prefix = f"{PRIMITIVE_TYPE_MAP[value_type.a_type]} "
-            else:
+            if declaration is cpp_aliasing.Declaration.DEFAULT:
+                # NOTE (mristin):
+                # We spell out the primitive types, as ``auto`` would deduce the type
+                # from the literal, *e.g.*, ``int`` instead of ``int64_t`` for ``0``,
+                # or ``const wchar_t*`` instead of ``std::wstring`` for ``L"..."``.
+                if isinstance(
+                    value_type, intermediate_type_inference.PrimitiveTypeAnnotation
+                ) and value_type.a_type is not (
+                    intermediate_type_inference.PrimitiveType.NONE
+                ):
+                    maybe_definition_prefix = (
+                        f"{PRIMITIVE_TYPE_MAP[value_type.a_type]} "
+                    )
+                else:
+                    maybe_definition_prefix = "auto "
+            elif declaration is cpp_aliasing.Declaration.COPY:
                 maybe_definition_prefix = "auto "
+            elif declaration is cpp_aliasing.Declaration.CONST_REF:
+                maybe_definition_prefix = "const auto& "
+            elif declaration is cpp_aliasing.Declaration.MUT_REF:
+                maybe_definition_prefix = "auto& "
+            else:
+                assert_never(declaration)
 
         # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
@@ -2413,18 +2646,36 @@ return (
             if error_msg is not None:
                 errors.append(Error(node.generator.variable.original_node, error_msg))
 
-            # NOTE (mristin):
-            # We iterate over the items by constant reference to avoid the copies,
-            # except for the arithmetic values and the enumerations which are cheap
-            # to copy.
-            if variable_type_cpp is not None and not _is_cheap_to_copy(
-                variable_type_annotation
-            ):
-                variable_type_cpp = Stripped(f"const {variable_type_cpp}&")
+            declaration = self._declaration(node.generator)
 
-            iteration, error = self._transform_and_value_if_necessary(
-                node.generator.iteration
-            )
+            if variable_type_cpp is not None:
+                if declaration is cpp_aliasing.Declaration.DEFAULT:
+                    # NOTE (mristin):
+                    # We iterate over the items by constant reference to avoid
+                    # the copies, except for the arithmetic values and
+                    # the enumerations which are cheap to copy.
+                    if not _is_cheap_to_copy(variable_type_annotation):
+                        variable_type_cpp = Stripped(f"const {variable_type_cpp}&")
+                elif declaration is cpp_aliasing.Declaration.COPY:
+                    pass
+                elif declaration is cpp_aliasing.Declaration.CONST_REF:
+                    variable_type_cpp = Stripped(f"const {variable_type_cpp}&")
+                elif declaration is cpp_aliasing.Declaration.MUT_REF:
+                    variable_type_cpp = Stripped(f"{variable_type_cpp}&")
+                else:
+                    assert_never(declaration)
+
+            if declaration is cpp_aliasing.Declaration.MUT_REF:
+                # NOTE (mristin):
+                # The items are mutated through the loop variable, so we need to
+                # iterate over the mutable collection.
+                iteration, error = self._transform_mutable_path(
+                    node.generator.iteration, dereference=True
+                )
+            else:
+                iteration, error = self._transform_and_value_if_necessary(
+                    node.generator.iteration
+                )
             if error is not None:
                 errors.append(error)
 

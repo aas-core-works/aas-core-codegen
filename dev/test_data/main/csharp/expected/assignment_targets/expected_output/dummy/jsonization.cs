@@ -381,6 +381,7 @@ namespace dummy
                 List<string>? theTexts = null;
                 string? theMaybeText = null;
                 Kind? theMaybeKind = null;
+                List<string>? theMaybeTexts = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -400,6 +401,10 @@ namespace dummy
                             break;
                         case "maybeKind":
                             theMaybeKind = KindFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "maybeTexts":
+                            theMaybeTexts = Parse_ListOf_string(
                                 keyValue.Value, out error);
                             break;
                         default:
@@ -439,7 +444,8 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theMaybeText,
-                    theMaybeKind);
+                    theMaybeKind,
+                    theMaybeTexts);
             }  // internal static ItemFrom
 
             /// <summary>
@@ -462,6 +468,7 @@ namespace dummy
                 }
 
                 List<IItem>? theItems = null;
+                IItem? theMaybeItem = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -469,6 +476,10 @@ namespace dummy
                     {
                         case "items":
                             theItems = Parse_ListOf_IItem(
+                                keyValue.Value, out error);
+                            break;
+                        case "maybeItem":
+                            theMaybeItem = ItemFrom(
                                 keyValue.Value, out error);
                             break;
                         default:
@@ -496,7 +507,8 @@ namespace dummy
                 return new Aas.Something(
                     theItems
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                            "Unexpected null, had to be handled before"),
+                    theMaybeItem);
             }  // internal static SomethingFrom
         }  // public static class DeserializeImplementation
 
@@ -785,6 +797,8 @@ namespace dummy
 
             private static readonly Serializer<Kind> Serialize_Kind = Serialize.KindToJsonValue;
 
+            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
             /// <paramref name="result" /> to <paramref name="that" />, serialized by
@@ -841,6 +855,16 @@ namespace dummy
 
                 SetProperty(result, "texts", "Texts", that.Texts, Serialize_ListOf_string);
 
+                if (that.MaybeTexts != null)
+                {
+                    SetProperty(
+                        result,
+                        "maybeTexts",
+                        "MaybeTexts",
+                        that.MaybeTexts,
+                        Serialize_ListOf_string);
+                }
+
                 return result;
             }
 
@@ -851,6 +875,11 @@ namespace dummy
                 var result = new Nodes.JsonObject();
 
                 SetProperty(result, "items", "Items", that.Items, Serialize_ListOf_IItem);
+
+                if (that.MaybeItem != null)
+                {
+                    SetProperty(result, "maybeItem", "MaybeItem", that.MaybeItem, Serialize_IClass);
+                }
 
                 return result;
             }

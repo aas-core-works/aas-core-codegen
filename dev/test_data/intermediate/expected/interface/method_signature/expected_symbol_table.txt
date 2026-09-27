@@ -22,6 +22,7 @@ SymbolTable(
                   a_type='INT',
                   parsed=...),
                 default=None,
+                mutable=False,
                 parsed=...)],
             returns=PrimitiveTypeAnnotation(
               a_type='BOOL',
@@ -67,6 +68,7 @@ SymbolTable(
                 a_type='INT',
                 parsed=...),
               default=None,
+              mutable=False,
               parsed=...)],
           returns=PrimitiveTypeAnnotation(
             a_type='BOOL',

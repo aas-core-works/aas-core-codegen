@@ -1,0 +1,1 @@
+The type annotation Mutable[List[str]] is redundant, since a List already declares a mutable list. Please declare it as List[str] without Mutable, or as Sequence[str] if the function does not mutate the list.

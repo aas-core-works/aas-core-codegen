@@ -1110,6 +1110,7 @@ def _read_item_as_sequence(
     the_maybe_text: Optional[str] = values.get('maybeText')
     the_maybe_kind: Optional[aas_types.Kind] = values.get('maybeKind')
     the_texts: Optional[List[str]] = values.get('texts')
+    the_maybe_texts: Optional[List[str]] = values.get('maybeTexts')
 
     if the_text is None:
         raise DeserializationException(
@@ -1125,7 +1126,8 @@ def _read_item_as_sequence(
         the_text,
         the_texts,
         the_maybe_text,
-        the_maybe_kind
+        the_maybe_kind,
+        the_maybe_texts
     )
 
 
@@ -1179,6 +1181,7 @@ def _read_something_as_sequence(
     )
 
     the_items: Optional[List[aas_types.Item]] = values.get('items')
+    the_maybe_item: Optional[aas_types.Item] = values.get('maybeItem')
 
     if the_items is None:
         raise DeserializationException(
@@ -1186,7 +1189,8 @@ def _read_something_as_sequence(
         )
 
     return aas_types.Something(
-        the_items
+        the_items,
+        the_maybe_item
     )
 
 
@@ -1264,6 +1268,7 @@ _READERS_FOR_ITEM: Mapping[
     'maybeText': read_str_from_element_text,
     'maybeKind': _read_kind_from_element_text,
     'texts': _read_list_of__str,
+    'maybeTexts': _read_list_of__str,
 }
 
 
@@ -1274,6 +1279,7 @@ _READERS_FOR_SOMETHING: Mapping[
     _ContentReader[Any]
 ] = {
     'items': _read_list_of__item,
+    'maybeItem': _read_item_as_sequence,
 }
 
 
@@ -1551,6 +1557,14 @@ def _write_item_as_element(
         _write_list_of_items(
             'texts', 'texts', that.texts, _write_str_as_element, serializer
         )
+        if that.maybe_texts is not None:
+            _write_list_of_items(
+                'maybeTexts',
+                'maybe_texts',
+                that.maybe_texts,
+                _write_str_as_element,
+                serializer
+            )
         serializer.writer.write_end_element(name)
     except Exception as exception:
         _attribute_to_property(exception, prop_name)
@@ -1576,6 +1590,10 @@ def _write_something_as_element(
     try:
         serializer.writer.write_start_element(name)
         _write_list_of_instances('items', 'items', that.items, serializer)
+        if that.maybe_item is not None:
+            _write_item_as_element(
+                'maybeItem', 'maybe_item', that.maybe_item, serializer
+            )
         serializer.writer.write_end_element(name)
     except Exception as exception:
         _attribute_to_property(exception, prop_name)

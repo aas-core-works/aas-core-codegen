@@ -1,1 +1,1 @@
-<item xmlns="https://dummy.com"><text>a</text><maybeText>b</maybeText><maybeKind>alpha</maybeKind><texts><v>c</v><v>d</v></texts></item>
+<item xmlns="https://dummy.com"><text>a</text><maybeText>b</maybeText><maybeKind>alpha</maybeKind><texts><v>c</v><v>d</v></texts><maybeTexts><v>e</v></maybeTexts></item>
