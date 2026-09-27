@@ -979,6 +979,33 @@ aascommon.MapContains(
                     f"this should have been caught before."
                 )
 
+                if isinstance(
+                    self.type_map[node.args[0]],
+                    intermediate_type_inference.TupleTypeAnnotation,
+                ):
+                    no_parentheses_types = (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.IsInstance,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Constant,
+                        parse_tree.Index,
+                        parse_tree.Slice,
+                        parse_tree.IsIn,
+                    )
+
+                    # NOTE (mristin):
+                    # We put the de-referencing in parentheses as ``*x.Len()``
+                    # would de-reference the length instead of the tuple.
+                    collection = args[0]
+                    if not isinstance(
+                        node.args[0], no_parentheses_types
+                    ) or collection.startswith("*"):
+                        collection = Stripped(f"({collection})")
+
+                    return Stripped(f"{collection}.Len()"), None
+
                 len_function = "len"
 
                 # NOTE (mristin):

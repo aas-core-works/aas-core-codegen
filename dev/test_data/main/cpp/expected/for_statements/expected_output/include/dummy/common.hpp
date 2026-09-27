@@ -10,6 +10,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <utility>
 #pragma warning(pop)
 
@@ -10087,6 +10088,16 @@ std::wstring Utf8ToWstring(
  * \return wide string
  */
 std::wstring Utf8ToWstring(const std::string& utf8_text);
+
+/**
+ * Count the items of a tuple.
+ *
+ * \return the number of items
+ */
+template<typename... T>
+size_t LenTuple(const std::tuple<T...>&) {
+  return sizeof...(T);
+}
 
 /**
  * Count the characters (code points) of \p text.

@@ -52,7 +52,11 @@ func SomeVerification(
 	return (aascommon.Tuple2[string, int64]{
 			x,
 			y,
-		}).Item1 == x
+		}).Item1 == x &&
+		(aascommon.Tuple2[string, int64]{
+			x,
+			y,
+		}).Len() == 2
 }
 
 // Verify `that` instance of [aastypes.ISomeItem].
@@ -105,6 +109,28 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"The second item of the pair must be positive",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(that.Pair().Len() == 2) {
+		abort = onError(
+			newVerificationError(
+				"The pair must have two items",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.OptionalPair() != nil) ||
+		((*that.OptionalPair()).Len() == 2)) {
+		abort = onError(
+			newVerificationError(
+				"The optional pair must have two items",),
 		)
 		if abort {
 			return

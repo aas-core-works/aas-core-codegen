@@ -9,6 +9,12 @@ package aas_core.aas3_0.common;
  * Represent a fixed-size heterogeneous tuple of 6 item(s).
  */
 public record Tuple6<T1, T2, T3, T4, T5, T6>(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6) {
+  /**
+   * Count the items of the tuple.
+   */
+  public int size() {
+    return 6;
+  }
 }
 
 /*

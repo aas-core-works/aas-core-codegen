@@ -866,7 +866,11 @@ class Transpiler(
                     return Stripped(f"{collection}.length"), None
 
                 elif isinstance(
-                    arg_type, intermediate_type_inference.ListTypeAnnotation
+                    arg_type,
+                    (
+                        intermediate_type_inference.ListTypeAnnotation,
+                        intermediate_type_inference.TupleTypeAnnotation,
+                    ),
                 ):
                     return Stripped(f"{collection}.size()"), None
 

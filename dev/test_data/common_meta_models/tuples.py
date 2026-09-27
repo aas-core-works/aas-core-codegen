@@ -8,7 +8,7 @@ from aas_core_meta.marker import verification
 
 @verification
 def some_verification(x: str, y: int) -> bool:
-    return (x, y)[0] == x
+    return (x, y)[0] == x and len((x, y)) == 2
 
 
 @invariant(lambda self: self > 0, "Larger than zero")
@@ -41,6 +41,14 @@ class Another_item(Abstract_item):
         self.serial_number = serial_number
 
 
+@invariant(
+    lambda self: not (self.optional_pair is not None) or len(self.optional_pair) == 2,
+    "The optional pair must have two items",
+)
+@invariant(
+    lambda self: len(self.pair) == 2,
+    "The pair must have two items",
+)
 @invariant(
     lambda self: self.pair[1] > 0,
     "The second item of the pair must be positive",

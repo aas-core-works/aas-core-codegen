@@ -511,6 +511,7 @@ std::unique_ptr<T> make_unique(
 #include <memory>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <utility>
 #pragma warning(pop)
 
@@ -821,6 +822,18 @@ std::wstring Utf8ToWstring(
  * \\return wide string
  */
 std::wstring Utf8ToWstring(const std::string& utf8_text);"""
+            ),
+            Stripped(
+                """\
+/**
+ * Count the items of a tuple.
+ *
+ * \\return the number of items
+ */
+template<typename... T>
+size_t LenTuple(const std::tuple<T...>&) {
+  return sizeof...(T);
+}"""
             ),
             *(
                 _generate_string_helper_declarations()
