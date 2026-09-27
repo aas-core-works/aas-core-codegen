@@ -974,7 +974,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewBool(
+{private_prop_name}: aascommon.NewAndPointTo(
 {I}{literal}
 )"""
                     )
@@ -984,8 +984,8 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewInt64(
-{I}{literal}
+{private_prop_name}: aascommon.NewAndPointTo(
+{I}int64({literal})
 )"""
                     )
                 )
@@ -994,8 +994,8 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewFloat64(
-{I}{literal}
+{private_prop_name}: aascommon.NewAndPointTo(
+{I}float64({literal})
 )"""
                     )
                 )
@@ -1004,7 +1004,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewString(
+{private_prop_name}: aascommon.NewAndPointTo(
 {I}{literal}
 )"""
                     )
@@ -1016,14 +1016,11 @@ def _generate_constructor(
             literal = golang_naming.enum_literal_name(
                 arg.default.enumeration.name, arg.default.literal.name
             )
-            enum_name = golang_naming.enum_name(arg.default.enumeration.name)
             struct_specs.append(
                 Stripped(
                     f"""\
-{private_prop_name}: (*{enum_name})(
-{I}aascommon.NewInt(
-{II}int({literal})
-{I})
+{private_prop_name}: aascommon.NewAndPointTo(
+{I}{literal}
 )"""
                 )
             )

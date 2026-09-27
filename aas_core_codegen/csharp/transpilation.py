@@ -1379,40 +1379,44 @@ Enumerable.Range(
             errors.append(error)
 
         target = None  # type: Optional[Stripped]
-        if isinstance(node.target, parse_tree.Name):
-            type_anno = self._environment.find(identifier=node.target.identifier)
-            if type_anno is None:
-                # NOTE (mristin):
-                # This is a variable definition as we did not specify the identifier
-                # in the environment.
+        if (
+            isinstance(node.target, parse_tree.Name)
+            and self._environment.find(identifier=node.target.identifier) is None
+        ):
+            # NOTE (mristin):
+            # This is a variable definition as we did not specify the identifier
+            # in the environment.
 
-                type_anno = self.type_map[node.value]
-                self._variable_name_set.add(node.target.identifier)
-                self._environment.set(
-                    identifier=node.target.identifier, type_annotation=type_anno
+            type_anno = self.type_map[node.value]
+            self._variable_name_set.add(node.target.identifier)
+            self._environment.set(
+                identifier=node.target.identifier, type_annotation=type_anno
+            )
+
+            target, error = self.transform_name(node=node.target)
+            if error is not None:
+                errors.append(error)
+            elif (
+                isinstance(
+                    type_anno, intermediate_type_inference.PrimitiveTypeAnnotation
                 )
-
-                target, error = self.transform_name(node=node.target)
-                if error is not None:
-                    errors.append(error)
-                elif (
-                    isinstance(
-                        type_anno, intermediate_type_inference.PrimitiveTypeAnnotation
-                    )
-                    and type_anno.a_type
-                    is intermediate_type_inference.PrimitiveType.INT
-                ):
-                    # NOTE (mristin):
-                    # The integers of the meta-model are ``long``'s in C#, while
-                    # C# infers ``int`` for the integer literals with ``var``, so
-                    # that the subsequent assignments of ``long``'s would fail.
-                    target = Stripped(f"long {target}")
-                else:
-                    target = Stripped(f"var {target}")
+                and type_anno.a_type is intermediate_type_inference.PrimitiveType.INT
+            ):
+                # NOTE (mristin):
+                # The integers of the meta-model are ``long``'s in C#, while
+                # C# infers ``int`` for the integer literals with ``var``, so
+                # that the subsequent assignments of ``long``'s would fail.
+                target = Stripped(f"long {target}")
             else:
-                target, error = self.transform(node=node.target)
-                if error is not None:
-                    errors.append(error)
+                target = Stripped(f"var {target}")
+        else:
+            # NOTE (mristin):
+            # The properties are settable in C#, and the index access resolves
+            # the negative literal indices, so we can assign to the members and
+            # the items of the lists directly.
+            target, error = self.transform(node=node.target)
+            if error is not None:
+                errors.append(error)
 
         if len(errors) > 0:
             return None, Error(

@@ -2077,7 +2077,16 @@ common::{qualifier_function}(
                 if error is not None:
                     errors.append(error)
         else:
-            target_type = self.type_map[node.target]
+            # NOTE (mristin):
+            # The local variables copy the vectors, and the parameters are passed
+            # in as constant references in C++, so that the naive assignments to
+            # the properties and to the items of the lists would silently diverge
+            # from the semantics of the meta-model.
+            return None, Error(
+                node.original_node,
+                "The assignment to a property or to an item of a list "
+                "is not supported yet in C++",
+            )
 
         if len(errors) > 0:
             return None, Error(

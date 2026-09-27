@@ -1498,6 +1498,91 @@ IntStream.range(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
+        if isinstance(node.target, (parse_tree.Member, parse_tree.Index)):
+            # NOTE (mristin):
+            # The type inference allows only the properties of a class and the items
+            # of a list as such targets. We assign to them with a setter and
+            # with ``List.set``, respectively. The value is an argument to these
+            # methods, so we pass in ``null`` for an empty optional, and render
+            # an integer literal as ``long``.
+            self._beneath_call.add(node.value)
+            value, error = self._transform_as_long(node.value)
+            self._beneath_call.remove(node.value)
+            if error is not None:
+                errors.append(error)
+
+            receiver_node = (
+                node.target.instance
+                if isinstance(node.target, parse_tree.Member)
+                else node.target.collection
+            )
+
+            receiver, error = self.transform(receiver_node)
+            if error is not None:
+                errors.append(error)
+
+            index = None  # type: Optional[Stripped]
+            if isinstance(node.target, parse_tree.Index):
+                index, error = self.transform(node.target.index)
+                if error is not None:
+                    errors.append(error)
+
+            if len(errors) > 0:
+                return None, Error(
+                    node.original_node, "Failed to transpile the assignment", errors
+                )
+
+            assert value is not None
+            assert receiver is not None
+
+            if not isinstance(
+                receiver_node,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                receiver = Stripped(f"({receiver})")
+
+            arguments = [value]  # type: List[Stripped]
+            if isinstance(node.target, parse_tree.Member):
+                method_name = java_naming.setter_name(node.target.name)
+            else:
+                assert index is not None
+
+                index_as_int = None  # type: Optional[int]
+                try:
+                    index_as_int = int(index)
+                except ValueError:
+                    pass
+
+                if index_as_int is not None and index_as_int < 0:
+                    # pylint: disable=invalid-unary-operand-type
+                    index = Stripped(f"{receiver}.size() - {-index_as_int}")
+
+                method_name = Identifier("set")
+                arguments.insert(0, index)
+
+            # NOTE (mristin):
+            # This is a rudimentary heuristic for basic line breaks, but works well in
+            # practice.
+            joined_arguments = ", ".join(arguments)
+            if "\n" not in joined_arguments and len(joined_arguments) <= 50:
+                return Stripped(f"{receiver}.{method_name}({joined_arguments});"), None
+
+            arguments_block = ",\n".join(arguments)
+            return (
+                Stripped(
+                    f"""\
+{receiver}.{method_name}(
+{I}{indent_but_first_line(arguments_block, I)});"""
+                ),
+                None,
+            )
+
         value, error = self.transform(node.value)
         if error is not None:
             errors.append(error)

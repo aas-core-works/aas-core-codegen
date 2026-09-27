@@ -1761,6 +1761,87 @@ aascommon.{qualifier_function}(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
+        if isinstance(node.target, parse_tree.Member):
+            # NOTE (mristin):
+            # The type inference allows only the properties of a class as member
+            # targets, which we assign to with the setters. We pass on the pointer
+            # of an optional value as-is.
+            #
+            # However, a non-optional value assigned to a property represented as
+            # a pointer needs to be wrapped in ``NewAndPointTo``. Go does not allow to
+            # take the address of a literal or of an expression, and taking
+            # the address of a variable would alias it, so that a later assignment
+            # to the variable would also change the property.
+            instance_type = self.type_map[node.target.instance]
+            assert isinstance(
+                instance_type, intermediate_type_inference.OurTypeAnnotation
+            ) and isinstance(instance_type.our_type, intermediate.Class)
+
+            prop = instance_type.our_type.properties_by_name[node.target.name]
+
+            instance, error = self.transform(node.target.instance)
+            if error is not None:
+                errors.append(error)
+
+            target_is_pointer = golang_pointering.is_pointer_type(prop.type_annotation)
+
+            value, error = (
+                self.transform(node.value)
+                if target_is_pointer
+                else self._transform_and_dereference_if_necessary(node.value)
+            )
+            if error is not None:
+                errors.append(error)
+            elif target_is_pointer and not (
+                isinstance(
+                    node.value,
+                    (parse_tree.Name, parse_tree.Member, parse_tree.Index),
+                )
+                and self._is_pointer_map[node.value]
+            ):
+                assert value is not None
+
+                if (
+                    isinstance(node.value, parse_tree.Constant)
+                    and isinstance(node.value.value, int)
+                    and not isinstance(node.value.value, bool)
+                ):
+                    # NOTE (mristin):
+                    # The integer literals are untyped in Go, and ``NewAndPointTo``
+                    # would infer an ``int`` for them, while we represent
+                    # the integers as ``int64``.
+                    value = Stripped(f"int64({value})")
+
+                value = Stripped(
+                    f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({value})"
+                )
+
+            if len(errors) > 0:
+                return None, Error(
+                    node.original_node, "Failed to transpile the assignment", errors
+                )
+
+            assert instance is not None
+            assert value is not None
+
+            setter_name = golang_naming.setter_name(node.target.name)
+
+            # NOTE (mristin):
+            # This is a rudimentary heuristic for basic line breaks, but works well in
+            # practice.
+            if "\n" in value or len(value) > 50:
+                return (
+                    Stripped(
+                        f"""\
+{instance}.{setter_name}(
+{I}{indent_but_first_line(value, I)},
+)"""
+                    ),
+                    None,
+                )
+
+            return Stripped(f"{instance}.{setter_name}({value})"), None
+
         value, error = self._transform_and_dereference_if_necessary(node.value)
         if error is not None:
             errors.append(error)
@@ -1768,28 +1849,33 @@ aascommon.{qualifier_function}(
         is_definition = False
 
         target = None  # type: Optional[Stripped]
-        if isinstance(node.target, parse_tree.Name):
-            type_anno = self._environment.find(identifier=node.target.identifier)
-            if type_anno is None:
-                # NOTE (mristin):
-                # This is a variable definition as we did not specify the identifier
-                # in the environment.
+        if (
+            isinstance(node.target, parse_tree.Name)
+            and self._environment.find(identifier=node.target.identifier) is None
+        ):
+            # NOTE (mristin):
+            # This is a variable definition as we did not specify the identifier
+            # in the environment.
 
-                is_definition = True
+            is_definition = True
 
-                type_anno = self.type_map[node.value]
-                self._variable_name_set.add(node.target.identifier)
-                self._environment.set(
-                    identifier=node.target.identifier, type_annotation=type_anno
-                )
+            type_anno = self.type_map[node.value]
+            self._variable_name_set.add(node.target.identifier)
+            self._environment.set(
+                identifier=node.target.identifier, type_annotation=type_anno
+            )
 
-                target, error = self.transform_name(node=node.target)
-                if error is not None:
-                    errors.append(error)
-            else:
-                target, error = self.transform(node=node.target)
-                if error is not None:
-                    errors.append(error)
+            target, error = self.transform_name(node=node.target)
+            if error is not None:
+                errors.append(error)
+        else:
+            # NOTE (mristin):
+            # The slices share their underlying arrays, so the assignment to an item
+            # of a list is visible through all the references to the list, as in
+            # Python.
+            target, error = self.transform(node=node.target)
+            if error is not None:
+                errors.append(error)
 
         if len(errors) > 0:
             return None, Error(

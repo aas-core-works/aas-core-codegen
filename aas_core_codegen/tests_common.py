@@ -9,6 +9,9 @@ the same cases.
 
 from typing import Final, Sequence, Tuple
 
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Identifier
+
 # region Arithmetic
 
 # NOTE (mristin):
@@ -138,5 +141,50 @@ for _argument, _expected in ABS_INT_CASES:
 
 for _float_argument, _float_expected in ABS_FLOAT_CASES:
     assert abs(_float_argument) == _float_expected
+
+# endregion
+
+# region Assignment targets
+
+# NOTE (mristin):
+# The generated SDKs, except for C++, support the assignments to the properties and
+# to the items of the lists in the verification functions. We test them by calling
+# the verification functions of ``dev/test_data/common_meta_models/assignment_targets.py``
+# directly, as the invariants must not call the functions which mutate their
+# arguments. Hence, we generate these unit tests only for that very meta-model.
+#
+# The tests will be removed once the mutability of the arguments is declared in
+# the meta-model, and C++ supports these assignments as well.
+
+#: Verification functions of the meta-model with the assignment targets called in
+#: the generated unit tests
+ASSIGNMENT_TARGET_VERIFICATION_NAMES: Final[Sequence[Identifier]] = [
+    Identifier("set_text"),
+    Identifier("set_maybe_text"),
+    Identifier("copy_maybe_text_and_set_maybe_kind"),
+    Identifier("set_text_through_alias"),
+    Identifier("set_texts"),
+    Identifier("set_first_and_last_text"),
+    Identifier("set_text_through_list_alias"),
+    Identifier("set_numbers"),
+    Identifier("set_nested_text"),
+    Identifier("replace_first_item"),
+    Identifier("set_texts_in_loops"),
+]
+
+
+def defines_assignment_target_verifications(
+    symbol_table: intermediate.SymbolTable,
+) -> bool:
+    """
+    Check whether the meta-model defines the verification functions to be tested.
+
+    See :py:attr:`ASSIGNMENT_TARGET_VERIFICATION_NAMES`.
+    """
+    return all(
+        name in symbol_table.verification_functions_by_name
+        for name in ASSIGNMENT_TARGET_VERIFICATION_NAMES
+    )
+
 
 # endregion

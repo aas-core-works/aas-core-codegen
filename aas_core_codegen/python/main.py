@@ -3,7 +3,13 @@
 import pathlib
 from typing import TextIO, Sequence, Callable, Tuple, Optional, List
 
-from aas_core_codegen import specific_implementations, run, intermediate, python
+from aas_core_codegen import (
+    specific_implementations,
+    run,
+    intermediate,
+    python,
+    tests_common,
+)
 from aas_core_codegen.common import Error
 from aas_core_codegen.python import (
     common as python_common,
@@ -377,6 +383,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 lambda: (
                     python_tests.generate_test_arithmetic(
                         symbol_table=context.symbol_table
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
+    # NOTE (mristin):
+    # We test the assignments to the properties and to the list items only for
+    # the meta-model which defines the corresponding verification functions, see
+    # :py:mod:`aas_core_codegen.tests_common`.
+    if tests_common.defines_assignment_target_verifications(context.symbol_table):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path / "test_assignment_targets.py",
+                lambda: (
+                    python_tests.generate_test_assignment_targets(
+                        symbol_table=context.symbol_table,
+                        qualified_module_name=qualified_module_name,
                     ),
                     None,
                 ),

@@ -22,6 +22,30 @@ _COMMON_META_MODEL_STEM_TO_PATH = {
 }
 
 
+def _meta_model_path(
+    target: aas_core_codegen.main.Target, case_dir: pathlib.Path, case_name: str
+) -> pathlib.Path:
+    """Resolve the meta-model of the case, falling back to the common one."""
+    meta_model_path = case_dir / "meta_model.py"
+    if not meta_model_path.exists():
+        real_meta_model_path = _COMMON_META_MODEL_STEM_TO_PATH.get(case_name, None)
+
+        if real_meta_model_path is None:
+            raise RuntimeError(
+                f"The meta-model could not be found for target {target.value} "
+                f"and case {case_name}. Neither {meta_model_path} exists "
+                f"nor is there a real meta-model corresponding to it. "
+                f"The real meta-model paths "
+                f"are: {tests.common.COMMON_META_MODEL_PATHS}."
+            )
+
+        meta_model_path = real_meta_model_path
+
+    assert meta_model_path.exists() and meta_model_path.is_file(), meta_model_path
+
+    return meta_model_path
+
+
 class _TestCase(unittest.TestCase):
     def _run_expected_test(
         self, target: aas_core_codegen.main.Target, case_name: str
@@ -33,22 +57,9 @@ class _TestCase(unittest.TestCase):
 
         assert case_dir.exists() and case_dir.is_dir(), case_dir
 
-        meta_model_path = case_dir / "meta_model.py"
-        if not meta_model_path.exists():
-            real_meta_model_path = _COMMON_META_MODEL_STEM_TO_PATH.get(case_name, None)
-
-            if real_meta_model_path is None:
-                raise RuntimeError(
-                    f"The meta-model could not be found for target {target.value} "
-                    f"and case {case_name}. Neither {meta_model_path} exists "
-                    f"nor is there a real meta-model corresponding to it. "
-                    f"The real meta-model paths "
-                    f"are: {tests.common.COMMON_META_MODEL_PATHS}."
-                )
-            else:
-                meta_model_path = real_meta_model_path
-
-        assert meta_model_path.exists() and meta_model_path.is_file(), meta_model_path
+        meta_model_path = _meta_model_path(
+            target=target, case_dir=case_dir, case_name=case_name
+        )
 
         snippets_dir = case_dir / "input/snippets"
         assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
@@ -130,9 +141,9 @@ class _TestCase(unittest.TestCase):
 
         assert case_dir.exists() and case_dir.is_dir(), case_dir
 
-        meta_model_path = case_dir / "meta_model.py"
-
-        assert meta_model_path.exists() and meta_model_path.is_file(), meta_model_path
+        meta_model_path = _meta_model_path(
+            target=target, case_dir=case_dir, case_name=case_name
+        )
 
         snippets_dir = case_dir / "input/snippets"
         assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
@@ -393,6 +404,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="unions"
         )
 
+    def test_unexpected_assignment_targets(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="assignment_targets"
+        )
+
     def test_unexpected_conflict_between_constructor_arguments(self) -> None:
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.CPP,
@@ -431,6 +447,11 @@ class Test_csharp(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="arithmetic"
+        )
+
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="assignment_targets"
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -581,6 +602,11 @@ class Test_golang(_TestCase):
             target=aas_core_codegen.main.Target.GOLANG, case_name="arithmetic"
         )
 
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="assignment_targets"
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG,
@@ -729,6 +755,11 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="arithmetic"
         )
 
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="assignment_targets"
+        )
+
     def test_expected_constants(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="constants"
@@ -872,6 +903,12 @@ class Test_jsonschema(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="arithmetic"
+        )
+
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="assignment_targets",
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -1031,6 +1068,11 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="arithmetic"
         )
 
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="assignment_targets"
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON,
@@ -1169,6 +1211,12 @@ class Test_typescript(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="arithmetic"
+        )
+
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="assignment_targets",
         )
 
     def test_expected_conflict_with_utility_types(self) -> None:
@@ -1332,6 +1380,11 @@ class Test_xsd(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="arithmetic"
+        )
+
+    def test_expected_assignment_targets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="assignment_targets"
         )
 
     def test_expected_constrained_primitives(self) -> None:

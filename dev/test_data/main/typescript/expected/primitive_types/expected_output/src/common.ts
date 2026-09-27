@@ -47,6 +47,35 @@ export function at<T>(
 
 
 /**
+ * Set the `index`-th item of the `array` to the `value`.
+ *
+ * @remarks
+ * Unlike the plain assignment, we do not grow the array on an out-of-bound
+ * `index`, but throw so that we follow the semantics of the meta-model.
+ *
+ * @param array - to set the element in
+ * @param index - zero-based index of the `array`. Negative index counts back.
+ * @param value - to be set
+ * @throws {@link RangeError} if `index` out-of-bound
+ * @typeParam T - type of the array items
+ */
+export function setAt<T>(
+  array: Array<T>,
+  index: number,
+  value: T
+): void {
+  const resolved = index < 0 ? array.length + index : index;
+  if (resolved < 0 || resolved >= array.length) {
+    throw new RangeError(
+      `The index ${index} is out of bound ` +
+      `for the array of length ${array.length}`
+    );
+  }
+  array[resolved] = value;
+}
+
+
+/**
  * Check that all the values of the iterable are `true`.
  *
  * @param iterable - to iterate over

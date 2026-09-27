@@ -3,7 +3,13 @@
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import run, intermediate, specific_implementations, golang
+from aas_core_codegen import (
+    run,
+    intermediate,
+    specific_implementations,
+    golang,
+    tests_common,
+)
 from aas_core_codegen.common import Stripped, Error
 from aas_core_codegen.golang import lib as golang_lib, tests as golang_tests
 
@@ -353,6 +359,23 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 base_rel_path / "verification/test/arithmetic_test.go",
                 lambda: (
                     golang_tests.generate_arithmetic_test(
+                        symbol_table=verified_ir_table, repo_url=repo_url
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
+    # NOTE (mristin):
+    # We test the assignments to the properties and to the list items only for
+    # the meta-model which defines the corresponding verification functions, see
+    # :py:mod:`aas_core_codegen.tests_common`.
+    if tests_common.defines_assignment_target_verifications(verified_ir_table):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                base_rel_path / "verification/test/assignment_targets_test.go",
+                lambda: (
+                    golang_tests.generate_assignment_targets_test(
                         symbol_table=verified_ir_table, repo_url=repo_url
                     ),
                     None,

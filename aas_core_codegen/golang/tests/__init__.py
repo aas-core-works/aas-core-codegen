@@ -8,6 +8,7 @@ from aas_core_codegen.golang.tests import (
     _generate_aastesting_filesystem,
     _generate_aastesting_tracing,
     _generate_arithmetic_test,
+    _generate_assignment_targets_test,
     _generate_descend_test_common,
     _generate_descend_test_descend_once_test,
     _generate_descend_test_descend_test,
@@ -33,6 +34,7 @@ generate_aastesting_doc = _generate_aastesting_doc.generate
 generate_aastesting_filesystem = _generate_aastesting_filesystem.generate
 generate_aastesting_tracing = _generate_aastesting_tracing.generate
 generate_arithmetic_test = _generate_arithmetic_test.generate
+generate_assignment_targets_test = _generate_assignment_targets_test.generate
 generate_descend_test_common = _generate_descend_test_common.generate
 generate_descend_test_descend_once_test = (
     _generate_descend_test_descend_once_test.generate
