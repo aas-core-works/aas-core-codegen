@@ -1062,7 +1062,9 @@ def _parse_block(
 
         assert stmt is not None
 
-        if not isinstance(stmt, (tree.Assignment, tree.Return, tree.Switch, tree.For)):
+        if not isinstance(
+            stmt, (tree.Assignment, tree.Return, tree.Switch, tree.For, tree.Continue)
+        ):
             return None, Error(
                 node,
                 f"Expected only statements in {block_name}, "
@@ -1226,6 +1228,14 @@ class _ParseFor(_Parse):
         )
 
 
+class _ParseContinue(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Continue)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        return tree.Continue(original_node=node), None
+
+
 _CHAIN_OF_RULES = [
     _ParseComparison(),
     _ParseIsIn(),
@@ -1251,6 +1261,7 @@ _CHAIN_OF_RULES = [
     _ParseReturn(),
     _ParseSwitch(),
     _ParseFor(),
+    _ParseContinue(),
 ]  # type: Sequence[_Parse]
 
 

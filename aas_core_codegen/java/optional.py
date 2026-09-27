@@ -699,3 +699,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
 
         self.is_optional_map[node] = False
         return None
+
+    def transform_continue(self, node: parse_tree.Continue) -> Optional[Error]:
+        self.is_optional_map[node] = False
+        return None

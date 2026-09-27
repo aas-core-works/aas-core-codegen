@@ -759,15 +759,32 @@ class For(Statement):
         visitor.visit_for(self)
 
 
-StatementUnion = Union[Assignment, Return, Switch, For]
+class Continue(Statement):
+    """Represent a ``continue`` statement which skips to the next loop iteration."""
+
+    def __init__(self, original_node: ast.AST) -> None:
+        """Initialize with the given values."""
+        Statement.__init__(self, original_node=original_node)
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_continue(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_continue(self)
+
+
+StatementUnion = Union[Assignment, Return, Switch, For, Continue]
 
 
 def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
     """
     Check whether the execution can continue after the ``statements``.
 
-    The execution can not continue if the last statement is a return, or a switch
-    with a default where none of the branches can complete normally.
+    The execution can not continue if the last statement is a return or
+    a ``continue``, or a switch with a default where none of the branches can
+    complete normally.
 
     A for-loop can always complete normally, since its body might not execute at all.
     """
@@ -775,7 +792,7 @@ def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
         return True
 
     last = statements[-1]
-    if isinstance(last, Return):
+    if isinstance(last, (Return, Continue)):
         return False
 
     if isinstance(last, Switch):
@@ -967,6 +984,9 @@ class Visitor(DBC):
         for stmt in node.body:
             self.visit(stmt)
 
+    def visit_continue(self, node: Continue) -> None:
+        """Visit a ``continue`` statement."""
+
 
 class Transformer(Generic[T], DBC):
     """Transform our AST into something."""
@@ -1128,6 +1148,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_for(self, node: For) -> T:
         """Transform a for-loop statement into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_continue(self, node: Continue) -> T:
+        """Transform a ``continue`` statement into something."""
         raise NotImplementedError(f"{node=}")
 
 
@@ -1497,6 +1522,14 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_continue(self, node: Continue) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
 
 def dump(node: Node) -> str:
     """Produce a string representation of the tree."""
@@ -1634,6 +1667,10 @@ class RestrictedTransformer(Transformer[T]):
 
     def transform_for(self, node: For) -> T:
         """Transform a for-loop statement into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_continue(self, node: Continue) -> T:
+        """Transform a ``continue`` statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
 
@@ -1812,6 +1849,9 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         yield from self.transform(node.generator)
         for stmt in node.body:
             yield from self.transform(stmt)
+
+    def transform_continue(self, node: Continue) -> Iterator[Node]:
+        yield node
 
 
 _ITERATION_TRANSFORMER = _IterationTransformer()

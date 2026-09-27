@@ -160,6 +160,42 @@ def alpha_has_no_negative_numbers(
     return True
 
 
+def sum_of_odd_numbers_is_small(
+    numbers: List[int]
+) -> bool:
+    """
+    Check the for-each with a continue in a switch followed by statements.
+    """
+    # pylint: disable=all
+    total = 0
+    for number in numbers:
+        if (number % 2) == 0:
+            continue
+        total = total + number
+    return total < 50
+
+
+def items_are_few_and_texts_expected(
+    items: List[aas_types.Item]
+) -> bool:
+    """
+    Check the continue in all the branches of a switch in a nested for-range.
+    """
+    # pylint: disable=all
+    count = 0
+    for item in items:
+        for i in range(0, len(item.texts)):
+            text = item.texts[i]
+            if text == 'unexpected':
+                return False
+            elif text in ('a', 'b'):
+                continue
+            else:
+                continue
+        count = count + 1
+    return count < 3
+
+
 class _Transformer(
         aas_types.AbstractTransformer[
             Iterator[Error]
@@ -182,6 +218,16 @@ class _Transformer(
             self,
             that: aas_types.Something
     ) -> Iterator[Error]:
+        if not items_are_few_and_texts_expected(that.items):
+            yield Error(
+                'Items are few and their texts expected'
+            )
+
+        if not sum_of_odd_numbers_is_small(that.numbers):
+            yield Error(
+                'Sum of odd numbers is small'
+            )
+
         if not (
             alpha_has_no_negative_numbers(
                 that.kind,

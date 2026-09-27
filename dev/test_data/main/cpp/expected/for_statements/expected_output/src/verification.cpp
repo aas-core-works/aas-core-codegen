@@ -37,6 +37,29 @@ Error::Error(
 
 // endregion struct Error
 
+// region Arithmetic
+
+int64_t FloorMod(int64_t dividend, int64_t divisor) {
+  // NOTE: The native INT64_MIN % -1 is undefined behavior in C++ as
+  // the corresponding division overflows, while every number is divisible
+  // by -1 without a remainder.
+  if (divisor == -1) {
+    return 0;
+  }
+
+  // NOTE: We can not use the native remainder directly as C++ truncates
+  // the division towards zero so that the remainder takes the sign of
+  // the dividend. We correct it to take the sign of the divisor as in Python.
+  int64_t remainder = dividend % divisor;
+  if (remainder != 0 && ((remainder < 0) != (divisor < 0))) {
+    remainder += divisor;
+  }
+
+  return remainder;
+}
+
+// endregion Arithmetic
+
 // region Verification functions
 
 bool FirstTextIsNotEmpty(
@@ -146,6 +169,42 @@ bool AlphaHasNoNegativeNumbers(
   return true;
 }
 
+bool SumOfOddNumbersIsSmall(
+  const std::vector<int64_t>& numbers
+) {
+  int64_t total = 0;
+  for (int64_t number : numbers) {
+    switch (verification::FloorMod(number, 2)) {
+      case 0:
+        continue;
+    }
+    total = total + number;
+  }
+  return total < 50;
+}
+
+bool ItemsAreFewAndTextsExpected(
+  const std::vector<
+    std::shared_ptr<types::IItem>
+  >& items
+) {
+  int64_t count = 0;
+  for (const std::shared_ptr<types::IItem>& item : items) {
+    for (size_t i = 0; i < item->texts().size(); ++i) {
+      std::wstring text = item->texts().at(i);
+      if (text == L"unexpected") {
+        return false;
+      } else if (text == L"a" || text == L"b") {
+        continue;
+      } else {
+        continue;
+      }
+    }
+    count = count + (1);
+  }
+  return count < 3;
+}
+
 // endregion Verification functions
 
 namespace {
@@ -184,13 +243,35 @@ bool Something_0(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
+  return verification::ItemsAreFewAndTextsExpected(
+    that->items()
+  );
+}
+
+bool Something_1(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::SumOfOddNumbersIsSmall(
+    that->numbers()
+  );
+}
+
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
   return verification::AlphaHasNoNegativeNumbers(
     that->kind(),
     that->numbers()
   );
 }
 
-bool Something_1(
+bool Something_3(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -201,7 +282,7 @@ bool Something_1(
   );
 }
 
-bool Something_2(
+bool Something_4(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -212,7 +293,7 @@ bool Something_2(
   );
 }
 
-bool Something_3(
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -223,7 +304,7 @@ bool Something_3(
   );
 }
 
-bool Something_4(
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -234,7 +315,7 @@ bool Something_4(
   );
 }
 
-bool Something_5(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -245,7 +326,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -256,7 +337,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -276,34 +357,42 @@ const std::vector<Check>& ChecksOf(Shape shape) {
       static const std::vector<Check> checks = {
         {
           &Something_0,
-          L"Alpha has no minus two"
+          L"Items are few and their texts expected"
         },
         {
           &Something_1,
-          L"Neither thirteen nor unlucky"
+          L"Sum of odd numbers is small"
         },
         {
           &Something_2,
-          L"No item has an empty text"
+          L"Alpha has no minus two"
         },
         {
           &Something_3,
-          L"Sum of numbers is small"
+          L"Neither thirteen nor unlucky"
         },
         {
           &Something_4,
-          L"No number after the first is one"
+          L"No item has an empty text"
         },
         {
           &Something_5,
-          L"No number is minus one"
+          L"Sum of numbers is small"
         },
         {
           &Something_6,
-          L"No number is zero"
+          L"No number after the first is one"
         },
         {
           &Something_7,
+          L"No number is minus one"
+        },
+        {
+          &Something_8,
+          L"No number is zero"
+        },
+        {
+          &Something_9,
           L"The first text must not be empty"
         }
       };

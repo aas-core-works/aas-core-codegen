@@ -1678,6 +1678,11 @@ for (
 
         return Stripped(writer.getvalue()), None
 
+    def transform_continue(
+        self, node: parse_tree.Continue
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return Stripped("continue;"), None
+
 
 # noinspection PyProtectedMember,PyProtectedMember
 assert all(op in Transpiler._CSHARP_COMPARISON_MAP for op in parse_tree.Comparator)
