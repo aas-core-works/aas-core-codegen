@@ -1342,6 +1342,12 @@ common::{contains_function}(
 
                 assert first_arg is not None
 
+                if isinstance(
+                    self.type_map[node.args[0]],
+                    intermediate_type_inference.TupleTypeAnnotation,
+                ):
+                    return Stripped(f"common::LenTuple({first_arg})"), None
+
                 # NOTE (mristin):
                 # We do not use the native ``size()`` on strings as it counts
                 # the UTF-16 code units instead of the characters on Windows,

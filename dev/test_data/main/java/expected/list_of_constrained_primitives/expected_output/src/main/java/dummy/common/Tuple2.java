@@ -9,6 +9,12 @@ package dummy.common;
  * Represent a fixed-size heterogeneous tuple of 2 item(s).
  */
 public record Tuple2<T1, T2>(T1 item1, T2 item2) {
+  /**
+   * Count the items of the tuple.
+   */
+  public int size() {
+    return 2;
+  }
 }
 
 /*

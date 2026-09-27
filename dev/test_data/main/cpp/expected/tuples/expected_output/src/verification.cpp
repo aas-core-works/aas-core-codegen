@@ -44,10 +44,16 @@ bool SomeVerification(
   int64_t y
 ) {
   return (
-    std::get<0>(std::make_tuple(
-      x,
-      y
-    )) == x
+    (
+      std::get<0>(std::make_tuple(
+        x,
+        y
+      )) == x
+      && common::LenTuple(std::make_tuple(
+        x,
+        y
+      )) == 2
+    )
   );
 }
 
@@ -100,6 +106,25 @@ bool Something_0(
   return std::get<1>(that->pair()) > 0;
 }
 
+bool Something_1(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::LenTuple(that->pair()) == 2;
+}
+
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->optional_pair().has_value())
+  || (common::LenTuple((*(that->optional_pair()))) == 2);
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -119,6 +144,14 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_0,
           L"The second item of the pair must be positive"
+        },
+        {
+          &Something_1,
+          L"The pair must have two items"
+        },
+        {
+          &Something_2,
+          L"The optional pair must have two items"
         }
       };
       return checks;

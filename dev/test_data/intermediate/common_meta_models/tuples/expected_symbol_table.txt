@@ -462,6 +462,58 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='The pair must have two items',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='pair',
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=Constant(
+                value=2,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='The optional pair must have two items',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_pair',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='optional_pair',
+                      original_node=...)],
+                  original_node=...),
+                op='EQ',
+                right=Constant(
+                  value=2,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),

@@ -810,6 +810,11 @@ class Transpiler(
                 ):
                     return Stripped(f"{collection}.Count"), None
 
+                elif isinstance(
+                    arg_type, intermediate_type_inference.TupleTypeAnnotation
+                ):
+                    return Stripped(f"TupleHelpers.Len({args[0]})"), None
+
                 # NOTE (mristin):
                 # A JSON-able array is a ``Nodes.JsonArray`` and a JSON-able
                 # object a ``Nodes.JsonObject``, and both count their items

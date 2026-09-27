@@ -771,7 +771,11 @@ AasCommon.at(
             return Stripped(f"{collection}.length"), None
 
         elif isinstance(
-            collection_type, intermediate_type_inference.ListTypeAnnotation
+            collection_type,
+            (
+                intermediate_type_inference.ListTypeAnnotation,
+                intermediate_type_inference.TupleTypeAnnotation,
+            ),
         ):
             return Stripped(f"{collection}.length"), None
 

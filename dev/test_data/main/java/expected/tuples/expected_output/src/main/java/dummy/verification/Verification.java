@@ -34,7 +34,10 @@ public class Verification {
     Long y) {
     return Objects.equals((new Tuple2<>(
       x,
-      y)).item1(), x);
+      y)).item1(), x)
+    && (new Tuple2<>(
+      x,
+      y)).size() == 2;
   }
 
   /**
@@ -89,6 +92,22 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "The second item of the pair must be positive")));
+      }
+
+      if (!(that.getPair().size() == 2)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "The pair must have two items")));
+      }
+
+      if (!(
+        !(that.getOptionalPair().isPresent())
+        || (that.getOptionalPair().get().size() == 2))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "The optional pair must have two items")));
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,

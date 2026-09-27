@@ -66,7 +66,11 @@ def some_verification(
     y: int
 ) -> bool:
     # pylint: disable=all
-    return (x, y)[0] == x
+    return (
+        (
+            (x, y)[0] == x
+            and len((x, y)) == 2
+        ))
 
 
 class _Transformer(
@@ -106,6 +110,19 @@ class _Transformer(
         if not (that.pair[1] > 0):
             yield Error(
                 'The second item of the pair must be positive'
+            )
+
+        if not (len(that.pair) == 2):
+            yield Error(
+                'The pair must have two items'
+            )
+
+        if not (
+            not (that.optional_pair is not None)
+            or (len(that.optional_pair) == 2)
+        ):
+            yield Error(
+                'The optional pair must have two items'
             )
 
         for error in self.transform(that.items[0]):

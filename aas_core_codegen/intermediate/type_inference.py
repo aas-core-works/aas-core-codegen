@@ -2603,7 +2603,18 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             arg_type = arg_types[0]
             assert arg_type is not None
 
-            if isinstance(beneath_optional(arg_type), JsonValueTypeAnnotation):
+            if isinstance(arg_type, OptionalTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the argument of ``len`` to be a non-None, "
+                        f"but got: {arg_type}. Please check for ``is not None`` "
+                        f"first.",
+                    )
+                )
+                return None
+
+            if isinstance(arg_type, JsonValueTypeAnnotation):
                 self.errors.append(
                     Error(
                         node.args[0].original_node,
@@ -2612,6 +2623,36 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         "it analogous to Unknown -- computing its length is not "
                         "supported. Only a JSONArray and a JSONObject have "
                         "a length which we can compute.",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # These are the types whose length all the transpilers know how to
+            # compute. The constrained primitives behave like their constrainees.
+            # The length of a tuple is fixed by its type, so the transpilers
+            # write it as a constant.
+            if not (
+                try_primitive_type(arg_type)
+                in (PrimitiveType.STR, PrimitiveType.BYTEARRAY)
+                or isinstance(
+                    arg_type,
+                    (
+                        ListTypeAnnotation,
+                        TupleTypeAnnotation,
+                        JsonArrayTypeAnnotation,
+                        JsonObjectTypeAnnotation,
+                    ),
+                )
+            ):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the argument of ``len`` to be a string, "
+                        f"a bytearray, a list, a tuple, a JSONArray or "
+                        f"a JSONObject, since we know how to compute the length "
+                        f"only of these types in all the target languages, "
+                        f"but got: {arg_type}",
                     )
                 )
                 return None

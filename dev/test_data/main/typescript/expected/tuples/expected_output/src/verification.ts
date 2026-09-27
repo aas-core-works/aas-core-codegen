@@ -193,7 +193,10 @@ export function someVerification(
   x: string,
   y: number
 ): boolean {
-  return [x, y][0] == x;
+  return (
+    [x, y][0] == x
+    && ([x, y]).length == 2
+  );
 }
 
 /**
@@ -228,6 +231,21 @@ class Verifier
     if (!(that.pair[1] > 0)) {
       yield new VerificationError(
         "The second item of the pair must be positive"
+      )
+    }
+
+    if (!(that.pair.length == 2)) {
+      yield new VerificationError(
+        "The pair must have two items"
+      )
+    }
+
+    if (!(
+      !(that.optionalPair !== null)
+      || (that.optionalPair.length == 2)
+    )) {
+      yield new VerificationError(
+        "The optional pair must have two items"
       )
     }
 

@@ -1125,6 +1125,77 @@ __xml_namespace__ = "https://dummy.com"
             ),
         )
 
+    def test_len_of_optional_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    len(self.text) > 0,
+    "Dummy invariant description"
+)
+class Something:
+    text: Optional[str]
+
+    def __init__(self, text: Optional[str] = None) -> None:
+        self.text = text
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the argument of ``len`` to be a non-None, "
+                "but got: Optional[str]. Please check for ``is not None`` first."
+            ),
+        )
+
+    def test_len_of_optional_after_none_check_passes(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    not (self.text is not None) or len(self.text) > 0,
+    "Dummy invariant description"
+)
+class Something:
+    text: Optional[str]
+
+    def __init__(self, text: Optional[str] = None) -> None:
+        self.text = text
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        Test_with_smoke.execute(source=source)
+
+    def test_len_of_int_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self:
+    len(self.number) > 0,
+    "Dummy invariant description"
+)
+class Something:
+    number: int
+
+    def __init__(self, number: int) -> None:
+        self.number = number
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the argument of ``len`` to be a string, "
+                "a bytearray, a list, a tuple, a JSONArray or a JSONObject, "
+                "since we know how to compute the length only of these types "
+                "in all the target languages, but got: int"
+            ),
+        )
+
 
 class Test_for_statement(unittest.TestCase):
     @staticmethod

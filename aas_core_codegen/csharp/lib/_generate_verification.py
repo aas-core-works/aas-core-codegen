@@ -9,6 +9,7 @@ from typing import (
     Set,
     Mapping,
     Union,
+    Final,
 )
 
 from icontract import ensure, require
@@ -660,6 +661,25 @@ yield return new Reporting.Error(
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
+
+
+#: Define the helper for ``len`` on tuples.
+_TUPLE_HELPERS: Final[Stripped] = Stripped(
+    f"""\
+/// <summary>
+/// Provide operations on tuples.
+/// </summary>
+public static class TupleHelpers
+{{
+{I}/// <summary>
+{I}/// Count the items of <paramref name="tuple" />.
+{I}/// </summary>
+{I}public static int Len(System.Runtime.CompilerServices.ITuple tuple)
+{I}{{
+{II}return tuple.Length;
+{I}}}
+}}  // public static class TupleHelpers"""
+)
 
 
 def _generate_string_helpers() -> Stripped:
@@ -1713,6 +1733,8 @@ using System.Linq;  // can't alias"""
 
     if intermediate.uses_len_slicing_or_find(symbol_table):
         verification_blocks.append(_generate_string_helpers())
+
+    verification_blocks.append(_TUPLE_HELPERS)
 
     verification_blocks.append(
         Stripped(

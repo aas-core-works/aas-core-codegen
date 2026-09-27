@@ -23,6 +23,7 @@ from aas_core_codegen.golang.common import (
 def _generate_tuple_struct(arity: int) -> Stripped:
     """Generate the generic struct representing a tuple of the given ``arity``."""
     type_params = ", ".join(f"T{i + 1} any" for i in range(arity))
+    type_args = ", ".join(f"T{i + 1}" for i in range(arity))
     fields = "\n".join(f"Item{i + 1} T{i + 1}" for i in range(arity))
 
     name = f"Tuple{arity}"
@@ -32,6 +33,11 @@ def _generate_tuple_struct(arity: int) -> Stripped:
 // Represent a fixed-size heterogeneous tuple of {arity} item(s).
 type {name}[{type_params}] struct {{
 {I}{indent_but_first_line(fields, I)}
+}}
+
+// Count the items of the tuple.
+func (tuple {name}[{type_args}]) Len() int {{
+{I}return {arity}
 }}"""
     )
 

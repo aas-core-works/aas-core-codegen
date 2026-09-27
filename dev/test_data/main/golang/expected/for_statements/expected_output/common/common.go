@@ -94,10 +94,20 @@ type Tuple1[T1 any] struct {
 	Item1 T1
 }
 
+// Count the items of the tuple.
+func (tuple Tuple1[T1]) Len() int {
+	return 1
+}
+
 // Represent a fixed-size heterogeneous tuple of 2 item(s).
 type Tuple2[T1 any, T2 any] struct {
 	Item1 T1
 	Item2 T2
+}
+
+// Count the items of the tuple.
+func (tuple Tuple2[T1, T2]) Len() int {
+	return 2
 }
 
 // Represent a fixed-size heterogeneous tuple of 3 item(s).
@@ -107,12 +117,22 @@ type Tuple3[T1 any, T2 any, T3 any] struct {
 	Item3 T3
 }
 
+// Count the items of the tuple.
+func (tuple Tuple3[T1, T2, T3]) Len() int {
+	return 3
+}
+
 // Represent a fixed-size heterogeneous tuple of 4 item(s).
 type Tuple4[T1 any, T2 any, T3 any, T4 any] struct {
 	Item1 T1
 	Item2 T2
 	Item3 T3
 	Item4 T4
+}
+
+// Count the items of the tuple.
+func (tuple Tuple4[T1, T2, T3, T4]) Len() int {
+	return 4
 }
 
 // Represent a fixed-size heterogeneous tuple of 5 item(s).
@@ -124,6 +144,11 @@ type Tuple5[T1 any, T2 any, T3 any, T4 any, T5 any] struct {
 	Item5 T5
 }
 
+// Count the items of the tuple.
+func (tuple Tuple5[T1, T2, T3, T4, T5]) Len() int {
+	return 5
+}
+
 // Represent a fixed-size heterogeneous tuple of 6 item(s).
 type Tuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any] struct {
 	Item1 T1
@@ -132,6 +157,11 @@ type Tuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any] struct {
 	Item4 T4
 	Item5 T5
 	Item6 T6
+}
+
+// Count the items of the tuple.
+func (tuple Tuple6[T1, T2, T3, T4, T5, T6]) Len() int {
+	return 6
 }
 
 // Represent a fixed-size heterogeneous tuple of 7 item(s).
@@ -145,6 +175,11 @@ type Tuple7[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any, T7 any] struct {
 	Item7 T7
 }
 
+// Count the items of the tuple.
+func (tuple Tuple7[T1, T2, T3, T4, T5, T6, T7]) Len() int {
+	return 7
+}
+
 // Represent a fixed-size heterogeneous tuple of 8 item(s).
 type Tuple8[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any, T7 any, T8 any] struct {
 	Item1 T1
@@ -155,6 +190,11 @@ type Tuple8[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any, T7 any, T8 any] stru
 	Item6 T6
 	Item7 T7
 	Item8 T8
+}
+
+// Count the items of the tuple.
+func (tuple Tuple8[T1, T2, T3, T4, T5, T6, T7, T8]) Len() int {
+	return 8
 }
 
 // Resolve `position` in a string of `length` as Python does in slicing.

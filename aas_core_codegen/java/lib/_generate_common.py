@@ -208,6 +208,12 @@ def generate(
  * Represent a fixed-size heterogeneous tuple of {arity} item(s).
  */
 public record {name}<{type_params}>({components}) {{
+{I}/**
+{I} * Count the items of the tuple.
+{I} */
+{I}public int size() {{
+{II}return {arity};
+{I}}}
 }}"""
         )
 
