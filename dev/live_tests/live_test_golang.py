@@ -3,14 +3,11 @@
 # pylint: disable=wrong-import-position
 
 import argparse
-import contextlib
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from typing import Optional, Pattern
 
 if sys.version_info < (3, 12):
@@ -24,38 +21,8 @@ from aas_core_codegen.golang import common as golang_common
 from live_tests import common as live_tests_common
 
 
-def main() -> int:
-    """Execute the main routine."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
-    args = parser.parse_args()
-
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
-
-    select_text = str(args.select) if args.select is not None else None
-
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
-
-    # region Find goimports
-
+def find_goimports() -> Optional[str]:
+    """Find the goimports executable, or report to STDERR and return ``None``."""
     # NOTE (mristin):
     # We use goimports to post-process the generated code so that we don't have to
     # fiddle around in the code generator to figure out which imports are used and
@@ -65,24 +32,76 @@ def main() -> int:
     # goimports is strictly necessary.
 
     goimports_path = shutil.which("goimports")
+    if goimports_path is not None:
+        return goimports_path
+
     alternative_goimports_path = pathlib.Path.home() / "go/bin/goimports"
+    if alternative_goimports_path.exists():
+        return str(alternative_goimports_path)
 
-    if shutil.which("goimports") is None:
-        if alternative_goimports_path.exists():
-            goimports_path = str(alternative_goimports_path)
+    path_env_var = os.environ.get("PATH", "")
+    print(
+        f"goimports could not be found on your PATH "
+        f"nor in {alternative_goimports_path} -- have you installed it "
+        f"with go install golang.org/x/tools/cmd/goimports@latest ?\n\n"
+        f"PATH: {path_env_var}",
+        file=sys.stderr,
+    )
+    return None
 
-    if goimports_path is None:
-        path_env_var = os.environ.get("PATH", "")
+
+def prepare_module(
+    case_dir: pathlib.Path, module_dir: pathlib.Path, goimports_path: str
+) -> Stripped:
+    """
+    Copy the generated code of the case to ``module_dir`` and set up the module.
+
+    Return the repository URL of the module.
+    """
+    module_dir.mkdir(exist_ok=True)
+
+    repo_url = Stripped(
+        (case_dir / "input" / "snippets" / "repo_url.txt")
+        .read_text(encoding="utf-8")
+        .strip()
+    )
+
+    live_tests_common.copy_expected_output(case_dir / "expected_output", module_dir)
+
+    (module_dir / "go.mod").write_text(
+        f"""\
+module {repo_url}
+
+go 1.18
+""",
+        encoding="utf-8",
+    )
+
+    for chunk in itertools.batched(sorted(module_dir.glob("**/*.go")), 64):
+        cmd = [goimports_path, "-w"] + [
+            str(pth.relative_to(module_dir)) for pth in chunk
+        ]
         print(
-            f"goimports could not be found on your PATH "
-            f"nor in {alternative_goimports_path} -- have you installed it "
-            f"with go install golang.org/x/tools/cmd/goimports@latest ?\n\n"
-            f"PATH: {path_env_var}",
-            file=sys.stderr,
+            f"Running {live_tests_common.escape_and_join_command(cmd)} "
+            f"in {module_dir}"
         )
-        return 1
+        subprocess.check_call(cmd, cwd=module_dir)
 
-    # endregion
+    return repo_url
+
+
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
+    args = parser.parse_args()
+
+    select: Optional[Pattern[str]] = args.select
+
+    goimports_path = find_goimports()
+    if goimports_path is None:
+        return 1
 
     repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
@@ -94,81 +113,14 @@ def main() -> int:
 
     live_tests_golang_dir = repo_root / "dev" / "test_data" / "live_tests" / "golang"
 
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
-
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_golang_expected_dir.iterdir() if path.is_dir()
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        for case_dir in live_tests_common.select_case_dirs(
+            main_golang_expected_dir, select
         ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
             print(f"Running the live test on {case_dir.name} ...")
 
             module_dir = output_dir / case_dir.name
-            module_dir.mkdir(exist_ok=True)
-
-            repo_url = Stripped(
-                (case_dir / "input" / "snippets" / "repo_url.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {module_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = module_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary recompilations
-                # due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            (module_dir / "go.mod").write_text(
-                f"""\
-module {repo_url}
-
-go 1.18
-""",
-                encoding="utf-8",
-            )
-
-            for chunk in itertools.batched(sorted(module_dir.glob("**/*.go")), 64):
-                cmd = [goimports_path, "-w"] + [
-                    str(pth.relative_to(module_dir)) for pth in chunk
-                ]
-                print(
-                    f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                    f"in {module_dir}"
-                )
-                subprocess.check_call(cmd, cwd=module_dir)
+            repo_url = prepare_module(case_dir, module_dir, goimports_path)
 
             cmd = ["go", "build", "./..."]
             print(

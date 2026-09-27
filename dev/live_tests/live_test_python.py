@@ -1,121 +1,48 @@
 """Run integration tests on the Python generated code."""
 
 import argparse
-import contextlib
+import json
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
-import tempfile
-from typing import Optional, Pattern
+from typing import Final, Optional, Pattern, Sequence
 
 from aas_core_codegen.common import Stripped
 from live_tests import common as live_tests_common
 
+#: Dependencies needed to check and test the generated code, as specified in
+#: ``dev/pyproject.toml`` of the project
+DEV_DEPENDENCIES: Final[Sequence[str]] = (
+    "mypy==0.982",
+    "pylint==2.15.4; python_version<'3.11'",
+    "pylint==4.0.3; python_version>'3.10'",
+)
 
-def main() -> int:
-    """Execute the main routine."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
-    args = parser.parse_args()
 
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
+def prepare_project(case_dir: pathlib.Path, project_dir: pathlib.Path) -> Stripped:
+    """
+    Copy the generated code of the case to ``project_dir`` and set up the project.
 
-    select_text = str(args.select) if args.select is not None else None
+    Return the qualified name of the generated module.
+    """
+    project_dir.mkdir(exist_ok=True)
 
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
-
-    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
-
-    main_python_expected_dir = (
-        repo_root / "dev" / "test_data" / "main" / "python" / "expected"
+    qualified_module_name = Stripped(
+        (case_dir / "input" / "snippets" / "qualified_module_name.txt")
+        .read_text(encoding="utf-8")
+        .strip()
     )
 
-    assert main_python_expected_dir.exists() and main_python_expected_dir.is_dir()
+    expected_output_dir = case_dir / "expected_output"
 
-    live_tests_python_dir = repo_root / "dev" / "test_data" / "live_tests" / "python"
+    live_tests_common.copy_expected_output(expected_output_dir, project_dir)
 
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
+    project_name = qualified_module_name.replace("_", "-")
 
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_python_expected_dir.iterdir() if path.is_dir()
-        ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
-            print(f"Running the live test on {case_dir.name} ...")
-
-            project_dir = output_dir / case_dir.name
-            project_dir.mkdir(exist_ok=True)
-
-            qualified_module_name = Stripped(
-                (case_dir / "input" / "snippets" / "qualified_module_name.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {project_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = project_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary actions
-                # due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            project_name = qualified_module_name.replace("_", "-")
-
-            (project_dir / "pyproject.toml").write_text(
-                f"""\
+    (project_dir / "pyproject.toml").write_text(
+        f"""\
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
@@ -132,11 +59,15 @@ exclude = ["dev"]
 [tool.setuptools.package-data]
 "{qualified_module_name}" = ["py.typed"]
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / "dev" / "pyproject.toml").write_text(
-                f"""\
+    dev_dependencies = ",\n".join(
+        f"    {json.dumps(dependency)}" for dependency in DEV_DEPENDENCIES
+    )
+
+    (project_dir / "dev" / "pyproject.toml").write_text(
+        f"""\
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -147,9 +78,7 @@ version = "0.0.1"
 requires-python = ">=3.8"
 
 dependencies = [
-    "mypy==0.982",
-    "pylint==2.15.4; python_version<'3.11'",
-    "pylint==4.0.3; python_version>'3.10'",
+{dev_dependencies}
 ]
 
 [tool.setuptools]
@@ -162,85 +91,178 @@ packages = [
 # to configure them with pyproject.toml not living in the current working directory
 # which is the repository root.
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            pylint_rc = project_dir / "dev" / "pylint.rc"
+    pylint_rc = project_dir / "dev" / "pylint.rc"
 
-            pylint_disables = (
-                "too-few-public-methods,len-as-condition,duplicate-code,no-else-raise,"
-                "no-else-return,too-many-locals,too-many-branches,"
-                "too-many-nested-blocks,too-many-return-statements,"
-                "unsubscriptable-object,not-an-iterable,broad-except,"
-                "too-many-statements,protected-access,unnecessary-pass,"
-                "too-many-statements,too-many-arguments,no-member,"
-                "too-many-instance-attributes,too-many-lines,undefined-variable,"
-                "unnecessary-lambda,assignment-from-none,useless-return,"
-                "unused-argument,too-many-boolean-expressions,"
-                "consider-using-f-string,use-dict-literal,invalid-name,"
-                "no-else-continue,no-else-break,unneeded-not,"
-                "too-many-public-methods,line-too-long,too-many-ancestors,"
-                "wrong-import-position,too-many-positional-arguments,"
-                "wrong-import-order,unused-import,missing-docstring,"
-                "superfluous-parens"
-            )
+    pylint_disables = (
+        "too-few-public-methods,len-as-condition,duplicate-code,no-else-raise,"
+        "no-else-return,too-many-locals,too-many-branches,"
+        "too-many-nested-blocks,too-many-return-statements,"
+        "unsubscriptable-object,not-an-iterable,broad-except,"
+        "too-many-statements,protected-access,unnecessary-pass,"
+        "too-many-statements,too-many-arguments,no-member,"
+        "too-many-instance-attributes,too-many-lines,undefined-variable,"
+        "unnecessary-lambda,assignment-from-none,useless-return,"
+        "unused-argument,too-many-boolean-expressions,"
+        "consider-using-f-string,use-dict-literal,invalid-name,"
+        "no-else-continue,no-else-break,unneeded-not,"
+        "too-many-public-methods,line-too-long,too-many-ancestors,"
+        "wrong-import-position,too-many-positional-arguments,"
+        "wrong-import-order,unused-import,missing-docstring,"
+        "superfluous-parens"
+    )
 
-            pylint_rc.write_text(
-                f"""\
+    pylint_rc.write_text(
+        f"""\
 [FORMAT]
 max-line-length=120
 
 [MESSAGES CONTROL]
 disable={pylint_disables}
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / qualified_module_name / "py.typed").write_text(
-                """\
+    (project_dir / qualified_module_name / "py.typed").write_text(
+        """\
 # Marker file for PEP 561. The mypy package uses inline types.
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / qualified_module_name / "__init__.py").write_text(
-                f"# This is {qualified_module_name}!\n", encoding="utf-8"
-            )
+    (project_dir / qualified_module_name / "__init__.py").write_text(
+        f"# This is {qualified_module_name}!\n", encoding="utf-8"
+    )
 
+    return qualified_module_name
+
+
+def _venv_python(venv_dir: pathlib.Path) -> pathlib.Path:
+    """Determine the path to the Python interpreter of the virtual environment."""
+    if sys.platform.startswith("win"):
+        return venv_dir / "Scripts" / "python.exe"
+
+    return venv_dir / "bin" / "python"
+
+
+def _site_packages(python: pathlib.Path) -> pathlib.Path:
+    """Determine the directory where ``python`` installs the pure packages."""
+    return pathlib.Path(
+        subprocess.check_output(
+            [
+                str(python),
+                "-c",
+                "import sysconfig; print(sysconfig.get_path('purelib'))",
+            ],
+            encoding="utf-8",
+        ).strip()
+    )
+
+
+def prepare_venv(output_dir: pathlib.Path) -> Optional[pathlib.Path]:
+    """
+    Create the virtual environment shared by all the projects in ``output_dir``.
+
+    We install only :py:data:`DEV_DEPENDENCIES` here, and never modify
+    the virtual environment afterwards so that the cases can run in parallel.
+    The virtual environments of the individual cases inherit its packages.
+    Return the path to the Python interpreter of the virtual environment, or report
+    to STDERR and return ``None``.
+    """
+    venv_dir = output_dir / "venv"
+
+    if not venv_dir.exists():
+        cmd = [sys.executable, "-m", "venv", str(venv_dir)]
+        print(f"Running {live_tests_common.escape_and_join_command(cmd)}")
+        subprocess.check_call(cmd)
+
+    venv_python = _venv_python(venv_dir)
+    if not venv_python.exists():
+        print(
+            f"Python could not be found in the virtual environment: {venv_python}",
+            file=sys.stderr,
+        )
+        return None
+
+    cmd = [str(venv_python), "-m", "pip", "install", "--quiet"] + list(DEV_DEPENDENCIES)
+    print(f"Running {live_tests_common.escape_and_join_command(cmd)}")
+    subprocess.check_call(cmd)
+
+    return venv_python
+
+
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
+    args = parser.parse_args()
+
+    select: Optional[Pattern[str]] = args.select
+
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+
+    main_python_expected_dir = (
+        repo_root / "dev" / "test_data" / "main" / "python" / "expected"
+    )
+
+    assert main_python_expected_dir.exists() and main_python_expected_dir.is_dir()
+
+    live_tests_python_dir = repo_root / "dev" / "test_data" / "live_tests" / "python"
+
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        shared_venv_python = prepare_venv(output_dir)
+        if shared_venv_python is None:
+            return 1
+
+        shared_site_packages = _site_packages(shared_venv_python)
+
+        for case_dir in live_tests_common.select_case_dirs(
+            main_python_expected_dir, select
+        ):
+            print(f"Running the live test on {case_dir.name} ...")
+
+            project_dir = output_dir / case_dir.name
+            qualified_module_name = prepare_project(case_dir, project_dir)
+
+            # NOTE (mristin):
+            # We install the package and its tests in a virtual environment of
+            # the case so that the cases do not clash (*e.g.*, all of them install
+            # the package ``tests``), and can run in parallel. To avoid installing
+            # the dependencies for every case, the virtual environment of the case
+            # inherits the packages of the shared virtual environment through
+            # a ``.pth`` file. We create it without pip, and use the pip of the shared
+            # virtual environment instead.
             venv_dir = project_dir / "venv"
+            if not venv_dir.exists():
+                cmd = [sys.executable, "-m", "venv", "--without-pip", str(venv_dir)]
+                print(f"Running {live_tests_common.escape_and_join_command(cmd)}")
+                subprocess.check_call(cmd)
 
-            cmd = [sys.executable, "-m", "venv", str(venv_dir)]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"in {project_dir}"
+            venv_python = _venv_python(venv_dir)
+
+            (_site_packages(venv_python) / "shared_venv.pth").write_text(
+                f"{shared_site_packages}\n", encoding="utf-8"
             )
-            subprocess.check_call(cmd, cwd=project_dir)
 
-            if sys.platform.startswith("win"):
-                venv_python = venv_dir / "Scripts" / "python.exe"
-            else:
-                venv_python = venv_dir / "bin" / "python"
-
-            if not venv_python.exists():
+            for package_dir in [".", "dev/"]:
+                cmd = [
+                    str(shared_venv_python),
+                    "-m",
+                    "pip",
+                    "--python",
+                    str(venv_python),
+                    "install",
+                    "-e",
+                    package_dir,
+                ]
                 print(
-                    f"Python could not be found in the virtual environment: {venv_python}",
-                    file=sys.stderr,
+                    f"Running {live_tests_common.escape_and_join_command(cmd)} "
+                    f"in {project_dir}"
                 )
-                return 1
-
-            cmd = [str(venv_python), "-m", "pip", "install", "-e", "."]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"in {project_dir}"
-            )
-            subprocess.check_call(cmd, cwd=project_dir)
-
-            cmd = [str(venv_python), "-m", "pip", "install", "-e", "dev/"]
-            print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
-                f"in {project_dir}"
-            )
-            subprocess.check_call(cmd, cwd=project_dir)
+                subprocess.check_call(cmd, cwd=project_dir)
 
             cmd = [str(venv_python), "-m", "mypy", "--strict", qualified_module_name]
             print(
@@ -253,7 +275,7 @@ disable={pylint_disables}
                 str(venv_python),
                 "-m",
                 "pylint",
-                f"--rcfile={pylint_rc.relative_to(project_dir)}",
+                "--rcfile=dev/pylint.rc",
                 qualified_module_name,
             ]
             print(

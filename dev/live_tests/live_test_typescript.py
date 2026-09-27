@@ -1,14 +1,11 @@
 """Run integration tests on the TypeScript generated code."""
 
 import argparse
-import contextlib
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from typing import Optional, Pattern
 
 from aas_core_codegen.common import Stripped
@@ -17,138 +14,22 @@ from aas_core_codegen.typescript import common as typescript_common
 from live_tests import common as live_tests_common
 
 
-def main() -> int:
-    """Execute the main routine."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output_dir",
-        help=(
-            "Path to where all the assembled project data including the test data "
-            "should be copied to. If not specified, everything will be put into "
-            "a temporary directory and deleted after the test."
-        ),
-    )
-    parser.add_argument(
-        "--select",
-        help="Run only the test cases which match the regular expression",
-        type=str,
-    )
-    args = parser.parse_args()
+def install_dependencies(output_dir: pathlib.Path) -> None:
+    """
+    Install the dependencies shared by all the projects in ``output_dir``.
 
-    output_dir = pathlib.Path(args.output_dir) if args.output_dir is not None else None
-
-    select_text = str(args.select) if args.select is not None else None
-
-    select: Optional[Pattern[str]] = None
-    if select_text is not None:
-        try:
-            select = re.compile(select_text)
-        except Exception as exception:
-            print(f"Problems with --select {select_text}: {exception}", file=sys.stderr)
-            return 1
-
-    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
-
-    main_typescript_expected_dir = (
-        repo_root / "dev" / "test_data" / "main" / "typescript" / "expected"
-    )
-
-    assert (
-        main_typescript_expected_dir.exists() and main_typescript_expected_dir.is_dir()
-    )
-
-    live_tests_typescript_dir = (
-        repo_root / "dev" / "test_data" / "live_tests" / "typescript"
-    )
-
-    with contextlib.ExitStack() as exit_stack:
-        # pylint: disable=consider-using-with
-
-        if output_dir is None:
-            temp_dir = tempfile.TemporaryDirectory()
-            exit_stack.push(temp_dir)
-            output_dir = pathlib.Path(temp_dir.name)
-        else:
-            try:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            except Exception as exception:
-                print(
-                    f"Problems with --output_dir {output_dir}: {exception}",
-                    file=sys.stderr,
-                )
-                return 1
-
-        for case_dir in sorted(
-            path for path in main_typescript_expected_dir.iterdir() if path.is_dir()
-        ):
-            if select is not None and select.match(case_dir.name) is None:
-                print(f"Skipping {case_dir.name} since not selected.")
-                continue
-
-            print(f"Running the live test on {case_dir.name} ...")
-
-            project_dir = output_dir / case_dir.name
-            project_dir.mkdir(exist_ok=True)
-
-            package_identifier = Stripped(
-                (case_dir / "input" / "snippets" / "package_identifier.txt")
-                .read_text(encoding="utf-8")
-                .strip()
-            )
-
-            expected_output_dir = case_dir / "expected_output"
-
-            print(
-                f"Copying all the files from {expected_output_dir} to {project_dir} ..."
-            )
-            for path in sorted(
-                path
-                for path in expected_output_dir.glob("**/*")
-                if path.name != "stdout.txt" and path.is_file()
-            ):
-                target_path = project_dir / (path.relative_to(expected_output_dir))
-
-                # NOTE (mristin):
-                # We check whether there is a change to avoid unnecessary actions
-                # due to modification timestamps of the files.
-
-                if not target_path.exists() or target_path.read_text(
-                    encoding="utf-8"
-                ) != path.read_text(encoding="utf-8"):
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy(path, target_path)
-
-            print(
-                "We remove test/*.spec.ts files which contain no tests "
-                "since eslint and jest will complain..."
-            )
-            for pth in sorted((project_dir / "test").glob("*.spec.ts")):
-                text = pth.read_text(encoding="utf-8")
-                if "test(" not in text:
-                    pth.unlink()
-
-            env_var_prefix = typescript_common.environment_variable_prefix(
-                package_identifier
-            )
-
-            (project_dir / "package.json").write_text(
-                f"""\
-{{
-  "name": "{package_identifier}",
+    All the projects have the same dependencies, so we install them only once
+    in ``output_dir`` instead of in every project to save time and disk space.
+    Both Node module resolution and ``npm run`` walk up the directory tree,
+    so the projects in the sub-directories find the dependencies.
+    """
+    (output_dir / "package.json").write_text(
+        """\
+{
+  "name": "live-tests",
   "private": true,
   "version": "0.0.1",
-  "scripts": {{
-    "build:esm": "cross-env BABEL_ENV=esmUnbundled babel src --extensions '.ts' --out-dir 'dist/lib/esm' --source-maps",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src --extensions '.ts' --out-dir 'dist/lib/cjs' --source-maps",
-    "build:bundles": "cross-env BABEL_ENV=esmBundled rollup -c",
-    "build:declarations": "tsc -p tsconfig.json",
-    "prebuild": "rimraf dist",
-    "build": "npm run build:esm && npm run build:cjs && npm run build:bundles && npm run build:declarations",
-    "lint": "eslint src test --ext .ts",
-    "test": "{env_var_prefix}_TEST_DATA_DIR=./test_data jest --coverage",
-    "format": "prettier --config .prettierrc 'src/**/*.ts' 'test/**/*.ts' --write"
-  }},
-  "devDependencies": {{
+  "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
     "@babel/parser": "^7.20.3",
@@ -175,6 +56,63 @@ def main() -> int:
     "typescript": "^4.8.4",
     "xmlsax-typescript": "^1.0.0-rc.2",
     "@xmldom/xmldom": "^0.9.10"
+  }
+}
+""",
+        encoding="utf-8",
+    )
+
+    cmd = ["npm", "install", "--no-audit", "--no-fund"]
+    print(f"Running {live_tests_common.escape_and_join_command(cmd)} in {output_dir}")
+    subprocess.check_call(cmd, cwd=output_dir)
+
+
+def prepare_project(case_dir: pathlib.Path, project_dir: pathlib.Path) -> Stripped:
+    """
+    Copy the generated code of the case to ``project_dir`` and set up the project.
+
+    The dependencies need to be installed in the parent directory of ``project_dir``
+    with :py:func:`install_dependencies`. Return the package identifier.
+    """
+    project_dir.mkdir(exist_ok=True)
+
+    package_identifier = Stripped(
+        (case_dir / "input" / "snippets" / "package_identifier.txt")
+        .read_text(encoding="utf-8")
+        .strip()
+    )
+
+    expected_output_dir = case_dir / "expected_output"
+
+    live_tests_common.copy_expected_output(expected_output_dir, project_dir)
+
+    print(
+        "We remove test/*.spec.ts files which contain no tests "
+        "since eslint and jest will complain..."
+    )
+    for pth in sorted((project_dir / "test").glob("*.spec.ts")):
+        text = pth.read_text(encoding="utf-8")
+        if "test(" not in text:
+            pth.unlink()
+
+    env_var_prefix = typescript_common.environment_variable_prefix(package_identifier)
+
+    (project_dir / "package.json").write_text(
+        f"""\
+{{
+  "name": "{package_identifier}",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {{
+    "build:esm": "cross-env BABEL_ENV=esmUnbundled babel src --extensions '.ts' --out-dir 'dist/lib/esm' --source-maps",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --extensions '.ts' --out-dir 'dist/lib/cjs' --source-maps",
+    "build:bundles": "cross-env BABEL_ENV=esmBundled rollup -c",
+    "build:declarations": "tsc -p tsconfig.json",
+    "prebuild": "rimraf dist",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:bundles && npm run build:declarations",
+    "lint": "eslint src test --ext .ts",
+    "test": "{env_var_prefix}_TEST_DATA_DIR=./test_data jest --coverage",
+    "format": "prettier --config .prettierrc 'src/**/*.ts' 'test/**/*.ts' --write"
   }},
   "main": "dist/lib/cjs/index.js",
   "module": "dist/lib/esm/index.js",
@@ -233,27 +171,27 @@ def main() -> int:
   }}
 }}
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / ".prettierrc").write_text(
-                """\
+    (project_dir / ".prettierrc").write_text(
+        """\
 {
   "semi": true,
   "trailingComma": "none",
   "printWidth": 88
 }
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            # NOTE (mristin):
-            # We set:
-            # "varsIgnorePattern": "^(_|Aas.*)$"
-            # in .eslintrc since we want to ignore unused imports.
+    # NOTE (mristin):
+    # We set:
+    # "varsIgnorePattern": "^(_|Aas.*)$"
+    # in .eslintrc since we want to ignore unused imports.
 
-            (project_dir / ".eslintrc").write_text(
-                """\
+    (project_dir / ".eslintrc").write_text(
+        """\
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
@@ -293,19 +231,19 @@ def main() -> int:
   }
 }
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / ".eslintignore").write_text(
-                """\
+    (project_dir / ".eslintignore").write_text(
+        """\
 node_modules
 dist
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / ".babelrc.js").write_text(
-                """\
+    (project_dir / ".babelrc.js").write_text(
+        """\
 const sharedPresets = ['@babel/typescript'];
 const shared = {
   ignore: ['src/**/*.spec.ts'],
@@ -333,10 +271,10 @@ module.exports = {
   }
 }
 """
-            )
+    )
 
-            (project_dir / "rollup.config.mjs").write_text(
-                """\
+    (project_dir / "rollup.config.mjs").write_text(
+        """\
 import babel from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
@@ -368,10 +306,10 @@ export default {
     })
   ]
 }"""
-            )
+    )
 
-            (project_dir / "tsconfig.json").write_text(
-                """\
+    (project_dir / "tsconfig.json").write_text(
+        """\
 {
   "compilerOptions": {
     "module": "commonjs",
@@ -390,22 +328,62 @@ export default {
   ]
 }
 """,
-                encoding="utf-8",
-            )
+        encoding="utf-8",
+    )
 
-            (project_dir / "jest.config.js").write_text(
-                """\
+    (project_dir / "jest.config.js").write_text(
+        """\
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
 };
 """,
-                encoding="utf-8",
+        encoding="utf-8",
+    )
+
+    return package_identifier
+
+
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    live_tests_common.add_output_dir_argument(parser)
+    live_tests_common.add_select_argument(parser)
+    args = parser.parse_args()
+
+    select: Optional[Pattern[str]] = args.select
+
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+
+    main_typescript_expected_dir = (
+        repo_root / "dev" / "test_data" / "main" / "typescript" / "expected"
+    )
+
+    assert (
+        main_typescript_expected_dir.exists() and main_typescript_expected_dir.is_dir()
+    )
+
+    live_tests_typescript_dir = (
+        repo_root / "dev" / "test_data" / "live_tests" / "typescript"
+    )
+
+    with live_tests_common.open_output_dir(args.output_dir) as output_dir:
+        install_dependencies(output_dir)
+
+        for case_dir in live_tests_common.select_case_dirs(
+            main_typescript_expected_dir, select
+        ):
+            print(f"Running the live test on {case_dir.name} ...")
+
+            project_dir = output_dir / case_dir.name
+            package_identifier = prepare_project(case_dir, project_dir)
+
+            env_var_prefix = typescript_common.environment_variable_prefix(
+                package_identifier
             )
 
             for cmd in [
-                ["npm", "install"],
                 ["npm", "run", "format"],
                 ["npm", "run", "lint"],
                 ["npm", "run", "build"],
