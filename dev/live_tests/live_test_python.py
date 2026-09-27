@@ -186,9 +186,17 @@ def prepare_venv(output_dir: pathlib.Path) -> Optional[pathlib.Path]:
         )
         return None
 
-    cmd = [str(venv_python), "-m", "pip", "install", "--quiet"] + list(DEV_DEPENDENCIES)
-    print(f"Running {live_tests_common.escape_and_join_command(cmd)}")
-    subprocess.check_call(cmd)
+    # NOTE (mristin):
+    # The virtual environments of the cases use the pip of the shared virtual
+    # environment through ``pip --python``, which is available only since pip 22.3.
+    # The pip bundled with older Python versions (*e.g.*, Python 3.10) is too old,
+    # so we upgrade it. Pip leaves a satisfied requirement untouched.
+    for cmd in [
+        [str(venv_python), "-m", "pip", "install", "--quiet", "pip>=22.3"],
+        [str(venv_python), "-m", "pip", "install", "--quiet"] + list(DEV_DEPENDENCIES),
+    ]:
+        print(f"Running {live_tests_common.escape_and_join_command(cmd)}")
+        subprocess.check_call(cmd)
 
     return venv_python
 
