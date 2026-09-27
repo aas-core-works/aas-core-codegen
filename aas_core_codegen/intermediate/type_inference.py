@@ -1947,6 +1947,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             method = cls.methods_by_name.get(node.name, None)
             if method is not None:
+                # NOTE (mristin):
+                # The invariants and the verification functions are generated
+                # outside the class in most targets (*e.g.*, in a separate package in
+                # Go and Java). Hence, the non-public methods can not be called from
+                # there, and serve only as helpers to the implementation-specific
+                # methods of the class.
+                if method.visibility is not _types.Visibility.PUBLIC:
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"The method {node.name!r} of the class {cls.name!r} "
+                            f"is {method.visibility.value}, so it can be only called "
+                            f"from the implementation-specific methods of the class",
+                        )
+                    )
+                    return None
+
                 result = MethodTypeAnnotation(method=method)
 
                 result = self._strip_optional_if_non_null(

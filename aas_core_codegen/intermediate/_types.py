@@ -42,6 +42,10 @@ from aas_core_codegen.parse import tree as parse_tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
+# NOTE (mristin):
+# The visibility is completely determined in the parse stage, so we re-use it here.
+Visibility = parse.Visibility
+
 # region Runtime IDs
 
 #: ID of a Python object while it lives, as :py:func:`id` gives it out.
@@ -1209,6 +1213,11 @@ class Method(SignatureLike):
 
         self.non_mutating = non_mutating
         self.specified_for = specified_for
+
+    @property
+    def visibility(self) -> Visibility:
+        """Return the visibility of the method as signalled in its name."""
+        return self.parsed.visibility
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -2664,6 +2673,11 @@ class Verification(SignatureLike):
             parsed=parsed,
         )
 
+    @property
+    def visibility(self) -> Visibility:
+        """Return the visibility of the function as signalled in its name."""
+        return self.parsed.visibility
+
     @abc.abstractmethod
     def __repr__(self) -> str:
         # Signal that this is a pure abstract class.
@@ -2889,6 +2903,9 @@ class Interface:
     properties: Final[Sequence[Property]]
 
     #: List of method signatures assumed by the interface
+    #:
+    #: Only the public methods are part of the interface. The non-public methods
+    #: are merely helpers for the implementation-specific methods of the class.
     signatures: Final[Sequence[Signature]]
 
     #: Description of the interface, taken from class
@@ -2935,7 +2952,7 @@ class Interface:
                 parsed=method.parsed,
             )
             for method in base.methods
-            if method.specified_for is base
+            if method.specified_for is base and method.visibility is Visibility.PUBLIC
         ]
 
         self.description = base.description

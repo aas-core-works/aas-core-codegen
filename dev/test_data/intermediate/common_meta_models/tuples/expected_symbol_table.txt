@@ -555,6 +555,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='some_verification',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='x',

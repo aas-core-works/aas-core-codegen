@@ -190,7 +190,10 @@ func compareOrRerecordValue(
         x_or_default_methods = [
             method
             for method in concrete_cls.methods
-            if method.name.endswith("_or_default")
+            if (
+                method.name.endswith("_or_default")
+                and method.visibility is intermediate.Visibility.PUBLIC
+            )
         ]  # type: List[intermediate.MethodUnion]
 
         model_type = naming.json_model_type(concrete_cls.name)

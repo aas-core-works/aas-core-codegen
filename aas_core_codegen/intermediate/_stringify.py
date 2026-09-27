@@ -53,6 +53,7 @@ from aas_core_codegen.intermediate._types import (
     PrimitiveSetLiteral,
     DescriptionOfConstant,
     TranspilableVerification,
+    Verification,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -464,6 +465,7 @@ def _stringify_implementation_specific_method(
         name=that.__class__.__name__,
         properties=[
             stringify_mod.Property("name", that.name),
+            stringify_mod.Property("visibility", that.visibility.name),
             stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
             stringify_mod.Property("returns", stringify(that.returns)),
             stringify_mod.Property("description", stringify(that.description)),
@@ -489,6 +491,7 @@ def _stringify_understood_method(
         name=that.__class__.__name__,
         properties=[
             stringify_mod.Property("name", that.name),
+            stringify_mod.Property("visibility", that.visibility.name),
             stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
             stringify_mod.Property("returns", stringify(that.returns)),
             stringify_mod.Property("description", stringify(that.description)),
@@ -819,20 +822,29 @@ def _stringify_constant_set_of_enumeration_literals(
     return result
 
 
+def _stringify_a_verification(that: Verification) -> stringify_mod.Entity:
+    signature_like = _stringify_a_signature_like(that)
+
+    properties = list(signature_like.properties)
+    properties.insert(1, stringify_mod.Property("visibility", that.visibility.name))
+
+    return stringify_mod.Entity(name=that.__class__.__name__, properties=properties)
+
+
 def _stringify_implementation_specific_verification(
     that: ImplementationSpecificVerification,
 ) -> stringify_mod.Entity:
-    return _stringify_a_signature_like(that)
+    return _stringify_a_verification(that)
 
 
 def _stringify_pattern_verification(
     that: PatternVerification,
 ) -> stringify_mod.Entity:
-    signature_like = _stringify_a_signature_like(that)
+    verification = _stringify_a_verification(that)
 
     result = stringify_mod.Entity(
         name=that.__class__.__name__,
-        properties=list(signature_like.properties)
+        properties=list(verification.properties)
         + [stringify_mod.Property("pattern", that.pattern)]
         + [stringify_mod.Property("pattern_expr", parse_tree.dump(that.pattern_expr))],
     )
@@ -843,13 +855,7 @@ def _stringify_pattern_verification(
 def _stringify_transpilable_verification(
     that: TranspilableVerification,
 ) -> stringify_mod.Entity:
-    signature_like = _stringify_a_signature_like(that)
-
-    result = stringify_mod.Entity(
-        name=that.__class__.__name__, properties=list(signature_like.properties)
-    )
-
-    return result
+    return _stringify_a_verification(that)
 
 
 def _stringify_signature(

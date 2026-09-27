@@ -6,6 +6,7 @@ from typing import (
     Tuple,
     Optional,
     List,
+    MutableMapping,
     Sequence,
     Mapping,
     Union,
@@ -2105,6 +2106,51 @@ func (ve *VerificationError) PathString() string {{
                         f"transpile {operation}",
                     )
                 )
+
+    # NOTE (mristin):
+    # The internal verification functions are unexported, so their names might
+    # collide with the unexported names that we generate in the same package.
+    origin_by_unexported_name = {
+        "newVerificationError": "our helper function to create verification errors",
+        "verifyJsonValue": "our helper function to verify JSON-able values",
+        "verifyJsonArray": "our helper function to verify JSON-able arrays",
+        "verifyJsonObject": "our helper function to verify JSON-able objects",
+    }  # type: MutableMapping[str, str]
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, intermediate.PatternVerification):
+            origin = (
+                f"the unexported name generated for the pattern verification "
+                f"function {verification.name!r}"
+            )
+
+            origin_by_unexported_name[
+                golang_naming.private_function_name(
+                    Identifier(f"construct_{verification.name}")
+                )
+            ] = origin
+
+            origin_by_unexported_name[
+                golang_naming.private_constant_name(
+                    Identifier(f"{verification.name}_re")
+                )
+            ] = origin
+
+    for verification in symbol_table.verification_functions:
+        if verification.visibility is not intermediate.Visibility.INTERNAL:
+            continue
+
+        verification_name = golang_naming.function_name(verification.name)
+        colliding_origin = origin_by_unexported_name.get(verification_name, None)
+        if colliding_origin is not None:
+            errors.append(
+                Error(
+                    verification.parsed.node,
+                    f"The name of the internal verification function "
+                    f"{verification.name!r} collides in Go with {colliding_origin}: "
+                    f"{verification_name}",
+                )
+            )
 
     base_environment = intermediate_type_inference.populate_base_environment(
         symbol_table=symbol_table

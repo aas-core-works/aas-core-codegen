@@ -1,6 +1,7 @@
 """Provide the types into which we parse the original meta-model."""
 import abc
 import ast
+import enum
 import os
 import pathlib
 from typing import Sequence, Optional, Union, Final, Mapping, cast
@@ -378,6 +379,23 @@ def is_string_expr(expr: ast.AST) -> bool:
     )
 
 
+class Visibility(enum.Enum):
+    """
+    Represent the visibility of a function or a method.
+
+    The visibility is signalled in the meta-model by the leading underscores in
+    the name, following the Python conventions. A function with a leading
+    underscore is internal, *i.e.*, visible only within the generated SDK, but not
+    to its users. A method with a single leading underscore is protected, and
+    a method with two leading underscores is private.
+    """
+
+    PUBLIC = "public"
+    INTERNAL = "internal"
+    PROTECTED = "protected"
+    PRIVATE = "private"
+
+
 class Method(DBC):
     """
     Represent a function or a class method.
@@ -391,6 +409,9 @@ class Method(DBC):
 
     #: Set if the method is marked to be used for verification
     verification: Final[bool]
+
+    #: Visibility of the method as signalled by the leading underscores in its name
+    visibility: Final[Visibility]
 
     #: Specification of method's arguments
     arguments: Final[Sequence[Argument]]
@@ -415,6 +436,12 @@ class Method(DBC):
     arguments_by_name: Final[Mapping[str, Argument]]
 
     # fmt: off
+    @require(
+        lambda name, visibility:
+        (visibility is Visibility.PUBLIC)
+        == (name == "__init__" or not name.startswith("_")),
+        "Only the names with the leading underscore are non-public"
+    )
     @require(
         lambda arguments, contracts:
         (
@@ -458,6 +485,7 @@ class Method(DBC):
         self,
         name: Identifier,
         verification: bool,
+        visibility: Visibility,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotation],
         description: Optional[Description],
@@ -468,6 +496,7 @@ class Method(DBC):
         """Initialize with the given values."""
         self.name = name
         self.verification = verification
+        self.visibility = visibility
         self.arguments = arguments
         self.returns = returns
         self.description = description
@@ -515,6 +544,7 @@ class UnderstoodMethod(Method):
         self,
         name: Identifier,
         verification: bool,
+        visibility: Visibility,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotation],
         description: Optional[Description],
@@ -528,6 +558,7 @@ class UnderstoodMethod(Method):
             self,
             name=name,
             verification=verification,
+            visibility=visibility,
             arguments=arguments,
             returns=returns,
             description=description,
@@ -578,6 +609,7 @@ class ConstructorToBeUnderstood(Method):
             self,
             name=Identifier("__init__"),
             verification=False,
+            visibility=Visibility.PUBLIC,
             arguments=arguments,
             returns=None,
             description=description,

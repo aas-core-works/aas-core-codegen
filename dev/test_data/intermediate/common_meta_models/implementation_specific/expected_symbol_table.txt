@@ -88,6 +88,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='describe',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -201,6 +202,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='describe',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -221,6 +223,7 @@ SymbolTable(
           arguments_by_name=...),
         ImplementationSpecificMethod(
           name='color_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Color',
@@ -241,6 +244,7 @@ SymbolTable(
           arguments_by_name=...),
         ImplementationSpecificMethod(
           name='resolve_color',
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='fallback',
@@ -271,6 +275,7 @@ SymbolTable(
           arguments_by_name=...),
         ImplementationSpecificMethod(
           name='relabel',
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='new_label',
@@ -410,6 +415,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='describe',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -655,6 +661,7 @@ SymbolTable(
   verification_functions=[
     ImplementationSpecificVerification(
       name='has_balanced_brackets',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -681,6 +688,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='texts_are_unique',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -709,6 +717,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='items_have_unique_labels',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',

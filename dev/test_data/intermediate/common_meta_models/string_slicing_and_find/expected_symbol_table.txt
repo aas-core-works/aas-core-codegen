@@ -285,6 +285,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='date_before_time_is_long_enough',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -311,6 +312,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='time_after_date_is_long_enough',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -337,6 +339,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='month_is_september',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -363,6 +366,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='seconds_follow_colon',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -389,6 +393,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='last_character_is_not_z',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -418,6 +423,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='name_starts_with_prefix',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='name',
@@ -444,6 +450,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='name_has_no_space_after_prefix',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='name',

@@ -246,6 +246,7 @@ def _stringify_implementation_specific_method(
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
+            stringify.Property("visibility", that.visibility.name),
             stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
@@ -267,6 +268,7 @@ def _stringify_understood_method(
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
+            stringify.Property("visibility", that.visibility.name),
             stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
@@ -289,6 +291,7 @@ def _stringify_constructor_to_be_understood(
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
+            stringify.Property("visibility", that.visibility.name),
             stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),

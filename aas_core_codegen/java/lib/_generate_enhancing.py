@@ -343,6 +343,9 @@ public Iterable<{items_type}> {method_name}() {{
     # endregion
 
     for method in cls.methods:
+        if method.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         blocks.append(_generate_delegate_method(method))
 
     visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))

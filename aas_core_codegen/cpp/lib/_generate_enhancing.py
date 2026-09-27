@@ -328,6 +328,9 @@ void {setter_name}(
         )
 
     for method in cls.methods:
+        if method.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         public_members.append(_generate_method_delegation(method=method))
 
     enhancement_getter = cpp_naming.getter_name(Identifier("enhancement"))

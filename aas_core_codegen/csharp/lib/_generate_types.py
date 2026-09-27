@@ -487,7 +487,10 @@ def _generate_interface(
     # region Signatures
 
     for method in cls.methods:
-        if method.specified_for is not cls:
+        if (
+            method.specified_for is not cls
+            or method.visibility is not intermediate.Visibility.PUBLIC
+        ):
             continue
 
         signature_blocks = []  # type: List[Stripped]

@@ -22,6 +22,7 @@ is_string_expr = _types.is_string_expr
 ImplementationSpecificMethod = _types.ImplementationSpecificMethod
 UnderstoodMethod = _types.UnderstoodMethod
 ConstructorToBeUnderstood = _types.ConstructorToBeUnderstood
+Visibility = _types.Visibility
 Method = _types.Method
 MethodUnion = _types.MethodUnion
 FunctionUnion = _types.FunctionUnion

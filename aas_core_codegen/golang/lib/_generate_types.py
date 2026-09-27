@@ -1200,6 +1200,9 @@ def _generate_interface(
     # region Methods
 
     for method in cls.methods:
+        if method.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         method_blocks = []  # type: List[Stripped]
 
         if method.description is not None:

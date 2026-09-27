@@ -80,8 +80,16 @@ def _lower_camel_case(identifier: Identifier) -> Identifier:
 
     >>> _lower_camel_case(Identifier("Something_to_URL"))
     'somethingToURL'
+
+    The underscores signalling the visibility in the meta-model are ignored:
+
+    >>> _lower_camel_case(Identifier("_something_re"))
+    'somethingRe'
+
+    >>> _lower_camel_case(Identifier("construct__something"))
+    'constructSomething'
     """
-    parts = identifier.split("_")
+    parts = [part for part in identifier.split("_") if len(part) > 0]
 
     cased = []  # type: List[str]
     parts_it = iter(parts)
@@ -347,20 +355,15 @@ def method_name(identifier: Identifier) -> Identifier:
 
     >>> method_name(Identifier("do_something_to_URL"))
     'DoSomethingToURL'
+
+    The leading underscores signal a non-public method, which we render unexported:
+
+    >>> method_name(Identifier("_do_something"))
+    'doSomething'
     """
-    return capital_camel_case(identifier)
+    if identifier.startswith("_"):
+        return private_method_name(Identifier(identifier.lstrip("_")))
 
-
-def function_name(identifier: Identifier) -> Identifier:
-    """
-    Generate a name for a function from its meta-model ``identifier``.
-
-    >>> function_name(Identifier("do_something"))
-    'DoSomething'
-
-    >>> function_name(Identifier("do_something_to_URL"))
-    'DoSomethingToURL'
-    """
     return capital_camel_case(identifier)
 
 
@@ -387,6 +390,27 @@ def private_function_name(identifier: Identifier) -> Identifier:
         return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
 
     return _lower_camel_case(identifier)
+
+
+def function_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a name for a function from its meta-model ``identifier``.
+
+    >>> function_name(Identifier("do_something"))
+    'DoSomething'
+
+    >>> function_name(Identifier("do_something_to_URL"))
+    'DoSomethingToURL'
+
+    The leading underscore signals an internal function, which we render unexported:
+
+    >>> function_name(Identifier("_do_something"))
+    'doSomething'
+    """
+    if identifier.startswith("_"):
+        return private_function_name(Identifier(identifier.lstrip("_")))
+
+    return capital_camel_case(identifier)
 
 
 def argument_name(identifier: Identifier) -> Identifier:

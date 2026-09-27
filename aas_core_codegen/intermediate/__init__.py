@@ -39,6 +39,7 @@ Invariant = _types.Invariant
 Contract = _types.Contract
 Snapshot = _types.Snapshot
 Contracts = _types.Contracts
+Visibility = _types.Visibility
 Method = _types.Method
 ImplementationSpecificMethod = _types.ImplementationSpecificMethod
 UnderstoodMethod = _types.UnderstoodMethod

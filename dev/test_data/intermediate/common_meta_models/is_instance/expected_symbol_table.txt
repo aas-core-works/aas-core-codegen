@@ -1281,6 +1281,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='has_leaf_in_tree',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1310,6 +1311,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='leaves_in_tree_are_not_empty',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1341,6 +1343,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_short_leaf_or_no_leaf',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1370,6 +1373,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_container',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1397,6 +1401,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_sorted_ordered_container',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1424,6 +1429,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='container_has_children',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='container',
@@ -1450,6 +1456,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_global_attribute_of_kind_name',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',
@@ -1479,6 +1486,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_string_value',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',

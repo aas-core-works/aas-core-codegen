@@ -356,6 +356,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='set_text',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -390,6 +391,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_maybe_text',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -424,6 +426,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='copy_maybe_text_and_set_maybe_kind',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -458,6 +461,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_text_through_alias',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -492,6 +496,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_texts',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -528,6 +533,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_first_and_last_text',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -562,6 +568,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_text_through_list_alias',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -596,6 +603,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_numbers',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -632,6 +640,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_nested_text',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -668,6 +677,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='replace_first_item',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -704,6 +714,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_texts_in_loops',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -740,6 +751,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='fill_texts',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -776,6 +788,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='fill_texts_of_item',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -810,6 +823,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='fill_texts_through_alias',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -844,6 +858,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='fill_texts_of_argument',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -880,6 +895,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='rename',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -914,6 +930,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='rename_all',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -950,6 +967,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_first_texts_of_lists',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lists',
@@ -988,6 +1006,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_first_texts_in_sibling_loops',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -1034,6 +1053,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='text_copy_is_independent',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1068,6 +1088,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='number_copy_is_independent',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -1096,6 +1117,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_maybe_texts',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1132,6 +1154,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_maybe_item',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',
@@ -1166,6 +1189,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='set_text_of_rebound_alias',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1208,6 +1232,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='first_text_through_alias_is',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1242,6 +1267,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='texts_are_not_empty',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',

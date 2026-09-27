@@ -89,6 +89,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -203,6 +204,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -268,6 +270,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_text',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -322,6 +325,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_maybe_text',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -376,6 +380,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='copy_maybe_text_and_set_maybe_kind',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -448,6 +453,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_text_through_alias',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -511,6 +517,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_texts',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -573,6 +580,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_first_and_last_text',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -649,6 +657,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_text_through_list_alias',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -717,6 +726,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_numbers',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -797,6 +807,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_nested_text',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -878,6 +889,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='replace_first_item',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -938,6 +950,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_texts_in_loops',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -1043,6 +1056,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='fill_texts',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -1117,6 +1131,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='fill_texts_of_item',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1169,6 +1184,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='fill_texts_through_alias',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1230,6 +1246,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='fill_texts_of_argument',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='texts',
@@ -1279,6 +1296,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='rename',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1333,6 +1351,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='rename_all',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -1411,6 +1430,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_first_texts_of_lists',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lists',
@@ -1482,6 +1502,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_first_texts_in_sibling_loops',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',
@@ -1607,6 +1628,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='text_copy_is_independent',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1682,6 +1704,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='number_copy_is_independent',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='numbers',
@@ -1766,6 +1789,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_maybe_texts',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1828,6 +1852,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_maybe_item',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='something',
@@ -1886,6 +1911,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='set_text_of_rebound_alias',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -1969,6 +1995,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='first_text_through_alias_is',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='item',
@@ -2030,6 +2057,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='texts_are_not_empty',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='items',

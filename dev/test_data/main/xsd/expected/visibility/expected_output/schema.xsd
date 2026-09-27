@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="box">
+    <xs:sequence>
+      <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="item">
+    <xs:sequence>
+      <xs:element name="number" type="xs:string"/>
+      <xs:element name="code" type="xs:string"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="item_choice">
+    <xs:choice>
+      <xs:element name="box" type="box_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="box_t">
+    <xs:sequence>
+      <xs:group ref="box"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="item_t">
+    <xs:sequence>
+      <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="box" type="box_t"/>
+</xs:schema>

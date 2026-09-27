@@ -17,6 +17,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -65,6 +66,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -123,6 +125,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -181,6 +184,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -237,6 +241,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -294,6 +299,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -341,6 +347,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -394,6 +401,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -441,6 +449,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -488,6 +497,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -582,6 +592,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -835,6 +846,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='has_leaf_in_tree',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -907,6 +919,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='leaves_in_tree_are_not_empty',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -996,6 +1009,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_short_leaf_or_no_leaf',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1070,6 +1084,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_container',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1110,6 +1125,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_sorted_ordered_container',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -1165,6 +1181,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='container_has_children',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='container',
@@ -1209,6 +1226,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_global_attribute_of_kind_name',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',
@@ -1276,6 +1294,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_string_value',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',

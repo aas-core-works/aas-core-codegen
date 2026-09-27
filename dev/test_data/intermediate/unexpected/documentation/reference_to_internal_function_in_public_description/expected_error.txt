@@ -1,0 +1,1 @@
+The public documentation refers to the internal verification function '_is_something', which is not visible to the users of the generated SDKs

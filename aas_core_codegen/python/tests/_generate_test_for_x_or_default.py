@@ -29,7 +29,10 @@ def _generate_test_case(cls: intermediate.ConcreteClass) -> Optional[Stripped]:
     test_methods = []  # type: List[Stripped]
 
     for method in cls.methods:
-        if not method.name.endswith("_or_default"):
+        if (
+            not method.name.endswith("_or_default")
+            or method.visibility is not intermediate.Visibility.PUBLIC
+        ):
             continue
 
         if method.returns is None:

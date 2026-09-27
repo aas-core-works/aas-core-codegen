@@ -1,0 +1,1 @@
+Expected at most one leading underscore in the name of a function, since there are no private functions, but got: '__is_something'

@@ -1,0 +1,1 @@
+The name of the verification function '_is_something' conflicts with the name of the verification function 'is_something' once the leading underscores, which only signal the visibility, are stripped

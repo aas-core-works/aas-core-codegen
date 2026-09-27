@@ -134,6 +134,9 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
     # endregion
 
     for method in cls.methods:
+        if method.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         blocks.append(_generate_delegate_method(method))
 
     visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))

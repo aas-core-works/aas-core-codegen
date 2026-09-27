@@ -79,6 +79,9 @@ test("verification error stores provided path", () => {{
     ]  # type: List[Stripped]
 
     for verification in symbol_table.verification_functions:
+        if verification.visibility is not intermediate.Visibility.PUBLIC:
+            continue
+
         if len(verification.arguments) != 1:
             continue
 

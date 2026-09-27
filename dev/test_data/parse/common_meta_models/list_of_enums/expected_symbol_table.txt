@@ -37,6 +37,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',

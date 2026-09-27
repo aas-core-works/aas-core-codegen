@@ -1,0 +1,1 @@
+The public documentation refers to the protected method '_prefix' of the class 'Parent', which is not visible to the users of the generated SDKs

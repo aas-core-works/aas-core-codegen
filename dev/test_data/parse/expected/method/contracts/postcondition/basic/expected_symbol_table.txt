@@ -17,6 +17,7 @@ UnverifiedSymbolTable(
         UnderstoodMethod(
           name='do_something',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',

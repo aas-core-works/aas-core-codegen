@@ -1,0 +1,1 @@
+return Wrap(code_);

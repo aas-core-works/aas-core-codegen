@@ -57,6 +57,7 @@ SymbolTable(
       methods=[
         UnderstoodMethod(
           name='some_func',
+          visibility='PUBLIC',
           arguments=[],
           returns=None,
           description=None,
@@ -194,6 +195,7 @@ SymbolTable(
       methods=[
         UnderstoodMethod(
           name='some_func',
+          visibility='PUBLIC',
           arguments=[],
           returns=None,
           description=None,
@@ -208,6 +210,7 @@ SymbolTable(
           arguments_by_name=...),
         UnderstoodMethod(
           name='another_func',
+          visibility='PUBLIC',
           arguments=[],
           returns=None,
           description=None,

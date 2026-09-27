@@ -706,6 +706,7 @@ SymbolTable(
   verification_functions=[
     TranspilableVerification(
       name='has_small_remainder',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -735,6 +736,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_within_distance',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -777,6 +779,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_negative',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',
@@ -803,6 +806,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_length_aligned',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -838,6 +842,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='has_remainder_one_by_length',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='number',

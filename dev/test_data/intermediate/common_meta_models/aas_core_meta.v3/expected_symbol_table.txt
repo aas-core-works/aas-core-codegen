@@ -1514,6 +1514,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='value_type_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Data_type_def_XSD',
@@ -3301,6 +3302,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='kind_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Modelling_kind',
@@ -4314,6 +4316,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='kind_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Qualifier_kind',
@@ -6559,6 +6562,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='kind_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=OurTypeAnnotation(
             our_type='Reference to our type Modelling_kind',
@@ -9450,6 +9454,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='order_relevant_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='BOOL',
@@ -11524,6 +11529,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -12353,6 +12359,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -13259,6 +13266,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -14187,6 +14195,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -15102,6 +15111,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -15937,6 +15947,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -16783,6 +16794,7 @@ SymbolTable(
       methods=[
         ImplementationSpecificMethod(
           name='category_or_default',
+          visibility='PUBLIC',
           arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='STR',
@@ -28874,6 +28886,7 @@ SymbolTable(
   verification_functions=[
     PatternVerification(
       name='matches_ID_short',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -28905,6 +28918,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_version_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -28936,6 +28950,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_revision_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -28967,6 +28982,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_date_time_UTC',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29006,6 +29022,7 @@ SymbolTable(
           original_node=...)""")),
     ImplementationSpecificVerification(
       name='is_xs_date_time_UTC',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29040,6 +29057,7 @@ SymbolTable(
       arguments_by_name=...),
     PatternVerification(
       name='matches_MIME_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29079,6 +29097,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_RFC_8089_path',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29116,6 +29135,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_BCP_47',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29148,6 +29168,7 @@ SymbolTable(
           original_node=...)""")),
     ImplementationSpecificVerification(
       name='lang_strings_have_unique_languages',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lang_strings',
@@ -29178,6 +29199,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='qualifier_types_are_unique',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='qualifiers',
@@ -29209,6 +29231,7 @@ SymbolTable(
       arguments_by_name=...),
     PatternVerification(
       name='matches_XML_serializable_string',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29246,6 +29269,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_any_URI',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29283,6 +29307,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_base_64_binary',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29318,6 +29343,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_boolean',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29353,6 +29379,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_date',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29388,6 +29415,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_date_time',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29423,6 +29451,7 @@ SymbolTable(
           original_node=...)""")),
     ImplementationSpecificVerification(
       name='is_xs_date_time',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29456,6 +29485,7 @@ SymbolTable(
       arguments_by_name=...),
     PatternVerification(
       name='matches_xs_decimal',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29491,6 +29521,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_double',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29526,6 +29557,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_duration',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29561,6 +29593,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_float',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29596,6 +29629,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_g_day',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29631,6 +29665,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_g_month',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29666,6 +29701,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_g_month_day',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29701,6 +29737,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_g_year',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29736,6 +29773,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_g_year_month',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29771,6 +29809,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_hex_binary',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29806,6 +29845,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_time',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29841,6 +29881,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_integer',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29876,6 +29917,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_long',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29911,6 +29953,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_int',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29946,6 +29989,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_short',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -29981,6 +30025,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_byte',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30016,6 +30061,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_non_negative_integer',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30051,6 +30097,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_positive_integer',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30086,6 +30133,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_unsigned_long',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30121,6 +30169,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_unsigned_int',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30156,6 +30205,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_unsigned_short',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30191,6 +30241,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_unsigned_byte',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30226,6 +30277,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_non_positive_integer',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30261,6 +30313,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_negative_integer',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30296,6 +30349,7 @@ SymbolTable(
           original_node=...)""")),
     PatternVerification(
       name='matches_xs_string',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -30331,6 +30385,7 @@ SymbolTable(
           original_node=...)""")),
     ImplementationSpecificVerification(
       name='value_consistent_with_XSD_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',
@@ -30371,6 +30426,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_model_reference_to',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='reference',
@@ -30405,6 +30461,7 @@ SymbolTable(
       arguments_by_name=...),
     TranspilableVerification(
       name='is_model_reference_to_referable',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='reference',
@@ -30431,6 +30488,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='ID_shorts_are_unique',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='referables',
@@ -30461,6 +30519,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='ID_shorts_of_variables_are_unique',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='input_variables',
@@ -30518,6 +30577,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='extension_names_are_unique',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='extensions',
@@ -30546,6 +30606,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='submodel_elements_have_identical_semantic_IDs',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='elements',
@@ -30574,6 +30635,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='submodel_element_is_of_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -30610,6 +30672,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='properties_or_ranges_have_value_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='elements',
@@ -30646,6 +30709,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='reference_key_values_equal',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='that',
@@ -30680,6 +30744,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30710,6 +30775,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_for_reference_have_appropriate_data_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30740,6 +30806,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_for_document_have_appropriate_data_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30770,6 +30837,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_have_data_type',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30800,6 +30868,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_have_value',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30830,6 +30899,7 @@ SymbolTable(
       arguments_by_name=...),
     ImplementationSpecificVerification(
       name='data_specification_IEC_61360s_have_definition_at_least_in_english',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -30860,6 +30930,7 @@ SymbolTable(
       arguments_by_name=...),
     PatternVerification(
       name='is_BCP_47_for_english',
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',

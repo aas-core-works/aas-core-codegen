@@ -67,7 +67,10 @@ const std::filesystem::path& DetermineLogDir() {{
         load_min = cpp_naming.function_name(Identifier(f"load_min_{cls.name}"))
 
         for method in cls.methods:
-            if not method.name.endswith("_or_default"):
+            if (
+                not method.name.endswith("_or_default")
+                or method.visibility is not intermediate.Visibility.PUBLIC
+            ):
                 continue
 
             assert method.returns is not None, (

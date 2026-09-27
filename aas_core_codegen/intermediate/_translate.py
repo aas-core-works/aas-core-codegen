@@ -84,6 +84,7 @@ from aas_core_codegen.intermediate._types import (
     TypeAnnotationUnion,
     ClassUnion,
     VerificationUnion,
+    Visibility,
     UnderstoodMethod,
     collect_ids_of_our_types_in_properties,
     OurTypeExceptEnumeration,
@@ -5377,6 +5378,147 @@ def _verify_invariant_descriptions_unique(symbol_table: SymbolTable) -> List[Err
     return errors
 
 
+def _verify_names_unique_regardless_of_visibility(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """
+    Check that the names are unique even if we strip the leading underscores.
+
+    The leading underscores only signal the visibility. Most targets do not use them
+    in the generated names (*e.g.*, C# renders both ``_do_something`` and
+    ``do_something`` as ``DoSomething``), so the names would conflict.
+    """
+    errors = []  # type: List[Error]
+
+    verification_by_stripped_name = (
+        dict()
+    )  # type: MutableMapping[str, VerificationUnion]
+
+    for verification in symbol_table.verification_functions:
+        stripped_name = verification.name.lstrip("_")
+
+        conflicting_verification = verification_by_stripped_name.get(
+            stripped_name, None
+        )
+        if conflicting_verification is not None:
+            errors.append(
+                Error(
+                    verification.parsed.node,
+                    f"The name of the verification function "
+                    f"{verification.name!r} conflicts with the name of "
+                    f"the verification function {conflicting_verification.name!r} "
+                    f"once the leading underscores, which only signal "
+                    f"the visibility, are stripped",
+                )
+            )
+        else:
+            verification_by_stripped_name[stripped_name] = verification
+
+    for cls in symbol_table.classes:
+        name_by_stripped_name = dict()  # type: MutableMapping[str, Identifier]
+
+        for member in itertools.chain(cls.properties, cls.methods):
+            stripped_name = member.name.lstrip("_")
+
+            conflicting_name = name_by_stripped_name.get(stripped_name, None)
+            if conflicting_name is not None:
+                errors.append(
+                    Error(
+                        cls.parsed.node,
+                        f"The name of the member {member.name!r} conflicts with "
+                        f"the name of the member {conflicting_name!r} "
+                        f"in the class {cls.name!r} once the leading underscores, "
+                        f"which only signal the visibility, are stripped",
+                    )
+                )
+            else:
+                name_by_stripped_name[stripped_name] = member.name
+
+    return errors
+
+
+def _verify_no_references_to_non_public_members_in_public_descriptions(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """
+    Check that only the descriptions of non-public members refer to non-public members.
+
+    The non-public members are not visible to the users of the generated SDKs. Hence,
+    the references to them in the public documentation would dangle, or would be
+    reported as broken by the documentation tools.
+    """
+    non_public_description_id_set = set(
+        id(something.description)
+        for something in itertools.chain(
+            symbol_table.verification_functions,
+            (method for cls in symbol_table.classes for method in cls.methods),
+        )
+        if something.description is not None
+        and something.visibility is not Visibility.PUBLIC
+    )
+
+    errors = []  # type: List[Error]
+
+    # NOTE (mristin):
+    # The descriptions of the inherited methods are shared among the classes, so we
+    # report each reference only once.
+    reported_element_id_set = set()  # type: Set[int]
+
+    # NOTE (mristin):
+    # We skip the references which could not be resolved. They have been already
+    # reported as errors, but we still verify the symbol table to report as many
+    # errors as possible at once.
+
+    for verification_ref, description, _ in _find_all_in_descriptions(
+        element_type=doc.ReferenceToVerificationFunction, symbol_table=symbol_table
+    ):
+        if (
+            not isinstance(verification_ref.verification, Verification)
+            or id(description) in non_public_description_id_set
+            or id(verification_ref) in reported_element_id_set
+            or verification_ref.verification.visibility is Visibility.PUBLIC
+        ):
+            continue
+
+        reported_element_id_set.add(id(verification_ref))
+
+        errors.append(
+            Error(
+                description.parsed.node,
+                f"The public documentation refers to the internal verification "
+                f"function {verification_ref.verification.name!r}, which is not "
+                f"visible to the users of the generated SDKs",
+            )
+        )
+
+    for method_ref, description, _ in _find_all_in_descriptions(
+        element_type=doc.ReferenceToMethod, symbol_table=symbol_table
+    ):
+        if not isinstance(method_ref.reference, doc.ReferenceToMethodOfClass):
+            continue
+
+        method = method_ref.reference.method
+        if (
+            id(description) in non_public_description_id_set
+            or id(method_ref) in reported_element_id_set
+            or method.visibility is Visibility.PUBLIC
+        ):
+            continue
+
+        reported_element_id_set.add(id(method_ref))
+
+        errors.append(
+            Error(
+                description.parsed.node,
+                f"The public documentation refers to the {method.visibility.value} "
+                f"method {method.name!r} of the class {method.specified_for.name!r}, "
+                f"which is not visible to the users of the generated SDKs",
+            )
+        )
+
+    return errors
+
+
 def _verify_patterns_anchored_at_start_and_end(
     symbol_table: SymbolTable,
 ) -> List[Error]:
@@ -5710,6 +5852,16 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_invariant_descriptions_unique(symbol_table=symbol_table))
 
     errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
+
+    errors.extend(
+        _verify_names_unique_regardless_of_visibility(symbol_table=symbol_table)
+    )
+
+    errors.extend(
+        _verify_no_references_to_non_public_members_in_public_descriptions(
+            symbol_table=symbol_table
+        )
+    )
 
     if len(errors) > 0:
         return errors

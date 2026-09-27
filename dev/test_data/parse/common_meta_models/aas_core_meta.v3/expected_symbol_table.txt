@@ -546,6 +546,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -719,6 +720,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='value_type_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -739,6 +741,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -928,6 +931,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1099,6 +1103,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1339,6 +1344,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1499,6 +1505,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='kind_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1519,6 +1526,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1582,6 +1590,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1721,6 +1730,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -1858,6 +1868,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -2058,6 +2069,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='kind_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -2078,6 +2090,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -2265,6 +2278,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -2614,6 +2628,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -2893,6 +2908,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -3011,6 +3027,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -3153,6 +3170,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -3610,6 +3628,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -3797,6 +3816,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -4144,6 +4164,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='order_relevant_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -4164,6 +4185,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -4677,6 +4699,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -4947,6 +4970,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -5098,6 +5122,7 @@ UnverifiedSymbolTable(
         ImplementationSpecificMethod(
           name='category_or_default',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -5204,6 +5229,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -5464,6 +5490,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -5752,6 +5779,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -6023,6 +6051,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -6226,6 +6255,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -6436,6 +6466,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -6639,6 +6670,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -6963,6 +6995,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -7563,6 +7596,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -7730,6 +7764,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -8003,6 +8038,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -8373,6 +8409,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -8712,6 +8749,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -8767,6 +8805,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -8952,6 +8991,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -9440,6 +9480,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10174,6 +10215,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10550,6 +10592,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10597,6 +10640,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10664,6 +10708,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10787,6 +10832,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -10993,6 +11039,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11222,6 +11269,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11304,6 +11352,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11365,6 +11414,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11429,6 +11479,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11496,6 +11547,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11563,6 +11615,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -11818,6 +11871,7 @@ UnverifiedSymbolTable(
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
+          visibility='PUBLIC',
           arguments=[
             Argument(
               name='self',
@@ -12617,6 +12671,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_ID_short',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -12667,6 +12722,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_version_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -12717,6 +12773,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_revision_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -12767,6 +12824,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_date_time_UTC',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -13027,6 +13085,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='is_xs_date_time_UTC',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -13051,6 +13110,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_MIME_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -13282,6 +13342,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_RFC_8089_path',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -13899,6 +13960,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_BCP_47',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -14188,6 +14250,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='lang_strings_have_unique_languages',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='lang_strings',
@@ -14216,6 +14279,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='qualifier_types_are_unique',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='qualifiers',
@@ -14244,6 +14308,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_XML_serializable_string',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -14293,6 +14358,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_any_URI',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -15216,6 +15282,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_base_64_binary',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -15501,6 +15568,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_boolean',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -15550,6 +15618,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_date',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -15752,6 +15821,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_date_time',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16026,6 +16096,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='is_xs_date_time',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16050,6 +16121,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_decimal',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16225,6 +16297,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_double',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16290,6 +16363,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_duration',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16355,6 +16429,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_float',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16420,6 +16495,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_g_day',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16485,6 +16561,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_g_month',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16550,6 +16627,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_g_month_day',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16615,6 +16693,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_g_year',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16680,6 +16759,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_g_year_month',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16745,6 +16825,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_hex_binary',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16810,6 +16891,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_time',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16875,6 +16957,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_integer',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -16940,6 +17023,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_long',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17005,6 +17089,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_int',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17070,6 +17155,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_short',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17135,6 +17221,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_byte',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17200,6 +17287,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_non_negative_integer',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17265,6 +17353,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_positive_integer',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17330,6 +17419,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_unsigned_long',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17395,6 +17485,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_unsigned_int',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17460,6 +17551,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_unsigned_short',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17525,6 +17617,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_unsigned_byte',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17590,6 +17683,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_non_positive_integer',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17655,6 +17749,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_negative_integer',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17720,6 +17815,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='matches_xs_string',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
@@ -17769,6 +17865,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='value_consistent_with_XSD_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='value',
@@ -17800,6 +17897,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_model_reference_to',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='reference',
@@ -17889,6 +17987,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_model_reference_to_referable',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='reference',
@@ -17970,6 +18069,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='ID_shorts_are_unique',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='referables',
@@ -17998,6 +18098,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='ID_shorts_of_variables_are_unique',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='input_variables',
@@ -18060,6 +18161,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='extension_names_are_unique',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='extensions',
@@ -18088,6 +18190,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='submodel_elements_have_identical_semantic_IDs',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='elements',
@@ -18116,6 +18219,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='submodel_element_is_of_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='element',
@@ -18147,6 +18251,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='properties_or_ranges_have_value_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='elements',
@@ -18182,6 +18287,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='reference_key_values_equal',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='that',
@@ -18213,6 +18319,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18241,6 +18348,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_for_reference_have_appropriate_data_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18269,6 +18377,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_for_document_have_appropriate_data_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18297,6 +18406,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_have_data_type',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18325,6 +18435,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_have_value',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18353,6 +18464,7 @@ UnverifiedSymbolTable(
     ImplementationSpecificMethod(
       name='data_specification_IEC_61360s_have_definition_at_least_in_english',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='embedded_data_specifications',
@@ -18381,6 +18493,7 @@ UnverifiedSymbolTable(
     UnderstoodMethod(
       name='is_BCP_47_for_english',
       verification=True,
+      visibility='PUBLIC',
       arguments=[
         Argument(
           name='text',
