@@ -513,9 +513,15 @@ def documentation_comment(text: Stripped) -> Stripped:
 
 
 def generate_comment_for_summary_remarks(
-    description: intermediate.SummaryRemarksDescription, context: Context
+    description: intermediate.SummaryRemarksDescription,
+    context: Context,
+    extra_remarks: Sequence[str] = (),
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the documentation comment for a summary-remarks."""
+    """
+    Generate the documentation comment for a summary-remarks.
+
+    The ``extra_remarks`` are appended as plain text to the rendered remarks.
+    """
     errors = []  # type: List[str]
 
     blocks = []  # type: List[str]
@@ -544,6 +550,8 @@ def generate_comment_for_summary_remarks(
         else:
             assert rendered_remark is not None
             blocks.append(rendered_remark)
+
+    blocks.extend(extra_remarks)
 
     if len(errors) > 0:
         return None, [

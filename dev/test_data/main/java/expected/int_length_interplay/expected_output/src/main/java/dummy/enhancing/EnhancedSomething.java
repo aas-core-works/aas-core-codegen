@@ -70,6 +70,24 @@ public class EnhancedSomething<EnhancementT>
     instance.setMaybeCount(maybeCount);
   }
 
+  public Boolean isValidIndex(
+    Long index
+  )
+  {
+    return instance.isValidIndex(
+      index
+    );
+  }
+
+  public String textAt(
+    Long index
+  )
+  {
+    return instance.textAt(
+      index
+    );
+  }
+
   public Iterable<IClass> descendOnce() {
     return instance.descendOnce();
   }

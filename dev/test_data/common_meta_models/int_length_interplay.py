@@ -103,11 +103,29 @@ def set_counts(something: Mutable["Something"], texts: Sequence[str]) -> bool:
     lambda self: count_after_reassignment(self.texts) < 6,
     "Count after re-assignment is small",
 )
+@invariant(
+    lambda self: not (len(self.texts) > 0) or self.is_valid_index(len(self.texts) - 1),
+    "Last position is a valid index",
+)
+@invariant(
+    lambda self: not (len(self.texts) > 0) or self.text_at(len(self.texts) - 1) != "",
+    "Last text is not empty",
+)
 class Something(DBC):
     numbers: List[int]
     texts: List[str]
     count: int
     maybe_count: Optional[int]
+
+    @non_mutating
+    def is_valid_index(self, index: int) -> bool:
+        """Check a method taking an integer argument, called with a length."""
+        return 0 <= index and index < len(self.texts)
+
+    @non_mutating
+    def text_at(self, index: int) -> str:
+        """Check reading in a method at an index which is an integer argument."""
+        return self.texts[index]
 
     def __init__(
         self,

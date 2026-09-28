@@ -29,6 +29,16 @@ public interface ISomething extends IClass {
   Optional<Long> getMaybeCount();
 
   void setMaybeCount(Long maybeCount);
+
+  /**
+   * Check a method taking an integer argument, called with a length.
+   */
+  Boolean isValidIndex(Long index);
+
+  /**
+   * Check reading in a method at an index which is an integer argument.
+   */
+  String textAt(Long index);
 }
 
 /*

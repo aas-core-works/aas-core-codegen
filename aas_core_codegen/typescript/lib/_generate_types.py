@@ -6,6 +6,7 @@ from typing import (
     Optional,
     Dict,
     List,
+    Mapping,
     Tuple,
     cast,
     Union,
@@ -21,14 +22,18 @@ from aas_core_codegen.common import (
     assert_never,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
+    type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.typescript import (
     common as typescript_common,
     naming as typescript_naming,
     description as typescript_description,
+    transpilation as typescript_transpilation,
 )
 from aas_core_codegen.typescript.common import (
     INDENT as I,
@@ -986,6 +991,56 @@ def _generate_comment_for_property(
     return comment, None
 
 
+@ensure(lambda result: not (result[1] is not None) or (result[0] is None))
+def _generate_comment_for_method(
+    method: intermediate.MethodUnion, cls: intermediate.ClassUnion
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Generate the documentation comment for the ``method``, if any.
+
+    We note in the documentation of the transpiled mutating methods that
+    the invariants are not enforced after the call.
+    """
+    extra_remarks = (
+        [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+        if isinstance(method, intermediate.UnderstoodMethod) and not method.non_mutating
+        else []
+    )
+
+    if method.description is None:
+        if len(extra_remarks) == 0:
+            return None, None
+
+        return (
+            typescript_description.documentation_comment(
+                Stripped("\n\n".join(extra_remarks))
+            ),
+            None,
+        )
+
+    (
+        comment,
+        comment_errors,
+    ) = typescript_description.generate_documentation_comment_for_signature(
+        method.description,
+        context=typescript_description.Context(
+            module=typescript_common.TYPES_MODULE, cls_or_enum=cls
+        ),
+        extra_remarks=extra_remarks,
+    )
+
+    if comment_errors is not None:
+        return None, Error(
+            method.description.parsed.node,
+            f"Failed to generate the documentation comment "
+            f"for the method {method.name!r}",
+            comment_errors,
+        )
+
+    assert comment is not None
+    return comment, None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
     interface: intermediate.Interface,
@@ -1027,27 +1082,13 @@ def _generate_interface(
     for signature in interface.signatures:
         signature_blocks = []  # type: List[Stripped]
 
-        if signature.description is not None:
-            (
-                signature_comment,
-                signature_comment_errors,
-            ) = typescript_description.generate_documentation_comment_for_signature(
-                signature.description,
-                context=typescript_description.Context(
-                    module=typescript_common.TYPES_MODULE, cls_or_enum=interface.base
-                ),
-            )
+        signature_comment, signature_comment_error = _generate_comment_for_method(
+            method=interface.base.methods_by_name[signature.name], cls=interface.base
+        )
+        if signature_comment_error is not None:
+            return None, signature_comment_error
 
-            if signature_comment_errors is not None:
-                return None, Error(
-                    signature.description.parsed.node,
-                    f"Failed to generate the documentation comment "
-                    f"for signature {signature.name!r}",
-                    signature_comment_errors,
-                )
-
-            assert signature_comment is not None
-
+        if signature_comment is not None:
             signature_blocks.append(signature_comment)
 
         # fmt: off
@@ -1246,18 +1287,163 @@ export type {union_name} =
     )
 
 
+class _MethodTranspiler(typescript_transpilation.Transpiler):
+    """Transpile the body of a :py:class:`intermediate.UnderstoodMethod`."""
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        method: intermediate.UnderstoodMethod,
+    ) -> None:
+        """Initialize with the given values."""
+        typescript_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            environment=inference.environment_with_args,
+            downcast_map=inference.downcast_map,
+            reassigned_definitions=(
+                typescript_transpilation.collect_reassigned_definitions(method.body)
+            ),
+            types_module=None,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(typescript_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped("this"), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(typescript_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(typescript_naming.enum_name(node.identifier)), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the modules.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to TypeScript. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method(
+    method: intermediate.UnderstoodMethod,
+    cls: intermediate.ConcreteClass,
+    inference: intermediate_type_inference.InferenceOfFunction,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the ``method`` as a member of the concrete class ``cls``."""
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification module, on the explicit request of the user. We note that
+    # in the documentation of the mutating methods, see
+    # :py:func:`_generate_comment_for_method`.
+
+    transpiler = _MethodTranspiler(inference=inference, method=method)
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r} "
+                f"of the class {cls.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+
+    comment, comment_error = _generate_comment_for_method(method=method, cls=cls)
+    if comment_error is not None:
+        return None, comment_error
+
+    if comment is not None:
+        writer.write(comment)
+        writer.write("\n")
+
+    if method.visibility is intermediate.Visibility.PROTECTED:
+        writer.write("protected ")
+    elif method.visibility is intermediate.Visibility.PRIVATE:
+        writer.write("private ")
+    else:
+        assert method.visibility is intermediate.Visibility.PUBLIC, (
+            f"Unexpected visibility of the method {method.name!r}: "
+            f"{method.visibility}"
+        )
+
+    method_name = typescript_naming.method_name(method.name)
+
+    returns = (
+        typescript_common.generate_type(type_annotation=method.returns)
+        if method.returns is not None
+        else "void"
+    )
+
+    arg_codes = [
+        Stripped(
+            f"{typescript_naming.argument_name(arg.name)}: "
+            f"{typescript_common.generate_type(type_annotation=arg.type_annotation)}"
+        )
+        for arg in method.arguments
+    ]
+
+    if len(arg_codes) == 0:
+        writer.write(f"{method_name}(): {returns} {{")
+    else:
+        arg_block = ",\n".join(arg_codes)
+        writer.write(
+            f"""\
+{method_name}(
+{I}{indent_but_first_line(arg_block, I)}
+): {returns} {{"""
+        )
+
+    if len(body) == 0:
+        writer.write(f"\n{I}// Intentionally empty.")
+    else:
+        for stmt in body:
+            writer.write("\n")
+            writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 @require(lambda concrete_cls_index: concrete_cls_index >= 0)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
     concrete_cls_index: int,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate code for the given concrete class ``cls``.
 
     ``concrete_cls_index`` refers to the number of the concrete class in
     the ``concrete_classes`` of the symbol table.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
     """
     # NOTE (mristin):
     # Code blocks of the class body separated by double newlines and indented once.
@@ -1368,17 +1554,18 @@ def _generate_class(
                 continue
 
             blocks.append(implementation)
-        else:
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    "(mristin, 2022-11-10) "
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts. We want to finish the meta-model for the V3, "
-                    "fix de/serialization and generate SDKs for a couple of languages "
-                    "before taking on this rather hard task.",
-                )
+        elif isinstance(method, intermediate.UnderstoodMethod):
+            method_code, method_error = _transpile_method(
+                method=method, cls=cls, inference=inference_by_method[method]
             )
+            if method_error is not None:
+                errors.append(method_error)
+                continue
+
+            assert method_code is not None
+            blocks.append(method_code)
+        else:
+            assert_never(method)
 
     blocks.append(_generate_descend_once_method(cls=cls))
 
@@ -2411,6 +2598,15 @@ export abstract class Class {{
         concrete_cls: i for i, concrete_cls in enumerate(symbol_table.concrete_classes)
     }
 
+    (
+        inference_by_method,
+        inference_errors,
+    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
+    if inference_errors is not None:
+        return None, inference_errors
+
+    assert inference_by_method is not None
+
     for our_type in symbol_table.our_types:
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _generate_enum(enum=our_type)
@@ -2444,6 +2640,7 @@ export abstract class Class {{
                     cls=our_type,
                     spec_impls=spec_impls,
                     concrete_cls_index=concrete_class_to_index[our_type],
+                    inference_by_method=inference_by_method,
                 )
                 if error is not None:
                     errors.append(error)
@@ -2459,6 +2656,17 @@ export abstract class Class {{
 
     if len(errors) > 0:
         return None, errors
+
+    # NOTE (mristin):
+    # The transpiled methods might use the helpers from the common module, *e.g.*,
+    # to slice the strings by code points. The common module does not depend on
+    # the types module, so the import is not cyclic. We import it only if it is
+    # used, as TypeScript complains about the unused imports.
+    if any("AasCommon." in block for block in blocks):
+        warning_index = blocks.index(typescript_common.WARNING)
+        blocks.insert(
+            warning_index + 1, Stripped('import * as AasCommon from "./common";')
+        )
 
     blocks.extend(
         [

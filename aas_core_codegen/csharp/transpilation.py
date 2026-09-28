@@ -386,12 +386,17 @@ class Transpiler(
         # We do not use the native ``Substring`` as it counts the UTF-16 code units
         # instead of the characters, throws on the positions out of range, and does
         # not count the negative ones from the end, unlike Python. See
-        # ``StringHelpers.Slice`` in the generated verification.
+        # ``Common.StringHelpers.Slice`` in the generated common module.
         args = [collection, start if start is not None else "0"]  # type: List[str]
         if end is not None:
             args.append(end)
 
-        return Stripped(f"StringHelpers.Slice({', '.join(args)})"), None
+        return (
+            Stripped(
+                f"{csharp_common.COMMON_CLASS}.StringHelpers.Slice({', '.join(args)})"
+            ),
+            None,
+        )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
@@ -676,9 +681,11 @@ class Transpiler(
                 # We do not use the native ``IndexOf`` as it counts the UTF-16
                 # code units instead of the characters, throws on a start out of
                 # range, and does not count a negative start from the end, unlike
-                # Python. See ``StringHelpers.Find`` in the generated verification.
+                # Python. See ``Common.StringHelpers.Find`` in the generated common module.
                 return (
-                    Stripped(f"StringHelpers.Find({instance}, {', '.join(args)})"),
+                    Stripped(
+                        f"{csharp_common.COMMON_CLASS}.StringHelpers.Find({instance}, {', '.join(args)})"
+                    ),
                     None,
                 )
 
@@ -842,8 +849,13 @@ class Transpiler(
                     # NOTE (mristin):
                     # We do not use the native ``Length`` as it counts the UTF-16
                     # code units instead of the characters, unlike Python. See
-                    # ``StringHelpers.Len`` in the generated verification.
-                    return Stripped(f"StringHelpers.Len({args[0]})"), None
+                    # ``Common.StringHelpers.Len`` in the generated common module.
+                    return (
+                        Stripped(
+                            f"{csharp_common.COMMON_CLASS}.StringHelpers.Len({args[0]})"
+                        ),
+                        None,
+                    )
 
                 elif (
                     primitive_type
@@ -859,7 +871,12 @@ class Transpiler(
                 elif isinstance(
                     arg_type, intermediate_type_inference.TupleTypeAnnotation
                 ):
-                    return Stripped(f"TupleHelpers.Len({args[0]})"), None
+                    return (
+                        Stripped(
+                            f"{csharp_common.COMMON_CLASS}.TupleHelpers.Len({args[0]})"
+                        ),
+                        None,
+                    )
 
                 # NOTE (mristin):
                 # A JSON-able array is a ``Nodes.JsonArray`` and a JSON-able
@@ -1181,7 +1198,7 @@ class Transpiler(
 
             return Stripped(f"{left} % {right}"), None
 
-        code = Stripped(f"Verification.FloorMod({left}, {right})")
+        code = Stripped(f"{csharp_common.COMMON_CLASS}.FloorMod({left}, {right})")
 
         # NOTE (mristin):
         # The helper always returns a ``long``. If the result is a length, *e.g.*,
@@ -1813,6 +1830,16 @@ for (
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        expression, error = self.transform(node.expression)
+        if error is not None:
+            return None, error
+
+        assert expression is not None
+        return Stripped(f"{expression};"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(

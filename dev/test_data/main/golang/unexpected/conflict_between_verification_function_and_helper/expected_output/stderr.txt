@@ -1,3 +1,0 @@
-Failed to generate verification/verification.go based on <path to meta_model.py>:
-* At line 4 and column 2: The name of the verification function 'floor_mod' collides in Go with the name of our helper function FloorMod used to transpile the modulo operation
-* At line 10 and column 2: The name of the verification function 'abs_int64' collides in Go with the name of our helper function AbsInt64 used to transpile the absolute value

@@ -121,6 +121,22 @@ class EnhancedSomething
     instance_->set_maybe_count(value);
   }
 
+  bool IsValidIndex(
+    int64_t index
+  ) const override {
+    return instance_->IsValidIndex(
+      index
+    );
+  }
+
+  std::wstring TextAt(
+    int64_t index
+  ) const override {
+    return instance_->TextAt(
+      index
+    );
+  }
+
   const std::shared_ptr<E>& enhancement() const {
     return enhancement_;
   }

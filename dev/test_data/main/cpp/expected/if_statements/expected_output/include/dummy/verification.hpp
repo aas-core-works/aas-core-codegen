@@ -212,31 +212,6 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
-// region Arithmetic
-
-/**
- * \brief Compute the remainder of the floored division of \p dividend
- * by \p divisor.
- *
- * The remainder takes the sign of the divisor, as the modulo in Python,
- * in which the meta-model is written.
- *
- * We deliberately do not use the native operator <code>%</code> which truncates
- * the division towards zero so that its remainder takes the sign of the dividend.
- * For example, <code>-7 % 3 == -1</code> in C++, while <code>-7 % 3 == 2</code>
- * in Python. The two only coincide when the operands have the same sign, but
- * the invariants must behave the same in all the SDKs for all the inputs.
- *
- * The \p divisor must not be zero.
- *
- * \param dividend to be divided
- * \param divisor to divide with, must not be zero
- * \return remainder of the floored division, with the sign of \p divisor
- */
-int64_t FloorMod(int64_t dividend, int64_t divisor);
-
-// endregion Arithmetic
-
 // region Verification functions
 
 /// \brief Check the if-statement with a single branch and no default.

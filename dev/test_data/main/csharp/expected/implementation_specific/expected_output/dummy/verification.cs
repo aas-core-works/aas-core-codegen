@@ -103,20 +103,6 @@ namespace dummy
             };
         }  // internal static class EnumValueSet
 
-        /// <summary>
-        /// Provide operations on tuples.
-        /// </summary>
-        public static class TupleHelpers
-        {
-            /// <summary>
-            /// Count the items of <paramref name="tuple" />.
-            /// </summary>
-            public static int Len(System.Runtime.CompilerServices.ITuple tuple)
-            {
-                return tuple.Length;
-            }
-        }  // public static class TupleHelpers
-
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Verification.Transformer _transformer = (
             new Verification.Transformer());

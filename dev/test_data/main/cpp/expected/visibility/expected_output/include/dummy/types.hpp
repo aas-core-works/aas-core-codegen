@@ -135,9 +135,10 @@ class Box
 
   ~Box() override = default;
 
- private:
+ protected:
   std::wstring Prefix() const;
 
+ private:
   std::wstring Wrap(
     const std::wstring& text
   ) const;

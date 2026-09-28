@@ -3161,9 +3161,9 @@ def _verify_symbol_table(
         """
         Check that ``Sequence`` and ``Mutable`` are placed only where ``allowed``.
 
-        They declare the mutability of an argument of a verification function, so
-        they are allowed only at the top of its type annotation, or directly under
-        ``Optional``. The ``where`` describes the place of ``type_annotation`` in
+        They declare the mutability of an argument of a verification function or
+        of a method, so they are allowed only at the top of its type annotation, or
+        directly under ``Optional``. The ``where`` describes the place of ``type_annotation`` in
         the error messages, *e.g.*, ``the property 'x' of the class 'Y'``.
 
         :return: error message, if any
@@ -3185,11 +3185,12 @@ def _verify_symbol_table(
                 type_annotation.node,
                 f"The type annotation {type_annotation} is not allowed "
                 f"in {where}. {type_annotation.identifier} declares "
-                f"the mutability of an argument of a verification function, "
-                f"so it is allowed only at the top of the argument's type "
-                f"annotation, or directly under Optional. The properties, "
-                f"the methods and the nested type annotations do not declare "
-                f"mutability. Please use {replacement} instead.",
+                f"the mutability of an argument of a verification function "
+                f"or of a method, so it is allowed only at the top of "
+                f"the argument's type annotation, or directly under Optional. "
+                f"The properties, the return values and the nested type "
+                f"annotations do not declare mutability. "
+                f"Please use {replacement} instead.",
             )
 
         if type_annotation.identifier == "Mutable" and allowed:
@@ -3252,7 +3253,7 @@ def _verify_symbol_table(
             for arg in method.arguments:
                 error = verify_placement_of_mutability_types(
                     type_annotation=arg.type_annotation,
-                    allowed=False,
+                    allowed=True,
                     where=(
                         f"the argument {arg.name!r} of the method "
                         f"{method.name!r} of the class {our_type.name!r}"

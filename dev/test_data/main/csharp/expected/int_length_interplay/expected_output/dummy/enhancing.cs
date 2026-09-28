@@ -68,6 +68,24 @@ namespace dummy
                 set => _instance.MaybeCount = value;
             }
 
+            public bool IsValidIndex(
+                long index
+            )
+            {
+                return _instance.IsValidIndex(
+                    index
+                );
+            }
+
+            public string TextAt(
+                long index
+            )
+            {
+                return _instance.TextAt(
+                    index
+                );
+            }
+
             public IEnumerable<Aas.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();

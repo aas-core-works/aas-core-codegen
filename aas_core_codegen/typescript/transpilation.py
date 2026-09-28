@@ -129,6 +129,7 @@ class Transpiler(
         environment: intermediate_type_inference.Environment,
         downcast_map: Mapping[parse_tree.Node, intermediate_type_inference.Downcast],
         reassigned_definitions: AbstractSet[parse_tree.Assignment] = frozenset(),
+        types_module: Optional[Identifier] = Identifier("AasTypes"),
     ) -> None:
         """
         Initialize with the given values.
@@ -136,8 +137,12 @@ class Transpiler(
         The ``reassigned_definitions`` are defined with ``let``, while
         the other definitions are defined with ``const``, see
         :py:func:`collect_reassigned_definitions`.
+
+        If ``types_module`` is specified, it is prepended to our types and
+        the type guards. It is None when we transpile in the types module itself.
         """
         self.type_map = type_map
+        self._types_module = types_module
         self._downcast_map = downcast_map
         self._environment = intermediate_type_inference.MutableEnvironment(
             parent=environment
@@ -150,6 +155,13 @@ class Transpiler(
         #
         # While this class does not directly use it, the descendants of this class do!
         self._variable_name_set = set()  # type: Set[Identifier]
+
+    def _qualify_with_types_module(self, identifier: Identifier) -> Stripped:
+        """Prepend the types module to ``identifier``, if necessary."""
+        if self._types_module is None:
+            return Stripped(identifier)
+
+        return Stripped(f"{self._types_module}.{identifier}")
 
     def _transform_without_downcast(
         self, node: parse_tree.Node
@@ -193,19 +205,21 @@ class Transpiler(
         else:
             assert_never(target_type)
 
+        qualified_target_type_name = self._qualify_with_types_module(target_type_name)
+
         if "\n" in code:
             return (
                 Stripped(
                     f"""\
 (
 {I}{indent_but_first_line(code, I)}
-{I}as AasTypes.{target_type_name}
+{I}as {qualified_target_type_name}
 )"""
                 ),
                 None,
             )
 
-        return Stripped(f"({code} as AasTypes.{target_type_name})"), None
+        return Stripped(f"({code} as {qualified_target_type_name})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
@@ -584,17 +598,12 @@ AasCommon.at(
 
         assert value is not None
 
-        # NOTE (mristin):
-        # We assume that the types module is imported as ``AasTypes`` in
-        # the generated code, as is the case with the verification module.
-        checks = [
-            Stripped(
-                f"AasTypes."
-                f"{typescript_naming.function_name(Identifier(f'is_{cls.identifier}'))}"
-                f"({value})"
+        checks = []  # type: List[Stripped]
+        for cls in node.classes:
+            guard = self._qualify_with_types_module(
+                typescript_naming.function_name(Identifier(f"is_{cls.identifier}"))
             )
-            for cls in node.classes
-        ]
+            checks.append(Stripped(f"{guard}({value})"))
 
         if len(checks) == 1:
             return checks[0], None
@@ -1240,18 +1249,15 @@ AasCommon.at(
         # (``-7 % 3 == 2``). The two only coincide for the operands of the same sign,
         # but the invariants must behave the same in all the SDKs for all the inputs.
         # Hence, we call the helper which computes the floored remainder, see
-        # :py:data:`aas_core_codegen.typescript.lib._generate_verification.FLOOR_MOD`.
-        #
-        # We transpile the modulo only in the verification module, so we refer to
-        # the helper directly by its name, as we do with the verification functions.
+        # :py:data:`aas_core_codegen.typescript.lib._generate_common.FLOOR_MOD`.
         joined_args = f"{left}, {right}"
         if "\n" not in joined_args and len(joined_args) <= 50:
-            return Stripped(f"floorMod({joined_args})"), None
+            return Stripped(f"AasCommon.floorMod({joined_args})"), None
 
         return (
             Stripped(
                 f"""\
-floorMod(
+AasCommon.floorMod(
 {I}{indent_but_first_line(left, I)},
 {I}{indent_but_first_line(right, I)}
 )"""
@@ -1812,6 +1818,16 @@ for (
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        expression, error = self.transform(node.expression)
+        if error is not None:
+            return None, error
+
+        assert expression is not None
+        return Stripped(f"{expression};"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(

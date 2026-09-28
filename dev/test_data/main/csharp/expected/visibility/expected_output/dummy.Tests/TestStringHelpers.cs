@@ -27,7 +27,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0,
-                Aas.Verification.StringHelpers.Len(
+                Aas.Common.StringHelpers.Len(
                     ""));
         }  // void Test_len_empty_text
 
@@ -36,7 +36,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 3,
-                Aas.Verification.StringHelpers.Len(
+                Aas.Common.StringHelpers.Len(
                     "abc"));
         }  // void Test_len_ASCII_text
 
@@ -45,7 +45,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 2,
-                Aas.Verification.StringHelpers.Len(
+                Aas.Common.StringHelpers.Len(
                     "é-"));
         }  // void Test_len_character_of_two_UTF_8_bytes
 
@@ -54,7 +54,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 2,
-                Aas.Verification.StringHelpers.Len(
+                Aas.Common.StringHelpers.Len(
                     "😀-"));
         }  // void Test_len_character_beyond_the_Basic_Multilingual_Plane
 
@@ -63,7 +63,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 5,
-                Aas.Verification.StringHelpers.Len(
+                Aas.Common.StringHelpers.Len(
                     "aé😀b😀"));
         }  // void Test_len_mixed_characters
 
@@ -72,7 +72,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "bc",
-                Aas.Verification.StringHelpers.Slice("abcde", 1, 3));
+                Aas.Common.StringHelpers.Slice("abcde", 1, 3));
         }  // void Test_slice_start_and_end
 
         [Test, Description("'abcde'[:2] gives 'ab': no start")]
@@ -80,7 +80,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "ab",
-                Aas.Verification.StringHelpers.Slice("abcde", 0, 2));
+                Aas.Common.StringHelpers.Slice("abcde", 0, 2));
         }  // void Test_slice_no_start
 
         [Test, Description("'abcde'[3:] gives 'de': no end")]
@@ -88,7 +88,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "de",
-                Aas.Verification.StringHelpers.Slice("abcde", 3));
+                Aas.Common.StringHelpers.Slice("abcde", 3));
         }  // void Test_slice_no_end
 
         [Test, Description("'abcde'[:] gives 'abcde': neither start nor end")]
@@ -96,7 +96,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "abcde",
-                Aas.Verification.StringHelpers.Slice("abcde", 0));
+                Aas.Common.StringHelpers.Slice("abcde", 0));
         }  // void Test_slice_neither_start_nor_end
 
         [Test, Description("'abcde'[-2:] gives 'de': negative start counts from the end")]
@@ -104,7 +104,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "de",
-                Aas.Verification.StringHelpers.Slice("abcde", -2));
+                Aas.Common.StringHelpers.Slice("abcde", -2));
         }  // void Test_slice_negative_start_counts_from_the_end
 
         [Test, Description("'abcde'[:-2] gives 'abc': negative end counts from the end")]
@@ -112,7 +112,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "abc",
-                Aas.Verification.StringHelpers.Slice("abcde", 0, -2));
+                Aas.Common.StringHelpers.Slice("abcde", 0, -2));
         }  // void Test_slice_negative_end_counts_from_the_end
 
         [Test, Description("'abcde'[-4:-1] gives 'bcd': negative start and end")]
@@ -120,7 +120,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "bcd",
-                Aas.Verification.StringHelpers.Slice("abcde", -4, -1));
+                Aas.Common.StringHelpers.Slice("abcde", -4, -1));
         }  // void Test_slice_negative_start_and_end
 
         [Test, Description("'abcde'[-10:2] gives 'ab': negative start before the beginning is clamped")]
@@ -128,7 +128,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "ab",
-                Aas.Verification.StringHelpers.Slice("abcde", -10, 2));
+                Aas.Common.StringHelpers.Slice("abcde", -10, 2));
         }  // void Test_slice_negative_start_before_the_beginning_is_clamped
 
         [Test, Description("'abcde'[2:10] gives 'cde': end beyond the end is clamped")]
@@ -136,7 +136,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "cde",
-                Aas.Verification.StringHelpers.Slice("abcde", 2, 10));
+                Aas.Common.StringHelpers.Slice("abcde", 2, 10));
         }  // void Test_slice_end_beyond_the_end_is_clamped
 
         [Test, Description("'abcde'[10:] gives '': start beyond the end gives empty")]
@@ -144,7 +144,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("abcde", 10));
+                Aas.Common.StringHelpers.Slice("abcde", 10));
         }  // void Test_slice_start_beyond_the_end_gives_empty
 
         [Test, Description("'abcde'[3:1] gives '': start after end gives empty")]
@@ -152,7 +152,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("abcde", 3, 1));
+                Aas.Common.StringHelpers.Slice("abcde", 3, 1));
         }  // void Test_slice_start_after_end_gives_empty
 
         [Test, Description("'abcde'[-1:-3] gives '': negative start after negative end gives empty")]
@@ -160,7 +160,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("abcde", -1, -3));
+                Aas.Common.StringHelpers.Slice("abcde", -1, -3));
         }  // void Test_slice_negative_start_after_negative_end_gives_empty
 
         [Test, Description("'abcde'[5:5] gives '': start equal to end gives empty")]
@@ -168,7 +168,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("abcde", 5, 5));
+                Aas.Common.StringHelpers.Slice("abcde", 5, 5));
         }  // void Test_slice_start_equal_to_end_gives_empty
 
         [Test, Description("''[0:0] gives '': empty text")]
@@ -176,7 +176,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("", 0, 0));
+                Aas.Common.StringHelpers.Slice("", 0, 0));
         }  // void Test_slice_empty_text
 
         [Test, Description("''[-1:] gives '': negative start on empty text")]
@@ -184,7 +184,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("", -1));
+                Aas.Common.StringHelpers.Slice("", -1));
         }  // void Test_slice_negative_start_on_empty_text
 
         [Test, Description("''[:5] gives '': end beyond the end of empty text")]
@@ -192,7 +192,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Verification.StringHelpers.Slice("", 0, 5));
+                Aas.Common.StringHelpers.Slice("", 0, 5));
         }  // void Test_slice_end_beyond_the_end_of_empty_text
 
         [Test, Description("'é-x'[1:] gives '-x': after a character of two UTF-8 bytes")]
@@ -200,7 +200,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "-x",
-                Aas.Verification.StringHelpers.Slice("é-x", 1));
+                Aas.Common.StringHelpers.Slice("é-x", 1));
         }  // void Test_slice_after_a_character_of_two_UTF_8_bytes
 
         [Test, Description("'aéb'[1:2] gives 'é': character of two UTF-8 bytes")]
@@ -208,7 +208,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "é",
-                Aas.Verification.StringHelpers.Slice("aéb", 1, 2));
+                Aas.Common.StringHelpers.Slice("aéb", 1, 2));
         }  // void Test_slice_character_of_two_UTF_8_bytes
 
         [Test, Description("'a😀b'[1:2] gives '😀': character beyond the Basic Multilingual Plane")]
@@ -216,7 +216,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "😀",
-                Aas.Verification.StringHelpers.Slice("a😀b", 1, 2));
+                Aas.Common.StringHelpers.Slice("a😀b", 1, 2));
         }  // void Test_slice_character_beyond_the_Basic_Multilingual_Plane
 
         [Test, Description("'😀-x'[1:] gives '-x': after a character beyond the Basic Multilingual Plane")]
@@ -224,7 +224,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "-x",
-                Aas.Verification.StringHelpers.Slice("😀-x", 1));
+                Aas.Common.StringHelpers.Slice("😀-x", 1));
         }  // void Test_slice_after_a_character_beyond_the_Basic_Multilingual_Plane
 
         [Test, Description("'aé😀b😀'[-3:-1] gives '😀b': negative start on characters beyond ASCII")]
@@ -232,7 +232,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "😀b",
-                Aas.Verification.StringHelpers.Slice("aé😀b😀", -3, -1));
+                Aas.Common.StringHelpers.Slice("aé😀b😀", -3, -1));
         }  // void Test_slice_negative_start_on_characters_beyond_ASCII
 
         [Test, Description("'abcabc'.find('b') gives 1: found")]
@@ -240,7 +240,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 1,
-                Aas.Verification.StringHelpers.Find("abcabc", "b"));
+                Aas.Common.StringHelpers.Find("abcabc", "b"));
         }  // void Test_find_found
 
         [Test, Description("'abcabc'.find('x') gives -1: not found")]
@@ -248,7 +248,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("abcabc", "x"));
+                Aas.Common.StringHelpers.Find("abcabc", "x"));
         }  // void Test_find_not_found
 
         [Test, Description("'abcabc'.find('') gives 0: empty sub")]
@@ -256,7 +256,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0,
-                Aas.Verification.StringHelpers.Find("abcabc", ""));
+                Aas.Common.StringHelpers.Find("abcabc", ""));
         }  // void Test_find_empty_sub
 
         [Test, Description("'ab'.find('abc') gives -1: sub longer than text")]
@@ -264,7 +264,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("ab", "abc"));
+                Aas.Common.StringHelpers.Find("ab", "abc"));
         }  // void Test_find_sub_longer_than_text
 
         [Test, Description("'abcabc'.find('b', 2) gives 4: found after start")]
@@ -272,7 +272,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 4,
-                Aas.Verification.StringHelpers.Find("abcabc", "b", 2));
+                Aas.Common.StringHelpers.Find("abcabc", "b", 2));
         }  // void Test_find_found_after_start
 
         [Test, Description("'abcabc'.find('b', 5) gives -1: found only before start")]
@@ -280,7 +280,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("abcabc", "b", 5));
+                Aas.Common.StringHelpers.Find("abcabc", "b", 5));
         }  // void Test_find_found_only_before_start
 
         [Test, Description("'abcabc'.find('c', -1) gives 5: negative start counts from the end")]
@@ -288,7 +288,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 5,
-                Aas.Verification.StringHelpers.Find("abcabc", "c", -1));
+                Aas.Common.StringHelpers.Find("abcabc", "c", -1));
         }  // void Test_find_negative_start_counts_from_the_end
 
         [Test, Description("'abcabc'.find('a', -3) gives 3: negative start finds the later occurrence")]
@@ -296,7 +296,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 3,
-                Aas.Verification.StringHelpers.Find("abcabc", "a", -3));
+                Aas.Common.StringHelpers.Find("abcabc", "a", -3));
         }  // void Test_find_negative_start_finds_the_later_occurrence
 
         [Test, Description("'abcabc'.find('a', -10) gives 0: negative start before the beginning is clamped")]
@@ -304,7 +304,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0,
-                Aas.Verification.StringHelpers.Find("abcabc", "a", -10));
+                Aas.Common.StringHelpers.Find("abcabc", "a", -10));
         }  // void Test_find_negative_start_before_the_beginning_is_clamped
 
         [Test, Description("'abcabc'.find('', 6) gives 6: empty sub at the end")]
@@ -312,7 +312,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 6,
-                Aas.Verification.StringHelpers.Find("abcabc", "", 6));
+                Aas.Common.StringHelpers.Find("abcabc", "", 6));
         }  // void Test_find_empty_sub_at_the_end
 
         [Test, Description("'abcabc'.find('', 7) gives -1: empty sub beyond the end gives -1")]
@@ -320,7 +320,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("abcabc", "", 7));
+                Aas.Common.StringHelpers.Find("abcabc", "", 7));
         }  // void Test_find_empty_sub_beyond_the_end_gives_1
 
         [Test, Description("'abcabc'.find('c', 10) gives -1: start beyond the end gives -1")]
@@ -328,7 +328,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("abcabc", "c", 10));
+                Aas.Common.StringHelpers.Find("abcabc", "c", 10));
         }  // void Test_find_start_beyond_the_end_gives_1
 
         [Test, Description("''.find('') gives 0: empty sub in empty text")]
@@ -336,7 +336,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0,
-                Aas.Verification.StringHelpers.Find("", ""));
+                Aas.Common.StringHelpers.Find("", ""));
         }  // void Test_find_empty_sub_in_empty_text
 
         [Test, Description("''.find('', 1) gives -1: empty sub beyond the end of empty text gives -1")]
@@ -344,7 +344,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("", "", 1));
+                Aas.Common.StringHelpers.Find("", "", 1));
         }  // void Test_find_empty_sub_beyond_the_end_of_empty_text_gives_1
 
         [Test, Description("''.find('x') gives -1: not found in empty text")]
@@ -352,7 +352,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("", "x"));
+                Aas.Common.StringHelpers.Find("", "x"));
         }  // void Test_find_not_found_in_empty_text
 
         [Test, Description("'é-'.find('-') gives 1: after a character of two UTF-8 bytes")]
@@ -360,7 +360,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 1,
-                Aas.Verification.StringHelpers.Find("é-", "-"));
+                Aas.Common.StringHelpers.Find("é-", "-"));
         }  // void Test_find_after_a_character_of_two_UTF_8_bytes
 
         [Test, Description("'😀-'.find('-') gives 1: after a character beyond the Basic Multilingual Plane")]
@@ -368,7 +368,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 1,
-                Aas.Verification.StringHelpers.Find("😀-", "-"));
+                Aas.Common.StringHelpers.Find("😀-", "-"));
         }  // void Test_find_after_a_character_beyond_the_Basic_Multilingual_Plane
 
         [Test, Description("'a😀b'.find('😀') gives 1: character beyond the Basic Multilingual Plane")]
@@ -376,7 +376,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 1,
-                Aas.Verification.StringHelpers.Find("a😀b", "😀"));
+                Aas.Common.StringHelpers.Find("a😀b", "😀"));
         }  // void Test_find_character_beyond_the_Basic_Multilingual_Plane
 
         [Test, Description("'😀a😀a'.find('a', 2) gives 3: start after a character beyond ASCII")]
@@ -384,7 +384,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 3,
-                Aas.Verification.StringHelpers.Find("😀a😀a", "a", 2));
+                Aas.Common.StringHelpers.Find("😀a😀a", "a", 2));
         }  // void Test_find_start_after_a_character_beyond_ASCII
 
         [Test, Description("'😀a😀a'.find('😀', -2) gives 2: negative start on characters beyond ASCII")]
@@ -392,7 +392,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 2,
-                Aas.Verification.StringHelpers.Find("😀a😀a", "😀", -2));
+                Aas.Common.StringHelpers.Find("😀a😀a", "😀", -2));
         }  // void Test_find_negative_start_on_characters_beyond_ASCII
 
         [Test, Description("'é😀'.find('', 3) gives -1: start beyond the end of characters beyond ASCII")]
@@ -400,7 +400,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -1,
-                Aas.Verification.StringHelpers.Find("é😀", "", 3));
+                Aas.Common.StringHelpers.Find("é😀", "", 3));
         }  // void Test_find_start_beyond_the_end_of_characters_beyond_ASCII
     }  // class TestStringHelpers
 }  // namespace dummy.Tests

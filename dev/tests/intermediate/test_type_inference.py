@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 
 import ast
+import textwrap
 import unittest
 from typing import List, Mapping, Tuple
 
@@ -407,8 +408,8 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The method '_is_valid' of the class 'Something' is protected, "
-                "so it can be only called from the implementation-specific "
-                "methods of the class"
+                "so it can be only called on self from the methods of the class "
+                "and its descendants"
             ),
         )
 
@@ -437,8 +438,7 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The method '__is_valid' of the class 'Something' is private, "
-                "so it can be only called from the implementation-specific "
-                "methods of the class"
+                "so it can be only called on self from the methods of the class"
             ),
         )
 
@@ -3210,6 +3210,183 @@ __xml_namespace__ = "https://dummy.com"
             'self.text.upper() == "A"',
             "The member 'upper' is not supported on strings; we support only "
             "the following methods: 'find'",
+        )
+
+
+class Test_method(unittest.TestCase):
+    @staticmethod
+    def source_with_methods(methods: str) -> str:
+        return f"""\
+class Kind(Enum):
+    Alpha = "alpha"
+    Beta = "beta"
+
+
+@abstract
+class Parent(DBC):
+    count: int
+    texts: List[str]
+
+    @non_mutating
+    def _parent_protected(self) -> int:
+        return self.count
+
+    @non_mutating
+    def __parent_private(self) -> int:
+        return self.count
+
+    def reset(self) -> None:
+        self.count = 0
+
+{textwrap.indent(methods, "    ")}
+
+    def __init__(self, count: int, texts: List[str]) -> None:
+        self.count = count
+        self.texts = texts
+
+
+class Child(Parent):
+    @non_mutating
+    def calls_parent_private(self) -> int:
+        return self.__parent_private()
+
+    def __init__(self, count: int, texts: List[str]) -> None:
+        Parent.__init__(self, count, texts)
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    @staticmethod
+    def infer(source: str) -> List[str]:
+        """Infer the types of all the methods, and return the error messages."""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        _, errors = intermediate_type_inference.infer_for_methods(
+            symbol_table=symbol_table
+        )
+
+        if errors is None:
+            return []
+
+        return [tests.common.most_underlying_messages([error]) for error in errors]
+
+    def expect_errors(self, methods: str, expected_messages: List[str]) -> None:
+        self.assertEqual(
+            expected_messages,
+            Test_method.infer(Test_method.source_with_methods(methods)),
+        )
+
+    def test_mutating_method_on_self(self) -> None:
+        self.expect_errors(
+            methods="""\
+def increment(self, delta: int) -> int:
+    self.count = self.count + delta + self._parent_protected()
+    for i in range(0, len(self.texts)):
+        self.texts[i] = ""
+    self.reset()
+    return self.count""",
+            expected_messages=[
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class"
+            ],
+        )
+
+    def test_assignment_to_self_in_non_mutating_method_fails(self) -> None:
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def increment(self) -> None:
+    self.count = self.count + 1""",
+            expected_messages=[
+                "We can not assign to the property 'count' of self, since "
+                "the method 'increment' is marked as @non_mutating, so it must "
+                "not change its instance.",
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
+        )
+
+    def test_mutating_call_in_non_mutating_method_fails(self) -> None:
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def reset_twice(self) -> None:
+    self.reset()""",
+            expected_messages=[
+                "The method 'reset' is not marked as @non_mutating, so it might "
+                "mutate its instance, but the method 'reset_twice' is marked as "
+                "@non_mutating, so it must not change its instance.",
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
+        )
+
+    def test_mutating_arguments_declared_mutable(self) -> None:
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def clear(self, texts: List[str], other: Mutable["Parent"]) -> None:
+    texts[0] = 'cleared'
+    other.count = 0
+
+def clear_own_texts(self, other: Mutable["Parent"]) -> None:
+    self.clear(self.texts, other)""",
+            expected_messages=[
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class"
+            ],
+        )
+
+    def test_mutating_a_sequence_argument_fails(self) -> None:
+        self.expect_errors(
+            methods="""\
+def clear(self, texts: Sequence[str]) -> None:
+    texts[0] = 'cleared'""",
+            expected_messages=[
+                "We can not assign to an item of the list of texts, since "
+                "the argument 'texts' is declared as a Sequence, which is "
+                "read-only. Please declare it as a List if the method mutates it.",
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
+        )
+
+    def test_passing_read_only_to_mutable_argument_fails(self) -> None:
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def clear(self, texts: List[str]) -> None:
+    texts[0] = 'cleared'
+
+@non_mutating
+def clear_own_texts(self) -> None:
+    self.clear(self.texts)""",
+            expected_messages=[
+                "The argument 'texts' of the method 'clear' is mutable, but "
+                "the method 'clear_own_texts' is marked as @non_mutating, so it "
+                "must not change its instance.",
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
+        )
+
+    def test_missing_return_fails(self) -> None:
+        self.expect_errors(
+            methods="""\
+def count_texts(self) -> int:
+    self.count = len(self.texts)""",
+            expected_messages=[
+                "Expected the method 'count_texts' of the class 'Parent' to end "
+                "with a return statement, since it returns a value",
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
         )
 
 

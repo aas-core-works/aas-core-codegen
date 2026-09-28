@@ -18,7 +18,7 @@ namespace dummy.Tests
     /// the divisor in Python (<c>-7 % 3 == 2</c>), while the native C# operator
     /// <c>%</c> gives the remainder with the sign of the dividend
     /// (<c>-7 % 3 == -1</c>). Therefore, we transpile the modulo to
-    /// <c>Verification.FloorMod</c> instead of the native operator.
+    /// <c>Common.FloorMod</c> instead of the native operator.
     /// </remarks>
     public class TestArithmetic
     {
@@ -28,7 +28,7 @@ namespace dummy.Tests
             // both operands positive
             Assert.AreEqual(
                 1L,
-                Aas.Verification.FloorMod(7L, 3L));
+                Aas.Common.FloorMod(7L, 3L));
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace dummy.Tests
             // the remainder takes the sign of the positive divisor
             Assert.AreEqual(
                 2L,
-                Aas.Verification.FloorMod(-7L, 3L));
+                Aas.Common.FloorMod(-7L, 3L));
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace dummy.Tests
             // the remainder takes the sign of the negative divisor
             Assert.AreEqual(
                 -2L,
-                Aas.Verification.FloorMod(7L, -3L));
+                Aas.Common.FloorMod(7L, -3L));
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace dummy.Tests
             // both operands negative
             Assert.AreEqual(
                 -1L,
-                Aas.Verification.FloorMod(-7L, -3L));
+                Aas.Common.FloorMod(-7L, -3L));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace dummy.Tests
             // divisible, positive dividend
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(6L, 3L));
+                Aas.Common.FloorMod(6L, 3L));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace dummy.Tests
             // divisible, negative dividend
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(-6L, 3L));
+                Aas.Common.FloorMod(-6L, 3L));
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace dummy.Tests
             // divisible, negative divisor
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(6L, -3L));
+                Aas.Common.FloorMod(6L, -3L));
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace dummy.Tests
             // zero dividend, positive divisor
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(0L, 3L));
+                Aas.Common.FloorMod(0L, 3L));
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace dummy.Tests
             // zero dividend, negative divisor
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(0L, -3L));
+                Aas.Common.FloorMod(0L, -3L));
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace dummy.Tests
             // dividend smaller than the positive divisor
             Assert.AreEqual(
                 2L,
-                Aas.Verification.FloorMod(2L, 5L));
+                Aas.Common.FloorMod(2L, 5L));
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace dummy.Tests
             // negative dividend smaller than the divisor
             Assert.AreEqual(
                 3L,
-                Aas.Verification.FloorMod(-2L, 5L));
+                Aas.Common.FloorMod(-2L, 5L));
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace dummy.Tests
             // largest 64-bit integer, which is odd, by a positive divisor
             Assert.AreEqual(
                 1L,
-                Aas.Verification.FloorMod(long.MaxValue, 2L));
+                Aas.Common.FloorMod(long.MaxValue, 2L));
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace dummy.Tests
             // largest 64-bit integer by a negative divisor
             Assert.AreEqual(
                 -1L,
-                Aas.Verification.FloorMod(long.MaxValue, -2L));
+                Aas.Common.FloorMod(long.MaxValue, -2L));
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace dummy.Tests
             // smallest 64-bit integer by a positive divisor
             Assert.AreEqual(
                 1L,
-                Aas.Verification.FloorMod(long.MinValue, 3L));
+                Aas.Common.FloorMod(long.MinValue, 3L));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace dummy.Tests
             // smallest 64-bit integer by -1, which overflows with the native operator in some languages
             Assert.AreEqual(
                 0L,
-                Aas.Verification.FloorMod(long.MinValue, -1L));
+                Aas.Common.FloorMod(long.MinValue, -1L));
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace dummy.Tests
             // smallest 64-bit integer by the largest one
             Assert.AreEqual(
                 9223372036854775806L,
-                Aas.Verification.FloorMod(long.MinValue, long.MaxValue));
+                Aas.Common.FloorMod(long.MinValue, long.MaxValue));
         }
     }  // class TestArithmetic
 }  // namespace dummy.Tests

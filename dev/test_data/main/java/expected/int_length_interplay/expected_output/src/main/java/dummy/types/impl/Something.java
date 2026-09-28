@@ -110,6 +110,27 @@ public class Something implements ISomething {
   }
 
   /**
+   * Check a method taking an integer argument, called with a length.
+   */
+  @Override
+  public Boolean isValidIndex(
+    Long index
+  ) {
+    return 0 <= index
+    && index < this.getTexts().size();
+  }
+
+  /**
+   * Check reading in a method at an index which is an integer argument.
+   */
+  @Override
+  public String textAt(
+    Long index
+  ) {
+    return this.getTexts().get(Math.toIntExact(index));
+  }
+
+  /**
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {

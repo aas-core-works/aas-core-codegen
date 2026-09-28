@@ -1,0 +1,9 @@
+{
+  "texts": [
+    "hello",
+    "world"
+  ],
+  "count": 2,
+  "kind": "beta",
+  "modelType": "First"
+}

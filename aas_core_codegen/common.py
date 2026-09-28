@@ -6,6 +6,7 @@ import itertools
 import re
 import textwrap
 from typing import (
+    Final,
     Optional,
     Tuple,
     cast,
@@ -61,6 +62,18 @@ class Stripped(Rstripped):
     @require(lambda block: is_stripped(block))
     def __new__(cls, block: str) -> "Stripped":
         return cast(Stripped, block)
+
+
+#: Note in the documentation of the transpiled methods which mutate their instance
+#:
+#: We deliberately do not enforce the invariants of the instance after a method call,
+#: as that would be too inefficient. The generators append this note, as plain text,
+#: to the documentation so that the users of the SDKs are not surprised.
+NOTE_ON_INVARIANTS_OF_MUTATING_METHODS: Final[str] = (
+    "The invariants of the instance are not checked after this method changes it,\n"
+    "as that would be too inefficient. Please verify the instance explicitly\n"
+    "once you are done with the changes."
+)
 
 
 # noinspection RegExpSimplifiable

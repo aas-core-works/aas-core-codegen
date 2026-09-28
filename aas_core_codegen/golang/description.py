@@ -460,12 +460,16 @@ def generate_comment_for_summary_remarks_constraints(
 
 
 def generate_comment_for_signature(
-    description: intermediate.DescriptionOfSignature, context: Context
+    description: intermediate.DescriptionOfSignature,
+    context: Context,
+    extra_remarks: Sequence[str] = (),
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """
     Generate the docstring for the given signature.
 
     A signature, in this context, means a function or a method signature.
+
+    The ``extra_remarks`` are appended as plain text to the rendered remarks.
     """
     errors = []  # type: List[str]
 
@@ -487,6 +491,8 @@ def generate_comment_for_signature(
         else:
             assert rendered_remark is not None
             blocks.append(rendered_remark)
+
+    blocks.extend(extra_remarks)
 
     param_and_return_blocks = []  # type: List[str]
     for arg_name, arg_description in description.arguments_by_name.items():

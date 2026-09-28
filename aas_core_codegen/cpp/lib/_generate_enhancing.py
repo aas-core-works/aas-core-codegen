@@ -212,8 +212,8 @@ def _generate_method_delegation(method: intermediate.Method) -> Stripped:
 
     arg_types_names = [
         (
-            cpp_common.generate_type_with_const_ref_if_applicable(
-                arg.type_annotation, types_namespace=Identifier("types")
+            cpp_common.generate_argument_type(
+                argument=arg, types_namespace=Identifier("types")
             ),
             cpp_naming.argument_name(arg.name),
         )

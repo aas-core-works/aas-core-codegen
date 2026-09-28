@@ -5,7 +5,12 @@ from typing import Final, List, Mapping, Optional, Pattern, Sequence, cast
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, assert_never, indent_but_first_line
+from aas_core_codegen.common import (
+    Identifier,
+    Stripped,
+    assert_never,
+    indent_but_first_line,
+)
 from aas_core_codegen.csharp import naming as csharp_naming
 
 
@@ -275,6 +280,11 @@ class NamespaceIdentifier(str):
     @require(lambda identifier: NAMESPACE_IDENTIFIER_RE.fullmatch(identifier))
     def __new__(cls, identifier: str) -> "NamespaceIdentifier":
         return cast(NamespaceIdentifier, identifier)
+
+
+#: Name of the static class which holds the helpers shared by the transpiled code
+#: in the types and in the verification
+COMMON_CLASS: Final[Identifier] = Identifier("Common")
 
 
 WARNING: Final[Stripped] = Stripped(

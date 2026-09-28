@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "First": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "First"
+            }
+          }
+        }
+      ]
+    },
+    "Item": {
+      "type": "object",
+      "properties": {
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "count": {
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/definitions/Kind"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "texts",
+        "count",
+        "modelType"
+      ]
+    },
+    "Kind": {
+      "type": "string",
+      "enum": [
+        "alpha",
+        "beta"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "First",
+        "Second"
+      ]
+    },
+    "Second": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Item"
+        },
+        {
+          "properties": {
+            "note": {
+              "type": "string"
+            },
+            "modelType": {
+              "const": "Second"
+            }
+          },
+          "required": [
+            "note"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -749,12 +749,16 @@ def generate_comment_for_property(
 
 
 def generate_comment_for_signature(
-    description: intermediate.DescriptionOfSignature, context: Context
+    description: intermediate.DescriptionOfSignature,
+    context: Context,
+    extra_remarks: Sequence[str] = (),
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """
     Generate the docstring for the given signature.
 
     A signature, in this context, means a function or a method signature.
+
+    The ``extra_remarks`` are appended as plain-text paragraphs to the remarks.
     """
     errors = []  # type: List[str]
 
@@ -776,6 +780,10 @@ def generate_comment_for_signature(
         else:
             assert remark_tokens is not None
             tokens.extend(_post_process_remark(remark_tokens))
+
+    for extra_remark in extra_remarks:
+        tokens.append(_TokenP())
+        tokens.append(_TokenText(extra_remark))
 
     blocks = []  # type: List[Stripped]
 

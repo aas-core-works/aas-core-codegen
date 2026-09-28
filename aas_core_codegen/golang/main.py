@@ -44,27 +44,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    unsupported_methods_errors = (
-        intermediate.errors_if_non_implementation_specific_methods(verified_ir_table)
-    )
-    if unsupported_methods_errors is not None:
-        run.write_error_report(
-            message=f"We added some support for understood methods already and keep "
-            f"maintaining it as it is only a matter of time when we will "
-            f"introduce their transpilation. Introducing them after the fact "
-            f"would have been much more difficult.\n"
-            f"\n"
-            f"At the given moment, however, we deliberately focus only on "
-            f"implementation-specific methods. "
-            f"(based on meta-model {context.model_path})",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in unsupported_methods_errors
-            ],
-            stderr=stderr,
-        )
-        return 1
-
     verification_functions_errors = golang_lib.verify_verification_functions(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
@@ -350,7 +329,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     ):
         rel_paths_generators = list(rel_paths_generators) + [
             (
-                base_rel_path / "verification/test/arithmetic_test.go",
+                base_rel_path / "common/arithmetic_test/arithmetic_test.go",
                 lambda: (
                     golang_tests.generate_arithmetic_test(
                         symbol_table=verified_ir_table, repo_url=repo_url

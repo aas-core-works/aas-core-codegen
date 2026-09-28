@@ -82,13 +82,13 @@ def generate_implementation(
  * the divisor in Python (<code>-7 % 3 == 2</code>), while the native C++ operator
  * <code>%</code> truncates the division towards zero so that the remainder takes
  * the sign of the dividend (<code>-7 % 3 == -1</code>). Therefore, we transpile
- * the modulo to <code>verification::FloorMod</code> instead of the native
+ * the modulo to <code>common::FloorMod</code> instead of the native
  * operator.
  */"""
         ),
         Stripped(
             f"""\
-#include "{include_prefix_path}/verification.hpp"
+#include "{include_prefix_path}/common.hpp"
 
 #pragma warning(push, 0)
 #include <cmath>
@@ -116,7 +116,7 @@ TEST_CASE("Test FloorMod of {case.dividend} by {case.divisor}") {{
 {I}const int64_t expected = {_int64_literal(case.expected)};
 
 {I}REQUIRE(
-{II}aas::verification::FloorMod(dividend, divisor)
+{II}aas::common::FloorMod(dividend, divisor)
 {II}== expected
 {I});
 }}"""
