@@ -839,7 +839,35 @@ class If(Statement):
         visitor.visit_if(self)
 
 
-StatementUnion = Union[Assignment, Return, Switch, For, Continue, If]
+class ExpressionStatement(Statement):
+    """
+    Represent a call whose result, if any, is discarded.
+
+    We allow only the calls as expression statements, since the other expressions
+    have no effect, and some targets, such as Go, refuse to compile them.
+    """
+
+    expression: Union[MethodCall, FunctionCall]
+
+    def __init__(
+        self, expression: Union[MethodCall, FunctionCall], original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Statement.__init__(self, original_node=original_node)
+        self.expression = expression
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_expression_statement(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_expression_statement(self)
+
+
+StatementUnion = Union[
+    Assignment, Return, Switch, For, Continue, If, ExpressionStatement
+]
 
 
 def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
@@ -934,6 +962,7 @@ class Visitor(DBC):
 
     def visit_function_call(self, node: FunctionCall) -> None:
         """Visit a function call."""
+        self.visit(node.name)
         for arg in node.args:
             self.visit(arg)
 
@@ -1068,6 +1097,10 @@ class Visitor(DBC):
         if node.default is not None:
             for stmt in node.default:
                 self.visit(stmt)
+
+    def visit_expression_statement(self, node: ExpressionStatement) -> None:
+        """Visit a call whose result is discarded."""
+        self.visit(node.expression)
 
 
 class Transformer(Generic[T], DBC):
@@ -1240,6 +1273,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_if(self, node: If) -> T:
         """Transform an if-statement into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_expression_statement(self, node: ExpressionStatement) -> T:
+        """Transform a call whose result is discarded into something."""
         raise NotImplementedError(f"{node=}")
 
 
@@ -1653,6 +1691,17 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_expression_statement(
+        self, node: ExpressionStatement
+    ) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("expression", self.transform(node.expression)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
 
 def dump(node: Node) -> str:
     """Produce a string representation of the tree."""
@@ -1800,6 +1849,10 @@ class RestrictedTransformer(Transformer[T]):
         """Transform an if-statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_expression_statement(self, node: ExpressionStatement) -> T:
+        """Transform a call whose result is discarded into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
 
 class _IterationTransformer(Transformer[Iterator[Node]]):
     """Transform a node into an iterator over nodes."""
@@ -1856,6 +1909,7 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
 
     def transform_function_call(self, node: FunctionCall) -> Iterator[Node]:
         yield node
+        yield from self.transform(node.name)
         for arg in node.args:
             yield from self.transform(arg)
 
@@ -1991,6 +2045,12 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         if node.default is not None:
             for stmt in node.default:
                 yield from self.transform(stmt)
+
+    def transform_expression_statement(
+        self, node: ExpressionStatement
+    ) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.expression)
 
 
 _ITERATION_TRANSFORMER = _IterationTransformer()

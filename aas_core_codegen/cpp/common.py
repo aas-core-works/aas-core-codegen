@@ -674,6 +674,36 @@ def generate_type_with_ref(
     return Stripped(f"{code}&")
 
 
+def generate_argument_type(
+    argument: intermediate.Argument,
+    types_namespace: Optional[Identifier] = None,
+) -> Stripped:
+    """
+    Generate the C++ type of the ``argument`` of a verification function or a method.
+
+    The mutable lists are passed in as mutable references so that the caller
+    observes the mutations, as in Python. The instances are always passed in as
+    constant references to the shared pointers, as the instance is mutable through
+    the pointer anyway, and the type inference already refuses to mutate
+    the read-only instances.
+
+    If ``types_namespace`` is specified, it is prepended to all our types.
+    """
+    if argument.mutable and isinstance(
+        intermediate.beneath_optional(argument.type_annotation),
+        intermediate.ListTypeAnnotation,
+    ):
+        return generate_type_with_ref(
+            type_annotation=argument.type_annotation,
+            types_namespace=types_namespace,
+        )
+
+    return generate_type_with_const_ref_if_applicable(
+        type_annotation=argument.type_annotation,
+        types_namespace=types_namespace,
+    )
+
+
 _ANGLE_BRACKETS_IN_TYPE_RE = re.compile(r"\s*([<>])\s*")
 _INDENT_LIST = [
     INDENT,

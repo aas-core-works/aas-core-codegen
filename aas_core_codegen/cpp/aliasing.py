@@ -157,7 +157,13 @@ class _Collector(parse_tree.Visitor):
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
         arguments: Sequence[intermediate.Argument],
+        binds_self: bool,
     ) -> None:
+        """
+        Initialize with the given values.
+
+        If ``binds_self`` is set, ``self`` is bound as an argument, as in a method.
+        """
         self.type_map = type_map
 
         self.binding_by_name = dict()  # type: MutableMapping[parse_tree.Name, _Binding]
@@ -197,12 +203,16 @@ class _Collector(parse_tree.Visitor):
 
         self.errors = []  # type: List[Error]
 
+        argument_names = [arg.name for arg in arguments]
+        if binds_self:
+            argument_names.append(Identifier("self"))
+
         self._scopes = [
             {
-                arg.name: _Binding(
-                    identifier=arg.name, kind=_BindingKind.ARGUMENT, definition=None
+                name: _Binding(
+                    identifier=name, kind=_BindingKind.ARGUMENT, definition=None
                 )
-                for arg in arguments
+                for name in argument_names
             }
         ]  # type: List[MutableMapping[Identifier, _Binding]]
 
@@ -297,17 +307,13 @@ class _Collector(parse_tree.Visitor):
                 f"this should have been caught in the type inference"
             )
 
-    def visit_function_call(self, node: parse_tree.FunctionCall) -> None:
-        for arg in node.args:
-            self.visit(arg)
-
-        func_type = self.type_map.get(node.name, None)
-        if not isinstance(
-            func_type, intermediate_type_inference.VerificationTypeAnnotation
-        ):
-            return
-
-        for arg_node, argument in zip(node.args, func_type.func.arguments):
+    def _collect_mutable_arguments(
+        self,
+        arg_nodes: Sequence[parse_tree.Expression],
+        arguments: Sequence[intermediate.Argument],
+    ) -> None:
+        """Collect the facts about the ``arg_nodes`` passed to mutable arguments."""
+        for arg_node, argument in zip(arg_nodes, arguments):
             if not argument.mutable:
                 continue
 
@@ -325,16 +331,34 @@ class _Collector(parse_tree.Visitor):
             else:
                 self.passes_mutable_non_primitive = True
 
+    def visit_function_call(self, node: parse_tree.FunctionCall) -> None:
+        for arg in node.args:
+            self.visit(arg)
+
+        func_type = self.type_map.get(node.name, None)
+        if isinstance(
+            func_type, intermediate_type_inference.VerificationTypeAnnotation
+        ):
+            self._collect_mutable_arguments(
+                arg_nodes=node.args, arguments=func_type.func.arguments
+            )
+
     def visit_method_call(self, node: parse_tree.MethodCall) -> None:
         self.visit(node.member)
         for arg in node.args:
             self.visit(arg)
 
         method_type = self.type_map.get(node.member, None)
-        if (
-            isinstance(method_type, intermediate_type_inference.MethodTypeAnnotation)
-            and not method_type.method.non_mutating
+        if not isinstance(
+            method_type, intermediate_type_inference.MethodTypeAnnotation
         ):
+            return
+
+        self._collect_mutable_arguments(
+            arg_nodes=node.args, arguments=method_type.method.arguments
+        )
+
+        if not method_type.method.non_mutating:
             self.mutates_in_place = True
             self.passes_mutable_non_primitive = True
 
@@ -405,7 +429,7 @@ class _Collector(parse_tree.Visitor):
 
 
 class Aliasing:
-    """Specify how to declare the variables of a verification function in C++."""
+    """Specify how to declare the variables of a function or a method in C++."""
 
     #: Declarations of the local variables by their defining assignments, and of
     #: the loop variables by their generators
@@ -419,12 +443,22 @@ class Aliasing:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def analyze(
-    verification: intermediate.TranspilableVerification,
+    body: Sequence[parse_tree.Node],
+    arguments: Sequence[intermediate.Argument],
     type_map: Mapping[parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion],
+    binds_self: bool,
 ) -> Tuple[Optional[Aliasing], Optional[List[Error]]]:
-    """Decide how to declare the variables of ``verification`` in C++."""
-    collector = _Collector(type_map=type_map, arguments=verification.arguments)
-    for stmt in verification.parsed.body:
+    """
+    Decide how to declare the variables of a function or a method in C++.
+
+    The ``body`` and the ``arguments`` belong to a verification function or to
+    a method. If ``binds_self`` is set, ``self`` is bound as an argument, as in
+    a method.
+    """
+    collector = _Collector(
+        type_map=type_map, arguments=arguments, binds_self=binds_self
+    )
+    for stmt in body:
         collector.visit(stmt)
 
     errors = list(collector.errors)

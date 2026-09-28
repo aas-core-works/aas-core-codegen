@@ -882,8 +882,8 @@ class Argument:
     #: Set if the argument has been declared mutable, *i.e.*, as ``List[...]`` or
     #: ``Mutable[...]``, possibly wrapped in ``Optional[...]``.
     #:
-    #: The declared mutability matters only for the verification functions, which
-    #: may mutate only their mutable arguments.
+    #: The declared mutability matters for the verification functions and
+    #: the methods, which may mutate only their mutable arguments.
     mutable: Final[bool]
 
     #: Relation to the parse stage
@@ -1153,8 +1153,9 @@ class Method(SignatureLike):
 
     #: If set, the method does not mutate the instance data.
     #:
-    #: We do not check for non-mutating methods in any way as this is very complex,
-    #: so we leave it out-of-scope for the moment (2023-07-06).
+    #: The type inference checks that the body of an understood non-mutating method
+    #: does not mutate ``self``. We can not check the implementation-specific
+    #: methods, so we trust their marker.
     non_mutating: Final[bool]
 
     # fmt: off
@@ -1225,12 +1226,6 @@ class Method(SignatureLike):
         raise NotImplementedError()
 
 
-# NOTE (mristin):
-# At the moment, we support only implementation-specific methods. However, we anticipate
-# that we will try to understand the methods in the very near future, so we already
-# prepare the class hierarchy for it.
-
-
 class ImplementationSpecificMethod(Method):
     """Represent an implementation-specific method of a class."""
 
@@ -1252,7 +1247,13 @@ class ImplementationSpecificMethod(Method):
 
 
 class UnderstoodMethod(Method):
-    """Represent a method of a class which we could understand."""
+    """
+    Represent a method of a class which we could understand.
+
+    The generators transpile the body of the method. The invariants of the instance
+    are not checked after the method call, as that would be too inefficient;
+    the invariants are verified only in the verification module.
+    """
 
     #: Understood syntax tree of the method's body
     body: Final[Sequence[parse_tree.Node]]

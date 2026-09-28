@@ -58,7 +58,112 @@ SymbolTable(
           json_name='maybeCount',
           xml_name='maybeCount',
           parsed=...)],
-      methods=[],
+      methods=[
+        UnderstoodMethod(
+          name='is_valid_index',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='index',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check a method taking an integer argument, called with a length.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Something',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=And(
+                  values=[
+                    Comparison(
+                      left=Constant(
+                        value=0,
+                        original_node=...),
+                      op='LE',
+                      right=Name(
+                        identifier='index',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=Name(
+                        identifier='index',
+                        original_node=...),
+                      op='LT',
+                      right=FunctionCall(
+                        name='len',
+                        args=[
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='texts',
+                            original_node=...)],
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...),
+        UnderstoodMethod(
+          name='text_at',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='index',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check reading in a method at an index which is an integer argument.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Something',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=Index(
+                  collection=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='texts',
+                    original_node=...),
+                  index=Name(
+                    identifier='index',
+                    original_node=...),
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -153,6 +258,106 @@ SymbolTable(
               argument='maybe_count',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Last text is not empty',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='texts',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=MethodCall(
+                  member=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='text_at',
+                    original_node=...),
+                  args=[
+                    Sub(
+                      left=FunctionCall(
+                        name='len',
+                        args=[
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='texts',
+                            original_node=...)],
+                        original_node=...),
+                      right=Constant(
+                        value=1,
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                op='NE',
+                right=Constant(
+                  value='',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Last position is a valid index',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='texts',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              consequent=MethodCall(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='is_valid_index',
+                  original_node=...),
+                args=[
+                  Sub(
+                    left=FunctionCall(
+                      name='len',
+                      args=[
+                        Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='texts',
+                          original_node=...)],
+                      original_node=...),
+                    right=Constant(
+                      value=1,
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
         Invariant(
           description='Count after re-assignment is small',
           body=textwrap.dedent("""\

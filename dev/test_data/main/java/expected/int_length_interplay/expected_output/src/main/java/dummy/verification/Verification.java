@@ -143,6 +143,24 @@ public class Verification {
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
+      if (!(
+        !(that.getTexts().size() > 0)
+        || (!Objects.equals(that.textAt((long) (that.getTexts().size() - 1)), "")))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Last text is not empty")));
+      }
+
+      if (!(
+        !(that.getTexts().size() > 0)
+        || that.isValidIndex((long) (that.getTexts().size() - 1)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Last position is a valid index")));
+      }
+
       if (!(countAfterReassignment(that.getTexts()) < 6)) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(

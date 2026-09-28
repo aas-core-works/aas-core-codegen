@@ -83,6 +83,22 @@ func (es *enhancedSomething[E]) SetMaybeCount(
 	es.instance.SetMaybeCount(value)
 }
 
+func (s *enhancedSomething[E]) IsValidIndex(
+	index int64,
+) bool {
+	return s.instance.IsValidIndex(
+		index,
+	)
+}
+
+func (s *enhancedSomething[E]) TextAt(
+	index int64,
+) string {
+	return s.instance.TextAt(
+		index,
+	)
+}
+
 func (es *enhancedSomething[E]) getEnhancement(
 ) E {
 	return es.enhancement

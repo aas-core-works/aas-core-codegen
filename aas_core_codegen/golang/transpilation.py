@@ -51,15 +51,15 @@ PRIMITIVE_TYPE_MAP = {
     intermediate_type_inference.PrimitiveType.LENGTH: Stripped("int"),
 }
 
-#: Name of the helper function in the verification package which computes
+#: Name of the helper function in the common package which computes
 #: the remainder of the floored division as in Python.
 #:
 #: See :py:meth:`Transpiler.transform_mod` and
-#: :py:data:`aas_core_codegen.golang.lib._generate_verification.FLOOR_MOD` on why
+#: :py:data:`aas_core_codegen.golang.lib._generate_common.FLOOR_MOD` on why
 #: we do not use the native Go operator ``%``.
 FLOOR_MOD_FUNCTION_NAME = Identifier("FloorMod")
 
-#: Name of the helper function in the verification package which computes
+#: Name of the helper function in the common package which computes
 #: the absolute value of a 64-bit signed integer.
 #:
 #: Go does not provide an absolute value for integers in its standard library;
@@ -1171,8 +1171,8 @@ aascommon.MapContains(
                     # NOTE (mristin):
                     # Go provides no absolute value of integers in its standard
                     # library, so we call our own helper, see
-                    # :py:data:`aas_core_codegen.golang.lib._generate_verification.ABS_INT64`.
-                    abs_function = ABS_INT64_FUNCTION_NAME
+                    # :py:data:`aas_core_codegen.golang.lib._generate_common.ABS_INT64`.
+                    abs_function = f"aascommon.{ABS_INT64_FUNCTION_NAME}"
 
                 else:
                     return None, Error(
@@ -1577,7 +1577,7 @@ aascommon.MapContains(
         # the same sign, but the invariants must behave the same in all the SDKs for
         # all the inputs. Hence, we call the helper which computes the floored
         # remainder, see
-        # :py:data:`aas_core_codegen.golang.lib._generate_verification.FLOOR_MOD`.
+        # :py:data:`aas_core_codegen.golang.lib._generate_common.FLOOR_MOD`.
         #
         # However, a length is never negative. When the dividend is a length and
         # the divisor is either a length or a positive integer literal, both operands
@@ -1626,13 +1626,13 @@ aascommon.MapContains(
         if "\n" in args_joined or len(args_joined) > 50:
             call = Stripped(
                 f"""\
-{FLOOR_MOD_FUNCTION_NAME}(
+aascommon.{FLOOR_MOD_FUNCTION_NAME}(
 {I}{indent_but_first_line(left, I)},
 {I}{indent_but_first_line(right, I)},
 )"""
             )
         else:
-            call = Stripped(f"{FLOOR_MOD_FUNCTION_NAME}({args_joined})")
+            call = Stripped(f"aascommon.{FLOOR_MOD_FUNCTION_NAME}({args_joined})")
 
         if result_a_type is length:
             # NOTE (mristin):
@@ -2366,6 +2366,11 @@ return {indent_but_first_line(value, I)}"""
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue"), None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self.transform(node.expression)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(

@@ -20,6 +20,68 @@ from aas_core_codegen.typescript.common import (
 )
 
 
+#: Helper to compute the remainder of the floored division as in Python.
+#:
+#: We deliberately do not transpile the modulo to the native TypeScript operator
+#: ``%``. JavaScript truncates the division towards zero so that its remainder
+#: takes the sign of the dividend (``-7 % 3 == -1``). The meta-model is written in
+#: Python where the division is floored so that the remainder takes the sign of
+#: the divisor (``-7 % 3 == 2``). The two only coincide when the operands have
+#: the same sign, but the invariants must behave the same in all the SDKs for all
+#: the inputs.
+#:
+#: Moreover, the native ``%`` gives a negative zero if the dividend is negative
+#: and divisible by the divisor (``-6 % 3`` is ``-0``). Python has no negative
+#: integer zero, so we normalize it to a positive zero with ``+ 0``. Otherwise,
+#: ``Object.is`` and, consequently, ``toBe`` in jest, would distinguish the result
+#: from ``0``.
+#:
+#: The numbers in TypeScript are double-precision floating-point numbers, so
+#: the integers are exact only up to ``Number.MAX_SAFE_INTEGER``.
+FLOOR_MOD = Stripped(
+    f"""\
+/**
+ * Compute the remainder of the floored division of `dividend` by `divisor`.
+ *
+ * @remarks
+ *
+ * The remainder takes the sign of the divisor, as the modulo in Python,
+ * in which the meta-model is written.
+ *
+ * We deliberately do not use the native operator `%` which truncates
+ * the division towards zero so that its remainder takes the sign of
+ * the dividend. For example, `-7 % 3 === -1` in TypeScript, while
+ * `-7 % 3 == 2` in Python. The two only coincide when the operands have
+ * the same sign, but the invariants must behave the same in all the SDKs for
+ * all the inputs.
+ *
+ * Unlike the native operator `%`, this function never returns a negative zero.
+ * For example, `-6 % 3` gives `-0` in TypeScript, while this function
+ * gives `0`.
+ *
+ * The `divisor` must not be zero.
+ *
+ * The numbers in TypeScript are double-precision floating-point numbers, so
+ * the result is exact only if the operands are integers within
+ * `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`.
+ *
+ * @param dividend - left operand of the modulo
+ * @param divisor - right operand of the modulo, must not be zero
+ * @returns the remainder with the sign of the divisor
+ */
+export function floorMod(dividend: number, divisor: number): number {{
+{I}const remainder = dividend % divisor;
+{I}if (remainder !== 0 && (remainder < 0) !== (divisor < 0)) {{
+{II}return remainder + divisor;
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// We add zero to turn a negative zero into a positive zero.
+{I}return remainder + 0;
+}}"""
+)
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -670,6 +732,14 @@ export function findStr(text: string, sub: string, start = 0): number {{
 }}"""
             ),
         ]
+
+    # NOTE (mristin):
+    # We add the helper only if the meta-model uses the modulo so that we do not
+    # clutter the code otherwise. The helper lives in the common module so that
+    # both the verification and the methods in the types can use it. It is exported
+    # so that the clients can rely on it, and so that we can unit-test it.
+    if intermediate.uses_modulo(symbol_table):
+        blocks.insert(len(blocks) - 1, FLOOR_MOD)
 
     writer = io.StringIO()
     for i, block in enumerate(blocks):

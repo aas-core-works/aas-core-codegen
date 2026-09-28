@@ -106,6 +106,30 @@ class Something(Class):
 
     maybe_count: Optional[int]
 
+    def is_valid_index(
+        self,
+        index: int
+    ) -> bool:
+        """
+        Check a method taking an integer argument, called with a length.
+        """
+        # pylint: disable=all
+        return (
+            (
+                0 <= index
+                and index < len(self.texts)
+            ))
+
+    def text_at(
+        self,
+        index: int
+    ) -> str:
+        """
+        Check reading in a method at an index which is an integer argument.
+        """
+        # pylint: disable=all
+        return self.texts[index]
+
     def descend_once(self) -> Iterator[Class]:
         """
         Iterate over the instances referenced from this instance.

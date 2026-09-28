@@ -1,0 +1,3 @@
+Failed to verify the intermediate symbol table for generation of C# code based on <path to meta_model.py>:
+* At line 7 and column 2: The C# name 'Common' of the meta-model concrete class 'Common' collides with the static class of the helpers shared by the transpiled code
+* At line 1 and column 1: The C# name 'Common' of the verification function 'common' collides with the static class of the helpers shared by the transpiled code

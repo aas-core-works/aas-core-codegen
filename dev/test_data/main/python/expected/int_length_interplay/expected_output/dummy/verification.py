@@ -171,6 +171,22 @@ class _Transformer(
             self,
             that: aas_types.Something
     ) -> Iterator[Error]:
+        if not (
+            not (len(that.texts) > 0)
+            or (that.text_at(len(that.texts) - 1) != '')
+        ):
+            yield Error(
+                'Last text is not empty'
+            )
+
+        if not (
+            not (len(that.texts) > 0)
+            or that.is_valid_index(len(that.texts) - 1)
+        ):
+            yield Error(
+                'Last position is a valid index'
+            )
+
         if not (count_after_reassignment(that.texts) < 6):
             yield Error(
                 'Count after re-assignment is small'

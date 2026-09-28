@@ -1048,8 +1048,13 @@ def generate_comment_for_enumeration_literal(
 
 def _render_description_of_signature(
     description: intermediate.DescriptionOfSignature,
+    extra_remarks: Sequence[str],
 ) -> Tuple[Optional[_List], Optional[List[Error]]]:
-    """Render a description where constraints are put in remarks."""
+    """
+    Render a description where constraints are put in remarks.
+
+    The ``extra_remarks`` are appended as plain-text paragraphs to the remarks.
+    """
     result_items = []  # type: List[_NodeUnion]
     errors = []  # type: List[Error]
 
@@ -1076,6 +1081,11 @@ def _render_description_of_signature(
         else:
             assert remark_node is not None
             remark_nodes.append(remark_node)
+
+    for extra_remark in extra_remarks:
+        remark_nodes.append(
+            _Element(name="para", children=_List(items=[_Text(extra_remark)]))
+        )
 
     param_nodes = []  # type: List[_NodeUnion]
 
@@ -1131,13 +1141,18 @@ def _render_description_of_signature(
 
 def generate_comment_for_signature(
     description: intermediate.DescriptionOfSignature,
+    extra_remarks: Sequence[str] = (),
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """
     Generate the documentation comment for the given signature.
 
     A signature, in this context, means a function or a method signature.
+
+    The ``extra_remarks`` are appended as plain-text paragraphs to the remarks.
     """
-    node, errors = _render_description_of_signature(description=description)
+    node, errors = _render_description_of_signature(
+        description=description, extra_remarks=extra_remarks
+    )
     if errors is not None:
         return None, errors
 
@@ -1149,3 +1164,23 @@ def generate_comment_for_signature(
     commented_lines = [_slash_slash_slash_line(line) for line in text.splitlines()]
 
     return Stripped("\n".join(commented_lines)), None
+
+
+def generate_comment_for_remarks(remarks: Sequence[str]) -> Stripped:
+    """Generate the documentation comment with only the plain-text ``remarks``."""
+    node = _Element(
+        name="remarks",
+        children=_List(
+            items=[
+                _Element(name="para", children=_List(items=[_Text(remark)]))
+                for remark in remarks
+            ]
+        ),
+    )  # type: _NodeUnion
+
+    _compress_node_in_place(node=node)
+    text = _to_text(node)
+
+    return Stripped(
+        "\n".join(_slash_slash_slash_line(line) for line in text.splitlines())
+    )

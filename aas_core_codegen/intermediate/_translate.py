@@ -5729,64 +5729,178 @@ def _assert_all_type_annotations_are_unique_instances(
 def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error]:
     """Check that ``Mutable[...]`` wraps only the classes."""
     errors = []  # type: List[Error]
-    for func in symbol_table.verification_functions:
-        for arg in func.arguments:
-            mutability_type = _mutability_type_beneath_optional(
-                arg.parsed.type_annotation
-            )
-            if mutability_type is None or mutability_type.identifier != "Mutable":
-                continue
 
-            type_anno = beneath_optional(arg.type_annotation)
-            if isinstance(type_anno, OurTypeAnnotation) and isinstance(
-                type_anno.our_type, Class
+    arguments_with_whats = [
+        (arg, f"The argument {arg.name!r} of the verification function {func.name!r}")
+        for func in symbol_table.verification_functions
+        for arg in func.arguments
+    ] + [
+        (
+            arg,
+            f"The argument {arg.name!r} of the method {method.name!r} "
+            f"of the class {cls.name!r}",
+        )
+        for cls in symbol_table.classes
+        for method in cls.methods
+        if method.specified_for is cls
+        for arg in method.arguments
+    ]
+
+    for arg, what in arguments_with_whats:
+        mutability_type = _mutability_type_beneath_optional(arg.parsed.type_annotation)
+        if mutability_type is None or mutability_type.identifier != "Mutable":
+            continue
+
+        type_anno = beneath_optional(arg.type_annotation)
+        if isinstance(type_anno, OurTypeAnnotation) and isinstance(
+            type_anno.our_type, Class
+        ):
+            continue
+
+        # NOTE (mristin):
+        # The parser already refused ``Mutable`` around ``List`` and
+        # ``Sequence``, as it can tell them apart syntactically.
+        assert not isinstance(type_anno, ListTypeAnnotation)
+
+        reason: str
+        if isinstance(type_anno, PrimitiveTypeAnnotation) or (
+            isinstance(type_anno, OurTypeAnnotation)
+            and isinstance(type_anno.our_type, ConstrainedPrimitive)
+        ):
+            reason = (
+                f"the values of type {type_anno} are immutable. A function can "
+                f"not change such a value in place; it can only re-bind its "
+                f"argument to another value, which the caller never observes"
+            )
+        elif isinstance(type_anno, OurTypeAnnotation) and isinstance(
+            type_anno.our_type, Enumeration
+        ):
+            reason = (
+                f"the literals of the enumeration {type_anno.our_type.name!r} "
+                f"are immutable values. A function can only re-bind its "
+                f"argument to another literal, which the caller never observes"
+            )
+        elif isinstance(type_anno, TupleTypeAnnotation):
+            reason = (
+                "the tuples are immutable in Python. If the function mutates "
+                "the objects held in the tuple, please pass them as separate "
+                "Mutable arguments"
+            )
+        else:
+            reason = f"we do not support mutating the values of type {type_anno}"
+
+        errors.append(
+            Error(
+                arg.parsed.node,
+                f"{what} is declared as Mutable, but Mutable applies only to "
+                f"the instances of the classes, and makes no sense here, since "
+                f"{reason}. Please remove Mutable.",
+            )
+        )
+
+    return errors
+
+
+def _verify_methods_refer_neither_to_constants_nor_verification_functions(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """
+    Check that the understood methods refer to no constants and verification functions.
+
+    The methods are generated in the types module, while the constants and
+    the verification functions live in their own modules, which depend on the types
+    module. A reference from a method would introduce a cyclic dependency, which
+    some targets, such as Go, refuse to compile, and which breaks the loading of
+    the modules in others, such as Python or TypeScript.
+    """
+    errors = []  # type: List[Error]
+    for cls in symbol_table.classes:
+        for method in cls.methods:
+            if method.specified_for is not cls or not isinstance(
+                method, UnderstoodMethod
             ):
                 continue
 
-            # NOTE (mristin):
-            # The parser already refused ``Mutable`` around ``List`` and
-            # ``Sequence``, as it can tell them apart syntactically.
-            assert not isinstance(type_anno, ListTypeAnnotation)
+            for stmt in method.body:
+                for node in parse_tree.over_nodes(stmt):
+                    if not isinstance(node, parse_tree.Name):
+                        continue
 
-            what = (
-                f"The argument {arg.name!r} of the verification function {func.name!r}"
-            )
+                    what: str
+                    if node.identifier in symbol_table.constants_by_name:
+                        what = "constant"
+                    elif node.identifier in symbol_table.verification_functions_by_name:
+                        what = "verification function"
+                    else:
+                        continue
 
-            reason: str
-            if isinstance(type_anno, PrimitiveTypeAnnotation) or (
-                isinstance(type_anno, OurTypeAnnotation)
-                and isinstance(type_anno.our_type, ConstrainedPrimitive)
+                    errors.append(
+                        Error(
+                            node.original_node,
+                            f"The method {method.name!r} of the class {cls.name!r} "
+                            f"refers to the {what} {node.identifier!r}. "
+                            f"The methods are generated in the types module, "
+                            f"while the constants and the verification functions "
+                            f"live in their own modules, which depend on the types "
+                            f"module. A reference from a method would introduce "
+                            f"a cyclic dependency between the modules. We do not "
+                            f"support such references at the moment; please "
+                            f"contact the developers if you need this feature.",
+                        )
+                    )
+
+    return errors
+
+
+def _verify_self_only_accessed_in_methods(symbol_table: SymbolTable) -> List[Error]:
+    """
+    Check that the understood methods use ``self`` only to access its members.
+
+    Some targets can not let the instance on which the method is called escape
+    the member access. For example, ``this`` is a raw pointer in C++, while
+    the instances are passed around as shared pointers. Hence, we refuse to pass
+    ``self`` as an argument, to assign it to a variable, to return it, to put it
+    in a tuple, to compare it or to check it with ``isinstance``.
+    """
+    errors = []  # type: List[Error]
+    for cls in symbol_table.classes:
+        for method in cls.methods:
+            if method.specified_for is not cls or not isinstance(
+                method, UnderstoodMethod
             ):
-                reason = (
-                    f"the values of type {type_anno} are immutable. A function can "
-                    f"not change such a value in place; it can only re-bind its "
-                    f"argument to another value, which the caller never observes"
-                )
-            elif isinstance(type_anno, OurTypeAnnotation) and isinstance(
-                type_anno.our_type, Enumeration
-            ):
-                reason = (
-                    f"the literals of the enumeration {type_anno.our_type.name!r} "
-                    f"are immutable values. A function can only re-bind its "
-                    f"argument to another literal, which the caller never observes"
-                )
-            elif isinstance(type_anno, TupleTypeAnnotation):
-                reason = (
-                    "the tuples are immutable in Python. If the function mutates "
-                    "the objects held in the tuple, please pass them as separate "
-                    "Mutable arguments"
-                )
-            else:
-                reason = f"we do not support mutating the values of type {type_anno}"
+                continue
 
-            errors.append(
-                Error(
-                    arg.parsed.node,
-                    f"{what} is declared as Mutable, but Mutable applies only to "
-                    f"the instances of the classes, and makes no sense here, since "
-                    f"{reason}. Please remove Mutable.",
-                )
-            )
+            nodes = [
+                node for stmt in method.body for node in parse_tree.over_nodes(stmt)
+            ]
+
+            accessed_set = {
+                id(node.instance)
+                for node in nodes
+                if isinstance(node, parse_tree.Member)
+            }
+
+            for node in nodes:
+                if (
+                    isinstance(node, parse_tree.Name)
+                    and node.identifier == "self"
+                    and id(node) not in accessed_set
+                ):
+                    errors.append(
+                        Error(
+                            node.original_node,
+                            f"The method {method.name!r} of the class {cls.name!r} "
+                            f"uses self other than to access its properties or "
+                            f"methods, *e.g.*, it passes self as an argument, "
+                            f"assigns it to a variable or checks it with "
+                            f"isinstance. Some targets can not let the instance "
+                            f"escape the member access, *e.g.*, ``this`` is a raw "
+                            f"pointer in C++, while the instances are passed around "
+                            f"as shared pointers. We do not support such uses of "
+                            f"self at the moment; please contact the developers if "
+                            f"you need this feature.",
+                        )
+                    )
 
     return errors
 
@@ -5852,6 +5966,14 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_invariant_descriptions_unique(symbol_table=symbol_table))
 
     errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
+
+    errors.extend(
+        _verify_methods_refer_neither_to_constants_nor_verification_functions(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(_verify_self_only_accessed_in_methods(symbol_table=symbol_table))
 
     errors.extend(
         _verify_names_unique_regardless_of_visibility(symbol_table=symbol_table)
@@ -6347,38 +6469,6 @@ def errors_if_contracts_for_functions_or_methods_defined(
                     f"for {signature_like.name!r}",
                 )
             )
-
-    if len(errors) > 0:
-        return errors
-
-    return None
-
-
-def errors_if_non_implementation_specific_methods(
-    symbol_table: SymbolTable,
-) -> Optional[List[Error]]:
-    """
-    Generate an error if one or more class methods are not implementation-specific.
-
-    We added some support for understood methods already and keep maintaining it as
-    it is only a matter of time when we will introduce their transpilation. Introducing
-    them "after the fact" would have been much more difficult.
-
-    At the given moment, however, we deliberately focus only on implementation-specific
-    methods.
-    """
-    errors = []  # type: List[Error]
-
-    for cls in symbol_table.classes:
-        for method in cls.methods:
-            if not isinstance(method, ImplementationSpecificMethod):
-                errors.append(
-                    Error(
-                        method.parsed.node,
-                        f"Method {method.name!r} of class {cls.name!r} is not "
-                        f"implementation-specific",
-                    )
-                )
 
     if len(errors) > 0:
         return errors

@@ -6,6 +6,7 @@ from typing import (
     cast,
     Dict,
     List,
+    Mapping,
     Optional,
     Tuple,
     Union,
@@ -21,11 +22,14 @@ from aas_core_codegen.common import (
     Identifier,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
     naming as java_naming,
+    optional as java_optional,
+    transpilation as java_transpilation,
 )
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -35,7 +39,9 @@ from aas_core_codegen.java.common import (
 )
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
+    type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.parse import tree as parse_tree
 
 
 # region Checks
@@ -737,6 +743,53 @@ def _generate_imports_for_class(
     return Stripped("\n".join(map(lambda imp: f"import {imp};", imports)))
 
 
+@ensure(lambda result: not (result[1] is not None) or (result[0] is None))
+def _generate_comment_for_method(
+    method: intermediate.MethodUnion,
+    cls: intermediate.ClassUnion,
+    package: java_common.PackageIdentifier,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Generate the documentation comment for the ``method``, if any.
+
+    We note in the documentation of the transpiled mutating methods that
+    the invariants are not enforced after the call.
+    """
+    extra_remarks = (
+        [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+        if isinstance(method, intermediate.UnderstoodMethod) and not method.non_mutating
+        else []
+    )
+
+    if method.description is None:
+        if len(extra_remarks) == 0:
+            return None, None
+
+        return (
+            java_description.documentation_comment(
+                Stripped("\n\n".join(extra_remarks))
+            ),
+            None,
+        )
+
+    comment, comment_errors = java_description.generate_comment_for_signature(
+        description=method.description,
+        context=java_description.Context(package=package, cls_or_enum=cls),
+        extra_remarks=extra_remarks,
+    )
+
+    if comment_errors is not None:
+        return None, Error(
+            method.description.parsed.node,
+            f"Failed to generate the documentation comment "
+            f"for the method {method.name!r}",
+            comment_errors,
+        )
+
+    assert comment is not None
+    return comment, None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
     cls: intermediate.ClassUnion, package: java_common.PackageIdentifier
@@ -848,25 +901,13 @@ public interface {name} extends\n"""
 
         signature_blocks = []  # type: List[Stripped]
 
-        if method.description is not None:
-            (
-                signature_comment,
-                signature_comment_errors,
-            ) = java_description.generate_comment_for_signature(
-                description=method.description,
-                context=java_description.Context(package=package, cls_or_enum=cls),
-            )
+        signature_comment, signature_comment_error = _generate_comment_for_method(
+            method=method, cls=cls, package=package
+        )
+        if signature_comment_error is not None:
+            return None, signature_comment_error
 
-            if signature_comment_errors is not None:
-                return None, Error(
-                    method.description.parsed.node,
-                    f"Failed to generate the documentation comment "
-                    f"for the method {method.name!r}",
-                    signature_comment_errors,
-                )
-
-            assert signature_comment is not None
-
+        if signature_comment is not None:
             signature_blocks.append(signature_comment)
 
         # fmt: off
@@ -1193,6 +1234,170 @@ this.{prop_name} = ({arg_name} != null)
     return Stripped("\n".join(blocks)), None
 
 
+class _MethodTranspiler(java_transpilation.Transpiler):
+    """Transpile the body of a :py:class:`intermediate.UnderstoodMethod`."""
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        method: intermediate.UnderstoodMethod,
+    ) -> None:
+        """Initialize with the given values."""
+        java_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            optional_map=is_optional_map,
+            environment=inference.environment_with_args,
+            downcast_map=inference.downcast_map,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(java_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped("this"), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(java_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(java_naming.enum_name(node.identifier)), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the modules in the other targets.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to Java. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method(
+    method: intermediate.UnderstoodMethod,
+    cls: intermediate.ConcreteClass,
+    inference: intermediate_type_inference.InferenceOfFunction,
+    package: java_common.PackageIdentifier,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Transpile the ``method`` as a member of the concrete class ``cls``.
+
+    The ``package`` defines the root Java package.
+    """
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification, on the explicit request of the user. We note that in
+    # the documentation of the mutating methods, see
+    # :py:func:`_generate_comment_for_method`.
+
+    optional_inferrer = java_optional.OptionalInferrer(
+        environment=inference.environment_with_args,
+        type_map=inference.type_map,
+    )
+
+    for node in method.body:
+        _ = optional_inferrer.transform(node)
+
+    if len(optional_inferrer.errors) > 0:
+        return None, Error(
+            method.parsed.node,
+            f"Failed to infer whether the types are optional "
+            f"in the method {method.name!r} of the class {cls.name!r}",
+            optional_inferrer.errors,
+        )
+
+    transpiler = _MethodTranspiler(
+        inference=inference,
+        is_optional_map=optional_inferrer.is_optional_map,
+        method=method,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r} "
+                f"of the class {cls.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+
+    comment, comment_error = _generate_comment_for_method(
+        method=method, cls=cls, package=package
+    )
+    if comment_error is not None:
+        return None, comment_error
+
+    if comment is not None:
+        writer.write(comment)
+        writer.write("\n")
+
+    if method.visibility is intermediate.Visibility.PUBLIC:
+        writer.write("@Override\npublic ")
+    elif method.visibility is intermediate.Visibility.PROTECTED:
+        writer.write("protected ")
+    elif method.visibility is intermediate.Visibility.PRIVATE:
+        writer.write("private ")
+    else:
+        raise AssertionError(
+            f"Unexpected visibility of the method {method.name!r}: "
+            f"{method.visibility}"
+        )
+
+    returns = (
+        java_common.generate_type(type_annotation=method.returns)
+        if method.returns is not None
+        else "void"
+    )
+
+    method_name = java_naming.method_name(method.name)
+
+    arg_defs = [
+        Stripped(
+            f"{java_common.generate_type(arg.type_annotation)} "
+            f"{java_naming.argument_name(arg.name)}"
+        )
+        for arg in method.arguments
+    ]
+
+    if len(arg_defs) == 0:
+        writer.write(f"{returns} {method_name}() {{")
+    else:
+        arg_block = ",\n".join(arg_defs)
+        writer.write(
+            f"""\
+{returns} {method_name}(
+{I}{indent_but_first_line(arg_block, I)}
+) {{"""
+        )
+
+    for stmt in body:
+        writer.write("\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 # fmt: on
@@ -1200,11 +1405,16 @@ def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
     package: java_common.PackageIdentifier,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the class ``cls``.
 
     The ``package`` defines the root Java package.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
     """
     # Code blocks to be later joined by double newlines and indented once
 
@@ -1391,15 +1601,21 @@ public Iterable<{items_type}> {method_name}() {{
                 continue
 
             blocks.append(implementation)
-        else:
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts. We want to finish the meta-model for the V3 and "
-                    "fix de/serialization before taking on this rather hard task.",
-                )
+        elif isinstance(method, intermediate.UnderstoodMethod):
+            method_code, method_error = _transpile_method(
+                method=method,
+                cls=cls,
+                inference=inference_by_method[method],
+                package=package,
             )
+            if method_error is not None:
+                errors.append(method_error)
+                continue
+
+            assert method_code is not None
+            blocks.append(method_code)
+        else:
+            assert_never(method)
 
     visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))
 
@@ -2042,11 +2258,16 @@ def _generate_structure(
     our_type: intermediate.OurType,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[Error]]:
     """
     Generate a single structure.
 
     The ``package`` defines the root Java package.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
     """
     assert isinstance(
         our_type,
@@ -2112,7 +2333,10 @@ def _generate_structure(
             imports = _generate_imports_for_class(cls=our_type, package=package)
 
             code, error = _generate_class(
-                cls=our_type, spec_impls=spec_impls, package=package
+                cls=our_type,
+                spec_impls=spec_impls,
+                package=package,
+                inference_by_method=inference_by_method,
             )
             if error is not None:
                 return None, Error(
@@ -2123,6 +2347,14 @@ def _generate_structure(
                 )
 
             assert code is not None
+
+            # NOTE (mristin):
+            # The transpiled methods might iterate over the ranges with streams.
+            for stream_class in ("IntStream", "LongStream"):
+                if f"{stream_class}." in code:
+                    imports = Stripped(
+                        f"{imports}\nimport java.util.stream.{stream_class};"
+                    )
 
             structure_name = java_naming.class_name(our_type.name)
 
@@ -2181,6 +2413,15 @@ def generate(
     Generate code of the data structures representing the meta-model.
     """
 
+    (
+        inference_by_method,
+        inference_errors,
+    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
+    if inference_errors is not None:
+        return None, inference_errors
+
+    assert inference_by_method is not None
+
     files = []  # type: List[java_common.JavaFile]
     errors = []  # type: List[Error]
 
@@ -2202,7 +2443,12 @@ def generate(
         ):
             continue
 
-        new_files, error = _generate_structure(our_type, package, spec_impls)
+        new_files, error = _generate_structure(
+            our_type=our_type,
+            package=package,
+            spec_impls=spec_impls,
+            inference_by_method=inference_by_method,
+        )
 
         if new_files is not None:
             files.extend(new_files)

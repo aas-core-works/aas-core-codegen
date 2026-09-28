@@ -90,6 +90,16 @@ class ISomething
     common::optional<int64_t> value
   ) = 0;
 
+  /// \brief Check a method taking an integer argument, called with a length.
+  virtual bool IsValidIndex(
+    int64_t index
+  ) const = 0;
+
+  /// \brief Check reading in a method at an index which is an integer argument.
+  virtual std::wstring TextAt(
+    int64_t index
+  ) const = 0;
+
   virtual ~ISomething() = default;
 };
 
@@ -156,6 +166,14 @@ class Something
   ) override;
 
   // endregion
+
+  bool IsValidIndex(
+    int64_t index
+  ) const override;
+
+  std::wstring TextAt(
+    int64_t index
+  ) const override;
 
   ~Something() override = default;
 

@@ -5,6 +5,7 @@ from typing import (
     Optional,
     Dict,
     List,
+    Mapping,
     Tuple,
     cast,
     Union,
@@ -21,11 +22,13 @@ from aas_core_codegen.common import (
     assert_never,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     description as csharp_description,
+    transpilation as csharp_transpilation,
 )
 from aas_core_codegen.csharp.common import (
     INDENT as I,
@@ -36,7 +39,9 @@ from aas_core_codegen.csharp.common import (
 )
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
+    type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.parse import tree as parse_tree
 
 
 # region Checks
@@ -284,6 +289,38 @@ def _verify_structure_name_collisions(
 
     # endregion
 
+    # region Collisions with the class of the common helpers
+
+    # NOTE (mristin):
+    # The helpers shared by the transpiled code live in a static class in the base
+    # namespace, and the verification refers to them unqualified from within
+    # the static class ``Verification``. Hence, neither a structure nor
+    # a verification function must carry the same name.
+    other = observed_structure_names.get(csharp_common.COMMON_CLASS, None)
+    if other is not None:
+        errors.append(
+            Error(
+                other.parsed.node,
+                f"The C# name {csharp_common.COMMON_CLASS!r} "
+                f"of the {_human_readable_identifier(other)} collides with "
+                f"the static class of the helpers shared by the transpiled code",
+            )
+        )
+
+    for verification in symbol_table.verification_functions:
+        if csharp_naming.method_name(verification.name) == csharp_common.COMMON_CLASS:
+            errors.append(
+                Error(
+                    verification.parsed.node,
+                    f"The C# name {csharp_common.COMMON_CLASS!r} of "
+                    f"the verification function {verification.name!r} collides "
+                    f"with the static class of the helpers shared by "
+                    f"the transpiled code",
+                )
+            )
+
+    # endregion
+
     # region Intra-structure collisions
 
     for our_type in symbol_table.our_types:
@@ -398,6 +435,44 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
+@ensure(lambda result: not (result[1] is not None) or (result[0] is None))
+def _generate_comment_for_method(
+    method: intermediate.MethodUnion,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Generate the documentation comment for the ``method``, if any.
+
+    We note in the documentation of the transpiled mutating methods that
+    the invariants are not enforced after the call.
+    """
+    extra_remarks = (
+        [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+        if isinstance(method, intermediate.UnderstoodMethod) and not method.non_mutating
+        else []
+    )
+
+    if method.description is None:
+        if len(extra_remarks) == 0:
+            return None, None
+
+        return csharp_description.generate_comment_for_remarks(extra_remarks), None
+
+    comment, comment_errors = csharp_description.generate_comment_for_signature(
+        method.description, extra_remarks=extra_remarks
+    )
+
+    if comment_errors is not None:
+        return None, Error(
+            method.description.parsed.node,
+            f"Failed to generate the documentation comment "
+            f"for the method {method.name!r}",
+            comment_errors,
+        )
+
+    assert comment is not None
+    return comment, None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
     cls: intermediate.ClassUnion,
@@ -495,22 +570,13 @@ def _generate_interface(
 
         signature_blocks = []  # type: List[Stripped]
 
-        if method.description is not None:
-            (
-                signature_comment,
-                signature_comment_errors,
-            ) = csharp_description.generate_comment_for_signature(method.description)
+        signature_comment, signature_comment_error = _generate_comment_for_method(
+            method=method
+        )
+        if signature_comment_error is not None:
+            return None, signature_comment_error
 
-            if signature_comment_errors is not None:
-                return None, Error(
-                    method.description.parsed.node,
-                    f"Failed to generate the documentation comment "
-                    f"for the method {method.name!r}",
-                    signature_comment_errors,
-                )
-
-            assert signature_comment is not None
-
+        if signature_comment is not None:
             signature_blocks.append(signature_comment)
 
         # fmt: off
@@ -995,12 +1061,159 @@ def _generate_constructor(
     return Stripped("\n".join(blocks)), None
 
 
+class _MethodTranspiler(csharp_transpilation.Transpiler):
+    """Transpile the body of a :py:class:`intermediate.UnderstoodMethod`."""
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        method: intermediate.UnderstoodMethod,
+    ) -> None:
+        """Initialize with the given values."""
+        csharp_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            environment=inference.environment_with_args,
+            downcast_map=inference.downcast_map,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped("this"), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(csharp_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            # NOTE (mristin):
+            # We qualify the enumeration, since a property of the class might
+            # carry the same name, *e.g.*, ``Kind`` of type ``Kind?``.
+            return Stripped(f"Aas.{csharp_naming.enum_name(node.identifier)}"), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the modules in the other targets.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C#. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method(
+    method: intermediate.UnderstoodMethod,
+    cls: intermediate.ConcreteClass,
+    inference: intermediate_type_inference.InferenceOfFunction,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the ``method`` as a member of the concrete class ``cls``."""
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification, on the explicit request of the user. We note that in
+    # the documentation of the mutating methods, see
+    # :py:func:`_generate_comment_for_method`.
+
+    transpiler = _MethodTranspiler(inference=inference, method=method)
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r} "
+                f"of the class {cls.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+
+    comment, comment_error = _generate_comment_for_method(method=method)
+    if comment_error is not None:
+        return None, comment_error
+
+    if comment is not None:
+        writer.write(comment)
+        writer.write("\n")
+
+    modifier: str
+    if method.visibility is intermediate.Visibility.PUBLIC:
+        modifier = "public"
+    elif method.visibility is intermediate.Visibility.PROTECTED:
+        modifier = "protected"
+    elif method.visibility is intermediate.Visibility.PRIVATE:
+        modifier = "private"
+    else:
+        raise AssertionError(
+            f"Unexpected visibility of the method {method.name!r}: "
+            f"{method.visibility}"
+        )
+
+    returns = (
+        csharp_common.generate_type(type_annotation=method.returns)
+        if method.returns is not None
+        else "void"
+    )
+
+    method_name = csharp_naming.method_name(method.name)
+
+    arg_defs = [
+        Stripped(
+            f"{csharp_common.generate_type(arg.type_annotation)} "
+            f"{csharp_naming.argument_name(arg.name)}"
+        )
+        for arg in method.arguments
+    ]
+
+    if len(arg_defs) == 0:
+        writer.write(f"{modifier} {returns} {method_name}()\n{{")
+    else:
+        arg_block = ",\n".join(arg_defs)
+        writer.write(
+            f"""\
+{modifier} {returns} {method_name}(
+{I}{indent_but_first_line(arg_block, I)}
+)
+{{"""
+        )
+
+    for stmt in body:
+        writer.write("\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate code for the given concrete class ``cls``."""
+    """
+    Generate code for the given concrete class ``cls``.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
+    """
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
@@ -1091,20 +1304,18 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
                 continue
 
             blocks.append(implementation)
-        else:
-            # NOTE (mristin):
-            # At the moment, we do not transpile the method body and its contracts.
-            # We want to finish the meta-model for the V3 and fix de/serialization
-            # before taking on this rather hard task.
-
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts. We want to finish the meta-model for the V3 and "
-                    "fix de/serialization before taking on this rather hard task.",
-                )
+        elif isinstance(method, intermediate.UnderstoodMethod):
+            method_code, method_error = _transpile_method(
+                method=method, cls=cls, inference=inference_by_method[method]
             )
+            if method_error is not None:
+                errors.append(method_error)
+                continue
+
+            assert method_code is not None
+            blocks.append(method_code)
+        else:
+            assert_never(method)
 
     blocks.append(_generate_descend_once_method(cls=cls))
 
@@ -1452,6 +1663,15 @@ def generate(
 
     The ``namespace`` defines the base C# namespace of the generated code.
     """
+    (
+        inference_by_method,
+        inference_errors,
+    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
+    if inference_errors is not None:
+        return None, inference_errors
+
+    assert inference_by_method is not None
+
     code_blocks = [
         Stripped(
             f"""\
@@ -1587,7 +1807,11 @@ public interface IUnion<T> : IUnion where T : IUnion<T>
             code_blocks.append(code)
 
             if isinstance(our_type, intermediate.ConcreteClass):
-                code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
+                code, error = _generate_class(
+                    cls=our_type,
+                    spec_impls=spec_impls,
+                    inference_by_method=inference_by_method,
+                )
                 if error is not None:
                     errors.append(
                         Error(
@@ -1613,12 +1837,18 @@ public interface IUnion<T> : IUnion where T : IUnion<T>
         csharp_common.generate_using_aas_directive_if_necessary(namespace)
     )
 
+    # NOTE (mristin):
+    # The transpiled methods might use LINQ, *e.g.*, for ``any`` and ``all``.
+    using_linq = (
+        "\nusing System.Linq;  // can't alias" if len(inference_by_method) > 0 else ""
+    )
+
     using_directives.append(
         Stripped(
-            """\
+            f"""\
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
-using System.Collections.Generic;  // can't alias"""
+using System.Collections.Generic;  // can't alias{using_linq}"""
         )
     )
 

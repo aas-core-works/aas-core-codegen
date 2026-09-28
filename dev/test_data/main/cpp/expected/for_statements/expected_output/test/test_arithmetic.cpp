@@ -9,11 +9,11 @@
  * the divisor in Python (<code>-7 % 3 == 2</code>), while the native C++ operator
  * <code>%</code> truncates the division towards zero so that the remainder takes
  * the sign of the dividend (<code>-7 % 3 == -1</code>). Therefore, we transpile
- * the modulo to <code>verification::FloorMod</code> instead of the native
+ * the modulo to <code>common::FloorMod</code> instead of the native
  * operator.
  */
 
-#include "dummy/verification.hpp"
+#include "dummy/common.hpp"
 
 #pragma warning(push, 0)
 #include <cmath>
@@ -34,7 +34,7 @@ TEST_CASE("Test FloorMod of 7 by 3") {
   const int64_t expected = 1;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -46,7 +46,7 @@ TEST_CASE("Test FloorMod of -7 by 3") {
   const int64_t expected = 2;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -58,7 +58,7 @@ TEST_CASE("Test FloorMod of 7 by -3") {
   const int64_t expected = -2;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -70,7 +70,7 @@ TEST_CASE("Test FloorMod of -7 by -3") {
   const int64_t expected = -1;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -82,7 +82,7 @@ TEST_CASE("Test FloorMod of 6 by 3") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -94,7 +94,7 @@ TEST_CASE("Test FloorMod of -6 by 3") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -106,7 +106,7 @@ TEST_CASE("Test FloorMod of 6 by -3") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -118,7 +118,7 @@ TEST_CASE("Test FloorMod of 0 by 3") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -130,7 +130,7 @@ TEST_CASE("Test FloorMod of 0 by -3") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -142,7 +142,7 @@ TEST_CASE("Test FloorMod of 2 by 5") {
   const int64_t expected = 2;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -154,7 +154,7 @@ TEST_CASE("Test FloorMod of -2 by 5") {
   const int64_t expected = 3;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -166,7 +166,7 @@ TEST_CASE("Test FloorMod of 9223372036854775807 by 2") {
   const int64_t expected = 1;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -178,7 +178,7 @@ TEST_CASE("Test FloorMod of 9223372036854775807 by -2") {
   const int64_t expected = -1;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -190,7 +190,7 @@ TEST_CASE("Test FloorMod of -9223372036854775808 by 3") {
   const int64_t expected = 1;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -202,7 +202,7 @@ TEST_CASE("Test FloorMod of -9223372036854775808 by -1") {
   const int64_t expected = 0;
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }
@@ -214,7 +214,7 @@ TEST_CASE("Test FloorMod of -9223372036854775808 by 9223372036854775807") {
   const int64_t expected = INT64_C(9223372036854775806);
 
   REQUIRE(
-    aas::verification::FloorMod(dividend, divisor)
+    aas::common::FloorMod(dividend, divisor)
     == expected
   );
 }

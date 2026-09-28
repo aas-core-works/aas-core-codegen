@@ -6,6 +6,7 @@ from typing import (
     Optional,
     Dict,
     List,
+    Mapping,
     Tuple,
     cast,
     Union,
@@ -21,12 +22,19 @@ from aas_core_codegen.common import (
     assert_never,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.golang import (
     common as golang_common,
     naming as golang_naming,
     description as golang_description,
+    pointering as golang_pointering,
+    transpilation as golang_transpilation,
 )
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+)
+from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.golang.common import (
     INDENT as I,
     INDENT2 as II,
@@ -1129,6 +1137,53 @@ def _generate_comment_for_property(
     return comment, None
 
 
+@ensure(lambda result: not (result[1] is not None) or (result[0] is None))
+def _generate_comment_for_method(
+    method: intermediate.MethodUnion, cls: intermediate.ClassUnion
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Generate the documentation comment for the ``method``, if any.
+
+    We note in the documentation of the transpiled mutating methods that
+    the invariants are not enforced after the call.
+    """
+    extra_remarks = (
+        [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+        if isinstance(method, intermediate.UnderstoodMethod) and not method.non_mutating
+        else []
+    )
+
+    if method.description is None:
+        if len(extra_remarks) == 0:
+            return None, None
+
+        return (
+            golang_description.documentation_comment(
+                Stripped("\n\n".join(extra_remarks))
+            ),
+            None,
+        )
+
+    comment, comment_errors = golang_description.generate_comment_for_signature(
+        method.description,
+        context=golang_description.Context(
+            package=golang_common.TYPES_PACKAGE, cls_or_enum=cls
+        ),
+        extra_remarks=extra_remarks,
+    )
+
+    if comment_errors is not None:
+        return None, Error(
+            method.description.parsed.node,
+            f"Failed to generate the documentation comment "
+            f"for method {method.name!r}",
+            comment_errors,
+        )
+
+    assert comment is not None
+    return comment, None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
     cls: intermediate.ClassUnion,
@@ -1205,27 +1260,13 @@ def _generate_interface(
 
         method_blocks = []  # type: List[Stripped]
 
-        if method.description is not None:
-            (
-                method_comment,
-                method_comment_errors,
-            ) = golang_description.generate_comment_for_signature(
-                method.description,
-                context=golang_description.Context(
-                    package=golang_common.TYPES_PACKAGE, cls_or_enum=cls
-                ),
-            )
+        method_comment, method_comment_error = _generate_comment_for_method(
+            method=method, cls=cls
+        )
+        if method_comment_error is not None:
+            return None, method_comment_error
 
-            if method_comment_errors is not None:
-                return None, Error(
-                    method.description.parsed.node,
-                    f"Failed to generate the documentation comment "
-                    f"for method {method.name!r}",
-                    method_comment_errors,
-                )
-
-            assert method_comment is not None
-
+        if method_comment is not None:
             method_blocks.append(method_comment)
 
         # fmt: off
@@ -1393,12 +1434,179 @@ type {struct_name} struct {{
     )
 
 
+class _MethodTranspiler(golang_transpilation.Transpiler):
+    """Transpile the body of a :py:class:`intermediate.UnderstoodMethod`."""
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        is_pointer_map: Mapping[parse_tree.Node, bool],
+        method: intermediate.UnderstoodMethod,
+        receiver: Identifier,
+    ) -> None:
+        """Initialize with the given values."""
+        golang_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            is_pointer_map=is_pointer_map,
+            downcast_map=inference.downcast_map,
+            environment=inference.environment_with_args,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+        self._receiver = receiver
+
+    def _transform_enumeration_literal(
+        self, enumeration_name: Identifier, literal_name: Identifier
+    ) -> Stripped:
+        return Stripped(
+            golang_naming.enum_literal_name(
+                enumeration_name=enumeration_name, literal_name=literal_name
+            )
+        )
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(golang_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped(self._receiver), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(golang_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(golang_naming.enum_name(node.identifier)), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the packages.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to Golang. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method(
+    method: intermediate.UnderstoodMethod,
+    cls: intermediate.ConcreteClass,
+    inference: intermediate_type_inference.InferenceOfFunction,
+    receiver: Identifier,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the ``method`` as a method of the struct of ``cls``."""
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification package, on the explicit request of the user. We note that
+    # in the documentation of the mutating methods, see
+    # :py:func:`_generate_comment_for_method`.
+
+    pointer_inferrer = golang_pointering.Inferrer(
+        environment=inference.environment_with_args,
+        type_map=inference.type_map,
+    )
+
+    for node in method.body:
+        _ = pointer_inferrer.transform(node)
+
+    if len(pointer_inferrer.errors) > 0:
+        return None, Error(
+            method.parsed.node,
+            f"Failed to infer whether a node is a Golang pointer "
+            f"in the method {method.name!r} of the class {cls.name!r}",
+            pointer_inferrer.errors,
+        )
+
+    transpiler = _MethodTranspiler(
+        inference=inference,
+        is_pointer_map=pointer_inferrer.is_pointer_map,
+        method=method,
+        receiver=receiver,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r} "
+                f"of the class {cls.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+
+    comment, comment_error = _generate_comment_for_method(method=method, cls=cls)
+    if comment_error is not None:
+        return None, comment_error
+
+    if comment is not None:
+        writer.write(comment)
+        writer.write("\n")
+
+    struct_name = golang_naming.struct_name(cls.name)
+
+    method_name = golang_naming.method_name(method.name)
+
+    returns = (
+        f" {golang_common.generate_type(type_annotation=method.returns)}"
+        if method.returns is not None
+        else ""
+    )
+
+    arg_defs = [
+        Stripped(
+            f"{golang_naming.argument_name(arg.name)} "
+            f"{golang_common.generate_type(arg.type_annotation)}"
+        )
+        for arg in method.arguments
+    ]
+
+    if len(arg_defs) == 0:
+        writer.write(f"func ({receiver} *{struct_name}) {method_name}(){returns} {{")
+    else:
+        arg_defs_joined = "\n".join(f"{arg_def}," for arg_def in arg_defs)
+        writer.write(
+            f"""\
+func ({receiver} *{struct_name}) {method_name}(
+{I}{indent_but_first_line(arg_defs_joined, I)}
+){returns} {{"""
+        )
+
+    for stmt in body:
+        writer.write("\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_struct_methods(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
-    """Generate the Golang methods for the struct corresponding to ``cls``."""
+    """
+    Generate the Golang methods for the struct corresponding to ``cls``.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
+    """
     methods = []  # type: List[Stripped]
 
     receiver = golang_naming.receiver_name(cls)
@@ -1490,17 +1698,21 @@ func ({receiver} *{struct_name}) {model_type_getter}(
                 )
             )
             # fmt: on
-        else:
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    "(mristin, 2023-03-31) "
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts. We want to finish the meta-model for the V3, "
-                    "fix de/serialization and generate SDKs for a couple of languages "
-                    "before taking on this rather hard task.",
-                )
+        elif isinstance(method, intermediate.UnderstoodMethod):
+            method_code, method_error = _transpile_method(
+                method=method,
+                cls=cls,
+                inference=inference_by_method[method],
+                receiver=receiver,
             )
+            if method_error is not None:
+                errors.append(method_error)
+                continue
+
+            assert method_code is not None
+            methods.append(method_code)
+        else:
+            assert_never(method)
 
     methods.append(_generate_descend_once_method(cls=cls, receiver=receiver))
 
@@ -1790,6 +2002,15 @@ def generate(
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code of the data structures representing the meta-model."""
+    (
+        inference_by_method,
+        inference_errors,
+    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
+    if inference_errors is not None:
+        return None, inference_errors
+
+    assert inference_by_method is not None
+
     errors = []  # type: List[Error]
 
     common_url_literal = golang_common.string_literal(f"{repo_url}/common")
@@ -1917,7 +2138,9 @@ type IClass interface {{
                 blocks.append(block)
 
                 methods, error = _generate_struct_methods(
-                    cls=our_type, spec_impls=spec_impls
+                    cls=our_type,
+                    spec_impls=spec_impls,
+                    inference_by_method=inference_by_method,
                 )
                 if error is not None:
                     errors.append(error)

@@ -46,7 +46,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
  * semantics. In particular, the remainder of the modulo takes the sign of
  * the divisor in Python (`-7 % 3 == 2`), while the native TypeScript operator
  * `%` gives the remainder with the sign of the dividend (`-7 % 3 === -1`).
- * Therefore, we transpile the modulo to `AasVerification.floorMod` instead of
+ * Therefore, we transpile the modulo to `AasCommon.floorMod` instead of
  * the native operator.
  *
  * The numbers in TypeScript are double-precision floating-point numbers, so
@@ -58,9 +58,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     ]  # type: List[Stripped]
 
     if intermediate.uses_modulo(symbol_table):
-        blocks.append(
-            Stripped('import * as AasVerification from "../src/verification";')
-        )
+        blocks.append(Stripped('import * as AasCommon from "../src/common";'))
 
         blocks.append(
             Stripped(
@@ -91,7 +89,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
                 Stripped(
                     f"""\
 test({title}, () => {{
-{I}expect(AasVerification.floorMod({dividend}, {divisor})).toBe({expected});
+{I}expect(AasCommon.floorMod({dividend}, {divisor})).toBe({expected});
 }});"""
                 )
             )

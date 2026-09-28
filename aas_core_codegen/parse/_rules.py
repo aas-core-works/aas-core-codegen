@@ -819,7 +819,14 @@ class _ParseExpression(_Parse):
 
         assert value is not None
 
-        return value, None
+        if not isinstance(value, (tree.MethodCall, tree.FunctionCall)):
+            return None, Error(
+                node,
+                "Only the calls can be used as statements, since the other "
+                "expressions have no effect",
+            )
+
+        return tree.ExpressionStatement(expression=value, original_node=node), None
 
 
 class _ParseJoinedStr(_Parse):

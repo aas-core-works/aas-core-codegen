@@ -190,46 +190,6 @@ export class VerificationError {
 }
 
 /**
- * Compute the remainder of the floored division of `dividend` by `divisor`.
- *
- * @remarks
- *
- * The remainder takes the sign of the divisor, as the modulo in Python,
- * in which the meta-model is written.
- *
- * We deliberately do not use the native operator `%` which truncates
- * the division towards zero so that its remainder takes the sign of
- * the dividend. For example, `-7 % 3 === -1` in TypeScript, while
- * `-7 % 3 == 2` in Python. The two only coincide when the operands have
- * the same sign, but the invariants must behave the same in all the SDKs for
- * all the inputs.
- *
- * Unlike the native operator `%`, this function never returns a negative zero.
- * For example, `-6 % 3` gives `-0` in TypeScript, while this function
- * gives `0`.
- *
- * The `divisor` must not be zero.
- *
- * The numbers in TypeScript are double-precision floating-point numbers, so
- * the result is exact only if the operands are integers within
- * `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`.
- *
- * @param dividend - left operand of the modulo
- * @param divisor - right operand of the modulo, must not be zero
- * @returns the remainder with the sign of the divisor
- */
-export function floorMod(dividend: number, divisor: number): number {
-  const remainder = dividend % divisor;
-  if (remainder !== 0 && (remainder < 0) !== (divisor < 0)) {
-    return remainder + divisor;
-  }
-
-  // NOTE (mristin):
-  // We add zero to turn a negative zero into a positive zero.
-  return remainder + 0;
-}
-
-/**
  * Check that the remainder of the division by 7 is smaller than 3.
  *
  * @remarks
@@ -240,7 +200,7 @@ export function floorMod(dividend: number, divisor: number): number {
 export function hasSmallRemainder(
   number: number
 ): boolean {
-  const remainder = floorMod(number, 7);
+  const remainder = AasCommon.floorMod(number, 7);
   return remainder < 3;
 }
 
@@ -279,7 +239,7 @@ export function isLengthAligned(
   alignment: number
 ): boolean {
   return (
-    (floorMod(AasCommon.lenStr(text), alignment)) == (0));
+    (AasCommon.floorMod(AasCommon.lenStr(text), alignment)) == (0));
 }
 
 /**
@@ -294,7 +254,7 @@ export function hasRemainderOneByLength(
   text: string
 ): boolean {
   return (
-    (floorMod(number, AasCommon.lenStr(text) + 1)) == (1));
+    (AasCommon.floorMod(number, AasCommon.lenStr(text) + 1)) == (1));
 }
 
 /**
@@ -309,7 +269,7 @@ class Verifier
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    if (!((floorMod(that.offset, 7)) == (3))) {
+    if (!((AasCommon.floorMod(that.offset, 7)) == (3))) {
       yield new VerificationError(
         "Offset must give the remainder 3 when divided by 7"
       )
@@ -321,13 +281,15 @@ class Verifier
       )
     }
 
-    if (!((floorMod(that.byNegative, -3)) == (-1))) {
+    if (!((AasCommon.floorMod(that.byNegative, -3)) == (-1))) {
       yield new VerificationError(
         "By negative must give the remainder -1 when divided by -3"
       )
     }
 
-    if (!((floorMod(AasCommon.lenStr(that.text), 2)) == (0))) {
+    if (!(
+      (AasCommon.floorMod(AasCommon.lenStr(that.text), 2)) == (0)
+    )) {
       yield new VerificationError(
         "Text must have an even length"
       )
@@ -374,7 +336,7 @@ class Verifier
       !(that.optionalNumber !== null)
       || (
         (
-          (floorMod(that.optionalNumber, 5)) == (4)
+          (AasCommon.floorMod(that.optionalNumber, 5)) == (4)
           && Math.abs(that.optionalNumber) < 100
         )
       )
@@ -449,7 +411,7 @@ export function *verify(
 export function *verifyEvenInt(
   that: number
 ): IterableIterator<VerificationError> {
-  if (!((floorMod(that, 2)) == (0))) {
+  if (!((AasCommon.floorMod(that, 2)) == (0))) {
     yield new VerificationError(
       "Even"
     )

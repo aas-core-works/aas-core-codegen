@@ -72,6 +72,16 @@ type ISomething interface {
 	SetMaybeCount(
 		value *int64,
 	);
+
+	// Check a method taking an integer argument, called with a length.
+	IsValidIndex(
+		index int64,
+	) bool;
+
+	// Check reading in a method at an index which is an integer argument.
+	TextAt(
+		index int64,
+	) string;
 }
 
 // Check whether the instance corresponds to [aastypes.ISomething]
@@ -141,6 +151,21 @@ func (s *Something) SetMaybeCount(
 func (s *Something) ModelType(
 ) ModelType {
 	return ModelTypeSomething
+}
+
+// Check a method taking an integer argument, called with a length.
+func (s *Something) IsValidIndex(
+	index int64,
+) bool {
+	return 0 <= index &&
+		index < int64(len(s.Texts()))
+}
+
+// Check reading in a method at an index which is an integer argument.
+func (s *Something) TextAt(
+	index int64,
+) string {
+	return s.Texts()[index]
 }
 
 // Apply the action on the instances referenced from s.

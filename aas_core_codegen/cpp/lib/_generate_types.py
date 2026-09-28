@@ -7,6 +7,7 @@ from typing import (
     Optional,
     Dict,
     List,
+    Mapping,
     Tuple,
     cast,
     Union,
@@ -22,11 +23,15 @@ from aas_core_codegen.common import (
     assert_never,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.cpp import (
+    aliasing as cpp_aliasing,
     common as cpp_common,
     naming as cpp_naming,
     description as cpp_description,
+    optionaling as cpp_optionaling,
+    transpilation as cpp_transpilation,
 )
 from aas_core_codegen.cpp.common import (
     INDENT as I,
@@ -34,7 +39,11 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
-from aas_core_codegen.intermediate import construction as intermediate_construction
+from aas_core_codegen.intermediate import (
+    construction as intermediate_construction,
+    type_inference as intermediate_type_inference,
+)
+from aas_core_codegen.parse import tree as parse_tree
 
 # region Checks
 
@@ -726,9 +735,7 @@ virtual void {setter_name}(
 
         arg_types_names = [
             (
-                cpp_common.generate_type_with_const_ref_if_applicable(
-                    arg.type_annotation
-                ),
+                cpp_common.generate_argument_type(argument=arg),
                 cpp_naming.argument_name(arg.name),
             )
             for arg in method.arguments
@@ -738,8 +745,25 @@ virtual void {setter_name}(
 
         const_suffix = " const" if method.non_mutating else ""
 
+        # NOTE (mristin):
+        # We note in the documentation of the transpiled mutating methods that
+        # the invariants are not enforced after the call.
+        extra_remarks = (
+            [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+            if isinstance(method, intermediate.UnderstoodMethod)
+            and not method.non_mutating
+            else []
+        )
+
         description_comment_prefix = ""
-        if method.description is not None:
+        if method.description is None and len(extra_remarks) > 0:
+            description_comment_prefix = (
+                cpp_description.documentation_comment(
+                    Stripped("\n\n".join(extra_remarks))
+                )
+                + "\n"
+            )
+        elif method.description is not None:
             (
                 description_comment,
                 description_errors,
@@ -748,6 +772,7 @@ virtual void {setter_name}(
                 context=cpp_description.Context(
                     namespace=cpp_common.TYPES_NAMESPACE, cls_or_enum=cls
                 ),
+                extra_remarks=extra_remarks,
             )
             if description_errors is not None:
                 errors.append(
@@ -938,8 +963,9 @@ void {setter_name}(
 
     # NOTE (mristin):
     # The non-public methods are not part of the interface, and serve only as
-    # helpers to the implementation-specific methods. As the concrete classes do not
-    # inherit from each other, we make them private.
+    # helpers to the other methods of the class. We keep the distinction between
+    # the protected and the private methods of the meta-model.
+    protected_members = []  # type: List[Stripped]
     private_members = []  # type: List[Stripped]
 
     for method in cls.methods:
@@ -954,9 +980,7 @@ void {setter_name}(
 
         arg_types_names = [
             (
-                cpp_common.generate_type_with_const_ref_if_applicable(
-                    arg.type_annotation
-                ),
+                cpp_common.generate_argument_type(argument=arg),
                 cpp_naming.argument_name(arg.name),
             )
             for arg in method.arguments
@@ -987,10 +1011,17 @@ void {setter_name}(
 ){const_suffix}{override_suffix};"""
             )
 
-        if is_public:
+        if method.visibility is intermediate.Visibility.PUBLIC:
             public_members.append(declaration)
-        else:
+        elif method.visibility is intermediate.Visibility.PROTECTED:
+            protected_members.append(declaration)
+        elif method.visibility is intermediate.Visibility.PRIVATE:
             private_members.append(declaration)
+        else:
+            raise AssertionError(
+                f"Unexpected visibility of the method {method.name!r}: "
+                f"{method.visibility}"
+            )
 
     public_members.append(Stripped(f"~{cls_name}() override = default;"))
 
@@ -1009,6 +1040,14 @@ void {setter_name}(
  public:
 {I}{indent_but_first_line(public_members_joined, I)}"""
     ]
+
+    if len(protected_members) > 0:
+        protected_members_joined = "\n\n".join(protected_members)
+        blocks.append(
+            f"""\
+ protected:
+{I}{indent_but_first_line(protected_members_joined, I)}"""
+        )
 
     if len(private_members) > 0:
         private_members_joined = "\n\n".join(private_members)
@@ -1430,14 +1469,150 @@ void {cls_name}::{setter_name}(
     return blocks
 
 
+class _MethodTranspiler(cpp_transpilation.Transpiler):
+    """
+    Transpile the body of a :py:class:`intermediate.UnderstoodMethod`.
+
+    The ``self`` is transpiled to ``this``, which is a pointer to the instance, so
+    that the members are accessed with ``->`` as for any other instance.
+    """
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        optional_inferrer: cpp_optionaling.Inferrer,
+        method: intermediate.UnderstoodMethod,
+        aliasing: cpp_aliasing.Aliasing,
+    ) -> None:
+        """Initialize with the given values."""
+        cpp_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            is_optional_map=optional_inferrer.is_optional_map,
+            downcast_map=inference.downcast_map,
+            is_optional_before_downcast_map=(
+                optional_inferrer.is_optional_before_downcast_map
+            ),
+            environment=inference.environment_with_args,
+            aliasing=aliasing,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(cpp_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped("this"), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(cpp_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(cpp_naming.enum_name(node.identifier)), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the modules in the other targets.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C++. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method_body(
+    method: intermediate.UnderstoodMethod,
+    inference: intermediate_type_inference.InferenceOfFunction,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the body of the ``method``."""
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification, on the explicit request of the user. We note that in
+    # the documentation of the mutating methods in the interfaces.
+
+    aliasing, aliasing_errors = cpp_aliasing.analyze(
+        body=method.body,
+        arguments=method.arguments,
+        type_map=inference.type_map,
+        binds_self=True,
+    )
+    if aliasing_errors is not None:
+        return None, Error(
+            method.parsed.node,
+            f"Failed to transpile the method {method.name!r} so that its C++ "
+            f"variables alias the values as in Python",
+            aliasing_errors,
+        )
+
+    assert aliasing is not None
+
+    optional_inferrer = cpp_optionaling.Inferrer(
+        environment=inference.environment_with_args,
+        type_map=inference.type_map,
+        downcast_map=inference.downcast_map,
+    )
+    for node in method.body:
+        _ = optional_inferrer.transform(node)
+
+    if len(optional_inferrer.errors) > 0:
+        return None, Error(
+            method.parsed.node,
+            f"Failed to infer whether one or more nodes are ``common::optional`` "
+            f"in the method {method.name!r}",
+            optional_inferrer.errors,
+        )
+
+    transpiler = _MethodTranspiler(
+        inference=inference,
+        optional_inferrer=optional_inferrer,
+        method=method,
+        aliasing=aliasing,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    if len(body) == 0:
+        return Stripped("// Intentionally empty."), None
+
+    return Stripped("\n".join(body)), None
+
+
 @require(lambda method, cls: intermediate.runtime_id(method) in cls.method_id_set)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_method_implementation(
     method: intermediate.MethodUnion,
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the implementation of the method."""
+    """
+    Generate the implementation of the method.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
+    """
     body: Optional[Stripped]
 
     if isinstance(method, intermediate.ImplementationSpecificMethod):
@@ -1455,12 +1630,11 @@ def _generate_method_implementation(
             )
 
     elif isinstance(method, intermediate.UnderstoodMethod):
-        return None, Error(
-            cls.parsed.node,
-            "At the moment (2023-09-22), we do not transpile the method body and "
-            "its contracts, as it is quite a difficult task. Please contact "
-            "the developers if you need this feature.",
+        body, error = _transpile_method_body(
+            method=method, inference=inference_by_method[method]
         )
+        if error is not None:
+            return None, error
     else:
         # noinspection PyTypeChecker
         assert_never(method)
@@ -1475,7 +1649,7 @@ def _generate_method_implementation(
 
     arg_types_names = [
         (
-            cpp_common.generate_type_with_const_ref_if_applicable(arg.type_annotation),
+            cpp_common.generate_argument_type(argument=arg),
             cpp_naming.argument_name(arg.name),
         )
         for arg in method.arguments
@@ -1519,8 +1693,15 @@ def _generate_method_implementation(
 def _generate_class_implementation(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    inference_by_method: Mapping[
+        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
+    ],
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
-    """Generate the implementation blocks for the given class."""
+    """
+    Generate the implementation blocks for the given class.
+
+    ``inference_by_method`` holds the type inference of all the understood methods.
+    """
     blocks = [
         _generate_constructor_implementation(cls=cls),
         _generate_model_type_getter_implementation(cls=cls),
@@ -1533,7 +1714,10 @@ def _generate_class_implementation(
 
     for method in cls.methods:
         code, error = _generate_method_implementation(
-            method=method, cls=cls, spec_impls=spec_impls
+            method=method,
+            cls=cls,
+            spec_impls=spec_impls,
+            inference_by_method=inference_by_method,
         )
         if error is not None:
             errors.append(
@@ -1671,6 +1855,15 @@ def generate_implementation(
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate implementation of the data structures representing the meta-model."""
+    (
+        inference_by_method,
+        inference_errors,
+    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
+    if inference_errors is not None:
+        return None, inference_errors
+
+    assert inference_by_method is not None
+
     namespace = Stripped(f"{library_namespace}::types")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -1689,7 +1882,9 @@ def generate_implementation(
 
     for concrete_cls in symbol_table.concrete_classes:
         cls_blocks, error = _generate_class_implementation(
-            cls=concrete_cls, spec_impls=spec_impls
+            cls=concrete_cls,
+            spec_impls=spec_impls,
+            inference_by_method=inference_by_method,
         )
         if error is not None:
             errors.append(error)

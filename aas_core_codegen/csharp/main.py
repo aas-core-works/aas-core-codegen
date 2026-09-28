@@ -48,27 +48,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    unsupported_methods_errors = (
-        intermediate.errors_if_non_implementation_specific_methods(verified_ir_table)
-    )
-    if unsupported_methods_errors is not None:
-        run.write_error_report(
-            message=f"We added some support for understood methods already and keep "
-            f"maintaining it as it is only a matter of time when we will "
-            f"introduce their transpilation. Introducing them after the fact "
-            f"would have been much more difficult.\n"
-            f"\n"
-            f"At the given moment, however, we deliberately focus only on "
-            f"implementation-specific methods. "
-            f"(based on meta-model {context.model_path})",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in unsupported_methods_errors
-            ],
-            stderr=stderr,
-        )
-        return 1
-
     namespace_key = specific_implementations.ImplementationKey("namespace.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
     if namespace_text is None:
@@ -106,6 +85,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     rel_paths_generators: Sequence[
         Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
     ] = [
+        (
+            project_rel_path / "common.cs",
+            lambda: (
+                csharp_lib.generate_common(
+                    symbol_table=verified_ir_table, namespace=namespace
+                ),
+                None,
+            ),
+        ),
         (
             project_rel_path / "constants.cs",
             lambda: csharp_lib.generate_constants(

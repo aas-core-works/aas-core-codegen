@@ -3,12 +3,13 @@
 # pylint: disable=line-too-long
 
 import io
-from typing import List
+from typing import Final, List
 
 from icontract import ensure
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
+    Identifier,
     Stripped,
     indent_but_first_line,
 )
@@ -439,6 +440,73 @@ int64_t FindStr(
     ]
 
 
+# NOTE (mristin):
+# We deliberately do not transpile the modulo to the native C++ operator ``%`` for
+# the signed operands. C++ truncates the division towards zero so that its remainder
+# takes the sign of the dividend (``-7 % 3 == -1``). The meta-model is written in
+# Python where the division is floored so that the remainder takes the sign of
+# the divisor (``-7 % 3 == 2``). The two only coincide when the operands have
+# the same sign, but the invariants must behave the same in all the SDKs for all
+# the inputs. Hence, we transpile the modulo to the helper ``FloorMod`` below.
+#
+# The helper lives in the common module so that both the verification and
+# the methods of the types can use it. It is public so that the clients can rely
+# on it, and so that we can unit-test it.
+
+#: Name of the helper function to compute the floored remainder
+FLOOR_MOD_NAME: Final[Identifier] = Identifier("FloorMod")
+
+#: Declaration of the helper to compute the remainder of the floored division as in
+#: Python, to be put in the header
+FLOOR_MOD_DECLARATION = Stripped(
+    """\
+/**
+ * \\brief Compute the remainder of the floored division of \\p dividend
+ * by \\p divisor.
+ *
+ * The remainder takes the sign of the divisor, as the modulo in Python,
+ * in which the meta-model is written.
+ *
+ * We deliberately do not use the native operator <code>%</code> which truncates
+ * the division towards zero so that its remainder takes the sign of the dividend.
+ * For example, <code>-7 % 3 == -1</code> in C++, while <code>-7 % 3 == 2</code>
+ * in Python. The two only coincide when the operands have the same sign, but
+ * the invariants must behave the same in all the SDKs for all the inputs.
+ *
+ * The \\p divisor must not be zero.
+ *
+ * \\param dividend to be divided
+ * \\param divisor to divide with, must not be zero
+ * \\return remainder of the floored division, with the sign of \\p divisor
+ */
+int64_t FloorMod(int64_t dividend, int64_t divisor);"""
+)
+
+#: Definition of the helper to compute the remainder of the floored division as in
+#: Python, to be put in the implementation
+FLOOR_MOD_DEFINITION = Stripped(
+    f"""\
+int64_t FloorMod(int64_t dividend, int64_t divisor) {{
+{I}// NOTE: The native INT64_MIN % -1 is undefined behavior in C++ as
+{I}// the corresponding division overflows, while every number is divisible
+{I}// by -1 without a remainder.
+{I}if (divisor == -1) {{
+{II}return 0;
+{I}}}
+
+{I}// NOTE: We can not use the native remainder directly as C++ truncates
+{I}// the division towards zero so that the remainder takes the sign of
+{I}// the dividend. We correct it to take the sign of the divisor as in Python.
+{I}int64_t remainder = dividend % divisor;
+{I}if (remainder != 0 && ((remainder < 0) != (divisor < 0))) {{
+{II}remainder += divisor;
+{I}}}
+
+{I}return remainder;
+}}"""
+)
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -556,13 +624,24 @@ std::unique_ptr<T> make_unique(
     # ``WCHAR_MAX`` to tell whether ``wchar_t`` is a UTF-16 code unit. Hence, we
     # include these headers only for a meta-model which might take ``len`` of
     # strings, slice them or call ``find`` on them.
+    #
+    # The helper ``FloorMod`` takes and returns ``int64_t``'s as well.
+    extra_std_includes = []  # type: List[str]
+    if intermediate.uses_len_slicing_or_find(symbol_table) or intermediate.uses_modulo(
+        symbol_table
+    ):
+        extra_std_includes.append("#include <cstdint>")
+
     if intermediate.uses_len_slicing_or_find(symbol_table):
+        extra_std_includes.append("#include <cwchar>")
+
+    if len(extra_std_includes) > 0:
+        extra_std_includes_joined = "\n".join(extra_std_includes)
         blocks.append(
             Stripped(
-                """\
+                f"""\
 #pragma warning(push, 0)
-#include <cstdint>
-#include <cwchar>
+{extra_std_includes_joined}
 #pragma warning(pop)"""
             )
         )
@@ -846,6 +925,11 @@ size_t LenTuple(const std::tuple<T...>&) {
                 if intermediate.uses_len_slicing_or_find(symbol_table)
                 else []
             ),
+            *(
+                [FLOOR_MOD_DECLARATION]
+                if intermediate.uses_modulo(symbol_table)
+                else []
+            ),
             Stripped(
                 f"""\
 }}  // namespace {cpp_common.COMMON_NAMESPACE}
@@ -1099,6 +1183,7 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
             if intermediate.uses_len_slicing_or_find(symbol_table)
             else []
         ),
+        *([FLOOR_MOD_DEFINITION] if intermediate.uses_modulo(symbol_table) else []),
         cpp_common.generate_namespace_closing(namespace),
         cpp_common.WARNING,
     ]

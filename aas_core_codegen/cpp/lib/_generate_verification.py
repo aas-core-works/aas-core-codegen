@@ -45,31 +45,6 @@ from aas_core_codegen.intermediate import type_inference as intermediate_type_in
 from aas_core_codegen.parse import tree as parse_tree
 
 
-def _generate_argument_type(argument: intermediate.Argument) -> Stripped:
-    """
-    Generate the C++ type of the ``argument`` of a verification function.
-
-    The mutable lists are passed in as mutable references so that the caller
-    observes the mutations, as in Python. The instances are always passed in as
-    constant references to the shared pointers, as the instance is mutable through
-    the pointer anyway, and the type inference already refuses to mutate
-    the read-only instances.
-    """
-    if argument.mutable and isinstance(
-        intermediate.beneath_optional(argument.type_annotation),
-        intermediate.ListTypeAnnotation,
-    ):
-        return cpp_common.generate_type_with_ref(
-            type_annotation=argument.type_annotation,
-            types_namespace=cpp_common.TYPES_NAMESPACE,
-        )
-
-    return cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=argument.type_annotation,
-        types_namespace=cpp_common.TYPES_NAMESPACE,
-    )
-
-
 def _generate_return_type(verification: intermediate.Verification) -> Stripped:
     """Generate the C++ return type of the ``verification`` function."""
     if verification.returns is None:
@@ -109,7 +84,12 @@ def _generate_verification_function_definition(
         return code, None
 
     arg_types_names = [
-        (_generate_argument_type(arg), cpp_naming.argument_name(arg.name))
+        (
+            cpp_common.generate_argument_type(
+                argument=arg, types_namespace=cpp_common.TYPES_NAMESPACE
+            ),
+            cpp_naming.argument_name(arg.name),
+        )
         for arg in verification.arguments
     ]
 
@@ -194,72 +174,6 @@ std::unique_ptr<IVerification> {verify_name}(
 {I}{arg_type} {arg_name}
 );"""
     )
-
-
-# NOTE (mristin):
-# We deliberately do not transpile the modulo to the native C++ operator ``%`` for
-# the signed operands. C++ truncates the division towards zero so that its remainder
-# takes the sign of the dividend (``-7 % 3 == -1``). The meta-model is written in
-# Python where the division is floored so that the remainder takes the sign of
-# the divisor (``-7 % 3 == 2``). The two only coincide when the operands have
-# the same sign, but the invariants must behave the same in all the SDKs for all
-# the inputs. Hence, we transpile the modulo to the helper ``FloorMod`` below.
-#
-# The helper is public so that the clients can rely on it, and so that we can
-# unit-test it.
-
-#: Name of the helper function to compute the floored remainder
-FLOOR_MOD_NAME: Final[Identifier] = Identifier("FloorMod")
-
-#: Declaration of the helper to compute the remainder of the floored division as in
-#: Python, to be put in the header
-FLOOR_MOD_DECLARATION = Stripped(
-    """\
-/**
- * \\brief Compute the remainder of the floored division of \\p dividend
- * by \\p divisor.
- *
- * The remainder takes the sign of the divisor, as the modulo in Python,
- * in which the meta-model is written.
- *
- * We deliberately do not use the native operator <code>%</code> which truncates
- * the division towards zero so that its remainder takes the sign of the dividend.
- * For example, <code>-7 % 3 == -1</code> in C++, while <code>-7 % 3 == 2</code>
- * in Python. The two only coincide when the operands have the same sign, but
- * the invariants must behave the same in all the SDKs for all the inputs.
- *
- * The \\p divisor must not be zero.
- *
- * \\param dividend to be divided
- * \\param divisor to divide with, must not be zero
- * \\return remainder of the floored division, with the sign of \\p divisor
- */
-int64_t FloorMod(int64_t dividend, int64_t divisor);"""
-)
-
-#: Definition of the helper to compute the remainder of the floored division as in
-#: Python, to be put in the implementation
-FLOOR_MOD_DEFINITION = Stripped(
-    f"""\
-int64_t FloorMod(int64_t dividend, int64_t divisor) {{
-{I}// NOTE: The native INT64_MIN % -1 is undefined behavior in C++ as
-{I}// the corresponding division overflows, while every number is divisible
-{I}// by -1 without a remainder.
-{I}if (divisor == -1) {{
-{II}return 0;
-{I}}}
-
-{I}// NOTE: We can not use the native remainder directly as C++ truncates
-{I}// the division towards zero so that the remainder takes the sign of
-{I}// the dividend. We correct it to take the sign of the divisor as in Python.
-{I}int64_t remainder = dividend % divisor;
-{I}if (remainder != 0 && ((remainder < 0) != (divisor < 0))) {{
-{II}remainder += divisor;
-{I}}}
-
-{I}return remainder;
-}}"""
-)
 
 
 # fmt: off
@@ -515,18 +429,6 @@ class RecursiveVerification : public IVerification {{
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
-
-    # NOTE (mristin):
-    # We add the helper only if the meta-model uses the modulo so that we do not
-    # clutter the code otherwise.
-    if intermediate.uses_modulo(symbol_table):
-        blocks.extend(
-            [
-                Stripped("// region Arithmetic"),
-                FLOOR_MOD_DECLARATION,
-                Stripped("// endregion Arithmetic"),
-            ]
-        )
 
     # NOTE (mristin):
     # The internal verification functions are declared only in the implementation
@@ -853,7 +755,10 @@ def _generate_implementation_of_transpilable_verification(
     assert type_inference is not None
 
     aliasing, aliasing_errors = cpp_aliasing.analyze(
-        verification=verification, type_map=type_inference.type_map
+        body=verification.parsed.body,
+        arguments=verification.arguments,
+        type_map=type_inference.type_map,
+        binds_self=False,
     )
     if aliasing_errors is not None:
         return None, Error(
@@ -908,7 +813,12 @@ def _generate_implementation_of_transpilable_verification(
         body.append(stmt)
 
     arg_types_names = [
-        (_generate_argument_type(arg), cpp_naming.argument_name(arg.name))
+        (
+            cpp_common.generate_argument_type(
+                argument=arg, types_namespace=cpp_common.TYPES_NAMESPACE
+            ),
+            cpp_naming.argument_name(arg.name),
+        )
         for arg in verification.arguments
     ]
 
@@ -3250,21 +3160,6 @@ def generate_implementation(
 
     errors = []  # type: List[Error]
 
-    uses_modulo = intermediate.uses_modulo(symbol_table)
-
-    if uses_modulo:
-        for verification in symbol_table.verification_functions:
-            if cpp_naming.function_name(verification.name) == FLOOR_MOD_NAME:
-                errors.append(
-                    Error(
-                        verification.parsed.node,
-                        f"The name of the verification function "
-                        f"{verification.name!r} collides with the name of "
-                        f"our helper function {FLOOR_MOD_NAME} used to transpile "
-                        f"the modulo operation",
-                    )
-                )
-
     base_environment = intermediate_type_inference.populate_base_environment(
         symbol_table=symbol_table
     )
@@ -3306,18 +3201,6 @@ def generate_implementation(
         cpp_common.generate_namespace_opening(namespace),
         *_generate_error_implementation(),
     ]  # type: List[Stripped]
-
-    # NOTE (mristin):
-    # We add the helper only if the meta-model uses the modulo so that we do not
-    # clutter the code otherwise.
-    if uses_modulo:
-        blocks.extend(
-            [
-                Stripped("// region Arithmetic"),
-                FLOOR_MOD_DEFINITION,
-                Stripped("// endregion Arithmetic"),
-            ]
-        )
 
     # NOTE (mristin):
     # The internal verification functions live in the anonymous namespace, so that

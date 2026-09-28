@@ -37,29 +37,6 @@ Error::Error(
 
 // endregion struct Error
 
-// region Arithmetic
-
-int64_t FloorMod(int64_t dividend, int64_t divisor) {
-  // NOTE: The native INT64_MIN % -1 is undefined behavior in C++ as
-  // the corresponding division overflows, while every number is divisible
-  // by -1 without a remainder.
-  if (divisor == -1) {
-    return 0;
-  }
-
-  // NOTE: We can not use the native remainder directly as C++ truncates
-  // the division towards zero so that the remainder takes the sign of
-  // the dividend. We correct it to take the sign of the divisor as in Python.
-  int64_t remainder = dividend % divisor;
-  if (remainder != 0 && ((remainder < 0) != (divisor < 0))) {
-    remainder += divisor;
-  }
-
-  return remainder;
-}
-
-// endregion Arithmetic
-
 // region Verification functions
 
 int64_t CountTexts(
@@ -92,7 +69,7 @@ bool NoNumberIsSeven(
         return false;
     }
     int64_t rotated = (
-      numbers.at(verification::FloorMod(i + (1), static_cast<int64_t>(numbers.size())))
+      numbers.at(common::FloorMod(i + (1), static_cast<int64_t>(numbers.size())))
     );
     switch (rotated) {
       case 7:
@@ -194,12 +171,36 @@ bool Something_0(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
+  return !(that->texts().size() > 0)
+  || (that->TextAt(
+    that->texts().size() - (1)
+  ) != L"");
+}
+
+bool Something_1(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->texts().size() > 0)
+  || that->IsValidIndex(
+    that->texts().size() - (1)
+  );
+}
+
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
   return verification::CountAfterReassignment(
     that->texts()
   ) < 6;
 }
 
-bool Something_1(
+bool Something_3(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -211,7 +212,7 @@ bool Something_1(
   );
 }
 
-bool Something_2(
+bool Something_4(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -220,7 +221,7 @@ bool Something_2(
   return (static_cast<int64_t>(that->texts().size()) - that->count()) >= (0);
 }
 
-bool Something_3(
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -231,7 +232,7 @@ bool Something_3(
   ) < 3;
 }
 
-bool Something_4(
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -242,7 +243,7 @@ bool Something_4(
   ) == static_cast<int64_t>(that->texts().size());
 }
 
-bool Something_5(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -263,26 +264,34 @@ const std::vector<Check>& ChecksOf(Shape shape) {
       static const std::vector<Check> checks = {
         {
           &Something_0,
-          L"Count after re-assignment is small"
+          L"Last text is not empty"
         },
         {
           &Something_1,
-          L"No seven from count on"
+          L"Last position is a valid index"
         },
         {
           &Something_2,
-          L"Count is at most texts"
+          L"Count after re-assignment is small"
         },
         {
           &Something_3,
-          L"At most three texts"
+          L"No seven from count on"
         },
         {
           &Something_4,
-          L"Texts are counted"
+          L"Count is at most texts"
         },
         {
           &Something_5,
+          L"At most three texts"
+        },
+        {
+          &Something_6,
+          L"Texts are counted"
+        },
+        {
+          &Something_7,
           L"No number is seven"
         }
       };

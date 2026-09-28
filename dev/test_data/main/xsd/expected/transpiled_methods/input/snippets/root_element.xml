@@ -1,0 +1,9 @@
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="https://dummy.com"
+        elementFormDefault="qualified"
+        targetNamespace="https://dummy.com"
+>
+    <xs:element name="first" type="first_t" />
+    <xs:element name="second" type="second_t" />
+</xs:schema>

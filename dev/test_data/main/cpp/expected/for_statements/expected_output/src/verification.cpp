@@ -37,29 +37,6 @@ Error::Error(
 
 // endregion struct Error
 
-// region Arithmetic
-
-int64_t FloorMod(int64_t dividend, int64_t divisor) {
-  // NOTE: The native INT64_MIN % -1 is undefined behavior in C++ as
-  // the corresponding division overflows, while every number is divisible
-  // by -1 without a remainder.
-  if (divisor == -1) {
-    return 0;
-  }
-
-  // NOTE: We can not use the native remainder directly as C++ truncates
-  // the division towards zero so that the remainder takes the sign of
-  // the dividend. We correct it to take the sign of the divisor as in Python.
-  int64_t remainder = dividend % divisor;
-  if (remainder != 0 && ((remainder < 0) != (divisor < 0))) {
-    remainder += divisor;
-  }
-
-  return remainder;
-}
-
-// endregion Arithmetic
-
 // region Verification functions
 
 bool FirstTextIsNotEmpty(
@@ -174,7 +151,7 @@ bool SumOfOddNumbersIsSmall(
 ) {
   int64_t total = 0;
   for (int64_t number : numbers) {
-    switch (verification::FloorMod(number, 2)) {
+    switch (common::FloorMod(number, 2)) {
       case 0:
         continue;
     }

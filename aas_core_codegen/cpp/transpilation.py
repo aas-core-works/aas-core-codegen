@@ -1337,6 +1337,70 @@ common::{contains_function}(
         )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_call_arguments(
+        self,
+        arg_nodes: Sequence[parse_tree.Expression],
+        arguments: Sequence[intermediate.Argument],
+    ) -> Tuple[Optional[List[Stripped]], Optional[List[Error]]]:
+        """
+        Transpile the ``arg_nodes`` passed to a function or a method call.
+
+        The ``arguments`` are the arguments of the called verification function or
+        of our method, which we need to pass the mutable lists by reference. They are
+        empty for the built-in functions and methods.
+        """
+        mutable_arg_set = set()  # type: Set[parse_tree.Expression]
+        for arg_node, argument in zip(arg_nodes, arguments):
+            if argument.mutable and isinstance(
+                intermediate_type_inference.beneath_optional(self.type_map[arg_node]),
+                intermediate_type_inference.ListTypeAnnotation,
+            ):
+                mutable_arg_set.add(arg_node)
+
+        errors = []  # type: List[Error]
+        args = []  # type: List[Stripped]
+        for arg_node in arg_nodes:
+            arg_type = self.type_map[arg_node]
+
+            # NOTE (mristin):
+            # This is a tough call to make. We decide that a value, for which we
+            # know that it might be null, will not be de-referenced. On the other
+            # hand, if the value is certainly not null, we de-reference it.
+            #
+            # The problem here is that the actual type of the argument in C++ changes
+            # depending on whether we check for its nullness before with an implication.
+            arg: Optional[Stripped]
+            error: Optional[Error]
+            if arg_node in mutable_arg_set:
+                # NOTE (mristin):
+                # The mutable lists are passed in as mutable references, so we
+                # need a mutable path to them.
+                arg, error = self._transform_mutable_path(
+                    arg_node,
+                    dereference=not isinstance(
+                        arg_type, intermediate_type_inference.OptionalTypeAnnotation
+                    ),
+                )
+            elif isinstance(
+                arg_type, intermediate_type_inference.OptionalTypeAnnotation
+            ):
+                arg, error = self.transform(arg_node)
+            else:
+                arg, error = self._transform_and_value_if_necessary(arg_node)
+
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert arg is not None
+            args.append(arg)
+
+        if len(errors) > 0:
+            return None, errors
+
+        return args, None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
         self, node: parse_tree.MethodCall
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1354,36 +1418,25 @@ common::{contains_function}(
         if error is not None:
             errors.append(error)
 
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            arg_type = self.type_map[arg_node]
-
-            # NOTE (mristin):
-            # This is a tough call to make. We decide that a value, for which we
-            # know that it might be null, will not be de-referenced. On the other
-            # hand, if the value is certainly not null, we de-reference it.
-            #
-            # The problem here is that the actual type of the argument in C++ changes
-            # depending on whether we check for its nullness before with an implication.
-
-            arg: Optional[Stripped]
-            if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
-                arg, error = self.transform(arg_node)
-            else:
-                arg, error = self._transform_and_value_if_necessary(arg_node)
-
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
+        args, args_errors = self._transform_call_arguments(
+            arg_nodes=node.args,
+            arguments=(
+                member_type.method.arguments
+                if isinstance(
+                    member_type, intermediate_type_inference.MethodTypeAnnotation
+                )
+                else []
+            ),
+        )
+        if args_errors is not None:
+            errors.extend(args_errors)
 
         if len(errors) > 0:
             return None, Error(
                 node.original_node, "Failed to transpile the method call", errors
             )
+
+        assert args is not None
 
         assert member_access is not None
 
@@ -1409,60 +1462,25 @@ common::{contains_function}(
 
         func_type = self.type_map[node.name]
 
-        mutable_arg_set = set()  # type: Set[parse_tree.Expression]
-        if isinstance(
-            func_type, intermediate_type_inference.VerificationTypeAnnotation
-        ):
-            for arg_node, argument in zip(node.args, func_type.func.arguments):
-                if argument.mutable and isinstance(
-                    intermediate_type_inference.beneath_optional(
-                        self.type_map[arg_node]
-                    ),
-                    intermediate_type_inference.ListTypeAnnotation,
-                ):
-                    mutable_arg_set.add(arg_node)
-
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            arg_type = self.type_map[arg_node]
-
-            # NOTE (mristin):
-            # This is a tough call to make. We decide that a value, for which we
-            # know that it might be null, will not be de-referenced. On the other
-            # hand, if the value is certainly not null, we de-reference it.
-            #
-            # The problem here is that the actual type of the argument in C++ changes
-            # depending on whether we check for its nullness before with an implication.
-            arg: Optional[Stripped]
-            if arg_node in mutable_arg_set:
-                # NOTE (mristin):
-                # The mutable lists are passed in as mutable references, so we
-                # need a mutable path to them.
-                arg, error = self._transform_mutable_path(
-                    arg_node,
-                    dereference=not isinstance(
-                        arg_type, intermediate_type_inference.OptionalTypeAnnotation
-                    ),
+        args, args_errors = self._transform_call_arguments(
+            arg_nodes=node.args,
+            arguments=(
+                func_type.func.arguments
+                if isinstance(
+                    func_type, intermediate_type_inference.VerificationTypeAnnotation
                 )
-            elif isinstance(
-                arg_type, intermediate_type_inference.OptionalTypeAnnotation
-            ):
-                arg, error = self.transform(arg_node)
-            else:
-                arg, error = self._transform_and_value_if_necessary(arg_node)
-
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
+                else []
+            ),
+        )
+        if args_errors is not None:
+            errors.extend(args_errors)
 
         if len(errors) > 0:
             return None, Error(
                 node.original_node, "Failed to transpile the function call", errors
             )
+
+        assert args is not None
 
         # NOTE (mristin):
         # The validity of the arguments is checked in
@@ -1955,7 +1973,7 @@ common::{contains_function}(
         # the operands of the same sign, but the invariants must behave the same in
         # all the SDKs for all the inputs. Hence, we call the helper which computes
         # the floored remainder, see
-        # :py:data:`aas_core_codegen.cpp.lib._generate_verification.FLOOR_MOD_DEFINITION`.
+        # :py:data:`aas_core_codegen.cpp.lib._generate_common.FLOOR_MOD_DEFINITION`.
         #
         # The helper works on ``int64_t``'s, so we convert the lengths, which are
         # unsigned ``size_t``'s in C++. If the meta-model expects a length as
@@ -1977,7 +1995,7 @@ common::{contains_function}(
         # NOTE (mristin):
         # We qualify the helper with the namespace as the invariants are transpiled
         # in the anonymous namespace.
-        function = f"{cpp_common.VERIFICATION_NAMESPACE}::FloorMod"
+        function = f"{cpp_common.COMMON_NAMESPACE}::FloorMod"
 
         call = Stripped(f"{function}({left}, {right})")
         if "\n" in call or len(call) > 70:
@@ -2871,6 +2889,16 @@ for (
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        expression, error = self.transform(node.expression)
+        if error is not None:
+            return None, error
+
+        assert expression is not None
+        return Stripped(f"{expression};"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(

@@ -10,6 +10,7 @@ from icontract import require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier
+from aas_core_codegen.parse import tree as parse_tree
 
 
 @require(lambda identifier_part: len(identifier_part) > 0)
@@ -567,6 +568,16 @@ def receiver_name(
     # The name ``instance`` is used as a property of an enhanced instance.
     # We skip it as a receiver to avoid confusion.
     total_arg_name_set.add(Identifier("instance"))
+
+    # NOTE (mristin):
+    # The variables in the bodies of the transpiled methods must not shadow
+    # the receiver.
+    for method in cls.methods:
+        if isinstance(method, intermediate.UnderstoodMethod):
+            for stmt in method.body:
+                for node in parse_tree.over_nodes(stmt):
+                    if isinstance(node, parse_tree.Name):
+                        total_arg_name_set.add(variable_name(node.identifier))
 
     receiver = None  # type: Optional[Identifier]
 

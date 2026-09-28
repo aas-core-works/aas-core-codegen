@@ -84,6 +84,23 @@ void Something::set_maybe_count(
   maybe_count_ = value;
 }
 
+bool Something::IsValidIndex(
+  int64_t index
+) const {
+  return (
+    (
+      0 <= index
+      && index < static_cast<int64_t>(this->texts().size())
+    )
+  );
+}
+
+std::wstring Something::TextAt(
+  int64_t index
+) const {
+  return this->texts().at(index);
+}
+
 // endregion Something
 
 // region Is-a functions

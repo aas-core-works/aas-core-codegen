@@ -7,6 +7,7 @@ using Aas = dummy;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
+using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -64,6 +65,16 @@ namespace dummy
         public long Count { get; set; }
 
         public long? MaybeCount { get; set; }
+
+        /// <summary>
+        /// Check a method taking an integer argument, called with a length.
+        /// </summary>
+        public bool IsValidIndex(long index);
+
+        /// <summary>
+        /// Check reading in a method at an index which is an integer argument.
+        /// </summary>
+        public string TextAt(long index);
     }
 
     public class Something : ISomething
@@ -75,6 +86,27 @@ namespace dummy
         public long Count { get; set; }
 
         public long? MaybeCount { get; set; }
+
+        /// <summary>
+        /// Check a method taking an integer argument, called with a length.
+        /// </summary>
+        public bool IsValidIndex(
+            long index
+        )
+        {
+            return 0 <= index
+            && index < this.Texts.Count;
+        }
+
+        /// <summary>
+        /// Check reading in a method at an index which is an integer argument.
+        /// </summary>
+        public string TextAt(
+            long index
+        )
+        {
+            return this.Texts[checked((int)index)];
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance

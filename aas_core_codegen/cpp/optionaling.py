@@ -818,3 +818,13 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_continue(self, node: parse_tree.Continue) -> Optional[Error]:
         self.is_optional_map[node] = False
         return None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Optional[Error]:
+        error = self.transform(node.expression)
+        if error is not None:
+            return error
+
+        self.is_optional_map[node] = False
+        return None

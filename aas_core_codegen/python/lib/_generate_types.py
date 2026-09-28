@@ -22,14 +22,18 @@ from aas_core_codegen.common import (
     assert_never,
     Stripped,
     indent_but_first_line,
+    NOTE_ON_INVARIANTS_OF_MUTATING_METHODS,
 )
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
+    type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.python import (
     common as python_common,
     naming as python_naming,
     description as python_description,
+    transpilation as python_transpilation,
 )
 from aas_core_codegen.python.common import (
     INDENT as I,
@@ -875,14 +879,169 @@ def _generate_comment_for_property(
     return python_description.documentation_comment(text), None
 
 
+class _MethodTranspiler(python_transpilation.Transpiler):
+    """Transpile the body of a :py:class:`intermediate.UnderstoodMethod`."""
+
+    def __init__(
+        self,
+        inference: intermediate_type_inference.InferenceOfFunction,
+        method: intermediate.UnderstoodMethod,
+    ) -> None:
+        """Initialize with the given values."""
+        python_transpilation.Transpiler.__init__(
+            self,
+            type_map=inference.type_map,
+            environment=inference.environment_with_args,
+            types_module=None,
+        )
+
+        self._argument_name_set = frozenset(arg.name for arg in method.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(python_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            return Stripped("self"), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(python_naming.argument_name(node.identifier)), None
+
+        our_type = self._environment.find_our_type(node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(python_naming.enum_name(node.identifier)), None
+
+        # NOTE (mristin):
+        # The intermediate stage refuses the references to the constants and
+        # to the verification functions in the methods, as they would introduce
+        # a cyclic dependency between the modules.
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to Python. We could not find it neither in the local variables, "
+            f"nor in the arguments, nor as an enumeration. If you expect this name "
+            f"to be transpilable, please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_method(
+    method: intermediate.UnderstoodMethod,
+    cls: intermediate.ClassUnion,
+    inference: intermediate_type_inference.InferenceOfFunction,
+    qualified_module_name: python_common.QualifiedModuleName,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the ``method`` as a member of the class ``cls``."""
+    # NOTE (mristin):
+    # We deliberately do not check the invariants of the instance after a method
+    # call, as that would be too inefficient. The invariants are verified only in
+    # the verification module, on the explicit request of the user. We note that
+    # in the docstring of the mutating methods.
+    extra_remarks = (
+        [] if method.non_mutating else [NOTE_ON_INVARIANTS_OF_MUTATING_METHODS]
+    )
+
+    docstring = None  # type: Optional[Stripped]
+    if method.description is not None:
+        (
+            docstring,
+            docstring_errors,
+        ) = python_description.generate_docstring_for_signature(
+            description=method.description,
+            context=python_description.Context(
+                qualified_module_name=qualified_module_name,
+                module=Identifier("types"),
+                cls_or_enum=cls,
+            ),
+            extra_remarks=extra_remarks,
+        )
+        if docstring_errors is not None:
+            return None, Error(
+                method.description.parsed.node,
+                f"Failed to generate the docstring for the method {method.name!r}",
+                docstring_errors,
+            )
+    elif len(extra_remarks) > 0:
+        docstring = python_description.docstring(Stripped("\n\n".join(extra_remarks)))
+
+    transpiler = _MethodTranspiler(inference=inference, method=method)
+
+    body = []  # type: List[Stripped]
+    for node in method.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                method.parsed.node,
+                f"Failed to transpile the method {method.name!r} "
+                f"of the class {cls.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    method_name = python_naming.method_name(method.name)
+
+    returns = (
+        python_common.generate_type(type_annotation=method.returns)
+        if method.returns is not None
+        else "None"
+    )
+
+    arg_codes = [Stripped("self")] + [
+        Stripped(
+            f"{python_naming.argument_name(arg.name)}: "
+            f"{python_common.generate_type(type_annotation=arg.type_annotation)}"
+        )
+        for arg in method.arguments
+    ]
+
+    writer = io.StringIO()
+    if len(arg_codes) == 1:
+        writer.write(f"def {method_name}(self) -> {returns}:")
+    else:
+        arg_block = ",\n".join(arg_codes)
+        writer.write(
+            f"""\
+def {method_name}(
+{I}{indent_but_first_line(arg_block, I)}
+) -> {returns}:"""
+        )
+
+    if docstring is not None:
+        writer.write("\n")
+        writer.write(textwrap.indent(docstring, I))
+
+    # NOTE (mristin):
+    # The transpiled code is not idiomatic Python, so we do not lint it, as is
+    # the case with the verification functions.
+    writer.write(f"\n{I}# pylint: disable=all")
+
+    if len(body) == 0:
+        writer.write(f"\n{I}pass")
+    else:
+        for stmt in body:
+            writer.write("\n")
+            writer.write(textwrap.indent(stmt, I))
+
+    return Stripped(writer.getvalue()), None
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ClassUnion,
     spec_impls: specific_implementations.SpecificImplementations,
     qualified_module_name: python_common.QualifiedModuleName,
     symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate Python code for the given concrete class ``cls``."""
+    """
+    Generate Python code for the given concrete class ``cls``.
+
+    The ``base_environment`` is used to infer the types of the understood methods.
+    """
     # region Collect blocks of the class body
 
     # Code blocks of the class body separated by double newlines and indented once
@@ -970,22 +1129,33 @@ def over_{prop_name}_or_empty(
                 continue
 
             blocks.append(implementation)
-        else:
+        elif isinstance(method, intermediate.UnderstoodMethod):
             # NOTE (mristin):
-            # At the moment, we do not transpile the method body and its contracts.
-            # We want to finish the meta-model for the V3, fix de/serialization and
-            # generate SDKs for a couple of languages before taking on this rather hard
-            # task.
-
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts. We want to finish the meta-model for the V3, "
-                    "fix de/serialization and generate SDKs for a couple of languages "
-                    "before taking on this rather hard task.",
-                )
+            # Python inherits the methods, so we transpile each method only once,
+            # in the class which specified it.
+            inference, inference_error = intermediate_type_inference.infer_for_method(
+                method=method, base_environment=base_environment
             )
+            if inference_error is not None:
+                errors.append(inference_error)
+                continue
+
+            assert inference is not None
+
+            method_code, method_error = _transpile_method(
+                method=method,
+                cls=cls,
+                inference=inference,
+                qualified_module_name=qualified_module_name,
+            )
+            if method_error is not None:
+                errors.append(method_error)
+                continue
+
+            assert method_code is not None
+            blocks.append(method_code)
+        else:
+            assert_never(method)
 
     if isinstance(cls, intermediate.ConcreteClass):
         blocks.append(_generate_descend_once_method(cls=cls))
@@ -1739,6 +1909,10 @@ def generate(
     """
     errors = []  # type: List[Error]
 
+    base_environment = intermediate_type_inference.populate_base_environment(
+        symbol_table=symbol_table
+    )
+
     blocks = []  # type: List[Stripped]
 
     if symbol_table.meta_model.description is not None:
@@ -1901,6 +2075,7 @@ class Class(abc.ABC):
                 spec_impls=spec_impls,
                 qualified_module_name=qualified_module_name,
                 symbol_table=symbol_table,
+                base_environment=base_environment,
             )
             if error is None:
                 assert block is not None

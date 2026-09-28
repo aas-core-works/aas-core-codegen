@@ -69,7 +69,7 @@ public void Test_FloorMod_{i}()
 {I}// {case.explanation}
 {I}Assert.AreEqual(
 {II}{_long_literal(case.expected)},
-{II}Aas.Verification.FloorMod({_long_literal(case.dividend)}, {_long_literal(case.divisor)}));
+{II}Aas.Common.FloorMod({_long_literal(case.dividend)}, {_long_literal(case.divisor)}));
 }}"""
                 )
             )
@@ -125,7 +125,7 @@ namespace {namespace}.Tests
 {I}/// the divisor in Python (<c>-7 % 3 == 2</c>), while the native C# operator
 {I}/// <c>%</c> gives the remainder with the sign of the dividend
 {I}/// (<c>-7 % 3 == -1</c>). Therefore, we transpile the modulo to
-{I}/// <c>Verification.FloorMod</c> instead of the native operator.
+{I}/// <c>Common.FloorMod</c> instead of the native operator.
 {I}/// </remarks>
 {I}public class TestArithmetic
 {I}{{

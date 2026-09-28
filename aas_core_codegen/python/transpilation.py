@@ -53,12 +53,19 @@ class Transpiler(
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
         environment: intermediate_type_inference.Environment,
+        types_module: Optional[Identifier] = Identifier("aas_types"),
     ) -> None:
-        """Initialize with the given values."""
+        """
+        Initialize with the given values.
+
+        If ``types_module`` is specified, it is prepended to our types. It is None
+        when we transpile in the types module itself.
+        """
         self.type_map = type_map
         self._environment = intermediate_type_inference.MutableEnvironment(
             parent=environment
         )
+        self._types_module = types_module
 
         # NOTE (mristin):
         # Keep track whenever we define a variable name, so that we can know how to
@@ -297,11 +304,9 @@ class Transpiler(
 
         assert value is not None
 
-        # NOTE (mristin):
-        # We assume that the types module is imported as ``aas_types`` in
-        # the generated code, as is the case with the verification module.
+        prefix = "" if self._types_module is None else f"{self._types_module}."
         classes = [
-            f"aas_types.{python_naming.class_name(cls.identifier)}"
+            f"{prefix}{python_naming.class_name(cls.identifier)}"
             for cls in node.classes
         ]
 
@@ -1382,6 +1387,11 @@ range(
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue"), None
+
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self.transform(node.expression)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(

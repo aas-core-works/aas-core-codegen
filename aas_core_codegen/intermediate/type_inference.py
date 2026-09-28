@@ -9,6 +9,7 @@ be traced back to the parse stage.
 """
 
 import abc
+import ast
 import contextlib
 import enum
 from typing import (
@@ -1334,6 +1335,14 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> str:
+        result = self.transform(node.expression)
+
+        self.representation_map[node] = result
+        return result
+
 
 #: Map a comparator to the comparator which says the same about the flipped operands
 _FLIPPED_COMPARATOR = {
@@ -1513,12 +1522,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         environment: "Environment",
         representation_map: Mapping[parse_tree.Node, str],
         argument_by_name: Mapping[Identifier, _types.Argument],
+        enclosing_method: Optional[_types.UnderstoodMethod],
     ) -> None:
         """
         Initialize with the given values.
 
-        The ``argument_by_name`` gives the arguments of the verification function,
-        and is empty for an invariant.
+        The ``argument_by_name`` gives the arguments of the verification function or
+        of the method, and is empty for an invariant.
+
+        The ``enclosing_method`` is the method whose body we infer, if any.
         """
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
@@ -1527,6 +1539,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self._representation_map = representation_map
 
         self._argument_by_name = argument_by_name
+
+        self._enclosing_method = enclosing_method
 
         # NOTE (mristin):
         # We keep track of the variables whose values can be mutated in place,
@@ -1541,6 +1555,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self._mutable_name_set = {
             arg.name for arg in argument_by_name.values() if arg.mutable
         }  # type: Set[Identifier]
+
+        # NOTE (mristin):
+        # The instance is mutable only in the methods which are not marked as
+        # @non_mutating. In the invariants and the verification functions, ``self``
+        # is either read-only or not defined at all.
+        if enclosing_method is not None and not enclosing_method.non_mutating:
+            self._mutable_name_set.add(Identifier("self"))
 
         # NOTE (mristin):
         # We keep track of why the read-only variables are read-only so that we can
@@ -1648,6 +1669,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             argument = self._argument_by_name.get(identifier, None)
             if argument is not None:
+                what = "function" if self._enclosing_method is None else "method"
+
                 if isinstance(
                     beneath_optional(convert_type_annotation(argument.type_annotation)),
                     ListTypeAnnotation,
@@ -1655,16 +1678,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     return (
                         f"the argument {identifier!r} is declared as a Sequence, "
                         f"which is read-only. Please declare it as a List "
-                        f"if the function mutates it"
+                        f"if the {what} mutates it"
                     )
 
                 return (
                     f"the argument {identifier!r} is read-only. Please declare it "
-                    f"as Mutable[...] if the function mutates it"
+                    f"as Mutable[...] if the {what} mutates it"
                 )
 
-            if identifier == "self" and len(self._argument_by_name) == 0:
-                return "an invariant must not change the instance it checks"
+            if identifier == "self":
+                if self._enclosing_method is None:
+                    return "an invariant must not change the instance it checks"
+
+                return (
+                    f"the method {self._enclosing_method.name!r} is marked as "
+                    f"@non_mutating, so it must not change its instance"
+                )
 
             if identifier in self._loop_variable_set:
                 return (
@@ -2011,15 +2040,30 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 # The invariants and the verification functions are generated
                 # outside the class in most targets (*e.g.*, in a separate package in
                 # Go and Java). Hence, the non-public methods can not be called from
-                # there, and serve only as helpers to the implementation-specific
-                # methods of the class.
-                if method.visibility is not _types.Visibility.PUBLIC:
+                # there, and serve only as helpers to the methods of the class.
+                # A protected method can be called on ``self`` from the methods of
+                # the class and its descendants, while a private method only from
+                # the methods of the class which specified it.
+                if method.visibility is not _types.Visibility.PUBLIC and not (
+                    self._enclosing_method is not None
+                    and isinstance(node.instance, parse_tree.Name)
+                    and node.instance.identifier == "self"
+                    and (
+                        method.visibility is _types.Visibility.PROTECTED
+                        or method.specified_for is self._enclosing_method.specified_for
+                    )
+                ):
                     self.errors.append(
                         Error(
                             node.original_node,
                             f"The method {node.name!r} of the class {cls.name!r} "
                             f"is {method.visibility.value}, so it can be only called "
-                            f"from the implementation-specific methods of the class",
+                            f"on self from the methods of the class"
+                            + (
+                                " and its descendants"
+                                if method.visibility is _types.Visibility.PROTECTED
+                                else ""
+                            ),
                         )
                     )
                     return None
@@ -2683,13 +2727,59 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
+    def _check_mutable_arguments(
+        self,
+        args: Sequence[parse_tree.Expression],
+        arguments: Sequence[_types.Argument],
+        what: str,
+    ) -> bool:
+        """
+        Check that the ``args`` passed to the mutable ``arguments`` are mutable.
+
+        The ``what`` describes the called function or method in the error messages,
+        *e.g.*, ``the verification function 'foo'``.
+
+        :return: True if the check passed
+        """
+        ok = True
+        for arg_node, argument in zip(args, arguments):
+            if not argument.mutable:
+                continue
+
+            if not _is_access_path(arg_node):
+                self.errors.append(
+                    Error(
+                        arg_node.original_node,
+                        f"The argument {argument.name!r} of {what} is mutable, "
+                        f"so we expect a variable, a property or an item of a list "
+                        f"or a tuple so that the mutation is observable, but "
+                        f"got a temporary value.",
+                    )
+                )
+                ok = False
+                continue
+
+            reason = self._read_only_reason(arg_node)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        arg_node.original_node,
+                        f"The argument {argument.name!r} of {what} is mutable, "
+                        f"but {reason}.",
+                    )
+                )
+                ok = False
+
+        return ok
+
     def transform_method_call(
         self, node: parse_tree.MethodCall
     ) -> Optional["TypeAnnotationUnion"]:
         # NOTE (mristin):
-        # We recurse to track the types of the arguments. We check them only for
-        # the built-in methods, as we have not implemented the checks against
-        # the signatures of our methods.
+        # We recurse to track the types of the arguments. We check their types only
+        # for the built-in methods, as we have not implemented the checks against
+        # the signatures of our methods. However, we check the mutability of
+        # the arguments passed to our methods.
         failed = False
         arg_types = []  # type: List[TypeAnnotationUnion]
         for arg in node.args:
@@ -2731,6 +2821,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     f"but got: {member_type}",
                 )
             )
+            return None
+
+        if not self._check_mutable_arguments(
+            args=node.args,
+            arguments=member_type.method.arguments,
+            what=f"the method {node.member.name!r}",
+        ):
             return None
 
         if not member_type.method.non_mutating:
@@ -2875,39 +2972,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if failed:
             return None
 
-        if isinstance(func_type, VerificationTypeAnnotation):
-            for arg_node, argument in zip(node.args, func_type.func.arguments):
-                if not argument.mutable:
-                    continue
-
-                if not _is_access_path(arg_node):
-                    self.errors.append(
-                        Error(
-                            arg_node.original_node,
-                            f"The argument {argument.name!r} of the verification "
-                            f"function {func_type.func.name!r} is mutable, so we "
-                            f"expect a variable, a property or an item of a list "
-                            f"or a tuple so that the mutation is observable, but "
-                            f"got a temporary value.",
-                        )
-                    )
-                    failed = True
-                    continue
-
-                reason = self._read_only_reason(arg_node)
-                if reason is not None:
-                    self.errors.append(
-                        Error(
-                            arg_node.original_node,
-                            f"The argument {argument.name!r} of the verification "
-                            f"function {func_type.func.name!r} is mutable, "
-                            f"but {reason}.",
-                        )
-                    )
-                    failed = True
-
-            if failed:
-                return None
+        if isinstance(
+            func_type, VerificationTypeAnnotation
+        ) and not self._check_mutable_arguments(
+            args=node.args,
+            arguments=func_type.func.arguments,
+            what=f"the verification function {func_type.func.name!r}",
+        ):
+            return None
 
         # NOTE (mristin):
         # The length of a JSON-able value is not a question we can answer: its
@@ -4293,6 +4365,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Optional["TypeAnnotationUnion"]:
+        if self.transform(node.expression) is None:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
 
 def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
     """Create a basic mapping name 🠒 type annotation from the global scope.
@@ -4378,50 +4460,52 @@ class InferenceOfFunction:
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def infer_for_verification(
-    verification: _types.TranspilableVerification, base_environment: Environment
+def _infer_for_function(
+    body: Sequence[parse_tree.Node],
+    arguments: Sequence[_types.Argument],
+    returns: Optional[_types.TypeAnnotationUnion],
+    environment: MutableEnvironment,
+    enclosing_method: Optional[_types.UnderstoodMethod],
+    what: str,
+    node: ast.AST,
 ) -> Tuple[Optional[InferenceOfFunction], Optional[Error]]:
-    """Infer the types for the given function and map the body nodes to the types."""
+    """
+    Infer the types in the ``body`` of a verification function or of a method.
+
+    The ``environment`` is expected to hold the arguments already, and ``self``
+    in case of a method. The ``what`` describes the function in the error messages,
+    *e.g.*, ``the verification function 'foo'``.
+    """
     canonicalizer = _Canonicalizer()
-    for node in verification.parsed.body:
-        _ = canonicalizer.transform(node)
-
-    environment = MutableEnvironment(parent=base_environment)
-
-    for arg in verification.arguments:
-        environment.set(
-            identifier=arg.name,
-            type_annotation=convert_type_annotation(arg.type_annotation),
-        )
+    for node_in_body in body:
+        _ = canonicalizer.transform(node_in_body)
 
     type_inferrer = _Inferrer(
         environment=environment,
         representation_map=canonicalizer.representation_map,
-        argument_by_name={arg.name: arg for arg in verification.arguments},
+        argument_by_name={arg.name: arg for arg in arguments},
+        enclosing_method=enclosing_method,
     )
 
-    for node in verification.parsed.body:
-        _ = type_inferrer.transform(node)
+    for node_in_body in body:
+        _ = type_inferrer.transform(node_in_body)
 
     # NOTE (mristin):
     # Some targets, such as Go or Java, refuse to compile a function which misses
     # a return statement at the end, so we refuse it here already.
-    if verification.returns is not None and parse_tree.can_complete_normally(
-        verification.parsed.body  # type: ignore
-    ):
+    if returns is not None and parse_tree.can_complete_normally(body):  # type: ignore
         type_inferrer.errors.append(
             Error(
-                verification.parsed.node,
-                f"Expected the verification function {verification.name!r} "
-                f"to end with a return statement, since it returns a value",
+                node,
+                f"Expected {what} to end with a return statement, "
+                f"since it returns a value",
             )
         )
 
     if len(type_inferrer.errors):
         return None, Error(
-            verification.parsed.node,
-            f"Failed to infer the types "
-            f"in the verification function {verification.name!r}",
+            node,
+            f"Failed to infer the types in {what}",
             type_inferrer.errors,
         )
 
@@ -4433,6 +4517,111 @@ def infer_for_verification(
         ),
         None,
     )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer_for_verification(
+    verification: _types.TranspilableVerification, base_environment: Environment
+) -> Tuple[Optional[InferenceOfFunction], Optional[Error]]:
+    """Infer the types for the given function and map the body nodes to the types."""
+    environment = MutableEnvironment(parent=base_environment)
+
+    for arg in verification.arguments:
+        environment.set(
+            identifier=arg.name,
+            type_annotation=convert_type_annotation(arg.type_annotation),
+        )
+
+    return _infer_for_function(
+        body=verification.parsed.body,
+        arguments=verification.arguments,
+        returns=verification.returns,
+        environment=environment,
+        enclosing_method=None,
+        what=f"the verification function {verification.name!r}",
+        node=verification.parsed.node,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer_for_method(
+    method: _types.UnderstoodMethod, base_environment: Environment
+) -> Tuple[Optional[InferenceOfFunction], Optional[Error]]:
+    """
+    Infer the types for the given method and map the body nodes to the types.
+
+    The ``self`` is typed as the class which specified the method, so that
+    the inference holds for all the classes which inherit the method.
+    """
+    specified_for = method.specified_for
+    assert isinstance(specified_for, (_types.AbstractClass, _types.ConcreteClass))
+
+    environment = MutableEnvironment(parent=base_environment)
+
+    environment.set(
+        identifier=Identifier("self"),
+        type_annotation=OurTypeAnnotation(our_type=specified_for),
+    )
+
+    for arg in method.arguments:
+        environment.set(
+            identifier=arg.name,
+            type_annotation=convert_type_annotation(arg.type_annotation),
+        )
+
+    return _infer_for_function(
+        body=method.body,
+        arguments=method.arguments,
+        returns=method.returns,
+        environment=environment,
+        enclosing_method=method,
+        what=f"the method {method.name!r} of the class {method.specified_for.name!r}",
+        node=method.parsed.node,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer_for_methods(
+    symbol_table: _types.SymbolTable,
+) -> Tuple[
+    Optional[Mapping[_types.UnderstoodMethod, InferenceOfFunction]],
+    Optional[List[Error]],
+]:
+    """
+    Infer the types for all the understood methods of the ``symbol_table``.
+
+    We infer the types of a method only once, in the class which specified it.
+    The generators re-use the inference in all the concrete classes which repeat
+    the method.
+    """
+    base_environment = populate_base_environment(symbol_table=symbol_table)
+
+    errors = []  # type: List[Error]
+    inference_by_method = (
+        dict()
+    )  # type: MutableMapping[_types.UnderstoodMethod, InferenceOfFunction]
+
+    for cls in symbol_table.classes:
+        for method in cls.methods:
+            if method.specified_for is not cls or not isinstance(
+                method, _types.UnderstoodMethod
+            ):
+                continue
+
+            inference, error = infer_for_method(
+                method=method, base_environment=base_environment
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert inference is not None
+            inference_by_method[method] = inference
+
+    if len(errors) > 0:
+        return None, errors
+
+    return inference_by_method, None
 
 
 class InferenceOfInvariant:
@@ -4466,6 +4655,7 @@ def infer_for_invariant(
         environment=environment,
         representation_map=canonicalizer.representation_map,
         argument_by_name=dict(),
+        enclosing_method=None,
     )
 
     _ = type_inferrer.transform(invariant.body)

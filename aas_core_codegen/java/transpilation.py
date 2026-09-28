@@ -2132,6 +2132,16 @@ for (
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
 
+    def transform_expression_statement(
+        self, node: parse_tree.ExpressionStatement
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        expression, error = self.transform(node.expression)
+        if error is not None:
+            return None, error
+
+        assert expression is not None
+        return Stripped(f"{expression};"), None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_if(
         self, node: parse_tree.If

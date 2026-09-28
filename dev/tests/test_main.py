@@ -421,6 +421,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="switch_statements"
         )
 
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="transpiled_methods",
+        )
+
     def test_expected_tuples(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="tuples"
@@ -454,14 +460,6 @@ class Test_cpp(_TestCase):
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.CPP,
             case_name="conflict_between_underlying_of_function_and_class",
-        )
-
-    def test_unexpected_conflict_between_verification_function_and_helper(
-        self,
-    ) -> None:
-        self._run_unexpected_test(
-            target=aas_core_codegen.main.Target.CPP,
-            case_name="conflict_between_verification_function_and_helper",
         )
 
 
@@ -615,6 +613,12 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="switch_statements"
         )
 
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="transpiled_methods",
+        )
+
     def test_expected_tuples(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="tuples"
@@ -636,12 +640,10 @@ class Test_csharp(_TestCase):
             case_name="conflict_between_transformed_keyword_and_property",
         )
 
-    def test_unexpected_conflict_between_verification_function_and_helper(
-        self,
-    ) -> None:
+    def test_unexpected_conflict_with_common_class(self) -> None:
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.CSHARP,
-            case_name="conflict_between_verification_function_and_helper",
+            case_name="conflict_with_common_class",
         )
 
 
@@ -795,6 +797,12 @@ class Test_golang(_TestCase):
             target=aas_core_codegen.main.Target.GOLANG, case_name="switch_statements"
         )
 
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="transpiled_methods",
+        )
+
     def test_expected_tuples(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="tuples"
@@ -822,14 +830,6 @@ class Test_golang(_TestCase):
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.GOLANG,
             case_name="conflict_between_transformed_keyword_and_property",
-        )
-
-    def test_unexpected_conflict_between_verification_function_and_helper(
-        self,
-    ) -> None:
-        self._run_unexpected_test(
-            target=aas_core_codegen.main.Target.GOLANG,
-            case_name="conflict_between_verification_function_and_helper",
         )
 
 
@@ -986,6 +986,12 @@ class Test_java(_TestCase):
     def test_expected_switch_statements(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="switch_statements"
+        )
+
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="transpiled_methods",
         )
 
     def test_expected_tuples(self) -> None:
@@ -1186,6 +1192,12 @@ class Test_jsonschema(_TestCase):
             case_name="switch_statements",
         )
 
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="transpiled_methods",
+        )
+
     def test_expected_tuples(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="tuples"
@@ -1350,6 +1362,12 @@ class Test_python(_TestCase):
     def test_expected_switch_statements(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="switch_statements"
+        )
+
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="transpiled_methods",
         )
 
     def test_expected_tuples(self) -> None:
@@ -1542,6 +1560,12 @@ class Test_typescript(_TestCase):
             case_name="switch_statements",
         )
 
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="transpiled_methods",
+        )
+
     def test_expected_tuples(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="tuples"
@@ -1561,14 +1585,6 @@ class Test_typescript(_TestCase):
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
             case_name="conflict_between_constructor_arguments",
-        )
-
-    def test_unexpected_conflict_between_verification_function_and_helper(
-        self,
-    ) -> None:
-        self._run_unexpected_test(
-            target=aas_core_codegen.main.Target.TYPESCRIPT,
-            case_name="conflict_between_verification_function_and_helper",
         )
 
 
@@ -1736,6 +1752,12 @@ class Test_xsd(_TestCase):
     def test_expected_switch_statements(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="switch_statements"
+        )
+
+    def test_expected_transpiled_methods(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="transpiled_methods",
         )
 
     def test_expected_tuples(self) -> None:
