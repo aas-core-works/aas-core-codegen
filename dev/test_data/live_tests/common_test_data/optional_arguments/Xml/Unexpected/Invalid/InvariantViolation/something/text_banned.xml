@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><item><name>a</name><note>short</note></item><optionalText>banned</optionalText><optionalNumber>3</optionalNumber><optionalItem><name>b</name><note>x</note></optionalItem><optionalTexts><v>a</v><v>b</v></optionalTexts><optionalKind>beta</optionalKind></something>

@@ -174,13 +174,14 @@ class Transpiler(
             parent=environment
         )
 
-        # Keep track of optionals in is none checks, here we don't want to call
-        # .get()
+        # Keep track of the optionals which we use as ``Optional``, *e.g.*, in
+        # the is-none checks or as optional arguments, where we must not call
+        # ``.get()``.
         self._beneath_none_check = set()  # type: Set[parse_tree.Node]
 
-        # Keep track of method calls. In Java we don't pass around optionals
-        # but Null. Optional should solely be used for return types. Thus, we
-        # have to unpack the value and fall back if it is not set.
+        # Keep track of the values passed to the setters and to ``List.set``, which
+        # expect ``null`` instead of an empty optional. Thus, we have to unpack
+        # the value and fall back if it is not set.
         self._beneath_call = set()  # type: Set[parse_tree.Node]
 
         # Keep track whenever we define a variable name, so that we can know how to
@@ -688,6 +689,7 @@ class Transpiler(
 
         return Stripped(f"{not_antecedent}\n|| {consequent}"), None
 
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_as_long(
         self, node: parse_tree.Expression
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -729,6 +731,34 @@ class Transpiler(
             return Stripped(f"(long) ({code})"), None
 
         return code, None
+
+    def _transform_as_optional(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` as an ``Optional``.
+
+        We keep the nullability explicit in the optional arguments and the optional
+        local variables. An optional value is passed on as-is, even if it has been
+        narrowed, while a non-optional value needs to be wrapped.
+        """
+        if isinstance(node, parse_tree.Constant) and node.value is None:
+            return Stripped("Optional.empty()"), None
+
+        if self._optional_map[node]:
+            self._beneath_none_check.add(node)
+            try:
+                return self.transform(node)
+            finally:
+                self._beneath_none_check.remove(node)
+
+        code, error = self._transform_as_long(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        return Stripped(f"Optional.of({code})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
@@ -840,17 +870,23 @@ class Transpiler(
             )
 
         args = []  # type: List[Stripped]
-        for arg_node in node.args:
+        for i, arg_node in enumerate(node.args):
             if isinstance(
                 func_type, intermediate_type_inference.VerificationTypeAnnotation
             ):
-                # NOTE (mristin):
-                # We need to render the integer literals and the lengths as
-                # ``long``'s as Java does not convert an ``int`` to ``Long``
-                # implicitly.
-                self._beneath_call.add(arg_node)
-                arg, error = self._transform_as_long(arg_node)
-                self._beneath_call.remove(arg_node)
+                if isinstance(
+                    func_type.func.arguments[i].type_annotation,
+                    intermediate.OptionalTypeAnnotation,
+                ):
+                    arg, error = self._transform_as_optional(arg_node)
+                else:
+                    # NOTE (mristin):
+                    # We need to render the integer literals and the lengths as
+                    # ``long``'s as Java does not convert an ``int`` to ``Long``
+                    # implicitly.
+                    self._beneath_call.add(arg_node)
+                    arg, error = self._transform_as_long(arg_node)
+                    self._beneath_call.remove(arg_node)
             else:
                 arg, error = self.transform(arg_node)
 
@@ -1666,12 +1702,26 @@ class Transpiler(
                 None,
             )
 
-        value, error = self.transform(node.value)
+        # NOTE (mristin):
+        # A variable of an optional type holds an ``Optional``, as we keep
+        # the nullability explicit.
+        if isinstance(node.target, parse_tree.Name) and isinstance(
+            self._environment.find(identifier=node.target.identifier)
+            or self.type_map[node.value],
+            intermediate_type_inference.OptionalTypeAnnotation,
+        ):
+            value, error = self._transform_as_optional(node.value)
+        else:
+            value, error = self.transform(node.value)
         if error is not None:
             errors.append(error)
 
         target = None  # type: Optional[Stripped]
         if isinstance(node.target, parse_tree.Name):
+            # NOTE (mristin):
+            # We must not unwrap the optional variable which we assign to.
+            self._beneath_none_check.add(node.target)
+
             type_anno = self._environment.find(identifier=node.target.identifier)
             if type_anno is None:
                 # NOTE (empwilli):
@@ -1705,6 +1755,8 @@ class Transpiler(
                 target, error = self.transform(node=node.target)
                 if error is not None:
                     errors.append(error)
+
+            self._beneath_none_check.remove(node.target)
 
         if len(errors) > 0:
             return None, Error(

@@ -464,13 +464,17 @@ class Transpiler(
             return None, error
 
         if self.is_optional_map[node]:
+            # NOTE (mristin):
+            # We always parenthesize the de-referenced value, since the postfix
+            # operators bind stronger than ``*``. For example, ``*item->name()``
+            # would access the member on the optional itself.
             no_parentheses_types = (
                 parse_tree.FunctionCall,
                 parse_tree.Name,
                 parse_tree.Constant,
             )
             if isinstance(node, no_parentheses_types):
-                return Stripped(f"*{code}"), None
+                return Stripped(f"(*{code})"), None
 
             return Stripped(f"(*({code}))"), None
 

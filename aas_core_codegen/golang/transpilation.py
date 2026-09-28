@@ -333,6 +333,66 @@ class Transpiler(
 
         return Stripped(f"*{code}"), None
 
+    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
+        """
+        Convert the transpiled position ``node`` to an ``int64`` if it is a length.
+
+        The string helpers take the positions as ``int64``'s, our integers,
+        while the lengths are ``int``'s. The same holds for the integer parameters
+        of our functions and methods.
+        """
+        type_anno = self.type_map[node]
+        if (
+            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
+            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            return Stripped(f"int64({code})")
+
+        return code
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_pointer(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` as a pointer to its value.
+
+        We pass on a pointer, *e.g.*, of an optional property, as-is. A non-pointer
+        value needs to be wrapped in ``NewAndPointTo``. Go does not allow to take
+        the address of a literal or of an expression, and taking the address of
+        a variable would alias it, so that a later assignment to the variable would
+        also change the pointed value.
+        """
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if (
+            isinstance(node, (parse_tree.Name, parse_tree.Member, parse_tree.Index))
+            and self._is_pointer_map[node]
+        ) or (isinstance(node, parse_tree.Constant) and node.value is None):
+            return code, None
+
+        # NOTE (mristin):
+        # A length can only be pointed to as an integer, an ``int64``, while
+        # the lengths are ``int``'s.
+        code = self._as_int64_position(node, code)
+
+        if (
+            isinstance(node, parse_tree.Constant)
+            and isinstance(node.value, int)
+            and not isinstance(node.value, bool)
+        ):
+            # NOTE (mristin):
+            # The integer literals are untyped in Go, and ``NewAndPointTo`` would
+            # infer an ``int`` for them, while we represent the integers as
+            # ``int64``.
+            code = Stripped(f"int64({code})")
+
+        return Stripped(f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({code})"), None
+
     @abc.abstractmethod
     def _transform_enumeration_literal(
         self, enumeration_name: Identifier, literal_name: Identifier
@@ -527,23 +587,6 @@ len(
         # all the index access.
 
         return Stripped(f"{collection}[{index}]"), None
-
-    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
-        """
-        Convert the transpiled position ``node`` to an ``int64`` if it is a length.
-
-        The string helpers take the positions as ``int64``'s, our integers,
-        while the lengths are ``int``'s. The same holds for the integer parameters
-        of our functions and methods.
-        """
-        type_anno = self.type_map[node]
-        if (
-            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
-            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            return Stripped(f"int64({code})")
-
-        return code
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
@@ -968,22 +1011,6 @@ aascommon.MapContains(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            arg, error = self._transform_and_dereference_if_necessary(arg_node)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the function call", errors
-            )
-
         # NOTE (mristin):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
@@ -998,6 +1025,33 @@ aascommon.MapContains(
                 node.name.original_node,
                 f"Expected the name to refer to a function, "
                 f"but its inferred type was {func_type}",
+            )
+
+        args = []  # type: List[Stripped]
+        for i, arg_node in enumerate(node.args):
+            # NOTE (mristin):
+            # We pass on a pointer to an optional argument of a verification
+            # function, and de-reference the values otherwise.
+            if isinstance(
+                func_type, intermediate_type_inference.VerificationTypeAnnotation
+            ) and golang_pointering.is_pointer_type(
+                func_type.func.arguments[i].type_annotation
+            ):
+                arg, error = self._transform_as_pointer(arg_node)
+            else:
+                arg, error = self._transform_and_dereference_if_necessary(arg_node)
+
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert arg is not None
+
+            args.append(arg)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the function call", errors
             )
 
         if isinstance(
@@ -1894,14 +1948,7 @@ aascommon.{qualifier_function}(
         if isinstance(node.target, parse_tree.Member):
             # NOTE (mristin):
             # The type inference allows only the properties of a class as member
-            # targets, which we assign to with the setters. We pass on the pointer
-            # of an optional value as-is.
-            #
-            # However, a non-optional value assigned to a property represented as
-            # a pointer needs to be wrapped in ``NewAndPointTo``. Go does not allow to
-            # take the address of a literal or of an expression, and taking
-            # the address of a variable would alias it, so that a later assignment
-            # to the variable would also change the property.
+            # targets, which we assign to with the setters.
             instance_type = self.type_map[node.target.instance]
             assert isinstance(
                 instance_type, intermediate_type_inference.OurTypeAnnotation
@@ -1913,44 +1960,20 @@ aascommon.{qualifier_function}(
             if error is not None:
                 errors.append(error)
 
-            target_is_pointer = golang_pointering.is_pointer_type(prop.type_annotation)
+            if golang_pointering.is_pointer_type(prop.type_annotation):
+                value, error = self._transform_as_pointer(node.value)
+            else:
+                value, error = self._transform_and_dereference_if_necessary(node.value)
+                if error is None:
+                    assert value is not None
 
-            value, error = (
-                self.transform(node.value)
-                if target_is_pointer
-                else self._transform_and_dereference_if_necessary(node.value)
-            )
+                    # NOTE (mristin):
+                    # A length can only be assigned to an integer property,
+                    # an ``int64``, while the lengths are ``int``'s.
+                    value = self._as_int64_position(node.value, value)
+
             if error is not None:
                 errors.append(error)
-            else:
-                assert value is not None
-
-                # NOTE (mristin):
-                # A length can only be assigned to an integer property, an ``int64``,
-                # while the lengths are ``int``'s.
-                value = self._as_int64_position(node.value, value)
-
-                if target_is_pointer and not (
-                    isinstance(
-                        node.value,
-                        (parse_tree.Name, parse_tree.Member, parse_tree.Index),
-                    )
-                    and self._is_pointer_map[node.value]
-                ):
-                    if (
-                        isinstance(node.value, parse_tree.Constant)
-                        and isinstance(node.value.value, int)
-                        and not isinstance(node.value.value, bool)
-                    ):
-                        # NOTE (mristin):
-                        # The integer literals are untyped in Go, and
-                        # ``NewAndPointTo`` would infer an ``int`` for them, while we
-                        # represent the integers as ``int64``.
-                        value = Stripped(f"int64({value})")
-
-                    value = Stripped(
-                        f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({value})"
-                    )
 
             if len(errors) > 0:
                 return None, Error(
@@ -1978,7 +2001,20 @@ aascommon.{qualifier_function}(
 
             return Stripped(f"{instance}.{setter_name}({value})"), None
 
-        value, error = self._transform_and_dereference_if_necessary(node.value)
+        # NOTE (mristin):
+        # A variable holding an optional value is a pointer. We re-bind the pointer
+        # instead of writing through it, since the pointer might alias a property,
+        # while Python only re-binds the name.
+        rebinds_pointer = (
+            isinstance(node.target, parse_tree.Name)
+            and self._is_pointer_map[node.target]
+        )
+
+        value, error = (
+            self._transform_as_pointer(node.value)
+            if rebinds_pointer
+            else self._transform_and_dereference_if_necessary(node.value)
+        )
         if error is not None:
             errors.append(error)
 
@@ -2021,15 +2057,14 @@ aascommon.{qualifier_function}(
         assert target is not None
         assert value is not None
 
-        target_is_pointer = self._is_pointer_map[node.target]
-        if target_is_pointer:
+        if not rebinds_pointer and self._is_pointer_map[node.target]:
             target = Stripped(f"*{target}")
 
         # NOTE (mristin):
         # A length can be assigned to an integer variable or an integer item of
         # a list, which are ``int64``'s, while the lengths are ``int``'s. A variable
         # defined by a length is an ``int`` itself.
-        if not is_definition:
+        if not is_definition and not rebinds_pointer:
             target_type = (
                 self._environment.find(node.target.identifier)
                 if isinstance(node.target, parse_tree.Name)
@@ -2051,6 +2086,7 @@ aascommon.{qualifier_function}(
         # ``int64``. Hence, we need to explicitly convert them.
         if (
             is_definition
+            and not rebinds_pointer
             and isinstance(node.value, parse_tree.Constant)
             and isinstance(node.value.value, int)
             and not isinstance(node.value.value, bool)

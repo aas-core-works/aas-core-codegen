@@ -5,14 +5,14 @@
  * @param inoutputVariables the inoutputVariables
 */
 public static boolean idShortsOfVariablesAreUnique(
-    Iterable<? extends IOperationVariable> inputVariables,
-    Iterable<? extends IOperationVariable> outputVariables,
-    Iterable<? extends IOperationVariable> inoutputVariables) {
+    Optional<List<IOperationVariable>> inputVariables,
+    Optional<List<IOperationVariable>> outputVariables,
+    Optional<List<IOperationVariable>> inoutputVariables) {
 
   Set<String> idShortSet = new HashSet<>();
 
-  if (inputVariables != null) {
-    for(IOperationVariable variable : inputVariables) {
+  if (inputVariables.isPresent()) {
+    for (IOperationVariable variable : inputVariables.get()) {
       if (variable.getValue().getIdShort().isPresent()) {
         if (idShortSet.contains(variable.getValue().getIdShort().get())) {
           return false;
@@ -22,8 +22,8 @@ public static boolean idShortsOfVariablesAreUnique(
     }
   }
 
-  if (outputVariables != null) {
-    for (IOperationVariable variable : outputVariables) {
+  if (outputVariables.isPresent()) {
+    for (IOperationVariable variable : outputVariables.get()) {
       if (variable.getValue().getIdShort().isPresent()) {
         if (idShortSet.contains(variable.getValue().getIdShort().get())) {
           return false;
@@ -33,8 +33,8 @@ public static boolean idShortsOfVariablesAreUnique(
     }
   }
 
-  if (inoutputVariables != null) {
-    for (IOperationVariable variable :  inoutputVariables) {
+  if (inoutputVariables.isPresent()) {
+    for (IOperationVariable variable : inoutputVariables.get()) {
       if (variable.getValue().getIdShort().isPresent()) {
         if (idShortSet.contains(variable.getValue().getIdShort().get())) {
           return false;
