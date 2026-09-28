@@ -419,11 +419,25 @@ class _TranspilableVerificationTranspiler(java_transpilation.Transpiler):
     def transform_name(
         self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if node.identifier in self._variable_name_set:
-            return Stripped(java_naming.variable_name(node.identifier)), None
+        if (
+            node.identifier in self._variable_name_set
+            or node.identifier in self._argument_name_set
+        ):
+            variable = java_naming.variable_name(node.identifier)
 
-        if node.identifier in self._argument_name_set:
-            return Stripped(java_naming.variable_name(node.identifier)), None
+            # NOTE (mristin):
+            # We unwrap an optional variable analogously to an optional property,
+            # see :py:meth:`java_transpilation.Transpiler.transform_member`.
+            if self._optional_map[node]:
+                if node in self._beneath_none_check:
+                    return Stripped(variable), None
+
+                if node in self._beneath_call:
+                    return Stripped(f"{variable}.orElse(null)"), None
+
+                return Stripped(f"{variable}.get()"), None
+
+            return Stripped(variable), None
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = java_naming.property_name(node.identifier)
@@ -1549,19 +1563,30 @@ def generate(
         )
 
     # NOTE (mristin):
-    # A transpiled verification function which takes a list as an argument needs
-    # the import of ``List`` in its signature. The implementation-specific ones
-    # come with their signatures written by hand, so we leave them out.
-    if intermediate.uses_json_types(symbol_table) or any(
-        isinstance(verification, intermediate.TranspilableVerification)
-        and isinstance(
-            intermediate.beneath_optional(arg.type_annotation),
-            intermediate.ListTypeAnnotation,
-        )
+    # A verification function which takes a list or an optional as an argument
+    # needs the import of ``List`` or ``Optional``, respectively, in its signature.
+    # The signatures of the implementation-specific functions are written by hand,
+    # but follow the same types.
+    argument_type_annotations = [
+        arg.type_annotation
         for verification in symbol_table.verification_functions
         for arg in verification.arguments
+    ]
+
+    if intermediate.uses_json_types(symbol_table) or any(
+        isinstance(
+            intermediate.beneath_optional(type_annotation),
+            intermediate.ListTypeAnnotation,
+        )
+        for type_annotation in argument_type_annotations
     ):
         imports.append(Stripped("import java.util.List;"))
+
+    if any(
+        isinstance(type_annotation, intermediate.OptionalTypeAnnotation)
+        for type_annotation in argument_type_annotations
+    ):
+        imports.append(Stripped("import java.util.Optional;"))
 
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]

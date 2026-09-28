@@ -27,6 +27,8 @@ import aas_core.aas3_0.reporting.Reporting;
 import aas_core.aas3_0.types.enums.*;
 import aas_core.aas3_0.types.model.*;
 import aas_core.aas3_0.visitation.AbstractTransformer;
+import java.util.List;
+import java.util.Optional;
 
 public class Verification {
   private static Pattern constructMatchesIdShort() {
@@ -1454,14 +1456,14 @@ public class Verification {
    * @param inoutputVariables the inoutputVariables
   */
   public static boolean idShortsOfVariablesAreUnique(
-      Iterable<? extends IOperationVariable> inputVariables,
-      Iterable<? extends IOperationVariable> outputVariables,
-      Iterable<? extends IOperationVariable> inoutputVariables) {
+      Optional<List<IOperationVariable>> inputVariables,
+      Optional<List<IOperationVariable>> outputVariables,
+      Optional<List<IOperationVariable>> inoutputVariables) {
 
     Set<String> idShortSet = new HashSet<>();
 
-    if (inputVariables != null) {
-      for(IOperationVariable variable : inputVariables) {
+    if (inputVariables.isPresent()) {
+      for (IOperationVariable variable : inputVariables.get()) {
         if (variable.getValue().getIdShort().isPresent()) {
           if (idShortSet.contains(variable.getValue().getIdShort().get())) {
             return false;
@@ -1471,8 +1473,8 @@ public class Verification {
       }
     }
 
-    if (outputVariables != null) {
-      for (IOperationVariable variable : outputVariables) {
+    if (outputVariables.isPresent()) {
+      for (IOperationVariable variable : outputVariables.get()) {
         if (variable.getValue().getIdShort().isPresent()) {
           if (idShortSet.contains(variable.getValue().getIdShort().get())) {
             return false;
@@ -1482,8 +1484,8 @@ public class Verification {
       }
     }
 
-    if (inoutputVariables != null) {
-      for (IOperationVariable variable :  inoutputVariables) {
+    if (inoutputVariables.isPresent()) {
+      for (IOperationVariable variable : inoutputVariables.get()) {
         if (variable.getValue().getIdShort().isPresent()) {
           if (idShortSet.contains(variable.getValue().getIdShort().get())) {
             return false;
@@ -7601,9 +7603,9 @@ public class Verification {
 
       if (!(
         idShortsOfVariablesAreUnique(
-            that.getInputVariables().orElse(null),
-            that.getOutputVariables().orElse(null),
-            that.getInoutputVariables().orElse(null)))) {
+            that.getInputVariables(),
+            that.getOutputVariables(),
+            that.getInoutputVariables()))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +

@@ -1,0 +1,18 @@
+{
+  "item": {
+    "name": "a",
+    "note": "short"
+  },
+  "optionalText": "hello",
+  "optionalNumber": 3,
+  "optionalItem": {
+    "name": "b",
+    "note": "x"
+  },
+  "optionalTexts": [
+    "a",
+    "b",
+    "c"
+  ],
+  "optionalKind": "beta"
+}
