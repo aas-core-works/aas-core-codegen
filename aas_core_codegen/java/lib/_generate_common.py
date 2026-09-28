@@ -3,18 +3,136 @@
 from typing import List
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped
+from aas_core_codegen.common import Stripped, indent_but_first_line
 from aas_core_codegen.java import common as java_common
 from aas_core_codegen.java.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
+    INDENT4 as IIII,
 )
 
 
-def _generate_string_helpers(package: java_common.PackageIdentifier) -> Stripped:
+#: Strip the characters from the start of a string as ``str.lstrip`` in Python
+_LSTRIP = Stripped(
+    f"""\
+/**
+ * Check whether {{@code text}} contains the character {{@code codePoint}}.
+ *
+ * @param text to be searched in
+ * @param codePoint to be searched for
+ * @return true if {{@code codePoint}} is one of the characters of {{@code text}}
+ */
+private static boolean containsCodePoint(String text, int codePoint) {{
+{I}int offset = 0;
+{I}while (offset < text.length()) {{
+{II}final int other = text.codePointAt(offset);
+{II}if (other == codePoint) {{
+{III}return true;
+{II}}}
+
+{II}offset += Character.charCount(other);
+{I}}}
+
+{I}return false;
+}}
+
+/**
+ * Strip the longest prefix of {{@code text}} which consists only of
+ * the characters listed in {{@code chars}}.
+ *
+ * <p>We follow the Python implementation of {{@code str.lstrip}}, since Python
+ * is the language of the meta-model specifications. Hence, we strip
+ * the characters (code points), and not the UTF-16 code units. For example,
+ * we do not strip the first half of a surrogate pair when {{@code chars}}
+ * contains another character with the same high surrogate.
+ *
+ * @param text to be stripped
+ * @param chars to be stripped from the start of {{@code text}}
+ * @return {{@code text}} without the stripped prefix
+ */
+public static String lstrip(String text, String chars) {{
+{I}int offset = 0;
+{I}while (offset < text.length()) {{
+{II}final int codePoint = text.codePointAt(offset);
+{II}if (!containsCodePoint(chars, codePoint)) {{
+{III}break;
+{II}}}
+
+{II}offset += Character.charCount(codePoint);
+{I}}}
+
+{I}return text.substring(offset);
+}}"""
+)
+
+#: Parse a text as a safe integer; this is how we transpile the built-in ``int``
+_PARSE_SAFE_INT = Stripped(
+    f"""\
+/**
+ * Parse {{@code text}} as a safe integer.
+ *
+ * <p>The meta-model calls {{@code int}} on strings, and this is its
+ * transpilation. We accept only an optional sign followed by the ASCII digits,
+ * and only the safe integers, <i>i.e.</i>, the integers within
+ * {{@code -(2^53 - 1)}} and {{@code 2^53 - 1}}, which a double-precision
+ * floating-point number represents exactly. This way, all the SDKs behave
+ * the same.
+ *
+ * <p>We do not use {{@link Long#parseLong(String)}} as it accepts the digits
+ * of any script, and the range of all the 64-bit integers.
+ *
+ * @param text to be parsed
+ * @return the parsed integer
+ * @throws IllegalArgumentException if {{@code text}} is not a safe integer
+ */
+public static long parseSafeInt(String text) {{
+{I}// This is 2^53 - 1.
+{I}final long maxSafeInteger = 9007199254740991L;
+
+{I}final int length = text.length();
+
+{I}int offset = 0;
+{I}boolean negative = false;
+{I}if (length > 0 && (text.charAt(0) == '+' || text.charAt(0) == '-')) {{
+{II}negative = text.charAt(0) == '-';
+{II}offset = 1;
+{I}}}
+
+{I}if (offset == length) {{
+{II}throw new IllegalArgumentException(
+{III}"Expected an optional sign followed by the ASCII digits, but got: "
+{III}+ text);
+{I}}}
+
+{I}long value = 0;
+{I}for (int i = offset; i < length; i++) {{
+{II}final char character = text.charAt(i);
+{II}if (character < '0' || character > '9') {{
+{III}throw new IllegalArgumentException(
+{IIII}"Expected an optional sign followed by the ASCII digits, but got: "
+{IIII}+ text);
+{II}}}
+
+{II}// NOTE (mristin):
+{II}// The value can not overflow as we check the range after each digit.
+{II}value = value * 10 + (character - '0');
+{II}if (value > maxSafeInteger) {{
+{III}throw new IllegalArgumentException(
+{IIII}"Expected a safe integer, but got a text out of its range: " + text);
+{II}}}
+{I}}}
+
+{I}return negative ? -value : value;
+}}"""
+)
+
+
+def _generate_string_helpers(
+    package: java_common.PackageIdentifier, symbol_table: intermediate.SymbolTable
+) -> Stripped:
     """
-    Generate the helpers for ``len``, slicing strings and ``find``.
+    Generate the helpers for ``len``, slicing strings, ``find``, ``lstrip`` and ``int``.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -24,7 +142,24 @@ def _generate_string_helpers(package: java_common.PackageIdentifier) -> Stripped
     on the positions out of range, and neither ``substring`` nor ``indexOf`` count
     the negative positions from the end. We also accept the positions as
     ``long``'s, since our integers are ``long``'s in Java.
+
+    The helpers for ``lstrip`` and ``int`` are generated only if the meta-model
+    uses them.
     """
+    extra_methods = []  # type: List[Stripped]
+    if intermediate.uses_lstrip(symbol_table):
+        extra_methods.append(_LSTRIP)
+
+    if intermediate.uses_int(symbol_table):
+        extra_methods.append(_PARSE_SAFE_INT)
+
+    extra_methods_joined = "".join(
+        f"""
+
+{I}{indent_but_first_line(method, I)}"""
+        for method in extra_methods
+    )
+
     # NOTE (mristin):
     # The native ``codePointCount`` and ``offsetByCodePoints`` count a lone
     # surrogate as a character of its own, as Python does. We do not check whether
@@ -160,7 +295,7 @@ public final class StringHelpers {{
 {I} */
 {I}public static long find(String text, String sub) {{
 {II}return find(text, sub, 0);
-{I}}}
+{I}}}{extra_methods_joined}
 }}"""
     )
 
@@ -186,14 +321,19 @@ def generate(
     infrastructure, and not meta-model-derived types.
 
     The string helpers are generated only if the meta-model might take ``len`` of
-    strings, slice them or call ``find`` on them.
+    strings, slice them, or call ``find``, ``lstrip`` or ``int`` on them.
     """
     files = []  # type: List[java_common.JavaFile]
 
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if (
+        intermediate.uses_len_slicing_or_find(symbol_table)
+        or intermediate.uses_lstrip(symbol_table)
+        or intermediate.uses_int(symbol_table)
+    ):
         files.append(
             java_common.JavaFile(
-                "StringHelpers.java", f"{_generate_string_helpers(package)}\n"
+                "StringHelpers.java",
+                f"{_generate_string_helpers(package, symbol_table)}\n",
             )
         )
 

@@ -2165,6 +2165,11 @@ type IClass interface {{
     if golang_common.names_package(blocks, "fmt"):
         import_lines.append(f'{I}"fmt"')
 
+    # NOTE (mristin):
+    # We transpile ``str.lstrip`` in the methods to ``strings.TrimLeft``.
+    if golang_common.names_package(blocks, "strings"):
+        import_lines.append(f'{I}"strings"')
+
     if golang_common.names_package(blocks, "aascommon"):
         import_lines.append(f"{I}aascommon {common_url_literal}")
 

@@ -817,6 +817,15 @@ class Transpiler(
                     None,
                 )
 
+            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+                # NOTE (mristin):
+                # Java has no native ``lstrip`` with a set of characters. See
+                # ``StringHelpers.lstrip`` in the generated common package.
+                return (
+                    Stripped(f"StringHelpers.lstrip({instance}, {args[0]})"),
+                    None,
+                )
+
             return None, Error(
                 node.original_node,
                 f"The handling of the built-in method {member_type.method.name!r} "
@@ -1027,6 +1036,20 @@ class Transpiler(
 
                 return Stripped(f"Math.abs({arg})"), None
 
+            elif func_type.func.name == "int":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # We do not use the native ``Long.parseLong`` as it accepts
+                # the digits of any script, and the range of all the 64-bit
+                # integers, while the other SDKs accept only the ASCII digits and
+                # the safe integers. See ``StringHelpers.parseSafeInt`` in
+                # the generated common package.
+                return Stripped(f"StringHelpers.parseSafeInt({args[0]})"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1043,7 +1066,15 @@ class Transpiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
-        elif isinstance(node.value, (int, float)):
+        elif isinstance(node.value, int):
+            # NOTE (mristin):
+            # An integer literal is an ``int`` in Java, so a literal beyond its range
+            # does not compile unless suffixed with ``L``.
+            if not -(2**31) <= node.value <= 2**31 - 1:
+                return Stripped(f"{node.value}L"), None
+
+            return Stripped(str(node.value)), None
+        elif isinstance(node.value, float):
             return Stripped(str(node.value)), None
         elif isinstance(node.value, str):
             return Stripped(java_common.string_literal(node.value)), None

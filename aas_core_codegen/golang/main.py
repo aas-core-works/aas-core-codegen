@@ -339,6 +339,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
+    # generate the helper function for ``int`` only in that case.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                base_rel_path / "common/lstrip_and_int_test/lstrip_and_int_test.go",
+                lambda: (
+                    golang_tests.generate_lstrip_and_int_test(
+                        symbol_table=verified_ir_table, repo_url=repo_url
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

@@ -603,6 +603,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
+    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                test_dir / "test_lstrip_and_int.cpp",
+                lambda: (
+                    cpp_tests.generate_test_lstrip_and_int_implementation(
+                        symbol_table=context.symbol_table,
+                        library_namespace=library_namespace,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
+    # NOTE (mristin):
     # Unlike the other targets, C++ copies the vectors by value, so we execute
     # the assignments to the properties and to the list items in the unit tests to
     # make sure that the transpiled code references and copies the vectors as

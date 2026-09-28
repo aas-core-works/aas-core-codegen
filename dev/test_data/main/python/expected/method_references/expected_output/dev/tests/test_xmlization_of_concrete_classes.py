@@ -86,6 +86,43 @@ class TestRoundTrips(unittest.TestCase):
             # endregion
 
 
+class TestLexicalForms(unittest.TestCase):
+    """Test the lexical forms which a recorded example can not hold."""
+
+    def _read_with(self, xml_name: str, text: str) -> aas_types.Box:
+        """Read a recorded example with the content of ``xml_name`` put to ``text``."""
+        paths = sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Xml"
+                / "Expected"
+                / 'box'
+            ).glob("**/*.xml")
+        )
+        self.assertGreater(
+            len(paths),
+            0,
+            f"Expected at least one recorded example of box, but got none",
+        )
+
+        original = paths[0].read_text(encoding="utf-8")
+
+        start = original.index(f"<{xml_name}>") + len(xml_name) + 2
+        end = original.index(f"</{xml_name}>")
+
+        return aas_xmlization.box_from_str(
+            original[:start] + text + original[end:]
+        )
+
+    def test_size_read_from_many_leading_zeros(self) -> None:
+        instance = self._read_with('size', "-" + "0" * 5000 + "42")
+        self.assertEqual(-42, instance.size)
+
+    def test_size_read_from_many_digits_fails(self) -> None:
+        with self.assertRaises(aas_xmlization.DeserializationException):
+            self._read_with('size', "1" + "0" * 5000)
+
+
 class TestDuplicateProperty(unittest.TestCase):
     """Test that a property given more than once is refused."""
 

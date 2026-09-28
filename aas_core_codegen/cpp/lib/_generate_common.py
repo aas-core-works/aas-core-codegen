@@ -145,7 +145,9 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
     return concat_funcs
 
 
-def _generate_string_helper_declarations() -> List[Stripped]:
+def _generate_string_helper_declarations(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Stripped]:
     """
     Generate the declarations of the helpers for ``len``, slicing strings and ``find``.
 
@@ -157,8 +159,10 @@ def _generate_string_helper_declarations() -> List[Stripped]:
     ``std::wstring::substr`` throws on a start out of range, and neither ``substr``
     nor ``find`` count the negative positions from the end. We also accept
     the positions as ``int64_t``'s, since our integers are ``int64_t``'s in C++.
+
+    We add ``LStrip`` only if the meta-model uses ``str.lstrip``.
     """
-    return [
+    result = [
         Stripped(
             """\
 /**
@@ -249,17 +253,48 @@ int64_t FindStr(
 {I}int64_t start
 );"""
         ),
-    ]
+    ]  # type: List[Stripped]
+
+    if intermediate.uses_lstrip(symbol_table):
+        result.append(
+            Stripped(
+                f"""\
+/**
+ * Strip the longest prefix of \\p text consisting of the \\p chars.
+ *
+ * We follow the Python implementation of `str.lstrip`, since Python is
+ * the language of the meta-model specifications. Hence, we strip
+ * the characters (code points), and never a half of a surrogate pair on
+ * the platforms where `wchar_t` is a UTF-16 code unit, such as Windows.
+ *
+ * \\param text to be stripped
+ * \\param chars to be stripped from the start of \\p text
+ * \\return \\p text without the stripped prefix
+ */
+std::wstring LStrip(
+{I}const std::wstring& text,
+{I}const std::wstring& chars
+);"""
+            )
+        )
+
+    return result
 
 
-def _generate_string_helper_definitions() -> List[Stripped]:
-    """Generate the definitions of the helpers for ``len``, slicing strings and ``find``."""
+def _generate_string_helper_definitions(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Stripped]:
+    """
+    Generate the definitions of the helpers for ``len``, slicing strings and ``find``.
+
+    We add ``LStrip`` only if the meta-model uses ``str.lstrip``.
+    """
     # NOTE (mristin):
     # We count a lone surrogate as a character of its own, as Python does. We do
     # not check whether ``find`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
-    return [
+    result = [
         Stripped(
             f"""\
 namespace {{
@@ -437,7 +472,75 @@ int64_t FindStr(
 {I});
 }}"""
         ),
-    ]
+    ]  # type: List[Stripped]
+
+    if intermediate.uses_lstrip(symbol_table):
+        result.extend(
+            [
+                Stripped(
+                    f"""\
+namespace {{
+
+#if WCHAR_MAX <= 0xFFFF
+/**
+ * Compute the size in wchar_t's of the character at \\p offset in \\p text.
+ */
+size_t CharacterSizeAt(const std::wstring& text, size_t offset) {{
+{I}return IsSurrogatePairAt(text, offset) ? 2 : 1;
+}}
+#else
+/**
+ * Compute the size in wchar_t's of a character in a text.
+ */
+size_t CharacterSizeAt(const std::wstring&, size_t) {{
+{I}return 1;
+}}
+#endif
+
+}}  // namespace"""
+                ),
+                Stripped(
+                    f"""\
+std::wstring LStrip(
+{I}const std::wstring& text,
+{I}const std::wstring& chars
+) {{
+{I}size_t offset = 0;
+{I}while (offset < text.size()) {{
+{II}const size_t size = CharacterSizeAt(text, offset);
+
+{II}// NOTE (mristin):
+{II}// We compare the whole characters so that we never strip a half of
+{II}// a surrogate pair.
+{II}bool stripped = false;
+{II}size_t chars_offset = 0;
+{II}while (chars_offset < chars.size()) {{
+{III}const size_t chars_size = CharacterSizeAt(chars, chars_offset);
+{III}if (
+{IIII}chars_size == size
+{IIII}&& chars.compare(chars_offset, chars_size, text, offset, size) == 0
+{III}) {{
+{IIII}stripped = true;
+{IIII}break;
+{III}}}
+
+{III}chars_offset += chars_size;
+{II}}}
+
+{II}if (!stripped) {{
+{III}break;
+{II}}}
+
+{II}offset += size;
+{I}}}
+
+{I}return text.substr(offset);
+}}"""
+                ),
+            ]
+        )
+
+    return result
 
 
 # NOTE (mristin):
@@ -503,6 +606,88 @@ int64_t FloorMod(int64_t dividend, int64_t divisor) {{
 {I}}}
 
 {I}return remainder;
+}}"""
+)
+
+
+# NOTE (mristin):
+# We deliberately do not transpile the built-in ``int`` to the native ``std::stoll``
+# as it skips the leading white space, ignores the trailing characters, and depends
+# on the locale. Moreover, it would parse the integers beyond the safe range, which
+# TypeScript can not represent, so that the SDKs would behave differently. Hence, we
+# transpile ``int`` to the helper ``ParseSafeInt`` below.
+#
+# The helper lives in the common module so that both the verification and
+# the methods of the types can use it. It is public so that the clients can rely
+# on it, and so that we can unit-test it.
+
+#: Name of the helper function to parse the safe integers
+PARSE_SAFE_INT_NAME: Final[Identifier] = Identifier("ParseSafeInt")
+
+#: Declaration of the helper to parse a safe integer, to be put in the header
+PARSE_SAFE_INT_DECLARATION = Stripped(
+    """\
+/**
+ * \\brief Parse \\p text as a safe integer.
+ *
+ * The meta-model calls <code>int</code> on strings, and this is its
+ * transpilation. We accept only an optional sign followed by the ASCII digits,
+ * and only the safe integers, <em>i.e.</em>, the integers within
+ * <code>-(2^53 - 1)</code> and <code>2^53 - 1</code>, which a double-precision
+ * floating-point number represents exactly. This way, all the SDKs behave
+ * the same.
+ *
+ * \\param text to be parsed
+ * \\return parsed integer
+ * \\throw std::invalid_argument if \\p text is not a safe integer
+ */
+int64_t ParseSafeInt(const std::wstring& text);"""
+)
+
+#: Definition of the helper to parse a safe integer, to be put in
+#: the implementation
+PARSE_SAFE_INT_DEFINITION = Stripped(
+    f"""\
+int64_t ParseSafeInt(const std::wstring& text) {{
+{I}// NOTE: This is 2^53 - 1.
+{I}const int64_t kMaxSafeInteger = 9007199254740991LL;
+
+{I}size_t offset = 0;
+{I}bool negative = false;
+{I}if (!text.empty() && (text[0] == L'-' || text[0] == L'+')) {{
+{II}negative = text[0] == L'-';
+{II}offset = 1;
+{I}}}
+
+{I}if (offset == text.size()) {{
+{II}throw std::invalid_argument(
+{III}"Expected an optional sign followed by the ASCII digits, but got: "
+{III}+ WstringToUtf8(text)
+{II});
+{I}}}
+
+{I}int64_t value = 0;
+{I}for (size_t i = offset; i < text.size(); ++i) {{
+{II}const wchar_t character = text[i];
+{II}if (character < L'0' || character > L'9') {{
+{III}throw std::invalid_argument(
+{IIII}"Expected an optional sign followed by the ASCII digits, but got: "
+{IIII}+ WstringToUtf8(text)
+{III});
+{II}}}
+
+{II}// NOTE: The value never overflows as we check it after each digit, and
+{II}// ten times the largest safe integer fits into int64_t.
+{II}value = value * 10 + static_cast<int64_t>(character - L'0');
+{II}if (value > kMaxSafeInteger) {{
+{III}throw std::invalid_argument(
+{IIII}"Expected a safe integer, but got a text out of its range: "
+{IIII}+ WstringToUtf8(text)
+{III});
+{II}}}
+{I}}}
+
+{I}return negative ? -value : value;
 }}"""
 )
 
@@ -623,16 +808,22 @@ std::unique_ptr<T> make_unique(
     # The string helpers take the positions as ``int64_t``'s, and need
     # ``WCHAR_MAX`` to tell whether ``wchar_t`` is a UTF-16 code unit. Hence, we
     # include these headers only for a meta-model which might take ``len`` of
-    # strings, slice them or call ``find`` on them.
+    # strings, slice them, or call ``find`` or ``lstrip`` on them.
     #
-    # The helper ``FloorMod`` takes and returns ``int64_t``'s as well.
-    extra_std_includes = []  # type: List[str]
-    if intermediate.uses_len_slicing_or_find(symbol_table) or intermediate.uses_modulo(
+    # The helpers ``FloorMod`` and ``ParseSafeInt`` return ``int64_t``'s as well.
+    uses_string_helpers = intermediate.uses_len_slicing_or_find(
         symbol_table
+    ) or intermediate.uses_lstrip(symbol_table)
+
+    extra_std_includes = []  # type: List[str]
+    if (
+        uses_string_helpers
+        or intermediate.uses_modulo(symbol_table)
+        or intermediate.uses_int(symbol_table)
     ):
         extra_std_includes.append("#include <cstdint>")
 
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if uses_string_helpers:
         extra_std_includes.append("#include <cwchar>")
 
     if len(extra_std_includes) > 0:
@@ -921,13 +1112,18 @@ size_t LenTuple(const std::tuple<T...>&) {
 }"""
             ),
             *(
-                _generate_string_helper_declarations()
-                if intermediate.uses_len_slicing_or_find(symbol_table)
+                _generate_string_helper_declarations(symbol_table)
+                if uses_string_helpers
                 else []
             ),
             *(
                 [FLOOR_MOD_DECLARATION]
                 if intermediate.uses_modulo(symbol_table)
+                else []
+            ),
+            *(
+                [PARSE_SAFE_INT_DECLARATION]
+                if intermediate.uses_int(symbol_table)
                 else []
             ),
             Stripped(
@@ -968,6 +1164,14 @@ def generate_implementation(
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
+    # NOTE (mristin):
+    # ``ParseSafeInt`` throws ``std::invalid_argument``.
+    std_includes = ["#include <algorithm>"]
+    if intermediate.uses_int(symbol_table):
+        std_includes.append("#include <stdexcept>")
+
+    std_includes_joined = "\n".join(std_includes)
+
     blocks = [
         cpp_common.WARNING,
         Stripped(
@@ -975,9 +1179,9 @@ def generate_implementation(
 #include "{include_prefix_path}/common.hpp"'''
         ),
         Stripped(
-            """\
+            f"""\
 #pragma warning(push, 0)
-#include <algorithm>
+{std_includes_joined}
 #pragma warning(pop)
 
 // NOTE (mristin):
@@ -1179,11 +1383,15 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
 }}"""
         ),
         *(
-            _generate_string_helper_definitions()
-            if intermediate.uses_len_slicing_or_find(symbol_table)
+            _generate_string_helper_definitions(symbol_table)
+            if (
+                intermediate.uses_len_slicing_or_find(symbol_table)
+                or intermediate.uses_lstrip(symbol_table)
+            )
             else []
         ),
         *([FLOOR_MOD_DEFINITION] if intermediate.uses_modulo(symbol_table) else []),
+        *([PARSE_SAFE_INT_DEFINITION] if intermediate.uses_int(symbol_table) else []),
         cpp_common.generate_namespace_closing(namespace),
         cpp_common.WARNING,
     ]

@@ -141,3 +141,90 @@ for _float_argument, _float_expected in ABS_FLOAT_CASES:
     assert abs(_float_argument) == _float_expected
 
 # endregion
+
+
+# region Strings
+
+#: Cases for ``str.lstrip`` as ``(text, chars, expected)``.
+#:
+#: The emojis lie outside the Basic Multilingual Plane, so they are encoded as two
+#: code units in UTF-16. Mind the two emojis 😀 (U+1F600) and 😁 (U+1F601) which
+#: share the high surrogate. An implementation which strips the UTF-16 code units
+#: instead of the characters would strip half of 😁 when told to strip 😀.
+LSTRIP_CASES: Final[Sequence[Tuple[str, str, str]]] = [
+    (text, chars, text.lstrip(chars))
+    for text, chars in (
+        ("000123", "0"),
+        ("+-+12", "+-"),
+        ("0102", "0"),
+        ("", "0"),
+        ("000", "0"),
+        ("abc", ""),
+        ("abc", "xyz"),
+        ("abc", "cba"),
+        ("éé-x", "-é"),
+        ("😀😀a😀", "😀"),
+        ("😁x", "😀"),
+        ("a😀", "a"),
+    )
+]
+
+# endregion
+
+
+# region Parsing integers
+
+# NOTE (mristin):
+# Provide the cases for the generated unit tests of ``int`` on strings.
+#
+# The transpiled ``int`` is stricter than the Python ``int``. It accepts only
+# an optional sign followed by the ASCII digits, and only the safe integers, *i.e.*,
+# the integers which a double-precision floating-point number represents exactly.
+# We limit ourselves to the safe integers as TypeScript represents the integers as
+# ``number``, and the invariants must behave the same in all the SDKs.
+#
+# Python itself would accept some of the invalid cases below. For example, it skips
+# the surrounding white space, accepts a digit group separator as in ``1_0``, and
+# the digits of any script such as the Arabic-Indic ``٥``. Hence, the meta-model has
+# to check the text before it calls ``int``.
+
+#: Valid cases for ``int`` as ``(text, expected)``
+PARSE_INT_CASES: Final[Sequence[Tuple[str, int]]] = [
+    ("0", 0),
+    ("-0", 0),
+    ("+7", 7),
+    ("42", 42),
+    ("-42", -42),
+    ("0007", 7),
+    ("-0042", -42),
+    ("0" * 30 + "1", 1),
+    (str(MAX_SAFE_INTEGER), MAX_SAFE_INTEGER),
+    (str(-MAX_SAFE_INTEGER), -MAX_SAFE_INTEGER),
+    ("+000" + str(MAX_SAFE_INTEGER), MAX_SAFE_INTEGER),
+]
+
+#: Invalid cases for ``int`` on which the transpiled code throws
+PARSE_INT_INVALID_CASES: Final[Sequence[str]] = [
+    "",
+    "+",
+    "-",
+    "+-1",
+    " 1",
+    "1 ",
+    "1_0",
+    "1.0",
+    "1e3",
+    "0x10",
+    "٥",
+    "１",
+    str(MAX_SAFE_INTEGER + 1),
+    str(-(MAX_SAFE_INTEGER + 1)),
+    str(INT64_MAX),
+    "9" * 30,
+]
+
+for _text, _expected_int in PARSE_INT_CASES:
+    assert int(_text) == _expected_int
+    assert abs(_expected_int) <= MAX_SAFE_INTEGER
+
+# endregion

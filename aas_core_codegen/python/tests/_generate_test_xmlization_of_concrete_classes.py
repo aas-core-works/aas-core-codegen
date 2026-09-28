@@ -65,8 +65,9 @@ def _generate_lexical_test_case(
 
     float_prop = prop_by_a_type.get(intermediate.PrimitiveType.FLOAT, None)
     bool_prop = prop_by_a_type.get(intermediate.PrimitiveType.BOOL, None)
+    int_prop = prop_by_a_type.get(intermediate.PrimitiveType.INT, None)
 
-    if float_prop is None and bool_prop is None:
+    if float_prop is None and bool_prop is None and int_prop is None:
         return None
 
     xml_class_name = naming.xml_class_name(cls.name)
@@ -175,6 +176,37 @@ def _read_with(self, xml_name: str, text: str) -> aas_types.{python_naming.class
 def {test_name}(self) -> None:
 {I}instance = self._read_with({prop_xml_name!r}, {text!r})
 {I}{assertion}"""
+            )
+        )
+
+    if int_prop is not None:
+        # NOTE (mristin):
+        # ``xs:long`` admits arbitrarily many leading zeros, while Python refuses
+        # to convert a text of more than 4300 digits, leading zeros included. Such
+        # texts can not be recorded examples as the leading zeros are not written
+        # back. We spell the texts out as expressions to keep the tests readable.
+        int_prop_xml_name = naming.xml_property(int_prop.name)
+        int_prop_name = python_naming.property_name(int_prop.name)
+
+        blocks.append(
+            Stripped(
+                f"""\
+def {python_naming.method_name(
+                Identifier(f"test_{int_prop.name}_read_from_many_leading_zeros")
+            )}(self) -> None:
+{I}instance = self._read_with({int_prop_xml_name!r}, "-" + "0" * 5000 + "42")
+{I}self.assertEqual(-42, instance.{int_prop_name})"""
+            )
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+def {python_naming.method_name(
+                Identifier(f"test_{int_prop.name}_read_from_many_digits_fails")
+            )}(self) -> None:
+{I}with self.assertRaises(aas_xmlization.DeserializationException):
+{II}self._read_with({int_prop_xml_name!r}, "1" + "0" * 5000)"""
             )
         )
 

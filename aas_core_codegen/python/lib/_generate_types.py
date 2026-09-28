@@ -1958,17 +1958,43 @@ def generate(
 
     typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
 
-    blocks.extend(
-        [
-            python_common.WARNING,
-            Stripped(
-                f"""\
+    # NOTE (mristin):
+    # We transpile ``int`` to a helper in the common module. We import the module
+    # only if an understood method calls ``int`` so that the import is never unused.
+    methods_call_int = any(
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "int"
+        for cls in symbol_table.classes
+        for method in cls.methods
+        if isinstance(method, intermediate.UnderstoodMethod)
+        for body_node in method.body
+        for node in parse_tree.over_nodes(body_node)
+    )
+
+    if methods_call_int:
+        imports = Stripped(
+            f"""\
+import abc
+import enum
+from typing import (
+{typing_imports_joined}
+)
+
+import {qualified_module_name}.common as aas_common"""
+        )
+    else:
+        imports = Stripped(
+            f"""\
 import abc
 import enum
 from typing import (
 {typing_imports_joined}
 )"""
-            ),
+        )
+
+    blocks.extend(
+        [
+            python_common.WARNING,
+            imports,
             Stripped(
                 """\
 T = TypeVar("T")

@@ -1330,6 +1330,16 @@ common::{contains_function}(
                 None,
             )
 
+        if method is intermediate_type_inference.STR_LSTRIP:
+            # NOTE (mristin):
+            # We do not use the native ``find_first_not_of`` as it strips
+            # the UTF-16 code units instead of the characters on Windows, unlike
+            # Python. See ``LStrip`` in the generated common module.
+            return (
+                Stripped(f"common::LStrip({instance}, {args[0]})"),
+                None,
+            )
+
         return None, Error(
             node.original_node,
             f"The handling of the built-in method {method.name!r} "
@@ -1587,6 +1597,23 @@ common::{contains_function}(
                 # while the overloads for ``double`` live in ``<cmath>``. We include
                 # both in the verification.
                 return Stripped(f"std::abs({args[0]})"), None
+
+            elif func_type.func.name == "int":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # We do not use the native ``std::stoll`` as it skips the leading
+                # white space, ignores the trailing garbage and depends on
+                # the locale. See ``ParseSafeInt`` in the generated common module.
+                # We qualify the helper with the namespace as the invariants are
+                # transpiled in the anonymous namespace.
+                return (
+                    Stripped(f"{cpp_common.COMMON_NAMESPACE}::ParseSafeInt({args[0]})"),
+                    None,
+                )
 
             else:
                 return None, Error(

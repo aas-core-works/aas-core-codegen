@@ -3262,7 +3262,90 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_error(
             'self.text.upper() == "A"',
             "The member 'upper' is not supported on strings; we support only "
-            "the following methods: 'find'",
+            "the following methods: 'find', 'lstrip'",
+        )
+
+    def test_lstrip_and_int(self) -> None:
+        type_map = Test_string_slicing_and_find.infer_type_map(
+            Test_string_slicing_and_find.source_with_invariant(
+                'int(self.text.lstrip("+-").lstrip("0")) > 0'
+            )
+        )
+
+        self.assertEqual("lstrip", type_map["self.text.lstrip"])
+        self.assertEqual("str", type_map["self.text.lstrip('+-').lstrip('0')"])
+        self.assertEqual("int", type_map["int(self.text.lstrip('+-').lstrip('0'))"])
+
+    def test_int_of_a_constrained_primitive(self) -> None:
+        source = """\
+@invariant(lambda self: len(self) > 0, "Dummy constraint")
+class Non_empty_string(str, DBC):
+    pass
+
+
+@invariant(
+    lambda self: int(self.text) > 0,
+    "Dummy invariant description"
+)
+class Something(DBC):
+    text: Non_empty_string
+
+    def __init__(self, text: Non_empty_string) -> None:
+        self.text = text
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        type_map = Test_string_slicing_and_find.infer_type_map(source)
+
+        self.assertEqual("int", type_map["int(self.text)"])
+
+    def test_lstrip_with_a_non_string_argument_fails(self) -> None:
+        self.expect_error(
+            'self.text.lstrip(1) == ""',
+            "Expected the stripped characters of ``lstrip`` to be a string, "
+            "but got: int",
+        )
+
+    def test_lstrip_with_no_arguments_fails(self) -> None:
+        self.expect_error(
+            'self.text.lstrip() == ""',
+            "Expected 1 argument(s) to the built-in method 'lstrip', but got 0",
+        )
+
+    def test_int_of_a_float_fails(self) -> None:
+        self.expect_error(
+            "int(self.text) > 0",
+            "Expected the argument of ``int`` to be a non-None string, since we "
+            "support only parsing the integers from the strings, but got: float",
+            property_type="float",
+        )
+
+    def test_int_of_an_optional_string_fails(self) -> None:
+        source = """\
+@invariant(
+    lambda self: int(self.text) > 0,
+    "Dummy invariant description"
+)
+class Something(DBC):
+    text: Optional[str]
+
+    def __init__(self, text: Optional[str] = None) -> None:
+        self.text = text
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        with self.assertRaises(AssertionError) as context:
+            Test_string_slicing_and_find.infer_type_map(source)
+
+        self.assertEqual(
+            "Expected the argument of ``int`` to be a non-None string, since we "
+            "support only parsing the integers from the strings, "
+            "but got: Optional[str]",
+            str(context.exception),
         )
 
 

@@ -1556,6 +1556,21 @@ def generate(
         else ""
     )
 
+    # NOTE (mristin):
+    # The helpers of the transpiled code live in the common module, so that both
+    # the types and the verification can use them.
+    imported_modules = [
+        "constants as aas_constants",
+        "reporting as aas_reporting",
+        "types as aas_types",
+    ]
+    if intermediate.uses_int(symbol_table):
+        imported_modules.insert(0, "common as aas_common")
+
+    imported_modules_joined = "\n".join(
+        f"{I}{imported_module}," for imported_module in imported_modules
+    )
+
     # region Module docstring
     blocks = [
         _generate_module_docstring(
@@ -1589,9 +1604,7 @@ else:
 {I}from typing_extensions import Final
 
 from {qualified_module_name} import (
-{I}constants as aas_constants,
-{I}reporting as aas_reporting,
-{I}types as aas_types,
+{imported_modules_joined}
 ){json_value_verification_import}"""
         ),
         # NOTE (mristin):

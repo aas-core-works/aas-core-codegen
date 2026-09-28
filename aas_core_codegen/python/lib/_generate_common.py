@@ -14,6 +14,66 @@ from aas_core_codegen.python import (
 from aas_core_codegen.python.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
+)
+
+
+#: Parse a text as a safe integer; this is how we transpile the built-in ``int``
+_PARSE_SAFE_INT = Stripped(
+    f"""\
+#: Match an optional sign followed by the ASCII digits.
+#:
+#: Mind the explicit ``[0-9]``: ``\\d`` would match a digit of any script.
+_SAFE_INT_RE = re.compile(r"[-+]?[0-9]+")
+
+
+def parse_safe_int(text: str) -> int:
+{I}\"\"\"
+{I}Parse :paramref:`text` as a safe integer.
+
+{I}The meta-model calls ``int`` on strings, and this is its transpilation.
+{I}We are stricter than the built-in :py:func:`int` so that all the SDKs behave
+{I}the same. We accept only an optional sign followed by the ASCII digits, and
+{I}only the safe integers, *i.e.*, the integers within ``-(2 ** 53 - 1)`` and
+{I}``2 ** 53 - 1``, which a double-precision floating-point number represents
+{I}exactly.
+
+{I}:param text: to be parsed
+{I}:return: parsed integer
+{I}:raise: :py:class:`ValueError` if :paramref:`text` is not a safe integer
+
+{I}>>> parse_safe_int("-0042")
+{I}-42
+{I}\"\"\"
+{I}# NOTE (mristin):
+{I}# Mind that it is checked with ``fullmatch`` and not with ``match``: ``$``
+{I}# would also match just before a trailing newline.
+{I}if _SAFE_INT_RE.fullmatch(text) is None:
+{II}raise ValueError(
+{III}f"Expected an optional sign followed by the ASCII digits, "
+{III}f"but got: {{text!r}}"
+{II})
+
+{I}# NOTE (mristin):
+{I}# We count the significant digits before we call ``int``, as the conversion
+{I}# is quadratic in the length of the text, and Python refuses a text of more
+{I}# than 4300 digits, leading zeros included.
+{I}digits = text.lstrip("+-").lstrip("0")
+{I}if len(digits) > 16:
+{II}raise ValueError(
+{III}f"Expected a safe integer, but got a text out of its range: {{text!r}}"
+{II})
+
+{I}value = int(digits) if len(digits) > 0 else 0
+
+{I}# NOTE (mristin):
+{I}# This is 2 ** 53 - 1.
+{I}if value > 9007199254740991:
+{II}raise ValueError(
+{III}f"Expected a safe integer, but got a text out of its range: {{text!r}}"
+{II})
+
+{I}return -value if text[0] == "-" else value"""
 )
 
 
@@ -26,12 +86,20 @@ from aas_core_codegen.python.common import (
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
     """Generate code of common functionality."""
+    # NOTE (mristin):
+    # The helper to parse the integers checks the text with a regular expression.
+    import_lines = ["import collections.abc"]
+    if intermediate.uses_int(symbol_table):
+        import_lines.append("import re")
+
+    import_lines_joined = "\n".join(import_lines)
+
     blocks = [
         Stripped('"""Provide common functions shared among the modules."""'),
         python_common.WARNING,
         Stripped(
             f"""\
-import collections.abc
+{import_lines_joined}
 from typing import (
 {I}Any,
 {I}NoReturn,
@@ -112,6 +180,9 @@ def try_to_cast_to_array_like(
         ),
         python_common.WARNING,
     ]
+
+    if intermediate.uses_int(symbol_table):
+        blocks.insert(len(blocks) - 1, _PARSE_SAFE_INT)
 
     # NOTE (mristin):
     # Only a meta-model which uses a JSON-able type ever meets a bare number

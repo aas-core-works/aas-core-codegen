@@ -3145,7 +3145,9 @@ def _read_int_from_element_text(
 {II}Input stream of ``(event, element)`` coming from
 {II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
 {II}``events=["start", "end"]``
-{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:raise:
+{II}:py:class:`DeserializationException` if unexpected input, including
+{II}a value outside of the 64-bit range of ``xs:long``
 {I}:return: parsed value
 {I}\"\"\"
 {I}text = collapse_whitespace(
@@ -3169,19 +3171,27 @@ def _read_int_from_element_text(
 {III}f"but got an element with text: {{text!r}}"
 {II})
 
-{I}try:
-{II}value = int(text)
-{I}except ValueError:
-{II}# pylint: disable=raise-missing-from
+{I}# NOTE (mristin):
+{I}# We count the significant digits before we call ``int``. The conversion is
+{I}# quadratic in the length of the text, and Python refuses a text of more than
+{I}# 4300 digits, leading zeros included, although ``xs:long`` allows arbitrarily
+{I}# many leading zeros. The largest magnitude, 2^63, has 19 digits.
+{I}digits = text.lstrip("+-").lstrip("0")
+{I}if len(digits) > 19:
 {II}raise DeserializationException(
-{III}f"Expected an integer, "
-{III}f"but got an element with text: {{text!r}}"
+{III}f"Expected a value as xs:long, "
+{III}f"but got an element with text out of its range: {{text!r}}"
 {II})
+
+{I}value = int(digits) if len(digits) > 0 else 0
+{I}if text[0] == "-":
+{II}value = -value
 
 {I}# NOTE (mristin):
 {I}# An ``int`` is unbounded in Python, while ``xs:long`` is a 64-bit integer,
-{I}# so the range has to be checked explicitly. Every other target gets this
-{I}# for free from a parser which refuses what does not fit.
+{I}# so the range has to be checked explicitly, as a number of 19 digits might
+{I}# still not fit. Every other target gets this for free from a parser which
+{I}# refuses what does not fit.
 {I}if value < -9223372036854775808 or value > 9223372036854775807:
 {II}raise DeserializationException(
 {III}f"Expected a value as xs:long, "

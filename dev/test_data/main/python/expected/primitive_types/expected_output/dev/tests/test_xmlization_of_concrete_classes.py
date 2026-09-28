@@ -170,6 +170,14 @@ class TestLexicalForms(unittest.TestCase):
         instance = self._read_with('someBool', 'false')
         self.assertIs(False, instance.some_bool)
 
+    def test_some_int_read_from_many_leading_zeros(self) -> None:
+        instance = self._read_with('someInt', "-" + "0" * 5000 + "42")
+        self.assertEqual(-42, instance.some_int)
+
+    def test_some_int_read_from_many_digits_fails(self) -> None:
+        with self.assertRaises(aas_xmlization.DeserializationException):
+            self._read_with('someInt', "1" + "0" * 5000)
+
 
 class TestDuplicateProperty(unittest.TestCase):
     """Test that a property given more than once is refused."""

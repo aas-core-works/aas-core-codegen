@@ -402,6 +402,24 @@ not (
             # specifications.
             return Stripped(f"{instance}.find({', '.join(args)})"), None
 
+        if method is intermediate_type_inference.STR_LSTRIP:
+            if not isinstance(
+                node.member.instance,
+                (
+                    parse_tree.Name,
+                    parse_tree.Member,
+                    parse_tree.Slice,
+                    parse_tree.MethodCall,
+                ),
+            ):
+                instance = Stripped(f"({instance})")
+
+            # NOTE (mristin):
+            # The other targets follow the semantics of the native Python
+            # ``str.lstrip``, since Python is the language of the meta-model
+            # specifications.
+            return Stripped(f"{instance}.lstrip({args[0]})"), None
+
         return None, Error(
             node.original_node,
             f"The handling of the built-in method {method.name!r} has not "
@@ -565,6 +583,18 @@ not (
                 )
 
                 return Stripped(f"abs({args[0]})"), None
+
+            elif func_type.func.name == "int":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # We do not use the native ``int`` as it is more permissive than
+                # the other targets. See ``parse_safe_int`` in the generated
+                # common module.
+                return Stripped(f"aas_common.parse_safe_int({args[0]})"), None
 
             else:
                 return None, Error(
