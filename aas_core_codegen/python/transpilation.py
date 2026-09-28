@@ -1388,6 +1388,11 @@ range(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue"), None
 
+    def transform_break(
+        self, node: parse_tree.Break
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return Stripped("break"), None
+
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement
     ) -> Tuple[Optional[Stripped], Optional[Error]]:

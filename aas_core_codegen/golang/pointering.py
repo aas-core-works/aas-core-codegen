@@ -914,6 +914,10 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         self.is_pointer_map[node] = False
         return None
 
+    def transform_break(self, node: parse_tree.Break) -> Optional[Error]:
+        self.is_pointer_map[node] = False
+        return None
+
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement
     ) -> Optional[Error]:

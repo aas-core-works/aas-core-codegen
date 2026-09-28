@@ -195,6 +195,66 @@ func ItemsAreFewAndTextsExpected(
 	return count < 3
 }
 
+// Check the for-each with a break in a switch followed by statements.
+func NumbersBeforeStopAreFew(
+	numbers []int64,
+) bool {
+	count := int64(0)
+	for _, number := range numbers {
+		if number == -50 {
+			break
+		}
+		count = count + 1
+	}
+	return count < 5
+}
+
+// Check the break in a chain of if and elif which compares a single subject.
+func WeightsBeforeEndAreSmall(
+	numbers []int64,
+) bool {
+	total := int64(0)
+	for _, number := range numbers {
+		if number == 3 {
+			total = total + 1
+		} else if (
+			number == 4 ||
+			number == 5) {
+			total = total + 2
+		} else if (
+			number == -50 ||
+			number == -51) {
+			break
+		} else {
+			total = total + 10
+		}
+	}
+	return total < 20
+}
+
+// Check the break in the nested branches of a switch in a nested for-range.
+func TextsBeforeStopAreFew(
+	kind aastypes.Kind,
+	items []aastypes.IItem,
+) bool {
+	count := int64(0)
+	for _, item := range items {
+		for i := 0; i < len(item.Texts()); i++ {
+			if kind == aastypes.KindAlpha {
+				if item.Texts()[i] == "stop" {
+					break
+				}
+			} else {
+				if aascommon.LenStr(item.Texts()[i]) > 10 {
+					break
+				}
+			}
+			count = count + 1
+		}
+	}
+	return count < 3
+}
+
 // Verify `that` instance of [aastypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -232,6 +292,36 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !TextsBeforeStopAreFew(that.Kind(), that.Items()) {
+		abort = onError(
+			newVerificationError(
+				"Texts before the stop are few",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !WeightsBeforeEndAreSmall(that.Numbers()) {
+		abort = onError(
+			newVerificationError(
+				"Weights before the end are small",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NumbersBeforeStopAreFew(that.Numbers()) {
+		abort = onError(
+			newVerificationError(
+				"Numbers before the stop are few",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if !ItemsAreFewAndTextsExpected(that.Items()) {
 		abort = onError(

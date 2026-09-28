@@ -196,6 +196,72 @@ def items_are_few_and_texts_expected(
     return count < 3
 
 
+def numbers_before_stop_are_few(
+    numbers: List[int]
+) -> bool:
+    """
+    Check the for-each with a break in a switch followed by statements.
+    """
+    # pylint: disable=all
+    count = 0
+    for number in numbers:
+        if number == -50:
+            break
+        count = count + 1
+    return count < 5
+
+
+def weights_before_end_are_small(
+    numbers: List[int]
+) -> bool:
+    """
+    Check the break in a chain of if and elif which compares a single subject.
+    """
+    # pylint: disable=all
+    total = 0
+    for number in numbers:
+        if number == 3:
+            total = total + 1
+        elif (
+            (
+                number == 4
+                or number == 5
+            )
+        ):
+            total = total + 2
+        elif (
+            (
+                number == -50
+                or number == -51
+            )
+        ):
+            break
+        else:
+            total = total + 10
+    return total < 20
+
+
+def texts_before_stop_are_few(
+    kind: aas_types.Kind,
+    items: List[aas_types.Item]
+) -> bool:
+    """
+    Check the break in the nested branches of a switch in a nested for-range.
+    """
+    # pylint: disable=all
+    count = 0
+    for item in items:
+        for i in range(0, len(item.texts)):
+            if kind == aas_types.Kind.ALPHA:
+                if item.texts[i] == 'stop':
+                    break
+            else:
+                if len(item.texts[i]) > 10:
+                    break
+            count = count + 1
+    return count < 3
+
+
 class _Transformer(
         aas_types.AbstractTransformer[
             Iterator[Error]
@@ -218,6 +284,21 @@ class _Transformer(
             self,
             that: aas_types.Something
     ) -> Iterator[Error]:
+        if not texts_before_stop_are_few(that.kind, that.items):
+            yield Error(
+                'Texts before the stop are few'
+            )
+
+        if not weights_before_end_are_small(that.numbers):
+            yield Error(
+                'Weights before the end are small'
+            )
+
+        if not numbers_before_stop_are_few(that.numbers):
+            yield Error(
+                'Numbers before the stop are few'
+            )
+
         if not items_are_few_and_texts_expected(that.items):
             yield Error(
                 'Items are few and their texts expected'

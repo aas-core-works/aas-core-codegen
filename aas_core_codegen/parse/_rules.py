@@ -1077,6 +1077,7 @@ def _parse_block(
                 tree.Switch,
                 tree.For,
                 tree.Continue,
+                tree.Break,
                 tree.If,
             ),
         ):
@@ -1091,6 +1092,34 @@ def _parse_block(
     return body, None
 
 
+def _breaks_loop(statements: Sequence[tree.StatementUnion]) -> bool:
+    """
+    Check whether the ``statements`` break the enclosing loop.
+
+    We descend into the branches of the switches and if-statements, but not into
+    the bodies of the nested for-loops, as their ``break``'s exit only them.
+    """
+    for stmt in statements:
+        if isinstance(stmt, tree.Break):
+            return True
+
+        if isinstance(stmt, tree.Switch):
+            if any(_breaks_loop(case.body) for case in stmt.cases):
+                return True
+
+            if stmt.default is not None and _breaks_loop(stmt.default):
+                return True
+
+        elif isinstance(stmt, tree.If):
+            if any(_breaks_loop(branch.body) for branch in stmt.branches):
+                return True
+
+            if stmt.default is not None and _breaks_loop(stmt.default):
+                return True
+
+    return False
+
+
 class _ParseSwitch(_Parse):
     """
     Parse a chain of ``if``, ``elif`` and ``else`` as a switch.
@@ -1103,6 +1132,11 @@ class _ParseSwitch(_Parse):
 
     The ``if``'s which do not compare a subject against constants are parsed
     by :py:class:`_ParseIf`.
+
+    A ``break`` exits the native switch instead of the enclosing loop in C++, C#,
+    Java, TypeScript and Go. Hence, if the chain breaks the enclosing loop, we
+    understand it as an if-statement which compares the subject against
+    the labels explicitly.
     """
 
     def matches(self, node: ast.AST) -> bool:
@@ -1195,12 +1229,52 @@ class _ParseSwitch(_Parse):
             if error is not None:
                 return None, error
 
-        return (
-            tree.Switch(
-                subject=subject, cases=cases, default=default, original_node=node
-            ),
-            None,
-        )
+        if not (
+            any(_breaks_loop(case.body) for case in cases)
+            or (default is not None and _breaks_loop(default))
+        ):
+            return (
+                tree.Switch(
+                    subject=subject, cases=cases, default=default, original_node=node
+                ),
+                None,
+            )
+
+        branches = []  # type: List[tree.IfBranch]
+        for if_node, case in zip(if_nodes, cases):
+            comparisons = []  # type: List[tree.Expression]
+            for label in case.labels:
+                # NOTE (mristin):
+                # We parse the subject anew for each comparison as the nodes must
+                # not be shared in the tree.
+                left, error = ast_node_to_our_node(subject_node)
+                if error is not None:
+                    return None, error
+
+                assert isinstance(left, tree.Expression)
+
+                comparisons.append(
+                    tree.Comparison(
+                        left=left,
+                        op=tree.Comparator.EQ,
+                        right=label,
+                        original_node=label.original_node,
+                    )
+                )
+
+            condition = (
+                comparisons[0]
+                if len(comparisons) == 1
+                else tree.Or(values=comparisons, original_node=if_node.test)
+            )  # type: tree.Expression
+
+            branches.append(
+                tree.IfBranch(
+                    condition=condition, body=case.body, original_node=if_node
+                )
+            )
+
+        return tree.If(branches=branches, default=default, original_node=node), None
 
 
 class _ParseFor(_Parse):
@@ -1244,6 +1318,14 @@ class _ParseContinue(_Parse):
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         return tree.Continue(original_node=node), None
+
+
+class _ParseBreak(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Break)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        return tree.Break(original_node=node), None
 
 
 class _ParseIf(_Parse):
@@ -1334,6 +1416,7 @@ _CHAIN_OF_RULES = [
     _ParseSwitch(),
     _ParseFor(),
     _ParseContinue(),
+    _ParseBreak(),
     _ParseIf(),
 ]  # type: Sequence[_Parse]
 

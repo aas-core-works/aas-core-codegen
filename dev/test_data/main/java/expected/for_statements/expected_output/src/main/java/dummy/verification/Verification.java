@@ -193,6 +193,71 @@ public class Verification {
   }
 
   /**
+   * Check the for-each with a break in a switch followed by statements.
+   */
+  public static Boolean numbersBeforeStopAreFew(
+    List<Long> numbers) {
+    long count = 0;
+    for (var number : numbers) {
+        if (number == -50) {
+            break;
+        }
+        count = count + 1;
+    }
+    return count < 5;
+  }
+
+  /**
+   * Check the break in a chain of if and elif which compares a single subject.
+   */
+  public static Boolean weightsBeforeEndAreSmall(
+    List<Long> numbers) {
+    long total = 0;
+    for (var number : numbers) {
+        if (number == 3) {
+            total = total + 1;
+        } else if (
+            number == 4
+            || number == 5
+        ) {
+            total = total + 2;
+        } else if (
+            number == -50
+            || number == -51
+        ) {
+            break;
+        } else {
+            total = total + 10;
+        }
+    }
+    return total < 20;
+  }
+
+  /**
+   * Check the break in the nested branches of a switch in a nested for-range.
+   */
+  public static Boolean textsBeforeStopAreFew(
+    Kind kind,
+    List<IItem> items) {
+    long count = 0;
+    for (var item : items) {
+        for (int i = 0; i < item.getTexts().size(); i++) {
+            if (kind == Kind.ALPHA) {
+                if (Objects.equals(item.getTexts().get(i), "stop")) {
+                    break;
+                }
+            } else {
+                if (StringHelpers.len(item.getTexts().get(i)) > 10) {
+                    break;
+                }
+            }
+            count = count + 1;
+        }
+    }
+    return count < 3;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -228,6 +293,28 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(
+        textsBeforeStopAreFew(that.getKind(), that.getItems()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts before the stop are few")));
+      }
+
+      if (!weightsBeforeEndAreSmall(that.getNumbers())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Weights before the end are small")));
+      }
+
+      if (!numbersBeforeStopAreFew(that.getNumbers())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Numbers before the stop are few")));
+      }
 
       if (!itemsAreFewAndTextsExpected(that.getItems())) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,

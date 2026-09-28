@@ -269,6 +269,24 @@ bool ItemsAreFewAndTextsExpected(
   >& items
 );
 
+/// \brief Check the for-each with a break in a switch followed by statements.
+bool NumbersBeforeStopAreFew(
+  const std::vector<int64_t>& numbers
+);
+
+/// \brief Check the break in a chain of if and elif which compares a single subject.
+bool WeightsBeforeEndAreSmall(
+  const std::vector<int64_t>& numbers
+);
+
+/// \brief Check the break in the nested branches of a switch in a nested for-range.
+bool TextsBeforeStopAreFew(
+  types::Kind kind,
+  const std::vector<
+    std::shared_ptr<types::IItem>
+  >& items
+);
+
 // endregion Verification functions
 
 }  // namespace verification

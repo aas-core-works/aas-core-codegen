@@ -1628,6 +1628,59 @@ def some_func(text: str) -> bool:
             ),
         )
 
+    def test_break_in_nested_loops(self) -> None:
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int], text: str) -> bool:
+    for number in numbers:
+        if number == 0:
+            break
+
+        for i in range(0, number):
+            if text == "skip":
+                break
+            else:
+                break
+
+        if number == 1:
+            return False
+
+    return True"""
+            )
+        )
+
+    def test_break_outside_of_loop_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int]) -> bool:
+    break
+    return True"""
+            ),
+            expected_joined_message=(
+                "The ``break`` statement is not within a for-loop"
+            ),
+        )
+
+    def test_break_in_switch_outside_of_loop_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str) -> bool:
+    if text == "skip":
+        break
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "The ``break`` statement is not within a for-loop"
+            ),
+        )
+
 
 class Test_assignment_target(unittest.TestCase):
     @staticmethod

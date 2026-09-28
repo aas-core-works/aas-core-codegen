@@ -696,6 +696,10 @@ class Switch(Statement):
 
     We understand the chains of ``if``, ``elif`` and ``else`` where all the conditions
     compare the same subject for equality against constants as switches.
+
+    A switch never contains a ``break`` of the enclosing loop, since the ``break``
+    exits the native switch instead of the loop in most of the targets. We
+    understand such chains as :py:class:`If`'s.
     """
 
     #: Expression whose value is matched against the labels of the cases
@@ -773,6 +777,22 @@ class Continue(Statement):
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_continue(self)
+
+
+class Break(Statement):
+    """Represent a ``break`` statement which exits the innermost loop."""
+
+    def __init__(self, original_node: ast.AST) -> None:
+        """Initialize with the given values."""
+        Statement.__init__(self, original_node=original_node)
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_break(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_break(self)
 
 
 class IfBranch:
@@ -866,7 +886,7 @@ class ExpressionStatement(Statement):
 
 
 StatementUnion = Union[
-    Assignment, Return, Switch, For, Continue, If, ExpressionStatement
+    Assignment, Return, Switch, For, Continue, Break, If, ExpressionStatement
 ]
 
 
@@ -874,9 +894,9 @@ def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
     """
     Check whether the execution can continue after the ``statements``.
 
-    The execution can not continue if the last statement is a return or
-    a ``continue``, or a switch or an if-statement with a default where none of
-    the branches can complete normally.
+    The execution can not continue if the last statement is a return,
+    a ``continue`` or a ``break``, or a switch or an if-statement with a default
+    where none of the branches can complete normally.
 
     A for-loop can always complete normally, since its body might not execute at all.
     """
@@ -884,7 +904,7 @@ def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
         return True
 
     last = statements[-1]
-    if isinstance(last, (Return, Continue)):
+    if isinstance(last, (Return, Continue, Break)):
         return False
 
     if isinstance(last, Switch):
@@ -1086,6 +1106,9 @@ class Visitor(DBC):
     def visit_continue(self, node: Continue) -> None:
         """Visit a ``continue`` statement."""
 
+    def visit_break(self, node: Break) -> None:
+        """Visit a ``break`` statement."""
+
     def visit_if(self, node: If) -> None:
         """Visit an if-statement."""
         for branch in node.branches:
@@ -1268,6 +1291,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_continue(self, node: Continue) -> T:
         """Transform a ``continue`` statement into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_break(self, node: Break) -> T:
+        """Transform a ``break`` statement into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -1655,6 +1683,14 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_break(self, node: Break) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_if(self, node: If) -> stringify.Entity:
         branches = []  # type: List[stringify.Entity]
         for branch in node.branches:
@@ -1845,6 +1881,10 @@ class RestrictedTransformer(Transformer[T]):
         """Transform a ``continue`` statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_break(self, node: Break) -> T:
+        """Transform a ``break`` statement into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
     def transform_if(self, node: If) -> T:
         """Transform an if-statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -2032,6 +2072,9 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
             yield from self.transform(stmt)
 
     def transform_continue(self, node: Continue) -> Iterator[Node]:
+        yield node
+
+    def transform_break(self, node: Break) -> Iterator[Node]:
         yield node
 
     def transform_if(self, node: If) -> Iterator[Node]:

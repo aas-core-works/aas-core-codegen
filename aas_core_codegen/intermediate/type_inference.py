@@ -1317,6 +1317,12 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_break(self, node: parse_tree.Break) -> str:
+        result = "break"
+
+        self.representation_map[node] = result
+        return result
+
     def transform_if(self, node: parse_tree.If) -> str:
         parts = []  # type: List[str]
 
@@ -1632,7 +1638,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # variables of the enclosing for-loops.
         #
         # The set is empty if and only if we are outside of all for-loops, so we
-        # also use it to refuse the ``continue`` statements outside of a loop.
+        # also use it to refuse the ``continue`` and ``break`` statements outside
+        # of a loop.
         self._loop_variable_set = set()  # type: Set[Identifier]
 
         self.type_map = dict()
@@ -4318,6 +4325,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 Error(
                     node.original_node,
                     "The ``continue`` statement is not within a for-loop",
+                )
+            )
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_break(
+        self, node: parse_tree.Break
+    ) -> Optional["TypeAnnotationUnion"]:
+        if len(self._loop_variable_set) == 0:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    "The ``break`` statement is not within a for-loop",
                 )
             )
             return None
