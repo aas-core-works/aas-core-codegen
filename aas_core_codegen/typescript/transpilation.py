@@ -77,6 +77,17 @@ def _collect_reassigned_definitions_in_scope(
                 statements=stmt.body, visible=definitions, result=result
             )
 
+        elif isinstance(stmt, parse_tree.If):
+            for branch in stmt.branches:
+                _collect_reassigned_definitions_in_scope(
+                    statements=branch.body, visible=definitions, result=result
+                )
+
+            if stmt.default is not None:
+                _collect_reassigned_definitions_in_scope(
+                    statements=stmt.default, visible=definitions, result=result
+                )
+
 
 def collect_reassigned_definitions(
     body: Sequence[parse_tree.Node],
@@ -1596,8 +1607,9 @@ return (
         """
         Transpile the ``statements`` of a block in a new scope.
 
-        The block is a switch branch or the body of a for-loop. The variables defined
-        in the ``statements`` are not visible after the block.
+        The block is a branch of a switch or of an if-statement, or the body of
+        a for-loop. The variables defined in the ``statements`` are not visible
+        after the block.
 
         Return the transpiled statements, and whether they define any variables.
         We leave the layout of the statements to the caller.
@@ -1800,6 +1812,72 @@ for (
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_if(
+        self, node: parse_tree.If
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We collect the headers of the branches together with their statements,
+        # and treat the default as the last branch.
+        branches = []  # type: List[Tuple[str, Sequence[parse_tree.StatementUnion]]]
+
+        for i, branch in enumerate(node.branches):
+            condition, error = self.transform(branch.condition)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert condition is not None
+
+            keyword = "if" if i == 0 else "else if"
+            if "\n" in condition:
+                header = f"""\
+{keyword} (
+{I}{indent_but_first_line(condition, I)}
+)"""
+            else:
+                header = f"{keyword} ({condition})"
+
+            branches.append((header, branch.body))
+
+        if node.default is not None:
+            branches.append(("else", node.default))
+
+        writer = io.StringIO()
+
+        for i, (header, statements) in enumerate(branches):
+            stmts_and_defines, error = self._transform_branch(statements)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert stmts_and_defines is not None
+            stmts, _ = stmts_and_defines
+
+            if i > 0:
+                writer.write(" ")
+
+            writer.write(f"{header} {{")
+
+            # NOTE (mristin):
+            # ESLint refuses the empty blocks, but accepts a block with a comment.
+            if len(stmts) == 0:
+                writer.write(f"\n{I}// Intentionally empty.")
+
+            for stmt in stmts:
+                writer.write("\n")
+                writer.write(textwrap.indent(stmt, I))
+            writer.write("\n}")
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the if-statement", errors
+            )
+
+        return Stripped(writer.getvalue()), None
 
 
 # noinspection PyProtectedMember,PyProtectedMember

@@ -620,10 +620,10 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The variable 'x' has been defined in a nested block before, "
-                "such as a for-loop or a branch of a switch, and is not visible "
-                "here. While Python keeps the variable after the block, the other "
-                "targets scope it to the block. Please define the variable before "
-                "the block."
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
             ),
         )
 
@@ -655,10 +655,10 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The variable 'x' has been defined in a nested block before, "
-                "such as a for-loop or a branch of a switch, and is not visible "
-                "here. While Python keeps the variable after the block, the other "
-                "targets scope it to the block. Please define the variable before "
-                "the block."
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
             ),
         )
 
@@ -691,7 +691,8 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The variable 'x' has been already defined in a nested block "
-                "before, such as a for-loop or a branch of a switch. In Python, "
+                "before, such as a for-loop or a branch of a switch or of "
+                "an if-statement. In Python, "
                 "both definitions denote the same variable, while they denote "
                 "two different variables in the target languages with block "
                 "scopes, and some target languages, such as C#, refuse such "
@@ -731,7 +732,8 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "The variable 'x' has been already defined in a nested block "
-                "before, such as a for-loop or a branch of a switch. In Python, "
+                "before, such as a for-loop or a branch of a switch or of "
+                "an if-statement. In Python, "
                 "both definitions denote the same variable, while they denote "
                 "two different variables in the target languages with block "
                 "scopes, and some target languages, such as C#, refuse such "
@@ -1396,7 +1398,8 @@ def some_func(numbers: List[int]) -> bool:
             ),
             expected_joined_message=(
                 "The variable 'y' has been already defined in a nested block "
-                "before, such as a for-loop or a branch of a switch. In Python, "
+                "before, such as a for-loop or a branch of a switch or of "
+                "an if-statement. In Python, "
                 "both definitions denote the same variable, while they denote "
                 "two different variables in the target languages with block "
                 "scopes, and some target languages, such as C#, refuse such "
@@ -1418,7 +1421,8 @@ def some_func(numbers: List[int]) -> bool:
             ),
             expected_joined_message=(
                 "The variable 'x' has been already defined in a nested block "
-                "before, such as a for-loop or a branch of a switch. In Python, "
+                "before, such as a for-loop or a branch of a switch or of "
+                "an if-statement. In Python, "
                 "both definitions denote the same variable, while they denote "
                 "two different variables in the target languages with block "
                 "scopes, and some target languages, such as C#, refuse such "
@@ -1479,10 +1483,10 @@ def some_func(numbers: List[int]) -> bool:
             ),
             expected_joined_message=(
                 "The variable 'x' has been defined in a nested block before, "
-                "such as a for-loop or a branch of a switch, and is not visible "
-                "here. While Python keeps the variable after the block, the other "
-                "targets scope it to the block. Please define the variable before "
-                "the block."
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
             ),
         )
 
@@ -1499,10 +1503,10 @@ def some_func(numbers: List[int]) -> bool:
             ),
             expected_joined_message=(
                 "The variable 'y' has been defined in a nested block before, "
-                "such as a for-loop or a branch of a switch, and is not visible "
-                "here. While Python keeps the variable after the block, the other "
-                "targets scope it to the block. Please define the variable before "
-                "the block."
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
             ),
         )
 
@@ -2075,6 +2079,99 @@ def some_func(items: Sequence[Item]) -> bool:
             expected_joined_message=(
                 "We can not assign to the property 'text' of item, since the "
                 "loop variable 'item' iterates over a read-only collection."
+            ),
+        )
+
+
+class Test_if_statement(unittest.TestCase):
+    def test_chain_with_default(self) -> None:
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str, number: int) -> bool:
+    if len(text) > 3 and number > 0:
+        return False
+    elif number < 0 or text == "something":
+        pass
+    else:
+        x = number + 1
+        return x > 0
+
+    return True"""
+            )
+        )
+
+    def test_if_in_default_of_switch(self) -> None:
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str, number: int) -> bool:
+    if number == 1:
+        return False
+    elif len(text) > 0:
+        return True
+    elif number == 2:
+        return True
+
+    return False"""
+            )
+        )
+
+    def test_non_boolean_condition_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str) -> bool:
+    if len(text):
+        return False
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the condition of the if-statement to be a boolean, "
+                "but got: length"
+            ),
+        )
+
+    def test_optional_condition_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(flag: Optional[bool]) -> bool:
+    if flag:
+        return False
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the condition of the if-statement to be a boolean, "
+                "but got: Optional[bool]"
+            ),
+        )
+
+    def test_using_variable_defined_in_branch_after_if_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(number: int) -> bool:
+    if number > 0:
+        x = 1
+    else:
+        x = 2
+
+    return x > 0"""
+            ),
+            expected_joined_message=(
+                "The variable 'x' has been defined in a nested block before, "
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
             ),
         )
 

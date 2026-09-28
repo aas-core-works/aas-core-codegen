@@ -53,6 +53,14 @@ Style rules that go against normal Python habits
 - Import with a module alias prefix (``cpp_common``, ``golang_naming``). 
   The only allowed symbol aliases are ``I``, ``II``, …
 - In ``Stripped`` blocks, use one placeholder per indentation level: ``{IIIII}``, never ``{IIII}{I}``.
+- Write multi-line generated code as a ``f"""\`` string, never with ``\n`` escapes:
+
+  .. code-block:: python
+
+      header = f"""\
+      {keyword} (
+      {I}{indent_but_first_line(condition, I)}
+      )"""
 - Use icontract ``@require``/``@ensure`` instead of ``assert``. Use a ``Union[...]`` type hint instead of an ``isinstance`` precondition.
 - No ``get_`` prefix. 
   Use ``_by_`` for mappings and ``_set`` for sets. No ``_utils``/``_helpers``.

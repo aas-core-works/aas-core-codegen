@@ -383,6 +383,14 @@ class _Collector(parse_tree.Visitor):
         if node.default is not None:
             self._visit_in_new_scope(node.default)
 
+    def visit_if(self, node: parse_tree.If) -> None:
+        for branch in node.branches:
+            self.visit(branch.condition)
+            self._visit_in_new_scope(branch.body)
+
+        if node.default is not None:
+            self._visit_in_new_scope(node.default)
+
     def visit_for(self, node: parse_tree.For) -> None:
         self.visit(node.generator)
 

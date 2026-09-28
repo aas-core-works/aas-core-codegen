@@ -1316,6 +1316,24 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_if(self, node: parse_tree.If) -> str:
+        parts = []  # type: List[str]
+
+        for i, branch in enumerate(node.branches):
+            keyword = "if" if i == 0 else "elif"
+            condition = self.transform(branch.condition)
+            stmts = "; ".join(self.transform(stmt) for stmt in branch.body)
+            parts.append(f"{keyword} {condition}: {{{stmts}}}")
+
+        if node.default is not None:
+            stmts = "; ".join(self.transform(stmt) for stmt in node.default)
+            parts.append(f"else: {{{stmts}}}")
+
+        result = " ".join(parts)
+
+        self.representation_map[node] = result
+        return result
+
 
 #: Map a comparator to the comparator which says the same about the flipped operands
 _FLIPPED_COMPARATOR = {
@@ -1555,7 +1573,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         # NOTE (mristin):
         # We keep track of the variables defined in the nested scopes, *i.e.*,
-        # the switch branches and the bodies of the for-loops, which have been
+        # the branches of the switches and the if-statements, and the bodies of
+        # the for-loops, which have been
         # already closed. The variables themselves are not visible anymore, as
         # their environments have been discarded. We keep their names to refuse
         # the re-declarations of the same names in the enclosing scope, see
@@ -3128,9 +3147,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         node.original_node,
                         f"The variable {node.identifier!r} has been defined in "
                         f"a nested block before, such as a for-loop or a branch of "
-                        f"a switch, and is not visible here. While Python keeps "
-                        f"the variable after the block, the other targets scope it "
-                        f"to the block. Please define the variable before the block.",
+                        f"a switch or of an if-statement, and is not visible here. "
+                        f"While Python keeps the variable after the block, the other "
+                        f"targets scope it to the block. Please define the variable "
+                        f"before the block.",
                     )
                 )
                 return None
@@ -3834,7 +3854,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         node.original_node,
                         f"The variable {node.target.identifier!r} has been already "
                         f"defined in a nested block before, such as a for-loop or "
-                        f"a branch of a switch. In Python, both "
+                        f"a branch of a switch or of an if-statement. In Python, both "
                         f"definitions denote the same variable, while they denote "
                         f"two different variables in the target languages with "
                         f"block scopes, and some target languages, such as C#, "
@@ -3995,9 +4015,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         only function-level scopes, so a variable assigned in a branch of an ``if``
         stays visible after the ``if``. The target languages with C-like syntax
         (C++, C#, Java, TypeScript and Go) scope the variables to the enclosing block,
-        and we generate a separate block for each branch of a switch and for the body
-        of a for-loop, including its loop variable. Hence, we model the branches and
-        the loop bodies as block scopes here as well:
+        and we generate a separate block for each branch of a switch or of
+        an if-statement, and for the body of a for-loop, including its loop variable.
+        Hence, we model the branches and the loop bodies as block scopes here as well:
 
         * The statements see the variables of the enclosing scopes, and can assign
           to them.
@@ -4228,6 +4248,45 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     "The ``continue`` statement is not within a for-loop",
                 )
             )
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_if(self, node: parse_tree.If) -> Optional["TypeAnnotationUnion"]:
+        # NOTE (mristin):
+        # We do not narrow the types in the branches by their conditions for now.
+        # For example, ``x`` stays optional in the body of ``if x is not None:``.
+
+        success = True
+
+        for branch in node.branches:
+            condition_type = self.transform(branch.condition)
+            if condition_type is None:
+                success = False
+
+            elif try_primitive_type(condition_type) is not PrimitiveType.BOOL:
+                # NOTE (mristin):
+                # We refuse the conditions which rely on Python's truthiness, such
+                # as ``if some_list:``, since the targets do not share it.
+                self.errors.append(
+                    Error(
+                        branch.condition.original_node,
+                        f"Expected the condition of the if-statement to be "
+                        f"a boolean, but got: {condition_type}",
+                    )
+                )
+                success = False
+
+            if not self._transform_in_new_scope(branch.body):
+                success = False
+
+        if node.default is not None:
+            if not self._transform_in_new_scope(node.default):
+                success = False
+
+        if not success:
             return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)

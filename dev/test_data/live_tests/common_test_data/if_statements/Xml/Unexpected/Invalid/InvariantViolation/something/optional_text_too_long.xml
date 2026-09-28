@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><kind>beta</kind><text>hello</text><number>3</number><flag>true</flag><item><name>item</name><optionalText>too long</optionalText></item></something>

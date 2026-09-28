@@ -1,0 +1,10 @@
+{
+  "kind": "gamma",
+  "text": "",
+  "number": -25,
+  "flag": true,
+  "item": {
+    "name": "item",
+    "optionalText": "short"
+  }
+}

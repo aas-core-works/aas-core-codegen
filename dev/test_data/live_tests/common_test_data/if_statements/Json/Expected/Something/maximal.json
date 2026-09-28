@@ -1,0 +1,10 @@
+{
+  "kind": "beta",
+  "text": "hello",
+  "number": 3,
+  "flag": true,
+  "item": {
+    "name": "item",
+    "optionalText": "short"
+  }
+}

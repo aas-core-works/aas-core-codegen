@@ -1163,9 +1163,10 @@ return (
         """
         Transpile the ``statements`` of a block in a new scope.
 
-        The block is a switch branch or the body of a for-loop. Python has only
-        function-level scopes, but we keep the environment in line with the other
-        targets where the variables of a block are not visible after it.
+        The block is a branch of a switch or of an if-statement, or the body of
+        a for-loop. Python has only function-level scopes, but we keep
+        the environment in line with the other targets where the variables of
+        a block are not visible after it.
 
         The type inference refused all the collisions of variable names where
         the function-level scope and the block scopes of the other targets
@@ -1381,6 +1382,68 @@ range(
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_if(
+        self, node: parse_tree.If
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We collect the headers of the branches together with their statements, and
+        # treat the default as the last branch.
+        branches = []  # type: List[Tuple[str, Sequence[parse_tree.StatementUnion]]]
+
+        for i, branch in enumerate(node.branches):
+            condition, error = self.transform(branch.condition)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert condition is not None
+
+            keyword = "if" if i == 0 else "elif"
+            if "\n" in condition:
+                header = f"""\
+{keyword} (
+{I}{indent_but_first_line(condition, I)}
+):"""
+            else:
+                header = f"{keyword} {condition}:"
+
+            branches.append((header, branch.body))
+
+        if node.default is not None:
+            branches.append(("else:", node.default))
+
+        writer = io.StringIO()
+
+        for i, (header, statements) in enumerate(branches):
+            stmts_and_defines, error = self._transform_branch(statements)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert stmts_and_defines is not None
+            stmts, _ = stmts_and_defines
+
+            if i > 0:
+                writer.write("\n")
+            writer.write(header)
+
+            if len(stmts) == 0:
+                writer.write(f"\n{I}pass")
+            else:
+                for stmt in stmts:
+                    writer.write("\n")
+                    writer.write(textwrap.indent(stmt, I))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the if-statement", errors
+            )
+
+        return Stripped(writer.getvalue()), None
 
 
 # noinspection PyProtectedMember,PyProtectedMember
