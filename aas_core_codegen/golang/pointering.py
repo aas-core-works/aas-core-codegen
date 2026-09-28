@@ -795,7 +795,8 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         """
         Transform the ``statements`` of a block in a new block scope.
 
-        The block is a switch branch or the body of a for-loop.
+        The block is a branch of a switch or of an if-statement, or the body of
+        a for-loop.
 
         A scope is the region of the code where a variable is visible. We look up
         the variables in the scopes, *i.e.*, in :attr:`_environment`, to infer
@@ -843,6 +844,24 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
                     return error
 
             error = self._transform_in_new_scope(case.body)
+            if error is not None:
+                return error
+
+        if node.default is not None:
+            error = self._transform_in_new_scope(node.default)
+            if error is not None:
+                return error
+
+        self.is_pointer_map[node] = False
+        return None
+
+    def transform_if(self, node: parse_tree.If) -> Optional[Error]:
+        for branch in node.branches:
+            error = self.transform(branch.condition)
+            if error is not None:
+                return error
+
+            error = self._transform_in_new_scope(branch.body)
             if error is not None:
                 return error
 

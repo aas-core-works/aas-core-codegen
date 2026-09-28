@@ -1,0 +1,10 @@
+{
+  "kind": "beta",
+  "text": "",
+  "number": -6,
+  "flag": true,
+  "item": {
+    "name": "item",
+    "optionalText": "short"
+  }
+}

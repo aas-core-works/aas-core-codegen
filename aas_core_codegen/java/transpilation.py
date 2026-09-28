@@ -1868,6 +1868,37 @@ return (
         return Stripped(writer.getvalue())
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_if_chain(
+        self, branches: Sequence[Tuple[str, Sequence[parse_tree.StatementUnion]]]
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``branches`` as a chain of ``if``, ``else if`` and ``else``.
+
+        Each branch is given as its header, *e.g.*, ``else if (x > 0)``, together
+        with its statements.
+        """
+        errors = []  # type: List[Error]
+        writer = io.StringIO()
+
+        for i, (header, statements) in enumerate(branches):
+            stmts_and_defines, error = self._transform_branch(statements)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert stmts_and_defines is not None
+            stmts, _ = stmts_and_defines
+
+            if i > 0:
+                writer.write(" ")
+            writer.write(f"{header} {Transpiler._block(stmts)}")
+
+        if len(errors) > 0:
+            return None, Error(None, "Failed to transpile the branches", errors)
+
+        return Stripped(writer.getvalue()), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_switch_as_if_chain(
         self, node: parse_tree.Switch, subject: Stripped
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1912,27 +1943,18 @@ return (
         if node.default is not None:
             branches.append(("else", node.default))
 
-        writer = io.StringIO()
-
-        for i, (header, statements) in enumerate(branches):
-            stmts_and_defines, error = self._transform_branch(statements)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert stmts_and_defines is not None
-            stmts, _ = stmts_and_defines
-
-            if i > 0:
-                writer.write(" ")
-            writer.write(f"{header} {Transpiler._block(stmts)}")
-
         if len(errors) > 0:
             return None, Error(
                 node.original_node, "Failed to transpile the switch", errors
             )
 
-        return Stripped(writer.getvalue()), None
+        code, error = self._transform_if_chain(branches)
+        if error is not None:
+            return None, Error(
+                node.original_node, "Failed to transpile the switch", [error]
+            )
+
+        return code, None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_switch(
@@ -2109,6 +2131,52 @@ for (
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue;"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_if(
+        self, node: parse_tree.If
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We collect the headers of the branches together with their statements,
+        # and treat the default as the last branch.
+        branches = []  # type: List[Tuple[str, Sequence[parse_tree.StatementUnion]]]
+
+        for i, branch in enumerate(node.branches):
+            condition, error = self.transform(branch.condition)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert condition is not None
+
+            keyword = "if" if i == 0 else "else if"
+            if "\n" in condition:
+                header = f"""\
+{keyword} (
+{I}{indent_but_first_line(condition, I)}
+)"""
+            else:
+                header = f"{keyword} ({condition})"
+
+            branches.append((header, branch.body))
+
+        if node.default is not None:
+            branches.append(("else", node.default))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the if-statement", errors
+            )
+
+        code, error = self._transform_if_chain(branches)
+        if error is not None:
+            return None, Error(
+                node.original_node, "Failed to transpile the if-statement", [error]
+            )
+
+        return code, None
 
 
 # noinspection PyProtectedMember,PyProtectedMember

@@ -2103,7 +2103,7 @@ aascommon.{qualifier_function}(
                 Stripped(
                     f"""\
 {target} {assignment}
-{I}{indent_but_first_line(value, I)})"""
+{I}{indent_but_first_line(value, I)}"""
                 ),
                 None,
             )
@@ -2366,6 +2366,71 @@ return {indent_but_first_line(value, I)}"""
         self, node: parse_tree.Continue
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("continue"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_if(
+        self, node: parse_tree.If
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We collect the headers of the branches together with their statements,
+        # and treat the default as the last branch.
+        branches = []  # type: List[Tuple[str, Sequence[parse_tree.StatementUnion]]]
+
+        for i, branch in enumerate(node.branches):
+            condition, error = self._transform_and_dereference_if_necessary(
+                branch.condition
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert condition is not None
+
+            keyword = "if" if i == 0 else "else if"
+            if "\n" in condition:
+                # NOTE (mristin):
+                # Go inserts a semicolon at the end of a line which ends with
+                # an operand, so we need to close the parenthesis on the last line
+                # of the condition.
+                header = f"""\
+{keyword} (
+{I}{indent_but_first_line(condition, I)})"""
+            else:
+                header = f"{keyword} {condition}"
+
+            branches.append((header, branch.body))
+
+        if node.default is not None:
+            branches.append(("else", node.default))
+
+        writer = io.StringIO()
+
+        for i, (header, statements) in enumerate(branches):
+            stmts_and_defines, error = self._transform_branch(statements)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert stmts_and_defines is not None
+            stmts, _ = stmts_and_defines
+
+            if i > 0:
+                writer.write(" ")
+
+            writer.write(f"{header} {{")
+            for stmt in stmts:
+                writer.write("\n")
+                writer.write(textwrap.indent(stmt, I))
+            writer.write("\n}")
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the if-statement", errors
+            )
+
+        return Stripped(writer.getvalue()), None
 
 
 # noinspection PyProtectedMember,PyProtectedMember

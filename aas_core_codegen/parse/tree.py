@@ -775,7 +775,71 @@ class Continue(Statement):
         visitor.visit_continue(self)
 
 
-StatementUnion = Union[Assignment, Return, Switch, For, Continue]
+class IfBranch:
+    """
+    Represent a single branch of an :py:class:`If`, *i.e.*, an ``if`` or an ``elif``.
+
+    The branch is not a node on its own, but only a part of the :py:class:`If`.
+    """
+
+    #: Condition under which the branch is executed
+    condition: Expression
+
+    #: Statements executed if the condition holds; empty if the original body
+    #: was ``pass``
+    body: Sequence["StatementUnion"]
+
+    #: Relevant Python node of the branch, *i.e.*, the ``if`` or ``elif``
+    original_node: ast.AST
+
+    def __init__(
+        self,
+        condition: Expression,
+        body: Sequence["StatementUnion"],
+        original_node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        self.condition = condition
+        self.body = body
+        self.original_node = original_node
+
+
+class If(Statement):
+    """
+    Represent a chain of ``if``, ``elif`` and ``else`` which is not a switch.
+
+    See :py:class:`Switch` for the chains which compare a single subject against
+    constants.
+    """
+
+    #: Branches in the order of the original chain
+    branches: Sequence[IfBranch]
+
+    #: Statements of the ``else`` branch, if any; empty if the ``else`` was ``pass``
+    default: Optional[Sequence["StatementUnion"]]
+
+    @require(lambda branches: len(branches) >= 1)
+    def __init__(
+        self,
+        branches: Sequence[IfBranch],
+        default: Optional[Sequence["StatementUnion"]],
+        original_node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        Statement.__init__(self, original_node=original_node)
+        self.branches = branches
+        self.default = default
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_if(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_if(self)
+
+
+StatementUnion = Union[Assignment, Return, Switch, For, Continue, If]
 
 
 def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
@@ -783,8 +847,8 @@ def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
     Check whether the execution can continue after the ``statements``.
 
     The execution can not continue if the last statement is a return or
-    a ``continue``, or a switch with a default where none of the branches can
-    complete normally.
+    a ``continue``, or a switch or an if-statement with a default where none of
+    the branches can complete normally.
 
     A for-loop can always complete normally, since its body might not execute at all.
     """
@@ -800,6 +864,12 @@ def can_complete_normally(statements: Sequence[StatementUnion]) -> bool:
             return True
 
         return any(can_complete_normally(case.body) for case in last.cases)
+
+    if isinstance(last, If):
+        if last.default is None or can_complete_normally(last.default):
+            return True
+
+        return any(can_complete_normally(branch.body) for branch in last.branches)
 
     return True
 
@@ -987,6 +1057,18 @@ class Visitor(DBC):
     def visit_continue(self, node: Continue) -> None:
         """Visit a ``continue`` statement."""
 
+    def visit_if(self, node: If) -> None:
+        """Visit an if-statement."""
+        for branch in node.branches:
+            self.visit(branch.condition)
+
+            for stmt in branch.body:
+                self.visit(stmt)
+
+        if node.default is not None:
+            for stmt in node.default:
+                self.visit(stmt)
+
 
 class Transformer(Generic[T], DBC):
     """Transform our AST into something."""
@@ -1153,6 +1235,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_continue(self, node: Continue) -> T:
         """Transform a ``continue`` statement into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_if(self, node: If) -> T:
+        """Transform an if-statement into something."""
         raise NotImplementedError(f"{node=}")
 
 
@@ -1530,6 +1617,42 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_if(self, node: If) -> stringify.Entity:
+        branches = []  # type: List[stringify.Entity]
+        for branch in node.branches:
+            branches.append(
+                stringify.Entity(
+                    name=branch.__class__.__name__,
+                    properties=[
+                        stringify.Property(
+                            "condition", self.transform(branch.condition)
+                        ),
+                        stringify.Property(
+                            "body", [self.transform(stmt) for stmt in branch.body]
+                        ),
+                        stringify.PropertyEllipsis(
+                            "original_node", branch.original_node
+                        ),
+                    ],
+                )
+            )
+
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("branches", branches),
+                stringify.Property(
+                    "default",
+                    (
+                        [self.transform(stmt) for stmt in node.default]
+                        if node.default is not None
+                        else None
+                    ),
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
 
 def dump(node: Node) -> str:
     """Produce a string representation of the tree."""
@@ -1671,6 +1794,10 @@ class RestrictedTransformer(Transformer[T]):
 
     def transform_continue(self, node: Continue) -> T:
         """Transform a ``continue`` statement into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_if(self, node: If) -> T:
+        """Transform an if-statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
 
@@ -1852,6 +1979,18 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
 
     def transform_continue(self, node: Continue) -> Iterator[Node]:
         yield node
+
+    def transform_if(self, node: If) -> Iterator[Node]:
+        yield node
+        for branch in node.branches:
+            yield from self.transform(branch.condition)
+
+            for stmt in branch.body:
+                yield from self.transform(stmt)
+
+        if node.default is not None:
+            for stmt in node.default:
+                yield from self.transform(stmt)
 
 
 _ITERATION_TRANSFORMER = _IterationTransformer()

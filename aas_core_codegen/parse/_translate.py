@@ -1812,7 +1812,9 @@ def _function_def_to_method(
                 # unreachable statements.
                 if (
                     len(understood_body) > 0
-                    and isinstance(understood_body[-1], (tree.Return, tree.Switch))
+                    and isinstance(
+                        understood_body[-1], (tree.Return, tree.Switch, tree.If)
+                    )
                     and not tree.can_complete_normally([understood_body[-1]])
                 ):
                     understanding_errors.append(

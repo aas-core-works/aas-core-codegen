@@ -1063,7 +1063,15 @@ def _parse_block(
         assert stmt is not None
 
         if not isinstance(
-            stmt, (tree.Assignment, tree.Return, tree.Switch, tree.For, tree.Continue)
+            stmt,
+            (
+                tree.Assignment,
+                tree.Return,
+                tree.Switch,
+                tree.For,
+                tree.Continue,
+                tree.If,
+            ),
         ):
             return None, Error(
                 node,
@@ -1083,27 +1091,22 @@ class _ParseSwitch(_Parse):
     The chain continues as long as the ``else`` contains a sole ``if`` statement
     which compares the same subject. Otherwise, the ``else`` is the default of
     the switch. Since Python's AST does not distinguish ``elif`` from ``else``
-    followed by a nested ``if``, an ``elif`` on a different subject becomes
-    a nested switch in the default.
+    followed by a nested ``if``, an ``elif`` which does not compare the same subject
+    becomes a nested switch or a nested if-statement in the default.
+
+    The ``if``'s which do not compare a subject against constants are parsed
+    by :py:class:`_ParseIf`.
     """
 
     def matches(self, node: ast.AST) -> bool:
-        return isinstance(node, ast.If)
+        return isinstance(node, ast.If) and _match_switch_test(node.test) is not None
 
     # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.If)
 
         match = _match_switch_test(node.test)
-        if match is None:
-            return None, Error(
-                node.test,
-                f"We support if-statements only as switches, where each condition "
-                f"compares a single subject against constants in the form "
-                f"``subject == label``, ``subject == label1 or subject == label2`` "
-                f"or ``subject in (label1, label2)``, but got: "
-                f"{ast.unparse(node.test)}",
-            )
+        assert match is not None
 
         subject_node, _ = match
 
@@ -1236,6 +1239,68 @@ class _ParseContinue(_Parse):
         return tree.Continue(original_node=node), None
 
 
+class _ParseIf(_Parse):
+    """
+    Parse a chain of ``if``, ``elif`` and ``else`` which is not a switch.
+
+    The chain continues as long as the ``else`` contains a sole ``if`` statement.
+    Otherwise, the ``else`` is the default of the chain.
+    """
+
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.If)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.If)
+
+        branches = []  # type: List[tree.IfBranch]
+
+        cursor = node
+        while True:
+            condition, error = ast_node_to_our_node(cursor.test)
+            if error is not None:
+                return None, error
+
+            assert condition is not None
+            if not isinstance(condition, tree.Expression):
+                return None, Error(
+                    cursor.test,
+                    f"Expected the condition of the if-statement to be "
+                    f"an expression, but got: {ast.unparse(cursor.test)}",
+                )
+
+            body, error = _parse_block(
+                cursor.body, block_name="a branch of an if-statement"
+            )
+            if error is not None:
+                return None, error
+
+            assert body is not None
+
+            branches.append(
+                tree.IfBranch(condition=condition, body=body, original_node=cursor)
+            )
+
+            if len(cursor.orelse) == 1 and isinstance(cursor.orelse[0], ast.If):
+                cursor = cursor.orelse[0]
+            else:
+                break
+
+        default = None  # type: Optional[List[tree.StatementUnion]]
+        if len(cursor.orelse) > 0:
+            default, error = _parse_block(
+                cursor.orelse, block_name="a branch of an if-statement"
+            )
+            if error is not None:
+                return None, error
+
+        return (
+            tree.If(branches=branches, default=default, original_node=node),
+            None,
+        )
+
+
 _CHAIN_OF_RULES = [
     _ParseComparison(),
     _ParseIsIn(),
@@ -1262,6 +1327,7 @@ _CHAIN_OF_RULES = [
     _ParseSwitch(),
     _ParseFor(),
     _ParseContinue(),
+    _ParseIf(),
 ]  # type: Sequence[_Parse]
 
 
