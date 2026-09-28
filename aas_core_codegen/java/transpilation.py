@@ -1629,9 +1629,11 @@ class Transpiler(
             if error is not None:
                 errors.append(error)
 
+            index_node = None  # type: Optional[parse_tree.Expression]
             index = None  # type: Optional[Stripped]
             if isinstance(node.target, parse_tree.Index):
-                index, error = self.transform(node.target.index)
+                index_node = node.target.index
+                index, error = self.transform(index_node)
                 if error is not None:
                     errors.append(error)
 
@@ -1659,6 +1661,7 @@ class Transpiler(
             if isinstance(node.target, parse_tree.Member):
                 method_name = java_naming.setter_name(node.target.name)
             else:
+                assert index_node is not None
                 assert index is not None
 
                 index_as_int = None  # type: Optional[int]
@@ -1674,7 +1677,7 @@ class Transpiler(
                 elif (
                     index_as_int is None
                     and intermediate_type_inference.try_primitive_type(
-                        self.type_map[node.target.index]
+                        self.type_map[index_node]
                     )
                     is intermediate_type_inference.PrimitiveType.INT
                 ):
