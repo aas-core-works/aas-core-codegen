@@ -362,6 +362,78 @@ export function itemsAreFewAndTextsExpected(
 }
 
 /**
+ * Check the for-each with a break in a switch followed by statements.
+ */
+export function numbersBeforeStopAreFew(
+  numbers: Array<number>
+): boolean {
+  let count = 0;
+  for (const number of numbers) {
+    if (number == -50) {
+      break;
+    }
+    count = count + 1;
+  }
+  return count < 5;
+}
+
+/**
+ * Check the break in a chain of if and elif which compares a single subject.
+ */
+export function weightsBeforeEndAreSmall(
+  numbers: Array<number>
+): boolean {
+  let total = 0;
+  for (const number of numbers) {
+    if (number == 3) {
+      total = total + 1;
+    } else if (
+      (
+        number == 4
+        || number == 5
+      )
+    ) {
+      total = total + 2;
+    } else if (
+      (
+        number == -50
+        || number == -51
+      )
+    ) {
+      break;
+    } else {
+      total = total + 10;
+    }
+  }
+  return total < 20;
+}
+
+/**
+ * Check the break in the nested branches of a switch in a nested for-range.
+ */
+export function textsBeforeStopAreFew(
+  kind: AasTypes.Kind,
+  items: Array<AasTypes.Item>
+): boolean {
+  let count = 0;
+  for (const item of items) {
+    for (let i = 0; i < item.texts.length; i++) {
+      if (kind == AasTypes.Kind.Alpha) {
+        if (AasCommon.at(item.texts, i) == "stop") {
+          break;
+        }
+      } else {
+        if (AasCommon.lenStr(AasCommon.at(item.texts, i)) > 10) {
+          break;
+        }
+      }
+      count = count + 1;
+    }
+  }
+  return count < 3;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -381,6 +453,24 @@ class Verifier
     that: AasTypes.Something,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!textsBeforeStopAreFew(that.kind, that.items)) {
+      yield new VerificationError(
+        "Texts before the stop are few"
+      )
+    }
+
+    if (!weightsBeforeEndAreSmall(that.numbers)) {
+      yield new VerificationError(
+        "Weights before the end are small"
+      )
+    }
+
+    if (!numbersBeforeStopAreFew(that.numbers)) {
+      yield new VerificationError(
+        "Numbers before the stop are few"
+      )
+    }
+
     if (!itemsAreFewAndTextsExpected(that.items)) {
       yield new VerificationError(
         "Items are few and their texts expected"

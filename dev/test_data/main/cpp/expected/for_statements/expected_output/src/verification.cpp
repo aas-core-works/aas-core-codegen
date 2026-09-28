@@ -182,6 +182,71 @@ bool ItemsAreFewAndTextsExpected(
   return count < 3;
 }
 
+bool NumbersBeforeStopAreFew(
+  const std::vector<int64_t>& numbers
+) {
+  int64_t count = 0;
+  for (int64_t number : numbers) {
+    if (number == -50) {
+      break;
+    }
+    count = count + (1);
+  }
+  return count < 5;
+}
+
+bool WeightsBeforeEndAreSmall(
+  const std::vector<int64_t>& numbers
+) {
+  int64_t total = 0;
+  for (int64_t number : numbers) {
+    if (number == 3) {
+      total = total + (1);
+    } else if (
+      (
+        number == 4
+        || number == 5
+      )
+    ) {
+      total = total + (2);
+    } else if (
+      (
+        number == -50
+        || number == -51
+      )
+    ) {
+      break;
+    } else {
+      total = total + (10);
+    }
+  }
+  return total < 20;
+}
+
+bool TextsBeforeStopAreFew(
+  types::Kind kind,
+  const std::vector<
+    std::shared_ptr<types::IItem>
+  >& items
+) {
+  int64_t count = 0;
+  for (const std::shared_ptr<types::IItem>& item : items) {
+    for (size_t i = 0; i < item->texts().size(); ++i) {
+      if (kind == types::Kind::kAlpha) {
+        if (item->texts().at(i) == L"stop") {
+          break;
+        }
+      } else {
+        if (common::LenStr(item->texts().at(i)) > 10) {
+          break;
+        }
+      }
+      count = count + (1);
+    }
+  }
+  return count < 3;
+}
+
 // endregion Verification functions
 
 namespace {
@@ -220,7 +285,8 @@ bool Something_0(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return verification::ItemsAreFewAndTextsExpected(
+  return verification::TextsBeforeStopAreFew(
+    that->kind(),
     that->items()
   );
 }
@@ -231,12 +297,45 @@ bool Something_1(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return verification::SumOfOddNumbersIsSmall(
+  return verification::WeightsBeforeEndAreSmall(
     that->numbers()
   );
 }
 
 bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::NumbersBeforeStopAreFew(
+    that->numbers()
+  );
+}
+
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::ItemsAreFewAndTextsExpected(
+    that->items()
+  );
+}
+
+bool Something_4(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::SumOfOddNumbersIsSmall(
+    that->numbers()
+  );
+}
+
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -248,7 +347,7 @@ bool Something_2(
   );
 }
 
-bool Something_3(
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -259,7 +358,7 @@ bool Something_3(
   );
 }
 
-bool Something_4(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -270,7 +369,7 @@ bool Something_4(
   );
 }
 
-bool Something_5(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -281,7 +380,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -292,7 +391,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_10(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -303,7 +402,7 @@ bool Something_7(
   );
 }
 
-bool Something_8(
+bool Something_11(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -314,7 +413,7 @@ bool Something_8(
   );
 }
 
-bool Something_9(
+bool Something_12(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -334,42 +433,54 @@ const std::vector<Check>& ChecksOf(Shape shape) {
       static const std::vector<Check> checks = {
         {
           &Something_0,
-          L"Items are few and their texts expected"
+          L"Texts before the stop are few"
         },
         {
           &Something_1,
-          L"Sum of odd numbers is small"
+          L"Weights before the end are small"
         },
         {
           &Something_2,
-          L"Alpha has no minus two"
+          L"Numbers before the stop are few"
         },
         {
           &Something_3,
-          L"Neither thirteen nor unlucky"
+          L"Items are few and their texts expected"
         },
         {
           &Something_4,
-          L"No item has an empty text"
+          L"Sum of odd numbers is small"
         },
         {
           &Something_5,
-          L"Sum of numbers is small"
+          L"Alpha has no minus two"
         },
         {
           &Something_6,
-          L"No number after the first is one"
+          L"Neither thirteen nor unlucky"
         },
         {
           &Something_7,
-          L"No number is minus one"
+          L"No item has an empty text"
         },
         {
           &Something_8,
-          L"No number is zero"
+          L"Sum of numbers is small"
         },
         {
           &Something_9,
+          L"No number after the first is one"
+        },
+        {
+          &Something_10,
+          L"No number is minus one"
+        },
+        {
+          &Something_11,
+          L"No number is zero"
+        },
+        {
+          &Something_12,
           L"The first text must not be empty"
         }
       };

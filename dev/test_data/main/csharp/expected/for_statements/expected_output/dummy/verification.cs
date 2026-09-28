@@ -237,6 +237,94 @@ namespace dummy
         }  // public static bool ItemsAreFewAndTextsExpected
 
         /// <summary>
+        /// Check the for-each with a break in a switch followed by statements.
+        /// </summary>
+        public static bool NumbersBeforeStopAreFew(
+            List<long> numbers
+        )
+        {
+            long count = 0;
+            foreach (var number in numbers)
+            {
+                if (number == -50)
+                {
+                    break;
+                }
+                count = count + 1;
+            }
+            return count < 5;
+        }  // public static bool NumbersBeforeStopAreFew
+
+        /// <summary>
+        /// Check the break in a chain of if and elif which compares a single subject.
+        /// </summary>
+        public static bool WeightsBeforeEndAreSmall(
+            List<long> numbers
+        )
+        {
+            long total = 0;
+            foreach (var number in numbers)
+            {
+                if (number == 3)
+                {
+                    total = total + 1;
+                }
+                else if (
+                    number == 4
+                    || number == 5
+                )
+                {
+                    total = total + 2;
+                }
+                else if (
+                    number == -50
+                    || number == -51
+                )
+                {
+                    break;
+                }
+                else
+                {
+                    total = total + 10;
+                }
+            }
+            return total < 20;
+        }  // public static bool WeightsBeforeEndAreSmall
+
+        /// <summary>
+        /// Check the break in the nested branches of a switch in a nested for-range.
+        /// </summary>
+        public static bool TextsBeforeStopAreFew(
+            Kind kind,
+            List<IItem> items
+        )
+        {
+            long count = 0;
+            foreach (var item in items)
+            {
+                for (int i = 0; i < item.Texts.Count; i++)
+                {
+                    if (kind == Kind.Alpha)
+                    {
+                        if (item.Texts[i] == "stop")
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (Common.StringHelpers.Len(item.Texts[i]) > 10)
+                        {
+                            break;
+                        }
+                    }
+                    count = count + 1;
+                }
+            }
+            return count < 3;
+        }  // public static bool TextsBeforeStopAreFew
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -270,6 +358,29 @@ namespace dummy
                 Aas.ISomething that
             )
             {
+                if (!(
+                    Verification.TextsBeforeStopAreFew(that.Kind, that.Items)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts before the stop are few");
+                }
+
+                if (!(
+                    Verification.WeightsBeforeEndAreSmall(that.Numbers)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Weights before the end are small");
+                }
+
+                if (!Verification.NumbersBeforeStopAreFew(that.Numbers))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Numbers before the stop are few");
+                }
+
                 if (!(
                     Verification.ItemsAreFewAndTextsExpected(that.Items)))
                 {

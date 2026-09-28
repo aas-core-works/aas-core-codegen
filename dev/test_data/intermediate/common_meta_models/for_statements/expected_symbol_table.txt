@@ -239,6 +239,57 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Texts before the stop are few',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='texts_before_stop_are_few',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='kind',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Weights before the end are small',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='weights_before_end_are_small',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='numbers',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Numbers before the stop are few',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='numbers_before_stop_are_few',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='numbers',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Items are few and their texts expected',
           body=textwrap.dedent("""\
             FunctionCall(
@@ -707,6 +758,101 @@ SymbolTable(
         parsed=...),
       description=DescriptionOfSignature(
         summary='<paragraph>Check the continue in all the branches of a switch in a nested for-range.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='numbers_before_stop_are_few',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the for-each with a break in a switch followed by statements.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='weights_before_end_are_small',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the break in a chain of if and elif which compares a single subject.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='texts_before_stop_are_few',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='kind',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Kind',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the break in the nested branches of a switch in a nested for-range.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,

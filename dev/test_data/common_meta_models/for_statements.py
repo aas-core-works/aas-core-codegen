@@ -135,6 +135,54 @@ def items_are_few_and_texts_expected(items: Sequence[Item]) -> bool:
     return count < 3
 
 
+@verification
+def numbers_before_stop_are_few(numbers: Sequence[int]) -> bool:
+    """Check the for-each with a break in a switch followed by statements."""
+    count = 0
+    for number in numbers:
+        if number == -50:
+            break
+
+        count = count + 1
+
+    return count < 5
+
+
+@verification
+def weights_before_end_are_small(numbers: Sequence[int]) -> bool:
+    """Check the break in a chain of if and elif which compares a single subject."""
+    total = 0
+    for number in numbers:
+        if number == 3:
+            total = total + 1
+        elif number == 4 or number == 5:
+            total = total + 2
+        elif number in (-50, -51):
+            break
+        else:
+            total = total + 10
+
+    return total < 20
+
+
+@verification
+def texts_before_stop_are_few(kind: Kind, items: Sequence[Item]) -> bool:
+    """Check the break in the nested branches of a switch in a nested for-range."""
+    count = 0
+    for item in items:
+        for i in range(0, len(item.texts)):
+            if kind == Kind.Alpha:
+                if item.texts[i] == "stop":
+                    break
+            else:
+                if len(item.texts[i]) > 10:
+                    break
+
+            count = count + 1
+
+    return count < 3
+
+
 @invariant(
     lambda self: first_text_is_not_empty(self.texts),
     "The first text must not be empty",
@@ -165,6 +213,18 @@ def items_are_few_and_texts_expected(items: Sequence[Item]) -> bool:
 @invariant(
     lambda self: items_are_few_and_texts_expected(self.items),
     "Items are few and their texts expected",
+)
+@invariant(
+    lambda self: numbers_before_stop_are_few(self.numbers),
+    "Numbers before the stop are few",
+)
+@invariant(
+    lambda self: weights_before_end_are_small(self.numbers),
+    "Weights before the end are small",
+)
+@invariant(
+    lambda self: texts_before_stop_are_few(self.kind, self.items),
+    "Texts before the stop are few",
 )
 class Something(DBC):
     kind: Kind
