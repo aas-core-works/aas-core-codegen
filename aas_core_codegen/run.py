@@ -84,19 +84,45 @@ def load_model(
     Load the given meta-model from the file system and understand it.
 
     If the ``cache_model`` is set, the symbol table will be stored in the temporary
-    directory of your OS keyed on the hash of the model source code. On subsequent
-    calls to this function, the model will be loaded from the cache instead of reparsed
-    as long as the content of the source code did not change.
+    directory of your OS keyed on the hash of the model source code and of the code
+    which translates it. On subsequent calls to this function, the model will be
+    loaded from the cache instead of reparsed as long as neither of them changed.
     """
     text = model_path.read_text(encoding="utf-8")
 
-    text_hash = hashlib.sha256(text.encode()).hexdigest()
-    cache_path = (
-        pathlib.Path(tempfile.gettempdir())
-        / f"aas-core-codegen-{aas_core_codegen.__version__}"
-        / f"model-{text_hash}.pickle"
-    )
+    cache_path = None  # type: Optional[pathlib.Path]
     if cache_model:
+        hasher = hashlib.sha256()
+
+        # NOTE (mristin):
+        # We include the code of the parse and intermediate stages in the key so that
+        # the cache is invalidated when we change them, and so that the checkouts in
+        # different worktrees do not share stale pickles. This is the closed set of
+        # modules which the translation imports, including ``_Cached`` in this module.
+        package_dir = pathlib.Path(aas_core_codegen.__file__).parent
+        code_paths = sorted(
+            [
+                *(package_dir / "parse").rglob("*.py"),
+                *(package_dir / "intermediate").rglob("*.py"),
+                package_dir / "common.py",
+                package_dir / "naming.py",
+                package_dir / "stringify.py",
+                package_dir / "run.py",
+            ]
+        )
+        for code_path in code_paths:
+            hasher.update(code_path.relative_to(package_dir).as_posix().encode())
+            hasher.update(code_path.read_bytes())
+
+        hasher.update(text.encode())
+
+        cache_path = (
+            pathlib.Path(tempfile.gettempdir())
+            / f"aas-core-codegen-{aas_core_codegen.__version__}"
+            / f"model-{hasher.hexdigest()}.pickle"
+        )
+
+    if cache_path is not None:
         if cache_path.exists():
             with cache_path.open("rb") as fid:
                 cached = pickle.load(fid)
@@ -158,7 +184,7 @@ def load_model(
 
     assert ir_symbol_table is not None
 
-    if cache_model:
+    if cache_path is not None:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
 
         tmp_path = cache_path.with_suffix(f".{uuid.uuid4()}.tmp")

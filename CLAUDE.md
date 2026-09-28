@@ -24,10 +24,11 @@ Summarize the changes with the function signatures, class interfaces and state, 
 * One test module: ``python -m unittest dev/tests/cpp/test_main.py``
 * Re-record golden data: set ``AAS_CORE_CODEGEN_TESTS_RERECORD=1``,
   then review with ``git diff dev/test_data/``.
-* Remove the model caches whenever you change ``parse`` or ``intermediate``:
+* The tests cache the pickled symbol tables in ``/tmp/aas-core-codegen-*/``,
+  keyed on the meta-model source and the code of ``parse`` and ``intermediate``,
+  so parallel worktrees never share stale pickles.
+  Old pickles pile up; remove them now and then with
   ``rm -f /tmp/aas-core-codegen-*/model-*.pickle``.
-  The tests cache the pickled symbol tables keyed only on the meta-model source,
-  so stale pickles otherwise cause spurious failures (*e.g.*, missing attributes).
 * Live-test fast checks (compile, type-check and lint only; no test runs):
   ``python dev/live_tests/fast_check_<language>.py --select <case> --output_dir <dir>``
   for ``cpp``, ``csharp``, ``golang``, ``java``, ``python`` and ``typescript``.
