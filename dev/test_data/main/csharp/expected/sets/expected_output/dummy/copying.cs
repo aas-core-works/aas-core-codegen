@@ -63,6 +63,20 @@ namespace dummy
                     that.OptionalTexts,
                     that.OptionalKind);
             }
+
+            public override Aas.IClass TransformCollection(
+                Aas.ICollection that
+            )
+            {
+                return new Aas.Collection(
+                    that.Texts,
+                    that.Numbers,
+                    that.Flags,
+                    that.Directions,
+                    that.Codes,
+                    that.OptionalTexts,
+                    that.OptionalDirections);
+            }
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
@@ -104,6 +118,25 @@ namespace dummy
                     theFlags,
                     theOptionalTexts,
                     that.OptionalKind
+                );
+            }
+
+            public override Aas.IClass TransformCollection(
+                Aas.ICollection that
+            )
+            {
+                return new Aas.Collection(
+                    new HashSet<string>(that.Texts),
+                    new HashSet<long>(that.Numbers),
+                    new HashSet<bool>(that.Flags),
+                    new HashSet<Direction>(that.Directions),
+                    new HashSet<string>(that.Codes),
+                    (that.OptionalTexts != null)
+                        ? new HashSet<string>(that.OptionalTexts)
+                        : null,
+                    (that.OptionalDirections != null)
+                        ? new HashSet<Direction>(that.OptionalDirections)
+                        : null
                 );
             }
         }  // internal class DeepCopier

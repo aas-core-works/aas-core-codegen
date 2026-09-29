@@ -61,6 +61,29 @@ namespace dummy.Tests
                         ? that.OptionalKind == casted.OptionalKind
                         : !that.OptionalKind.HasValue && !casted.OptionalKind.HasValue));
             }
+
+            public override bool TransformCollection(
+                Aas.ICollection that,
+                Aas.IClass other)
+            {
+                if (!(other is Aas.Collection casted))
+                {
+                    return false;
+                }
+
+                return (
+                    that.Texts.SetEquals(casted.Texts)
+                    && that.Numbers.SetEquals(casted.Numbers)
+                    && that.Flags.SetEquals(casted.Flags)
+                    && that.Directions.SetEquals(casted.Directions)
+                    && that.Codes.SetEquals(casted.Codes)
+                    && ((that.OptionalTexts != null && casted.OptionalTexts != null)
+                        ? that.OptionalTexts.SetEquals(casted.OptionalTexts)
+                        : that.OptionalTexts == null && casted.OptionalTexts == null)
+                    && ((that.OptionalDirections != null && casted.OptionalDirections != null)
+                        ? that.OptionalDirections.SetEquals(casted.OptionalDirections)
+                        : that.OptionalDirections == null && casted.OptionalDirections == null));
+            }
         }  // internal class DeepEqualiser
 
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
@@ -82,9 +105,30 @@ namespace dummy.Tests
                 && that.OptionalKind == other.OptionalKind);
         }
 
+        private static bool CollectionShallowEquals(
+            Aas.Collection that,
+            Aas.Collection other)
+        {
+            return (
+                that.Texts == other.Texts
+                && that.Numbers == other.Numbers
+                && that.Flags == other.Flags
+                && that.Directions == other.Directions
+                && that.Codes == other.Codes
+                && that.OptionalTexts == other.OptionalTexts
+                && that.OptionalDirections == other.OptionalDirections);
+        }
+
         private static bool SomethingDeepEquals(
             Aas.Something that,
             Aas.Something other)
+        {
+            return DeepEqualiserInstance.Transform(that, other);
+        }
+
+        private static bool CollectionDeepEquals(
+            Aas.Collection that,
+            Aas.Collection other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -116,6 +160,34 @@ namespace dummy.Tests
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy
+
+        [Test]
+        public void Test_Collection_shallow_copy()
+        {
+            Aas.Collection instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+
+            var instanceCopy = Aas.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                CollectionShallowEquals(
+                    instance, instanceCopy),
+                "Collection");
+        }  // public void Test_Collection_shallow_copy
+
+        [Test]
+        public void Test_Collection_deep_copy()
+        {
+            Aas.Collection instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+
+            var instanceCopy = Aas.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                CollectionDeepEquals(
+                    instance, instanceCopy),
+                "Collection");
+        }  // public void Test_Collection_deep_copy
     }  // class TestCopying
 }  // namespace dummy.Tests
 

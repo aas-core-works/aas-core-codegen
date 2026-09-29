@@ -629,13 +629,32 @@ def _value_to_type_element_or_type_identifier(
                 # noinspection PyTypeChecker
                 assert_never(our_type)
 
-        elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-            assert not isinstance(
-                type_annotation.items, intermediate.OptionalTypeAnnotation
-            ), (
-                "(mristin, 2026-05-08): Only lists of non-optionals are supported "
-                "at the moment. If you see this, please contact the developers."
-            )
+        elif isinstance(
+            type_annotation,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
+            # NOTE (mristin):
+            # We serialize a set exactly as a list, with its items sorted, and
+            # leave the order and the uniqueness of the items to the SDKs.
+
+            if isinstance(type_annotation, intermediate.ListTypeAnnotation):
+                assert not isinstance(
+                    type_annotation.items, intermediate.OptionalTypeAnnotation
+                ), (
+                    "(mristin): Lists of optional values were not expected "
+                    "at the time when we implemented this. Please contact "
+                    "the developers if you need this functionality."
+                )
+            elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+                assert not isinstance(
+                    type_annotation.items, intermediate.OptionalTypeAnnotation
+                ), (
+                    "(mristin): Sets of optional values were not expected "
+                    "at the time when we implemented this. Please contact "
+                    "the developers if you need this functionality."
+                )
+            else:
+                assert_never(type_annotation)
 
             xs_complex_type = ET.Element("xs:complexType")
             xs_sequence = ET.SubElement(xs_complex_type, "xs:sequence")
@@ -978,12 +997,6 @@ def _value_to_type_element_or_type_identifier(
             xs_sequence.append(xs_member)
 
             return _TypeElementOrTypeIdentifier(element=xs_complex_type), None
-
-        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_annotation}"
-            )
 
         else:
             # noinspection PyTypeChecker

@@ -31,6 +31,48 @@ namespace dummy.Tests
                     count);
             }
         }  // public void Test_Something_OverOptionalTextsOrEmpty
+
+        [Test]
+        public void Test_Collection_OverOptionalTextsOrEmpty()
+        {
+            foreach (Aas.Collection instance in new[]
+            {
+                Aas.Tests.CommonJsonization.LoadMinimalCollection(),
+                Aas.Tests.CommonJsonization.LoadMaximalCollection()
+            })
+            {
+                int count = 0;
+                foreach (var _ in instance.OverOptionalTextsOrEmpty())
+                {
+                    count++;
+                }
+
+                Assert.AreEqual(
+                    instance.OptionalTexts?.Count ?? 0,
+                    count);
+            }
+        }  // public void Test_Collection_OverOptionalTextsOrEmpty
+
+        [Test]
+        public void Test_Collection_OverOptionalDirectionsOrEmpty()
+        {
+            foreach (Aas.Collection instance in new[]
+            {
+                Aas.Tests.CommonJsonization.LoadMinimalCollection(),
+                Aas.Tests.CommonJsonization.LoadMaximalCollection()
+            })
+            {
+                int count = 0;
+                foreach (var _ in instance.OverOptionalDirectionsOrEmpty())
+                {
+                    count++;
+                }
+
+                Assert.AreEqual(
+                    instance.OptionalDirections?.Count ?? 0,
+                    count);
+            }
+        }  // public void Test_Collection_OverOptionalDirectionsOrEmpty
     }  // class TestOverXOrEmpty
 }  // namespace dummy.Tests
 

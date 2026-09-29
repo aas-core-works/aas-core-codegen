@@ -3176,11 +3176,56 @@ def _verify_symbol_table(
                         if error is not None:
                             errors.append(error)
 
+    def verify_placement_of_sets(
+        type_annotation: TypeAnnotation, allowed: bool, where: str
+    ) -> Optional[Error]:
+        """
+        Check that ``Set`` and ``AbstractSet`` are placed only where ``allowed``.
+
+        We support the sets at the top of the type annotation of an argument or
+        of a property, or directly under ``Optional``. The ``where`` describes
+        the place of ``type_annotation`` in the error messages, *e.g.*,
+        ``the property 'x' of the class 'Y'``.
+
+        We look through ``Mutable`` as well, so that
+        :py:func:`verify_placement_of_mutability_types` can explain what is wrong
+        with ``Mutable`` around a set.
+
+        :return: error message, if any
+        """
+        if not isinstance(type_annotation, SubscriptedTypeAnnotation):
+            return None
+
+        if type_annotation.identifier in SET_TYPES and not allowed:
+            return Error(
+                type_annotation.node,
+                f"The type annotation {type_annotation} is not allowed "
+                f"in {where}. We support the sets only in the arguments of "
+                f"the verification functions and of the methods and in "
+                f"the properties, at the top of the type annotation or directly "
+                f"under Optional, and in the constant sets. The return values "
+                f"and the nested type annotations can not be sets at the moment. "
+                f"Please contact the developers if you need this feature.",
+            )
+
+        is_transparent = type_annotation.identifier in ("Optional", "Mutable")
+
+        for subscript in type_annotation.subscripts:
+            error = verify_placement_of_sets(
+                type_annotation=subscript,
+                allowed=allowed and is_transparent,
+                where=where,
+            )
+            if error is not None:
+                return error
+
+        return None
+
     def verify_placement_of_mutability_types(
         type_annotation: TypeAnnotation, allowed: bool, where: str
     ) -> Optional[Error]:
         """
-        Check that ``Sequence`` and ``Mutable`` are placed only where ``allowed``.
+        Check that ``Sequence``, ``AbstractSet`` and ``Mutable`` are placed only where ``allowed``.
 
         They declare the mutability of an argument of a verification function or
         of a method, so they are allowed only at the top of its type annotation, or
@@ -3192,15 +3237,21 @@ def _verify_symbol_table(
         if not isinstance(type_annotation, SubscriptedTypeAnnotation):
             return None
 
-        if type_annotation.identifier in MUTABILITY_TYPES and not allowed:
+        if (
+            type_annotation.identifier in MUTABILITY_TYPES
+            or type_annotation.identifier == "AbstractSet"
+        ) and not allowed:
             subscripts_text = ", ".join(
                 str(subscript) for subscript in type_annotation.subscripts
             )
-            replacement = (
-                f"List[{subscripts_text}]"
-                if type_annotation.identifier == "Sequence"
-                else subscripts_text
-            )
+
+            replacement: str
+            if type_annotation.identifier == "Sequence":
+                replacement = f"List[{subscripts_text}]"
+            elif type_annotation.identifier == "AbstractSet":
+                replacement = f"Set[{subscripts_text}]"
+            else:
+                replacement = subscripts_text
 
             return Error(
                 type_annotation.node,
@@ -3212,18 +3263,6 @@ def _verify_symbol_table(
                 f"The properties, the return values and the nested type "
                 f"annotations do not declare mutability. "
                 f"Please use {replacement} instead.",
-            )
-
-        if type_annotation.identifier in SET_TYPES and not allowed:
-            return Error(
-                type_annotation.node,
-                f"The type annotation {type_annotation} is not allowed "
-                f"in {where}. We support the sets only in the arguments of "
-                f"the verification functions and of the methods, at the top of "
-                f"the argument's type annotation or directly under Optional, "
-                f"and in the constant sets. The properties, the return values "
-                f"and the nested type annotations can not be sets at the moment. "
-                f"Please contact the developers if you need this feature.",
             )
 
         if type_annotation.identifier == "Mutable" and allowed:
@@ -3272,74 +3311,96 @@ def _verify_symbol_table(
                     f"does not mutate the {what}.",
                 )
 
-        subscripts_allowed = allowed and type_annotation.identifier == "Optional"
+        is_optional = type_annotation.identifier == "Optional"
 
         for subscript in type_annotation.subscripts:
             error = verify_placement_of_mutability_types(
-                type_annotation=subscript, allowed=subscripts_allowed, where=where
+                type_annotation=subscript,
+                allowed=allowed and is_optional,
+                where=where,
             )
             if error is not None:
                 return error
 
         return None
 
+    # NOTE (mristin):
+    # We check the placement of the sets first, since a misplaced ``AbstractSet``
+    # is primarily a misplaced set, and only then a misplaced declaration of
+    # the mutability.
+
     for our_type in symbol_table.our_types:
         if not isinstance(our_type, Class):
             continue
 
         for prop in our_type.properties:
-            error = verify_placement_of_mutability_types(
-                type_annotation=prop.type_annotation,
-                allowed=False,
-                where=f"the property {prop.name!r} of the class {our_type.name!r}",
+            where = f"the property {prop.name!r} of the class {our_type.name!r}"
+            error = verify_placement_of_sets(
+                type_annotation=prop.type_annotation, allowed=True, where=where
             )
+            if error is None:
+                error = verify_placement_of_mutability_types(
+                    type_annotation=prop.type_annotation, allowed=False, where=where
+                )
             if error is not None:
                 errors.append(error)
 
         for method in our_type.methods:
             for arg in method.arguments:
-                error = verify_placement_of_mutability_types(
-                    type_annotation=arg.type_annotation,
-                    allowed=True,
-                    where=(
-                        f"the argument {arg.name!r} of the method "
-                        f"{method.name!r} of the class {our_type.name!r}"
-                    ),
+                where = (
+                    f"the argument {arg.name!r} of the method "
+                    f"{method.name!r} of the class {our_type.name!r}"
                 )
+                error = verify_placement_of_sets(
+                    type_annotation=arg.type_annotation, allowed=True, where=where
+                )
+                if error is None:
+                    error = verify_placement_of_mutability_types(
+                        type_annotation=arg.type_annotation, allowed=True, where=where
+                    )
                 if error is not None:
                     errors.append(error)
 
             if method.returns is not None:
-                error = verify_placement_of_mutability_types(
-                    type_annotation=method.returns,
-                    allowed=False,
-                    where=(
-                        f"the return type of the method {method.name!r} "
-                        f"of the class {our_type.name!r}"
-                    ),
+                where = (
+                    f"the return type of the method {method.name!r} "
+                    f"of the class {our_type.name!r}"
                 )
+                error = verify_placement_of_sets(
+                    type_annotation=method.returns, allowed=False, where=where
+                )
+                if error is None:
+                    error = verify_placement_of_mutability_types(
+                        type_annotation=method.returns, allowed=False, where=where
+                    )
                 if error is not None:
                     errors.append(error)
 
     for func in symbol_table.verification_functions:
         for arg in func.arguments:
-            error = verify_placement_of_mutability_types(
-                type_annotation=arg.type_annotation,
-                allowed=True,
-                where=(
-                    f"the argument {arg.name!r} of the verification function "
-                    f"{func.name!r}"
-                ),
+            where = (
+                f"the argument {arg.name!r} of the verification function "
+                f"{func.name!r}"
             )
+            error = verify_placement_of_sets(
+                type_annotation=arg.type_annotation, allowed=True, where=where
+            )
+            if error is None:
+                error = verify_placement_of_mutability_types(
+                    type_annotation=arg.type_annotation, allowed=True, where=where
+                )
             if error is not None:
                 errors.append(error)
 
         if func.returns is not None:
-            error = verify_placement_of_mutability_types(
-                type_annotation=func.returns,
-                allowed=False,
-                where=f"the return type of the verification function {func.name!r}",
+            where = f"the return type of the verification function {func.name!r}"
+            error = verify_placement_of_sets(
+                type_annotation=func.returns, allowed=False, where=where
             )
+            if error is None:
+                error = verify_placement_of_mutability_types(
+                    type_annotation=func.returns, allowed=False, where=where
+                )
             if error is not None:
                 errors.append(error)
 

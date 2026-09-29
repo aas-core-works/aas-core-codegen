@@ -143,6 +143,132 @@ func TestSomethingDeserializationFail(t *testing.T) {
 	}
 }
 
+func TestCollectionRoundTripOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Xml",
+			"Expected",
+			"collection",
+		),
+		".xml",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		bb, err := os.ReadFile(pth)
+		if err != nil {
+			t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+			return
+		}
+		text := string(bb)
+
+		decoder := xml.NewDecoder(strings.NewReader(text))
+
+		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		if _, ok := deserialized.(aastypes.ICollection); !ok {
+			t.Fatalf(
+				"Expected an instance of ICollection, "+
+					"but got %T: %v",
+				deserialized, deserialized,
+			)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		encoder := xml.NewEncoder(buf)
+		encoder.Indent("", "\t")
+
+		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		roundTrip := string(buf.Bytes())
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			text,
+			roundTrip,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestCollectionDeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Xml",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"collection",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".xml",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			bb, err := os.ReadFile(pth)
+			if err != nil {
+				t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+				return
+			}
+			text := string(bb)
+
+			decoder := xml.NewDecoder(strings.NewReader(text))
+
+			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestDuplicatePropertyFails(t *testing.T) {
 	pth := filepath.Join(
 		aastesting.TestDataDir,

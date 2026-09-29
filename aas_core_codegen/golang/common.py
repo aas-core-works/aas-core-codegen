@@ -3,7 +3,7 @@ import io
 import math
 import re
 import urllib.parse
-from typing import List, Sequence, Tuple, Optional
+from typing import List, Sequence, Set, Tuple, Optional
 
 from icontract import ensure, require
 
@@ -509,3 +509,108 @@ def names_package(blocks: Sequence[str], qualifier: str) -> bool:
     """
     pattern = re.compile(r"(?<![\w.])" + re.escape(qualifier) + r"\.")
     return any(pattern.search(block) is not None for block in blocks)
+
+
+def uses_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
+    """
+    Check whether any class of the ``symbol_table`` has a set property.
+
+    The set properties are serialized as sorted arrays, so we need to generate
+    the helpers for sorting them only if there are any.
+    """
+    return any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )
+
+
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """
+    List the enumerations whose literals are held in a set property.
+
+    The enumerations are listed in the order of their definition.
+    """
+    ids = set()  # type: Set[int]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if (
+                isinstance(type_anno, intermediate.SetTypeAnnotation)
+                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+            ):
+                ids.add(intermediate.runtime_id(type_anno.items.our_type))
+
+    return [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if intermediate.runtime_id(enumeration) in ids
+    ]
+
+
+def sorted_set_items_expr(
+    set_expr: str, items: intermediate.TypeAnnotationUnion, column: int
+) -> Stripped:
+    """
+    Generate the expression giving the items of ``set_expr`` as a sorted slice.
+
+    The expression is expected to start at the ``column`` of its line, counting
+    a tab as :py:data:`TAB_WIDTH` characters. If it does not fit on that line,
+    we split it over multiple lines.
+
+    We sort the items in the order of their serialization, which is the same in
+    all the targets: ``false`` before ``true``, the integers numerically, and
+    the strings and the literals of the enumerations by the code points of their
+    text. Go compares the strings byte by byte, and the order of the bytes in
+    UTF-8 is the order of the code points.
+
+    A nil set gives a nil slice, so that an absent optional set stays absent.
+    """
+    less: str
+
+    primitive_type = intermediate.try_primitive_type(items)
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        less = "aascommon.LessBool"
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        less = "aascommon.LessOrdered[int64]"
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        less = "aascommon.LessOrdered[string]"
+
+    elif primitive_type is not None:
+        raise AssertionError(
+            f"Unexpected items of a set, as we refuse the sets of {primitive_type} "
+            f"in intermediate._translate._verify_items_of_sets: {items}"
+        )
+
+    elif isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
+        items.our_type, intermediate.Enumeration
+    ):
+        less = "aasstringification." + golang_naming.function_name(
+            Identifier(f"less_by_rank_of_{items.our_type.name}")
+        )
+
+    else:
+        raise AssertionError(
+            f"Unexpected items of a set, as we refuse them "
+            f"in intermediate._translate._verify_items_of_sets: {items}"
+        )
+
+    single_line = f"aascommon.SortedKeys({set_expr}, {less})"
+    if column + len(single_line) <= MAX_LINE_LENGTH:
+        return Stripped(single_line)
+
+    return Stripped(
+        f"""\
+aascommon.SortedKeys(
+{INDENT}{set_expr},
+{INDENT}{less},
+)"""
+    )

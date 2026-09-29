@@ -1034,9 +1034,41 @@ foreach (var member in {source_expr})
             )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        # NOTE (mristin):
+        # We only verify the constrained primitives and the enumeration literals
+        # here; there is nothing to check for a plain primitive item.
+        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            return Stripped(""), None
+
+        index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
+        verify_method = _generate_verify_method(type_anno.items.our_type)
+        comparison = csharp_common.set_items_comparison(type_anno.items)
+
+        # NOTE (mristin):
+        # A set has no index of its own, so we report the position of the item
+        # in the sorted order, which is the index in the serialized array.
+        stmts.append(
+            Stripped(
+                f"""\
+int {index_var} = 0;
+foreach (
+{I}var item in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(
+{II}{source_expr},
+{II}{comparison}))
+{{
+{I}foreach (var error in {verify_method}(item))
+{I}{{
+{II}error.PrependSegment(
+{III}new Reporting.IndexSegment(
+{IIII}{index_var}));
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment(
+{IIII}{prop_literal}));
+{II}yield return error;
+{I}}}
+{I}{index_var}++;
+}}"""
+            )
         )
 
     else:

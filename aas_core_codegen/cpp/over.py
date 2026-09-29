@@ -61,7 +61,7 @@ Yields = Callable[[intermediate.TypeAnnotationUnion], bool]
 # NOTE (mristin):
 # The moniker of a type is a Polish notation over ``_``-separated tokens.
 # A composite type is spelled as a head followed by its arguments, where
-# the heads ``optionalOf`` and ``listOf`` take exactly one argument,
+# the heads ``optionalOf``, ``listOf`` and ``setOf`` take exactly one argument,
 # ``jsonObjectOf`` exactly one (the moniker of its keys), and ``tupleOf{N}``
 # exactly ``N`` of them. For example, ``Tuple[List[A], B, C]`` gives
 # ``tupleOf3_listOf_A_B_C``.
@@ -165,11 +165,7 @@ def moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
         return _leaf_moniker(type_annotation)
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected iteration over a set, as the type inference refuses it "
-            f"since the order of the items differs among the targets: "
-            f"{type_annotation}"
-        )
+        return f"setOf_{moniker(type_annotation.items)}"
 
     else:
         assert_never(type_annotation)
@@ -250,7 +246,11 @@ def referenced_function_types(
 
     if isinstance(
         type_annotation,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+        ),
     ):
         return [type_annotation]
 
@@ -284,6 +284,12 @@ def called_function_types(
             return []
 
         return [items]
+
+    if isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The sets hold no instances, so the items always get a function of
+        # their own.
+        return [type_annotation.items]
 
     if isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         return [

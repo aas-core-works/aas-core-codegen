@@ -27,6 +27,20 @@ public class TestJsonizationOfEnums {
       "\"alpha\"",
       serialized.toString());
   } // void testRoundTripKind
+
+  @Test
+  public void testRoundTripDirection() {
+    final JsonNode node = JsonNodeFactory.instance.textNode(
+      "up");
+
+    final Direction parsed = Jsonization.Deserialize.deserializeDirection(node);
+
+    final JsonNode serialized = Jsonization.Serialize.directionToJsonValue(parsed);
+
+    assertEquals(
+      "\"up\"",
+      serialized.toString());
+  } // void testRoundTripDirection
 } // class TestJsonizationOfEnums
 
 // package dummy.tests

@@ -10,11 +10,36 @@ import * as TestCommonJsonization from "./commonJsonization";
 
 const THE_SOMETHING = TestCommonJsonization.loadMinimalSomething();
 
+const THE_COLLECTION = TestCommonJsonization.loadMinimalCollection();
+
 test("type matches for Something", () => {
   expect(
     AasTypes.typesMatch(
       THE_SOMETHING,
       THE_SOMETHING
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_COLLECTION
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for Collection", () => {
+  expect(
+    AasTypes.typesMatch(
+      THE_COLLECTION,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_COLLECTION,
+      THE_COLLECTION
     )
   ).toStrictEqual(true);
 });

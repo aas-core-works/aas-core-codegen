@@ -7,6 +7,7 @@ import dummy.types.model.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Builder for the Something type.

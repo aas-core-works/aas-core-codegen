@@ -473,6 +473,25 @@ def _generate_comment_for_method(
     return comment, None
 
 
+def _over_x_or_empty_summary(
+    type_anno: Union[intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation],
+    prop_name: Identifier,
+) -> str:
+    """Generate the summary of the ``OverXOrEmpty`` method for ``prop_name``."""
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return (
+            f"Iterate over {prop_name}, if set, and otherwise return "
+            f"an empty enumerable."
+        )
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return (
+            f"Iterate over the items of {prop_name} in no particular order, "
+            f"if specified, and otherwise return an empty enumerable."
+        )
+    else:
+        assert_never(type_anno)
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
     cls: intermediate.ClassUnion,
@@ -615,14 +634,17 @@ def _generate_interface(
 
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = csharp_naming.property_name(prop.name)
             items_type = csharp_common.generate_type(prop.type_annotation.value.items)
             blocks.append(
                 Stripped(
                     f"""\
 /// <summary>
-/// Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
+/// {_over_x_or_empty_summary(prop.type_annotation.value, prop_name)}
 /// </summary>
 public IEnumerable<{items_type}> Over{prop_name}OrEmpty();"""
                 )
@@ -861,10 +883,11 @@ foreach (var {_OUTER_ITEM_VAR} in {access_expr})
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, never a reference to one of our own classes, so there is
+            # nothing to descend into.
+            continue
 
         else:
             # noinspection PyTypeChecker
@@ -1260,7 +1283,10 @@ def _generate_class(
     for prop in cls.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = csharp_naming.property_name(prop.name)
             items_type = csharp_common.generate_type(prop.type_annotation.value.items)
 
@@ -1268,7 +1294,7 @@ def _generate_class(
                 Stripped(
                     f"""\
 /// <summary>
-/// Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
+/// {_over_x_or_empty_summary(prop.type_annotation.value, prop_name)}
 /// </summary>
 public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
 {{

@@ -41,6 +41,32 @@ public final class CommonJsonization {
 
     return Jsonization.Deserialize.deserializeSomething(node);
   } // public static Something loadMinimalSomething
+
+  public static Collection loadMaximalCollection() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Collection",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeCollection(node);
+  } // public static Collection loadMaximalCollection
+
+  public static Collection loadMinimalCollection() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Collection",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeCollection(node);
+  } // public static Collection loadMinimalCollection
 } // class CommonJsonization
 
 // package dummy.tests

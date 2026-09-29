@@ -38,6 +38,35 @@ test("model type to string of Something", () => {
   );
 });
 
+test("model type of Collection", () => {
+  const instance = TestCommonJsonization.loadMinimalCollection();
+
+  expect(instance.modelType()).toStrictEqual(
+    AasTypes.ModelType.Collection
+  );
+});
+
+test("model type from string of Collection", () => {
+  const text = "Collection";
+  const literal = AasStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    AasTypes.ModelType.Collection
+  );
+});
+
+test("model type to string of Collection", () => {
+  const text = AasStringification.mustModelTypeToString(
+    AasTypes.ModelType.Collection
+  );
+
+  expect(text).toStrictEqual(
+    "Collection"
+  );
+});
+
 test("model type from invalid string", () => {
   const text = "This is definitely not a valid model type.";
   const literal = AasStringification.modelTypeFromString(

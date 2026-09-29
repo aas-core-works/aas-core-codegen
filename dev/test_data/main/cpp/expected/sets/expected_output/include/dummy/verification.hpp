@@ -268,7 +268,7 @@ bool IsInOptionalTexts(
 /// \brief Check whether \p kind is in \p kinds, a read-only set.
 bool IsInKinds(
   types::Kind kind,
-  const std::unordered_set<types::Kind>& kinds
+  const std::unordered_set<types::Kind, common::EnumHash>& kinds
 );
 
 /// \brief Check that \p texts and \p other_texts share no text.

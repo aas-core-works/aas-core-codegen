@@ -23,6 +23,10 @@ public interface IVisitorWithContext<ContextT>
     ISomething that,
     ContextT context
   );
+  void visitCollection(
+    ICollection that,
+    ContextT context
+  );
 }
 
 /*

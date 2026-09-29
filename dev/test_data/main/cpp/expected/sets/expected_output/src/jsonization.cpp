@@ -668,6 +668,94 @@ std::pair<
 }
 
 /**
+ * \brief De-serialize a set of items from \p json.
+ *
+ * The items can come in any order, but we refuse the duplicates, as we would
+ * lose them silently otherwise.
+ *
+ * \tparam SetT type of the set, which might come with its own hasher
+ * \param json value expected to be an array
+ * \param deserialize_item de-serializes an item
+ * \return the set, or an error, if any
+ */
+template <typename SetT, typename DeserializeItemT>
+std::pair<
+  common::optional<SetT >,
+  common::optional<DeserializationError>
+> DeserializeSet(
+  const nlohmann::json& json,
+  DeserializeItemT&& deserialize_item
+) {
+  typedef typename SetT::value_type T;
+
+  if (!json.is_array()) {
+    std::wstring message = common::Concat(
+      L"Expected an array, but got: ",
+      common::Utf8ToWstring(
+        json.type_name()
+      )
+    );
+
+    return std::make_pair<
+      common::optional<SetT >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  common::optional<SetT > set(
+    common::make_optional<SetT >()
+  );
+
+  set->reserve(json.size());
+
+  size_t index = 0;
+
+  for(const nlohmann::json& item : json) {
+    common::optional<T> deserialized;
+    common::optional<DeserializationError> error;
+
+    std::tie(deserialized, error) = deserialize_item(item);
+
+    if (!error.has_value()) {
+      const bool inserted = set->insert(std::move(*deserialized)).second;
+      if (!inserted) {
+        error = common::make_optional<DeserializationError>(
+          L"Expected unique items in the set, but the item is a duplicate"
+        );
+      }
+    }
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<SetT >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    ++index;
+  }
+
+  return std::make_pair(
+    std::move(set),
+    common::nullopt
+  );
+}
+
+/**
  * \brief De-serialize a literal of an enumeration from \p json.
  *
  * \p from_wstring is a template argument taken by reference, so the call is
@@ -736,6 +824,19 @@ std::pair<
   );
 }
 
+std::pair<
+  common::optional<types::Direction>,
+  common::optional<DeserializationError>
+> DeserializeDirection(
+  const nlohmann::json& json
+) {
+  return DeserializeEnumeration<types::Direction>(
+    json,
+    wstringification::DirectionFromWstring,
+    L"Direction"
+  );
+}
+
 namespace properties {
 
 enum class OfSomething : std::uint32_t {
@@ -750,6 +851,16 @@ enum class OfSomething : std::uint32_t {
   kOptionalTexts,
   kOptionalKind
 };  // enum class OfSomething
+
+enum class OfCollection : std::uint32_t {
+  kTexts,
+  kNumbers,
+  kFlags,
+  kDirections,
+  kCodes,
+  kOptionalTexts,
+  kOptionalDirections
+};  // enum class OfCollection
 
 const std::unordered_map<
   std::string,
@@ -794,6 +905,40 @@ const std::unordered_map<
   {
     "optionalKind",
     OfSomething::kOptionalKind
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfCollection
+> kMapOfCollection = {
+  {
+    "texts",
+    OfCollection::kTexts
+  },
+  {
+    "numbers",
+    OfCollection::kNumbers
+  },
+  {
+    "flags",
+    OfCollection::kFlags
+  },
+  {
+    "directions",
+    OfCollection::kDirections
+  },
+  {
+    "codes",
+    OfCollection::kCodes
+  },
+  {
+    "optionalTexts",
+    OfCollection::kOptionalTexts
+  },
+  {
+    "optionalDirections",
+    OfCollection::kOptionalDirections
   }
 };
 
@@ -1005,6 +1150,48 @@ std::pair<
   >,
   common::optional<DeserializationError>
 > DeserializeSomething(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Parse the properties of an instance of types::ICollection.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfCollection(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::ICollection.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> DeserializeCollection(
   const nlohmann::json& json,
   bool additional_properties
 );
@@ -1260,6 +1447,216 @@ std::pair<
   return ParsePropertiesOfSomething(json, additional_properties);
 }
 
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfCollection(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<std::unordered_set<std::wstring> > the_texts;
+
+  common::optional<std::unordered_set<int64_t> > the_numbers;
+
+  common::optional<std::unordered_set<bool> > the_flags;
+
+  common::optional<std::unordered_set<types::Direction, common::EnumHash> > the_directions;
+
+  common::optional<std::unordered_set<std::wstring> > the_codes;
+
+  common::optional<
+    std::unordered_set<std::wstring>
+  > the_optional_texts;
+
+  common::optional<
+    std::unordered_set<types::Direction, common::EnumHash>
+  > the_optional_directions;
+
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfCollection,
+      additional_properties,
+      [&](
+        properties::OfCollection property,
+        const nlohmann::json& value
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfCollection::kTexts:
+            return ParseInto(
+              the_texts,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                value,
+                DeserializeWstring
+              )
+            );
+          case properties::OfCollection::kNumbers:
+            return ParseInto(
+              the_numbers,
+              DeserializeSet<
+                std::unordered_set<int64_t>
+              >(
+                value,
+                DeserializeInt64
+              )
+            );
+          case properties::OfCollection::kFlags:
+            return ParseInto(
+              the_flags,
+              DeserializeSet<
+                std::unordered_set<bool>
+              >(
+                value,
+                DeserializeBool
+              )
+            );
+          case properties::OfCollection::kDirections:
+            return ParseInto(
+              the_directions,
+              DeserializeSet<
+                std::unordered_set<types::Direction, common::EnumHash>
+              >(
+                value,
+                DeserializeDirection
+              )
+            );
+          case properties::OfCollection::kCodes:
+            return ParseInto(
+              the_codes,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                value,
+                DeserializeWstring
+              )
+            );
+          case properties::OfCollection::kOptionalTexts:
+            return ParseInto(
+              the_optional_texts,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                value,
+                DeserializeWstring
+              )
+            );
+          case properties::OfCollection::kOptionalDirections:
+            return ParseInto(
+              the_optional_directions,
+              DeserializeSet<
+                std::unordered_set<types::Direction, common::EnumHash>
+              >(
+                value,
+                DeserializeDirection
+              )
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfCollection",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::ICollection>
+    >(
+      std::move(*error)
+    );
+  }
+
+  if (!the_texts.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ICollection>
+    >(
+      L"The required property texts is missing"
+    );
+  }
+
+  if (!the_numbers.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ICollection>
+    >(
+      L"The required property numbers is missing"
+    );
+  }
+
+  if (!the_flags.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ICollection>
+    >(
+      L"The required property flags is missing"
+    );
+  }
+
+  if (!the_directions.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ICollection>
+    >(
+      L"The required property directions is missing"
+    );
+  }
+
+  if (!the_codes.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ICollection>
+    >(
+      L"The required property codes is missing"
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<types::ICollection>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::Collection(
+        std::move(*the_texts),
+        std::move(*the_numbers),
+        std::move(*the_flags),
+        std::move(*the_directions),
+        std::move(*the_codes),
+        std::move(the_optional_texts),
+        std::move(the_optional_directions)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> DeserializeCollection(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckJsonObject(json)
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::ICollection>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfCollection(json, additional_properties);
+}
+
 /**
  * \brief De-serialize \p json and render the outcome as an expected value.
  *
@@ -1314,6 +1711,22 @@ common::expected<
     json,
     additional_properties,
     DeserializeSomething
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::ICollection>,
+  DeserializationError
+> CollectionFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::ICollection>
+  >(
+    json,
+    additional_properties,
+    DeserializeCollection
   );
 }
 
@@ -1578,6 +1991,106 @@ nlohmann::json SerializeListWithInfallible(
 }
 
 /**
+ * Serialize the given set to a JSON array, sorted by \p less, where item
+ * serialization might fail.
+ *
+ * The path of an error refers to the index of the item in the sorted array.
+ */
+template<
+  typename T,
+  typename HashT,
+  typename LessT,
+  typename FallibleSerializeItemT
+>
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeSetWithFallible(
+  const std::unordered_set<T, HashT>& set,
+  LessT less,
+  FallibleSerializeItemT&& fallible_serialize_item
+) {
+  const std::vector<const T*> sorted(
+    common::SortedPointers(set, less)
+  );
+
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    sorted.size()
+  );
+
+  for (size_t index = 0; index < sorted.size(); ++index) {
+    common::optional<nlohmann::json> json_item;
+    common::optional<SerializationError> error;
+
+    std::tie(
+      json_item,
+      error
+    ) = fallible_serialize_item(*sorted[index]);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    serialized.emplace_back(
+      std::move(*json_item)
+    );
+  }
+
+  return std::make_pair(
+    std::move(serialized),
+    common::nullopt
+  );
+}
+
+/**
+ * Serialize the given set to a JSON array, sorted by \p less, where item
+ * serialization can not fail.
+ */
+template<
+  typename T,
+  typename HashT,
+  typename LessT,
+  typename InfallibleSerializeItemT
+>
+nlohmann::json SerializeSetWithInfallible(
+  const std::unordered_set<T, HashT>& set,
+  LessT less,
+  InfallibleSerializeItemT&& infallible_serialize_item
+) {
+  const std::vector<const T*> sorted(
+    common::SortedPointers(set, less)
+  );
+
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    sorted.size()
+  );
+
+  for (const T* item : sorted) {
+    serialized.emplace_back(
+      infallible_serialize_item(*item)
+    );
+  }
+
+  return serialized;
+}
+
+/**
  * \brief Give out a failed serialization with \p cause as its message.
  *
  * \param cause human-readable description of the failure
@@ -1737,6 +2250,19 @@ std::pair<
   const types::ISomething& that
 );
 
+/**
+ * \brief Serialize \p that instance of types::ICollection to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeCollection(
+  const types::ICollection& that
+);
+
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
@@ -1837,6 +2363,91 @@ std::pair<
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
+> SerializeCollection(
+  const types::ICollection& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  common::optional<SerializationError> error;
+
+  result["texts"] = SerializeSetWithInfallible(
+    that.texts(),
+    common::LessByCodePoints,
+    SerializeWstring
+  );
+
+  error = SerializeInto(
+    result,
+    "numbers",
+    iteration::Property::kNumbers,
+    SerializeSetWithFallible(
+      that.numbers(),
+      std::less<int64_t>(),
+      SerializeInt64
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  result["flags"] = SerializeSetWithInfallible(
+    that.flags(),
+    std::less<bool>(),
+    SerializeBool
+  );
+
+  result["directions"] = SerializeSetWithInfallible(
+    that.directions(),
+    stringification::LessByRankOfDirection,
+    SerializeEnumeration<types::Direction>
+  );
+
+  result["codes"] = SerializeSetWithInfallible(
+    that.codes(),
+    common::LessByCodePoints,
+    SerializeWstring
+  );
+
+  const common::optional<
+    std::unordered_set<std::wstring>
+  >& maybe_optional_texts(
+    that.optional_texts()
+  );
+  if (maybe_optional_texts.has_value()) {
+    result["optionalTexts"] = SerializeSetWithInfallible(
+      *maybe_optional_texts,
+      common::LessByCodePoints,
+      SerializeWstring
+    );
+  }
+
+  const common::optional<
+    std::unordered_set<types::Direction, common::EnumHash>
+  >& maybe_optional_directions(
+    that.optional_directions()
+  );
+  if (maybe_optional_directions.has_value()) {
+    result["optionalDirections"] = SerializeSetWithInfallible(
+      *maybe_optional_directions,
+      stringification::LessByRankOfDirection,
+      SerializeEnumeration<types::Direction>
+    );
+  }
+
+  return std::make_pair<
+    common::optional<nlohmann::json>,
+    common::optional<SerializationError>
+  >(
+    common::make_optional<nlohmann::json>(std::move(result)),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
 > SerializeIClass(
   const types::IClass& that
 ) {
@@ -1844,6 +2455,10 @@ std::pair<
     case types::ModelType::kSomething:
       return SerializeSomething(
         dynamic_cast<const types::ISomething&>(that)
+      );
+    case types::ModelType::kCollection:
+      return SerializeCollection(
+        dynamic_cast<const types::ICollection&>(that)
       );
     default: {
       std::string message = common::Concat(

@@ -118,14 +118,12 @@ def _parse_method_name(type_anno: intermediate.TypeAnnotationUnion) -> Identifie
     """
     Name the function parsing a value of ``type_anno`` from a JSON node.
 
-    An atomic value already has a function of its own to be named after. A list
-    and a tuple do not, so they are composed out of the parsers of their items
-    and named by the moniker of the type (see
+    An atomic value already has a function of its own to be named after. A list,
+    a set and a tuple do not, so they are composed out of the parsers of their
+    items and named by the moniker of the type (see
     :py:func:`aas_core_codegen.java.common.type_moniker`).
     """
-    if isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
-    ):
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return Identifier(f"parse{java_common.type_moniker(type_anno)}")
 
     assert isinstance(
@@ -416,6 +414,51 @@ private static <T> Reporting.Result<List<T>> parseArray(
     )
 
 
+def _generate_parse_set_helper() -> Stripped:
+    """Generate the generic helper to parse a JSON array as a set."""
+    return Stripped(
+        f"""\
+/**
+ * Parse {{@code node}} as a JSON array, and every of its items with
+ * {{@code parseItem}}, into a set.
+ *
+ * <p>The items can come in any order, but a duplicate item is an error, so that
+ * no item is silently dropped.
+ *
+ * @param node JSON node to be parsed
+ * @param parseItem to parse a single item of the array
+ */
+private static <T> Reporting.Result<Set<T>> parseSet(
+{I}JsonNode node,
+{I}Function<JsonNode, Reporting.Result<? extends T>> parseItem) {{
+{I}if (!node.isArray()) {{
+{II}return notAJsonArray(node);
+{I}}}
+
+{I}final Set<T> result = new HashSet<>();
+
+{I}int index = 0;
+{I}for (JsonNode item : node) {{
+{II}final Reporting.Result<? extends T> parsedItem = parseItem.apply(item);
+{II}if (parsedItem.isError()) {{
+{III}return prependIndex(parsedItem, index);
+{II}}}
+
+{II}if (!result.add(parsedItem.getResult())) {{
+{III}final Reporting.Error error = new Reporting.Error(
+{IIII}"Expected unique items in the set, but the item is a duplicate");
+{III}error.prependSegment(new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(error);
+{II}}}
+
+{II}index++;
+{I}}}
+
+{I}return Reporting.Result.success(result);
+}}"""
+    )
+
+
 def _generate_parse_tuple_helper(arity: int) -> Stripped:
     """Generate the generic helper to parse a JSON array as a tuple."""
     type_params = [f"T{i + 1}" for i in range(arity)]
@@ -546,6 +589,20 @@ return parseArray(
 {I}{item_parser});"""
             )
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_parser = _item_parser_reference(type_anno.items)
+
+        description = f"a set of {{@code {java_common.generate_type(type_anno.items)}}}"
+
+        body = Stripped(f"return parseSet(node, {item_parser});")
+        if _FUNCTION_BODY_INDENTATION + len(body) > _MAX_LINE_LENGTH:
+            body = Stripped(
+                f"""\
+return parseSet(
+{I}node,
+{I}{item_parser});"""
+            )
+
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         item_parsers_joined = ",\n".join(
             _item_parser_reference(item_type_anno) for item_type_anno in type_anno.items
@@ -562,7 +619,7 @@ return parseTuple{len(type_anno.items)}(
 
     else:
         raise AssertionError(
-            f"Expected a list or a tuple type annotation, but got: {type_anno}"
+            f"Expected a list, a set or a tuple type annotation, but got: {type_anno}"
         )
 
     # NOTE (mristin):
@@ -706,11 +763,9 @@ def _generate_case_for_argument(
     json_name = cls.properties_by_name[arg.name].json_name
     assert not java_common.needs_escaping(json_name)
 
-    if isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
-    ):
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         # NOTE (mristin):
-        # A list and a tuple are parsed into their exact type, whereas an atomic
+        # A list, a set and a tuple are parsed into their exact type, whereas an atomic
         # value of one of our classes is parsed by the function of the concrete
         # class and hence only *extends* the type of the property.
         result_type = java_common.generate_type(type_anno)
@@ -1536,11 +1591,16 @@ def _generate_deserialize_impl(
         for type_anno in composed_type_annotations
     )
 
+    needs_parse_set = any(
+        isinstance(type_anno, intermediate.SetTypeAnnotation)
+        for type_anno in composed_type_annotations
+    )
+
     tuple_arities = intermediate.tuple_arities(symbol_table)
 
-    #: Both the array helper and the tuple helpers report a non-array and mark
+    #: The array, the set and the tuple helpers all report a non-array and mark
     #: the index of the item which failed.
-    needs_array_helpers = needs_parse_array or len(tuple_arities) > 0
+    needs_array_helpers = needs_parse_array or needs_parse_set or len(tuple_arities) > 0
 
     needs_check_model_type = any(
         cls.serialization.with_model_type for cls in parsed_classes
@@ -1603,6 +1663,9 @@ def _generate_deserialize_impl(
 
     if needs_parse_array:
         blocks.append(_generate_parse_array_helper())
+
+    if needs_parse_set:
+        blocks.append(_generate_parse_set_helper())
 
     for arity in tuple_arities:
         blocks.append(_generate_parse_tuple_helper(arity=arity))
@@ -1985,11 +2048,15 @@ def _item_type_annotations(
     and which we narrow here so that the leaf functions can simply say so in
     their signatures.
     """
-    items = (
-        [type_anno.items]
-        if isinstance(type_anno, intermediate.ListTypeAnnotation)
-        else list(type_anno.items)
-    )
+    items: List[intermediate.TypeAnnotationUnion]
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        items = [type_anno.items]
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        items = list(type_anno.items)
+    else:
+        assert_never(type_anno)
 
     result = []  # type: List[intermediate.AtomicTypeAnnotation]
     for item in items:
@@ -2023,6 +2090,15 @@ def _serializer_name(type_anno: intermediate.ContainerTypeAnnotation) -> Identif
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return Identifier(f"serialize{java_common.list_moniker(monikers[0])}")
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The items of a set are sorted before they are serialized, and they
+        # are sorted each in their own way, so we can not name the serializer
+        # after what the items are serialized as.
+        return Identifier(
+            f"serialize{java_common.set_moniker(java_common.set_items_moniker(type_anno.items))}"
+        )
+
     return Identifier(f"serialize{java_common.tuple_moniker(monikers)}")
 
 
@@ -2035,6 +2111,12 @@ def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped
     # has to be spelled out for the container to accept the list or the tuple
     # which a property actually holds. A scalar widens to nothing, so it needs
     # none.
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The items of a set are sorted before they are serialized, so the set
+        # must keep its items as precise as the sorting needs them.
+        return Stripped(f"Set<{java_common.generate_type(type_anno.items)}>")
+
     argument_types = []  # type: List[Stripped]
     for item_type_anno in _item_type_annotations(type_anno):
         value_type = _serialized_value_type(item_type_anno)
@@ -2113,8 +2195,21 @@ def _generate_composed_serializer(
         Stripped("final ArrayNode result = JsonNodeFactory.instance.arrayNode();")
     ]  # type: List[Stripped]
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
         item_type = _serialized_value_type(item_type_annos[0])
+
+        # NOTE (mristin):
+        # A set is serialized as an array of its items sorted in the same order
+        # in all the targets, so that the index on the error path points to
+        # the item in the written array.
+        items_expr = (
+            java_common.sorted_set_items(item_type_annos[0], Stripped("that"))
+            if isinstance(type_anno, intermediate.SetTypeAnnotation)
+            else Stripped("that")
+        )
+
         conversion = _serialize_call(
             type_anno=item_type_annos[0],
             source_expr=Stripped("item"),
@@ -2131,7 +2226,7 @@ def _generate_composed_serializer(
             Stripped(
                 f"""\
 int i = 0;
-for ({item_type} item : that) {{
+for ({item_type} item : {items_expr}) {{
 {I}try {{
 {II}result.add({indent_but_first_line(conversion, II)});
 {I}}} catch (_SerializeFailure failure) {{
@@ -2170,6 +2265,8 @@ try {{
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         description = "every item of {@code that}"
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        description = "every item of {@code that}, in the sorted order,"
     else:
         description = f"each of the {len(item_type_annos)} items of {{@code that}}"
 
@@ -2272,11 +2369,6 @@ def _generate_transform_property(
         # :py:func:`_item_type_annotations`, which names the offending type,
         # and through which every use of the items goes.
         serializer = Stripped(_serializer_name(type_anno))
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
     else:
         serializer = _serialize_function(type_anno)
 
@@ -2415,10 +2507,7 @@ def _composed_serializer_type_annotations(
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-            if not isinstance(
-                type_anno,
-                (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-            ):
+            if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
                 continue
 
             name = _serializer_name(type_anno)
@@ -2446,12 +2535,6 @@ def _called_serialize_functions(
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-            if isinstance(type_anno, intermediate.SetTypeAnnotation):
-                raise AssertionError(
-                    f"Unexpected set in a property, as the sets are allowed only "
-                    f"in the arguments: {type_anno}"
-                )
 
             item_type_annos = (
                 _item_type_annotations(type_anno)
@@ -2913,16 +2996,21 @@ def generate(
         )
 
     # NOTE (mristin):
-    # A JSON-able value is walked with an iterator over the field names of
-    # an object, which no other conversion in this module needs.
-    if intermediate.uses_json_types(symbol_table):
-        imports.append(Stripped("import java.util.Iterator;"))
-
+    # We import the types of ``java.util`` one by one, and not on demand with
+    # a wildcard, since a class of the meta-model imported on demand as well,
+    # *e.g.*, ``Collection``, would make every reference to it ambiguous.
     imports.extend(
         [
             Stripped("import com.fasterxml.jackson.databind.node.JsonNodeFactory;"),
             Stripped("import com.fasterxml.jackson.databind.node.ObjectNode;"),
-            Stripped("import java.util.*;"),
+            Stripped("import java.util.ArrayList;"),
+            Stripped("import java.util.Base64;"),
+            Stripped("import java.util.HashSet;"),
+            Stripped("import java.util.Iterator;"),
+            Stripped("import java.util.List;"),
+            Stripped("import java.util.Map;"),
+            Stripped("import java.util.Optional;"),
+            Stripped("import java.util.Set;"),
         ]
     )
 

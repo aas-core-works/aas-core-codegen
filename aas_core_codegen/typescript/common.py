@@ -121,9 +121,9 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
     """
     Determine the moniker of the ``type_annotation``.
 
-    A moniker of a list or of a tuple is a Polish notation over ``_``-separated
-    tokens: ``ListOf_{M}`` takes exactly one argument, and ``TupleOf{N}_{M}...``
-    exactly ``N`` of them. As a leaf moniker never contains an underscore, such
+    A moniker of a list, of a set or of a tuple is a Polish notation over
+    ``_``-separated tokens: ``ListOf_{M}`` and ``SetOf_{M}`` take exactly one
+    argument, and ``TupleOf{N}_{M}...`` exactly ``N`` of them. As a leaf moniker never contains an underscore, such
     a name can always be split back into its parts, so the monikers are unique by
     construction and we need no check for collisions.
     """
@@ -132,11 +132,112 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return f"ListOf_{type_moniker(type_anno.items)}"
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"SetOf_{type_moniker(type_anno.items)}"
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         monikers = "_".join(type_moniker(item) for item in type_anno.items)
         return f"TupleOf{len(type_anno.items)}_{monikers}"
 
     return atomic_moniker(type_anno)
+
+
+# endregion
+
+# region Sorting of the sets
+
+
+def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
+    """
+    Check whether a class of the meta-model holds a set in one of its properties.
+
+    The sets in the properties are serialized as sorted arrays, so we generate
+    the helpers for sorting only if there is such a property.
+    """
+    return any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )
+
+
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """
+    List the enumerations whose literals a set in a property holds.
+
+    We generate the ranks of the literals only for these enumerations, see
+    :py:func:`generate_sorted_set_items`.
+    """
+    result = []  # type: List[intermediate.Enumeration]
+    for enumeration in symbol_table.enumerations:
+        if any(
+            isinstance(type_anno, intermediate.SetTypeAnnotation)
+            and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            and type_anno.items.our_type is enumeration
+            for cls in symbol_table.classes
+            for prop in cls.properties
+            for type_anno in (intermediate.beneath_optional(prop.type_annotation),)
+        ):
+            result.append(enumeration)
+
+    return result
+
+
+def generate_sorted_set_items(
+    type_anno: intermediate.SetTypeAnnotation, set_expression: Stripped
+) -> Stripped:
+    """
+    Generate the expression giving the items of the ``set_expression`` in an array.
+
+    The items are sorted in the order which is the same in all the SDKs: ``false``
+    before ``true``, the integers numerically, and the strings and the literals of
+    enumerations by the code points of their serialized values. The expression
+    names the helpers of the common module, and the stringification module
+    for the enumerations, where we rank the literals at the generation time.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+    if primitive_type is not None:
+        comparator: str
+        if primitive_type is intermediate.PrimitiveType.BOOL:
+            comparator = "AasCommon.compareBooleans"
+        elif primitive_type is intermediate.PrimitiveType.INT:
+            comparator = "AasCommon.compareNumbers"
+        elif primitive_type is intermediate.PrimitiveType.STR:
+            comparator = "AasCommon.compareByCodePoints"
+        elif primitive_type is intermediate.PrimitiveType.FLOAT:
+            raise AssertionError(
+                f"Unexpected set of floats, which should have been refused in "
+                f"the intermediate stage: {type_anno}"
+            )
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            raise AssertionError(
+                f"Unexpected set of byte arrays, which should have been refused in "
+                f"the intermediate stage: {type_anno}"
+            )
+        else:
+            assert_never(primitive_type)
+
+        return Stripped(f"Array.from({set_expression}).sort({comparator})")
+
+    assert isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.items.our_type, intermediate.Enumeration
+    ), (
+        f"Expected a set of primitives, constrained primitives or enumeration "
+        f"literals, as the other items should have been refused in "
+        f"the intermediate stage, but got: {type_anno}"
+    )
+
+    compare = typescript_naming.function_name(
+        Identifier(f"compare_by_rank_of_{type_anno.items.our_type.name}")
+    )
+
+    return Stripped(f"Array.from({set_expression}).sort(AasStringification.{compare})")
 
 
 # endregion

@@ -87,6 +87,41 @@ std::wstring to_wstring(
   types::Kind literal
 );
 
+/**
+ * Try to parse the \p text as a literal of
+ * types::Direction.
+ *
+ * \param text to be parsed
+ * \return literal, or nothing, if \p text invalid
+ */
+common::optional<types::Direction> DirectionFromWstring(
+  const std::wstring& text
+);
+
+/**
+ * Parse the \p text as a literal of
+ * types::Direction.
+ *
+ * \param text to be parsed
+ * \return literal
+ * \throw std::invalid_argument if \p text invalid
+ */
+types::Direction MustDirectionFromWstring(
+  const std::wstring& text
+);
+
+/**
+ * Translate the enumeration literal \p literal
+ * of types::Direction to text.
+ *
+ * \param literal to be converted into text
+ * \return text representation of \p literal
+ * \throw std::invalid_argument if \p literal invalid
+ */
+std::wstring to_wstring(
+  types::Direction literal
+);
+
 }  // namespace wstringification
 /**@}*/
 

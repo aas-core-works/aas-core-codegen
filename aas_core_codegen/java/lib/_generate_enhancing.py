@@ -325,7 +325,10 @@ public void {setter_name}({inner_type} {prop_name}) {{
     for prop in cls.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = java_naming.property_name(prop.name)
             method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
             getter_name = java_naming.getter_name(prop.name)
@@ -466,7 +469,7 @@ def _generate_enhanced(
         imports.extend(
             Stripped(f"import {set_import};")
             for set_import in java_common.set_imports_if_necessary(
-                cls.methods, with_bodies=False
+                cls, with_bodies=False
             )
         )
 
@@ -857,10 +860,11 @@ if (that.{getter_name}().isPresent()) {{
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, never one of our own classes, so there is nothing to
+            # enhance.
+            continue
 
         else:
             assert_never(type_anno.our_type)

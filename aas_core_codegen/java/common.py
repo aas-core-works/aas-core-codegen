@@ -1,12 +1,17 @@
 """Provide common functions shared among different Java code generation modules."""
 
-from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence
+from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence, Set
 import re
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, assert_never, indent_but_first_line
+from aas_core_codegen.common import (
+    Identifier,
+    Stripped,
+    assert_never,
+    indent_but_first_line,
+)
 from aas_core_codegen.java import naming as java_naming
 
 
@@ -151,18 +156,25 @@ def json_imports_if_necessary(
 
 
 def set_imports_if_necessary(
-    methods: Iterable[intermediate.Method], with_bodies: bool
+    cls: intermediate.Class, with_bodies: bool
 ) -> List[Stripped]:
     """
-    Give the imports of the sets if any of ``methods`` uses them.
+    Give the imports of the sets if the properties or the methods of ``cls`` use them.
 
-    We need ``Set`` for the set arguments. If ``with_bodies`` is set, we also
-    consider the local sets declared in the bodies, which need ``HashSet`` as well.
+    We need ``Set`` for the set properties and the set arguments. If
+    ``with_bodies`` is set, we also consider the local sets declared in the bodies
+    of the methods, which need ``HashSet`` as well.
     """
-    uses_set = False
+    uses_set = any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for prop in cls.properties
+    )
     uses_hash_set = False
 
-    for method in methods:
+    for method in cls.methods:
         if any(
             isinstance(
                 intermediate.beneath_optional(argument.type_annotation),
@@ -384,9 +396,9 @@ def leaf_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 
 
 # NOTE (mristin):
-# The two functions which follow are the whole grammar of a compound moniker:
-# a Polish notation over ``_``-separated tokens, where ``ListOf`` takes
-# exactly one argument and ``TupleOf{N}`` exactly ``N`` of them. They take
+# The three functions which follow are the whole grammar of a compound moniker:
+# a Polish notation over ``_``-separated tokens, where ``ListOf`` and ``SetOf``
+# take exactly one argument and ``TupleOf{N}`` exactly ``N`` of them. They take
 # the monikers of the items rather than the items themselves, because the two
 # sides of a de/serialization do not agree on what a leaf is: the reading
 # names a leaf by its very type (see :py:func:`leaf_moniker`), whereas
@@ -402,6 +414,11 @@ def leaf_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 def list_moniker(item_moniker: str) -> str:
     """Name a list whose item is named ``item_moniker``."""
     return f"ListOf_{item_moniker}"
+
+
+def set_moniker(item_moniker: str) -> str:
+    """Name a set whose item is named ``item_moniker``."""
+    return f"SetOf_{item_moniker}"
 
 
 @require(lambda item_monikers: len(item_monikers) > 0)
@@ -423,6 +440,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     """
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return list_moniker(type_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return set_moniker(type_moniker(type_anno.items))
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return tuple_moniker(
@@ -498,3 +518,119 @@ class JavaFile:
     ):
         self.name = name
         self.content = content
+
+
+def sorted_set_items(
+    items: intermediate.TypeAnnotationUnion, set_expr: Stripped
+) -> Stripped:
+    """
+    Generate the expression giving the items of the set ``set_expr`` as a sorted list.
+
+    The order is the same in all the targets: ``false`` before ``true``,
+    the integers numerically, the strings by their code points, and
+    the enumeration literals by the code points of their serialized values.
+    The native :py:meth:`String.compareTo` compares the UTF-16 code units
+    instead, which disagrees on the characters outside the Basic Multilingual
+    Plane, so we compare with the helpers in ``SetHelpers``. The literals are
+    ranked at the generation time, so they are compared without any
+    stringification at run time.
+    """
+    primitive_type = intermediate.try_primitive_type(items)
+    if primitive_type is not None:
+        if primitive_type is intermediate.PrimitiveType.STR:
+            return Stripped(f"SetHelpers.sortedByCodePoints({set_expr})")
+
+        elif (
+            primitive_type is intermediate.PrimitiveType.BOOL
+            or primitive_type is intermediate.PrimitiveType.INT
+        ):
+            return Stripped(f"SetHelpers.sorted({set_expr})")
+
+        elif (
+            primitive_type is intermediate.PrimitiveType.FLOAT
+            or primitive_type is intermediate.PrimitiveType.BYTEARRAY
+        ):
+            raise AssertionError(
+                f"Unexpected set of {primitive_type.value}, which should have been "
+                f"refused in intermediate._translate._verify_items_of_sets"
+            )
+
+        else:
+            assert_never(primitive_type)
+
+    assert isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
+        items.our_type, intermediate.Enumeration
+    ), (
+        f"Expected only primitives, constrained primitives and enumerations "
+        f"in a set, as the other items are refused in "
+        f"intermediate._translate._verify_items_of_sets, but got: {items}"
+    )
+
+    compare_name = java_naming.method_name(
+        Identifier(f"compare_by_rank_of_{items.our_type.name}")
+    )
+
+    return Stripped(f"SetHelpers.sortedBy({set_expr}, SetHelpers::{compare_name})")
+
+
+@ensure(lambda result: "_" not in result)
+def set_items_moniker(items: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Name how the ``items`` of a set are sorted, for a set serializer to be named after.
+
+    Unlike the lists, the sets of booleans, of integers, of strings and of
+    the different enumerations are sorted each in their own way before they are
+    serialized, so they can not share a serializer. A constrained primitive is
+    sorted exactly as its constrainee.
+    """
+    primitive_type = intermediate.try_primitive_type(items)
+    if primitive_type is not None:
+        return PRIMITIVE_TYPE_TO_MONIKER[primitive_type]
+
+    assert isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
+        items.our_type, intermediate.Enumeration
+    ), (
+        f"Expected only primitives, constrained primitives and enumerations "
+        f"in a set, as the other items are refused in "
+        f"intermediate._translate._verify_items_of_sets, but got: {items}"
+    )
+
+    return leaf_moniker(items)
+
+
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """List the enumerations held by the set properties, in the order of the classes."""
+    result = []  # type: List[intermediate.Enumeration]
+    observed = set()  # type: Set[Identifier]
+
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if not isinstance(type_anno, intermediate.SetTypeAnnotation):
+                continue
+
+            if not isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) or not isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                continue
+
+            enumeration = type_anno.items.our_type
+            if enumeration.name not in observed:
+                observed.add(enumeration.name)
+                result.append(enumeration)
+
+    return result
+
+
+def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
+    """Check whether any class of the meta-model has a set property."""
+    return any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )

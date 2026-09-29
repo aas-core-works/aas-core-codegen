@@ -22,6 +22,9 @@ public interface ITransformer<T> {
   T transformSomething(
     ISomething that
   );
+  T transformCollection(
+    ICollection that
+  );
 }
 
 /*

@@ -421,11 +421,73 @@ namespace dummy
             }
 
             /// <summary>
+            /// Read a content as a set of items, each read with
+            /// <paramref name="readItem" />.
+            /// </summary>
+            /// <remarks>
+            /// A self-closing element represents an empty set. The items can come in
+            /// any order, but a duplicate item is reported as an error.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single set item</typeparam>
+            private static ContentReader<HashSet<T>> AsSet<T>(
+                ElementReader<T> readItem
+                )
+            {
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+                    var result = new HashSet<T>();
+
+                    if (isEmpty)
+                    {
+                        return result;
+                    }
+
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    int index = 0;
+                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        T item = readItem(reader, out error);
+                        if (error == null && !result.Add(item))
+                        {
+                            error = new Reporting.Error(
+                                "Expected unique items in the set, but the item is a duplicate");
+                        }
+
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    index));
+                            return result;
+                        }
+
+                        index++;
+                        XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    }
+
+                    return result;
+                };
+            }
+
+            /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
             internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
                 AtElement<Aas.Something>(
                     SomethingFromSequence, "something"));
+
+            /// <summary>
+            /// Read an instance of class Collection from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Aas.Collection> CollectionFromElement = (
+                AtElement<Aas.Collection>(
+                    CollectionFromSequence, "collection"));
 
             private static readonly ContentReader<string> Read_string = (
                 AsText<string>(ReadContentAsString, ""));
@@ -459,6 +521,30 @@ namespace dummy
                 AsList<bool>(
                     AtElement(
                         Read_bool, "v")));
+
+            private static readonly ContentReader<HashSet<string>> Read_SetOf_string = (
+                AsSet<string>(
+                    AtElement(
+                        Read_string, "v")));
+
+            private static readonly ContentReader<HashSet<long>> Read_SetOf_long = (
+                AsSet<long>(
+                    AtElement(
+                        Read_long, "v")));
+
+            private static readonly ContentReader<HashSet<bool>> Read_SetOf_bool = (
+                AsSet<bool>(
+                    AtElement(
+                        Read_bool, "v")));
+
+            private static readonly ContentReader<Direction> Read_Direction = (
+                AsEnum<Aas.Direction>(
+                    Stringification.DirectionFromString));
+
+            private static readonly ContentReader<HashSet<Direction>> Read_SetOf_Direction = (
+                AsSet<Direction>(
+                    AtElement(
+                        Read_Direction, "v")));
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -724,6 +810,208 @@ namespace dummy
                     theOptionalTexts,
                     theOptionalKind);
             }  // internal static Aas.Something? SomethingFromSequence
+
+            /// <summary>
+            /// Deserialize an instance of class Collection from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.Collection CollectionFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                HashSet<string>? theTexts = null;
+                HashSet<long>? theNumbers = null;
+                HashSet<bool>? theFlags = null;
+                HashSet<Direction>? theDirections = null;
+                HashSet<string>? theCodes = null;
+                HashSet<string>? theOptionalTexts = null;
+                HashSet<Direction>? theOptionalDirections = null;
+
+                if (!isEmptySequence)
+                {
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class Collection, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+                    while (TryNextProperty(
+                            reader,
+                            out string elementName,
+                            out bool isEmptyProperty,
+                            out error))
+                    {
+                        switch (elementName)
+                        {
+                            case "texts":
+                                if (theTexts != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theTexts = Read_SetOf_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "numbers":
+                                if (theNumbers != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theNumbers = Read_SetOf_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "flags":
+                                if (theFlags != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theFlags = Read_SetOf_bool(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "directions":
+                                if (theDirections != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theDirections = Read_SetOf_Direction(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "codes":
+                                if (theCodes != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theCodes = Read_SetOf_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "optionalTexts":
+                                if (theOptionalTexts != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalTexts = Read_SetOf_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "optionalDirections":
+                                if (theOptionalDirections != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalDirections = Read_SetOf_Direction(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class Collection, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {elementName}");
+                                return default!;
+                        }
+
+                        // NOTE (mristin):
+                        // Every property is read in this very loop, so we mark the error with
+                        // the property's own element name here, once, instead of at every
+                        // single case above. For a matched case, elementName *is* that name.
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    elementName));
+                            return default!;
+                        }
+
+                        XmlCommon.ConsumeEndElement(
+                            reader, elementName, isEmptyProperty, out error);
+                        if (error != null)
+                        {
+                            return default!;
+                        }
+                    }
+
+                    // NOTE (mristin):
+                    // The loop also ends when the next property could not be read at all,
+                    // which is the only way out of it that is a failure.
+                    if (error != null)
+                    {
+                        return default!;
+                    }
+                }
+
+                if (theTexts == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Texts has not been given " +
+                        "in the XML representation of an instance of class Collection");
+                    return default!;
+                }
+
+                if (theNumbers == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Numbers has not been given " +
+                        "in the XML representation of an instance of class Collection");
+                    return default!;
+                }
+
+                if (theFlags == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Flags has not been given " +
+                        "in the XML representation of an instance of class Collection");
+                    return default!;
+                }
+
+                if (theDirections == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Directions has not been given " +
+                        "in the XML representation of an instance of class Collection");
+                    return default!;
+                }
+
+                if (theCodes == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Codes has not been given " +
+                        "in the XML representation of an instance of class Collection");
+                    return default!;
+                }
+
+                return new Aas.Collection(
+                    theTexts
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theNumbers
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theFlags
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDirections
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCodes
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalTexts,
+                    theOptionalDirections);
+            }  // internal static Aas.Collection? CollectionFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -782,6 +1070,40 @@ namespace dummy
                 }
 
                 Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Collection from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of Collection.
+            /// </exception>
+            public static Aas.Collection CollectionFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Collection, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Aas.Collection result = DeserializeImplementation.CollectionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -974,6 +1296,41 @@ namespace dummy
             }
 
             /// <summary>
+            /// Write the items of a set, each with <paramref name="writeItem" />, in
+            /// the order given by <paramref name="comparison" />.
+            /// </summary>
+            /// <remarks>
+            /// We write the items sorted, so that all the SDKs serialize a set in
+            /// the same order. An empty set writes no items at all, which the reading
+            /// sees as a self-closing element.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single set item</typeparam>
+            private static ContentWriter<HashSet<T>> WriteSet<T>(
+                ContentWriter<T> writeItem,
+                System.Comparison<T> comparison
+                )
+            {
+                return (that, writer) =>
+                {
+                    int index = 0;
+                    foreach (var item in Common.SetHelpers.Sorted(that, comparison))
+                    {
+                        try
+                        {
+                            writeItem(item, writer);
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.IndexSegment(index));
+                            throw;
+                        }
+                        index++;
+                    }
+                };
+            }
+
+            /// <summary>
             /// The one instance through which the writing is dispatched.
             /// </summary>
             /// <remarks>
@@ -1035,6 +1392,34 @@ namespace dummy
                     WrapInElement(
                         Write_bool, "v")));
 
+            private static readonly ContentWriter<HashSet<string>> Write_SetOf_string = (
+                WriteSet<string>(
+                    WrapInElement(
+                        Write_string, "v"),
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly ContentWriter<HashSet<long>> Write_SetOf_long = (
+                WriteSet<long>(
+                    WrapInElement(
+                        Write_long, "v"),
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly ContentWriter<HashSet<bool>> Write_SetOf_bool = (
+                WriteSet<bool>(
+                    WrapInElement(
+                        Write_bool, "v"),
+                    System.Collections.Generic.Comparer<bool>.Default.Compare));
+
+            private static readonly ContentWriter<Direction> Write_Direction = (
+                WriteEnum<Aas.Direction>(
+                    Stringification.ToString));
+
+            private static readonly ContentWriter<HashSet<Direction>> Write_SetOf_Direction = (
+                WriteSet<Direction>(
+                    WrapInElement(
+                        Write_Direction, "v"),
+                    Common.SetHelpers.CompareByRankOfDirection));
+
             private static void SomethingToSequence(
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
@@ -1092,6 +1477,59 @@ namespace dummy
                     "something",
                     NS);
                 SomethingToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private static void CollectionToSequence(
+                Aas.ICollection that,
+                Xml.XmlWriter writer)
+            {
+                WriteProperty(
+                    "texts", "Texts", that.Texts, writer, Write_SetOf_string);
+
+                WriteProperty(
+                    "numbers", "Numbers", that.Numbers, writer, Write_SetOf_long);
+
+                WriteProperty(
+                    "flags", "Flags", that.Flags, writer, Write_SetOf_bool);
+
+                WriteProperty(
+                    "directions", "Directions", that.Directions, writer, Write_SetOf_Direction);
+
+                WriteProperty(
+                    "codes", "Codes", that.Codes, writer, Write_SetOf_string);
+
+                if (that.OptionalTexts != null)
+                {
+                    WriteProperty(
+                        "optionalTexts",
+                        "OptionalTexts",
+                        that.OptionalTexts,
+                        writer,
+                        Write_SetOf_string);
+                }
+
+                if (that.OptionalDirections != null)
+                {
+                    WriteProperty(
+                        "optionalDirections",
+                        "OptionalDirections",
+                        that.OptionalDirections,
+                        writer,
+                        Write_SetOf_Direction);
+                }
+            }  // private static void CollectionToSequence
+
+            public override void VisitCollection(
+                Aas.ICollection that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "collection",
+                    NS);
+                CollectionToSequence(
                     that,
                     writer);
                 writer.WriteEndElement();

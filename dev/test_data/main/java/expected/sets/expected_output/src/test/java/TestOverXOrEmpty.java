@@ -27,6 +27,34 @@ public class TestOverXOrEmpty {
       assertEquals(length , count.get());
     }
   } // public void testSomethingoverOptionalTextsOrEmpty
+
+  @Test
+  public void testCollectionOverOptionalTextsOrEmpty() throws IOException {
+    for (Collection instance : new Collection[]
+    {
+      CommonJsonization.loadMinimalCollection(),
+      CommonJsonization.loadMaximalCollection()
+    }) {
+      int length = instance.getOptionalTexts().map(elem -> elem.size()).orElse(0);
+      AtomicInteger count = new AtomicInteger();
+      instance.overOptionalTextsOrEmpty().forEach(i -> count.getAndIncrement());
+      assertEquals(length , count.get());
+    }
+  } // public void testCollectionoverOptionalTextsOrEmpty
+
+  @Test
+  public void testCollectionOverOptionalDirectionsOrEmpty() throws IOException {
+    for (Collection instance : new Collection[]
+    {
+      CommonJsonization.loadMinimalCollection(),
+      CommonJsonization.loadMaximalCollection()
+    }) {
+      int length = instance.getOptionalDirections().map(elem -> elem.size()).orElse(0);
+      AtomicInteger count = new AtomicInteger();
+      instance.overOptionalDirectionsOrEmpty().forEach(i -> count.getAndIncrement());
+      assertEquals(length , count.get());
+    }
+  } // public void testCollectionoverOptionalDirectionsOrEmpty
 } // class TestOverXOrEmpty
 
 // package dummy.tests

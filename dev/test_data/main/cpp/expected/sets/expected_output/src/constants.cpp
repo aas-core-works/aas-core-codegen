@@ -28,7 +28,7 @@ const std::unordered_set<int64_t> kLuckyNumbers = {
   42
 };
 
-const std::unordered_set<types::Kind> kSpecialKinds = {
+const std::unordered_set<types::Kind, common::EnumHash> kSpecialKinds = {
   types::Kind::kBeta,
   types::Kind::kGamma
 };

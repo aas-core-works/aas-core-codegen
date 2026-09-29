@@ -2,10 +2,10 @@ from typing import Set
 
 
 class Something(DBC):
-    texts: Set[str]
+    numbers: Set[float]
 
-    def __init__(self, texts: Set[str]) -> None:
-        self.texts = texts
+    def __init__(self, numbers: Set[float]) -> None:
+        self.numbers = numbers
 
 
 __version__ = "dummy"

@@ -9,6 +9,77 @@
   ],
   "$id": "https://dummy.com",
   "definitions": {
+    "Collection": {
+      "type": "object",
+      "properties": {
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "uniqueItems": true,
+          "maxItems": 5
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          },
+          "uniqueItems": true
+        },
+        "directions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Direction"
+          },
+          "uniqueItems": true
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "optionalTexts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "optionalDirections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Direction"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "texts",
+        "numbers",
+        "flags",
+        "directions",
+        "codes"
+      ]
+    },
+    "Direction": {
+      "type": "string",
+      "enum": [
+        "down",
+        "right",
+        "up"
+      ]
+    },
     "Kind": {
       "type": "string",
       "enum": [

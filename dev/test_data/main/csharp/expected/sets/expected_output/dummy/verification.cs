@@ -347,6 +347,14 @@ namespace dummy
                 (int)Aas.Kind.Beta,
                 (int)Aas.Kind.Gamma
             };
+
+            internal static readonly HashSet<int> ForDirection = new HashSet<int>
+            {
+
+                (int)Aas.Direction.North,
+                (int)Aas.Direction.South,
+                (int)Aas.Direction.East
+            };
         }  // internal static class EnumValueSet
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -543,6 +551,120 @@ namespace dummy
                     }
                 }
             }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformCollection(
+                Aas.ICollection that
+            )
+            {
+                if (!that.TextsAreNotAllIn(Aas.Constants.ReservedTexts))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts must contain a text which is not reserved, if any.");
+                }
+
+                if (!(
+                    !(that.OptionalTexts != null)
+                    || (new HashSet<string>(that.OptionalTexts.Intersect(that.Texts)).Count == 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional texts must not share any text with texts.");
+                }
+
+                if (!(
+                    !that.Directions.Contains(Direction.North)
+                    || that.Directions.Contains(Direction.South)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Directions must contain south if they contain north.");
+                }
+
+                if (!(
+                    that.Numbers.All(
+                        number => number > -1000)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Numbers must be greater than -1000.");
+                }
+
+                if (!(that.Numbers.Count <= 5))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "There must be at most five numbers.");
+                }
+
+                if (!(!Verification.IsInTexts("forbidden", that.Texts)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts must not contain the forbidden text.");
+                }
+
+                int indexDirections = 0;
+                foreach (
+                    var item in Common.SetHelpers.Sorted(
+                        that.Directions,
+                        Common.SetHelpers.CompareByRankOfDirection))
+                {
+                    foreach (var error in Verification.VerifyDirection(item))
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                indexDirections));
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "directions"));
+                        yield return error;
+                    }
+                    indexDirections++;
+                }
+
+                int indexCodes = 0;
+                foreach (
+                    var item in Common.SetHelpers.Sorted(
+                        that.Codes,
+                        Common.SetHelpers.CompareByCodePoints))
+                {
+                    foreach (var error in Verification.VerifyCode(item))
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                indexCodes));
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "codes"));
+                        yield return error;
+                    }
+                    indexCodes++;
+                }
+
+                if (that.OptionalDirections != null)
+                {
+                    int indexOptionalDirections = 0;
+                    foreach (
+                        var item in Common.SetHelpers.Sorted(
+                            that.OptionalDirections,
+                            Common.SetHelpers.CompareByRankOfDirection))
+                    {
+                        foreach (var error in Verification.VerifyDirection(item))
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexOptionalDirections));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "optionalDirections"));
+                            yield return error;
+                        }
+                        indexOptionalDirections++;
+                    }
+                }
+            }
         }  // private class Transformer
 
         /// <summary>
@@ -570,6 +692,20 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Kind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDirection(
+            Aas.Direction that)
+        {
+            if (!EnumValueSet.ForDirection.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid Direction: {that}");
             }
         }
 

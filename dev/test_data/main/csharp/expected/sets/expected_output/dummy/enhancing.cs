@@ -155,6 +155,118 @@ namespace dummy
             }
         }
 
+        public class EnhancedCollection<TEnhancement>
+            : Enhanced<TEnhancement>, Aas.ICollection
+            where TEnhancement : class
+        {
+            private readonly Aas.ICollection _instance;
+
+            public EnhancedCollection(
+                Aas.ICollection instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public HashSet<string> Texts
+            {
+                get => _instance.Texts;
+                set => _instance.Texts = value;
+            }
+
+            public HashSet<long> Numbers
+            {
+                get => _instance.Numbers;
+                set => _instance.Numbers = value;
+            }
+
+            public HashSet<bool> Flags
+            {
+                get => _instance.Flags;
+                set => _instance.Flags = value;
+            }
+
+            public HashSet<Direction> Directions
+            {
+                get => _instance.Directions;
+                set => _instance.Directions = value;
+            }
+
+            public HashSet<string> Codes
+            {
+                get => _instance.Codes;
+                set => _instance.Codes = value;
+            }
+
+            public HashSet<string>? OptionalTexts
+            {
+                get => _instance.OptionalTexts;
+                set => _instance.OptionalTexts = value;
+            }
+
+            public HashSet<Direction>? OptionalDirections
+            {
+                get => _instance.OptionalDirections;
+                set => _instance.OptionalDirections = value;
+            }
+
+            public IEnumerable<string> OverOptionalTextsOrEmpty()
+            {
+                return _instance.OverOptionalTextsOrEmpty();
+            }
+
+            public IEnumerable<Aas.Direction> OverOptionalDirectionsOrEmpty()
+            {
+                return _instance.OverOptionalDirectionsOrEmpty();
+            }
+
+            public bool TextsAreNotAllIn(
+                HashSet<string> others
+            )
+            {
+                return _instance.TextsAreNotAllIn(
+                    others
+                );
+            }
+
+            public IEnumerable<Aas.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Aas.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Aas.Visitation.IVisitor visitor)
+            {
+                visitor.VisitCollection(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitCollection(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformCollection(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformCollection(_instance, context);
+            }
+        }
+
         internal class Wrapper<TEnhancement>
             : Aas.Visitation.AbstractTransformer<Aas.IClass>
             where TEnhancement : class
@@ -183,6 +295,26 @@ namespace dummy
                 return (enhancement == null)
                     ? that
                     : new EnhancedSomething<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
+            public override Aas.IClass TransformCollection(
+                Aas.ICollection that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedCollection<TEnhancement>(
                         that,
                         enhancement
                     );

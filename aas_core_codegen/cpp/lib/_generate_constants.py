@@ -327,9 +327,12 @@ def _generate_constant_set_of_enumeration_literals_definition(
 
     constant_name = cpp_naming.constant_name(constant.name)
 
-    writer.write(
-        f"extern const std::unordered_set<types::{enum_name}> {constant_name};"
+    set_type = cpp_common.generate_set_type(
+        item_type=Stripped(f"types::{enum_name}"),
+        items_are_enumeration_literals=True,
     )
+
+    writer.write(f"extern const {set_type} {constant_name};")
 
     return Stripped(writer.getvalue()), None
 
@@ -352,10 +355,15 @@ def _generate_constant_set_of_enumeration_literals_implementation(
 
     literals_joined = ",\n".join(literal_codes)
 
+    set_type = cpp_common.generate_set_type(
+        item_type=Stripped(f"types::{enum_name}"),
+        items_are_enumeration_literals=True,
+    )
+
     return (
         Stripped(
             f"""\
-const std::unordered_set<types::{enum_name}> {constant_name} = {{
+const {set_type} {constant_name} = {{
 {I}{indent_but_first_line(literals_joined, I)}
 }};"""
         ),

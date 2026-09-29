@@ -16,7 +16,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -257,6 +264,45 @@ public class Jsonization {
       }
 
       /**
+       * Parse {@code node} as a JSON array, and every of its items with
+       * {@code parseItem}, into a set.
+       *
+       * <p>The items can come in any order, but a duplicate item is an error, so that
+       * no item is silently dropped.
+       *
+       * @param node JSON node to be parsed
+       * @param parseItem to parse a single item of the array
+       */
+      private static <T> Reporting.Result<Set<T>> parseSet(
+        JsonNode node,
+        Function<JsonNode, Reporting.Result<? extends T>> parseItem) {
+        if (!node.isArray()) {
+          return notAJsonArray(node);
+        }
+
+        final Set<T> result = new HashSet<>();
+
+        int index = 0;
+        for (JsonNode item : node) {
+          final Reporting.Result<? extends T> parsedItem = parseItem.apply(item);
+          if (parsedItem.isError()) {
+            return prependIndex(parsedItem, index);
+          }
+
+          if (!result.add(parsedItem.getResult())) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected unique items in the set, but the item is a duplicate");
+            error.prependSegment(new Reporting.IndexSegment(index));
+            return Reporting.Result.failure(error);
+          }
+
+          index++;
+        }
+
+        return Reporting.Result.success(result);
+      }
+
+      /**
        * Parse {@code node} as a list of {@code String}.
        *
        * @param node JSON node to be parsed
@@ -293,12 +339,57 @@ public class Jsonization {
       }
 
       /**
+       * Parse {@code node} as a set of {@code String}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Set<String>> parseSetOf_string(JsonNode node) {
+        return parseSet(node, _DeserializeImplementation::tryStringFrom);
+      }
+
+      /**
+       * Parse {@code node} as a set of {@code Long}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Set<Long>> parseSetOf_long(JsonNode node) {
+        return parseSet(node, _DeserializeImplementation::tryLongFrom);
+      }
+
+      /**
+       * Parse {@code node} as a set of {@code Boolean}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Set<Boolean>> parseSetOf_bool(JsonNode node) {
+        return parseSet(node, _DeserializeImplementation::tryBooleanFrom);
+      }
+
+      /**
+       * Parse {@code node} as a set of {@code Direction}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Set<Direction>> parseSetOf_Direction(JsonNode node) {
+        return parseSet(node, _DeserializeImplementation::tryDirectionFrom);
+      }
+
+      /**
        * Deserialize the enumeration Kind from the {@code node}.
        *
        * @param node JSON node to be parsed
        */
       private static Reporting.Result<Kind> tryKindFrom(JsonNode node) {
         return tryEnumFrom(node, Stringification::kindFromString, Kind.class);
+      }
+
+      /**
+       * Deserialize the enumeration Direction from the {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Direction> tryDirectionFrom(JsonNode node) {
+        return tryEnumFrom(node, Stringification::directionFromString, Direction.class);
       }
 
       /**
@@ -457,6 +548,121 @@ public class Jsonization {
           theOptionalTexts,
           theOptionalKind));
       }
+
+      /**
+       * Deserialize an instance of Collection from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Collection> tryCollectionFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        Set<String> theTexts = null;
+        Set<Long> theNumbers = null;
+        Set<Boolean> theFlags = null;
+        Set<Direction> theDirections = null;
+        Set<String> theCodes = null;
+        Set<String> theOptionalTexts = null;
+        Set<Direction> theOptionalDirections = null;
+
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+          final JsonNode value = keyValue.getValue();
+
+          switch (key) {
+            case "texts": {
+              final Reporting.Result<Set<String>> parsed = parseSetOf_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theTexts = parsed.getResult();
+              break;
+            }
+            case "numbers": {
+              final Reporting.Result<Set<Long>> parsed = parseSetOf_long(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theNumbers = parsed.getResult();
+              break;
+            }
+            case "flags": {
+              final Reporting.Result<Set<Boolean>> parsed = parseSetOf_bool(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theFlags = parsed.getResult();
+              break;
+            }
+            case "directions": {
+              final Reporting.Result<Set<Direction>> parsed = parseSetOf_Direction(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theDirections = parsed.getResult();
+              break;
+            }
+            case "codes": {
+              final Reporting.Result<Set<String>> parsed = parseSetOf_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theCodes = parsed.getResult();
+              break;
+            }
+            case "optionalTexts": {
+              final Reporting.Result<Set<String>> parsed = parseSetOf_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalTexts = parsed.getResult();
+              break;
+            }
+            case "optionalDirections": {
+              final Reporting.Result<Set<Direction>> parsed = parseSetOf_Direction(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalDirections = parsed.getResult();
+              break;
+            }
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        if (theTexts == null) {
+          return missingRequiredProperty("texts");
+        }
+
+        if (theNumbers == null) {
+          return missingRequiredProperty("numbers");
+        }
+
+        if (theFlags == null) {
+          return missingRequiredProperty("flags");
+        }
+
+        if (theDirections == null) {
+          return missingRequiredProperty("directions");
+        }
+
+        if (theCodes == null) {
+          return missingRequiredProperty("codes");
+        }
+
+        return Reporting.Result.success(new Collection(
+          theTexts,
+          theNumbers,
+          theFlags,
+          theDirections,
+          theCodes,
+          theOptionalTexts,
+          theOptionalDirections));
+      }
     }
 
     /**
@@ -561,6 +767,23 @@ public class Jsonization {
       }
 
       /**
+       * Deserialize an instance of Direction from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Direction deserializeDirection(JsonNode node) {
+        final Reporting.Result<? extends Direction> result =
+          _DeserializeImplementation.tryDirectionFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
        * Deserialize an instance of Something from {@code node}.
        *
        * @param node JSON node to be parsed
@@ -568,6 +791,23 @@ public class Jsonization {
       public static Something deserializeSomething(JsonNode node) {
         final Reporting.Result<? extends Something> result =
           _DeserializeImplementation.trySomethingFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of Collection from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Collection deserializeCollection(JsonNode node) {
+        final Reporting.Result<? extends Collection> result =
+          _DeserializeImplementation.tryCollectionFrom(
             node);
 
         return result.onError(error -> {
@@ -789,6 +1029,94 @@ public class Jsonization {
         return result;
       }
 
+      /**
+       * Serialize every item of {@code that}, in the sorted order, into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeSetOf_string(
+        Set<String> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (String item : SetHelpers.sortedByCodePoints(that)) {
+          try {
+            result.add(stringToJsonNode(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order, into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeSetOf_long(
+        Set<Long> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (Long item : SetHelpers.sorted(that)) {
+          try {
+            result.add(longToJsonNode(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order, into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeSetOf_bool(
+        Set<Boolean> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (Boolean item : SetHelpers.sorted(that)) {
+          try {
+            result.add(boolToJsonNode(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order, into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeSetOf_Direction(
+        Set<Direction> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (IEnum item : SetHelpers.sortedBy(that, SetHelpers::compareByRankOfDirection)) {
+          try {
+            result.add(Serialize.toJsonValue(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
       @Override
       public JsonNode transformSomething(
         ISomething that
@@ -830,6 +1158,43 @@ public class Jsonization {
         setOptionalProperty(
           result, "optionalKind", "getOptionalKind()",
           that.getOptionalKind(), Serialize::toJsonValue);
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformCollection(
+        ICollection that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setProperty(
+          result, "texts", "getTexts()",
+          that.getTexts(), _Transformer::serializeSetOf_string);
+
+        setProperty(
+          result, "numbers", "getNumbers()",
+          that.getNumbers(), _Transformer::serializeSetOf_long);
+
+        setProperty(
+          result, "flags", "getFlags()",
+          that.getFlags(), _Transformer::serializeSetOf_bool);
+
+        setProperty(
+          result, "directions", "getDirections()",
+          that.getDirections(), _Transformer::serializeSetOf_Direction);
+
+        setProperty(
+          result, "codes", "getCodes()",
+          that.getCodes(), _Transformer::serializeSetOf_string);
+
+        setOptionalProperty(
+          result, "optionalTexts", "getOptionalTexts()",
+          that.getOptionalTexts(), _Transformer::serializeSetOf_string);
+
+        setOptionalProperty(
+          result, "optionalDirections", "getOptionalDirections()",
+          that.getOptionalDirections(), _Transformer::serializeSetOf_Direction);
 
         return result;
       }
@@ -883,6 +1248,13 @@ public class Jsonization {
        * Serialize a literal of Kind into a JSON string.
        */
       public static JsonNode kindToJsonValue(Kind that) {
+        return toJsonValue(that);
+      }
+
+      /**
+       * Serialize a literal of Direction into a JSON string.
+       */
+      public static JsonNode directionToJsonValue(Direction that) {
         return toJsonValue(that);
       }
     }

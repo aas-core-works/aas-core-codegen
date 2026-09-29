@@ -29,6 +29,16 @@ const char* StaticTypeName<
   aas::types::ISomething
 >::name = "ISomething";
 
+template<>
+struct StaticTypeName<
+  aas::types::ICollection
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  aas::types::ICollection
+>::name = "ICollection";
+
 std::shared_ptr<
   aas::types::ISomething
 > LoadSomething(
@@ -92,6 +102,73 @@ std::shared_ptr<
   );
 
   return LoadSomething(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::ICollection
+> LoadCollection(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    aas::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    aas::types::ICollection
+  > instance(
+    std::dynamic_pointer_cast<
+      aas::types::ICollection
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      aas::common::Concat(
+        "Failed to cast the instance to ICollection from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  aas::types::ICollection
+> LoadMinCollection() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "collection"
+      / "minimal.xml"
+  );
+
+  return LoadCollection(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::ICollection
+> LoadMaxCollection() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "collection"
+      / "maximal.xml"
+  );
+
+  return LoadCollection(
     path
   );
 }

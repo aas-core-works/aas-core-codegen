@@ -485,6 +485,55 @@ func parseArray[T any](
     )
 
 
+def _generate_parse_set() -> Stripped:
+    """Generate the generic helper to parse a JSON array item-by-item into a set."""
+    return Stripped(
+        f"""\
+// Parse `jsonable` as an array and parse every item with `parseItem` into a set,
+// or return an error.
+//
+// The items can come in any order, but they must be unique. We do not drop
+// a duplicate silently, but report it at its index in the array.
+func parseSet[T comparable](
+{I}jsonable interface{{}},
+{I}parseItem func(jsonable interface{{}}) (T, error),
+) (result map[T]struct{{}}, err error) {{
+{I}jsonableArray, ok := jsonable.([]interface{{}})
+{I}if !ok {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected an array, but got %T",
+{IIII}jsonable,
+{III}),
+{II})
+{II}return
+{I}}}
+
+{I}result = make(map[T]struct{{}}, len(jsonableArray))
+{I}for i, itemJsonable := range jsonableArray {{
+{II}var item T
+{II}item, err = parseItem(itemJsonable)
+{II}if err != nil {{
+{III}mustDeserializationError(err).prependIndex(i)
+{III}return
+{II}}}
+
+{II}if _, has := result[item]; has {{
+{III}deseriaErr := newDeserializationError(
+{IIII}"Expected unique items in the set, but the item is a duplicate",
+{III})
+{III}deseriaErr.prependIndex(i)
+{III}err = deseriaErr
+{III}return
+{II}}}
+
+{II}result[item] = struct{{}}{{}}
+{I}}}
+{I}return
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_parse_tuple_helper(arity: int) -> Stripped:
     """
@@ -1146,10 +1195,20 @@ def _generate_deserialization_switch_statement(
                 )
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"NOTE (mristin): We expect only sets of atomic types, "
+                f"as we refuse the others in "
+                f"intermediate._translate._verify_items_of_sets, "
+                f"but you specified {type_anno}."
             )
+
+            function = "parseSet"
+            arguments = [
+                "v",
+                _determine_parse_function_for_atomic_value(type_anno.items),
+            ]
 
         else:
             # noinspection PyTypeChecker
@@ -2089,7 +2148,7 @@ class _ItemSerializerWrappers:
 def _determine_item_serializer_wrappers(
     symbol_table: intermediate.SymbolTable,
 ) -> _ItemSerializerWrappers:
-    """Determine the wrappers needed to serialize the list and the tuple items."""
+    """Determine the wrappers needed to serialize the list, set and tuple items."""
     result = _ItemSerializerWrappers()
 
     enumeration_names = set()  # type: Set[Identifier]
@@ -2100,6 +2159,8 @@ def _determine_item_serializer_wrappers(
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
             if isinstance(type_anno, intermediate.ListTypeAnnotation):
+                item_type_annotations.append(type_anno.items)
+            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
                 item_type_annotations.append(type_anno.items)
             elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
                 item_type_annotations.extend(type_anno.items)
@@ -2263,10 +2324,9 @@ assert_union_without_excluded(
     original_union=intermediate.TypeAnnotationUnion,
     subset_union=TypeAnnotationExceptList,
     # NOTE (mristin):
-    # ``ListTypeAnnotation`` and ``TupleTypeAnnotation`` are handled directly in
-    # the calling code (see ``_generate_cls_to_map``), which unrolls them into
-    # calls of this function on the atomic items. The sets are allowed only in
-    # the arguments, so they are never serialized.
+    # ``ListTypeAnnotation``, ``SetTypeAnnotation`` and ``TupleTypeAnnotation``
+    # are handled directly in the calling code (see ``_generate_cls_to_map``),
+    # which unrolls them into calls of this function on the atomic items.
     excluded=[
         intermediate.ListTypeAnnotation,
         intermediate.TupleTypeAnnotation,
@@ -2437,6 +2497,28 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
                 access_expression,
                 _item_serializer_function(type_anno.items),
             ]
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"NOTE (mristin): We expect only sets of atomic types, "
+                f"as we refuse the others in "
+                f"intermediate._translate._verify_items_of_sets, "
+                f"but you specified {type_anno}."
+            )
+
+            # NOTE (mristin):
+            # We serialize a set as an array whose items are sorted in the same
+            # order in all the SDKs.
+            function = "serializeArray"
+            arguments = [
+                golang_common.sorted_set_items_expr(
+                    access_expression,
+                    type_anno.items,
+                    column=(indention + 1) * golang_common.TAB_WIDTH,
+                ),
+                _item_serializer_function(type_anno.items),
+            ]
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             item_serializers = []  # type: List[str]
 
@@ -2472,7 +2554,7 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
                     intermediate.JsonObjectTypeAnnotation,
                 ),
             ), (
-                f"Since {type_anno} is neither a list nor a tuple, "
+                f"Since {type_anno} is neither a list, a set nor a tuple, "
                 f"we expect the property to be atomic (optionally wrapped), "
                 f"but got {prop.type_annotation}."
             )
@@ -2790,6 +2872,9 @@ func mustDeserializationError(err error) *DeserializationError {{
     if len(symbol_table.named_unions) > 0:
         blocks.append(_generate_has_all_properties())
         blocks.append(_generate_union_from_map())
+
+    if golang_common.uses_set_properties(symbol_table):
+        blocks.append(_generate_parse_set())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_parse_tuple_helper(arity))

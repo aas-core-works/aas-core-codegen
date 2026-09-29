@@ -4,6 +4,7 @@ import io
 import re
 from typing import (
     List,
+    Set,
     cast,
     Tuple,
     Optional,
@@ -645,6 +646,43 @@ def typing_imports_for_sets(
         result.append(Identifier("Set"))
 
     return result
+
+
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """
+    List the enumerations whose literals are held in the set properties.
+
+    The enumerations are listed in the order of their definition in
+    the meta-model, each only once.
+    """
+    ids_in_sets = set()  # type: Set[int]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if (
+                isinstance(type_anno, intermediate.SetTypeAnnotation)
+                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+            ):
+                ids_in_sets.add(id(type_anno.items.our_type))
+
+    return [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if id(enumeration) in ids_in_sets
+    ]
+
+
+def rank_function_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """
+    Give out the name of the function ranking the literals of the ``enumeration``.
+
+    The function lives in the stringification module, see
+    :py:mod:`aas_core_codegen.python.lib._generate_stringification`.
+    """
+    return python_naming.function_name(Identifier(f"rank_of_{enumeration.name}"))
 
 
 INDENT2 = INDENT * 2

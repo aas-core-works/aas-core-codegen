@@ -291,6 +291,21 @@ public class Verification {
 
       forKind = Collections.unmodifiableSet(temp);
     }
+
+    private static final Set<Direction> forDirection;
+    static {
+      final Set<Direction> temp = new HashSet<>();
+
+      temp.add(Direction.NORTH);
+      temp.add(Direction.SOUTH);
+      temp.add(Direction.EAST);
+
+      if (!temp.containsAll(Arrays.asList(Direction.values()))) {
+        throw new IllegalStateException("Uncovered Direction");
+      }
+
+      forDirection = Collections.unmodifiableSet(temp);
+    }
   }
 
   private static final _Transformer transformer = new _Transformer();
@@ -487,6 +502,121 @@ public class Verification {
 
       return errorStream;
     }
+
+    @Override
+    public Stream<Reporting.Error> transformCollection(
+      ICollection that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!that.textsAreNotAllIn(Constants.reservedTexts)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts must contain a text which is not reserved, if any.")));
+      }
+
+      if (!(
+        !(that.getOptionalTexts().isPresent())
+        || (SetHelpers.intersection(that.getOptionalTexts().get(), that.getTexts()).size() == 0))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional texts must not share any text with texts.")));
+      }
+
+      if (!(
+        !that.getDirections().contains(Direction.NORTH)
+        || that.getDirections().contains(Direction.SOUTH))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Directions must contain south if they contain north.")));
+      }
+
+      if (!(
+        that.getNumbers().stream().allMatch(
+            number -> number > -1000))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Numbers must be greater than -1000.")));
+      }
+
+      if (!(that.getNumbers().size() <= 5)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "There must be at most five numbers.")));
+      }
+
+      if (!(!isInTexts("forbidden", that.getTexts()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts must not contain the forbidden text.")));
+      }
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Verification.zip(
+          IntStream.iterate(0, i -> i + 1).boxed(),
+          SetHelpers.sortedBy(that.getDirections(), SetHelpers::compareByRankOfDirection).stream())
+            .flatMap(elemTuple -> {
+              final int index = elemTuple.getFirst();
+              final Direction elem = elemTuple.getSecond();
+              return Verification.verifyDirection(elem)
+                .map(error -> {
+                  error.prependSegment(new Reporting.IndexSegment(index));
+                  return error;
+                });
+            })
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.NameSegment("directions"));
+            return error;
+          }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Verification.zip(
+          IntStream.iterate(0, i -> i + 1).boxed(),
+          SetHelpers.sortedByCodePoints(that.getCodes()).stream())
+            .flatMap(elemTuple -> {
+              final int index = elemTuple.getFirst();
+              final String elem = elemTuple.getSecond();
+              return Verification.verifyCode(elem)
+                .map(error -> {
+                  error.prependSegment(new Reporting.IndexSegment(index));
+                  return error;
+                });
+            })
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.NameSegment("codes"));
+            return error;
+          }));
+
+      if (that.getOptionalDirections().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Verification.zip(
+            IntStream.iterate(0, i -> i + 1).boxed(),
+            SetHelpers.sortedBy(that.getOptionalDirections().get(), SetHelpers::compareByRankOfDirection).stream())
+              .flatMap(elemTuple -> {
+                final int index = elemTuple.getFirst();
+                final Direction elem = elemTuple.getSecond();
+                return Verification.verifyDirection(elem)
+                  .map(error -> {
+                    error.prependSegment(new Reporting.IndexSegment(index));
+                    return error;
+                  });
+              })
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("optionalDirections"));
+              return error;
+            }));
+      }
+
+      return errorStream;
+    }
   }
 
   public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {
@@ -543,6 +673,19 @@ public class Verification {
     if (!_EnumValueSet.forKind.contains(that)) {
       return Stream.of(new Reporting.Error(
         "Invalid Kind: " + that));
+    } else {
+      return Stream.empty();
+    }
+  }
+
+  /**
+   * Verify that {@code that} is a valid enumeration value.
+   */
+  public static Stream<Reporting.Error> verifyDirection(
+    Direction that) {
+    if (!_EnumValueSet.forDirection.contains(that)) {
+      return Stream.of(new Reporting.Error(
+        "Invalid Direction: " + that));
     } else {
       return Stream.empty();
     }

@@ -8,6 +8,13 @@ with ``in``, the sets passed as read-only (``AbstractSet``) and as mutable
 We also check the iteration over the sets, their ``intersection``, ``difference``
 and ``len``. The order of the items in a set differs among the targets, so
 the results must not depend on it.
+
+The class ``Collection`` holds the sets in its properties, which the targets
+serialize as sorted arrays. We pick the items so that a wrong order shows: the
+strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+units than by code points, the integers differently as text than numerically,
+and the literals of ``Direction`` differently by their names or by their
+declaration than by their values.
 """
 
 
@@ -110,6 +117,16 @@ class Kind(enum.Enum):
     BETA = 'beta'
 
     GAMMA = 'gamma'
+
+
+class Direction(enum.Enum):
+    # pylint: disable=missing-class-docstring
+
+    NORTH = 'up'
+
+    SOUTH = 'down'
+
+    EAST = 'right'
 
 
 class Something(Class):
@@ -243,6 +260,127 @@ class Something(Class):
         self.optional_kind = optional_kind
 
 
+class Collection(Class):
+    # pylint: disable=missing-class-docstring
+
+    texts: Set[str]
+
+    numbers: Set[int]
+
+    flags: Set[bool]
+
+    directions: Set['Direction']
+
+    codes: Set[str]
+
+    optional_texts: Optional[Set[str]]
+
+    optional_directions: Optional[Set['Direction']]
+
+    def over_optional_texts_or_empty(
+            self
+    ) -> Iterator[str]:
+        """Yield from :py:attr:`.optional_texts` if set."""
+        if self.optional_texts is not None:
+            yield from self.optional_texts
+
+    def over_optional_directions_or_empty(
+            self
+    ) -> Iterator['Direction']:
+        """Yield from :py:attr:`.optional_directions` if set."""
+        if self.optional_directions is not None:
+            yield from self.optional_directions
+
+    def texts_are_not_all_in(
+        self,
+        others: AbstractSet[str]
+    ) -> bool:
+        """Check the difference of a set property and a set argument."""
+        # pylint: disable=all
+        return (
+            (
+                len(self.texts) == 0
+                or len(self.texts.difference(others)) > 0
+            ))
+
+    def descend_once(self) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this instance.
+
+        We do not recurse into the referenced instance.
+
+        :yield: instances directly referenced from this instance
+        """
+        # No descendable properties
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    def descend(self) -> Iterator[Class]:
+        """
+        Iterate recursively over the instances referenced from this one.
+
+        :yield: instances recursively referenced from this instance
+        """
+        # No descendable properties
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    def accept(self, visitor: "AbstractVisitor") -> None:
+        """Dispatch the :paramref:`visitor` on this instance."""
+        visitor.visit_collection(self)
+
+    def accept_with_context(
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
+    ) -> None:
+        """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
+        visitor.visit_collection_with_context(self, context)
+
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
+        """Dispatch the :paramref:`transformer` on this instance."""
+        return transformer.transform_collection(self)
+
+    def transform_with_context(
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
+    ) -> T:
+        """
+        Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
+        """
+        return transformer.transform_collection_with_context(
+            self, context)
+
+    def __init__(
+            self,
+            texts: Set[str],
+            numbers: Set[int],
+            flags: Set[bool],
+            directions: Set['Direction'],
+            codes: Set[str],
+            optional_texts: Optional[Set[str]] = None,
+            optional_directions: Optional[Set['Direction']] = None
+    ) -> None:
+        """Initialize with the given values."""
+        self.texts = texts
+        self.numbers = numbers
+        self.flags = flags
+        self.directions = directions
+        self.codes = codes
+        self.optional_texts = optional_texts
+        self.optional_directions = optional_directions
+
+
 class AbstractVisitor:
     """Visit the instances of the model."""
     def visit(
@@ -256,6 +394,14 @@ class AbstractVisitor:
     def visit_something(
             self,
             that: Something
+    ) -> None:
+        """Visit :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit_collection(
+            self,
+            that: Collection
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
@@ -280,6 +426,15 @@ class AbstractVisitorWithContext(Generic[ContextT]):
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def visit_collection_with_context(
+            self,
+            that: Collection,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
 
 class PassThroughVisitor(AbstractVisitor):
     """
@@ -298,6 +453,14 @@ class PassThroughVisitor(AbstractVisitor):
     def visit_something(
             self,
             that: Something
+    ) -> None:
+        """Visit :paramref:`that`."""
+        for another in that.descend_once():
+            self.visit(another)
+
+    def visit_collection(
+            self,
+            that: Collection
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
@@ -330,6 +493,15 @@ class PassThroughVisitorWithContext(
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
+    def visit_collection_with_context(
+            self,
+            that: Collection,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        for another in that.descend_once():
+            self.visit_with_context(another, context)
+
 
 class AbstractTransformer(Generic[T]):
     """Transform the instances of the model."""
@@ -344,6 +516,14 @@ class AbstractTransformer(Generic[T]):
     def transform_something(
             self,
             that: Something
+    ) -> T:
+        """Transform :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_collection(
+            self,
+            that: Collection
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
@@ -365,6 +545,15 @@ class AbstractTransformerWithContext(
     def transform_something_with_context(
             self,
             that: Something,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_collection_with_context(
+            self,
+            that: Collection,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
@@ -399,6 +588,13 @@ class TransformerWithDefault(AbstractTransformer[T]):
         """Transform :paramref:`that`."""
         return self.default
 
+    def transform_collection(
+            self,
+            that: Collection
+    ) -> T:
+        """Transform :paramref:`that`."""
+        return self.default
+
 
 class TransformerWithDefaultAndContext(
         AbstractTransformerWithContext[ContextT, T]
@@ -427,6 +623,14 @@ class TransformerWithDefaultAndContext(
     def transform_something_with_context(
             self,
             that: Something,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        return self.default
+
+    def transform_collection_with_context(
+            self,
+            that: Collection,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""

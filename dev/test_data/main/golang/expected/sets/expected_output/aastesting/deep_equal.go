@@ -134,6 +134,121 @@ func deepEqualSomething(
 	return true
 }
 
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
+func deepEqualCollection(
+	that aastypes.ICollection,
+	other aastypes.ICollection,
+) bool {
+	thatTexts := that.Texts()
+	otherTexts := other.Texts()
+	if 
+		len(thatTexts) !=
+		len(otherTexts) {
+		return false
+	}
+	for k := range thatTexts {
+		if _, ok := otherTexts[k]; !ok {
+			return false
+		}
+	}
+
+	thatNumbers := that.Numbers()
+	otherNumbers := other.Numbers()
+	if 
+		len(thatNumbers) !=
+		len(otherNumbers) {
+		return false
+	}
+	for k := range thatNumbers {
+		if _, ok := otherNumbers[k]; !ok {
+			return false
+		}
+	}
+
+	thatFlags := that.Flags()
+	otherFlags := other.Flags()
+	if 
+		len(thatFlags) !=
+		len(otherFlags) {
+		return false
+	}
+	for k := range thatFlags {
+		if _, ok := otherFlags[k]; !ok {
+			return false
+		}
+	}
+
+	thatDirections := that.Directions()
+	otherDirections := other.Directions()
+	if 
+		len(thatDirections) !=
+		len(otherDirections) {
+		return false
+	}
+	for k := range thatDirections {
+		if _, ok := otherDirections[k]; !ok {
+			return false
+		}
+	}
+
+	thatCodes := that.Codes()
+	otherCodes := other.Codes()
+	if 
+		len(thatCodes) !=
+		len(otherCodes) {
+		return false
+	}
+	for k := range thatCodes {
+		if _, ok := otherCodes[k]; !ok {
+			return false
+		}
+	}
+
+	thatOptionalTexts := that.OptionalTexts()
+	otherOptionalTexts := other.OptionalTexts()
+	if
+		(thatOptionalTexts == nil && otherOptionalTexts != nil) ||
+		(thatOptionalTexts != nil && otherOptionalTexts == nil) {
+		return false
+	}
+	if thatOptionalTexts != nil {
+		if 
+			len(thatOptionalTexts) !=
+			len(otherOptionalTexts) {
+			return false
+		}
+		for k := range thatOptionalTexts {
+			if _, ok := otherOptionalTexts[k]; !ok {
+				return false
+			}
+		}
+	}
+
+	thatOptionalDirections := that.OptionalDirections()
+	otherOptionalDirections := other.OptionalDirections()
+	if
+		(thatOptionalDirections == nil && otherOptionalDirections != nil) ||
+		(thatOptionalDirections != nil && otherOptionalDirections == nil) {
+		return false
+	}
+	if thatOptionalDirections != nil {
+		if 
+			len(thatOptionalDirections) !=
+			len(otherOptionalDirections) {
+			return false
+		}
+		for k := range thatOptionalDirections {
+			if _, ok := otherOptionalDirections[k]; !ok {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 func DeepEqual(
 	that aastypes.IClass,
 	other aastypes.IClass,
@@ -147,6 +262,11 @@ func DeepEqual(
 		return deepEqualSomething(
 			that.(aastypes.ISomething),
 			other.(aastypes.ISomething),
+		)
+	case aastypes.ModelTypeCollection:
+		return deepEqualCollection(
+			that.(aastypes.ICollection),
+			other.(aastypes.ICollection),
 		)
 	}
 

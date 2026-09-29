@@ -71,6 +71,21 @@ namespace dummy.Tests
                     "Something",
                     "maximal.json.trace"));
         }  // public void Test_Something
+
+        [Test]
+        public void Test_Collection()
+        {
+            Aas.Collection instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "Collection",
+                    "maximal.json.trace"));
+        }  // public void Test_Collection
     }  // class TestDescendOnce
 }  // namespace dummy.Tests
 

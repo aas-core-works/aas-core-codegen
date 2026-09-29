@@ -5,6 +5,7 @@
 
 #pragma warning(push, 0)
 #include <algorithm>
+#include <cstdint>
 #pragma warning(pop)
 
 // NOTE (mristin):
@@ -14223,6 +14224,57 @@ int64_t FindStr(
   return the_start + static_cast<int64_t>(
     CountCharacters(text, start_offset, offset)
   );
+}
+
+namespace {
+
+/**
+ * Decode the code point at \p offset in \p text, and move \p offset
+ * past it.
+ *
+ * A high surrogate followed by a low surrogate is decoded as a single code
+ * point. Any other code unit, including a lone surrogate, is taken as
+ * the code point itself. Where wchar_t has 32 bits, as on Linux, a well-formed
+ * text contains no surrogates, so that each code unit is a code point.
+ */
+std::uint32_t DecodeCodePoint(const std::wstring& text, size_t& offset) {
+  const std::uint32_t unit = static_cast<std::uint32_t>(text[offset]);
+  ++offset;
+
+  if (
+    unit >= 0xD800
+    && unit <= 0xDBFF
+    && offset < text.size()
+  ) {
+    const std::uint32_t next = static_cast<std::uint32_t>(text[offset]);
+    if (next >= 0xDC00 && next <= 0xDFFF) {
+      ++offset;
+      return 0x10000 + ((unit - 0xD800) << 10) + (next - 0xDC00);
+    }
+  }
+
+  return unit;
+}
+
+}  // namespace
+
+bool LessByCodePoints(
+  const std::wstring& that,
+  const std::wstring& other
+) {
+  size_t that_offset = 0;
+  size_t other_offset = 0;
+
+  while (that_offset < that.size() && other_offset < other.size()) {
+    const std::uint32_t that_code_point = DecodeCodePoint(that, that_offset);
+    const std::uint32_t other_code_point = DecodeCodePoint(other, other_offset);
+
+    if (that_code_point != other_code_point) {
+      return that_code_point < other_code_point;
+    }
+  }
+
+  return other_offset < other.size();
 }
 
 }  // namespace common

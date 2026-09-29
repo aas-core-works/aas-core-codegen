@@ -30,6 +30,22 @@ std::shared_ptr<
   dummy::types::ISomething
 > LoadMaxSomething();
 
+/**
+ * Load a minimal example of ICollection by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::ICollection
+> LoadMinCollection();
+
+/**
+ * Load a maximal example of ICollection by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::ICollection
+> LoadMaxCollection();
+
 }  // namespace examples
 }  // namespace common
 }  // namespace test

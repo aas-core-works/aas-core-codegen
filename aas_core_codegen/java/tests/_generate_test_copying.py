@@ -277,10 +277,25 @@ that.{getter_name}().equals(
                 )
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, which all override ``equals`` to compare by value, so
+            # ``Set.equals`` compares the sets by value as well.
+            if optional:
+                expr = Stripped(
+                    f"""\
+(that.{getter_name}().isPresent()
+{I}? casted.{getter_name}().isPresent()
+{II}&& that.{getter_name}().get().equals(
+{III}casted.{getter_name}().get())
+{I}: ! casted.{getter_name}().isPresent())"""
+                )
+            else:
+                expr = Stripped(
+                    f"""\
+that.{getter_name}().equals(
+{I}casted.{getter_name}())"""
+                )
 
         else:
             # noinspection PyTypeChecker
@@ -529,7 +544,11 @@ import {package}.types.model.*;
 import {package}.types.model.IClass;
 import {package}.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;

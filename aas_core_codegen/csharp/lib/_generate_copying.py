@@ -560,10 +560,21 @@ if (that.{prop_name} != null)
                     constructor_arg_exprs.append(deep_copy_expr)
 
             elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                raise AssertionError(
-                    f"Unexpected set in a property, as the sets are allowed only "
-                    f"in the arguments: {type_anno}"
-                )
+                # NOTE (mristin):
+                # A set holds only primitives, constrained primitives and
+                # enumeration literals, which are all immutable, so copying
+                # the set itself makes a deep copy.
+                set_type = csharp_common.generate_type(type_anno)
+
+                if optional:
+                    constructor_arg_exprs.append(
+                        f"""\
+(that.{prop_name} != null)
+{I}? new {set_type}(that.{prop_name})
+{I}: null"""
+                    )
+                else:
+                    constructor_arg_exprs.append(f"new {set_type}(that.{prop_name})")
 
             else:
                 # noinspection PyTypeChecker

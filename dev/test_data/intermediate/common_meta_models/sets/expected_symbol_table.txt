@@ -24,6 +24,30 @@ SymbolTable(
       literal_id_set=...,
       literal_value_set=...,
       parsed=...),
+    Enumeration(
+      name='Direction',
+      literals=[
+        EnumerationLiteral(
+          name='North',
+          value='up',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='South',
+          value='down',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='East',
+          value='right',
+          description=None,
+          parsed=...)],
+      description=None,
+      literals_by_name=...,
+      literals_by_value=...,
+      literal_id_set=...,
+      literal_value_set=...,
+      parsed=...),
     ConstrainedPrimitive(
       name='Code',
       inheritances=[],
@@ -850,18 +874,536 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Collection',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='texts',
+          type_annotation=SetTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='texts',
+          xml_name='texts',
+          parsed=...),
+        Property(
+          name='numbers',
+          type_annotation=SetTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='numbers',
+          xml_name='numbers',
+          parsed=...),
+        Property(
+          name='flags',
+          type_annotation=SetTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='BOOL',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='flags',
+          xml_name='flags',
+          parsed=...),
+        Property(
+          name='directions',
+          type_annotation=SetTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Direction',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='directions',
+          xml_name='directions',
+          parsed=...),
+        Property(
+          name='codes',
+          type_annotation=SetTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Code',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='codes',
+          xml_name='codes',
+          parsed=...),
+        Property(
+          name='optional_texts',
+          type_annotation=OptionalTypeAnnotation(
+            value=SetTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='optionalTexts',
+          xml_name='optionalTexts',
+          parsed=...),
+        Property(
+          name='optional_directions',
+          type_annotation=OptionalTypeAnnotation(
+            value=SetTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Direction',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Collection',
+          json_name='optionalDirections',
+          xml_name='optionalDirections',
+          parsed=...)],
+      methods=[
+        UnderstoodMethod(
+          name='texts_are_not_all_in',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='others',
+              type_annotation=SetTypeAnnotation(
+                items=PrimitiveTypeAnnotation(
+                  a_type='STR',
+                  parsed=...),
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check the difference of a set property and a set argument.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Collection',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=Or(
+                  values=[
+                    Comparison(
+                      left=FunctionCall(
+                        name='len',
+                        args=[
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='texts',
+                            original_node=...)],
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
+                        value=0,
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=FunctionCall(
+                        name='len',
+                        args=[
+                          MethodCall(
+                            member=Member(
+                              instance=Member(
+                                instance=Name(
+                                  identifier='self',
+                                  original_node=...),
+                                name='texts',
+                                original_node=...),
+                              name='difference',
+                              original_node=...),
+                            args=[
+                              Name(
+                                identifier='others',
+                                original_node=...)],
+                            original_node=...)],
+                        original_node=...),
+                      op='GT',
+                      right=Constant(
+                        value=0,
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...)],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='texts',
+            type_annotation=SetTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='numbers',
+            type_annotation=SetTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='flags',
+            type_annotation=SetTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='BOOL',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='directions',
+            type_annotation=SetTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Direction',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='codes',
+            type_annotation=SetTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Code',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='optional_texts',
+            type_annotation=OptionalTypeAnnotation(
+              value=SetTypeAnnotation(
+                items=PrimitiveTypeAnnotation(
+                  a_type='STR',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='optional_directions',
+            type_annotation=OptionalTypeAnnotation(
+              value=SetTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Direction',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='texts',
+              argument='texts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='numbers',
+              argument='numbers',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='flags',
+              argument='flags',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='directions',
+              argument='directions',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='codes',
+              argument='codes',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_texts',
+              argument='optional_texts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_directions',
+              argument='optional_directions',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='texts',
+              argument='texts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='numbers',
+              argument='numbers',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='flags',
+              argument='flags',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='directions',
+              argument='directions',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='codes',
+              argument='codes',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_texts',
+              argument='optional_texts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_directions',
+              argument='optional_directions',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description='Texts must contain a text which is not reserved, if any.',
+          body=textwrap.dedent("""\
+            MethodCall(
+              member=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='texts_are_not_all_in',
+                original_node=...),
+              args=[
+                Name(
+                  identifier='Reserved_texts',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...),
+        Invariant(
+          description='Optional texts must not share any text with texts.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_texts',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    MethodCall(
+                      member=Member(
+                        instance=Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='optional_texts',
+                          original_node=...),
+                        name='intersection',
+                        original_node=...),
+                      args=[
+                        Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='texts',
+                          original_node=...)],
+                      original_node=...)],
+                  original_node=...),
+                op='EQ',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...),
+        Invariant(
+          description='Directions must contain south if they contain north.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='Direction',
+                    original_node=...),
+                  name='North',
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='directions',
+                  original_node=...),
+                original_node=...),
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='Direction',
+                    original_node=...),
+                  name='South',
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='directions',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...),
+        Invariant(
+          description='Numbers must be greater than -1000.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='number',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='numbers',
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=Name(
+                  identifier='number',
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=-1000,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...),
+        Invariant(
+          description='There must be at most five numbers.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='numbers',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=5,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...),
+        Invariant(
+          description='Texts must not contain the forbidden text.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=FunctionCall(
+                name='is_in_texts',
+                args=[
+                  Constant(
+                    value='forbidden',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='texts',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Collection',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type Code',
+    'Reference to our type Collection',
     'Reference to our type Something'],
   enumerations=[
-    'Reference to our type Kind'],
+    'Reference to our type Kind',
+    'Reference to our type Direction'],
   constrained_primitives=[
     'Reference to our type Code'],
   classes=[
-    'Reference to our type Something'],
+    'Reference to our type Something',
+    'Reference to our type Collection'],
   concrete_classes=[
-    'Reference to our type Something'],
+    'Reference to our type Something',
+    'Reference to our type Collection'],
   named_unions=[],
   constants=[
     ConstantSetOfPrimitives(
@@ -1485,7 +2027,14 @@ SymbolTable(
         textwrap.dedent("""\
           <paragraph>We also check the iteration over the sets, their <literal>intersection</literal>, <literal>difference</literal>
           and <literal>len</literal>. The order of the items in a set differs among the targets, so
-          the results must not depend on it.</paragraph>""")],
+          the results must not depend on it.</paragraph>"""),
+        textwrap.dedent("""\
+          <paragraph>The class <literal>Collection</literal> holds the sets in its properties, which the targets
+          serialize as sorted arrays. We pick the items so that a wrong order shows: the
+          strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+          units than by code points, the integers differently as text than numerically,
+          and the literals of <literal>Direction</literal> differently by their names or by their
+          declaration than by their values.</paragraph>""")],
       constraints_by_identifier=[],
       parsed=...),
     version='dummy',

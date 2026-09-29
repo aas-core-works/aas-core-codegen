@@ -14,7 +14,11 @@ import dummy.types.model.*;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
@@ -40,6 +44,37 @@ public class TestCopying {
         && that.getFlags().equals(casted.getFlags())
         && that.getOptionalTexts().equals(casted.getOptionalTexts())
         && that.getOptionalKind().equals(casted.getOptionalKind()));
+    }
+
+    @Override
+    public Boolean transformCollection(ICollection that, IClass other) {
+      if (!(other instanceof Collection)) {
+        return false;
+      }
+
+      Collection casted = (Collection) that;
+
+      return (
+        that.getTexts().equals(
+          casted.getTexts())
+        && that.getNumbers().equals(
+          casted.getNumbers())
+        && that.getFlags().equals(
+          casted.getFlags())
+        && that.getDirections().equals(
+          casted.getDirections())
+        && that.getCodes().equals(
+          casted.getCodes())
+        && (that.getOptionalTexts().isPresent()
+          ? casted.getOptionalTexts().isPresent()
+            && that.getOptionalTexts().get().equals(
+              casted.getOptionalTexts().get())
+          : ! casted.getOptionalTexts().isPresent())
+        && (that.getOptionalDirections().isPresent()
+          ? casted.getOptionalDirections().isPresent()
+            && that.getOptionalDirections().get().equals(
+              casted.getOptionalDirections().get())
+          : ! casted.getOptionalDirections().isPresent()));
     }
   } // class _DeepEqualiser
 
@@ -119,7 +154,24 @@ public class TestCopying {
       && that.getOptionalKind().equals(other.getOptionalKind()));
   }
 
+  private static Boolean CollectionShallowEquals(
+    Collection that,
+    Collection other) {
+    return (
+      that.getTexts().equals(other.getTexts())
+      && that.getNumbers().equals(other.getNumbers())
+      && that.getFlags().equals(other.getFlags())
+      && that.getDirections().equals(other.getDirections())
+      && that.getCodes().equals(other.getCodes())
+      && that.getOptionalTexts().equals(other.getOptionalTexts())
+      && that.getOptionalDirections().equals(other.getOptionalDirections()));
+  }
+
   private static Boolean SomethingDeepEquals(Something that, Something other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean CollectionDeepEquals(Collection that, Collection other) {
     return DeepEqualiserInstance.transform(that, other);
   }
 
@@ -142,6 +194,26 @@ public class TestCopying {
       SomethingDeepEquals(instance, instanceCopy),
       "Something");
   } // public void testSomethingDeepCopy
+
+  @Test
+  public void testCollectionShallowCopy() throws IOException {
+    final Collection instance = CommonJsonization.loadMaximalCollection();
+    final Collection instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      CollectionShallowEquals(instance, instanceCopy),
+      "Collection");
+  } // public void testCollectionShallowCopy
+
+  @Test
+  public void testCollectionDeepCopy() throws IOException {
+    final Collection instance = CommonJsonization.loadMaximalCollection();
+    final Collection instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      CollectionDeepEquals(instance, instanceCopy),
+      "Collection");
+  } // public void testCollectionDeepCopy
 } // class TestCopying
 
 // package dummy.tests

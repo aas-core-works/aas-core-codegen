@@ -739,10 +739,10 @@ for (const {loop_var} of this.{prop_name}) {{
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, so there is nothing to descend into.
+            continue
 
         else:
             # noinspection PyTypeChecker
@@ -1139,7 +1139,10 @@ def _generate_interface(
     for prop in interface.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = typescript_naming.property_name(prop.name)
             items_type = typescript_common.generate_type(
                 prop.type_annotation.value.items
@@ -1510,7 +1513,10 @@ def _generate_class(
     for prop in cls.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = typescript_naming.property_name(prop.name)
             items_type = typescript_common.generate_type(
                 prop.type_annotation.value.items

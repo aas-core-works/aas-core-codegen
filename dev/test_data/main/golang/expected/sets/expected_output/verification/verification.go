@@ -16,6 +16,7 @@ import (
 	aascommon "github.com/dummy-works/dummy/common"
 	aasconstants "github.com/dummy-works/dummy/constants"
 	aasreporting "github.com/dummy-works/dummy/reporting"
+	aasstringification "github.com/dummy-works/dummy/stringification"
 	aastypes "github.com/dummy-works/dummy/types"
 )
 
@@ -661,6 +662,240 @@ func VerifySomething(
 	return
 }
 
+// Verify `that` instance of [aastypes.ICollection].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyCollection(
+	that aastypes.ICollection,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if !that.TextsAreNotAllIn(aasconstants.ReservedTexts) {
+		abort = onError(
+			newVerificationError(
+				"Texts must contain a text which is not reserved, if any.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.OptionalTexts() != nil) ||
+		(len(
+			aascommon.SetIntersection(
+				that.OptionalTexts(),
+				that.Texts(),
+			),
+		) == 0)) {
+		abort = onError(
+			newVerificationError(
+				"Optional texts must not share any text with texts.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!aascommon.MapContains(
+			that.Directions(),
+			aastypes.DirectionNorth,
+		) ||
+		aascommon.MapContains(
+			that.Directions(),
+			aastypes.DirectionSouth,
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Directions must contain south if they contain north.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		aascommon.AllKeys(
+			func(number int64) bool {
+				return number > -1000
+			},
+			that.Numbers(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Numbers must be greater than -1000.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(that.Numbers()) <= 5) {
+		abort = onError(
+			newVerificationError(
+				"There must be at most five numbers.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!IsInTexts("forbidden", that.Texts())) {
+		abort = onError(
+			newVerificationError(
+				"Texts must not contain the forbidden text.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Texts() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Texts",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Numbers() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Numbers",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Flags() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Flags",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Directions() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Directions",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		for i, v := range aascommon.SortedKeys(
+			that.Directions(),
+			aasstringification.LessByRankOfDirection,
+		) {
+			abort = VerifyDirection(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Directions",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.Codes() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Codes",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		for i, v := range aascommon.SortedKeys(
+			that.Codes(),
+			aascommon.LessOrdered[string],
+		) {
+			abort = VerifyCode(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Codes",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.OptionalDirections() != nil {
+		for i, v := range aascommon.SortedKeys(
+			that.OptionalDirections(),
+			aasstringification.LessByRankOfDirection,
+		) {
+			abort = VerifyDirection(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "OptionalDirections",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
 // Verify that `that` is a literal in the valid range
 // of Kind.
 //
@@ -681,6 +916,35 @@ func VerifyKind(
 			newVerificationError(
 				fmt.Sprintf(
 					"Invalid literal value for Kind: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of Direction.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyDirection(
+	that aastypes.Direction,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.DirectionNorth ||
+		that > aastypes.DirectionEast {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for Direction: %v",
 					that,
 				),
 			),
@@ -730,6 +994,11 @@ func Verify(
 	case aastypes.ModelTypeSomething:
 		abort = VerifySomething(
 			that.(aastypes.ISomething),
+			onError,
+		)
+	case aastypes.ModelTypeCollection:
+		abort = VerifyCollection(
+			that.(aastypes.ICollection),
 			onError,
 		)
 	default:

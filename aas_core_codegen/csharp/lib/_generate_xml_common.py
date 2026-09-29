@@ -29,6 +29,7 @@ class NeededCombinators:
         enumerations: bool,
         polymorphic: bool,
         lists: bool,
+        sets: bool,
         v_elements: bool,
         json_shapes: bool,
     ) -> None:
@@ -37,6 +38,7 @@ class NeededCombinators:
         self.enumerations = enumerations
         self.polymorphic = polymorphic
         self.lists = lists
+        self.sets = sets
         self.v_elements = v_elements
         self.json_shapes = json_shapes
 
@@ -78,6 +80,7 @@ def needed_combinators(
     enumerations = False
     polymorphic = False
     lists = False
+    sets = False
     v_elements = False
     json_shapes = False
 
@@ -91,7 +94,7 @@ def needed_combinators(
         de/serialize their own, self-describing element and hence need no
         dispatching combinator.
         """
-        nonlocal enumerations, polymorphic, lists, v_elements, json_shapes
+        nonlocal enumerations, polymorphic, lists, sets, v_elements, json_shapes
 
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
             primitive_types.add(type_anno.a_type)
@@ -154,10 +157,9 @@ def needed_combinators(
             v_elements = v_elements or nested
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            sets = True
+            v_elements = v_elements or nested
+            register(type_anno.items, nested=True)
 
         else:
             assert_never(type_anno)
@@ -171,6 +173,7 @@ def needed_combinators(
         enumerations=enumerations,
         polymorphic=polymorphic,
         lists=lists,
+        sets=sets,
         v_elements=v_elements,
         json_shapes=json_shapes,
     )

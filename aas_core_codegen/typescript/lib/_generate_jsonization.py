@@ -84,6 +84,71 @@ function parseArray<T>(
     )
 
 
+def _generate_parse_set() -> Stripped:
+    """
+    Generate the generic helper to parse a JSON array item-by-item into a set.
+
+    We accept the items in any order, but refuse a duplicate item at its own index,
+    so that no item is silently lost.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Parse `jsonable` as an array of unique items, each with `parseItem`, into a set.
+ *
+ * @param jsonable - to be parsed item-by-item
+ * @param parseItem - to parse a single item of `jsonable`
+ * @returns parsed items, or an error
+ * @typeParam T - type of a single parsed item
+ */
+function parseSet<T>(
+{I}jsonable: JsonValue,
+{I}parseItem: (
+{II}jsonableItem: JsonValue
+{I}) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<Set<T>, DeserializationError> {{
+{I}const iterableError = checkIsIterable(jsonable);
+{I}if (iterableError !== null) {{
+{II}return new AasCommon.Either<Set<T>, DeserializationError>(
+{III}null,
+{III}iterableError
+{II});
+{I}}}
+
+{I}const iterable = <Iterable<JsonValue>>jsonable;
+
+{I}const items = new Set<T>();
+{I}let i = 0;
+{I}for (const jsonableItem of iterable) {{
+{II}const itemOrError = parseItem(jsonableItem);
+{II}if (itemOrError.error !== null) {{
+{III}itemOrError.error.path.prepend(new IndexSegment(iterable, i));
+{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{IIII}null,
+{IIII}itemOrError.error
+{III});
+{II}}}
+
+{II}const item = itemOrError.mustValue();
+{II}if (items.has(item)) {{
+{III}const error = new DeserializationError(
+{IIII}"Expected unique items in the set, but the item is a duplicate"
+{III});
+{III}error.path.prepend(new IndexSegment(iterable, i));
+{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{IIII}null,
+{IIII}error
+{III});
+{II}}}
+
+{II}items.add(item);
+{II}i++;
+{I}}}
+{I}return new AasCommon.Either<Set<T>, DeserializationError>(items, null);
+}}"""
+    )
+
+
 def _generate_extract_model_type() -> Stripped:
     """
     Generate the generic helper to read the ``modelType`` property of an object.
@@ -1050,9 +1115,19 @@ parseTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            "The sets hold only primitives, constrained primitives and enumeration "
+            "literals; see intermediate._translate._verify_items_of_sets"
+        )
+
+        parse_item_function = _parse_function_for_atomic_value(type_anno.items)
+
+        return Stripped(
+            f"""\
+parseSet(
+{I}jsonableValue,
+{I}{parse_item_function}
+)"""
         )
 
     assert_never(type_anno)
@@ -1483,7 +1558,7 @@ def _serialize_enumeration_function_name(
 def _composed_serialize_function_name(
     type_anno: intermediate.ContainerTypeAnnotation,
 ) -> Identifier:
-    """Name the function serializing the list or the tuple ``type_anno``."""
+    """Name the function serializing the list, the set or the tuple ``type_anno``."""
     return Identifier(f"serialize_{typescript_common.type_moniker(type_anno)}")
 
 
@@ -1972,6 +2047,68 @@ function {function_name}(
     )
 
 
+def _generate_serialize_set(type_anno: intermediate.SetTypeAnnotation) -> Stripped:
+    """
+    Generate the function serializing the set ``type_anno`` as a sorted array.
+
+    The items are sorted first, so that a refused item is reported at its index
+    in the serialized array, just as for a list.
+    """
+    items_type_anno = type_anno.items
+    assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+        "The sets hold only primitives, constrained primitives and enumeration "
+        "literals; see intermediate._translate._verify_items_of_sets"
+    )
+
+    function_name = _composed_serialize_function_name(type_anno)
+
+    item_type = typescript_common.generate_type(
+        items_type_anno, types_module=Identifier("AasTypes")
+    )
+    jsonable_item_type = _jsonable_type_of_atomic(items_type_anno)
+
+    sorted_items = typescript_common.generate_sorted_set_items(
+        type_anno=type_anno, set_expression=Stripped("that")
+    )
+
+    serialize_item = _generate_serialize_call(
+        access_expression=Stripped("items[i]"), type_anno=items_type_anno
+    )
+
+    body = Stripped(
+        f"""\
+const items = {sorted_items};
+const result = new Array<{jsonable_item_type}>(items.length);
+let i = 0;
+try {{
+{I}for (; i < items.length; i++) {{
+{II}result[i] = {serialize_item};
+{I}}}
+}} catch (error) {{
+{I}if (error instanceof SerializationError) {{
+{II}error.prependIndex(i);
+{I}}}
+{I}throw error;
+}}
+return result;"""
+    )
+
+    return Stripped(
+        f"""\
+/**
+ * Serialize `that` to a JSON-able array of the sorted items.
+ *
+ * @param that - set to be serialized
+ * @returns JSON-able array
+ */
+function {function_name}(
+{I}that: ReadonlySet<{item_type}>
+): Array<{jsonable_item_type}> {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_serialize_tuple(type_anno: intermediate.TupleTypeAnnotation) -> Stripped:
     """
     Generate the function serializing the tuple ``type_anno``.
@@ -2074,15 +2211,20 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
         # and it copies at the speed of the engine.
         value_expression = Stripped(f"Array.from({access_expression})")
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation) and (
+        intermediate.try_primitive_type(type_anno.items)
+        in (intermediate.PrimitiveType.BOOL, intermediate.PrimitiveType.STR)
+    ):
+        # NOTE (mristin):
+        # Analogous to the lists above, a set of booleans or of strings needs no
+        # serializer of its own, only the sorting.
+        value_expression = typescript_common.generate_sorted_set_items(
+            type_anno=type_anno, set_expression=access_expression
+        )
+
     elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         function_name = _composed_serialize_function_name(type_anno)
         value_expression = Stripped(f"{function_name}({access_expression})")
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
 
     else:
         assert_never(type_anno)
@@ -2261,15 +2403,17 @@ def _needs_composed_serializer(
     """
     Check whether a value of ``type_anno`` is serialized by a composed serializer.
 
-    Only a list and a tuple have no function of their own to be named after, so
-    only they are composed out of the serialization of their items -- and a list of
-    booleans or of strings not even that, as ``Array.from`` already is the whole
-    conversion.
+    Only a list, a set and a tuple have no function of their own to be named after,
+    so only they are composed out of the serialization of their items -- and a list
+    or a set of booleans or of strings not even that, as ``Array.from``, followed by
+    the sorting for a set, already is the whole conversion.
     """
     if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return False
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
         return intermediate.try_primitive_type(type_anno.items) not in (
             intermediate.PrimitiveType.BOOL,
             intermediate.PrimitiveType.STR,
@@ -2282,7 +2426,7 @@ def _collect_composed_type_annotations(
     symbol_table: intermediate.SymbolTable,
 ) -> List[intermediate.ContainerTypeAnnotation]:
     """
-    List the lists and the tuples which need a serializer of their own.
+    List the lists, the sets and the tuples which need a serializer of their own.
 
     The result is de-duplicated by the name of the serializer, which follows
     the moniker of the type, so every list of the same item type collapses onto one
@@ -2722,6 +2866,11 @@ function newDeserializationError<T>(
         _generate_check_model_type(),
         _generate_check_is_iterable(),
         _generate_parse_array(),
+        *(
+            [_generate_parse_set()]
+            if typescript_common.has_set_properties(symbol_table)
+            else []
+        ),
         _generate_bool_from_jsonable(),
         _generate_int_from_jsonable(),
         _generate_float_from_jsonable(),
@@ -2784,8 +2933,12 @@ function newDeserializationError<T>(
     for composed_type_anno in _collect_composed_type_annotations(symbol_table):
         if isinstance(composed_type_anno, intermediate.ListTypeAnnotation):
             blocks.append(_generate_serialize_list(type_anno=composed_type_anno))
-        else:
+        elif isinstance(composed_type_anno, intermediate.SetTypeAnnotation):
+            blocks.append(_generate_serialize_set(type_anno=composed_type_anno))
+        elif isinstance(composed_type_anno, intermediate.TupleTypeAnnotation):
             blocks.append(_generate_serialize_tuple(type_anno=composed_type_anno))
+        else:
+            assert_never(composed_type_anno)
 
     blocks.append(_generate_transformer(symbol_table=symbol_table))
 

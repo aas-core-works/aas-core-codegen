@@ -1,0 +1,34 @@
+{
+  "texts": [
+    "Z",
+    "a",
+    "é",
+    "ﬁ",
+    "😀"
+  ],
+  "numbers": [
+    -5,
+    3,
+    10
+  ],
+  "flags": [
+    false,
+    true
+  ],
+  "directions": [
+    "down",
+    "right",
+    "up"
+  ],
+  "codes": [
+    "a",
+    "b"
+  ],
+  "optionalTexts": [
+    "x"
+  ],
+  "optionalDirections": [
+    "right",
+    "up"
+  ]
+}

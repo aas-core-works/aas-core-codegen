@@ -73,7 +73,9 @@ bool NumbersAreUniqueBetweenZeros(
 bool KindsAreUnique(
   const std::vector<types::Kind>& kinds
 ) {
-  std::unordered_set<types::Kind> seen = std::unordered_set<types::Kind>();
+  std::unordered_set<types::Kind, common::EnumHash> seen = (
+    std::unordered_set<types::Kind, common::EnumHash>()
+  );
   for (types::Kind kind : kinds) {
     if (seen.find(kind) != seen.end()) {
       return false;
@@ -159,7 +161,7 @@ bool IsInOptionalTexts(
 
 bool IsInKinds(
   types::Kind kind,
-  const std::unordered_set<types::Kind>& kinds
+  const std::unordered_set<types::Kind, common::EnumHash>& kinds
 ) {
   return kinds.find(kind) != kinds.end();
 }
@@ -293,7 +295,9 @@ bool SomeKindIsNotSpecial(
   const std::vector<types::Kind>& kinds,
   const common::optional<types::Kind>& optional_kind
 ) {
-  std::unordered_set<types::Kind> seen = std::unordered_set<types::Kind>();
+  std::unordered_set<types::Kind, common::EnumHash> seen = (
+    std::unordered_set<types::Kind, common::EnumHash>()
+  );
   for (types::Kind kind : kinds) {
     seen.insert(kind);
   }
@@ -322,7 +326,8 @@ namespace {
  */
 enum class Shape : std::uint32_t {
   kCode = 0,
-  kSomething = 1
+  kSomething = 1,
+  kCollection = 2
 };  // enum class Shape
 
 /**
@@ -542,6 +547,79 @@ bool Something_16(
   );
 }
 
+bool Collection_0(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return that->TextsAreNotAllIn(
+    constants::kReservedTexts
+  );
+}
+
+bool Collection_1(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return !(that->optional_texts().has_value())
+  || (common::Intersection(
+    (*(that->optional_texts())),
+    that->texts()
+  ).size() == 0);
+}
+
+bool Collection_2(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return !((that->directions()).find(
+    types::Direction::kNorth
+  ) != (that->directions()).end())
+  || (that->directions()).find(
+    types::Direction::kSouth
+  ) != (that->directions()).end();
+}
+
+bool Collection_3(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return common::All(
+    [&](int64_t number) -> bool {
+      return number > -1000;
+    },
+    that->numbers()
+  );
+}
+
+bool Collection_4(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return that->numbers().size() <= 5;
+}
+
+bool Collection_5(
+  const void* value
+) {
+  const types::ICollection* that = (
+    static_cast<const types::ICollection*>(value)
+  );
+  return !verification::IsInTexts(
+    L"forbidden",
+    that->texts()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -626,6 +704,35 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_16,
           L"Texts must be unique."
+        }
+      };
+      return checks;
+    }
+    case Shape::kCollection: {
+      static const std::vector<Check> checks = {
+        {
+          &Collection_0,
+          L"Texts must contain a text which is not reserved, if any."
+        },
+        {
+          &Collection_1,
+          L"Optional texts must not share any text with texts."
+        },
+        {
+          &Collection_2,
+          L"Directions must contain south if they contain north."
+        },
+        {
+          &Collection_3,
+          L"Numbers must be greater than -1000."
+        },
+        {
+          &Collection_4,
+          L"There must be at most five numbers."
+        },
+        {
+          &Collection_5,
+          L"Texts must not contain the forbidden text."
         }
       };
       return checks;
@@ -1095,7 +1202,144 @@ std::unique_ptr<IIterator> Each(
   return common::make_unique<EachIterator<T> >(&items, over_item, recursive);
 }
 
+/**
+ * \brief Iterate over the values of every item of a set, one item after
+ * another, in the order in which we serialize the set.
+ *
+ * The index in the path of an error is the index of the item in the serialized
+ * array. The items are sorted only once the iteration starts, and the iterator
+ * over an item is built only once the iteration reaches the item.
+ */
+template<typename T, typename HashT, typename LessT>
+class EachSortedIterator : public IIterator {
+ public:
+  /**
+   * Build the iterator over the values of an item
+   */
+  typedef std::unique_ptr<IIterator> (*OverItem)(const T& item, bool recursive);
+
+  EachSortedIterator(
+    const std::unordered_set<T, HashT>* items,
+    LessT less,
+    OverItem over_item,
+    bool recursive
+  ) :
+    items_(items),
+    less_(less),
+    over_item_(over_item),
+    recursive_(recursive),
+    index_(0) {
+    // Intentionally empty.
+  }
+
+  EachSortedIterator(const EachSortedIterator<T, HashT, LessT>& other) :
+    items_(other.items_),
+    less_(other.less_),
+    over_item_(other.over_item_),
+    recursive_(other.recursive_),
+    sorted_(other.sorted_),
+    index_(other.index_),
+    item_(other.item_ == nullptr ? nullptr : other.item_->Clone()) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    if (sorted_ == nullptr) {
+      sorted_ = std::make_shared<std::vector<const T*> >(
+        common::SortedPointers(*items_, less_)
+      );
+    }
+
+    index_ = 0;
+    item_ = nullptr;
+    SkipDoneItems();
+  }
+
+  void Next() override {
+    item_->Next();
+    SkipDoneItems();
+  }
+
+  bool Done() const override {
+    return index_ >= sorted_->size();
+  }
+
+  const void* Value() const override {
+    return item_->Value();
+  }
+
+  Shape ShapeOf() const override {
+    return item_->ShapeOf();
+  }
+
+  void AppendToPath(iteration::Path& path) const override {
+    path.segments.emplace_back(
+      common::make_unique<iteration::IndexSegment>(index_)
+    );
+    item_->AppendToPath(path);
+  }
+
+  std::unique_ptr<IIterator> Clone() const override {
+    return common::make_unique<EachSortedIterator<T, HashT, LessT> >(*this);
+  }
+
+ private:
+  const std::unordered_set<T, HashT>* items_;
+  LessT less_;
+  OverItem over_item_;
+  bool recursive_;
+
+  /**
+   * Pointers to the items, sorted once the iteration started, and shared among
+   * the clones as they never change
+   */
+  std::shared_ptr<const std::vector<const T*> > sorted_;
+
+  /**
+   * Index of the item we currently iterate over, in the sorted order
+   */
+  std::size_t index_;
+
+  /**
+   * Iterator over the current item, built once we reached the item
+   */
+  std::unique_ptr<IIterator> item_;
+
+  /**
+   * Move on to the next items, and build their iterators, until one is not done.
+   */
+  void SkipDoneItems() {
+    while (index_ < sorted_->size()) {
+      if (item_ == nullptr) {
+        item_ = over_item_(*(*sorted_)[index_], recursive_);
+        item_->Start();
+      }
+
+      if (!item_->Done()) {
+        return;
+      }
+
+      item_ = nullptr;
+      ++index_;
+    }
+  }
+};  // class EachSortedIterator
+
+template<typename T, typename HashT, typename LessT>
+std::unique_ptr<IIterator> EachSorted(
+  const std::unordered_set<T, HashT>& items,
+  LessT less,
+  std::unique_ptr<IIterator> (*over_item)(const T& item, bool recursive),
+  bool recursive
+) {
+  return common::make_unique<EachSortedIterator<T, HashT, LessT> >(
+    &items, less, over_item, recursive
+  );
+}
+
 using listOf_Code = std::vector<std::wstring>;
+
+using setOf_Code = std::unordered_set<std::wstring>;
 
 std::unique_ptr<IIterator> Over_Code(
   const std::wstring& value,
@@ -1111,6 +1355,18 @@ std::unique_ptr<IIterator> Over_listOf_Code(
   return Each(value, &Over_Code, recursive);
 }
 
+std::unique_ptr<IIterator> Over_setOf_Code(
+  const setOf_Code& value,
+  bool recursive
+) {
+  return EachSorted(
+    value,
+    common::LessByCodePoints,
+    &Over_Code,
+    recursive
+  );
+}
+
 std::unique_ptr<IIterator> Over_Something(
   const types::ISomething& that,
   bool recursive
@@ -1120,6 +1376,19 @@ std::unique_ptr<IIterator> Over_Something(
     InProperty(
       iteration::Property::kCodes,
       Over_listOf_Code(that.codes(), recursive)
+    )
+  );
+}
+
+std::unique_ptr<IIterator> Over_Collection(
+  const types::ICollection& that,
+  bool recursive
+) {
+  return Chain(
+    One(&that, Shape::kCollection),
+    InProperty(
+      iteration::Property::kCodes,
+      Over_setOf_Code(that.codes(), recursive)
     )
   );
 }
@@ -1135,6 +1404,11 @@ std::unique_ptr<IIterator> DispatchOnModelType(
     case types::ModelType::kSomething:
       return Over_Something(
         dynamic_cast<const types::ISomething&>(instance),
+        recursive
+      );
+    case types::ModelType::kCollection:
+      return Over_Collection(
+        dynamic_cast<const types::ICollection&>(instance),
         recursive
       );
     default:

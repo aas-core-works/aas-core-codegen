@@ -1489,10 +1489,10 @@ def _yields(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        # NOTE (mristin):
+        # A set holds only primitives and enumeration literals, never a reference
+        # to one of our own classes.
+        return False
 
     else:
         assert_never(type_annotation)

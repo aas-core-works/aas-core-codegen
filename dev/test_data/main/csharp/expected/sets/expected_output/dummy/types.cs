@@ -68,6 +68,18 @@ namespace dummy
         Gamma
     }
 
+    public enum Direction
+    {
+        [EnumMember(Value = "up")]
+        North,
+
+        [EnumMember(Value = "down")]
+        South,
+
+        [EnumMember(Value = "right")]
+        East
+    }
+
     public interface ISomething : IClass
     {
         public string Text { get; set; }
@@ -240,6 +252,161 @@ namespace dummy
             Flags = flags;
             OptionalTexts = optionalTexts;
             OptionalKind = optionalKind;
+        }
+    }
+
+    public interface ICollection : IClass
+    {
+        public HashSet<string> Texts { get; set; }
+
+        public HashSet<long> Numbers { get; set; }
+
+        public HashSet<bool> Flags { get; set; }
+
+        public HashSet<Direction> Directions { get; set; }
+
+        public HashSet<string> Codes { get; set; }
+
+        public HashSet<string>? OptionalTexts { get; set; }
+
+        public HashSet<Direction>? OptionalDirections { get; set; }
+
+        /// <summary>
+        /// Check the difference of a set property and a set argument.
+        /// </summary>
+        public bool TextsAreNotAllIn(HashSet<string> others);
+
+        /// <summary>
+        /// Iterate over the items of OptionalTexts in no particular order, if specified, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<string> OverOptionalTextsOrEmpty();
+
+        /// <summary>
+        /// Iterate over the items of OptionalDirections in no particular order, if specified, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Direction> OverOptionalDirectionsOrEmpty();
+    }
+
+    public class Collection : ICollection
+    {
+        public HashSet<string> Texts { get; set; }
+
+        public HashSet<long> Numbers { get; set; }
+
+        public HashSet<bool> Flags { get; set; }
+
+        public HashSet<Direction> Directions { get; set; }
+
+        public HashSet<string> Codes { get; set; }
+
+        public HashSet<string>? OptionalTexts { get; set; }
+
+        public HashSet<Direction>? OptionalDirections { get; set; }
+
+        /// <summary>
+        /// Iterate over the items of OptionalTexts in no particular order, if specified, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<string> OverOptionalTextsOrEmpty()
+        {
+            return OptionalTexts
+                ?? System.Linq.Enumerable.Empty<string>();
+        }
+
+        /// <summary>
+        /// Iterate over the items of OptionalDirections in no particular order, if specified, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Direction> OverOptionalDirectionsOrEmpty()
+        {
+            return OptionalDirections
+                ?? System.Linq.Enumerable.Empty<Direction>();
+        }
+
+        /// <summary>
+        /// Check the difference of a set property and a set argument.
+        /// </summary>
+        public bool TextsAreNotAllIn(
+            HashSet<string> others
+        )
+        {
+            return this.Texts.Count == 0
+            || new HashSet<string>(this.Texts.Except(others)).Count > 0;
+        }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitCollection(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitCollection(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformCollection(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformCollection(this, context);
+        }
+
+        public Collection(
+            HashSet<string> texts,
+            HashSet<long> numbers,
+            HashSet<bool> flags,
+            HashSet<Direction> directions,
+            HashSet<string> codes,
+            HashSet<string>? optionalTexts = null,
+            HashSet<Direction>? optionalDirections = null)
+        {
+            Texts = texts;
+            Numbers = numbers;
+            Flags = flags;
+            Directions = directions;
+            Codes = codes;
+            OptionalTexts = optionalTexts;
+            OptionalDirections = optionalDirections;
         }
     }
 }  // namespace dummy

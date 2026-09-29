@@ -32,40 +32,40 @@ struct HashBytes {
 extern const std::unordered_set<std::wstring> kValidCategoriesForDataElement;
 
 /// \brief Enumeration of all identifiable elements within an asset administration shell.
-extern const std::unordered_set<types::KeyTypes> kGenericFragmentKeys;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kGenericFragmentKeys;
 
 /// \brief Enumeration of different key value types within a key.
-extern const std::unordered_set<types::KeyTypes> kGenericGloballyIdentifiables;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kGenericGloballyIdentifiables;
 
 /// \brief Enumeration of different key value types within a key.
-extern const std::unordered_set<types::KeyTypes> kAasIdentifiables;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kAasIdentifiables;
 
 /// \brief Enumeration of all submodel elements within an asset administration shell.
-extern const std::unordered_set<types::KeyTypes> kAasSubmodelElementsAsKeys;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kAasSubmodelElementsAsKeys;
 
 /// \brief Enumeration of different fragment key value types within a key.
-extern const std::unordered_set<types::KeyTypes> kAasReferableNonIdentifiables;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kAasReferableNonIdentifiables;
 
 /// \brief Enumeration of referables. We need this to check that model references refer to a Referable. For example, the observed attribute of the Basic Event Element object must be a model reference to a Referable.
-extern const std::unordered_set<types::KeyTypes> kAasReferables;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kAasReferables;
 
 /// \brief Enumeration of all referable elements within an asset administration shell
-extern const std::unordered_set<types::KeyTypes> kGloballyIdentifiables;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kGloballyIdentifiables;
 
 /// \brief Enumeration of different key value types within a key.
-extern const std::unordered_set<types::KeyTypes> kFragmentKeys;
+extern const std::unordered_set<types::KeyTypes, common::EnumHash> kFragmentKeys;
 
 /// \brief IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.
-extern const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForPropertyOrValue;
+extern const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForPropertyOrValue;
 
 /// \brief IEC 61360 data types for concept descriptions categorized with REFERENCE.
-extern const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForReference;
+extern const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForReference;
 
 /// \brief IEC 61360 data types for concept descriptions categorized with DOCUMENT.
-extern const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForDocument;
+extern const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForDocument;
 
 /// \brief These data types imply that the unit is defined in the data specification.
-extern const std::unordered_set<types::DataTypeIec61360> kIec61360DataTypesWithUnit;
+extern const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kIec61360DataTypesWithUnit;
 
 }  // namespace common
 /**@}*/

@@ -43,6 +43,26 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         enhancement.get()
       );
   }
+
+  @Override
+  public IClass transformCollection(
+    ICollection that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedCollection<>(
+        that,
+        enhancement.get()
+      );
+  }
 }
 
 /*

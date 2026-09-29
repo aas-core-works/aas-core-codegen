@@ -8,6 +8,13 @@ with ``in``, the sets passed as read-only (``AbstractSet``) and as mutable
 We also check the iteration over the sets, their ``intersection``, ``difference``
 and ``len``. The order of the items in a set differs among the targets, so
 the results must not depend on it.
+
+The class ``Collection`` holds the sets in its properties, which the targets
+serialize as sorted arrays. We pick the items so that a wrong order shows: the
+strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+units than by code points, the integers differently as text than numerically,
+and the literals of ``Direction`` differently by their names or by their
+declaration than by their values.
 """
 from enum import Enum
 from typing import AbstractSet, List, Optional, Sequence, Set
@@ -19,6 +26,12 @@ class Kind(Enum):
     Alpha = "alpha"
     Beta = "beta"
     Gamma = "gamma"
+
+
+class Direction(Enum):
+    North = "up"
+    South = "down"
+    East = "right"
 
 
 @invariant(lambda self: len(self) > 0, "Code must not be empty.")
@@ -369,6 +382,65 @@ class Something(DBC):
         self.flags = flags
         self.optional_texts = optional_texts
         self.optional_kind = optional_kind
+
+
+@invariant(
+    lambda self: not is_in_texts("forbidden", self.texts),
+    "Texts must not contain the forbidden text.",
+)
+@invariant(
+    lambda self: len(self.numbers) <= 5,
+    "There must be at most five numbers.",
+)
+@invariant(
+    lambda self: all(number > -1000 for number in self.numbers),
+    "Numbers must be greater than -1000.",
+)
+@invariant(
+    lambda self: not (Direction.North in self.directions)
+    or Direction.South in self.directions,
+    "Directions must contain south if they contain north.",
+)
+@invariant(
+    lambda self: not (self.optional_texts is not None)
+    or len(self.optional_texts.intersection(self.texts)) == 0,
+    "Optional texts must not share any text with texts.",
+)
+@invariant(
+    lambda self: self.texts_are_not_all_in(Reserved_texts),
+    "Texts must contain a text which is not reserved, if any.",
+)
+class Collection(DBC):
+    texts: Set[str]
+    numbers: Set[int]
+    flags: Set[bool]
+    directions: Set[Direction]
+    codes: Set[Code]
+    optional_texts: Optional[Set[str]]
+    optional_directions: Optional[Set[Direction]]
+
+    @non_mutating
+    def texts_are_not_all_in(self, others: AbstractSet[str]) -> bool:
+        """Check the difference of a set property and a set argument."""
+        return len(self.texts) == 0 or len(self.texts.difference(others)) > 0
+
+    def __init__(
+        self,
+        texts: Set[str],
+        numbers: Set[int],
+        flags: Set[bool],
+        directions: Set[Direction],
+        codes: Set[Code],
+        optional_texts: Optional[Set[str]] = None,
+        optional_directions: Optional[Set[Direction]] = None,
+    ) -> None:
+        self.texts = texts
+        self.numbers = numbers
+        self.flags = flags
+        self.directions = directions
+        self.codes = codes
+        self.optional_texts = optional_texts
+        self.optional_directions = optional_directions
 
 
 __version__ = "dummy"

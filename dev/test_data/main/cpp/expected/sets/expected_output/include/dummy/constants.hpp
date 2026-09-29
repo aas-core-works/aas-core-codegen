@@ -34,7 +34,7 @@ extern const std::unordered_set<std::wstring> kReservedTexts;
 extern const std::unordered_set<int64_t> kLuckyNumbers;
 
 /// \brief List the special kinds.
-extern const std::unordered_set<types::Kind> kSpecialKinds;
+extern const std::unordered_set<types::Kind, common::EnumHash> kSpecialKinds;
 
 }  // namespace common
 /**@}*/

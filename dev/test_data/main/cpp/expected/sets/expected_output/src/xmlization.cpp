@@ -77,6 +77,28 @@ std::pair<
   xml_common::ReaderMergingText& reader
 );
 
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> CollectionFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::ICollection>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> CollectionFromSequence(
+  xml_common::ReaderMergingText& reader
+);
+
 // endregion Forward declarations of de-serialization functions
 
 /**
@@ -89,6 +111,10 @@ const std::unordered_map<
   {
     "something",
     types::ModelType::kSomething
+  },
+  {
+    "collection",
+    types::ModelType::kCollection
   }
 };
 
@@ -799,13 +825,41 @@ std::pair<
 > ClassFromElement(
   xml_common::ReaderMergingText& reader
 ) {
-  return DeserializeSoleFromElement<
+  return DeserializeFromElement<
     std::shared_ptr<types::IClass>
   >(
     reader,
     L"IClass",
-    types::ModelType::kSomething,
-    SomethingFromSequence<types::IClass>
+    [](
+      xml_common::ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IClass> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSomething:
+          return SomethingFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kCollection:
+          return CollectionFromSequence<
+            types::IClass
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IClass>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IClass from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -824,6 +878,24 @@ std::pair<
     L"ISomething",
     types::ModelType::kSomething,
     SomethingFromSequence<types::ISomething>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::ICollection>
+  >,
+  common::optional<DeserializationError>
+> CollectionFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::ICollection>
+  >(
+    reader,
+    L"ICollection",
+    types::ModelType::kCollection,
+    CollectionFromSequence<types::ICollection>
   );
 }
 
@@ -1454,6 +1526,108 @@ std::pair<
   }
 }
 
+/**
+ * \brief De-serialize a set of items, each wrapped in its own element.
+ *
+ * The items can come in any order, but we refuse the duplicates, as we would
+ * lose them silently otherwise.
+ *
+ * \tparam SetT type of the set, which might come with its own hasher
+ * \param reader to read from
+ * \param deserialize_item de-serializes an item
+ * \return the set, or an error, if any
+ */
+template <typename SetT, typename DeserializeT>
+std::pair<
+  common::optional<SetT >,
+  common::optional<DeserializationError>
+> DeserializeSet(
+  xml_common::ReaderMergingText& reader,
+  const DeserializeT& deserialize_item
+) {
+  typedef typename SetT::value_type T;
+
+  #ifdef DEBUG
+  if (reader.node().kind() == xml_common::NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeSet. "
+      "DeserializeSet expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<DeserializationError> error;
+
+  error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  SetT items;
+
+  // If we encounter the stop element then we reached the end of the set. If this is
+  // the first node we encounter then the set is empty, *i.e.*, contains no items.
+  if (reader.node().kind() == xml_common::NodeKind::Stop) {
+    return std::make_pair(
+      std::move(items),
+      common::nullopt
+    );
+  }
+
+  size_t i = 0;
+
+  while (true) {
+    common::optional<T> item;
+
+    std::tie(
+      item,
+      error
+    ) = deserialize_item(reader);
+
+    if (!error.has_value()) {
+      const bool inserted = items.insert(std::move(*item)).second;
+      if (!inserted) {
+        error = DeserializationError(
+          L"Expected unique items in the set, but the item is a duplicate"
+        );
+      }
+    }
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<xml_path::IndexSegment>(i)
+      );
+      break;
+    }
+
+    error = SkipWhitespace(reader);
+    if (error.has_value()) {
+      break;
+    }
+
+    if (reader.node().kind() == xml_common::NodeKind::Stop) {
+      break;
+    }
+
+    ++i;
+  }
+
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  return std::make_pair(
+    std::move(items),
+    common::nullopt
+  );
+}
+
 std::pair<
   common::optional<types::Kind>,
   common::optional<DeserializationError>
@@ -1508,6 +1682,60 @@ std::pair<
   return std::make_pair(std::move(deserialized), common::nullopt);
 }
 
+std::pair<
+  common::optional<types::Direction>,
+  common::optional<DeserializationError>
+> DeserializeDirection(
+  xml_common::ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == xml_common::NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::Direction
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of Direction: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::Direction
+  > deserialized = wstringification::DirectionFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::Direction
+    >(
+      common::Concat(
+        L"Expected a literal of Direction, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
 /**
  * \brief Assign the value read to \p target, or return the error of the read.
  *
@@ -1551,6 +1779,16 @@ enum class OfSomething : std::uint32_t {
   kOptionalTexts = 8,
   kOptionalKind = 9
 };  // enum class OfSomething
+
+enum class OfCollection : std::uint32_t {
+  kTexts = 0,
+  kNumbers = 1,
+  kFlags = 2,
+  kDirections = 3,
+  kCodes = 4,
+  kOptionalTexts = 5,
+  kOptionalDirections = 6
+};  // enum class OfCollection
 
 const std::size_t kPropertyCountOfSomething = 10;
 
@@ -1597,6 +1835,42 @@ const std::unordered_map<
   {
     "optionalKind",
     OfSomething::kOptionalKind
+  }
+};
+
+const std::size_t kPropertyCountOfCollection = 7;
+
+const std::unordered_map<
+  std::string,
+  OfCollection
+> kMapOfCollection = {
+  {
+    "texts",
+    OfCollection::kTexts
+  },
+  {
+    "numbers",
+    OfCollection::kNumbers
+  },
+  {
+    "flags",
+    OfCollection::kFlags
+  },
+  {
+    "directions",
+    OfCollection::kDirections
+  },
+  {
+    "codes",
+    OfCollection::kCodes
+  },
+  {
+    "optionalTexts",
+    OfCollection::kOptionalTexts
+  },
+  {
+    "optionalDirections",
+    OfCollection::kOptionalDirections
   }
 };
 
@@ -1889,6 +2163,260 @@ std::pair<
   );
 }
 
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::ICollection>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> CollectionFromSequence(
+  xml_common::ReaderMergingText& reader
+) {
+  // region Initialization
+
+  common::optional<std::unordered_set<std::wstring> > the_texts;
+
+  common::optional<std::unordered_set<int64_t> > the_numbers;
+
+  common::optional<std::unordered_set<bool> > the_flags;
+
+  common::optional<std::unordered_set<types::Direction, common::EnumHash> > the_directions;
+
+  common::optional<std::unordered_set<std::wstring> > the_codes;
+
+  common::optional<
+    std::unordered_set<std::wstring>
+  > the_optional_texts;
+
+  common::optional<
+    std::unordered_set<types::Direction, common::EnumHash>
+  > the_optional_directions;
+
+  // endregion Initialization
+
+  common::optional<DeserializationError> error(
+    ReadProperties<
+      properties::kPropertyCountOfCollection
+    >(
+      reader,
+      properties::kMapOfCollection,
+      L"ICollection",
+      [&](
+        properties::OfCollection property
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfCollection::kTexts:
+            return ReadInto(
+              the_texts,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    std::wstring
+                  >(
+                    a_reader,
+                    DeserializeWstring,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kNumbers:
+            return ReadInto(
+              the_numbers,
+              DeserializeSet<
+                std::unordered_set<int64_t>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    int64_t
+                  >(
+                    a_reader,
+                    DeserializeInt64,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kFlags:
+            return ReadInto(
+              the_flags,
+              DeserializeSet<
+                std::unordered_set<bool>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    bool
+                  >(
+                    a_reader,
+                    DeserializeBool,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kDirections:
+            return ReadInto(
+              the_directions,
+              DeserializeSet<
+                std::unordered_set<types::Direction, common::EnumHash>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    types::Direction
+                  >(
+                    a_reader,
+                    DeserializeDirection,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kCodes:
+            return ReadInto(
+              the_codes,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    std::wstring
+                  >(
+                    a_reader,
+                    DeserializeWstring,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kOptionalTexts:
+            return ReadInto(
+              the_optional_texts,
+              DeserializeSet<
+                std::unordered_set<std::wstring>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    std::wstring
+                  >(
+                    a_reader,
+                    DeserializeWstring,
+                    "v"
+                  );
+                }
+              )
+            );
+          case properties::OfCollection::kOptionalDirections:
+            return ReadInto(
+              the_optional_directions,
+              DeserializeSet<
+                std::unordered_set<types::Direction, common::EnumHash>
+              >(
+                reader,
+                [](xml_common::ReaderMergingText& a_reader) {
+                  return DeserializeValueFromVElement<
+                    types::Direction
+                  >(
+                    a_reader,
+                    DeserializeDirection,
+                    "v"
+                  );
+                }
+              )
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfCollection",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  // region Check required properties
+
+  if (!the_texts.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property texts is missing"
+    );
+  }
+
+  if (!the_numbers.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property numbers is missing"
+    );
+  }
+
+  if (!the_flags.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property flags is missing"
+    );
+  }
+
+  if (!the_directions.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property directions is missing"
+    );
+  }
+
+  if (!the_codes.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property codes is missing"
+    );
+  }
+
+  // endregion Check required properties
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::Collection(
+        std::move(*the_texts),
+        std::move(*the_numbers),
+        std::move(*the_flags),
+        std::move(*the_directions),
+        std::move(*the_codes),
+        std::move(the_optional_texts),
+        std::move(the_optional_directions)
+      )
+    ),
+    common::nullopt
+  );
+}
+
 template <typename ValueT, typename FromElementT>
 common::expected<
   ValueT,
@@ -1971,6 +2499,22 @@ common::expected<
     is,
     options,
     SomethingFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::ICollection>,
+  DeserializationError
+> CollectionFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::ICollection>
+  >(
+    is,
+    options,
+    CollectionFromElement
   );
 }
 
@@ -2283,11 +2827,123 @@ common::optional<xml_common::SerializationError> WriteListOfValuesProperty(
 }
 
 /**
+ * \brief Write \p set as the XML element of \p property, every item
+ * wrapped in a `<v>` element of its own, sorted by \p less.
+ *
+ * All the SDKs write the items in the same order. The path of an error refers
+ * to the index of the item in that order.
+ *
+ * \param name of the XML element
+ * \param set of the values
+ * \param writer to write to
+ * \param property which the element stands for, for the path of the error
+ * \param less compares two items for the order
+ * \param write_value writes a value between the tags of its `<v>`
+ * \return an error, if any
+ */
+template <
+  typename T,
+  typename HashT,
+  typename LessT,
+  typename WriteValueT
+>
+common::optional<xml_common::SerializationError> WriteSetOfValuesProperty(
+  const char* name,
+  const std::unordered_set<T, HashT>& set,
+  xml_common::SelfClosingWriter& writer,
+  iteration::Property property,
+  LessT less,
+  const WriteValueT& write_value
+) {
+  return WriteProperty(
+    name,
+    common::SortedPointers(set, less),
+    writer,
+    property,
+    [&write_value](
+      const std::vector<const T*>& sorted,
+      xml_common::SelfClosingWriter& a_writer
+    ) -> common::optional<xml_common::SerializationError> {
+      for (size_t i = 0; i < sorted.size(); ++i) {
+        common::optional<xml_common::SerializationError> error(
+          WriteElement("v", *sorted[i], a_writer, write_value)
+        );
+
+        if (error.has_value()) {
+          error->path.segments.emplace_front(
+            common::make_unique<iteration::IndexSegment>(i)
+          );
+
+          return error;
+        }
+      }
+
+      return common::nullopt;
+    }
+  );
+}
+
+/**
+ * \brief Write \p set as the XML element of \p property, or nothing at all
+ * if the property has not been given.
+ *
+ * See the overload which takes the set itself for what is written and
+ * for the path of the error.
+ */
+template <
+  typename T,
+  typename HashT,
+  typename LessT,
+  typename WriteValueT
+>
+common::optional<xml_common::SerializationError> WriteSetOfValuesProperty(
+  const char* name,
+  const common::optional<std::unordered_set<T, HashT> >& set,
+  xml_common::SelfClosingWriter& writer,
+  iteration::Property property,
+  LessT less,
+  const WriteValueT& write_value
+) {
+  if (!set.has_value()) {
+    return common::nullopt;
+  }
+
+  return WriteSetOfValuesProperty(
+    name,
+    *set,
+    writer,
+    property,
+    less,
+    write_value
+  );
+}
+
+/**
  * Serialize the literal of Kind
  * to XML text.
  */
 common::optional<xml_common::SerializationError> SerializeKind(
   types::Kind that,
+  xml_common::SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of Direction
+ * to XML text.
+ */
+common::optional<xml_common::SerializationError> SerializeDirection(
+  types::Direction that,
   xml_common::SelfClosingWriter& writer
 ) {
   writer.SerializeString(
@@ -2331,6 +2987,38 @@ common::optional<xml_common::SerializationError> SerializeSomethingAsElement(
 /** @copybrief SerializeSomethingAsElement(const types::ISomething&, xml_common::SelfClosingWriter& */
 common::optional<xml_common::SerializationError> SerializeSomethingPtrAsElement(
   const std::shared_ptr<types::ISomething>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeCollectionAsSequence(
+  const types::ICollection& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * Serialize \p that instance to an XML element
+ * `<collection>`.
+ *
+ * \param that instance to be serialized
+ * \return an error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeCollectionAsElement(
+  const types::ICollection& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeCollectionAsElement(const types::ICollection&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeCollectionPtrAsElement(
+  const std::shared_ptr<types::ICollection>& that,
   xml_common::SelfClosingWriter& writer
 );
 
@@ -2481,6 +3169,127 @@ common::optional<xml_common::SerializationError> SerializeSomethingPtrAsElement(
   return SerializeSomethingAsElement(*that, writer);
 }
 
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeCollectionAsSequence(
+  const types::ICollection& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  common::optional<xml_common::SerializationError> error;
+
+  error = WriteSetOfValuesProperty(
+    "texts",
+    that.texts(),
+    writer,
+    iteration::Property::kTexts,
+    common::LessByCodePoints,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "numbers",
+    that.numbers(),
+    writer,
+    iteration::Property::kNumbers,
+    std::less<int64_t>(),
+    WriteInt64
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "flags",
+    that.flags(),
+    writer,
+    iteration::Property::kFlags,
+    std::less<bool>(),
+    WriteBool
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "directions",
+    that.directions(),
+    writer,
+    iteration::Property::kDirections,
+    stringification::LessByRankOfDirection,
+    SerializeDirection
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "codes",
+    that.codes(),
+    writer,
+    iteration::Property::kCodes,
+    common::LessByCodePoints,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "optionalTexts",
+    that.optional_texts(),
+    writer,
+    iteration::Property::kOptionalTexts,
+    common::LessByCodePoints,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteSetOfValuesProperty(
+    "optionalDirections",
+    that.optional_directions(),
+    writer,
+    iteration::Property::kOptionalDirections,
+    stringification::LessByRankOfDirection,
+    SerializeDirection
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+common::optional<xml_common::SerializationError> SerializeCollectionAsElement(
+  const types::ICollection& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return WriteElement(
+    "collection",
+    that,
+    writer,
+    SerializeCollectionAsSequence
+  );
+}
+
+common::optional<xml_common::SerializationError> SerializeCollectionPtrAsElement(
+  const std::shared_ptr<types::ICollection>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeCollectionAsElement(*that, writer);
+}
+
 common::optional<xml_common::SerializationError> WriteClass(
   const types::IClass& that,
   xml_common::SelfClosingWriter& writer
@@ -2494,6 +3303,13 @@ common::optional<xml_common::SerializationError> WriteClass(
       return SerializeSomethingAsElement(
         dynamic_cast<
           const types::ISomething&
+        >(that),
+        writer
+      );
+    case types::ModelType::kCollection:
+      return SerializeCollectionAsElement(
+        dynamic_cast<
+          const types::ICollection&
         >(that),
         writer
       );

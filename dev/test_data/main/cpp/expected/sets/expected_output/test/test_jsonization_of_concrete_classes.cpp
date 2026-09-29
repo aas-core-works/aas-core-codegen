@@ -269,6 +269,62 @@ TEST_CASE("Test the de-serialization failure on an unexpected Something") {
   }
 }
 
+TEST_CASE("Test the round-trip of an expected Collection") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "Collection",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      aas::types::ICollection
+    >(path, aas::jsonization::CollectionFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected Collection") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "Collection",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        aas::types::ICollection
+      >(
+        path,
+        aas::jsonization::CollectionFrom,
+        error_path
+      );
+    }
+  }
+}
+
 TEST_CASE(
   "Test the serialization failure on an integer outside the range representable in JSON "
   "at .number of Something"

@@ -949,11 +949,26 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
             )
         )
 
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "We chose to implement only a very limited pattern matching; "
-            "see the note above in the code."
-        )
+    elif isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        if isinstance(type_anno, intermediate.ListTypeAnnotation):
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                "We chose to implement only a very limited pattern matching; "
+                "see the note above in the code."
+            )
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                "We expect only primitives, constrained primitives and enumeration "
+                "literals as items of a set, as the other items are refused in "
+                "intermediate._translate._verify_items_of_sets."
+            )
+        else:
+            assert_never(type_anno)
 
         # NOTE (empwilli):
         # We only descend into our classes here.
@@ -962,6 +977,16 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
 
         verify_method = _generate_verify_method(type_anno.items.our_type)
         item_type = java_common.generate_type(type_anno.items)
+
+        # NOTE (mristin):
+        # A set has no index of its own, so we verify its items in the order
+        # in which they are serialized. The index in the error path hence
+        # points to the item in the serialized array.
+        items_expr = (
+            java_common.sorted_set_items(type_anno.items, source_expr)
+            if isinstance(type_anno, intermediate.SetTypeAnnotation)
+            else source_expr
+        )
 
         # NOTE (mristin):
         # A named union item is matched by its own ``verifyToErrorStream``
@@ -974,7 +999,7 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
 errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Verification.zip(
 {II}IntStream.iterate(0, i -> i + 1).boxed(),
-{II}{source_expr}.stream())
+{II}{items_expr}.stream())
 {III}.flatMap(elemTuple -> {{
 {IIII}final int index = elemTuple.getFirst();
 {IIII}final {item_type} elem = elemTuple.getSecond();
@@ -1087,12 +1112,6 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
 {IIII}}})));"""
                 )
             )
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
 
     else:
         assert_never(type_anno)

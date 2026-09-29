@@ -25,22 +25,22 @@ const std::unordered_set<std::wstring> kValidCategoriesForDataElement = {
   L"VARIABLE"
 };
 
-const std::unordered_set<types::KeyTypes> kGenericFragmentKeys = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kGenericFragmentKeys = {
   types::KeyTypes::kFragmentReference
 };
 
-const std::unordered_set<types::KeyTypes> kGenericGloballyIdentifiables = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kGenericGloballyIdentifiables = {
   types::KeyTypes::kGlobalReference
 };
 
-const std::unordered_set<types::KeyTypes> kAasIdentifiables = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kAasIdentifiables = {
   types::KeyTypes::kAssetAdministrationShell,
   types::KeyTypes::kConceptDescription,
   types::KeyTypes::kIdentifiable,
   types::KeyTypes::kSubmodel
 };
 
-const std::unordered_set<types::KeyTypes> kAasSubmodelElementsAsKeys = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kAasSubmodelElementsAsKeys = {
   types::KeyTypes::kAnnotatedRelationshipElement,
   types::KeyTypes::kBasicEventElement,
   types::KeyTypes::kBlob,
@@ -60,7 +60,7 @@ const std::unordered_set<types::KeyTypes> kAasSubmodelElementsAsKeys = {
   types::KeyTypes::kSubmodelElementList
 };
 
-const std::unordered_set<types::KeyTypes> kAasReferableNonIdentifiables = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kAasReferableNonIdentifiables = {
   types::KeyTypes::kAnnotatedRelationshipElement,
   types::KeyTypes::kBasicEventElement,
   types::KeyTypes::kBlob,
@@ -80,7 +80,7 @@ const std::unordered_set<types::KeyTypes> kAasReferableNonIdentifiables = {
   types::KeyTypes::kSubmodelElementList
 };
 
-const std::unordered_set<types::KeyTypes> kAasReferables = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kAasReferables = {
   types::KeyTypes::kAssetAdministrationShell,
   types::KeyTypes::kConceptDescription,
   types::KeyTypes::kIdentifiable,
@@ -105,7 +105,7 @@ const std::unordered_set<types::KeyTypes> kAasReferables = {
   types::KeyTypes::kSubmodelElementList
 };
 
-const std::unordered_set<types::KeyTypes> kGloballyIdentifiables = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kGloballyIdentifiables = {
   types::KeyTypes::kGlobalReference,
   types::KeyTypes::kAssetAdministrationShell,
   types::KeyTypes::kConceptDescription,
@@ -113,7 +113,7 @@ const std::unordered_set<types::KeyTypes> kGloballyIdentifiables = {
   types::KeyTypes::kSubmodel
 };
 
-const std::unordered_set<types::KeyTypes> kFragmentKeys = {
+const std::unordered_set<types::KeyTypes, common::EnumHash> kFragmentKeys = {
   types::KeyTypes::kAnnotatedRelationshipElement,
   types::KeyTypes::kBasicEventElement,
   types::KeyTypes::kBlob,
@@ -134,7 +134,7 @@ const std::unordered_set<types::KeyTypes> kFragmentKeys = {
   types::KeyTypes::kSubmodelElementList
 };
 
-const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForPropertyOrValue = {
+const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForPropertyOrValue = {
   types::DataTypeIec61360::kDate,
   types::DataTypeIec61360::kString,
   types::DataTypeIec61360::kStringTranslatable,
@@ -151,19 +151,19 @@ const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForPropertyOr
   types::DataTypeIec61360::kTimestamp
 };
 
-const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForReference = {
+const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForReference = {
   types::DataTypeIec61360::kString,
   types::DataTypeIec61360::kIri,
   types::DataTypeIec61360::kIrdi
 };
 
-const std::unordered_set<types::DataTypeIec61360> kDataTypeIec61360ForDocument = {
+const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kDataTypeIec61360ForDocument = {
   types::DataTypeIec61360::kFile,
   types::DataTypeIec61360::kBlob,
   types::DataTypeIec61360::kHtml
 };
 
-const std::unordered_set<types::DataTypeIec61360> kIec61360DataTypesWithUnit = {
+const std::unordered_set<types::DataTypeIec61360, common::EnumHash> kIec61360DataTypesWithUnit = {
   types::DataTypeIec61360::kIntegerMeasure,
   types::DataTypeIec61360::kRealMeasure,
   types::DataTypeIec61360::kRationalMeasure,

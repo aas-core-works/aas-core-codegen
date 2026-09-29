@@ -440,6 +440,71 @@ class _Transformer(
                 )
                 yield error
 
+    # noinspection PyMethodMayBeStatic
+    def transform_collection(
+            self,
+            that: aas_types.Collection
+    ) -> Iterator[Error]:
+        if not (
+            that.texts_are_not_all_in(aas_constants.RESERVED_TEXTS)
+        ):
+            yield Error(
+                'Texts must contain a text which is not reserved, if any.'
+            )
+
+        if not (
+            not (that.optional_texts is not None)
+            or (len(that.optional_texts.intersection(that.texts)) == 0)
+        ):
+            yield Error(
+                'Optional texts must not share any text with texts.'
+            )
+
+        if not (
+            not (aas_types.Direction.NORTH in that.directions)
+            or (aas_types.Direction.SOUTH in that.directions)
+        ):
+            yield Error(
+                'Directions must contain south if they contain north.'
+            )
+
+        if not (
+            all(
+                number > -1000
+                for number in that.numbers
+            )
+        ):
+            yield Error(
+                'Numbers must be greater than -1000.'
+            )
+
+        if not (len(that.numbers) <= 5):
+            yield Error(
+                'There must be at most five numbers.'
+            )
+
+        if not (not is_in_texts('forbidden', that.texts)):
+            yield Error(
+                'Texts must not contain the forbidden text.'
+            )
+
+        sorted_codes = sorted(that.codes)
+        for i, an_item in enumerate(sorted_codes):
+            for error in verify_code(an_item):
+                error.path._prepend(
+                    IndexSegment(
+                        sorted_codes,
+                        i
+                    )
+                )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'codes'
+                    )
+                )
+                yield error
+
 
 _TRANSFORMER = _Transformer()
 

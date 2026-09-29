@@ -980,8 +980,8 @@ for error in {item_verify_function}(
 
         elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
             raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno.items}"
+                f"Unexpected list of sets, as the parser refuses the sets nested "
+                f"in the type annotations: {type_anno}"
             )
 
         else:
@@ -1233,9 +1233,46 @@ for key in that.{prop_name}:
             )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        constrained_primitive = intermediate.try_constrained_primitive(type_anno.items)
+
+        # NOTE (mristin):
+        # A set holds only primitives, constrained primitives and enumeration
+        # literals. We rely on mypy to check for valid enumerations, and there is
+        # nothing to verify about the primitives.
+        if constrained_primitive is None:
+            return Stripped(""), None
+
+        function_name = python_naming.function_name(
+            Identifier(f"verify_{constrained_primitive.name}")
+        )
+
+        loop_variable = next(generator_for_loop_variables)
+
+        # NOTE (mristin):
+        # A set has no index, so we report the position of the item in the sorted
+        # order, which is also its position in the serialized array.
+        sorted_name = f"sorted_{prop_name}"
+
+        stmts.append(
+            Stripped(
+                f"""\
+{sorted_name} = sorted(that.{prop_name})
+for i, {loop_variable} in enumerate({sorted_name}):
+{I}for error in {function_name}({loop_variable}):
+{II}error.path._prepend(
+{III}IndexSegment(
+{IIII}{sorted_name},
+{IIII}i
+{III})
+{II})
+{II}error.path._prepend(
+{III}PropertySegment(
+{IIII}that,
+{IIII}{prop_name_literal}
+{III})
+{II})
+{II}yield error"""
+            )
         )
 
     else:

@@ -301,6 +301,99 @@ public class TestXmlizationOfConcreteClasses {
   } // public void testSomethingVerificationFail
 
   @Test
+  public void testCollectionOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "collection");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final Collection instance =
+        Xmlization.Deserialize.deserializeCollection(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testCollectionOk
+
+  @Test
+  public void testCollectionDeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("collection");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Collection for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializeCollection(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testCollectionDeserializationFail
+
+  @Test
+  public void testCollectionVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "collection");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Collection for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final Collection instance =
+          Xmlization.Deserialize.deserializeCollection(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testCollectionVerificationFail
+
+  @Test
   public void testDuplicatePropertyFails() throws IOException, XMLStreamException {
     final Path path =
       Paths.get(

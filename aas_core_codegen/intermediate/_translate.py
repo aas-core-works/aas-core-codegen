@@ -5746,15 +5746,19 @@ def _assert_all_type_annotations_are_unique_instances(
             observed_set_of_type_anno_ids.add(type_anno_id)
 
 
-def _verify_items_of_set_arguments(symbol_table: SymbolTable) -> List[Error]:
-    """Check that the sets in the arguments hold only the supported items."""
+def _verify_items_of_sets(symbol_table: SymbolTable) -> List[Error]:
+    """Check that the sets in the arguments and properties hold supported items."""
     errors = []  # type: List[Error]
 
-    arguments_with_whats = [
+    typed_with_whats = []  # type: List[Tuple[Union[Argument, Property], str]]
+
+    typed_with_whats.extend(
         (arg, f"the argument {arg.name!r} of the verification function {func.name!r}")
         for func in symbol_table.verification_functions
         for arg in func.arguments
-    ] + [
+    )
+
+    typed_with_whats.extend(
         (
             arg,
             f"the argument {arg.name!r} of the method {method.name!r} "
@@ -5764,10 +5768,17 @@ def _verify_items_of_set_arguments(symbol_table: SymbolTable) -> List[Error]:
         for method in cls.methods
         if method.specified_for is cls
         for arg in method.arguments
-    ]
+    )
 
-    for arg, what in arguments_with_whats:
-        type_anno = beneath_optional(arg.type_annotation)
+    typed_with_whats.extend(
+        (prop, f"the property {prop.name!r} of the class {cls.name!r}")
+        for cls in symbol_table.classes
+        for prop in cls.properties
+        if prop.specified_for is cls
+    )
+
+    for typed, what in typed_with_whats:
+        type_anno = beneath_optional(typed.type_annotation)
         if not isinstance(type_anno, SetTypeAnnotation):
             continue
 
@@ -5775,7 +5786,7 @@ def _verify_items_of_set_arguments(symbol_table: SymbolTable) -> List[Error]:
             intermediate_type_inference.convert_type_annotation(type_anno.items)
         )
         if refusal is not None:
-            errors.append(Error(arg.parsed.node, f"In {what}: {refusal}"))
+            errors.append(Error(typed.parsed.node, f"In {what}: {refusal}"))
 
     return errors
 
@@ -6021,7 +6032,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
 
-    errors.extend(_verify_items_of_set_arguments(symbol_table=symbol_table))
+    errors.extend(_verify_items_of_sets(symbol_table=symbol_table))
 
     errors.extend(
         _verify_methods_refer_neither_to_constants_nor_verification_functions(

@@ -294,6 +294,108 @@ class NamespaceIdentifier(str):
 COMMON_CLASS: Final[Identifier] = Identifier("Common")
 
 
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """
+    List the enumerations whose literals are held by a set property.
+
+    Each of them needs a comparison of its own, so that the set is serialized
+    sorted by the serialized values of its literals.
+    """
+    result = []  # type: List[intermediate.Enumeration]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if (
+                isinstance(type_anno, intermediate.SetTypeAnnotation)
+                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+                and type_anno.items.our_type not in result
+            ):
+                result.append(type_anno.items.our_type)
+
+    return result
+
+
+def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
+    """Check whether any class of the meta-model has a set property."""
+    return any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )
+
+
+# NOTE (mristin):
+# The names of the helpers generated per enumeration in ``SetHelpers`` start with
+# a prefix, ``RankOf`` and ``CompareByRankOf``, with which no fixed helper there
+# starts. Hence a generated name can never coincide with a fixed one, whatever
+# the name of the enumeration, and there are no confusing overloads. For example,
+# an enumeration ``Code_points`` gives ``CompareByRankOfCodePoints``, and not
+# an overload of the fixed ``CompareByCodePoints``.
+
+
+def rank_of_enumeration_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """Name the helper in ``SetHelpers`` which ranks the literals of ``enumeration``."""
+    return Identifier(f"RankOf{csharp_naming.enum_name(enumeration.name)}")
+
+
+def compare_by_rank_of_enumeration_name(
+    enumeration: intermediate.Enumeration,
+) -> Identifier:
+    """Name the helper in ``SetHelpers`` which compares the literals by their rank."""
+    return Identifier(f"CompareByRankOf{csharp_naming.enum_name(enumeration.name)}")
+
+
+def set_items_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Generate the ``System.Comparison`` which sorts the ``items`` of a set.
+
+    The sets are serialized sorted, in the same order in all the SDKs: ``false``
+    before ``true``, the integers numerically, and the strings and the serialized
+    values of the enumeration literals by their code points.
+    """
+    if isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
+        items.our_type, intermediate.Enumeration
+    ):
+        method_name = compare_by_rank_of_enumeration_name(items.our_type)
+        return Stripped(f"{COMMON_CLASS}.SetHelpers.{method_name}")
+
+    primitive_type = intermediate.try_primitive_type(items)
+    assert primitive_type is not None, (
+        f"Expected the items of a set to be primitives, constrained primitives "
+        f"or enumeration literals, but got: {items}"
+    )
+
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return Stripped("System.Collections.Generic.Comparer<bool>.Default.Compare")
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("System.Collections.Generic.Comparer<long>.Default.Compare")
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(f"{COMMON_CLASS}.SetHelpers.CompareByCodePoints")
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        raise AssertionError(
+            f"Unexpected set of floats, as they are refused in "
+            f"intermediate._translate._verify_items_of_sets: {items}"
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        raise AssertionError(
+            f"Unexpected set of byte arrays, as they are refused in "
+            f"intermediate._translate._verify_items_of_sets: {items}"
+        )
+
+    else:
+        assert_never(primitive_type)
+
+
 WARNING: Final[Stripped] = Stripped(
     """\
 /*
@@ -394,7 +496,7 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     Name the type in a way usable as a part of a C# identifier.
 
     The monikers are a Polish notation over ``_``-separated tokens: ``ListOf``
-    takes exactly one argument, ``TupleOf{N}`` exactly ``N`` of them, and
+    and ``SetOf`` take exactly one argument, ``TupleOf{N}`` exactly ``N`` of them, and
     everything else is a leaf. A leaf token never contains an underscore
     (see :py:func:`leaf_moniker`), so the encoding is injective -- two
     different types can not be given the same moniker, and hence neither can
@@ -404,6 +506,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     """
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return f"ListOf_{type_moniker(type_anno.items)}"
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"SetOf_{type_moniker(type_anno.items)}"
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         joined = "_".join(type_moniker(item) for item in type_anno.items)
