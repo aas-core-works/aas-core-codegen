@@ -459,10 +459,19 @@ that.{getter_name}().isPresent()
                     constructor_arg_exprs.append(f"that.{getter_name}().deepCopy()")
 
             elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                raise AssertionError(
-                    f"Unexpected set in a property, as the sets are allowed only "
-                    f"in the arguments: {type_anno}"
-                )
+                # NOTE (mristin):
+                # A set holds only primitives, constrained primitives and
+                # enumeration literals, which are all immutable, so a copy of
+                # the set container itself already gives us a deep copy.
+                if optional:
+                    constructor_arg_exprs.append(
+                        f"""\
+that.{getter_name}().isPresent()
+{I}? new HashSet<>(that.{getter_name}().get())
+{I}: null"""
+                    )
+                else:
+                    constructor_arg_exprs.append(f"new HashSet<>(that.{getter_name}())")
 
             else:
                 assert_never(type_anno)
@@ -554,6 +563,9 @@ def generate(
         Stripped(f"import {package}.types.impl.*;"),
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
+
+    if java_common.has_set_properties(symbol_table):
+        imports.append(Stripped("import java.util.HashSet;"))
 
     # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one

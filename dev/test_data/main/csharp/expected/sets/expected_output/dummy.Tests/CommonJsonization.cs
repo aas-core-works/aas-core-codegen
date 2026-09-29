@@ -47,6 +47,40 @@ namespace dummy.Tests
 
             return instance;
         }  // public static Aas.Something LoadMinimalSomething
+
+        public static Aas.Collection LoadMaximalCollection()
+        {
+            string path = Path.Combine(
+                Aas.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "Collection",
+                "maximal.json");
+
+            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Aas.Jsonization.Deserialize.CollectionFrom(
+                node);
+
+            return instance;
+        }  // public static Aas.Collection LoadMaximalCollection
+
+        public static Aas.Collection LoadMinimalCollection()
+        {
+            string path = Path.Combine(
+                Aas.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "Collection",
+                "minimal.json");
+
+            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Aas.Jsonization.Deserialize.CollectionFrom(
+                node);
+
+            return instance;
+        }  // public static Aas.Collection LoadMinimalCollection
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

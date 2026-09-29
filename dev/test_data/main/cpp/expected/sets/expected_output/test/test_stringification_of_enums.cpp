@@ -22,6 +22,20 @@ TEST_CASE("Test ModelType round-trip") {
     )
     == "Something"
   );
+
+  REQUIRE(
+    aas::types::ModelType::kCollection
+    == aas::stringification::MustModelTypeFromString(
+      "Collection"
+    )
+  );
+
+  REQUIRE(
+    aas::stringification::to_string(
+      aas::types::ModelType::kCollection
+    )
+    == "Collection"
+  );
 }
 
 TEST_CASE("Test failure on ModelType") {
@@ -95,6 +109,65 @@ TEST_CASE("Test failure on Kind") {
       "Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"
+  );
+}
+
+TEST_CASE("Test Direction round-trip") {
+  REQUIRE(
+    aas::types::Direction::kNorth
+    == aas::stringification::MustDirectionFromString(
+      "up"
+    )
+  );
+
+  REQUIRE(
+    aas::stringification::to_string(
+      aas::types::Direction::kNorth
+    )
+    == "up"
+  );
+
+  REQUIRE(
+    aas::types::Direction::kSouth
+    == aas::stringification::MustDirectionFromString(
+      "down"
+    )
+  );
+
+  REQUIRE(
+    aas::stringification::to_string(
+      aas::types::Direction::kSouth
+    )
+    == "down"
+  );
+
+  REQUIRE(
+    aas::types::Direction::kEast
+    == aas::stringification::MustDirectionFromString(
+      "right"
+    )
+  );
+
+  REQUIRE(
+    aas::stringification::to_string(
+      aas::types::Direction::kEast
+    )
+    == "right"
+  );
+}
+
+TEST_CASE("Test failure on Direction") {
+  CHECK(
+    !aas::stringification::DirectionFromString(
+      "Totally utterly invalid"
+    ).has_value()
+  );
+
+  REQUIRE_THROWS_WITH(
+    aas::stringification::MustDirectionFromString(
+      "Totally utterly invalid"
+    ),
+    "Unexpected Direction literal: Totally utterly invalid"
   );
 }
 

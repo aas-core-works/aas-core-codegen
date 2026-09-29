@@ -73,6 +73,68 @@ namespace dummy
                 return null;
             }
         }
+
+        private static readonly Dictionary<Aas.Direction, string> DirectionToString = (
+            new Dictionary<Aas.Direction, string>()
+            {
+                { Aas.Direction.North, "up" },
+                { Aas.Direction.South, "down" },
+                { Aas.Direction.East, "right" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.Direction? that)
+        {
+            if (!that.HasValue)
+            {
+                return null;
+            }
+            else
+            {
+                if (DirectionToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        private static readonly Dictionary<string, Aas.Direction> _directionFromString = (
+            new Dictionary<string, Aas.Direction>()
+            {
+                { "up", Aas.Direction.North },
+                { "down", Aas.Direction.South },
+                { "right", Aas.Direction.East }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="Direction" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="Direction" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.Direction? DirectionFromString(string text)
+        {
+            if (_directionFromString.TryGetValue(text, out Direction value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }  // public static class Stringification
 }  // namespace dummy
 

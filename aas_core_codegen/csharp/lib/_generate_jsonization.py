@@ -163,6 +163,65 @@ private static Deserializer<List<T>> AsArrayOf<T>(
     )
 
 
+def _generate_as_set_of_helper() -> Stripped:
+    """Generate the combinator de-serializing a JSON array into a set."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// De-serialize every item of a JSON array with
+/// <paramref name="deserializeItem" /> into a set.
+/// </summary>
+/// <remarks>
+/// The items can come in any order, but a duplicate item is reported as
+/// an error, so that no item is silently dropped.
+/// </remarks>
+/// <typeparam name="T">Type of a single array item</typeparam>
+private static Deserializer<HashSet<T>> AsSetOf<T>(
+{I}Deserializer<T> deserializeItem)
+{{
+{I}return (
+{II}Nodes.JsonNode? node,
+{II}out Reporting.Error? error) =>
+{II}{{
+{III}error = null;
+
+{III}Nodes.JsonArray? array = node as Nodes.JsonArray;
+{III}if (array == null)
+{III}{{
+{IIII}error = new Reporting.Error(
+{IIIII}$"Expected a JsonArray, but got {{Describe(node)}}");
+{IIII}return default!;
+{III}}}
+
+{III}HashSet<T> result = new HashSet<T>();
+
+{III}int index = 0;
+{III}foreach (Nodes.JsonNode? item in array)
+{III}{{
+{IIII}T parsedItem = deserializeItem(item, out error);
+{IIII}if (error == null && !result.Add(parsedItem))
+{IIII}{{
+{IIIII}error = new Reporting.Error(
+{IIIII}{I}"Expected unique items in the set, but the item is a duplicate");
+{IIII}}}
+
+{IIII}if (error != null)
+{IIII}{{
+{IIIII}error.PrependSegment(
+{IIIII}{I}new Reporting.IndexSegment(
+{IIIII}{II}index));
+{IIIII}return default!;
+{IIII}}}
+
+{IIII}index++;
+{III}}}
+
+{III}return result;
+{II}}};
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_as_tuple_helper(arity: int) -> Stripped:
     """
@@ -741,10 +800,7 @@ def _deserializer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
     its items. Either way the expression is a plain name, so that a call site
     neither allocates a delegate nor composes anything.
     """
-    if isinstance(
-        type_anno,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-    ):
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return Stripped(_deserializer_name(type_anno))
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
@@ -790,11 +846,11 @@ def _deserializer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
 
 def _composed_types_in_initialization_order(
     symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.TypeAnnotationUnion]:
+) -> List[intermediate.ContainerTypeAnnotation]:
     """
-    List the list- and tuple-typed values which need a de/serializer of their own.
+    List the list-, set- and tuple-typed values which need a de/serializer of their own.
 
-    Only a list and a tuple have no function of their own to be named after
+    Only a list, a set and a tuple have no function of their own to be named after
     (a ``...From`` when de-serializing, a ``...ToJsonValue``, ``TransformIClass``
     or ``TransformIUnion`` when serializing), so only they are composed by
     a combinator and cached in a ``static readonly`` field. The fields are
@@ -806,12 +862,14 @@ def _composed_types_in_initialization_order(
     :py:func:`aas_core_codegen.csharp.common.type_moniker`), so that two
     distinct types can never be conflated into one field.
     """
-    result = []  # type: List[intermediate.TypeAnnotationUnion]
+    result = []  # type: List[intermediate.ContainerTypeAnnotation]
     observed = set()  # type: Set[str]
 
     def register(type_anno: intermediate.TypeAnnotationUnion) -> None:
         """Register what ``type_anno`` needs, its items first."""
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
+            register(type_anno.items)
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             register(type_anno.items)
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             for item_type_anno in type_anno.items:
@@ -835,9 +893,9 @@ def _composed_types_in_initialization_order(
 
 
 def _generate_deserializer_field(
-    type_anno: intermediate.TypeAnnotationUnion,
+    type_anno: intermediate.ContainerTypeAnnotation,
 ) -> Stripped:
-    """Generate the cached de-serializer of the list or the tuple ``type_anno``."""
+    """Generate the cached de-serializer of the container ``type_anno``."""
     name = _deserializer_name(type_anno)
     value_type = csharp_common.generate_type(type_anno)
 
@@ -848,6 +906,14 @@ def _generate_deserializer_field(
         composition = Stripped(
             f"""\
 AsArrayOf<{item_type}>(
+{I}{_deserializer_expr(type_anno.items)})"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_type = csharp_common.generate_type(type_anno.items)
+        composition = Stripped(
+            f"""\
+AsSetOf<{item_type}>(
 {I}{_deserializer_expr(type_anno.items)})"""
         )
 
@@ -866,9 +932,7 @@ AsTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     else:
-        raise AssertionError(
-            f"Expected a list or a tuple type annotation, but got {type_anno}"
-        )
+        assert_never(type_anno)
 
     declaration = f"private static readonly Deserializer<{value_type}> {name} = ("
     if len(declaration) + len(I) * 3 > _MAX_LINE_LENGTH:
@@ -1404,6 +1468,12 @@ def _generate_deserialize_impl(
     ):
         blocks.append(_generate_as_array_of_helper())
 
+    if any(
+        isinstance(type_anno, intermediate.SetTypeAnnotation)
+        for type_anno in composed_types
+    ):
+        blocks.append(_generate_as_set_of_helper())
+
     tuple_arities = sorted(
         {
             len(type_anno.items)
@@ -1703,10 +1773,7 @@ def _serializer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
     items. Either way the expression is a plain name, so that a call site
     neither allocates a delegate nor composes anything.
     """
-    if isinstance(
-        type_anno,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-    ):
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return Stripped(_serializer_name(type_anno))
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
@@ -1840,8 +1907,8 @@ def _property_serializer_type_annotations(
     group converted to a delegate allocates at every call under
     ``LangVersion 8``.
 
-    A list and a tuple already have such a field (see
-    :py:func:`_generate_serializer_field`), so neither is collected here.
+    A list, a set and a tuple already have such a field (see
+    :py:func:`_generate_serializer_field`), so none of them is collected here.
 
     The types are de-duplicated by their serializer, and not by themselves:
     every class goes through ``TransformIClass``, and a constrained primitive
@@ -1857,10 +1924,7 @@ def _property_serializer_type_annotations(
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-            if isinstance(
-                type_anno,
-                (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-            ):
+            if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
                 continue
 
             name = _atomic_serializer_name(type_anno)
@@ -1915,12 +1979,14 @@ def _composed_primitive_types(
     for composed_type in composed_types:
         if isinstance(composed_type, intermediate.ListTypeAnnotation):
             register(composed_type.items)
+        elif isinstance(composed_type, intermediate.SetTypeAnnotation):
+            register(composed_type.items)
         elif isinstance(composed_type, intermediate.TupleTypeAnnotation):
             for item_type_anno in composed_type.items:
                 register(item_type_anno)
         else:
             raise AssertionError(
-                f"Expected a list or a tuple type annotation, "
+                f"Expected a list, a set or a tuple type annotation, "
                 f"but got {composed_type}"
             )
 
@@ -1995,6 +2061,48 @@ private static Serializer<List<T>> SerializeList<T>(
 {II}var result = new Nodes.JsonArray();
 {II}int i = 0;
 {II}foreach (T item in that)
+{II}{{
+{III}try
+{III}{{
+{IIII}result.Add(serializeItem(item));
+{III}}}
+{III}catch (SerializationFailure failure)
+{III}{{
+{IIII}failure.Error.PrependSegment(
+{IIIII}new Reporting.IndexSegment(i));
+{IIII}throw;
+{III}}}
+{III}i++;
+{II}}}
+{II}return result;
+{I}}};
+}}"""
+    )
+
+
+def _generate_serialize_set_helper() -> Stripped:
+    """Generate the combinator composing the serializer of a set."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Compose the serializer of a set whose items are serialized with
+/// <paramref name="serializeItem" /> in the order given by
+/// <paramref name="comparison" />.
+/// </summary>
+/// <remarks>
+/// We serialize the items sorted, so that all the SDKs serialize a set
+/// in the same order.
+/// </remarks>
+/// <typeparam name="T">Type of a single set item</typeparam>
+private static Serializer<HashSet<T>> SerializeSet<T>(
+{I}Serializer<T> serializeItem,
+{I}System.Comparison<T> comparison)
+{{
+{I}return (that) =>
+{I}{{
+{II}var result = new Nodes.JsonArray();
+{II}int i = 0;
+{II}foreach (T item in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(that, comparison))
 {II}{{
 {III}try
 {III}{{
@@ -2120,9 +2228,9 @@ private static void SetProperty<T>(
 
 
 def _generate_serializer_field(
-    type_anno: intermediate.TypeAnnotationUnion,
+    type_anno: intermediate.ContainerTypeAnnotation,
 ) -> Stripped:
-    """Generate the cached serializer of the list or the tuple ``type_anno``."""
+    """Generate the cached serializer of the container ``type_anno``."""
     name = _serializer_name(type_anno)
     value_type = csharp_common.generate_type(type_anno)
 
@@ -2134,6 +2242,15 @@ def _generate_serializer_field(
             f"""\
 SerializeList<{item_type}>(
 {I}{_serializer_expr(type_anno.items)})"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_type = csharp_common.generate_type(type_anno.items)
+        composition = Stripped(
+            f"""\
+SerializeSet<{item_type}>(
+{I}{_serializer_expr(type_anno.items)},
+{I}{csharp_common.set_items_comparison(type_anno.items)})"""
         )
 
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -2151,9 +2268,7 @@ SerializeTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     else:
-        raise AssertionError(
-            f"Expected a list or a tuple type annotation, but got {type_anno}"
-        )
+        assert_never(type_anno)
 
     declaration = f"private static readonly Serializer<{value_type}> {name} = ("
     if len(declaration) + len(I) * 3 > _MAX_LINE_LENGTH:
@@ -2291,10 +2406,14 @@ def _generate_transform_property(
         serializer_name = _serializer_name(type_anno)
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            f"Expected an atomic item (a primitive, a constrained primitive or "
+            f"an enumeration) of {type_anno}, but got {type_anno.items}. "
+            f"This should have already been verified in "
+            f"intermediate._translate._verify_items_of_sets."
         )
+
+        serializer_name = _serializer_name(type_anno)
 
     else:
         assert_never(type_anno)
@@ -2704,6 +2823,12 @@ private static Nodes.JsonValue ToJsonValue(double that)
             for composed_type in composed_types
         ):
             blocks.append(_generate_serialize_list_helper())
+
+        if any(
+            isinstance(composed_type, intermediate.SetTypeAnnotation)
+            for composed_type in composed_types
+        ):
+            blocks.append(_generate_serialize_set_helper())
 
         for arity in intermediate.tuple_arities(symbol_table):
             blocks.append(_generate_serialize_tuple_helper(arity))

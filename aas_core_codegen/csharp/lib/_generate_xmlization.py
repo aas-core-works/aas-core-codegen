@@ -747,6 +747,72 @@ private static ContentReader<List<T>> AsList<T>(
     )
 
 
+def _generate_as_set_combinator() -> Stripped:
+    """
+    Generate the combinator to read a content as a set.
+
+    The items can come in any order, but a duplicate item is reported as
+    an error at its index, so that no item is silently dropped.
+    """
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a content as a set of items, each read with
+/// <paramref name="readItem" />.
+/// </summary>
+/// <remarks>
+/// A self-closing element represents an empty set. The items can come in
+/// any order, but a duplicate item is reported as an error.
+/// </remarks>
+/// <typeparam name="T">Type of a single set item</typeparam>
+private static ContentReader<HashSet<T>> AsSet<T>(
+{I}ElementReader<T> readItem
+{I})
+{{
+{I}return (
+{II}Xml.XmlReader reader,
+{II}bool isEmpty,
+{II}out Reporting.Error? error
+{I}) =>
+{I}{{
+{II}error = null;
+{II}var result = new HashSet<T>();
+
+{II}if (isEmpty)
+{II}{{
+{III}return result;
+{II}}}
+
+{II}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+{II}int index = 0;
+{II}while (reader.NodeType == Xml.XmlNodeType.Element)
+{II}{{
+{III}T item = readItem(reader, out error);
+{III}if (error == null && !result.Add(item))
+{III}{{
+{IIII}error = new Reporting.Error(
+{IIIII}"Expected unique items in the set, but the item is a duplicate");
+{III}}}
+
+{III}if (error != null)
+{III}{{
+{IIII}error.PrependSegment(
+{IIIII}new Reporting.IndexSegment(
+{IIIIII}index));
+{IIII}return result;
+{III}}}
+
+{III}index++;
+{III}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+{II}}}
+
+{II}return result;
+{I}}};
+}}"""
+    )
+
+
 def _generate_as_element_combinator() -> Stripped:
     """
     Generate the combinator to read a content which is a self-describing element.
@@ -958,6 +1024,15 @@ AsList<{item_type}>(
 {I}{indent_but_first_line(item_reader, I)})"""
         )
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_type = csharp_common.generate_type(type_anno.items)
+        item_reader = _element_reader_expr(type_anno.items, '"v"')
+        return Stripped(
+            f"""\
+AsSet<{item_type}>(
+{I}{indent_but_first_line(item_reader, I)})"""
+        )
+
     assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
 
     item_types = ", ".join(
@@ -1039,8 +1114,8 @@ def _content_types_in_initialization_order(
     """
     Collect the distinct types de/serialized as the content of an element.
 
-    A field initializer reads the fields it composes, so the items of a list
-    and of a tuple come before the container itself. A class, an interface
+    A field initializer reads the fields it composes, so the items of a list,
+    of a set and of a tuple come before the container itself. A class, an interface
     and a named union are left out: they de/serialize their own,
     self-describing element and are referred to by a function, not by
     a field.
@@ -1059,6 +1134,8 @@ def _content_types_in_initialization_order(
             item_type_annotations = [
                 type_anno.items
             ]  # type: List[intermediate.TypeAnnotationUnion]
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            item_type_annotations = [type_anno.items]
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             item_type_annotations = list(type_anno.items)
         else:
@@ -1780,6 +1857,9 @@ def _generate_deserialize_impl(
         blocks.append(_generate_read_list_helper())
         blocks.append(_generate_as_list_combinator())
 
+    if needed_readers.sets:
+        blocks.append(_generate_as_set_combinator())
+
     if needed_readers.polymorphic:
         blocks.append(_generate_as_element_combinator())
 
@@ -2280,6 +2360,47 @@ private static ContentWriter<List<T>> WriteList<T>(
     )
 
 
+def _generate_write_set_combinator() -> Stripped:
+    """Generate the combinator to write a set with its items sorted."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Write the items of a set, each with <paramref name="writeItem" />, in
+/// the order given by <paramref name="comparison" />.
+/// </summary>
+/// <remarks>
+/// We write the items sorted, so that all the SDKs serialize a set in
+/// the same order. An empty set writes no items at all, which the reading
+/// sees as a self-closing element.
+/// </remarks>
+/// <typeparam name="T">Type of a single set item</typeparam>
+private static ContentWriter<HashSet<T>> WriteSet<T>(
+{I}ContentWriter<T> writeItem,
+{I}System.Comparison<T> comparison
+{I})
+{{
+{I}return (that, writer) =>
+{I}{{
+{II}int index = 0;
+{II}foreach (var item in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(that, comparison))
+{II}{{
+{III}try
+{III}{{
+{IIII}writeItem(item, writer);
+{III}}}
+{III}catch (SerializationFailure failure)
+{III}{{
+{IIII}failure.Error.PrependSegment(
+{IIIII}new Reporting.IndexSegment(index));
+{IIII}throw;
+{III}}}
+{III}index++;
+{II}}}
+{I}}};
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_write_tuple_combinator(arity: int) -> Stripped:
     """
@@ -2541,6 +2662,17 @@ WriteList<{item_type}>(
 {I}{indent_but_first_line(item_writer, I)})"""
         )
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_type = csharp_common.generate_type(type_anno.items)
+        item_writer = _item_writer_expr(type_anno.items, '"v"')
+        comparison = csharp_common.set_items_comparison(type_anno.items)
+        return Stripped(
+            f"""\
+WriteSet<{item_type}>(
+{I}{indent_but_first_line(item_writer, I)},
+{I}{comparison})"""
+        )
+
     assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
 
     item_types = ", ".join(
@@ -2776,6 +2908,9 @@ def _generate_visitor(
 
     if needed.lists:
         blocks.append(_generate_write_list_combinator())
+
+    if needed.sets:
+        blocks.append(_generate_write_set_combinator())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_write_tuple_combinator(arity))

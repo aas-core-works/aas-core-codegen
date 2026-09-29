@@ -455,6 +455,107 @@ std::string to_string(
     )
 
 
+def _generate_rank_and_less_definitions(
+    enum: intermediate.Enumeration,
+) -> List[Stripped]:
+    """Generate the definitions of the rank and the comparison of the literals."""
+    enum_name = cpp_naming.enum_name(enum.name)
+
+    rank_name = cpp_common.rank_function_name(enum)
+    less_name = cpp_common.less_function_name(enum)
+
+    return [
+        Stripped(
+            f"""\
+/**
+ * \\brief Determine the rank of \\p literal of types::{enum_name} among
+ * the literals sorted by their text, code point by code point.
+ *
+ * We sort the literals in a set by their rank in the serialization so that
+ * all the SDKs write the same order.
+ *
+ * \\param literal to be ranked
+ * \\return the rank, or the number of the literals if \\p literal is invalid
+ */
+std::uint32_t {rank_name}(
+{I}types::{enum_name} literal
+);"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * \\brief Check whether \\p that literal of types::{enum_name} comes before
+ * \\p other literal, compared by their ranks.
+ *
+ * \\param that literal to be compared
+ * \\param other literal to compare against
+ * \\return `true` if \\p that comes before \\p other
+ */
+bool {less_name}(
+{I}types::{enum_name} that,
+{I}types::{enum_name} other
+);"""
+        ),
+    ]
+
+
+def _generate_rank_and_less_implementations(
+    enum: intermediate.Enumeration,
+) -> List[Stripped]:
+    """
+    Generate the implementations of the rank and the comparison of the literals.
+
+    We sort the literals by their text at the generation time, as Python compares
+    the strings by code points, and compare only their ranks at the run time.
+    """
+    enum_name = cpp_naming.enum_name(enum.name)
+
+    rank_name = cpp_common.rank_function_name(enum)
+    less_name = cpp_common.less_function_name(enum)
+
+    case_blocks = [
+        Stripped(
+            f"""\
+case types::{enum_name}::{cpp_naming.enum_literal_name(literal.name)}:
+{I}return {rank};  // {cpp_common.string_literal(literal.value)}"""
+        )
+        for rank, literal in enumerate(
+            sorted(enum.literals, key=lambda literal: literal.value)
+        )
+    ]
+    case_blocks.append(
+        Stripped(
+            f"""\
+default:
+{I}return {len(enum.literals)};"""
+        )
+    )
+
+    case_blocks_joined = "\n".join(case_blocks)
+
+    return [
+        Stripped(
+            f"""\
+std::uint32_t {rank_name}(
+{I}types::{enum_name} literal
+) {{
+{I}switch (literal) {{
+{II}{indent_but_first_line(case_blocks_joined, II)}
+{I}}}
+}}"""
+        ),
+        Stripped(
+            f"""\
+bool {less_name}(
+{I}types::{enum_name} that,
+{I}types::{enum_name} other
+) {{
+{I}return {rank_name}(that) < {rank_name}(other);
+}}"""
+        ),
+    ]
+
+
 def _generate_base64_encode_definition() -> Stripped:
     """Generate the definition of the base64 encoding of bytes to a string."""
     function_name = cpp_naming.function_name(Identifier("base64_encode"))
@@ -872,6 +973,9 @@ namespace stringification {"""
         blocks.extend(_generate_enum_from_string_definition(enum=enum))
         blocks.append(_generate_enum_to_string_definition(enum=enum))
 
+    for enum in cpp_common.enumerations_in_set_properties(symbol_table):
+        blocks.extend(_generate_rank_and_less_definitions(enum=enum))
+
     blocks.extend(
         [
             _generate_base64_encode_definition(),
@@ -928,6 +1032,9 @@ def generate_implementation(
     for enum in symbol_table.enumerations:
         blocks.extend(_generate_enum_from_string_implementation(enum=enum))
         blocks.append(_generate_enum_to_string_implementation(enum=enum))
+
+    for enum in cpp_common.enumerations_in_set_properties(symbol_table):
+        blocks.extend(_generate_rank_and_less_implementations(enum=enum))
 
     blocks.extend(
         [

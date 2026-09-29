@@ -1,0 +1,1 @@
+In the property 'blobs' of the class 'Something': We do not support the sets of byte arrays, but got the items of type bytearray. A bytearray is mutable and hence unhashable in Python, so ``set().add(bytearray(...))`` raises a ``TypeError``.

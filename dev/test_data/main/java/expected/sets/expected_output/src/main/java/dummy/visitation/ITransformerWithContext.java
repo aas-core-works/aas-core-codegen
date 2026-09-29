@@ -24,6 +24,10 @@ public interface ITransformerWithContext<ContextT, T> {
     ISomething that,
     ContextT context
   );
+  T transformCollection(
+    ICollection that,
+    ContextT context
+  );
 }
 
 /*

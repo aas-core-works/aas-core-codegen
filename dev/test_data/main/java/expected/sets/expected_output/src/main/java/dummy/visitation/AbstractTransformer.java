@@ -24,6 +24,10 @@ public abstract class AbstractTransformer<T> implements ITransformer<T>
   public abstract T transformSomething(
     ISomething that
   );
+
+  public abstract T transformCollection(
+    ICollection that
+  );
 }
 
 /*

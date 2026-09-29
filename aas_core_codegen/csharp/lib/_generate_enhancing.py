@@ -115,7 +115,10 @@ public {prop_type} {prop_name}
     for prop in cls.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = csharp_naming.property_name(prop.name)
             items_type = csharp_common.generate_type(
                 prop.type_annotation.value.items, our_type_qualifier=Stripped("Aas")
@@ -529,10 +532,10 @@ that.{prop_name} = {tuple_literal};"""
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, so we can not enhance any of its items; nothing to do here.
+            continue
 
         else:
             assert_never(type_anno)

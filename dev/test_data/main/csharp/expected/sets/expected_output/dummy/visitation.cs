@@ -21,6 +21,9 @@ namespace dummy
             public void VisitSomething(
                 ISomething that
             );
+            public void VisitCollection(
+                ICollection that
+            );
         }  // public interface IVisitor
 
         /// <summary>
@@ -48,6 +51,17 @@ namespace dummy
                     Visit(something);
                 }
             }
+
+            public virtual void VisitCollection(
+                ICollection that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
         }  // public class VisitorThrough
 
         /// <summary>
@@ -61,6 +75,9 @@ namespace dummy
             }
             public abstract void VisitSomething(
                 ISomething that
+            );
+            public abstract void VisitCollection(
+                ICollection that
             );
         }  // public abstract class AbstractVisitor
 
@@ -78,6 +95,10 @@ namespace dummy
             public void Visit(IClass that, TContext context);
             public void VisitSomething(
                 ISomething that,
+                TContext context
+            );
+            public void VisitCollection(
+                ICollection that,
                 TContext context
             );
         }  // public interface IVisitorWithContext
@@ -98,6 +119,10 @@ namespace dummy
                 ISomething that,
                 TContext context
             );
+            public abstract void VisitCollection(
+                ICollection that,
+                TContext context
+            );
         }  // public abstract class AbstractVisitorWithContext
 
         /// <summary>
@@ -116,6 +141,9 @@ namespace dummy
             public T TransformSomething(
                 ISomething that
             );
+            public T TransformCollection(
+                ICollection that
+            );
         }  // public interface ITransformer
 
         /// <summary>
@@ -132,6 +160,10 @@ namespace dummy
 
             public abstract T TransformSomething(
                 ISomething that
+            );
+
+            public abstract T TransformCollection(
+                ICollection that
             );
         }  // public abstract class AbstractTransformer
 
@@ -151,6 +183,10 @@ namespace dummy
             public T Transform(IClass that, TContext context);
             public T TransformSomething(
                 ISomething that,
+                TContext context
+            );
+            public T TransformCollection(
+                ICollection that,
                 TContext context
             );
         }  // public interface ITransformerWithContext
@@ -176,6 +212,11 @@ namespace dummy
 
             public abstract T TransformSomething(
                 ISomething that,
+                TContext context
+            );
+
+            public abstract T TransformCollection(
+                ICollection that,
                 TContext context
             );
         }  // public abstract class AbstractTransformerWithContext

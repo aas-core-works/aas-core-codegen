@@ -15,7 +15,14 @@ import dummy.visitation.AbstractTransformer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Provide de/serialization of meta-model classes to/from JSON.

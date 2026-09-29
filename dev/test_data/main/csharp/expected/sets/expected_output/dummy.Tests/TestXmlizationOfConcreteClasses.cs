@@ -295,6 +295,135 @@ namespace dummy.Tests
                 }
             }
         }  // public void Test_Something_verification_fail
+
+        [Test]
+        public void Test_Collection_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "collection"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                var instance = Aas.Xmlization.Deserialize.CollectionFrom(
+                    xmlReader);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    instance, path);
+            }
+        }  // public void Test_Collection_ok
+
+        [Test]
+        public void Test_Collection_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "collection"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Collection for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    Aas.Xmlization.Exception? exception = null;
+
+                    try
+                    {
+                        _ = Aas.Xmlization.Deserialize.CollectionFrom(
+                            xmlReader);
+                    }
+                    catch (Aas.Xmlization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_Collection_deserialization_fail
+
+        [Test]
+        public void Test_Collection_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "collection"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Collection for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    var instance = Aas.Xmlization.Deserialize.CollectionFrom(
+                        xmlReader);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_Collection_verification_fail
     }  // class TestXmlizationOfConcreteClasses
 }  // namespace dummy.Tests
 

@@ -35,6 +35,7 @@ import {
   parseElementContent,
   parseList,
   parseNamedElement,
+  parseSet,
   parseTextContent,
   readRequiredRootOpenTag,
   removeWhitespace,
@@ -240,6 +241,16 @@ function parse_Kind(
   );
 }
 
+function parse_Direction(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Direction, DeserializationError> {
+  return parseEnumerationContent(
+    cursor,
+    "Direction",
+    AasStringification.directionFromString
+  );
+}
+
 function write_Kind(
   parts: Array<string>,
   value: AasTypes.Kind
@@ -249,6 +260,28 @@ function write_Kind(
     value,
     "Kind",
     AasStringification.kindToString
+  );
+}
+
+function write_Direction(
+  parts: Array<string>,
+  value: AasTypes.Direction
+): void {
+  writeEnumerationContent(
+    parts,
+    value,
+    "Direction",
+    AasStringification.directionToString
+  );
+}
+
+function parseAtV_Direction(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Direction, DeserializationError> {
+  return parseNamedElement(
+    cursor,
+    "v",
+    parse_Direction
   );
 }
 
@@ -325,6 +358,54 @@ function parse_ListOf_str(
   return parseList<string>(
     cursor,
     parseAtV_str
+  );
+}
+
+function parse_SetOf_Direction(
+  cursor: XmlCursor
+): AasCommon.Either<Set<AasTypes.Direction>, DeserializationError> {
+  return parseSet<AasTypes.Direction>(
+    cursor,
+    parseAtV_Direction
+  );
+}
+
+function parse_SetOf_bool(
+  cursor: XmlCursor
+): AasCommon.Either<Set<boolean>, DeserializationError> {
+  return parseSet<boolean>(
+    cursor,
+    parseAtV_bool
+  );
+}
+
+function parse_SetOf_int(
+  cursor: XmlCursor
+): AasCommon.Either<Set<number>, DeserializationError> {
+  return parseSet<number>(
+    cursor,
+    parseAtV_int
+  );
+}
+
+function parse_SetOf_str(
+  cursor: XmlCursor
+): AasCommon.Either<Set<string>, DeserializationError> {
+  return parseSet<string>(
+    cursor,
+    parseAtV_str
+  );
+}
+
+function writeAtV_Direction(
+  parts: Array<string>,
+  value: AasTypes.Direction
+): void {
+  writeElement(
+    parts,
+    "v",
+    value,
+    write_Direction
   );
 }
 
@@ -416,6 +497,50 @@ function write_ListOf_str(
   writeList(
     parts,
     values,
+    writeAtV_str
+  );
+}
+
+function write_SetOf_Direction(
+  parts: Array<string>,
+  values: Set<AasTypes.Direction>
+): void {
+  writeList(
+    parts,
+    Array.from(values).sort(AasStringification.compareByRankOfDirection),
+    writeAtV_Direction
+  );
+}
+
+function write_SetOf_bool(
+  parts: Array<string>,
+  values: Set<boolean>
+): void {
+  writeList(
+    parts,
+    Array.from(values).sort(AasCommon.compareBooleans),
+    writeAtV_bool
+  );
+}
+
+function write_SetOf_int(
+  parts: Array<string>,
+  values: Set<number>
+): void {
+  writeList(
+    parts,
+    Array.from(values).sort(AasCommon.compareNumbers),
+    writeAtV_int
+  );
+}
+
+function write_SetOf_str(
+  parts: Array<string>,
+  values: Set<string>
+): void {
+  writeList(
+    parts,
+    Array.from(values).sort(AasCommon.compareByCodePoints),
     writeAtV_str
   );
 }
@@ -710,6 +835,223 @@ function parseSomethingFromSequence(
 }
 
 /**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Collection}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!Collection} is embedded.
+ */
+function parseCollectionFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Collection, DeserializationError> {
+  let theTexts: Set<string> | null = null;
+  let theNumbers: Set<number> | null = null;
+  let theFlags: Set<boolean> | null = null;
+  let theDirections: Set<AasTypes.Direction> | null = null;
+  let theCodes: Set<string> | null = null;
+  let theOptionalTexts: Set<string> | null = null;
+  let theOptionalDirections: Set<AasTypes.Direction> | null = null;
+
+  const className = AasTypes.Collection.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new AasCommon.Either<AasTypes.Collection, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "texts": {
+        if (theTexts !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_str
+        );
+        propertyError = parsed.error;
+        theTexts = parsed.value;
+        break;
+      }
+
+      case "numbers": {
+        if (theNumbers !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_int
+        );
+        propertyError = parsed.error;
+        theNumbers = parsed.value;
+        break;
+      }
+
+      case "flags": {
+        if (theFlags !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_bool
+        );
+        propertyError = parsed.error;
+        theFlags = parsed.value;
+        break;
+      }
+
+      case "directions": {
+        if (theDirections !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_Direction
+        );
+        propertyError = parsed.error;
+        theDirections = parsed.value;
+        break;
+      }
+
+      case "codes": {
+        if (theCodes !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_str
+        );
+        propertyError = parsed.error;
+        theCodes = parsed.value;
+        break;
+      }
+
+      case "optionalTexts": {
+        if (theOptionalTexts !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_str
+        );
+        propertyError = parsed.error;
+        theOptionalTexts = parsed.value;
+        break;
+      }
+
+      case "optionalDirections": {
+        if (theOptionalDirections !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_SetOf_Direction
+        );
+        propertyError = parsed.error;
+        theOptionalDirections = parsed.value;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new AasCommon.Either<AasTypes.Collection, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  if (theTexts === null) {
+    return newDeserializationError<AasTypes.Collection>(
+      "The required property 'texts' is missing"
+    );
+  }
+
+  if (theNumbers === null) {
+    return newDeserializationError<AasTypes.Collection>(
+      "The required property 'numbers' is missing"
+    );
+  }
+
+  if (theFlags === null) {
+    return newDeserializationError<AasTypes.Collection>(
+      "The required property 'flags' is missing"
+    );
+  }
+
+  if (theDirections === null) {
+    return newDeserializationError<AasTypes.Collection>(
+      "The required property 'directions' is missing"
+    );
+  }
+
+  if (theCodes === null) {
+    return newDeserializationError<AasTypes.Collection>(
+      "The required property 'codes' is missing"
+    );
+  }
+
+  const instance = new AasTypes.Collection(
+    theTexts,
+    theNumbers,
+    theFlags,
+    theDirections,
+    theCodes,
+    theOptionalTexts,
+    theOptionalDirections
+  );
+  return new AasCommon.Either<AasTypes.Collection, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
  * Write the properties of an instance
  * of {@link types!Something}, and neither the opening
  * nor the closing tag of the element which holds them -- which is the contract of
@@ -781,11 +1123,66 @@ function writeSomethingAsSequence(
   );
 }
 
+/**
+ * Write the properties of an instance
+ * of {@link types!Collection}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writeCollectionAsSequence(
+  parts: Array<string>,
+  that: AasTypes.Collection
+): void {
+  writeProperty(
+    parts,
+    "texts",
+    that.texts,
+    write_SetOf_str
+  );
+  writeProperty(
+    parts,
+    "numbers",
+    that.numbers,
+    write_SetOf_int
+  );
+  writeProperty(
+    parts,
+    "flags",
+    that.flags,
+    write_SetOf_bool
+  );
+  writeProperty(
+    parts,
+    "directions",
+    that.directions,
+    write_SetOf_Direction
+  );
+  writeProperty(
+    parts,
+    "codes",
+    that.codes,
+    write_SetOf_str
+  );
+  writeOptionalProperty(
+    parts,
+    "optionalTexts",
+    that.optionalTexts,
+    write_SetOf_str
+  );
+  writeOptionalProperty(
+    parts,
+    "optionalDirections",
+    that.optionalDirections,
+    write_SetOf_Direction
+  );
+}
+
 const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
   string,
   ContentParser<AasTypes.Class>
 >([
-  ["something", parseSomethingFromSequence]
+  ["something", parseSomethingFromSequence],
+  ["collection", parseCollectionFromSequence]
 ]);
 
 /**
@@ -992,6 +1389,18 @@ class Serializer extends AasTypes.AbstractVisitorWithContext<Array<string>> {
       "something",
       that,
       writeSomethingAsSequence
+    );
+  }
+
+  visitCollectionWithContext(
+    that: AasTypes.Collection,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "collection",
+      that,
+      writeCollectionAsSequence
     );
   }
 }

@@ -2155,6 +2155,114 @@ std::pair<
     )
 
 
+def _generate_deserialize_set() -> Stripped:
+    """Generate a generic function to deserialize the sets."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a set of items, each wrapped in its own element.
+ *
+ * The items can come in any order, but we refuse the duplicates, as we would
+ * lose them silently otherwise.
+ *
+ * \\tparam SetT type of the set, which might come with its own hasher
+ * \\param reader to read from
+ * \\param deserialize_item de-serializes an item
+ * \\return the set, or an error, if any
+ */
+template <typename SetT, typename DeserializeT>
+std::pair<
+{I}common::optional<SetT >,
+{I}common::optional<DeserializationError>
+> DeserializeSet(
+{I}xml_common::ReaderMergingText& reader,
+{I}const DeserializeT& deserialize_item
+) {{
+{I}typedef typename SetT::value_type T;
+
+{I}#ifdef DEBUG
+{I}if (reader.node().kind() == xml_common::NodeKind::Error) {{
+{II}throw std::logic_error(
+{III}"Unexpected unhandled XML error in DeserializeSet. "
+{III}"DeserializeSet expects no error node."
+{II});
+{I}}}
+{I}#endif
+
+{I}common::optional<DeserializationError> error;
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(
+{III}common::nullopt,
+{III}std::move(error)
+{II});
+{I}}}
+
+{I}SetT items;
+
+{I}// If we encounter the stop element then we reached the end of the set. If this is
+{I}// the first node we encounter then the set is empty, *i.e.*, contains no items.
+{I}if (reader.node().kind() == xml_common::NodeKind::Stop) {{
+{II}return std::make_pair(
+{III}std::move(items),
+{III}common::nullopt
+{II});
+{I}}}
+
+{I}size_t i = 0;
+
+{I}while (true) {{
+{II}common::optional<T> item;
+
+{II}std::tie(
+{III}item,
+{III}error
+{II}) = deserialize_item(reader);
+
+{II}if (!error.has_value()) {{
+{III}const bool inserted = items.insert(std::move(*item)).second;
+{III}if (!inserted) {{
+{IIII}error = DeserializationError(
+{IIIII}L"Expected unique items in the set, but the item is a duplicate"
+{IIII});
+{III}}}
+{II}}}
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<xml_path::IndexSegment>(i)
+{III});
+{III}break;
+{II}}}
+
+{II}error = SkipWhitespace(reader);
+{II}if (error.has_value()) {{
+{III}break;
+{II}}}
+
+{II}if (reader.node().kind() == xml_common::NodeKind::Stop) {{
+{III}break;
+{II}}}
+
+{II}++i;
+{I}}}
+
+{I}if (error.has_value()) {{
+{II}return std::make_pair(
+{III}common::nullopt,
+{III}std::move(error)
+{II});
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(items),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
 def _generate_deserialize_list() -> Stripped:
     """Generate a generic function to deserialize the lists."""
     return Stripped(
@@ -2930,6 +3038,41 @@ DeserializeList<
     )
 
 
+def _generate_deserialize_set_expr(
+    prop: intermediate.Property,
+) -> Stripped:
+    """Generate the expression reading a property annotated with a set type."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    assert isinstance(type_anno, intermediate.SetTypeAnnotation)
+
+    assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+        "Set items are restricted to primitives, constrained primitives and "
+        "enumerations by intermediate._translate._verify_items_of_sets."
+    )
+
+    item_type = cpp_common.generate_type(
+        type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    set_type = cpp_common.generate_type(
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    deserialize_item_expr = _xml_deserialize_item_expr(
+        item_type_anno=type_anno.items, item_type=item_type, v_element_name="v"
+    )
+
+    return Stripped(
+        f"""\
+DeserializeSet<
+{I}{indent_but_first_line(set_type, I)}
+>(
+{I}reader,
+{I}{indent_but_first_line(deserialize_item_expr, I)}
+)"""
+    )
+
+
 def _generate_deserialize_tuple_expr(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -3077,10 +3220,7 @@ def _generate_deserialize_property_expr(
             return Stripped(f"{deserialize_function}(reader)")
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            return _generate_deserialize_set_expr(prop=prop)
 
         else:
             # noinspection PyTypeChecker
@@ -3907,6 +4047,108 @@ common::optional<xml_common::SerializationError> WriteListOfValuesProperty(
     ]
 
 
+def _generate_write_set_of_values_property() -> List[Stripped]:
+    """Generate the generic functions to write a property holding a set."""
+    return [
+        Stripped(
+            f"""\
+/**
+ * \\brief Write \\p set as the XML element of \\p property, every item
+ * wrapped in a `<v>` element of its own, sorted by \\p less.
+ *
+ * All the SDKs write the items in the same order. The path of an error refers
+ * to the index of the item in that order.
+ *
+ * \\param name of the XML element
+ * \\param set of the values
+ * \\param writer to write to
+ * \\param property which the element stands for, for the path of the error
+ * \\param less compares two items for the order
+ * \\param write_value writes a value between the tags of its `<v>`
+ * \\return an error, if any
+ */
+template <
+{I}typename T,
+{I}typename HashT,
+{I}typename LessT,
+{I}typename WriteValueT
+>
+common::optional<xml_common::SerializationError> WriteSetOfValuesProperty(
+{I}const char* name,
+{I}const std::unordered_set<T, HashT>& set,
+{I}xml_common::SelfClosingWriter& writer,
+{I}iteration::Property property,
+{I}LessT less,
+{I}const WriteValueT& write_value
+) {{
+{I}return WriteProperty(
+{II}name,
+{II}common::SortedPointers(set, less),
+{II}writer,
+{II}property,
+{II}[&write_value](
+{III}const std::vector<const T*>& sorted,
+{III}xml_common::SelfClosingWriter& a_writer
+{II}) -> common::optional<xml_common::SerializationError> {{
+{III}for (size_t i = 0; i < sorted.size(); ++i) {{
+{IIII}common::optional<xml_common::SerializationError> error(
+{IIIII}WriteElement("v", *sorted[i], a_writer, write_value)
+{IIII});
+
+{IIII}if (error.has_value()) {{
+{IIIII}error->path.segments.emplace_front(
+{IIIIII}common::make_unique<iteration::IndexSegment>(i)
+{IIIII});
+
+{IIIII}return error;
+{IIII}}}
+{III}}}
+
+{III}return common::nullopt;
+{II}}}
+{I});
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * \\brief Write \\p set as the XML element of \\p property, or nothing at all
+ * if the property has not been given.
+ *
+ * See the overload which takes the set itself for what is written and
+ * for the path of the error.
+ */
+template <
+{I}typename T,
+{I}typename HashT,
+{I}typename LessT,
+{I}typename WriteValueT
+>
+common::optional<xml_common::SerializationError> WriteSetOfValuesProperty(
+{I}const char* name,
+{I}const common::optional<std::unordered_set<T, HashT> >& set,
+{I}xml_common::SelfClosingWriter& writer,
+{I}iteration::Property property,
+{I}LessT less,
+{I}const WriteValueT& write_value
+) {{
+{I}if (!set.has_value()) {{
+{II}return common::nullopt;
+{I}}}
+
+{I}return WriteSetOfValuesProperty(
+{II}name,
+{II}*set,
+{II}writer,
+{II}property,
+{II}less,
+{II}write_value
+{I});
+}}"""
+        ),
+    ]
+
+
 def _generate_write_tuple_property(arity: int) -> List[Stripped]:
     """
     Generate the generic functions to write a tuple-valued property.
@@ -4262,6 +4504,18 @@ def _generate_write_property_statements(prop: intermediate.Property) -> Stripped
         else:
             function_name = "WriteListOfValuesProperty"
             writer_exprs = [_xml_write_content_expr(type_anno.items)]
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Set items are restricted to primitives, constrained primitives and "
+            "enumerations by intermediate._translate._verify_items_of_sets."
+        )
+
+        function_name = "WriteSetOfValuesProperty"
+        writer_exprs = [
+            cpp_common.generate_set_item_less(type_anno.items),
+            _xml_write_content_expr(type_anno.items),
+        ]
 
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         function_name = f"WriteTuple{len(type_anno.items)}Property"
@@ -4849,10 +5103,9 @@ def _type_annotation_contains_list(
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        # NOTE (mristin):
+        # A set is de-serialized with ``DeserializeSet``, not ``DeserializeList``.
+        return False
 
     else:
         # noinspection PyTypeChecker
@@ -4919,10 +5172,7 @@ def _type_annotation_contains_tuple_with_atomic_non_class_item(
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        return False
 
     else:
         # noinspection PyTypeChecker
@@ -5004,8 +5254,8 @@ def _type_annotation_contains_list_of_atomic_non_class_values(
 
         elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
             raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_annotation.items}"
+                f"Unexpected set nested in a list, as the parser refuses "
+                f"the nested sets: {type_annotation}"
             )
 
         else:
@@ -5036,10 +5286,10 @@ def _type_annotation_contains_list_of_atomic_non_class_values(
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        # NOTE (mristin):
+        # A set is written with ``WriteSetOfValuesProperty``, see
+        # :py:func:`_type_annotation_contains_set`.
+        return False
 
     else:
         # noinspection PyTypeChecker
@@ -5116,8 +5366,8 @@ def _type_annotation_contains_list_of_instances(
 
         elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
             raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_annotation.items}"
+                f"Unexpected set nested in a list, as the parser refuses "
+                f"the nested sets: {type_annotation}"
             )
 
         else:
@@ -5144,14 +5394,27 @@ def _type_annotation_contains_list_of_instances(
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        # NOTE (mristin):
+        # A set holds only primitives and enumeration literals, but no instances.
+        return False
 
     else:
         # noinspection PyTypeChecker
         assert_never(type_annotation)
+
+
+def _type_annotation_contains_set(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether the type annotation is a set, or an optional set.
+
+    The sets hold only primitives, constrained primitives and enumeration
+    literals, each wrapped in its own ``<v>`` element, and never nest.
+    """
+    return isinstance(
+        intermediate.beneath_optional(type_annotation), intermediate.SetTypeAnnotation
+    )
 
 
 # fmt: off
@@ -5273,6 +5536,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         or _type_annotation_contains_tuple_with_atomic_non_class_item(
             prop.type_annotation
         )
+        or _type_annotation_contains_set(prop.type_annotation)
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
     ):
@@ -5284,6 +5548,15 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         for prop in cls.properties
     ):
         blocks.append(_generate_deserialize_list())
+
+    has_set_properties = any(
+        _type_annotation_contains_set(prop.type_annotation)
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+    )
+
+    if has_set_properties:
+        blocks.append(_generate_deserialize_set())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_deserialize_tuple_function(arity))
@@ -5375,6 +5648,9 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         for prop in cls.properties
     ):
         blocks.extend(_generate_write_list_of_values_property())
+
+    if has_set_properties:
+        blocks.extend(_generate_write_set_of_values_property())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.extend(_generate_write_tuple_property(arity))

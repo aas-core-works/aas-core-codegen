@@ -31,6 +31,11 @@ public abstract class AbstractTransformerWithContext<ContextT, T>
     ISomething that,
     ContextT context
   );
+
+  public abstract T transformCollection(
+    ICollection that,
+    ContextT context
+  );
 }
 
 /*

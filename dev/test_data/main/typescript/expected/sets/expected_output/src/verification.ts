@@ -609,6 +609,86 @@ class Verifier
       }
     }
   }
+
+  *transformCollectionWithContext(
+    that: AasTypes.Collection,
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    if (!that.textsAreNotAllIn(AasConstants.RESERVED_TEXTS)) {
+      yield new VerificationError(
+        "Texts must contain a text which is not reserved, if any."
+      )
+    }
+
+    if (!(
+      !(that.optionalTexts !== null)
+      || (AasCommon.setIntersection(that.optionalTexts, that.texts).size == 0)
+    )) {
+      yield new VerificationError(
+        "Optional texts must not share any text with texts."
+      )
+    }
+
+    if (!(
+      !(that.directions.has(AasTypes.Direction.North))
+      || (that.directions.has(AasTypes.Direction.South))
+    )) {
+      yield new VerificationError(
+        "Directions must contain south if they contain north."
+      )
+    }
+
+    if (!(
+      AasCommon.every(
+        AasCommon.map(
+          that.numbers,
+          number =>
+            number > -1000
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Numbers must be greater than -1000."
+      )
+    }
+
+    if (!(that.numbers.size <= 5)) {
+      yield new VerificationError(
+        "There must be at most five numbers."
+      )
+    }
+
+    if (!(!isInTexts("forbidden", that.texts))) {
+      yield new VerificationError(
+        "Texts must not contain the forbidden text."
+      )
+    }
+
+    if (context === true) {
+      const sortedCodes = Array.from(that.codes).sort(AasCommon.compareByCodePoints);
+      for (
+        let codesIndex = 0;
+        codesIndex < sortedCodes.length;
+        codesIndex++
+      ) {
+        for (const error of verifyCode(sortedCodes[codesIndex])) {
+          error.path.prepend(
+            new IndexSegment(
+              sortedCodes,
+              codesIndex
+            )
+          );
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "codes"
+            )
+          );
+          yield error;
+        }
+      }
+    }
+  }
 }
 
 const VERIFIER = new Verifier();

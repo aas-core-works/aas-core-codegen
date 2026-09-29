@@ -12,6 +12,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <vector>
 #pragma warning(pop)
 
 // NOTE (mristin):
@@ -10228,6 +10229,76 @@ SetT Difference(
   }
   return result;
 }
+
+/**
+ * \brief Check whether \p that text comes before \p other text,
+ * comparing them code point by code point.
+ *
+ * The comparison of std::wstring compares the code units. Where wchar_t has
+ * 16 bits, as on Windows, the text is encoded in UTF-16, and the code units put
+ * the characters above U+FFFF, encoded as surrogate pairs, before
+ * the characters from U+E000 to U+FFFF. Hence we decode the code points and
+ * compare them instead, in the same way on all the platforms.
+ *
+ * We sort the items of the sets by the code points in the serialization so that
+ * all the SDKs write the same order.
+ *
+ * \param that text to be compared
+ * \param other text to compare against
+ * \return `true` if \p that comes before \p other
+ */
+bool LessByCodePoints(
+  const std::wstring& that,
+  const std::wstring& other
+);
+
+/**
+ * \brief Sort the pointers to the items of \p set by \p less.
+ *
+ * We sort the pointers instead of the items so that we copy no items.
+ *
+ * \param set whose items are to be sorted
+ * \param less comparing two items
+ * \return pointers to the items, sorted
+ */
+template<typename SetT, typename LessT>
+std::vector<const typename SetT::value_type*> SortedPointers(
+  const SetT& set,
+  LessT less
+) {
+  typedef typename SetT::value_type T;
+
+  std::vector<const T*> result;
+  result.reserve(set.size());
+
+  for (const T& item : set) {
+    result.push_back(&item);
+  }
+
+  std::sort(
+    result.begin(),
+    result.end(),
+    [&less](const T* that, const T* other) {
+      return less(*that, *other);
+    }
+  );
+
+  return result;
+}
+
+/**
+ * \brief Hash an enumeration literal by its underlying value.
+ *
+ * C++11 does not specialize std::hash for the enumerations, while C++14 does.
+ * We use this hasher for all the sets of enumeration literals so that
+ * the SDK stays C++11-compatible.
+ */
+struct EnumHash {
+  template<typename T>
+  std::size_t operator()(T that) const {
+    return static_cast<std::size_t>(that);
+  }
+};
 
 }  // namespace common
 /**@}*/

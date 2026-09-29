@@ -100,6 +100,81 @@ export function parseNamedElementInNoNamespace<T>(
         else []
     )  # type: List[Stripped]
 
+    # NOTE (mristin):
+    # We parse the sets only for a meta-model which has a set in a property.
+    set_blocks = (
+        [
+            Stripped(
+                f"""\
+/**
+ * Parse a sequence of the items of a set from `cursor`, stopping (without
+ * consuming) at the first closing element.
+ *
+ * The items can come in any order, but a duplicate item is refused at its own
+ * index, so that no item is silently lost. The caller is expected to read and
+ * verify the property's own closing element afterwards.
+ *
+ * @param cursor - to read from
+ * @param parseItem - parses a single item
+ * @returns the parsed items, or an error
+ * @typeParam T - type of a single item
+ */
+export function parseSet<T>(
+{I}cursor: XmlCursor,
+{I}parseItem: ContentParser<T>
+): AasCommon.Either<Set<T>, DeserializationError> {{
+{I}const items = new Set<T>();
+{I}let itemIndex = 0;
+
+{I}cursor.skipIgnorable();
+{I}// eslint-disable-next-line no-constant-condition
+{I}while (true) {{
+{II}const maybeClose = cursor.current();
+{II}if (maybeClose === null) {{
+{III}return newDeserializationError<Set<T>>(
+{IIII}"Expected an XML element corresponding to a set item " +
+{IIIII}"or property closing element, but got end of token stream"
+{III});
+{II}}}
+
+{II}if (maybeClose instanceof CloseTagToken) {{
+{III}break;
+{II}}}
+
+{II}const itemOrError = parseItem(cursor);
+{II}if (itemOrError.error !== null) {{
+{III}itemOrError.error.path.prepend(new IndexSegment(itemIndex));
+{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{IIII}null,
+{IIII}itemOrError.error
+{III});
+{II}}}
+
+{II}const item = itemOrError.mustValue();
+{II}if (items.has(item)) {{
+{III}const error = new DeserializationError(
+{IIII}"Expected unique items in the set, but the item is a duplicate"
+{III});
+{III}error.path.prepend(new IndexSegment(itemIndex));
+{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{IIII}null,
+{IIII}error
+{III});
+{II}}}
+
+{II}items.add(item);
+{II}itemIndex++;
+{II}cursor.skipIgnorable();
+{I}}}
+
+{I}return new AasCommon.Either<Set<T>, DeserializationError>(items, null);
+}}"""
+            )
+        ]
+        if typescript_common.has_set_properties(symbol_table)
+        else []
+    )  # type: List[Stripped]
+
     blocks = [
         Stripped(
             """\
@@ -1120,6 +1195,7 @@ export function escapeXmlText(text: string): string {{
 {II}.replace(/'/g, "&apos;");
 }}"""
         ),
+        *set_blocks,
         *in_no_namespace_blocks,
         typescript_common.WARNING,
     ]  # type: List[Stripped]

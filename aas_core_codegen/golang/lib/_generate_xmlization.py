@@ -291,6 +291,19 @@ def _collect_requirements(
                     observed_list_writers.add(writer_name)
                     list_items_type_annos.append(type_anno.items)
 
+            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+                # NOTE (mristin):
+                # We write a set exactly as a list of its sorted items.
+                assert isinstance(
+                    type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+                )
+                require_item(type_anno.items, "v")
+
+                writer_name = _list_content_writer_name(type_anno.items)
+                if writer_name not in observed_list_writers:
+                    observed_list_writers.add(writer_name)
+                    list_items_type_annos.append(type_anno.items)
+
             elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
                 for i, item_type_anno in enumerate(type_anno.items):
                     assert isinstance(
@@ -449,6 +462,76 @@ func readListOf[T any](
 {II}}}
 
 {II}values = append(values, value)
+
+{II}i++
+{I}}}
+
+{I}next = current
+{I}return
+}}"""
+    )
+
+
+def _generate_read_set_of() -> Stripped:
+    """Generate the function to read a set of values as a sequence of XML elements."""
+    return Stripped(
+        f"""\
+// Read a set of values as a sequence of XML elements.
+//
+// The items are read exactly as the items of a list, see [readListOf].
+// They can come in any order, but they must be unique. We do not drop
+// a duplicate silently, but report it at its index in the sequence.
+//
+// The set is represented as a map to empty structs.
+func readSetOf[T comparable](
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}readItem func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (value T, aNext xml.Token, anErr error),
+) (values map[T]struct{{}}, next xml.Token, err error) {{
+{I}values = make(map[T]struct{{}})
+
+{I}i := 0
+{I}for {{
+{II}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}if _, ok := current.(xml.StartElement); !ok {{
+{III}break
+{II}}}
+
+{II}var value T
+{II}var valueErr error
+{II}value, current, valueErr = xmlcommon.ReadElementDispatched(
+{III}decoder, current, readItem,
+{II})
+{II}if valueErr != nil {{
+{III}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
+{IIII}deseriaErr.Path.PrependIndex(
+{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}err = valueErr
+{III}return
+{II}}}
+
+{II}if _, has := values[value]; has {{
+{III}deseriaErr := xmlcommon.NewDeserializationError(
+{IIII}"Expected unique items in the set, but the item is a duplicate",
+{III})
+{III}deseriaErr.Path.PrependIndex(
+{IIII}&aasreporting.IndexSegment{{Index: i}},
+{III})
+{III}err = deseriaErr
+{III}return
+{II}}}
+
+{II}values[value] = struct{{}}{{}}
 
 {II}i++
 {I}}}
@@ -1127,9 +1210,22 @@ readTuple{arity}(
             )
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"NOTE (mristin): We expect only sets of atomic values, "
+                f"as we refuse the others in "
+                f"intermediate._translate._verify_items_of_sets, "
+                f"but you specified {type_anno}."
+            )
+
+            read_item = _item_reader_name(type_anno.items, "v")
+
+            case_body = Stripped(
+                f"""\
+{prop_var}, current, valueErr = readSetOf(
+{I}decoder, current, {read_item},
+)"""
             )
 
         else:
@@ -1996,6 +2092,13 @@ def _content_writer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Strippe
         assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple)
         return _list_content_writer_name(type_anno.items)
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # We write a set exactly as a list of its sorted items, see
+        # :py:func:`_generate_snippet_to_serialize_property`.
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple)
+        return _list_content_writer_name(type_anno.items)
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return _tuple_content_writer_name(type_anno)
 
@@ -2242,6 +2345,11 @@ def _generate_snippet_to_serialize_property(
         intermediate.PrimitiveType.BYTEARRAY
     ):
         function_name = "writeOptionalSlice"
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # We write the sorted items of a set as a slice. An absent set gives
+        # a nil slice, see ``aascommon.SortedKeys``.
+        function_name = "writeOptionalSlice"
     elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         function_name = "writeOptionalJsonValue"
     elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
@@ -2269,11 +2377,23 @@ def _generate_snippet_to_serialize_property(
 
     getter_name = golang_naming.getter_name(prop.name)
 
+    value_expr = f"that.{getter_name}()"
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # We serialize a set as a list whose items are sorted in the same order
+        # in all the SDKs.
+        # NOTE (mristin):
+        # The value is an argument of the write call, which is itself an argument
+        # of ``finishProperty``, so it is indented by four tabs.
+        value_expr = golang_common.sorted_set_items_expr(
+            value_expr, type_anno.items, column=4 * golang_common.TAB_WIDTH
+        )
+
     arguments_joined = golang_common.join_arguments(
         [
             "encoder",
             golang_common.string_literal(prop.xml_name),
-            f"that.{getter_name}()",
+            value_expr,
             _content_writer_expr(type_anno),
         ],
         indention=3,
@@ -2530,6 +2650,9 @@ type DeserializationError = xmlcommon.DeserializationError"""
             _generate_conclude_property(),
         ]
     )
+
+    if golang_common.uses_set_properties(symbol_table):
+        blocks.append(_generate_read_set_of())
 
     requirements = _collect_requirements(symbol_table)
 

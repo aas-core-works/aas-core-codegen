@@ -370,6 +370,28 @@ if {item_that} != {item_other} {{
 
             cmp_subblock = Stripped("\n".join(item_cmp_blocks))
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            # NOTE (mristin):
+            # A set holds only primitives and enumeration literals, which Go
+            # compares with ``==`` as the keys of a map.
+            cmp_subblock = Stripped(
+                f"""\
+if 
+{I}len({that_var}) !=
+{I}len({other_var}) {{
+{I}return false
+}}
+for k := range {that_var} {{
+{I}if _, ok := {other_var}[k]; !ok {{
+{II}return false
+{I}}}
+}}"""
+            )
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(type_anno)
+
         assert cmp_subblock is not None
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):

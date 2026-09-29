@@ -45,6 +45,9 @@ class IVisitor {
   virtual void VisitSomething(
     const std::shared_ptr<types::ISomething>& that
   ) = 0;
+  virtual void VisitCollection(
+    const std::shared_ptr<types::ICollection>& that
+  ) = 0;
 };  // class IVisitor
 
 /**
@@ -71,6 +74,9 @@ class PassThroughVisitor
  protected:
   void VisitSomething(
     const std::shared_ptr<types::ISomething>& that
+  ) override;
+  void VisitCollection(
+    const std::shared_ptr<types::ICollection>& that
   ) override;
 };  // class PassThroughVisitor
 

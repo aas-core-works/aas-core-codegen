@@ -28,15 +28,17 @@ namespace iteration {
  */
 enum class Property : std::uint32_t {
   kCodes = 0,
-  kFlags = 1,
-  kKind = 2,
-  kKinds = 3,
-  kNumber = 4,
-  kNumbers = 5,
-  kOptionalKind = 6,
-  kOptionalTexts = 7,
-  kText = 8,
-  kTexts = 9
+  kDirections = 1,
+  kFlags = 2,
+  kKind = 3,
+  kKinds = 4,
+  kNumber = 5,
+  kNumbers = 6,
+  kOptionalDirections = 7,
+  kOptionalKind = 8,
+  kOptionalTexts = 9,
+  kText = 10,
+  kTexts = 11
 };
 
 std::wstring PropertyToWstring(
@@ -372,6 +374,13 @@ class DescentOnce : public IDescent {
  * This container is practical when you want to show the literals in a GUI or a CLI.
  */
 extern const std::vector<types::Kind> kOverKind;
+
+/**
+ * \brief Give a container for all the literals of types::Direction.
+ *
+ * This container is practical when you want to show the literals in a GUI or a CLI.
+ */
+extern const std::vector<types::Direction> kOverDirection;
 
 // endregion Over enumerations
 

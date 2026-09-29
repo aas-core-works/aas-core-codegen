@@ -1249,6 +1249,100 @@ std::pair<
     )
 
 
+def _generate_deserialize_set() -> Stripped:
+    """Generate a generic set deserialization function."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a set of items from \\p json.
+ *
+ * The items can come in any order, but we refuse the duplicates, as we would
+ * lose them silently otherwise.
+ *
+ * \\tparam SetT type of the set, which might come with its own hasher
+ * \\param json value expected to be an array
+ * \\param deserialize_item de-serializes an item
+ * \\return the set, or an error, if any
+ */
+template <typename SetT, typename DeserializeItemT>
+std::pair<
+{I}common::optional<SetT >,
+{I}common::optional<DeserializationError>
+> DeserializeSet(
+{I}const nlohmann::json& json,
+{I}DeserializeItemT&& deserialize_item
+) {{
+{I}typedef typename SetT::value_type T;
+
+{I}if (!json.is_array()) {{
+{II}std::wstring message = common::Concat(
+{III}L"Expected an array, but got: ",
+{III}common::Utf8ToWstring(
+{IIII}json.type_name()
+{III})
+{II});
+
+{II}return std::make_pair<
+{III}common::optional<SetT >,
+{III}common::optional<DeserializationError>
+{II}>(
+{III}common::nullopt,
+{III}common::make_optional<DeserializationError>(
+{IIII}message
+{III})
+{II});
+{I}}}
+
+{I}common::optional<SetT > set(
+{II}common::make_optional<SetT >()
+{I});
+
+{I}set->reserve(json.size());
+
+{I}size_t index = 0;
+
+{I}for(const nlohmann::json& item : json) {{
+{II}common::optional<T> deserialized;
+{II}common::optional<DeserializationError> error;
+
+{II}std::tie(deserialized, error) = deserialize_item(item);
+
+{II}if (!error.has_value()) {{
+{III}const bool inserted = set->insert(std::move(*deserialized)).second;
+{III}if (!inserted) {{
+{IIII}error = common::make_optional<DeserializationError>(
+{IIIII}L"Expected unique items in the set, but the item is a duplicate"
+{IIII});
+{III}}}
+{II}}}
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<IndexSegment>(
+{IIIII}index
+{IIII})
+{III});
+
+{III}return std::make_pair<
+{IIII}common::optional<SetT >,
+{IIII}common::optional<DeserializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}std::move(error)
+{III});
+{II}}}
+
+{II}++index;
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(set),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
 def _generate_deserialize_list_of_instances() -> Stripped:
     """
     Generate the list de-serialization whose items are given the options.
@@ -2419,9 +2513,29 @@ DeserializeList<
         return Stripped(f"{deserialize_function}(value)")
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Set items are restricted to primitives, constrained primitives and "
+            "enumerations by intermediate._translate._verify_items_of_sets."
+        )
+
+        set_type = cpp_common.generate_type(
+            type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        parse_item, takes_options = _json_parse_item_expr(type_anno.items)
+        assert not takes_options, (
+            f"Only the instances take the options, but the set items are never "
+            f"instances: {type_anno}"
+        )
+
+        return Stripped(
+            f"""\
+DeserializeSet<
+{I}{indent_but_first_line(set_type, I)}
+>(
+{I}value,
+{I}{indent_but_first_line(parse_item, I)}
+)"""
         )
 
     else:
@@ -3776,6 +3890,118 @@ nlohmann::json SerializeListWithInfallible(
     )
 
 
+def _generate_serialize_set_with_fallible_item_serialization() -> Stripped:
+    """Generate a function to serialize a set with fallible item serialization."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given set to a JSON array, sorted by \\p less, where item
+ * serialization might fail.
+ *
+ * The path of an error refers to the index of the item in the sorted array.
+ */
+template<
+{I}typename T,
+{I}typename HashT,
+{I}typename LessT,
+{I}typename FallibleSerializeItemT
+>
+std::pair<
+{I}common::optional<nlohmann::json>,
+{I}common::optional<SerializationError>
+> SerializeSetWithFallible(
+{I}const std::unordered_set<T, HashT>& set,
+{I}LessT less,
+{I}FallibleSerializeItemT&& fallible_serialize_item
+) {{
+{I}const std::vector<const T*> sorted(
+{II}common::SortedPointers(set, less)
+{I});
+
+{I}nlohmann::json serialized = nlohmann::json::array();
+
+{I}serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+{II}sorted.size()
+{I});
+
+{I}for (size_t index = 0; index < sorted.size(); ++index) {{
+{II}common::optional<nlohmann::json> json_item;
+{II}common::optional<SerializationError> error;
+
+{II}std::tie(
+{III}json_item,
+{III}error
+{II}) = fallible_serialize_item(*sorted[index]);
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<iteration::IndexSegment>(
+{IIIII}index
+{IIII})
+{III});
+
+{III}return std::make_pair<
+{IIII}common::optional<nlohmann::json>,
+{IIII}common::optional<SerializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}std::move(error)
+{III});
+{II}}}
+
+{II}serialized.emplace_back(
+{III}std::move(*json_item)
+{II});
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(serialized),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_serialize_set_with_infallible_item_serialization() -> Stripped:
+    """Generate a function to serialize a set with infallible item serialization."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given set to a JSON array, sorted by \\p less, where item
+ * serialization can not fail.
+ */
+template<
+{I}typename T,
+{I}typename HashT,
+{I}typename LessT,
+{I}typename InfallibleSerializeItemT
+>
+nlohmann::json SerializeSetWithInfallible(
+{I}const std::unordered_set<T, HashT>& set,
+{I}LessT less,
+{I}InfallibleSerializeItemT&& infallible_serialize_item
+) {{
+{I}const std::vector<const T*> sorted(
+{II}common::SortedPointers(set, less)
+{I});
+
+{I}nlohmann::json serialized = nlohmann::json::array();
+
+{I}serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+{II}sorted.size()
+{I});
+
+{I}for (const T* item : sorted) {{
+{II}serialized.emplace_back(
+{III}infallible_serialize_item(*item)
+{II});
+{I}}}
+
+{I}return serialized;
+}}"""
+    )
+
+
 def _generate_serialize_tuple_function(arity: int) -> Stripped:
     """
     Generate a generic function to serialize a tuple of the given ``arity``.
@@ -3997,7 +4223,9 @@ def _serialization_is_fallible(
             or a_type is intermediate.PrimitiveType.FLOAT
         )
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
         return _serialization_is_fallible(type_anno.items, ids_of_fallible_types)
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -4356,9 +4584,27 @@ Serialize{union_name}(
         )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Set items are restricted to primitives, constrained primitives and "
+            "enumerations by intermediate._translate._verify_items_of_sets."
+        )
+
+        if _serialization_is_fallible(type_anno.items, ids_of_fallible_types):
+            serialize_set = "SerializeSetWithFallible"
+        else:
+            serialize_set = "SerializeSetWithInfallible"
+
+        less = cpp_common.generate_set_item_less(type_anno.items)
+
+        serialize_item = _serialize_item_expr(type_anno.items)
+
+        return Stripped(
+            f"""\
+{serialize_set}(
+{I}{indent_but_first_line(value_expr, I)},
+{I}{less},
+{I}{indent_but_first_line(serialize_item, I)}
+)"""
         )
 
     else:
@@ -5187,10 +5433,9 @@ def _type_annotation_contains_list(
         return False
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
+        # NOTE (mristin):
+        # A set is de-serialized with ``DeserializeSet``, not ``DeserializeList``.
+        return False
 
     else:
         # noinspection PyTypeChecker
@@ -5269,6 +5514,11 @@ def generate_implementation(
     ):
         blocks.append(_generate_deserialize_list())
         blocks.append(_generate_deserialize_list_of_instances())
+
+    has_set_properties = len(cpp_common.set_types_of_properties(symbol_table)) > 0
+
+    if has_set_properties:
+        blocks.append(_generate_deserialize_set())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_deserialize_tuple_function(arity))
@@ -5383,6 +5633,10 @@ struct SerializationError {{
             _generate_serialize_list_with_infallible_item_serialization(),
         ]
     )
+
+    if has_set_properties:
+        blocks.append(_generate_serialize_set_with_fallible_item_serialization())
+        blocks.append(_generate_serialize_set_with_infallible_item_serialization())
 
     # NOTE (mristin):
     # A serializer can fail only where a number can be reached from what it

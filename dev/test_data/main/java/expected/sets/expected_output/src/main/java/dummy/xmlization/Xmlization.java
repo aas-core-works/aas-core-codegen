@@ -24,6 +24,8 @@ import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.visitation.*;
 import dummy.xmlcommon.XmlCommon;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Provide de/serialization of meta-model classes to/from XML.
@@ -224,6 +226,55 @@ public class Xmlization {
     }
 
     /**
+     * Read the items of a set, each with {@code readItem}.
+     *
+     * <p>Every start element is considered to mark the start of an item. Reading
+     * stops as soon as a non-start element is encountered.
+     *
+     * <p>The items can come in any order, but a duplicate item is an error, so that
+     * no item is silently dropped.
+     */
+    private static <T> Reporting.Result<Set<T>> readSet(
+      XMLEventReader reader, boolean isEmpty, XmlCommon.ElementReader<T> readItem) {
+      final Set<T> result = new HashSet<>();
+      if (isEmpty) {
+        return Reporting.Result.success(result);
+      }
+
+      XmlCommon.skipWhitespaceAndComments(reader);
+      int index = 0;
+      if (!XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a start element opening an item of the set, " +
+          "but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
+        error.prependSegment(new Reporting.IndexSegment(index));
+        return Reporting.Result.failure(error);
+      }
+
+      while (XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Result<? extends T> itemResult = readItem.read(reader);
+        if (itemResult.isError()) {
+          itemResult.getError()
+            .prependSegment(
+              new Reporting.IndexSegment(index));
+          return Reporting.Result.failure(itemResult.getError());
+        }
+
+        if (!result.add(itemResult.getResult())) {
+          final Reporting.Error error = new Reporting.Error(
+            "Expected unique items in the set, but the item is a duplicate");
+          error.prependSegment(new Reporting.IndexSegment(index));
+          return Reporting.Result.failure(error);
+        }
+
+        index++;
+        XmlCommon.skipWhitespaceAndComments(reader);
+      }
+
+      return Reporting.Result.success(result);
+    }
+
+    /**
      * Check whether the sequence of the properties has ended.
      *
      * <p>Only the end tag of the enclosing element concludes a sequence. Reaching
@@ -327,6 +378,39 @@ public class Xmlization {
         reader, isEmpty, _DeserializeImplementation::readAtV_bool);
     }
 
+    private static Reporting.Result<Set<String>> readSetOf_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readSet(
+        reader, isEmpty, _DeserializeImplementation::readAtV_string);
+    }
+
+    private static Reporting.Result<Set<Long>> readSetOf_long(
+      XMLEventReader reader, boolean isEmpty) {
+      return readSet(
+        reader, isEmpty, _DeserializeImplementation::readAtV_long);
+    }
+
+    private static Reporting.Result<Set<Boolean>> readSetOf_bool(
+      XMLEventReader reader, boolean isEmpty) {
+      return readSet(
+        reader, isEmpty, _DeserializeImplementation::readAtV_bool);
+    }
+
+    private static Reporting.Result<Direction> readTextAs_Direction(
+      XMLEventReader reader, boolean isEmpty) {
+      return readEnum(
+        reader,
+        isEmpty,
+        Stringification::directionFromString,
+        "Direction");
+    }
+
+    private static Reporting.Result<Set<Direction>> readSetOf_Direction(
+      XMLEventReader reader, boolean isEmpty) {
+      return readSet(
+        reader, isEmpty, _DeserializeImplementation::readAtV_Direction);
+    }
+
     private static Reporting.Result<? extends String> readAtV_string(
       XMLEventReader reader) {
       return XmlCommon.readNamedElement(
@@ -357,6 +441,14 @@ public class Xmlization {
         reader,
         "v",
         _DeserializeImplementation::readTextAs_bool);
+    }
+
+    private static Reporting.Result<? extends Direction> readAtV_Direction(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "v",
+        _DeserializeImplementation::readTextAs_Direction);
     }
 
     /**
@@ -616,6 +708,201 @@ public class Xmlization {
         "something",
         _DeserializeImplementation::readSomethingFromSequence);
     }
+
+    /**
+     * Deserialize an instance of class Collection from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<Collection> readCollectionFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      Set<String> theTexts = null;
+      Set<Long> theNumbers = null;
+      Set<Boolean> theFlags = null;
+      Set<Direction> theDirections = null;
+      Set<String> theCodes = null;
+      Set<String> theOptionalTexts = null;
+      Set<Direction> theOptionalDirections = null;
+
+      if (!isEmptySequence) {
+        while (!atEndOfSequence(reader)) {
+          final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+          if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+          }
+
+          final String elementName = tryElementName.getResult();
+          final boolean isEmptyProperty = XmlCommon.isEmptyElement(reader);
+
+          Reporting.Error valueError = null;
+
+          switch (elementName) {
+            case "texts": {
+              if (theTexts != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<String>> value =
+                readSetOf_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theTexts = value.getResult();
+              }
+              break;
+            }
+            case "numbers": {
+              if (theNumbers != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<Long>> value =
+                readSetOf_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theNumbers = value.getResult();
+              }
+              break;
+            }
+            case "flags": {
+              if (theFlags != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<Boolean>> value =
+                readSetOf_bool(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theFlags = value.getResult();
+              }
+              break;
+            }
+            case "directions": {
+              if (theDirections != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<Direction>> value =
+                readSetOf_Direction(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theDirections = value.getResult();
+              }
+              break;
+            }
+            case "codes": {
+              if (theCodes != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<String>> value =
+                readSetOf_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theCodes = value.getResult();
+              }
+              break;
+            }
+            case "optionalTexts": {
+              if (theOptionalTexts != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<String>> value =
+                readSetOf_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalTexts = value.getResult();
+              }
+              break;
+            }
+            case "optionalDirections": {
+              if (theOptionalDirections != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Set<Direction>> value =
+                readSetOf_Direction(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalDirections = value.getResult();
+              }
+              break;
+            }
+            default:
+              return unexpectedProperty("Collection", elementName);
+          }
+
+          if (valueError != null) {
+            valueError.prependSegment(
+              new Reporting.NameSegment(
+                elementName));
+            return Reporting.Result.failure(valueError);
+          }
+
+          final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
+          if (endResult.isError()) {
+            return Reporting.Result.failure(endResult.getError());
+          }
+        }
+      }
+
+      if (theTexts == null) {
+        return missingRequiredProperty("texts", "Collection");
+      }
+
+      if (theNumbers == null) {
+        return missingRequiredProperty("numbers", "Collection");
+      }
+
+      if (theFlags == null) {
+        return missingRequiredProperty("flags", "Collection");
+      }
+
+      if (theDirections == null) {
+        return missingRequiredProperty("directions", "Collection");
+      }
+
+      if (theCodes == null) {
+        return missingRequiredProperty("codes", "Collection");
+      }
+
+      return Reporting.Result.success(new Collection(
+        theTexts,
+        theNumbers,
+        theFlags,
+        theDirections,
+        theCodes,
+        theOptionalTexts,
+        theOptionalDirections));
+    }
+
+    /**
+     * Deserialize an instance of class Collection from an XML element.
+     */
+    private static Reporting.Result<? extends Collection> readCollectionFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "collection",
+        _DeserializeImplementation::readCollectionFromSequence);
+    }
   }
 
   /**
@@ -659,6 +946,29 @@ public class Xmlization {
 
       return result.onError(error -> {
         error.prependSegment(new Reporting.NameSegment("something"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of Collection from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static Collection deserializeCollection(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends Collection> result =
+        _DeserializeImplementation.readCollectionFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("collection"));
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -790,6 +1100,70 @@ public class Xmlization {
       }
     }
 
+    private static void writeSetOf_string(
+      Set<String> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (Object item : SetHelpers.sortedByCodePoints(that)) {
+          writeAtV_stringified(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
+    private static void writeSetOf_long(
+      Set<Long> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (Object item : SetHelpers.sorted(that)) {
+          writeAtV_stringified(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
+    private static void writeSetOf_bool(
+      Set<Boolean> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (Object item : SetHelpers.sorted(that)) {
+          writeAtV_stringified(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
+    private static void writeSetOf_Direction(
+      Set<Direction> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (IEnum item : SetHelpers.sortedBy(that, SetHelpers::compareByRankOfDirection)) {
+          writeAtV_IEnum(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
     private static void writeAtV_stringified(
       Object that,
       XMLStreamWriter writer) {
@@ -894,6 +1268,71 @@ public class Xmlization {
         writer,
         withNamespace,
         _VisitorWithWriter::writeSomethingAsSequence);
+    }
+
+    private static void writeCollectionAsSequence(
+      ICollection that,
+      XMLStreamWriter writer) {
+      writeProperty(
+        "texts",
+        "getTexts()",
+        that.getTexts(),
+        writer,
+        _VisitorWithWriter::writeSetOf_string);
+
+      writeProperty(
+        "numbers",
+        "getNumbers()",
+        that.getNumbers(),
+        writer,
+        _VisitorWithWriter::writeSetOf_long);
+
+      writeProperty(
+        "flags",
+        "getFlags()",
+        that.getFlags(),
+        writer,
+        _VisitorWithWriter::writeSetOf_bool);
+
+      writeProperty(
+        "directions",
+        "getDirections()",
+        that.getDirections(),
+        writer,
+        _VisitorWithWriter::writeSetOf_Direction);
+
+      writeProperty(
+        "codes",
+        "getCodes()",
+        that.getCodes(),
+        writer,
+        _VisitorWithWriter::writeSetOf_string);
+
+      writeOptionalProperty(
+        "optionalTexts",
+        "getOptionalTexts()",
+        that.getOptionalTexts(),
+        writer,
+        _VisitorWithWriter::writeSetOf_string);
+
+      writeOptionalProperty(
+        "optionalDirections",
+        "getOptionalDirections()",
+        that.getOptionalDirections(),
+        writer,
+        _VisitorWithWriter::writeSetOf_Direction);
+    }
+
+    @Override
+    public void visitCollection(
+      ICollection that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "collection",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writeCollectionAsSequence);
     }
   }
 

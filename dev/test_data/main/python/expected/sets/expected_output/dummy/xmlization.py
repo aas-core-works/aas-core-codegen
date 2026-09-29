@@ -91,6 +91,7 @@ from typing import (
     NoReturn,
     Optional,
     Sequence,
+    Set,
     TextIO,
     Tuple,
     TypeVar,
@@ -334,6 +335,185 @@ def something_from_str(
         ['start', 'end']
     )
     return something_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def collection_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.collection_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Collection` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_collection_as_element,
+        'Collection'
+    )
+
+
+def collection_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.collection_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Collection` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Collection` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return collection_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def collection_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.collection_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Collection` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Collection` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return collection_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def collection_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.collection_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Collection` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Collection` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return collection_from_iterparse(
         _with_elements_cleared_after_yield(iterator)
     )
 
@@ -770,6 +950,82 @@ def _read_list_of_items(
     return result
 
 
+def _read_set_of_items(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_item: _ContentReader[_ValueT]
+) -> Set[_ValueT]:
+    """
+    Read the children of :paramref:`element` as a set of items.
+
+    We accept the items in any order, but refuse the duplicates, so that no item
+    is silently lost.
+
+    :paramref:`read_item` is responsible for verifying the tag of each item
+    element itself, see :py:func:`_read_list_of_items`.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the set
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_item: to read a single item, including its own end element
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed items
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only item elements and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    result = set()  # type: Set[_ValueT]
+
+    while True:
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                f"Expected an item element or the end element corresponding "
+                f"to {element.tag}, but got the end-of-input"
+            )
+
+        next_event, item_element = next_event_element
+        if next_event == 'end' and item_element.tag == element.tag:
+            # We reached the end element enclosing the items.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                f"Expected a start element corresponding to an item, "
+                f"but got event {next_event!r} "
+                f"and element {item_element.tag!r}"
+            )
+
+        # NOTE (mristin):
+        # We raise on a duplicate, so the number of the items read so far is also
+        # the index of the item element.
+        index = len(result)
+
+        try:
+            item = read_item(item_element, iterator)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(item_element, index))
+            raise
+
+        if item in result:
+            duplicate_exception = DeserializationException(
+                "Expected unique items in the set, but the item is a duplicate"
+            )
+            duplicate_exception.path._prepend(IndexSegment(item_element, index))
+            raise duplicate_exception
+
+        result.add(item)
+
+    return result
+
+
 def _read_instance_from_iterparse(
     iterator: Iterator[Tuple[str, Element]],
     read_as_element: _ContentReader[_ValueT],
@@ -964,6 +1220,22 @@ def _read_bool__at_v(
     )
 
 
+def _read_direction__at_v(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Direction:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``v``, as :py:class:`.types.Direction`.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'v',
+        _read_direction_from_element_text
+    )
+
+
 def _read_int__at_v(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1056,6 +1328,66 @@ def _read_list_of__str(
     )
 
 
+def _read_set_of__bool(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Set[bool]:
+    """
+    Read the items of :paramref:`element` as a set of
+    ``bool``.
+    """
+    return _read_set_of_items(
+        element,
+        iterator,
+        _read_bool__at_v
+    )
+
+
+def _read_set_of__direction(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Set[aas_types.Direction]:
+    """
+    Read the items of :paramref:`element` as a set of
+    :py:class:`.types.Direction`.
+    """
+    return _read_set_of_items(
+        element,
+        iterator,
+        _read_direction__at_v
+    )
+
+
+def _read_set_of__int(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Set[int]:
+    """
+    Read the items of :paramref:`element` as a set of
+    ``int``.
+    """
+    return _read_set_of_items(
+        element,
+        iterator,
+        _read_int__at_v
+    )
+
+
+def _read_set_of__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Set[str]:
+    """
+    Read the items of :paramref:`element` as a set of
+    ``str``.
+    """
+    return _read_set_of_items(
+        element,
+        iterator,
+        _read_str__at_v
+    )
+
+
 def _read_str__at_v(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1094,6 +1426,31 @@ def _read_kind_from_element_text(
         iterator,
         aas_stringification.kind_from_str,
         'Kind'
+    )
+
+
+def _read_direction_from_element_text(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Direction:
+    """
+    Parse the text of :paramref:`element` as a literal of
+    :py:class:`.types.Direction`, and read the corresponding
+    end element from :paramref:`iterator`.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed value
+    """
+    return _read_enum_from_element_text(
+        element,
+        iterator,
+        aas_stringification.direction_from_str,
+        'Direction'
     )
 
 
@@ -1211,6 +1568,101 @@ def _read_something_as_element(
     )
 
 
+def _read_collection_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    values = _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_COLLECTION
+    )
+
+    the_texts: Optional[Set[str]] = values.get('texts')
+    the_numbers: Optional[Set[int]] = values.get('numbers')
+    the_flags: Optional[Set[bool]] = values.get('flags')
+    the_directions: Optional[Set[aas_types.Direction]] = values.get('directions')
+    the_codes: Optional[Set[str]] = values.get('codes')
+    the_optional_texts: Optional[Set[str]] = values.get('optionalTexts')
+    the_optional_directions: Optional[Set[aas_types.Direction]] = values.get(
+        'optionalDirections'
+    )
+
+    if the_texts is None:
+        raise DeserializationException(
+            "The required property 'texts' is missing"
+        )
+
+    if the_numbers is None:
+        raise DeserializationException(
+            "The required property 'numbers' is missing"
+        )
+
+    if the_flags is None:
+        raise DeserializationException(
+            "The required property 'flags' is missing"
+        )
+
+    if the_directions is None:
+        raise DeserializationException(
+            "The required property 'directions' is missing"
+        )
+
+    if the_codes is None:
+        raise DeserializationException(
+            "The required property 'codes' is missing"
+        )
+
+    return aas_types.Collection(
+        the_texts,
+        the_numbers,
+        the_flags,
+        the_directions,
+        the_codes,
+        the_optional_texts,
+        the_optional_directions
+    )
+
+
+def _read_collection_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Collection:
+    """
+    Read an instance of :py:class:`.types.Collection` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'collection',
+        _read_collection_as_sequence
+    )
+
+
 def _read_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1247,6 +1699,7 @@ _GENERAL_DISPATCH: Mapping[
     ]
 ] = {
     'something': _read_something_as_sequence,
+    'collection': _read_collection_as_sequence,
 }
 
 
@@ -1266,6 +1719,22 @@ _READERS_FOR_SOMETHING: Mapping[
     'flags': _read_list_of__bool,
     'optionalTexts': _read_list_of__str,
     'optionalKind': _read_kind_from_element_text,
+}
+
+
+#: Read the content of a property of
+#: :py:class:`.types.Collection`, by the XML name of the property
+_READERS_FOR_COLLECTION: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
+    'texts': _read_set_of__str,
+    'numbers': _read_set_of__int,
+    'flags': _read_set_of__bool,
+    'directions': _read_set_of__direction,
+    'codes': _read_set_of__str,
+    'optionalTexts': _read_set_of__str,
+    'optionalDirections': _read_set_of__direction,
 }
 
 
@@ -1526,6 +1995,138 @@ def _write_list_of_items(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_set_of__bool(
+    name: str,
+    prop_name: Optional[str],
+    value: Set[bool],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted, enclosed in
+    the :paramref:`name` element.
+
+    The items are sorted in the same order in all the SDKs, and then written
+    exactly as a list, see :py:func:`_write_list_of_items`.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        _write_list_of_items(
+            name,
+            None,
+            sorted(value),
+            _write_bool_as_element,
+            serializer
+        )
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_set_of__direction(
+    name: str,
+    prop_name: Optional[str],
+    value: Set[aas_types.Direction],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted, enclosed in
+    the :paramref:`name` element.
+
+    The items are sorted in the same order in all the SDKs, and then written
+    exactly as a list, see :py:func:`_write_list_of_items`.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        _write_list_of_items(
+            name,
+            None,
+            sorted(value, key=aas_stringification.rank_of_direction),
+            _write_enum_as_element,
+            serializer
+        )
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_set_of__int(
+    name: str,
+    prop_name: Optional[str],
+    value: Set[int],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted, enclosed in
+    the :paramref:`name` element.
+
+    The items are sorted in the same order in all the SDKs, and then written
+    exactly as a list, see :py:func:`_write_list_of_items`.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        _write_list_of_items(
+            name,
+            None,
+            sorted(value),
+            _write_int_as_element,
+            serializer
+        )
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_set_of__str(
+    name: str,
+    prop_name: Optional[str],
+    value: Set[str],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted, enclosed in
+    the :paramref:`name` element.
+
+    The items are sorted in the same order in all the SDKs, and then written
+    exactly as a list, see :py:func:`_write_list_of_items`.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        _write_list_of_items(
+            name,
+            None,
+            sorted(value),
+            _write_str_as_element,
+            serializer
+        )
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_something_as_element(
     name: str,
     prop_name: Optional[str],
@@ -1580,6 +2181,48 @@ def _write_something_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_collection_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: aas_types.Collection,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        _write_set_of__str('texts', 'texts', that.texts, serializer)
+        _write_set_of__int('numbers', 'numbers', that.numbers, serializer)
+        _write_set_of__bool('flags', 'flags', that.flags, serializer)
+        _write_set_of__direction(
+            'directions', 'directions', that.directions, serializer
+        )
+        _write_set_of__str('codes', 'codes', that.codes, serializer)
+        if that.optional_texts is not None:
+            _write_set_of__str(
+                'optionalTexts', 'optional_texts', that.optional_texts, serializer
+            )
+        if that.optional_directions is not None:
+            _write_set_of__direction(
+                'optionalDirections',
+                'optional_directions',
+                that.optional_directions,
+                serializer
+            )
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 class _Serializer(aas_types.AbstractVisitor):
     """Encode instances as XML and write them to :py:attr:`~writer`."""
 
@@ -1613,6 +2256,20 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         _write_something_as_element('something', None, that, self)
+
+    def visit_collection(
+        self,
+        that: aas_types.Collection
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_collection_as_element('collection', None, that, self)
 
 
 def write(instance: aas_types.Class, stream: TextIO) -> None:

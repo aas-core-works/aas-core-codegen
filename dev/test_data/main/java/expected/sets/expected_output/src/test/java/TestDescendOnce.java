@@ -56,6 +56,19 @@ public class TestDescendOnce {
         "Something",
         "maximal.json.trace"));
   } // public void testSomething
+
+  @Test
+  public void testCollection() throws IOException {
+    Collection instance = CommonJsonization.loadMaximalCollection();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "Collection",
+        "maximal.json.trace"));
+  } // public void testCollection
 }  // class TestDescendOnce
 
 // package dummy.tests

@@ -520,8 +520,10 @@ Stream.concat(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
+                f"A set holds only primitives, constrained primitives and "
+                f"enumeration literals, never a reference to one of our own "
+                f"classes, so it can not have been determined "
+                f"descendable: {type_anno}"
             )
 
         else:
@@ -669,7 +671,7 @@ def _generate_imports_for_interface(
         )
     )
 
-    imports.extend(java_common.set_imports_if_necessary(cls.methods, with_bodies=False))
+    imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=False))
 
     if len(cls.inheritances) == 0:
         import_name = Stripped(f"{package}.types.{java_common.INTERFACE_PKG}.IClass")
@@ -720,7 +722,7 @@ def _generate_imports_for_class(
         )
     )
 
-    imports.extend(java_common.set_imports_if_necessary(cls.methods, with_bodies=True))
+    imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=True))
 
     if _has_descendable_properties(cls):
         imports.extend(
@@ -956,7 +958,10 @@ public interface {name} extends\n"""
 
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = java_naming.property_name(prop.name)
             method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
             items_type = java_common.generate_type(prop.type_annotation.value.items)
@@ -1581,11 +1586,22 @@ public void {setter_name}({arg_type} {prop_name}) {{
     for prop in cls.properties:
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             prop_name = java_naming.property_name(prop.name)
             method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
             getter_name = java_naming.getter_name(prop.name)
             items_type = java_common.generate_type(prop.type_annotation.value.items)
+
+            empty_factory: str
+            if isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+                empty_factory = "emptyList"
+            elif isinstance(prop.type_annotation.value, intermediate.SetTypeAnnotation):
+                empty_factory = "emptySet"
+            else:
+                assert_never(prop.type_annotation.value)
 
             blocks.append(
                 Stripped(
@@ -1595,7 +1611,7 @@ public void {setter_name}({arg_type} {prop_name}) {{
  * and otherwise return an empty iterator.
  */
 public Iterable<{items_type}> {method_name}() {{
-{I}return {getter_name}().orElseGet(Collections::emptyList);
+{I}return {getter_name}().orElseGet(Collections::{empty_factory});
 }}"""
                 )
             )

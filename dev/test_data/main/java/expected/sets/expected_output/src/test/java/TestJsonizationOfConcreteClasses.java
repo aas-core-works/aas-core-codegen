@@ -181,6 +181,105 @@ public class TestJsonizationOfConcreteClasses {
     }
   } // public void testSomethingVerificationFail
 
+  @Test
+  public void testCollectionOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Collection");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final Collection instance = Jsonization.Deserialize.deserializeCollection(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testCollectionOk
+
+  @Test
+  public void testCollectionDeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final Collection unused = Jsonization.Deserialize.deserializeCollection(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testCollectionDeserializationFromNonObjectFail
+
+  @Test
+  public void testCollectionDeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("Collection");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Collection for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final Collection var = Jsonization.Deserialize.deserializeCollection(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testCollectionDeserializationFail
+
+  @Test
+  public void testCollectionVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("Collection");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Collection for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final Collection instance = Jsonization.Deserialize.deserializeCollection(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testCollectionVerificationFail
+
   private static JsonNode loadTheFirstExpected(String modelType) throws IOException {
     final List<Path> paths =
       Common.findPaths(

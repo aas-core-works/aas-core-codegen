@@ -20,6 +20,9 @@ public abstract class AbstractVisitor implements IVisitor
   public abstract void visitSomething(
     ISomething that
   );
+  public abstract void visitCollection(
+    ICollection that
+  );
 }
 
 /*

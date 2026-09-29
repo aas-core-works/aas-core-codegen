@@ -215,6 +215,166 @@ bool Something::OptionalTextsAreUniqueIgnoring(
 
 // endregion Something
 
+// region Collection
+
+Collection::Collection(
+  std::unordered_set<std::wstring> texts,
+  std::unordered_set<int64_t> numbers,
+  std::unordered_set<bool> flags,
+  std::unordered_set<Direction, common::EnumHash> directions,
+  std::unordered_set<std::wstring> codes,
+  common::optional<
+    std::unordered_set<std::wstring>
+  > optional_texts,
+  common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  > optional_directions
+) {
+  texts_ = std::move(texts);
+
+  numbers_ = std::move(numbers);
+
+  flags_ = std::move(flags);
+
+  directions_ = std::move(directions);
+
+  codes_ = std::move(codes);
+
+  optional_texts_ = std::move(optional_texts);
+
+  optional_directions_ = std::move(optional_directions);
+}
+
+ModelType Collection::model_type() const {
+  return ModelType::kCollection;
+}
+
+const std::unordered_set<std::wstring>& Collection::texts() const {
+  return texts_;
+}
+
+std::unordered_set<std::wstring>& Collection::mutable_texts() {
+  return texts_;
+}
+
+void Collection::set_texts(
+  std::unordered_set<std::wstring> value
+) {
+  texts_ = value;
+}
+
+const std::unordered_set<int64_t>& Collection::numbers() const {
+  return numbers_;
+}
+
+std::unordered_set<int64_t>& Collection::mutable_numbers() {
+  return numbers_;
+}
+
+void Collection::set_numbers(
+  std::unordered_set<int64_t> value
+) {
+  numbers_ = value;
+}
+
+const std::unordered_set<bool>& Collection::flags() const {
+  return flags_;
+}
+
+std::unordered_set<bool>& Collection::mutable_flags() {
+  return flags_;
+}
+
+void Collection::set_flags(
+  std::unordered_set<bool> value
+) {
+  flags_ = value;
+}
+
+const std::unordered_set<Direction, common::EnumHash>& Collection::directions() const {
+  return directions_;
+}
+
+std::unordered_set<Direction, common::EnumHash>& Collection::mutable_directions() {
+  return directions_;
+}
+
+void Collection::set_directions(
+  std::unordered_set<Direction, common::EnumHash> value
+) {
+  directions_ = value;
+}
+
+const std::unordered_set<std::wstring>& Collection::codes() const {
+  return codes_;
+}
+
+std::unordered_set<std::wstring>& Collection::mutable_codes() {
+  return codes_;
+}
+
+void Collection::set_codes(
+  std::unordered_set<std::wstring> value
+) {
+  codes_ = value;
+}
+
+const common::optional<
+  std::unordered_set<std::wstring>
+>& Collection::optional_texts() const {
+  return optional_texts_;
+}
+
+common::optional<
+  std::unordered_set<std::wstring>
+>& Collection::mutable_optional_texts() {
+  return optional_texts_;
+}
+
+void Collection::set_optional_texts(
+  common::optional<
+    std::unordered_set<std::wstring>
+  > value
+) {
+  optional_texts_ = value;
+}
+
+const common::optional<
+  std::unordered_set<Direction, common::EnumHash>
+>& Collection::optional_directions() const {
+  return optional_directions_;
+}
+
+common::optional<
+  std::unordered_set<Direction, common::EnumHash>
+>& Collection::mutable_optional_directions() {
+  return optional_directions_;
+}
+
+void Collection::set_optional_directions(
+  common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  > value
+) {
+  optional_directions_ = value;
+}
+
+bool Collection::TextsAreNotAllIn(
+  const std::unordered_set<std::wstring>& others
+) const {
+  return (
+    (
+      this->texts().size() == 0
+      || common::Difference(
+        this->texts(),
+        others
+      ).size() > 0
+    )
+  );
+}
+
+// endregion Collection
+
 // region Is-a functions
 
 bool IsSomething(
@@ -222,6 +382,28 @@ bool IsSomething(
 ) {
   switch (that.model_type()) {
     case ModelType::kSomething:
+      return true;
+    case ModelType::kCollection:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsCollection(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kSomething:
+      return false;
+    case ModelType::kCollection:
       return true;
     default:
       throw std::invalid_argument(

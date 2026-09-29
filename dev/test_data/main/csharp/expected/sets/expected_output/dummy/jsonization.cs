@@ -324,6 +324,59 @@ namespace dummy
                     };
             }
 
+            /// <summary>
+            /// De-serialize every item of a JSON array with
+            /// <paramref name="deserializeItem" /> into a set.
+            /// </summary>
+            /// <remarks>
+            /// The items can come in any order, but a duplicate item is reported as
+            /// an error, so that no item is silently dropped.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single array item</typeparam>
+            private static Deserializer<HashSet<T>> AsSetOf<T>(
+                Deserializer<T> deserializeItem)
+            {
+                return (
+                    Nodes.JsonNode? node,
+                    out Reporting.Error? error) =>
+                    {
+                        error = null;
+
+                        Nodes.JsonArray? array = node as Nodes.JsonArray;
+                        if (array == null)
+                        {
+                            error = new Reporting.Error(
+                                $"Expected a JsonArray, but got {Describe(node)}");
+                            return default!;
+                        }
+
+                        HashSet<T> result = new HashSet<T>();
+
+                        int index = 0;
+                        foreach (Nodes.JsonNode? item in array)
+                        {
+                            T parsedItem = deserializeItem(item, out error);
+                            if (error == null && !result.Add(parsedItem))
+                            {
+                                error = new Reporting.Error(
+                                    "Expected unique items in the set, but the item is a duplicate");
+                            }
+
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.IndexSegment(
+                                        index));
+                                return default!;
+                            }
+
+                            index++;
+                        }
+
+                        return result;
+                    };
+            }
+
             private static readonly Deserializer<List<string>> Parse_ListOf_string = (
                 AsArrayOf<string>(
                     StringFrom));
@@ -339,6 +392,22 @@ namespace dummy
             private static readonly Deserializer<List<bool>> Parse_ListOf_bool = (
                 AsArrayOf<bool>(
                     BoolFrom));
+
+            private static readonly Deserializer<HashSet<string>> Parse_SetOf_string = (
+                AsSetOf<string>(
+                    StringFrom));
+
+            private static readonly Deserializer<HashSet<long>> Parse_SetOf_long = (
+                AsSetOf<long>(
+                    LongFrom));
+
+            private static readonly Deserializer<HashSet<bool>> Parse_SetOf_bool = (
+                AsSetOf<bool>(
+                    BoolFrom));
+
+            private static readonly Deserializer<HashSet<Direction>> Parse_SetOf_Direction = (
+                AsSetOf<Direction>(
+                    DirectionFrom));
 
             /// <summary>
             /// Deserialize the enumeration Kind from the <paramref name="node" />.
@@ -365,6 +434,32 @@ namespace dummy
 
                 return result.Value;
             }  // internal static KindFrom
+
+            /// <summary>
+            /// Deserialize the enumeration Direction from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Direction DirectionFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                string text = StringFrom(node, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                Aas.Direction? result = Stringification.DirectionFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of Direction");
+                    return default!;
+                }
+
+                return result.Value;
+            }  // internal static DirectionFrom
 
             /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
@@ -539,6 +634,135 @@ namespace dummy
                     theOptionalTexts,
                     theOptionalKind);
             }  // internal static SomethingFrom
+
+            /// <summary>
+            /// Deserialize an instance of Collection from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Collection CollectionFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing Collection, but got {Describe(node)}");
+                    return default!;
+                }
+
+                HashSet<string>? theTexts = null;
+                HashSet<long>? theNumbers = null;
+                HashSet<bool>? theFlags = null;
+                HashSet<Direction>? theDirections = null;
+                HashSet<string>? theCodes = null;
+                HashSet<string>? theOptionalTexts = null;
+                HashSet<Direction>? theOptionalDirections = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "texts":
+                            theTexts = Parse_SetOf_string(
+                                keyValue.Value, out error);
+                            break;
+                        case "numbers":
+                            theNumbers = Parse_SetOf_long(
+                                keyValue.Value, out error);
+                            break;
+                        case "flags":
+                            theFlags = Parse_SetOf_bool(
+                                keyValue.Value, out error);
+                            break;
+                        case "directions":
+                            theDirections = Parse_SetOf_Direction(
+                                keyValue.Value, out error);
+                            break;
+                        case "codes":
+                            theCodes = Parse_SetOf_string(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalTexts":
+                            theOptionalTexts = Parse_SetOf_string(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalDirections":
+                            theOptionalDirections = Parse_SetOf_Direction(
+                                keyValue.Value, out error);
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (theTexts == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"texts\" is missing");
+                    return default!;
+                }
+
+                if (theNumbers == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"numbers\" is missing");
+                    return default!;
+                }
+
+                if (theFlags == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"flags\" is missing");
+                    return default!;
+                }
+
+                if (theDirections == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"directions\" is missing");
+                    return default!;
+                }
+
+                if (theCodes == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"codes\" is missing");
+                    return default!;
+                }
+
+                return new Aas.Collection(
+                    theTexts
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theNumbers
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theFlags
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDirections
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCodes
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalTexts,
+                    theOptionalDirections);
+            }  // internal static CollectionFrom
         }  // public static class DeserializeImplementation
 
         /// <summary>
@@ -630,6 +854,29 @@ namespace dummy
             }
 
             /// <summary>
+            /// Deserialize an instance of Direction from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Direction.
+            /// </exception>
+            public static Aas.Direction DirectionFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Direction result = DeserializeImplementation.DirectionFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -641,6 +888,29 @@ namespace dummy
                 Nodes.JsonNode node)
             {
                 Aas.Something result = DeserializeImplementation.SomethingFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Collection from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Collection.
+            /// </exception>
+            public static Aas.Collection CollectionFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Collection result = DeserializeImplementation.CollectionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -798,6 +1068,42 @@ namespace dummy
                 };
             }
 
+            /// <summary>
+            /// Compose the serializer of a set whose items are serialized with
+            /// <paramref name="serializeItem" /> in the order given by
+            /// <paramref name="comparison" />.
+            /// </summary>
+            /// <remarks>
+            /// We serialize the items sorted, so that all the SDKs serialize a set
+            /// in the same order.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single set item</typeparam>
+            private static Serializer<HashSet<T>> SerializeSet<T>(
+                Serializer<T> serializeItem,
+                System.Comparison<T> comparison)
+            {
+                return (that) =>
+                {
+                    var result = new Nodes.JsonArray();
+                    int i = 0;
+                    foreach (T item in Common.SetHelpers.Sorted(that, comparison))
+                    {
+                        try
+                        {
+                            result.Add(serializeItem(item));
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.IndexSegment(i));
+                            throw;
+                        }
+                        i++;
+                    }
+                    return result;
+                };
+            }
+
             private static readonly Serializer<List<string>> Serialize_ListOf_string = (
                 SerializeList<string>(
                     ToJsonValue));
@@ -813,6 +1119,26 @@ namespace dummy
             private static readonly Serializer<List<bool>> Serialize_ListOf_bool = (
                 SerializeList<bool>(
                     ToJsonValue));
+
+            private static readonly Serializer<HashSet<string>> Serialize_SetOf_string = (
+                SerializeSet<string>(
+                    ToJsonValue,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly Serializer<HashSet<long>> Serialize_SetOf_long = (
+                SerializeSet<long>(
+                    ToJsonValue,
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly Serializer<HashSet<bool>> Serialize_SetOf_bool = (
+                SerializeSet<bool>(
+                    ToJsonValue,
+                    System.Collections.Generic.Comparer<bool>.Default.Compare));
+
+            private static readonly Serializer<HashSet<Direction>> Serialize_SetOf_Direction = (
+                SerializeSet<Direction>(
+                    Serialize.DirectionToJsonValue,
+                    Common.SetHelpers.CompareByRankOfDirection));
 
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
@@ -895,6 +1221,50 @@ namespace dummy
 
                 return result;
             }
+
+            public override Nodes.JsonObject TransformCollection(
+                Aas.ICollection that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                SetProperty(result, "texts", "Texts", that.Texts, Serialize_SetOf_string);
+
+                SetProperty(result, "numbers", "Numbers", that.Numbers, Serialize_SetOf_long);
+
+                SetProperty(result, "flags", "Flags", that.Flags, Serialize_SetOf_bool);
+
+                SetProperty(
+                    result,
+                    "directions",
+                    "Directions",
+                    that.Directions,
+                    Serialize_SetOf_Direction);
+
+                SetProperty(result, "codes", "Codes", that.Codes, Serialize_SetOf_string);
+
+                if (that.OptionalTexts != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalTexts",
+                        "OptionalTexts",
+                        that.OptionalTexts,
+                        Serialize_SetOf_string);
+                }
+
+                if (that.OptionalDirections != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalDirections",
+                        "OptionalDirections",
+                        that.OptionalDirections,
+                        Serialize_SetOf_Direction);
+                }
+
+                return result;
+            }
         }  // internal class Transformer
 
         /// <summary>
@@ -949,6 +1319,23 @@ namespace dummy
                     ?? throw new SerializationFailure(
                         new Reporting.Error(
                             $"Invalid Kind: {that}"));
+            }
+
+            /// <summary>
+            /// Serialize a literal of Direction into a JSON string.
+            /// </summary>
+            /// <exception cref="SerializationFailure">
+            /// Thrown when <paramref name="that" /> is no literal of Direction at all.
+            /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
+            /// a whole instance catches <see cref="SerializationException" /> instead.
+            /// </exception>
+            public static Nodes.JsonValue DirectionToJsonValue(Aas.Direction that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new SerializationFailure(
+                        new Reporting.Error(
+                            $"Invalid Direction: {that}"));
             }
         }  // public static class Serialize
     }  // public static class Jsonization

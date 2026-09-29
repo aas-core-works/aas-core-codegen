@@ -23,6 +23,7 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
+    Set,
     Tuple,
     TypeVar,
     Union,
@@ -355,6 +356,48 @@ def _list_from_jsonable(
     return result
 
 
+def _set_from_jsonable(
+    jsonable: Jsonable,
+    parse_item: _Parser[_ValueT]
+) -> Set[_ValueT]:
+    """
+    Parse :paramref:`jsonable` as a set, applying :paramref:`parse_item` on
+    every item.
+
+    We accept the items in any order, but refuse the duplicates, so that no
+    item is silently lost.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_item: to parse a single item of the array
+    :return: parsed set
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    if array_like is None:
+        raise DeserializationException(
+            f"Expected something array-like, but got: {type(jsonable)}"
+        )
+
+    result = set()  # type: Set[_ValueT]
+    for i, jsonable_item in enumerate(array_like):
+        try:
+            item = parse_item(jsonable_item)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(array_like, i))
+            raise
+
+        if item in result:
+            duplicate_exception = DeserializationException(
+                "Expected unique items in the set, but the item is a duplicate"
+            )
+            duplicate_exception.path._prepend(IndexSegment(array_like, i))
+            raise duplicate_exception
+
+        result.add(item)
+
+    return result
+
+
 def _list_of__bool_from_jsonable(
     jsonable: Jsonable
 ) -> List[bool]:
@@ -423,6 +466,74 @@ def _list_of__str_from_jsonable(
     )
 
 
+def _set_of__bool_from_jsonable(
+    jsonable: Jsonable
+) -> Set[bool]:
+    """
+    Parse :paramref:`jsonable` as a set of
+    ``bool``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed set
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _set_from_jsonable(
+        jsonable,
+        _bool_from_jsonable
+    )
+
+
+def _set_of__direction_from_jsonable(
+    jsonable: Jsonable
+) -> Set[aas_types.Direction]:
+    """
+    Parse :paramref:`jsonable` as a set of
+    :py:class:`.types.Direction`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed set
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _set_from_jsonable(
+        jsonable,
+        direction_from_jsonable
+    )
+
+
+def _set_of__int_from_jsonable(
+    jsonable: Jsonable
+) -> Set[int]:
+    """
+    Parse :paramref:`jsonable` as a set of
+    ``int``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed set
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _set_from_jsonable(
+        jsonable,
+        _int_from_jsonable
+    )
+
+
+def _set_of__str_from_jsonable(
+    jsonable: Jsonable
+) -> Set[str]:
+    """
+    Parse :paramref:`jsonable` as a set of
+    ``str``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed set
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _set_from_jsonable(
+        jsonable,
+        _str_from_jsonable
+    )
+
+
 def kind_from_jsonable(
     jsonable: Jsonable
 ) -> aas_types.Kind:
@@ -444,6 +555,32 @@ def kind_from_jsonable(
         raise DeserializationException(
             f"Not a valid string representation of "
             f"a literal of Kind: {jsonable}"
+        )
+
+    return literal
+
+
+def direction_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.Direction:
+    """
+    Convert the JSON-able structure :paramref:`jsonable` to a literal of
+    :py:class:`.types.Direction`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed literal
+    :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    if not isinstance(jsonable, str):
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
+
+    literal = aas_stringification.direction_from_str(jsonable)
+    if literal is None:
+        raise DeserializationException(
+            f"Not a valid string representation of "
+            f"a literal of Direction: {jsonable}"
         )
 
     return literal
@@ -559,6 +696,92 @@ def something_from_jsonable(
         the_flags,
         the_optional_texts,
         the_optional_kind
+    )
+
+
+def collection_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Collection:
+    """
+    Parse an instance of :py:class:`.types.Collection` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.Collection`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    the_texts: Optional[Set[str]] = None
+    the_numbers: Optional[Set[int]] = None
+    the_flags: Optional[Set[bool]] = None
+    the_directions: Optional[Set[aas_types.Direction]] = None
+    the_codes: Optional[Set[str]] = None
+    the_optional_texts: Optional[Set[str]] = None
+    the_optional_directions: Optional[Set[aas_types.Direction]] = None
+
+    try:
+        for key, jsonable_value in mapping.items():
+            if key == 'modelType':
+                # The model type is redundant for this class, and we simply accept it.
+                pass
+            elif key == 'texts':
+                the_texts = _set_of__str_from_jsonable(jsonable_value)
+            elif key == 'numbers':
+                the_numbers = _set_of__int_from_jsonable(jsonable_value)
+            elif key == 'flags':
+                the_flags = _set_of__bool_from_jsonable(jsonable_value)
+            elif key == 'directions':
+                the_directions = _set_of__direction_from_jsonable(jsonable_value)
+            elif key == 'codes':
+                the_codes = _set_of__str_from_jsonable(jsonable_value)
+            elif key == 'optionalTexts':
+                the_optional_texts = _set_of__str_from_jsonable(jsonable_value)
+            elif key == 'optionalDirections':
+                the_optional_directions = _set_of__direction_from_jsonable(jsonable_value)
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    if the_texts is None:
+        raise DeserializationException(
+            "The required property 'texts' is missing"
+        )
+
+    if the_numbers is None:
+        raise DeserializationException(
+            "The required property 'numbers' is missing"
+        )
+
+    if the_flags is None:
+        raise DeserializationException(
+            "The required property 'flags' is missing"
+        )
+
+    if the_directions is None:
+        raise DeserializationException(
+            "The required property 'directions' is missing"
+        )
+
+    if the_codes is None:
+        raise DeserializationException(
+            "The required property 'codes' is missing"
+        )
+
+    return aas_types.Collection(
+        the_texts,
+        the_numbers,
+        the_flags,
+        the_directions,
+        the_codes,
+        the_optional_texts,
+        the_optional_directions
     )
 
 
@@ -688,6 +911,52 @@ def _list_of__kind_to_jsonable(
     return jsonable
 
 
+def _set_of__direction_to_jsonable(
+    that: Set[aas_types.Direction]
+) -> List[MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a sorted list of
+    :py:class:`.types.Direction`.
+
+    :param that: set to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = []  # type: List[MutableJsonable]
+    for i, item in enumerate(sorted(that, key=aas_stringification.rank_of_direction)):
+        try:
+            jsonable.append(
+                item.value
+            )
+        except SerializationException as exception:
+            exception._prepend_index(i)
+            raise
+    return jsonable
+
+
+def _set_of__int_to_jsonable(
+    that: Set[int]
+) -> List[MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a sorted list of
+    ``int``.
+
+    :param that: set to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = []  # type: List[MutableJsonable]
+    for i, item in enumerate(sorted(that)):
+        try:
+            jsonable.append(
+                _int_to_jsonable(
+                    item
+                )
+            )
+        except SerializationException as exception:
+            exception._prepend_index(i)
+            raise
+    return jsonable
+
+
 def _something_to_jsonable(
     that: aas_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
@@ -762,6 +1031,65 @@ def _something_to_jsonable(
     return jsonable
 
 
+def _collection_to_jsonable(
+    that: aas_types.Collection
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    try:
+        jsonable['texts'] = sorted(
+            that.texts
+        )
+    except SerializationException as exception:
+        exception._prepend_property('texts')
+        raise
+    try:
+        jsonable['numbers'] = _set_of__int_to_jsonable(
+            that.numbers
+        )
+    except SerializationException as exception:
+        exception._prepend_property('numbers')
+        raise
+    try:
+        jsonable['flags'] = sorted(
+            that.flags
+        )
+    except SerializationException as exception:
+        exception._prepend_property('flags')
+        raise
+    try:
+        jsonable['directions'] = _set_of__direction_to_jsonable(
+            that.directions
+        )
+    except SerializationException as exception:
+        exception._prepend_property('directions')
+        raise
+    try:
+        jsonable['codes'] = sorted(
+            that.codes
+        )
+    except SerializationException as exception:
+        exception._prepend_property('codes')
+        raise
+    if that.optional_texts is not None:
+        try:
+            jsonable['optionalTexts'] = sorted(
+                that.optional_texts
+            )
+        except SerializationException as exception:
+            exception._prepend_property('optional_texts')
+            raise
+    if that.optional_directions is not None:
+        try:
+            jsonable['optionalDirections'] = _set_of__direction_to_jsonable(
+                that.optional_directions
+            )
+        except SerializationException as exception:
+            exception._prepend_property('optional_directions')
+            raise
+    return jsonable
+
+
 class _Serializer(
         aas_types.AbstractTransformer[MutableJsonable]
 ):
@@ -776,6 +1104,9 @@ class _Serializer(
 
     transform_something = staticmethod(
         _something_to_jsonable
+    )
+    transform_collection = staticmethod(
+        _collection_to_jsonable
     )
 
 

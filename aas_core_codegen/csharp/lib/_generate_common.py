@@ -6,7 +6,10 @@ from typing import Final, List
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped, indent_but_first_line
-from aas_core_codegen.csharp import common as csharp_common
+from aas_core_codegen.csharp import (
+    common as csharp_common,
+    naming as csharp_naming,
+)
 from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
@@ -412,6 +415,180 @@ public static long ParseSafeInt(string text)
 )
 
 
+def _generate_set_helpers(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """
+    Generate the helpers which sort the items of the set properties.
+
+    The set properties are serialized sorted, in the same order in all the SDKs:
+    ``false`` before ``true``, the integers numerically, and the strings and
+    the serialized values of the enumeration literals by their code points.
+    The C# strings, however, compare by their UTF-16 code units, which sort
+    the characters beyond the Basic Multilingual Plane (surrogate pairs) before
+    the characters from U+E000 to U+FFFF.
+    """
+    members = [
+        Stripped(
+            f"""\
+/// <summary>
+/// Decode the code point at <paramref name="offset" /> in
+/// <paramref name="text" />.
+/// </summary>
+/// <remarks>
+/// A lone surrogate is decoded as a code point of its own.
+/// </remarks>
+private static int CodePointAt(string text, int offset)
+{{
+{I}return (
+{II}offset + 1 < text.Length
+{II}&& char.IsHighSurrogate(text[offset])
+{II}&& char.IsLowSurrogate(text[offset + 1])
+{I})
+{II}? char.ConvertToUtf32(text[offset], text[offset + 1])
+{II}: text[offset];
+}}"""
+        ),
+        Stripped(
+            f"""\
+/// <summary>
+/// Compare <paramref name="that" /> and <paramref name="other" /> by their
+/// code points.
+/// </summary>
+/// <remarks>
+/// Unlike <see cref="string.CompareOrdinal(string, string)" />, which compares
+/// the UTF-16 code units, this comparison sorts the characters beyond
+/// the Basic Multilingual Plane after all the others.
+/// </remarks>
+public static int CompareByCodePoints(string that, string other)
+{{
+{I}int length = System.Math.Min(that.Length, other.Length);
+
+{I}int offset = 0;
+{I}while (offset < length && that[offset] == other[offset])
+{I}{{
+{II}offset++;
+{I}}}
+
+{I}if (offset == length)
+{I}{{
+{II}return that.Length.CompareTo(other.Length);
+{I}}}
+
+{I}// NOTE: We might have stopped in the middle of a surrogate pair.
+{I}if (
+{II}offset > 0
+{II}&& char.IsHighSurrogate(that[offset - 1])
+{II}&& (
+{III}char.IsLowSurrogate(that[offset])
+{III}|| char.IsLowSurrogate(other[offset])
+{II})
+{I})
+{I}{{
+{II}offset--;
+{I}}}
+
+{I}return CodePointAt(that, offset).CompareTo(CodePointAt(other, offset));
+}}"""
+        ),
+    ]  # type: List[Stripped]
+
+    for enumeration in csharp_common.enumerations_in_set_properties(symbol_table):
+        enum_name = csharp_naming.enum_name(enumeration.name)
+        # NOTE (mristin):
+        # See the note above ``csharp_common.rank_of_enumeration_name`` why these
+        # names can never coincide with the names of the fixed helpers.
+        rank_name = csharp_common.rank_of_enumeration_name(enumeration)
+        compare_name = csharp_common.compare_by_rank_of_enumeration_name(enumeration)
+
+        # NOTE (mristin):
+        # Python compares the strings by their code points, so we can rank
+        # the literals here once instead of comparing their values at run time.
+        sorted_literals = sorted(
+            enumeration.literals, key=lambda a_literal: a_literal.value
+        )
+
+        cases = []  # type: List[str]
+        for rank, literal in enumerate(sorted_literals):
+            literal_name = csharp_naming.enum_literal_name(literal.name)
+            cases.append(
+                f"""\
+case {enum_name}.{literal_name}:
+{I}return {rank};  // {csharp_common.string_literal(literal.value)}"""
+            )
+
+        cases.append(
+            f"""\
+default:
+{I}return {len(sorted_literals)};"""
+        )
+
+        cases_joined = "\n".join(cases)
+
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Rank <paramref name="literal" /> by its serialized value in code points.
+/// </summary>
+private static int {rank_name}({enum_name} literal)
+{{
+{I}switch (literal)
+{I}{{
+{II}{indent_but_first_line(cases_joined, II)}
+{I}}}
+}}"""
+            )
+        )
+
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Compare the literals of <see cref="{enum_name}" /> by their serialized
+/// values in code points.
+/// </summary>
+/// <remarks>
+/// The invalid literals, which have no serialized value, come last.
+/// </remarks>
+public static int {compare_name}({enum_name} that, {enum_name} other)
+{{
+{I}return {rank_name}(that).CompareTo({rank_name}(other));
+}}"""
+            )
+        )
+
+    members.append(
+        Stripped(
+            f"""\
+/// <summary>
+/// Copy <paramref name="items" /> into a new list sorted by
+/// <paramref name="comparison" />.
+/// </summary>
+public static System.Collections.Generic.List<T> Sorted<T>(
+{I}System.Collections.Generic.IEnumerable<T> items,
+{I}System.Comparison<T> comparison)
+{{
+{I}var result = new System.Collections.Generic.List<T>(items);
+{I}result.Sort(comparison);
+{I}return result;
+}}"""
+        )
+    )
+
+    members_joined = "\n\n".join(members)
+
+    return Stripped(
+        f"""\
+/// <summary>
+/// Sort the items of the sets, so that they are serialized in the same order
+/// in all the SDKs.
+/// </summary>
+public static class SetHelpers
+{{
+{I}{indent_but_first_line(members_joined, I)}
+}}  // public static class SetHelpers"""
+    )
+
+
 def generate(
     symbol_table: intermediate.SymbolTable,
     namespace: csharp_common.NamespaceIdentifier,
@@ -430,6 +607,9 @@ def generate(
         symbol_table
     ):
         blocks.append(_generate_string_helpers(symbol_table))
+
+    if csharp_common.has_set_properties(symbol_table):
+        blocks.append(_generate_set_helpers(symbol_table))
 
     # NOTE (mristin):
     # We add the helper only if the meta-model uses the modulo so that we do not

@@ -419,7 +419,10 @@ def _over_non_optional_type_annotations(
     if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         yield from _over_non_optional_type_annotations(type_annotation.value)
 
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+    elif isinstance(
+        type_annotation,
+        (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+    ):
         yield from _over_non_optional_type_annotations(type_annotation.items)
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
@@ -439,12 +442,6 @@ def _over_non_optional_type_annotations(
 
     elif isinstance(type_annotation, intermediate.JsonObjectTypeAnnotation):
         yield from _over_non_optional_type_annotations(type_annotation.key)
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
 
     else:
         # noinspection PyTypeChecker

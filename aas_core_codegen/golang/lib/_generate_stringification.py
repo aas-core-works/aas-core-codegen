@@ -376,9 +376,75 @@ import (
         _generate_model_type_to_string(symbol_table=symbol_table),
     ]
 
+    enum_ids_in_set_properties = set(
+        intermediate.runtime_id(enum)
+        for enum in golang_common.enumerations_in_set_properties(symbol_table)
+    )
+
     for enum in symbol_table.enumerations:
         blocks.append(_generate_enum_from_string(enumeration=enum))
         blocks.append(_generate_enum_to_string(enumeration=enum))
+
+        if intermediate.runtime_id(enum) in enum_ids_in_set_properties:
+            name = golang_naming.enum_name(enum.name)
+
+            rank_name = golang_naming.function_name(Identifier(f"rank_of_{enum.name}"))
+
+            less_name = golang_naming.function_name(
+                Identifier(f"less_by_rank_of_{enum.name}")
+            )
+
+            # NOTE (mristin):
+            # We rank the literals at the generation time by the code points of
+            # their serialized values, which is the order of the sets of
+            # the enumeration literals in all the SDKs.
+            case_blocks = []  # type: List[Stripped]
+            for rank, literal in enumerate(
+                sorted(enum.literals, key=lambda literal: literal.value)
+            ):
+                literal_name = golang_naming.enum_literal_name(enum.name, literal.name)
+
+                comment = golang_common.string_literal(literal.value)
+
+                case_blocks.append(
+                    Stripped(
+                        f"""\
+case aastypes.{literal_name}:
+{I}return {rank} // {comment}"""
+                    )
+                )
+
+            case_blocks_joined = "\n".join(case_blocks)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+// Rank `that` by the code points of its string representation.
+//
+// We serialize the sets of [aastypes.{name}] in this order, which is the same
+// in all the SDKs. An invalid literal is ranked last.
+func {rank_name}(that aastypes.{name}) int {{
+{I}switch that {{
+{I}{indent_but_first_line(case_blocks_joined, I)}
+{I}}}
+{I}return {len(enum.literals)}
+}}"""
+                )
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+// Check whether `that` comes before `other` in the order of their string
+// representations, see [{rank_name}].
+func {less_name}(
+{I}that aastypes.{name},
+{I}other aastypes.{name},
+) bool {{
+{I}return {rank_name}(that) < {rank_name}(other)
+}}"""
+                )
+            )
 
     blocks.append(golang_common.WARNING)
 

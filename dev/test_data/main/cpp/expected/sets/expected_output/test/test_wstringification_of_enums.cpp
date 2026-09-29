@@ -22,6 +22,20 @@ TEST_CASE("Test ModelType round-trip") {
     )
     == L"Something"
   );
+
+  REQUIRE(
+    aas::types::ModelType::kCollection
+    == aas::wstringification::MustModelTypeFromWstring(
+      L"Collection"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::ModelType::kCollection
+    )
+    == L"Collection"
+  );
 }
 
 TEST_CASE("Test failure on ModelType") {
@@ -95,6 +109,65 @@ TEST_CASE("Test failure on Kind") {
       L"Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"
+  );
+}
+
+TEST_CASE("Test Direction round-trip") {
+  REQUIRE(
+    aas::types::Direction::kNorth
+    == aas::wstringification::MustDirectionFromWstring(
+      L"up"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::Direction::kNorth
+    )
+    == L"up"
+  );
+
+  REQUIRE(
+    aas::types::Direction::kSouth
+    == aas::wstringification::MustDirectionFromWstring(
+      L"down"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::Direction::kSouth
+    )
+    == L"down"
+  );
+
+  REQUIRE(
+    aas::types::Direction::kEast
+    == aas::wstringification::MustDirectionFromWstring(
+      L"right"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::Direction::kEast
+    )
+    == L"right"
+  );
+}
+
+TEST_CASE("Test failure on Direction") {
+  CHECK(
+    !aas::wstringification::DirectionFromWstring(
+      L"Totally utterly invalid"
+    ).has_value()
+  );
+
+  REQUIRE_THROWS_WITH(
+    aas::wstringification::MustDirectionFromWstring(
+      L"Totally utterly invalid"
+    ),
+    "Unexpected Direction literal: Totally utterly invalid"
   );
 }
 

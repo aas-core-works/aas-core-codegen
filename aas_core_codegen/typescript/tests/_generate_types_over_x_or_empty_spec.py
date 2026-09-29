@@ -49,19 +49,30 @@ import * as TestCommonJsonization from "./commonJsonization";"""
 
             prop_name_typescript = typescript_naming.property_name(prop.name)
 
-            if isinstance(
+            if not isinstance(
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
-            ) and isinstance(
-                prop.type_annotation.value, intermediate.ListTypeAnnotation
             ):
-                load_maximal_name = typescript_naming.function_name(
-                    Identifier(f"load_maximal_{concrete_cls.name}")
-                )
+                continue
 
-                # noinspection SpellCheckingInspection
-                blocks.append(
-                    Stripped(
-                        f"""\
+            # NOTE (mristin):
+            # We only count the items, so the test does not depend on the order
+            # of the items in a set, which differs among the targets.
+            size_property: str
+            if isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+                size_property = "length"
+            elif isinstance(prop.type_annotation.value, intermediate.SetTypeAnnotation):
+                size_property = "size"
+            else:
+                continue
+
+            load_maximal_name = typescript_naming.function_name(
+                Identifier(f"load_maximal_{concrete_cls.name}")
+            )
+
+            # noinspection SpellCheckingInspection
+            blocks.append(
+                Stripped(
+                    f"""\
 test("{cls_name_typescript}.{method_name_typescript} on maximal", () => {{
 {I}const instance = TestCommonJsonization.{load_maximal_name}();
 
@@ -71,19 +82,19 @@ test("{cls_name_typescript}.{method_name_typescript} on maximal", () => {{
 {I}}}
 
 {I}expect(count).toStrictEqual(
-{II}instance.{prop_name_typescript}?.length ?? 0,
+{II}instance.{prop_name_typescript}?.{size_property} ?? 0,
 {I});
 }});"""
-                    )
                 )
+            )
 
-                load_minimal_name = typescript_naming.function_name(
-                    Identifier(f"load_minimal_{concrete_cls.name}")
-                )
+            load_minimal_name = typescript_naming.function_name(
+                Identifier(f"load_minimal_{concrete_cls.name}")
+            )
 
-                blocks.append(
-                    Stripped(
-                        f"""\
+            blocks.append(
+                Stripped(
+                    f"""\
 test("{cls_name_typescript}.{method_name_typescript} on minimal", () => {{
 {I}const instance = TestCommonJsonization.{load_minimal_name}();
 
@@ -93,11 +104,11 @@ test("{cls_name_typescript}.{method_name_typescript} on minimal", () => {{
 {I}}}
 
 {I}expect(count).toStrictEqual(
-{II}instance.{prop_name_typescript}?.length ?? 0,
+{II}instance.{prop_name_typescript}?.{size_property} ?? 0,
 {I});
 }});"""
-                    )
                 )
+            )
 
     blocks.append(typescript_common.WARNING)
 

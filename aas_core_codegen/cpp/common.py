@@ -454,6 +454,40 @@ common::variant<
     )
 
 
+def generate_set_type(
+    item_type: Stripped,
+    items_are_enumeration_literals: bool,
+    common_namespace: Optional[Identifier] = COMMON_NAMESPACE,
+) -> Stripped:
+    """
+    Generate the C++ type of a set of ``item_type``.
+
+    C++11 does not specialize ``std::hash`` for the enumerations, which C++14
+    does, so we hash the enumeration literals with our own ``EnumHash``.
+
+    If `common_namespace` is specified, it is prepended to ``EnumHash``.
+    """
+    common_namespace_prefix = (
+        "" if common_namespace is None else f"{common_namespace}::"
+    )
+
+    arguments = (
+        f"{item_type}, {common_namespace_prefix}EnumHash"
+        if items_are_enumeration_literals
+        else item_type
+    )
+
+    if "<" not in arguments:
+        return Stripped(f"std::unordered_set<{arguments}>")
+
+    return Stripped(
+        f"""\
+std::unordered_set<
+{INDENT}{indent_but_first_line(arguments, INDENT)}
+>"""
+    )
+
+
 def generate_type(
     type_annotation: intermediate.TypeAnnotationUnion,
     types_namespace: Optional[Identifier] = None,
@@ -535,14 +569,14 @@ std::vector<
             type_annotation=type_annotation.items, types_namespace=types_namespace
         )
 
-        if "<" not in item_type:
-            return Stripped(f"std::unordered_set<{item_type}>")
+        items_are_enumeration_literals = isinstance(
+            type_annotation.items, intermediate.OurTypeAnnotation
+        ) and isinstance(type_annotation.items.our_type, intermediate.Enumeration)
 
-        return Stripped(
-            f"""\
-std::unordered_set<
-{INDENT}{indent_but_first_line(item_type, INDENT)}
->"""
+        return generate_set_type(
+            item_type=item_type,
+            items_are_enumeration_literals=items_are_enumeration_literals,
+            common_namespace=common_namespace,
         )
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
@@ -740,6 +774,108 @@ def uses_sets(
         )
         or intermediate.declares_local_set(function)
         for function in functions
+    )
+
+
+def set_types_of_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.SetTypeAnnotation]:
+    """
+    List the set types of the properties, beneath the optionals.
+
+    We use it to decide which helpers for the sets we need to generate, as we
+    sort the items of a set property when we serialize or verify it.
+    """
+    result = []  # type: List[intermediate.SetTypeAnnotation]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            if prop.specified_for is not cls:
+                continue
+
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if isinstance(type_anno, intermediate.SetTypeAnnotation):
+                result.append(type_anno)
+
+    return result
+
+
+def enumerations_in_set_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """List the enumerations whose literals are held by a set property."""
+    enumeration_id_set = {
+        id(set_type.items.our_type)
+        for set_type in set_types_of_properties(symbol_table)
+        if isinstance(set_type.items, intermediate.OurTypeAnnotation)
+        and isinstance(set_type.items.our_type, intermediate.Enumeration)
+    }
+
+    return [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if id(enumeration) in enumeration_id_set
+    ]
+
+
+def rank_function_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """
+    Generate the name of the function ranking the literals by their text.
+
+    For example, ``Direction`` gives ``RankOfDirection``.
+    """
+    return cpp_naming.function_name(Identifier(f"rank_of_{enumeration.name}"))
+
+
+def less_function_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """
+    Generate the name of the function comparing the literals by their ranks.
+
+    For example, ``Direction`` gives ``LessByRankOfDirection``.
+    """
+    return cpp_naming.function_name(Identifier(f"less_by_rank_of_{enumeration.name}"))
+
+
+def generate_set_item_less(items: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Generate the comparator by which we sort the ``items`` of a set property.
+
+    We sort the items in the same order in all the targets: ``false`` before
+    ``true``, the integers numerically, and the strings and the texts of
+    the enumeration literals code point by code point.
+    """
+    primitive_type = intermediate.try_primitive_type(items)
+    if primitive_type is not None:
+        if primitive_type is intermediate.PrimitiveType.BOOL:
+            return Stripped("std::less<bool>()")
+
+        elif primitive_type is intermediate.PrimitiveType.INT:
+            return Stripped("std::less<int64_t>()")
+
+        elif primitive_type is intermediate.PrimitiveType.STR:
+            return Stripped(f"{COMMON_NAMESPACE}::LessByCodePoints")
+
+        elif primitive_type is intermediate.PrimitiveType.FLOAT:
+            raise AssertionError(
+                f"Unexpected set of floating-point numbers, as "
+                f"the intermediate layer refuses them: {items}"
+            )
+
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            raise AssertionError(
+                f"Unexpected set of byte arrays, as "
+                f"the intermediate layer refuses them: {items}"
+            )
+
+        else:
+            assert_never(primitive_type)
+
+    if isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
+        items.our_type, intermediate.Enumeration
+    ):
+        return Stripped(f"stringification::{less_function_name(items.our_type)}")
+
+    raise AssertionError(
+        f"Unexpected items of a set, as the intermediate layer refuses them: {items}"
     )
 
 

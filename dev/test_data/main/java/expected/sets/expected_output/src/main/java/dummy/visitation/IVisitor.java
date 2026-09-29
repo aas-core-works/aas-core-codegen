@@ -20,6 +20,9 @@ public interface IVisitor
   void visitSomething(
     ISomething that
   );
+  void visitCollection(
+    ICollection that
+  );
 }
 
 /*

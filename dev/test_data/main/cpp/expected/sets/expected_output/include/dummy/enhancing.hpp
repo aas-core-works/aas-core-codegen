@@ -37,6 +37,20 @@ std::shared_ptr<
   >& factory
 );
 
+template <typename E>
+std::shared_ptr<
+  types::ICollection
+> Wrap(
+  const std::shared_ptr<
+    types::ICollection
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
 // endregion Forward declarations
 
 /// \cond HIDDEN
@@ -249,6 +263,163 @@ class EnhancedSomething
   std::shared_ptr<E> enhancement_;
 };
 
+template<class E>
+class EnhancedCollection
+    : virtual public types::ICollection,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kCollection;
+  }
+
+  const std::unordered_set<std::wstring>& texts() const override {
+    return instance_->texts();
+  }
+
+  std::unordered_set<std::wstring>& mutable_texts() override {
+    return instance_->mutable_texts();
+  }
+
+  void set_texts(
+    std::unordered_set<std::wstring> value
+  ) override {
+    instance_->set_texts(value);
+  }
+
+  const std::unordered_set<int64_t>& numbers() const override {
+    return instance_->numbers();
+  }
+
+  std::unordered_set<int64_t>& mutable_numbers() override {
+    return instance_->mutable_numbers();
+  }
+
+  void set_numbers(
+    std::unordered_set<int64_t> value
+  ) override {
+    instance_->set_numbers(value);
+  }
+
+  const std::unordered_set<bool>& flags() const override {
+    return instance_->flags();
+  }
+
+  std::unordered_set<bool>& mutable_flags() override {
+    return instance_->mutable_flags();
+  }
+
+  void set_flags(
+    std::unordered_set<bool> value
+  ) override {
+    instance_->set_flags(value);
+  }
+
+  const std::unordered_set<types::Direction, common::EnumHash>& directions() const override {
+    return instance_->directions();
+  }
+
+  std::unordered_set<types::Direction, common::EnumHash>& mutable_directions() override {
+    return instance_->mutable_directions();
+  }
+
+  void set_directions(
+    std::unordered_set<types::Direction, common::EnumHash> value
+  ) override {
+    instance_->set_directions(value);
+  }
+
+  const std::unordered_set<std::wstring>& codes() const override {
+    return instance_->codes();
+  }
+
+  std::unordered_set<std::wstring>& mutable_codes() override {
+    return instance_->mutable_codes();
+  }
+
+  void set_codes(
+    std::unordered_set<std::wstring> value
+  ) override {
+    instance_->set_codes(value);
+  }
+
+  const common::optional<
+    std::unordered_set<std::wstring>
+  >& optional_texts() const override {
+    return instance_->optional_texts();
+  }
+
+  common::optional<
+    std::unordered_set<std::wstring>
+  >& mutable_optional_texts() override {
+    return instance_->mutable_optional_texts();
+  }
+
+  void set_optional_texts(
+    common::optional<
+      std::unordered_set<std::wstring>
+    > value
+  ) override {
+    instance_->set_optional_texts(value);
+  }
+
+  const common::optional<
+    std::unordered_set<types::Direction, common::EnumHash>
+  >& optional_directions() const override {
+    return instance_->optional_directions();
+  }
+
+  common::optional<
+    std::unordered_set<types::Direction, common::EnumHash>
+  >& mutable_optional_directions() override {
+    return instance_->mutable_optional_directions();
+  }
+
+  void set_optional_directions(
+    common::optional<
+      std::unordered_set<types::Direction, common::EnumHash>
+    > value
+  ) override {
+    instance_->set_optional_directions(value);
+  }
+
+  bool TextsAreNotAllIn(
+    const std::unordered_set<std::wstring>& others
+  ) const override {
+    return instance_->TextsAreNotAllIn(
+      others
+    );
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedCollection(
+    std::shared_ptr<types::ICollection> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedCollection() = default;
+
+ private:
+  std::shared_ptr<types::ICollection> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
 /**
  * Wrap \p that with an enhanced instance.
  *
@@ -279,6 +450,42 @@ std::shared_ptr<types::ISomething> WrapSomething(
     ? that
     : std::shared_ptr<types::ISomething>(
       new EnhancedSomething<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::shared_ptr<types::ICollection> WrapCollection(
+  const std::shared_ptr<types::ICollection>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  // No properties to be recursively enhanced.
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::ICollection>(
+      new EnhancedCollection<E>(
         that,
         enh
       )
@@ -365,6 +572,14 @@ std::shared_ptr<
         factory
       );
       break;
+    case types::ModelType::kCollection:
+      return impl::WrapCollection<E>(
+        std::dynamic_pointer_cast<
+          types::ICollection
+        >(that),
+        factory
+      );
+      break;
     default:
       throw std::invalid_argument(
         common::Concat(
@@ -401,6 +616,46 @@ std::shared_ptr<
   switch (that->model_type()) {
     case types::ModelType::kSomething:
       return impl::WrapSomething<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::ICollection
+> Wrap(
+  const std::shared_ptr<
+    types::ICollection
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::ICollection
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kCollection:
+      return impl::WrapCollection<E>(
         that,
         factory
       );

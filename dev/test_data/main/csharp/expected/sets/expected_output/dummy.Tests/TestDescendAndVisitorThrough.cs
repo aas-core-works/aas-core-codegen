@@ -117,6 +117,31 @@ namespace dummy.Tests
             AssertDescendAndVisitorThroughSame(
                 instance);
         }  // public void Test_Descend_against_VisitorThrough_for_Something
+
+        [Test]
+        public void Test_Descend_of_Collection()
+        {
+            Aas.Collection instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Descend",
+                    "Collection",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_Collection
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_Collection()
+        {
+            Aas.Collection instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_Collection
     }  // class TestDescendAndVisitorThrough
 }  // namespace dummy.Tests
 

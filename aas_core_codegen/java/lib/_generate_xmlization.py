@@ -125,9 +125,7 @@ def _from_sequence_name(cls: intermediate.ClassUnion) -> Identifier:
 @require(lambda type_anno: not _is_instance_type(type_anno))
 def _content_reader_name(type_anno: intermediate.TypeAnnotationUnion) -> Identifier:
     """Name the function reading the content of an element as ``type_anno``."""
-    if isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
-    ):
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return Identifier(f"read{java_common.type_moniker(type_anno)}")
 
     return Identifier(f"readTextAs_{java_common.leaf_moniker(type_anno)}")
@@ -319,11 +317,15 @@ def _item_type_annotations(
     narrow it here, once, so that everything downstream can simply say so in
     its signature.
     """
-    items = (
-        [type_anno.items]
-        if isinstance(type_anno, intermediate.ListTypeAnnotation)
-        else list(type_anno.items)
-    )
+    items: List[intermediate.TypeAnnotationUnion]
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        items = [type_anno.items]
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        items = list(type_anno.items)
+    else:
+        assert_never(type_anno)
 
     result = []  # type: List[intermediate.AtomicTypeAnnotation]
     for item in items:
@@ -358,6 +360,14 @@ def _content_writer_name(type_anno: intermediate.TypeAnnotationUnion) -> Identif
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         moniker = _written_leaf_moniker(_item_type_annotations(type_anno)[0])
         return Identifier(f"write{java_common.list_moniker(moniker)}")
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The items of a set are sorted before they are written, and they are
+        # sorted each in their own way, so we can not name the writer after
+        # what the items are written as.
+        moniker = java_common.set_items_moniker(type_anno.items)
+        return Identifier(f"write{java_common.set_moniker(moniker)}")
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         monikers = [
@@ -489,6 +499,7 @@ class _Needed:
         self.primitive_types = set()  # type: Set[intermediate.PrimitiveType]
         self.enumerations = False
         self.lists = False
+        self.sets = False
         self.nested_elements = False
 
         #: Content readers to emit, keyed and de-duplicated by the moniker
@@ -579,10 +590,7 @@ def _collect_needed(symbol_table: intermediate.SymbolTable) -> _Needed:
         if moniker in needed.content_readers:
             return
 
-        if isinstance(
-            type_anno,
-            (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-        ):
+        if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
             writer_name = _content_writer_name(type_anno)
             if writer_name not in needed.content_writers:
                 needed.content_writers[writer_name] = type_anno
@@ -591,6 +599,9 @@ def _collect_needed(symbol_table: intermediate.SymbolTable) -> _Needed:
 
             if isinstance(type_anno, intermediate.ListTypeAnnotation):
                 needed.lists = True
+                register_item(item_type_annos[0], "v")
+            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+                needed.sets = True
                 register_item(item_type_annos[0], "v")
             else:
                 for i, item_type_anno in enumerate(item_type_annos):
@@ -678,7 +689,10 @@ def _collect_dispatching_writers(
         nonlocal classes
         nonlocal unions
 
-        if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(
+            type_anno,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
             register(type_anno.items, True)
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             for item_type_anno in type_anno.items:
@@ -1187,6 +1201,61 @@ private static <T> Reporting.Result<List<T>> readList(
     )
 
 
+def _generate_read_set() -> Stripped:
+    """Generate the reader of the items of a set."""
+    return Stripped(
+        f"""\
+/**
+ * Read the items of a set, each with {{@code readItem}}.
+ *
+ * <p>Every start element is considered to mark the start of an item. Reading
+ * stops as soon as a non-start element is encountered.
+ *
+ * <p>The items can come in any order, but a duplicate item is an error, so that
+ * no item is silently dropped.
+ */
+private static <T> Reporting.Result<Set<T>> readSet(
+{I}XMLEventReader reader, boolean isEmpty, XmlCommon.ElementReader<T> readItem) {{
+{I}final Set<T> result = new HashSet<>();
+{I}if (isEmpty) {{
+{II}return Reporting.Result.success(result);
+{I}}}
+
+{I}XmlCommon.skipWhitespaceAndComments(reader);
+{I}int index = 0;
+{I}if (!XmlCommon.currentEvent(reader).isStartElement()) {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Expected a start element opening an item of the set, " +
+{III}"but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
+{II}error.prependSegment(new Reporting.IndexSegment(index));
+{II}return Reporting.Result.failure(error);
+{I}}}
+
+{I}while (XmlCommon.currentEvent(reader).isStartElement()) {{
+{II}final Reporting.Result<? extends T> itemResult = readItem.read(reader);
+{II}if (itemResult.isError()) {{
+{III}itemResult.getError()
+{IIII}.prependSegment(
+{IIIII}new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(itemResult.getError());
+{II}}}
+
+{II}if (!result.add(itemResult.getResult())) {{
+{III}final Reporting.Error error = new Reporting.Error(
+{IIII}"Expected unique items in the set, but the item is a duplicate");
+{III}error.prependSegment(new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(error);
+{II}}}
+
+{II}index++;
+{II}XmlCommon.skipWhitespaceAndComments(reader);
+{I}}}
+
+{I}return Reporting.Result.success(result);
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_read_tuple_helper(arity: int) -> Stripped:
     """Generate the reader of the items of a tuple of ``arity`` items."""
@@ -1361,6 +1430,13 @@ def _generate_content_reader(type_anno: intermediate.TypeAnnotationUnion) -> Str
         body = Stripped(
             f"""\
 return readList(
+{I}reader, isEmpty, _DeserializeImplementation::{item_reader});"""
+        )
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_reader = _element_reader_name(type_anno.items, "v")
+        body = Stripped(
+            f"""\
+return readSet(
 {I}reader, isEmpty, _DeserializeImplementation::{item_reader});"""
         )
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -2017,6 +2093,9 @@ def _generate_deserialize_impl(
     if needed.lists:
         blocks.append(_generate_read_list())
 
+    if needed.sets:
+        blocks.append(_generate_read_set())
+
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_read_tuple_helper(arity=arity))
 
@@ -2468,6 +2547,12 @@ def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped
     # We read all of that off :py:func:`_written_value_type`, which is the one
     # place deciding how far a value widens, so that the bound here can not
     # drift from the type the item writer takes.
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The items of a set are sorted before they are written, so the set
+        # must keep its items as precise as the sorting needs them.
+        return Stripped(f"Set<{java_common.generate_type(type_anno.items)}>")
+
     argument_types = []  # type: List[Stripped]
     for item_type_anno in _item_type_annotations(type_anno):
         written_value_type = _written_value_type(item_type_anno)
@@ -2512,9 +2597,21 @@ def _generate_content_writer(
 
     body: Stripped
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
         item_type = _written_value_type(item_type_annos[0])
         item_writer = _element_writer_name(item_type_annos[0], "v")
+
+        # NOTE (mristin):
+        # A set is written as a sequence of its items sorted in the same order
+        # in all the targets, so that the index on the error path points to
+        # the item in the written sequence.
+        items_expr = (
+            java_common.sorted_set_items(item_type_annos[0], Stripped("that"))
+            if isinstance(type_anno, intermediate.SetTypeAnnotation)
+            else Stripped("that")
+        )
 
         # NOTE (mristin):
         # The ``try`` sits outside the loop, and the index is advanced only
@@ -2525,7 +2622,7 @@ def _generate_content_writer(
             f"""\
 int index = 0;
 try {{
-{I}for ({item_type} item : that) {{
+{I}for ({item_type} item : {items_expr}) {{
 {II}{item_writer}(item, writer);
 {II}index++;
 {I}}}
@@ -2926,6 +3023,14 @@ def generate(
         Stripped(f"import {package}.visitation.*;"),
         Stripped(f"import {package}.xmlcommon.XmlCommon;"),
     ]  # type: List[Stripped]
+
+    if java_common.has_set_properties(symbol_table):
+        imports.extend(
+            [
+                Stripped("import java.util.HashSet;"),
+                Stripped("import java.util.Set;"),
+            ]
+        )
 
     # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one

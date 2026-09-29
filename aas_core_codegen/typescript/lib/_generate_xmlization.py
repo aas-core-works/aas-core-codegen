@@ -499,6 +499,44 @@ function {name}(
             ),
         )
 
+    def _register_set_parser(self, type_anno: intermediate.SetTypeAnnotation) -> None:
+        """Register the parser of the content of an element holding a set."""
+        items_type_anno = type_anno.items
+
+        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "The sets hold only primitives, constrained primitives and enumeration "
+            "literals; see intermediate._translate._verify_items_of_sets"
+        )
+
+        self._register_element_parser(items_type_anno, tag_suffix="")
+
+        name = _content_parser_name(type_anno)
+
+        item_type = typescript_common.generate_type(
+            items_type_anno, types_module=Identifier("AasTypes")
+        )
+        item_parser = _element_parser_name(items_type_anno, tag_suffix="")
+
+        call = Stripped(
+            f"""\
+parseSet<{item_type}>(
+{I}cursor,
+{I}{item_parser}
+)"""
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+function {name}(
+{I}cursor: XmlCursor
+): AasCommon.Either<Set<{item_type}>, DeserializationError> {{
+{I}return {indent_but_first_line(call, I)};
+}}"""
+            ),
+        )
+
     def _register_tuple_parser(
         self, type_anno: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -568,6 +606,9 @@ function {name}(
 
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
             self._register_list_parser(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            self._register_set_parser(type_anno)
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_parser(type_anno)
@@ -1421,6 +1462,55 @@ function {name}(
             ),
         )
 
+    def _register_set_writer(self, type_anno: intermediate.SetTypeAnnotation) -> None:
+        """
+        Register the writer of the content of an element holding a set.
+
+        The items are written sorted, so that a refused item is reported at its
+        index in the written sequence, just as for a list.
+        """
+        items_type_anno = type_anno.items
+
+        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "The sets hold only primitives, constrained primitives and enumeration "
+            "literals; see intermediate._translate._verify_items_of_sets"
+        )
+
+        self._register_element_writer(items_type_anno, tag_suffix="")
+
+        name = _content_writer_name(type_anno)
+
+        item_type = typescript_common.generate_type(
+            items_type_anno, types_module=Identifier("AasTypes")
+        )
+        item_writer = _element_writer_name(items_type_anno, tag_suffix="")
+
+        sorted_items = typescript_common.generate_sorted_set_items(
+            type_anno=type_anno, set_expression=Stripped("values")
+        )
+
+        call = Stripped(
+            f"""\
+writeList(
+{I}parts,
+{I}{indent_but_first_line(sorted_items, I)},
+{I}{item_writer}
+)"""
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+function {name}(
+{I}parts: Array<string>,
+{I}values: Set<{item_type}>
+): void {{
+{I}{indent_but_first_line(call, I)};
+}}"""
+            ),
+        )
+
     def _register_tuple_writer(
         self, type_anno: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -1484,6 +1574,9 @@ function {name}(
 
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
             self._register_list_writer(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            self._register_set_writer(type_anno)
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_writer(type_anno)
@@ -1658,6 +1751,7 @@ _XML_COMMON_NAMES = (
     "parseElementContent",
     "parseList",
     "parseNamedElement",
+    "parseSet",
     "parseTextContent",
     "readNextOpenTag",
     "readRequiredRootOpenTag",

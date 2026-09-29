@@ -335,6 +335,69 @@ export function {must_to_str_name}(
     return Stripped("\n\n".join(blocks))
 
 
+def _generate_rank_and_compare(enumeration: intermediate.Enumeration) -> Stripped:
+    """
+    Generate the rank and the comparison of the literals of ``enumeration``.
+
+    A set in a property is serialized sorted by the code points of the serialized
+    values of its literals. We sort the literals here, at the generation time, so
+    that all the SDKs follow the order of Python.
+    """
+    name = typescript_naming.enum_name(enumeration.name)
+    rank_name = typescript_naming.function_name(
+        Identifier(f"rank_of_{enumeration.name}")
+    )
+    compare_name = typescript_naming.function_name(
+        Identifier(f"compare_by_rank_of_{enumeration.name}")
+    )
+
+    cases = []  # type: List[str]
+    for rank, literal in enumerate(
+        sorted(enumeration.literals, key=lambda literal: literal.value)
+    ):
+        literal_name = typescript_naming.enum_literal_name(literal.name)
+        cases.append(
+            f"case AasTypes.{name}.{literal_name}:\n"
+            f"{I}return {rank};  // {typescript_common.string_literal(literal.value)}"
+        )
+
+    cases_joined = "\n".join(cases)
+
+    return Stripped(
+        f"""\
+/**
+ * Rank `that` literal by the code points of its serialized value.
+ *
+ * @param that - literal to be ranked
+ * @returns rank of `that`, or the number of the literals if `that` is invalid
+ */
+export function {rank_name}(
+{I}that: AasTypes.{name}
+): number {{
+{I}switch (that) {{
+{II}{indent_but_first_line(cases_joined, II)}
+{II}default:
+{III}return {len(enumeration.literals)};
+{I}}}
+}}
+
+/**
+ * Compare `that` and `other` by the code points of their serialized values.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns negative, zero or positive, as `that` is before, equal to or
+ * after `other`
+ */
+export function {compare_name}(
+{I}that: AasTypes.{name},
+{I}other: AasTypes.{name}
+): number {{
+{I}return {rank_name}(that) - {rank_name}(other);
+}}"""
+    )
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -363,6 +426,9 @@ def generate(
     for enum in symbol_table.enumerations:
         blocks.append(_generate_enum_from_string(enumeration=enum))
         blocks.append(_generate_enum_to_string(enumeration=enum))
+
+    for enum in typescript_common.enumerations_in_set_properties(symbol_table):
+        blocks.append(_generate_rank_and_compare(enumeration=enum))
 
     blocks.append(typescript_common.WARNING)
 

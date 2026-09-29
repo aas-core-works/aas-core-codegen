@@ -93,6 +93,27 @@ public class TestDescendAndVisitorThrough {
 
       assertDescendAndVisitorThroughSame(instance);
     } // public void testDescendAgainstVisitorThroughForSomething
+
+    @Test
+    public void testDescendOfCollection() throws IOException {
+      final Collection instance = CommonJsonization.loadMaximalCollection();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "Collection",
+          "maximal.json.trace"));
+    } // public void testDescendOfCollection
+
+    @Test
+    public void testDescendAgainstVisitorThroughForCollection() throws IOException {
+      Collection instance = (
+        CommonJsonization.loadMaximalCollection());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForCollection
 } // class TestDescendAndVisitorThrough
 
 // package dummy.tests

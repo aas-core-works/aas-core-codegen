@@ -25,6 +25,16 @@ class TestRoundTrips(unittest.TestCase):
 
             self.assertEqual(enum_literal.value, jsonable)
 
+    def test_direction(self) -> None:
+        for jsonable in [
+            'up',
+            'down',
+            'right'
+        ]:
+            enum_literal = aas_jsonization.direction_from_jsonable(jsonable)
+
+            self.assertEqual(enum_literal.value, jsonable)
+
 
 if __name__ == "__main__":
     unittest.main()

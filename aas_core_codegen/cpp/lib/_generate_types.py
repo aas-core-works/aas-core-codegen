@@ -1147,8 +1147,11 @@ def generate_header(
 
     unordered_set_include = (
         "#include <unordered_set>\n"
-        if cpp_common.uses_sets(
-            [method for cls in symbol_table.classes for method in cls.methods]
+        if (
+            cpp_common.uses_sets(
+                [method for cls in symbol_table.classes for method in cls.methods]
+            )
+            or len(cpp_common.set_types_of_properties(symbol_table)) > 0
         )
         else ""
     )

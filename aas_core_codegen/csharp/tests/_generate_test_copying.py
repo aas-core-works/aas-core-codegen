@@ -371,10 +371,10 @@ that.{prop_name}.ToJsonString() == casted.{prop_name}.ToJsonString()"""
             )
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives, constrained primitives and enumeration
+            # literals, which all compare by value.
+            expr = Stripped(f"that.{prop_name}.SetEquals(casted.{prop_name})")
 
         else:
             # noinspection PyTypeChecker

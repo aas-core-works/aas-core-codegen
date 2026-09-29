@@ -11,6 +11,7 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
+	aascommon "github.com/dummy-works/dummy/common"
 	aasreporting "github.com/dummy-works/dummy/reporting"
 	aasstringification "github.com/dummy-works/dummy/stringification"
 	aastypes "github.com/dummy-works/dummy/types"
@@ -261,6 +262,70 @@ func concludeProperty(
 	return
 }
 
+// Read a set of values as a sequence of XML elements.
+//
+// The items are read exactly as the items of a list, see [readListOf].
+// They can come in any order, but they must be unique. We do not drop
+// a duplicate silently, but report it at its index in the sequence.
+//
+// The set is represented as a map to empty structs.
+func readSetOf[T comparable](
+	decoder *xml.Decoder,
+	current xml.Token,
+	readItem func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (value T, aNext xml.Token, anErr error),
+) (values map[T]struct{}, next xml.Token, err error) {
+	values = make(map[T]struct{})
+
+	i := 0
+	for {
+		current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		if _, ok := current.(xml.StartElement); !ok {
+			break
+		}
+
+		var value T
+		var valueErr error
+		value, current, valueErr = xmlcommon.ReadElementDispatched(
+			decoder, current, readItem,
+		)
+		if valueErr != nil {
+			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			err = valueErr
+			return
+		}
+
+		if _, has := values[value]; has {
+			deseriaErr := xmlcommon.NewDeserializationError(
+				"Expected unique items in the set, but the item is a duplicate",
+			)
+			deseriaErr.Path.PrependIndex(
+				&aasreporting.IndexSegment{Index: i},
+			)
+			err = deseriaErr
+			return
+		}
+
+		values[value] = struct{}{}
+
+		i++
+	}
+
+	next = current
+	return
+}
+
 // Read a scalar item expected in the element `v`.
 //
 // The `current` token is expected to point to the content of that element, and
@@ -341,6 +406,26 @@ func readAtV_bool(
 	return xmlcommon.ReadTextAs_bool(decoder, current)
 }
 
+// Read a scalar item expected in the element `v`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtV_Direction(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value aastypes.Direction,
+	next xml.Token,
+	err error,
+) {
+	if local != "v" {
+		err = unexpectedItemElement(local, "v")
+		return
+	}
+
+	return readTextAs_Direction(decoder, current)
+}
+
 // Consume the text tokens (char data) as a string-encoded literal of
 // [aastypes.Kind].
 //
@@ -369,6 +454,43 @@ func readTextAs_Kind(
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
 				"Unexpected literal of Kind: %v",
+				text,
+			),
+		)
+		return
+	}
+
+	return
+}
+
+// Consume the text tokens (char data) as a string-encoded literal of
+// [aastypes.Direction].
+//
+// Any comment tokens are skipped.
+//
+// The resulting `next` token points to the first token which is neither text
+// nor comment.
+//
+// If we reached the end-of-file, `next` is an [eof] sentinel token.
+func readTextAs_Direction(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (value aastypes.Direction,
+	next xml.Token,
+	err error,
+) {
+	var text string
+	text, next, err = xmlcommon.ReadText(decoder, current)
+	if err != nil {
+		return
+	}
+
+	var ok bool
+	value, ok = aasstringification.DirectionFromString(text)
+	if !ok {
+		err = xmlcommon.NewDeserializationError(
+			fmt.Sprintf(
+				"Unexpected literal of Direction: %v",
 				text,
 			),
 		)
@@ -585,6 +707,162 @@ func readSomethingAsSequence(
 	return
 }
 
+// De-serialize the instance of [aastypes.ICollection]
+// as a sequence of XML elements, each representing a property
+// of [aastypes.ICollection].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readCollectionAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.ICollection,
+	next xml.Token,
+	err error,
+) {
+	var theTexts map[string]struct{}
+	var theNumbers map[int64]struct{}
+	var theFlags map[bool]struct{}
+	var theDirections map[aastypes.Direction]struct{}
+	var theCodes map[string]struct{}
+	var theOptionalTexts map[string]struct{}
+	var theOptionalDirections map[aastypes.Direction]struct{}
+
+	foundTexts := false
+	foundNumbers := false
+	foundFlags := false
+	foundDirections := false
+	foundCodes := false
+	foundOptionalTexts := false
+	foundOptionalDirections := false
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "ICollection")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		case "texts":
+			if foundTexts {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theTexts, current, valueErr = readSetOf(
+				decoder, current, readAtV_string,
+			)
+			foundTexts = true
+		case "numbers":
+			if foundNumbers {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theNumbers, current, valueErr = readSetOf(
+				decoder, current, readAtV_long,
+			)
+			foundNumbers = true
+		case "flags":
+			if foundFlags {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theFlags, current, valueErr = readSetOf(
+				decoder, current, readAtV_bool,
+			)
+			foundFlags = true
+		case "directions":
+			if foundDirections {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theDirections, current, valueErr = readSetOf(
+				decoder, current, readAtV_Direction,
+			)
+			foundDirections = true
+		case "codes":
+			if foundCodes {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theCodes, current, valueErr = readSetOf(
+				decoder, current, readAtV_string,
+			)
+			foundCodes = true
+		case "optionalTexts":
+			if foundOptionalTexts {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalTexts, current, valueErr = readSetOf(
+				decoder, current, readAtV_string,
+			)
+			foundOptionalTexts = true
+		case "optionalDirections":
+			if foundOptionalDirections {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalDirections, current, valueErr = readSetOf(
+				decoder, current, readAtV_Direction,
+			)
+			foundOptionalDirections = true
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	if !foundTexts {
+		err = missingProperty("texts")
+		return
+	}
+
+	if !foundNumbers {
+		err = missingProperty("numbers")
+		return
+	}
+
+	if !foundFlags {
+		err = missingProperty("flags")
+		return
+	}
+
+	if !foundDirections {
+		err = missingProperty("directions")
+		return
+	}
+
+	if !foundCodes {
+		err = missingProperty("codes")
+		return
+	}
+
+	instance = aastypes.NewCollection(
+		theTexts,
+		theNumbers,
+		theFlags,
+		theDirections,
+		theCodes,
+	)
+	instance.SetOptionalTexts(theOptionalTexts)
+	instance.SetOptionalDirections(theOptionalDirections)
+	return
+}
+
 // De-serialize an instance of [aastypes.IClass] based on the `local` name
 // of its start element.
 //
@@ -601,6 +879,8 @@ func readClassDispatched(
 	switch local {
 	case "something":
 		instance, next, err = readSomethingAsSequence(decoder, current)
+	case "collection":
+		instance, next, err = readCollectionAsSequence(decoder, current)
 	default:
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -874,6 +1154,18 @@ func writeAtV_bool(
 	)
 }
 
+// Write the scalar `value` in the element `v`.
+//
+// Do not flush.
+func writeAtV_Direction(
+	encoder *xml.Encoder,
+	value aastypes.Direction,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "v", value, writeAsText_Direction,
+	)
+}
+
 // Write the items of the `list` as a sequence of XML elements.
 //
 // Do not flush.
@@ -922,6 +1214,18 @@ func writeListOf_bool(
 	)
 }
 
+// Write the items of the `list` as a sequence of XML elements.
+//
+// Do not flush.
+func writeListOf_Direction(
+	encoder *xml.Encoder,
+	list []aastypes.Direction,
+) error {
+	return writeList(
+		encoder, list, writeAtV_Direction,
+	)
+}
+
 // Write the `value` of a property as string representation
 // of [aastypes.Kind]
 // in a text element.
@@ -938,6 +1242,32 @@ func writeAsText_Kind(
 		err = xmlcommon.NewSerializationError(
 			fmt.Sprintf(
 				"Unexpected literal of Kind: %v",
+				value,
+			),
+		)
+		return
+	}
+
+	err = xmlcommon.WriteText(encoder, text)
+	return
+}
+
+// Write the `value` of a property as string representation
+// of [aastypes.Direction]
+// in a text element.
+//
+// Do not flush.
+func writeAsText_Direction(
+	encoder *xml.Encoder,
+	value aastypes.Direction,
+) (err error) {
+	text, ok := aasstringification.DirectionToString(
+		value,
+	)
+	if !ok {
+		err = xmlcommon.NewSerializationError(
+			fmt.Sprintf(
+				"Unexpected literal of Direction: %v",
 				value,
 			),
 		)
@@ -1063,6 +1393,121 @@ func writeSomethingAsSequence(
 	return
 }
 
+// Serialize the instance
+// of [aastypes.ICollection]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writeCollectionAsSequence(
+	encoder *xml.Encoder,
+	that aastypes.ICollection,
+) (err error) {
+	err = finishProperty(
+		"Texts()",
+		xmlcommon.WriteElement(
+			encoder,
+			"texts",
+			aascommon.SortedKeys(that.Texts(), aascommon.LessOrdered[string]),
+			writeListOf_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Numbers()",
+		xmlcommon.WriteElement(
+			encoder,
+			"numbers",
+			aascommon.SortedKeys(that.Numbers(), aascommon.LessOrdered[int64]),
+			writeListOf_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Flags()",
+		xmlcommon.WriteElement(
+			encoder,
+			"flags",
+			aascommon.SortedKeys(that.Flags(), aascommon.LessBool),
+			writeListOf_bool,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Directions()",
+		xmlcommon.WriteElement(
+			encoder,
+			"directions",
+			aascommon.SortedKeys(
+				that.Directions(),
+				aasstringification.LessByRankOfDirection,
+			),
+			writeListOf_Direction,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Codes()",
+		xmlcommon.WriteElement(
+			encoder,
+			"codes",
+			aascommon.SortedKeys(that.Codes(), aascommon.LessOrdered[string]),
+			writeListOf_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"OptionalTexts()",
+		writeOptionalSlice(
+			encoder,
+			"optionalTexts",
+			aascommon.SortedKeys(
+				that.OptionalTexts(),
+				aascommon.LessOrdered[string],
+			),
+			writeListOf_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"OptionalDirections()",
+		writeOptionalSlice(
+			encoder,
+			"optionalDirections",
+			aascommon.SortedKeys(
+				that.OptionalDirections(),
+				aasstringification.LessByRankOfDirection,
+			),
+			writeListOf_Direction,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // Serialize `that` instance as an XML element named after its model type.
 //
 // Do not flush.
@@ -1082,6 +1527,14 @@ func writeClass(
 			withNamespace,
 			that.(aastypes.ISomething),
 			writeSomethingAsSequence,
+		)
+	case aastypes.ModelTypeCollection:
+		err = writeClassElement(
+			encoder,
+			"collection",
+			withNamespace,
+			that.(aastypes.ICollection),
+			writeCollectionAsSequence,
 		)
 	default:
 		err = xmlcommon.NewSerializationError(

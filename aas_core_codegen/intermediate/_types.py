@@ -326,8 +326,15 @@ class SetTypeAnnotation(TypeAnnotation):
     the argument, see :py:attr:`Argument.mutable`, so that the generators need
     not distinguish the two.
 
-    The sets are allowed only in the arguments of the verification functions and
-    of the methods, but not in the properties or the return values.
+    The sets are allowed in the arguments of the verification functions and of
+    the methods, and in the properties, but not in the return values.
+
+    The sets hold only booleans, integers, strings, constrained primitives of them
+    and enumeration literals. A set in a property is serialized as an array whose
+    items are sorted in the same order in all the targets: ``false`` before
+    ``true``, the integers numerically, and the strings and the serialized values
+    of the enumeration literals by their code points. The de-serialization
+    accepts the items in any order, but refuses the duplicates.
     """
 
     def __init__(self, items: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
@@ -518,19 +525,21 @@ assert_union_without_excluded(
 #: A type annotation which holds other values, and hence has to be de/serialized
 #: out of the de/serialization of its items. It is the complement of
 #: :py:data:`AtomicTypeAnnotation` beneath an optional.
-ContainerTypeAnnotation = Union[ListTypeAnnotation, TupleTypeAnnotation]
+ContainerTypeAnnotation = Union[
+    ListTypeAnnotation, TupleTypeAnnotation, SetTypeAnnotation
+]
 
-ContainerTypeAnnotationAsTuple = (ListTypeAnnotation, TupleTypeAnnotation)
+ContainerTypeAnnotationAsTuple = (
+    ListTypeAnnotation,
+    TupleTypeAnnotation,
+    SetTypeAnnotation,
+)
 assert ContainerTypeAnnotationAsTuple == get_args(ContainerTypeAnnotation)
 
 assert_union_without_excluded(
     original_union=TypeAnnotationUnion,
     subset_union=ContainerTypeAnnotation,
     excluded=[
-        # NOTE (mristin):
-        # The sets are allowed only in the arguments, so they are never
-        # de/serialized.
-        SetTypeAnnotation,
         PrimitiveTypeAnnotation,
         OurTypeAnnotation,
         JsonValueTypeAnnotation,

@@ -1651,6 +1651,150 @@ std::unique_ptr<IIterator> Each(
 ]  # type: Final[Sequence[Stripped]]
 
 
+#: Define the iterator over the items of a set, in the order of the serialization.
+_EACH_SORTED = [
+    Stripped(
+        f"""\
+/**
+ * \\brief Iterate over the values of every item of a set, one item after
+ * another, in the order in which we serialize the set.
+ *
+ * The index in the path of an error is the index of the item in the serialized
+ * array. The items are sorted only once the iteration starts, and the iterator
+ * over an item is built only once the iteration reaches the item.
+ */
+template<typename T, typename HashT, typename LessT>
+class EachSortedIterator : public IIterator {{
+ public:
+{I}/**
+{I} * Build the iterator over the values of an item
+{I} */
+{I}typedef std::unique_ptr<IIterator> (*OverItem)(const T& item, bool recursive);
+
+{I}EachSortedIterator(
+{II}const std::unordered_set<T, HashT>* items,
+{II}LessT less,
+{II}OverItem over_item,
+{II}bool recursive
+{I}) :
+{II}items_(items),
+{II}less_(less),
+{II}over_item_(over_item),
+{II}recursive_(recursive),
+{II}index_(0) {{
+{II}// Intentionally empty.
+{I}}}
+
+{I}EachSortedIterator(const EachSortedIterator<T, HashT, LessT>& other) :
+{II}items_(other.items_),
+{II}less_(other.less_),
+{II}over_item_(other.over_item_),
+{II}recursive_(other.recursive_),
+{II}sorted_(other.sorted_),
+{II}index_(other.index_),
+{II}item_(other.item_ == nullptr ? nullptr : other.item_->Clone()) {{
+{II}// Intentionally empty.
+{I}}}
+
+{I}void Start() override {{
+{II}if (sorted_ == nullptr) {{
+{III}sorted_ = std::make_shared<std::vector<const T*> >(
+{IIII}common::SortedPointers(*items_, less_)
+{III});
+{II}}}
+
+{II}index_ = 0;
+{II}item_ = nullptr;
+{II}SkipDoneItems();
+{I}}}
+
+{I}void Next() override {{
+{II}item_->Next();
+{II}SkipDoneItems();
+{I}}}
+
+{I}bool Done() const override {{
+{II}return index_ >= sorted_->size();
+{I}}}
+
+{I}const void* Value() const override {{
+{II}return item_->Value();
+{I}}}
+
+{I}Shape ShapeOf() const override {{
+{II}return item_->ShapeOf();
+{I}}}
+
+{I}void AppendToPath(iteration::Path& path) const override {{
+{II}path.segments.emplace_back(
+{III}common::make_unique<iteration::IndexSegment>(index_)
+{II});
+{II}item_->AppendToPath(path);
+{I}}}
+
+{I}std::unique_ptr<IIterator> Clone() const override {{
+{II}return common::make_unique<EachSortedIterator<T, HashT, LessT> >(*this);
+{I}}}
+
+ private:
+{I}const std::unordered_set<T, HashT>* items_;
+{I}LessT less_;
+{I}OverItem over_item_;
+{I}bool recursive_;
+
+{I}/**
+{I} * Pointers to the items, sorted once the iteration started, and shared among
+{I} * the clones as they never change
+{I} */
+{I}std::shared_ptr<const std::vector<const T*> > sorted_;
+
+{I}/**
+{I} * Index of the item we currently iterate over, in the sorted order
+{I} */
+{I}std::size_t index_;
+
+{I}/**
+{I} * Iterator over the current item, built once we reached the item
+{I} */
+{I}std::unique_ptr<IIterator> item_;
+
+{I}/**
+{I} * Move on to the next items, and build their iterators, until one is not done.
+{I} */
+{I}void SkipDoneItems() {{
+{II}while (index_ < sorted_->size()) {{
+{III}if (item_ == nullptr) {{
+{IIII}item_ = over_item_(*(*sorted_)[index_], recursive_);
+{IIII}item_->Start();
+{III}}}
+
+{III}if (!item_->Done()) {{
+{IIII}return;
+{III}}}
+
+{III}item_ = nullptr;
+{III}++index_;
+{II}}}
+{I}}}
+}};  // class EachSortedIterator"""
+    ),
+    Stripped(
+        f"""\
+template<typename T, typename HashT, typename LessT>
+std::unique_ptr<IIterator> EachSorted(
+{I}const std::unordered_set<T, HashT>& items,
+{I}LessT less,
+{I}std::unique_ptr<IIterator> (*over_item)(const T& item, bool recursive),
+{I}bool recursive
+) {{
+{I}return common::make_unique<EachSortedIterator<T, HashT, LessT> >(
+{II}&items, less, over_item, recursive
+{I});
+}}"""
+    ),
+]  # type: Final[Sequence[Stripped]]
+
+
 #: Define the iterator over the instances referenced from another one.
 _OVER = [
     Stripped(
@@ -2180,6 +2324,9 @@ class _Analysis:
         elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
             return self.yields(type_annotation.items, descend=descend)
 
+        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+            return self.yields(type_annotation.items, descend=descend)
+
         elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
             return any(
                 self.yields(item, descend=descend) for item in type_annotation.items
@@ -2194,12 +2341,6 @@ class _Analysis:
             ),
         ):
             return True
-
-        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_annotation}"
-            )
 
         else:
             assert_never(type_annotation)
@@ -2374,7 +2515,11 @@ def _generate_over_expression(
 
     elif isinstance(
         type_annotation,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+        ),
     ):
         return cpp_over.generate_call(
             cpp_over.over_function_name(type_annotation), [expr, "recursive"]
@@ -2412,12 +2557,6 @@ def _generate_over_expression(
             "EachKey", [expr, f"Shape::{_shape_literal(key_constrained_primitive)}"]
         )
         return cpp_over.generate_call("Chain", [one, each_key])
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
 
     else:
         assert_never(type_annotation)
@@ -2512,6 +2651,17 @@ def _generate_over_function(
             f"return {cpp_over.generate_call('Each', ['value', f'&{item_function}', 'recursive'])};"
         )
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # We iterate over the items in the order of the serialization, so that
+        # the index in the path of an error matches the serialized array.
+        less = cpp_common.generate_set_item_less(type_annotation.items)
+        item_function = cpp_over.over_function_name(type_annotation.items)
+
+        body = Stripped(
+            f"return {cpp_over.generate_call('EachSorted', ['value', less, f'&{item_function}', 'recursive'])};"
+        )
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         components = []  # type: List[Stripped]
         for i, item in enumerate(type_annotation.items):
@@ -2582,7 +2732,11 @@ switch (value.index()) {{
 
     if isinstance(
         type_annotation,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+        ),
     ):
         alias_name = cpp_over.moniker(type_annotation)
         alias = Stripped(f"using {alias_name} = {value_type};")
@@ -3442,6 +3596,7 @@ namespace {{
         ("InProperty", _IN_PROPERTY),
         ("AtIndex", _AT_INDEX),
         ("Each", _EACH),
+        ("EachSorted", _EACH_SORTED),
         ("Over", _OVER),
         ("ThroughPointer", _OVER),
         ("EachKey", _EACH_KEY),

@@ -13,6 +13,7 @@ import dummy.visitation.AbstractTransformer;
 import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
+import java.util.HashSet;
 
 /**
  * Allow for making shallow and deep copies of AAS model instances.
@@ -67,6 +68,20 @@ public class Copying
                 that.getOptionalTexts().orElse(null),
                 that.getOptionalKind().orElse(null));
         }
+
+        @Override
+        public IClass transformCollection(
+            ICollection that
+        ) {
+            return new Collection(
+                that.getTexts(),
+                that.getNumbers(),
+                that.getFlags(),
+                that.getDirections(),
+                that.getCodes(),
+                that.getOptionalTexts().orElse(null),
+                that.getOptionalDirections().orElse(null));
+        }
     }
 
     /** Dispatch the making of deep copies. */
@@ -105,6 +120,25 @@ public class Copying
                 theFlags,
                 theOptionalTexts,
                 that.getOptionalKind().orElse(null)
+            );
+        }
+
+        @Override
+        public IClass transformCollection (
+            ICollection that
+        ) {
+            return new Collection(
+                new HashSet<>(that.getTexts()),
+                new HashSet<>(that.getNumbers()),
+                new HashSet<>(that.getFlags()),
+                new HashSet<>(that.getDirections()),
+                new HashSet<>(that.getCodes()),
+                that.getOptionalTexts().isPresent()
+                    ? new HashSet<>(that.getOptionalTexts().get())
+                    : null,
+                that.getOptionalDirections().isPresent()
+                    ? new HashSet<>(that.getOptionalDirections().get())
+                    : null
             );
         }
     }

@@ -253,6 +253,166 @@ namespace dummy.Tests
             }
         }  // public void Test_Something_verification_fail
 
+        [Test]
+        public void Test_Collection_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Json",
+                    "Expected",
+                    "Collection"
+                ),
+                "*.json",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                var instance = Aas.Jsonization.Deserialize.CollectionFrom(
+                    node);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    node, instance, path);
+            }
+        }  // public void Test_Collection_ok
+
+        [Test]
+        public void Test_Collection_deserialization_from_non_object_fail()
+        {
+            var node = Nodes.JsonValue.Create("INVALID")
+                ?? throw new System.InvalidOperationException(
+                    "Unexpected failure of the node creation");
+
+            Aas.Jsonization.Exception? exception = null;
+            try
+            {
+                var _ = Aas.Jsonization.Deserialize.CollectionFrom(
+                    node);
+            }
+            catch (Aas.Jsonization.Exception observedException)
+            {
+                exception = observedException;
+            }
+
+            if (exception == null)
+            {
+                throw new AssertionException("Expected an exception, but got none");
+            }
+
+            if (
+                !exception.Message.StartsWith(
+                    "Expected a JsonObject representing Collection, but got "))
+            {
+                throw new AssertionException(
+                    $"Unexpected exception message: {exception.Message}");
+            }
+        }  // public void Test_Collection_deserialization_from_non_object_fail
+
+        [Test]
+        public void Test_Collection_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "Collection"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Collection for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    Aas.Jsonization.Exception? exception = null;
+                    try
+                    {
+                        var _ = Aas.Jsonization.Deserialize.CollectionFrom(
+                            node);
+                    }
+                    catch (Aas.Jsonization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_Collection_deserialization_fail
+
+        [Test]
+        public void Test_Collection_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "Collection"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Collection for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    var instance = Aas.Jsonization.Deserialize.CollectionFrom(
+                        node);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_Collection_verification_fail
+
         /// <summary>
         /// Read the first recorded example of the <paramref name="modelType" />.
         /// </summary>

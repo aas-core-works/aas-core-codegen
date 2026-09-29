@@ -349,8 +349,8 @@ for i, v := range {prop_var} {{
 
             elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
                 raise AssertionError(
-                    f"Unexpected set in a property, as the sets are allowed only "
-                    f"in the arguments: {type_anno.items}"
+                    f"Unexpected set nested in a list, as the parser refuses "
+                    f"the nested sets: {type_anno}"
                 )
 
             else:
@@ -423,10 +423,10 @@ that.{prop_setter_name}(
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives and enumeration literals, never one of
+            # our own classes, so there is nothing to enhance.
+            continue
 
         else:
             # noinspection PyTypeChecker

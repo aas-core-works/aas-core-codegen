@@ -237,10 +237,17 @@ std::tuple<
 
         assert item_type is not None
 
-        if item_type.endswith(">"):
-            return Stripped(f"std::unordered_set<{item_type} >"), None
+        items_are_enumeration_literals = isinstance(
+            type_annotation.items, intermediate_type_inference.OurTypeAnnotation
+        ) and isinstance(type_annotation.items.our_type, intermediate.Enumeration)
 
-        return Stripped(f"std::unordered_set<{item_type}>"), None
+        return (
+            cpp_common.generate_set_type(
+                item_type=item_type,
+                items_are_enumeration_literals=items_are_enumeration_literals,
+            ),
+            None,
+        )
 
     else:
         return None, (

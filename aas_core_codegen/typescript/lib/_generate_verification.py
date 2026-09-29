@@ -1180,9 +1180,56 @@ for (const key of Object.keys(that.{prop_name})) {{
             )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        constrained_primitive = intermediate.try_constrained_primitive(type_anno.items)
+
+        if constrained_primitive is None:
+            # NOTE (mristin):
+            # The sets of primitives are verified at the level of class invariants,
+            # and we rely on the TypeScript compiler to check for valid
+            # enumerations, analogous to the lists.
+            return Stripped(""), None
+
+        verify_function = typescript_naming.function_name(
+            Identifier(f"verify_{constrained_primitive.name}")
+        )
+
+        # NOTE (mristin):
+        # A set has no index, so we verify the items in the sorted order in which
+        # they are serialized. Thus, the path of an error resolves in
+        # the serialized array.
+        sorted_var = typescript_naming.variable_name(Identifier(f"sorted_{prop.name}"))
+        index_var = typescript_naming.variable_name(Identifier(f"{prop.name}_index"))
+
+        sorted_items = typescript_common.generate_sorted_set_items(
+            type_anno=type_anno, set_expression=Stripped(f"that.{prop_name}")
+        )
+
+        stmts.append(
+            Stripped(
+                f"""\
+const {sorted_var} = {sorted_items};
+for (
+{I}let {index_var} = 0;
+{I}{index_var} < {sorted_var}.length;
+{I}{index_var}++
+) {{
+{I}for (const error of {verify_function}({sorted_var}[{index_var}])) {{
+{II}error.path.prepend(
+{III}new IndexSegment(
+{IIII}{sorted_var},
+{IIII}{index_var}
+{III})
+{II});
+{II}error.path.prepend(
+{III}new PropertySegment(
+{IIII}that,
+{IIII}{prop_name_literal}
+{III})
+{II});
+{II}yield error;
+{I}}}
+}}"""
+            )
         )
 
     else:

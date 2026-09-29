@@ -22,6 +22,8 @@ std::wstring PropertyToWstring(
   switch (property) {
     case Property::kCodes:
       return L"codes";
+    case Property::kDirections:
+      return L"directions";
     case Property::kFlags:
       return L"flags";
     case Property::kKind:
@@ -32,6 +34,8 @@ std::wstring PropertyToWstring(
       return L"number";
     case Property::kNumbers:
       return L"numbers";
+    case Property::kOptionalDirections:
+      return L"optional_directions";
     case Property::kOptionalKind:
       return L"optional_kind";
     case Property::kOptionalTexts:
@@ -464,6 +468,12 @@ const std::vector<types::Kind> kOverKind = {
   types::Kind::kAlpha,
   types::Kind::kBeta,
   types::Kind::kGamma
+};
+
+const std::vector<types::Direction> kOverDirection = {
+  types::Direction::kNorth,
+  types::Direction::kSouth,
+  types::Direction::kEast
 };
 
 // endregion Over enumerations

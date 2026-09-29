@@ -367,6 +367,60 @@ function parseArray<T>(
 }
 
 /**
+ * Parse `jsonable` as an array of unique items, each with `parseItem`, into a set.
+ *
+ * @param jsonable - to be parsed item-by-item
+ * @param parseItem - to parse a single item of `jsonable`
+ * @returns parsed items, or an error
+ * @typeParam T - type of a single parsed item
+ */
+function parseSet<T>(
+  jsonable: JsonValue,
+  parseItem: (
+    jsonableItem: JsonValue
+  ) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<Set<T>, DeserializationError> {
+  const iterableError = checkIsIterable(jsonable);
+  if (iterableError !== null) {
+    return new AasCommon.Either<Set<T>, DeserializationError>(
+      null,
+      iterableError
+    );
+  }
+
+  const iterable = <Iterable<JsonValue>>jsonable;
+
+  const items = new Set<T>();
+  let i = 0;
+  for (const jsonableItem of iterable) {
+    const itemOrError = parseItem(jsonableItem);
+    if (itemOrError.error !== null) {
+      itemOrError.error.path.prepend(new IndexSegment(iterable, i));
+      return new AasCommon.Either<Set<T>, DeserializationError>(
+        null,
+        itemOrError.error
+      );
+    }
+
+    const item = itemOrError.mustValue();
+    if (items.has(item)) {
+      const error = new DeserializationError(
+        "Expected unique items in the set, but the item is a duplicate"
+      );
+      error.path.prepend(new IndexSegment(iterable, i));
+      return new AasCommon.Either<Set<T>, DeserializationError>(
+        null,
+        error
+      );
+    }
+
+    items.add(item);
+    i++;
+  }
+  return new AasCommon.Either<Set<T>, DeserializationError>(items, null);
+}
+
+/**
  * Parse `jsonable` as a boolean.
  *
  * @param jsonable - to be parsed
@@ -535,6 +589,36 @@ export function kindFromJsonable(
 
   return new AasCommon.Either<
     AasTypes.Kind,
+    DeserializationError
+  >(literal, null);
+}
+
+/**
+ * Parse `jsonable` structure as a literal
+ * of {@link types!Direction}.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed literal, or an error if `jsonable` invalid
+ */
+export function directionFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<AasTypes.Direction, DeserializationError> {
+  if (typeof jsonable !== "string") {
+    return newDeserializationError<AasTypes.Direction>(
+      `Expected a string, but got: ${typeof jsonable}`
+    );
+  }
+
+  const literal = AasStringification.directionFromString(jsonable);
+  if (literal === null) {
+    return newDeserializationError<AasTypes.Direction>(
+      "Not a valid string representation of " +
+        `a literal of Direction: ${jsonable}`
+    );
+  }
+
+  return new AasCommon.Either<
+    AasTypes.Direction,
     DeserializationError
   >(literal, null);
 }
@@ -801,6 +885,212 @@ export function somethingFromJsonable(
   return parsePropertiesOfSomething(jsonObject);
 }
 
+/**
+ * Parse the properties of an instance
+ * of {@link types!Collection} from `jsonObject`.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!Collection},
+ * or an error if any
+ */
+function parsePropertiesOfCollection(
+  jsonObject: JsonObject
+): AasCommon.Either<
+  AasTypes.Collection,
+  DeserializationError
+> {
+  let theTexts: Set<string> | null = null;
+  let theNumbers: Set<number> | null = null;
+  let theFlags: Set<boolean> | null = null;
+  let theDirections: Set<AasTypes.Direction> | null = null;
+  let theCodes: Set<string> | null = null;
+  let theOptionalTexts: Set<string> | null = null;
+  let theOptionalDirections: Set<AasTypes.Direction> | null = null;
+
+  for (const key in jsonObject) {
+    const jsonableValue = jsonObject[key];
+
+    let propertyError: DeserializationError | null = null;
+    switch (key) {
+      case "texts": {
+        const parsed = parseSet(
+          jsonableValue,
+          stringFromJsonable
+        );
+        propertyError = parsed.error;
+        theTexts = parsed.value;
+        break;
+      }
+
+      case "numbers": {
+        const parsed = parseSet(
+          jsonableValue,
+          integerFromJsonable
+        );
+        propertyError = parsed.error;
+        theNumbers = parsed.value;
+        break;
+      }
+
+      case "flags": {
+        const parsed = parseSet(
+          jsonableValue,
+          booleanFromJsonable
+        );
+        propertyError = parsed.error;
+        theFlags = parsed.value;
+        break;
+      }
+
+      case "directions": {
+        const parsed = parseSet(
+          jsonableValue,
+          directionFromJsonable
+        );
+        propertyError = parsed.error;
+        theDirections = parsed.value;
+        break;
+      }
+
+      case "codes": {
+        const parsed = parseSet(
+          jsonableValue,
+          stringFromJsonable
+        );
+        propertyError = parsed.error;
+        theCodes = parsed.value;
+        break;
+      }
+
+      case "optionalTexts": {
+        const parsed = parseSet(
+          jsonableValue,
+          stringFromJsonable
+        );
+        propertyError = parsed.error;
+        theOptionalTexts = parsed.value;
+        break;
+      }
+
+      case "optionalDirections": {
+        const parsed = parseSet(
+          jsonableValue,
+          directionFromJsonable
+        );
+        propertyError = parsed.error;
+        theOptionalDirections = parsed.value;
+        break;
+      }
+
+      // NOTE (mristin):
+      // Since we conflate here a JavaScript object with a JSON object, we ignore
+      // properties which we do not know how to de-serialize and assume they are
+      // related to the *JavaScript* properties of the object or `Object` prototype.
+      default: {
+        continue;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(
+        new PropertySegment(jsonObject, key)
+      );
+      return new AasCommon.Either<
+        AasTypes.Collection,
+        DeserializationError
+      >(
+        null,
+        propertyError
+      );
+    }
+  }
+
+  if (theTexts === null) {
+    return newDeserializationError<
+      AasTypes.Collection
+    >(
+      "The required property 'texts' is missing"
+    );
+  }
+
+  if (theNumbers === null) {
+    return newDeserializationError<
+      AasTypes.Collection
+    >(
+      "The required property 'numbers' is missing"
+    );
+  }
+
+  if (theFlags === null) {
+    return newDeserializationError<
+      AasTypes.Collection
+    >(
+      "The required property 'flags' is missing"
+    );
+  }
+
+  if (theDirections === null) {
+    return newDeserializationError<
+      AasTypes.Collection
+    >(
+      "The required property 'directions' is missing"
+    );
+  }
+
+  if (theCodes === null) {
+    return newDeserializationError<
+      AasTypes.Collection
+    >(
+      "The required property 'codes' is missing"
+    );
+  }
+
+  return new AasCommon.Either<
+    AasTypes.Collection,
+    DeserializationError
+  >(
+    new AasTypes.Collection(
+      theTexts,
+      theNumbers,
+      theFlags,
+      theDirections,
+      theCodes,
+      theOptionalTexts,
+      theOptionalDirections
+    ),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!Collection} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!Collection},
+ * or an error if any
+ */
+export function collectionFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.Collection,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new AasCommon.Either<
+      AasTypes.Collection,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  return parsePropertiesOfCollection(jsonObject);
+}
+
 // endregion
 
 // region Serialization
@@ -899,6 +1189,26 @@ function serialize_Kind(
 }
 
 /**
+ * Serialize `that` literal to a JSON-able string.
+ *
+ * @param that - literal to be serialized
+ * @returns text of `that`
+ * @throws {@link SerializationError} if `that` is outside
+ * {@link types!Direction}
+ */
+function serialize_Direction(
+  that: AasTypes.Direction
+): string {
+  const text = AasStringification.directionToString(that);
+  if (text === null) {
+    throw new SerializationError(
+      `Invalid literal of Direction: ${that}`
+    );
+  }
+  return text;
+}
+
+/**
  * Serialize `that` to a JSON-able representation.
  *
  * @param that - instance to be serialized
@@ -966,6 +1276,61 @@ function serializeSomething(
 }
 
 /**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
+function serializeCollection(
+  that: AasTypes.Collection
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  // The property being serialized, for the path of a failure.
+  let prop = "";
+  try {
+    prop = "texts";
+    jsonable["texts"] =
+      Array.from(that.texts).sort(AasCommon.compareByCodePoints);
+
+    prop = "numbers";
+    jsonable["numbers"] =
+      serialize_SetOf_int(that.numbers);
+
+    prop = "flags";
+    jsonable["flags"] =
+      Array.from(that.flags).sort(AasCommon.compareBooleans);
+
+    prop = "directions";
+    jsonable["directions"] =
+      serialize_SetOf_Direction(that.directions);
+
+    prop = "codes";
+    jsonable["codes"] =
+      Array.from(that.codes).sort(AasCommon.compareByCodePoints);
+
+    if (that.optionalTexts !== null) {
+      prop = "optionalTexts";
+      jsonable["optionalTexts"] =
+        Array.from(that.optionalTexts).sort(AasCommon.compareByCodePoints);
+    }
+
+    if (that.optionalDirections !== null) {
+      prop = "optionalDirections";
+      jsonable["optionalDirections"] =
+        serialize_SetOf_Direction(that.optionalDirections);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependProperty(prop);
+    }
+    throw error;
+  }
+
+  return jsonable;
+}
+
+/**
  * Serialize `that` to a JSON-able array.
  *
  * @param that - list to be serialized
@@ -1014,6 +1379,56 @@ function serialize_ListOf_Kind(
 }
 
 /**
+ * Serialize `that` to a JSON-able array of the sorted items.
+ *
+ * @param that - set to be serialized
+ * @returns JSON-able array
+ */
+function serialize_SetOf_int(
+  that: ReadonlySet<number>
+): Array<number> {
+  const items = Array.from(that).sort(AasCommon.compareNumbers);
+  const result = new Array<number>(items.length);
+  let i = 0;
+  try {
+    for (; i < items.length; i++) {
+      result[i] = integerToJsonable(items[i]);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependIndex(i);
+    }
+    throw error;
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON-able array of the sorted items.
+ *
+ * @param that - set to be serialized
+ * @returns JSON-able array
+ */
+function serialize_SetOf_Direction(
+  that: ReadonlySet<AasTypes.Direction>
+): Array<string> {
+  const items = Array.from(that).sort(AasStringification.compareByRankOfDirection);
+  const result = new Array<string>(items.length);
+  let i = 0;
+  try {
+    for (; i < items.length; i++) {
+      result[i] = serialize_Direction(items[i]);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependIndex(i);
+    }
+    throw error;
+  }
+  return result;
+}
+
+/**
  * Dispatch the serialization on the run-time type of an instance.
  */
 class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
@@ -1021,6 +1436,12 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     that: AasTypes.Something
   ): JsonObject {
     return serializeSomething(that);
+  }
+
+  transformCollection(
+    that: AasTypes.Collection
+  ): JsonObject {
+    return serializeCollection(that);
   }
 }
 

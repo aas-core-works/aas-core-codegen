@@ -113,6 +113,58 @@ func SetDifference[K comparable](
     ),
 ]
 
+#: Sort the items of a set in the order of their serialization
+SORTED_KEYS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+// Collect the items of the set into a slice, sorted by `less`.
+//
+// The set is represented as a map to empty structs. A nil set gives
+// a nil slice, so that an absent optional set stays absent.
+//
+// We serialize the sets as arrays whose items are sorted in the same order
+// in all the SDKs, see [LessBool] and [LessOrdered].
+func SortedKeys[K comparable](
+{I}set map[K]struct{{}},
+{I}less func(that K, other K) bool,
+) []K {{
+{I}if set == nil {{
+{II}return nil
+{I}}}
+
+{I}result := make([]K, 0, len(set))
+{I}for k := range set {{
+{II}result = append(result, k)
+{I}}}
+
+{I}sort.Slice(
+{II}result,
+{II}func(i, j int) bool {{
+{III}return less(result[i], result[j])
+{II}}},
+{I})
+{I}return result
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Check whether `that` comes before `other`, where false comes before true.
+func LessBool(that bool, other bool) bool {{
+{I}return !that && other
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Check whether `that` comes before `other`.
+//
+// The integers are compared numerically, and the strings byte by byte, which
+// is the order of their code points, as the strings are encoded in UTF-8.
+func LessOrdered[T int64 | string](that T, other T) bool {{
+{I}return that < other
+}}"""
+    ),
+]
+
 #: Helper to compute the remainder of the floored division as in Python.
 #:
 #: We deliberately do not transpile the modulo to the native Go operator ``%``.
@@ -271,6 +323,9 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     import_lines = []  # type: List[str]
     if intermediate.uses_int(symbol_table):
         import_lines.append(f'{I}"fmt"')
+
+    if golang_common.uses_set_properties(symbol_table):
+        import_lines.append(f'{I}"sort"')
 
     import_lines.append(f'{I}"strings"')
 
@@ -539,6 +594,9 @@ func FindStr(text string, sub string, start int64) int64 {{
 
     if intermediate.uses_set_operations(symbol_table):
         blocks.extend(SET_OPERATIONS)
+
+    if golang_common.uses_set_properties(symbol_table):
+        blocks.extend(SORTED_KEYS)
 
     blocks.append(golang_common.WARNING)
 

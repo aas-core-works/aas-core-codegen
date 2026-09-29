@@ -745,6 +745,172 @@ SetT Difference(
 ]
 
 
+#: Declare the comparison of the strings by code points, by which we sort
+#: the items of the set properties
+_LESS_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * \\brief Check whether \\p that text comes before \\p other text,
+ * comparing them code point by code point.
+ *
+ * The comparison of std::wstring compares the code units. Where wchar_t has
+ * 16 bits, as on Windows, the text is encoded in UTF-16, and the code units put
+ * the characters above U+FFFF, encoded as surrogate pairs, before
+ * the characters from U+E000 to U+FFFF. Hence we decode the code points and
+ * compare them instead, in the same way on all the platforms.
+ *
+ * We sort the items of the sets by the code points in the serialization so that
+ * all the SDKs write the same order.
+ *
+ * \\param that text to be compared
+ * \\param other text to compare against
+ * \\return `true` if \\p that comes before \\p other
+ */
+bool LessByCodePoints(
+{I}const std::wstring& that,
+{I}const std::wstring& other
+);"""
+)
+
+#: Define the comparison of the strings by code points, by which we sort
+#: the items of the set properties
+_LESS_BY_CODE_POINTS_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+namespace {{
+
+/**
+ * Decode the code point at \\p offset in \\p text, and move \\p offset
+ * past it.
+ *
+ * A high surrogate followed by a low surrogate is decoded as a single code
+ * point. Any other code unit, including a lone surrogate, is taken as
+ * the code point itself. Where wchar_t has 32 bits, as on Linux, a well-formed
+ * text contains no surrogates, so that each code unit is a code point.
+ */
+std::uint32_t DecodeCodePoint(const std::wstring& text, size_t& offset) {{
+{I}const std::uint32_t unit = static_cast<std::uint32_t>(text[offset]);
+{I}++offset;
+
+{I}if (
+{II}unit >= 0xD800
+{II}&& unit <= 0xDBFF
+{II}&& offset < text.size()
+{I}) {{
+{II}const std::uint32_t next = static_cast<std::uint32_t>(text[offset]);
+{II}if (next >= 0xDC00 && next <= 0xDFFF) {{
+{III}++offset;
+{III}return 0x10000 + ((unit - 0xD800) << 10) + (next - 0xDC00);
+{II}}}
+{I}}}
+
+{I}return unit;
+}}
+
+}}  // namespace
+
+bool LessByCodePoints(
+{I}const std::wstring& that,
+{I}const std::wstring& other
+) {{
+{I}size_t that_offset = 0;
+{I}size_t other_offset = 0;
+
+{I}while (that_offset < that.size() && other_offset < other.size()) {{
+{II}const std::uint32_t that_code_point = DecodeCodePoint(that, that_offset);
+{II}const std::uint32_t other_code_point = DecodeCodePoint(other, other_offset);
+
+{II}if (that_code_point != other_code_point) {{
+{III}return that_code_point < other_code_point;
+{II}}}
+{I}}}
+
+{I}return other_offset < other.size();
+}}"""
+)
+
+#: Define the hasher of the enumeration literals in the sets, as C++11 does not
+#: specialize ``std::hash`` for the enumerations, which C++14 does
+_ENUM_HASH_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * \\brief Hash an enumeration literal by its underlying value.
+ *
+ * C++11 does not specialize std::hash for the enumerations, while C++14 does.
+ * We use this hasher for all the sets of enumeration literals so that
+ * the SDK stays C++11-compatible.
+ */
+struct EnumHash {{
+{I}template<typename T>
+{I}std::size_t operator()(T that) const {{
+{II}return static_cast<std::size_t>(that);
+{I}}}
+}};"""
+)
+
+
+def _uses_sets_of_enumeration_literals(symbol_table: intermediate.SymbolTable) -> bool:
+    """
+    Check whether the meta-model might use a set of enumeration literals.
+
+    We can not tell the items of the local sets without the type inference, so
+    we approximate: any set in a meta-model with an enumeration might hold
+    the enumeration literals. In the worst case, we generate an unused hasher.
+    """
+    return len(symbol_table.enumerations) > 0 and (
+        intermediate.uses_sets(symbol_table)
+        or len(cpp_common.set_types_of_properties(symbol_table)) > 0
+    )
+
+
+#: Define the sorting of the items of a set, which we need to serialize and
+#: verify the set properties in the same order in all the SDKs
+_SORTED_POINTERS_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * \\brief Sort the pointers to the items of \\p set by \\p less.
+ *
+ * We sort the pointers instead of the items so that we copy no items.
+ *
+ * \\param set whose items are to be sorted
+ * \\param less comparing two items
+ * \\return pointers to the items, sorted
+ */
+template<typename SetT, typename LessT>
+std::vector<const typename SetT::value_type*> SortedPointers(
+{I}const SetT& set,
+{I}LessT less
+) {{
+{I}typedef typename SetT::value_type T;
+
+{I}std::vector<const T*> result;
+{I}result.reserve(set.size());
+
+{I}for (const T& item : set) {{
+{II}result.push_back(&item);
+{I}}}
+
+{I}std::sort(
+{II}result.begin(),
+{II}result.end(),
+{II}[&less](const T* that, const T* other) {{
+{III}return less(*that, *other);
+{II}}}
+{I});
+
+{I}return result;
+}}"""
+)
+
+
+def _uses_sets_of_strings_in_properties(symbol_table: intermediate.SymbolTable) -> bool:
+    """Check whether a set property holds strings, which we compare by code points."""
+    return any(
+        intermediate.try_primitive_type(set_type.items)
+        is intermediate.PrimitiveType.STR
+        for set_type in cpp_common.set_types_of_properties(symbol_table)
+    )
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -802,6 +968,10 @@ std::unique_ptr<T> make_unique(
 
     make_uniques_joined = "\n\n".join(make_uniques)
 
+    has_set_properties = len(cpp_common.set_types_of_properties(symbol_table)) > 0
+
+    vector_include = "#include <vector>\n" if has_set_properties else ""
+
     blocks = [
         Stripped(
             f"""\
@@ -810,7 +980,7 @@ std::unique_ptr<T> make_unique(
         ),
         cpp_common.WARNING,
         Stripped(
-            """\
+            f"""\
 #pragma warning(push, 0)
 #include <algorithm>
 #include <functional>
@@ -819,6 +989,7 @@ std::unique_ptr<T> make_unique(
 #include <string>
 #include <tuple>
 #include <utility>
+{vector_include}\
 #pragma warning(pop)
 
 // NOTE (mristin):
@@ -1184,6 +1355,17 @@ size_t LenTuple(const std::tuple<T...>&) {
                 if intermediate.uses_set_operations(symbol_table)
                 else []
             ),
+            *(
+                [_LESS_BY_CODE_POINTS_DECLARATION]
+                if _uses_sets_of_strings_in_properties(symbol_table)
+                else []
+            ),
+            *([_SORTED_POINTERS_DEFINITION] if has_set_properties else []),
+            *(
+                [_ENUM_HASH_DEFINITION]
+                if _uses_sets_of_enumeration_literals(symbol_table)
+                else []
+            ),
             Stripped(
                 f"""\
 }}  // namespace {cpp_common.COMMON_NAMESPACE}
@@ -1227,6 +1409,11 @@ def generate_implementation(
     std_includes = ["#include <algorithm>"]
     if intermediate.uses_int(symbol_table):
         std_includes.append("#include <stdexcept>")
+
+    # NOTE (mristin):
+    # ``LessByCodePoints`` needs ``std::uint32_t``.
+    if _uses_sets_of_strings_in_properties(symbol_table):
+        std_includes.append("#include <cstdint>")
 
     std_includes_joined = "\n".join(std_includes)
 
@@ -1450,6 +1637,11 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
         ),
         *([FLOOR_MOD_DEFINITION] if intermediate.uses_modulo(symbol_table) else []),
         *([PARSE_SAFE_INT_DEFINITION] if intermediate.uses_int(symbol_table) else []),
+        *(
+            [_LESS_BY_CODE_POINTS_DEFINITION]
+            if _uses_sets_of_strings_in_properties(symbol_table)
+            else []
+        ),
         cpp_common.generate_namespace_closing(namespace),
         cpp_common.WARNING,
     ]

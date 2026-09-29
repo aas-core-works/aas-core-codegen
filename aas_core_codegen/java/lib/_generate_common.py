@@ -1,10 +1,10 @@
 """Generate code shared across the generated Java packages."""
 
-from typing import List
+from typing import List, Sequence
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, indent_but_first_line
-from aas_core_codegen.java import common as java_common
+from aas_core_codegen.common import Identifier, Stripped, indent_but_first_line
+from aas_core_codegen.java import common as java_common, naming as java_naming
 from aas_core_codegen.java.common import (
     INDENT as I,
     INDENT2 as II,
@@ -309,64 +309,277 @@ public final class StringHelpers {{
     return Stripped("\n\n".join(blocks))
 
 
-def _generate_set_helpers(package: java_common.PackageIdentifier) -> Stripped:
+def _generate_set_helpers(
+    package: java_common.PackageIdentifier,
+    with_operations: bool,
+    with_sorting: bool,
+    ranked_enumerations: Sequence[intermediate.Enumeration],
+) -> Stripped:
     """
-    Generate the helpers for the operations on sets.
+    Generate the helpers for the operations on sets and for their sorting.
 
     Python gives a new set as the result of an operation, so the helpers copy
     the sets instead of mutating them in place, as the native ``retainAll`` and
-    ``removeAll`` do.
+    ``removeAll`` do. We generate them only ``with_operations``.
+
+    The set properties are serialized as sorted arrays, and the items are
+    verified in the sorted order. The order must be the same in all the targets,
+    so the strings are compared by their code points, and not by their UTF-16
+    code units as :py:meth:`String.compareTo` does. We generate the sorting
+    only ``with_sorting``.
+
+    The literals of the ``ranked_enumerations`` are sorted by the code points of
+    their serialized values. We rank them here, at the generation time, so that
+    the generated code compares them without any stringification.
     """
+    methods = []  # type: List[Stripped]
+
+    if with_operations:
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Give a new set of the items which are both in {{@code that}} and
+ * in {{@code other}}.
+ *
+ * @param that set to be intersected
+ * @param other set to intersect with
+ * @param <T> type of the items
+ * @return new set with the common items
+ */
+public static <T> Set<T> intersection(Set<T> that, Set<T> other) {{
+{I}final Set<T> result = new HashSet<>(that);
+{I}result.retainAll(other);
+{I}return result;
+}}"""
+            )
+        )
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Give a new set of the items which are in {{@code that}}, but not
+ * in {{@code other}}.
+ *
+ * @param that set to be subtracted from
+ * @param other set of the items to be left out
+ * @param <T> type of the items
+ * @return new set with the remaining items
+ */
+public static <T> Set<T> difference(Set<T> that, Set<T> other) {{
+{I}final Set<T> result = new HashSet<>(that);
+{I}result.removeAll(other);
+{I}return result;
+}}"""
+            )
+        )
+
+    if with_sorting:
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Compare {{@code that}} and {{@code other}} by their code points.
+ *
+ * <p>{{@link String#compareTo}} compares the UTF-16 code units instead,
+ * which gives a different order for the characters outside the Basic
+ * Multilingual Plane.
+ *
+ * @param that text to be compared
+ * @param other text to compare against
+ * @return negative, zero or positive if {{@code that}} comes before, is equal to
+ * or comes after {{@code other}}, respectively
+ */
+public static int compareByCodePoints(String that, String other) {{
+{I}int i = 0;
+{I}int j = 0;
+{I}while (i < that.length() && j < other.length()) {{
+{II}final int thatCodePoint = that.codePointAt(i);
+{II}final int otherCodePoint = other.codePointAt(j);
+{II}if (thatCodePoint != otherCodePoint) {{
+{III}return Integer.compare(thatCodePoint, otherCodePoint);
+{II}}}
+
+{II}i += Character.charCount(thatCodePoint);
+{II}j += Character.charCount(otherCodePoint);
+{I}}}
+
+{I}return Integer.compare(that.length() - i, other.length() - j);
+}}"""
+            )
+        )
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Give the items of {{@code that}} in their natural order.
+ *
+ * <p>We use it for the booleans, where {{@code false}} comes before
+ * {{@code true}}, and for the integers.
+ *
+ * @param that set to be sorted
+ * @param <T> type of the items
+ * @return new list of the sorted items
+ */
+public static <T extends Comparable<? super T>> List<T> sorted(
+{I}Set<? extends T> that) {{
+{I}final List<T> result = new ArrayList<>(that);
+{I}Collections.sort(result);
+{I}return result;
+}}"""
+            )
+        )
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Give the texts of {{@code that}} sorted by their code points.
+ *
+ * @param that set to be sorted
+ * @return new list of the sorted texts
+ */
+public static List<String> sortedByCodePoints(Set<String> that) {{
+{I}final List<String> result = new ArrayList<>(that);
+{I}result.sort(SetHelpers::compareByCodePoints);
+{I}return result;
+}}"""
+            )
+        )
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Give the items of {{@code that}} sorted by {{@code comparator}}.
+ *
+ * <p>We use it for the enumeration literals, which we compare by their ranks.
+ *
+ * @param that set to be sorted
+ * @param comparator to compare two items
+ * @param <T> type of the items
+ * @return new list of the sorted items
+ */
+public static <T> List<T> sortedBy(
+{I}Set<? extends T> that, Comparator<? super T> comparator) {{
+{I}final List<T> result = new ArrayList<>(that);
+{I}result.sort(comparator);
+{I}return result;
+}}"""
+            )
+        )
+
+    # NOTE (mristin):
+    # The names of the helpers generated per enumeration start with ``rankOf``
+    # and ``compareByRankOf``, respectively, while no fixed helper in this class
+    # starts with either prefix. Hence a generated name can never equal nor
+    # overload a fixed one, whatever the name of the enumeration, *e.g.*,
+    # an enumeration ``By_code_points`` gives ``compareByRankOfByCodePoints``
+    # and not ``compareByCodePoints``.
+    for enumeration in ranked_enumerations:
+        enum_name = java_naming.enum_name(enumeration.name)
+        rank_name = java_naming.method_name(Identifier(f"rank_of_{enumeration.name}"))
+        compare_name = java_naming.method_name(
+            Identifier(f"compare_by_rank_of_{enumeration.name}")
+        )
+
+        # NOTE (mristin):
+        # Python compares the strings by their code points, which is exactly
+        # the order in which we sort the literals in all the targets.
+        sorted_literals = sorted(
+            enumeration.literals, key=lambda literal: literal.value
+        )
+
+        cases = "\n".join(
+            f"case {java_naming.enum_literal_name(literal.name)}: "
+            f"return {rank};  // {java_common.string_literal(literal.value)}"
+            for rank, literal in enumerate(sorted_literals)
+        )
+
+        unknown_rank = len(sorted_literals)
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Rank the literal {{@code that}} of {{@link {enum_name}}} by the code points
+ * of its serialized value.
+ *
+ * <p>A null or an unknown literal ranks last.
+ *
+ * @param that literal to be ranked
+ * @return rank of the literal
+ */
+public static int {rank_name}({enum_name} that) {{
+{I}if (that == null) {{
+{II}return {unknown_rank};
+{I}}}
+
+{I}switch (that) {{
+{II}{indent_but_first_line(cases, II)}
+{II}default: return {unknown_rank};
+{I}}}
+}}"""
+            )
+        )
+
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Compare the literals {{@code that}} and {{@code other}} of
+ * {{@link {enum_name}}} by their ranks.
+ *
+ * @param that literal to be compared
+ * @param other literal to compare against
+ * @return negative, zero or positive if {{@code that}} comes before, is equal to
+ * or comes after {{@code other}}, respectively
+ */
+public static int {compare_name}({enum_name} that, {enum_name} other) {{
+{I}return Integer.compare({rank_name}(that), {rank_name}(other));
+}}"""
+            )
+        )
+
+    methods_joined = "\n\n".join(methods)
+
     code = Stripped(
         f"""\
 /**
- * Provide the operations on sets which give a new set, as in Python.
+ * Provide the operations on sets and the sorting of their items.
  */
 public final class SetHelpers {{
 {I}private SetHelpers() {{
 {II}// Prevent instantiation
 {I}}}
 
-{I}/**
-{I} * Give a new set of the items which are both in {{@code that}} and
-{I} * in {{@code other}}.
-{I} *
-{I} * @param that set to be intersected
-{I} * @param other set to intersect with
-{I} * @param <T> type of the items
-{I} * @return new set with the common items
-{I} */
-{I}public static <T> Set<T> intersection(Set<T> that, Set<T> other) {{
-{II}final Set<T> result = new HashSet<>(that);
-{II}result.retainAll(other);
-{II}return result;
-{I}}}
-
-{I}/**
-{I} * Give a new set of the items which are in {{@code that}}, but not
-{I} * in {{@code other}}.
-{I} *
-{I} * @param that set to be subtracted from
-{I} * @param other set of the items to be left out
-{I} * @param <T> type of the items
-{I} * @return new set with the remaining items
-{I} */
-{I}public static <T> Set<T> difference(Set<T> that, Set<T> other) {{
-{II}final Set<T> result = new HashSet<>(that);
-{II}result.removeAll(other);
-{II}return result;
-{I}}}
+{I}{indent_but_first_line(methods_joined, I)}
 }}"""
     )
+
+    imports = []  # type: List[str]
+    if len(ranked_enumerations) > 0:
+        imports.append(f"import {package}.types.enums.*;")
+    if with_sorting:
+        imports.extend(
+            [
+                "import java.util.ArrayList;",
+                "import java.util.Collections;",
+                "import java.util.Comparator;",
+            ]
+        )
+    if with_operations:
+        imports.append("import java.util.HashSet;")
+    if with_sorting:
+        imports.append("import java.util.List;")
+    imports.append("import java.util.Set;")
 
     blocks = [
         java_common.WARNING,
         Stripped(f"package {package}.common;"),
-        Stripped(
-            """\
-import java.util.HashSet;
-import java.util.Set;"""
-        ),
+        Stripped("\n".join(imports)),
         code,
         java_common.WARNING,
     ]  # type: List[Stripped]
@@ -402,12 +615,18 @@ def generate(
             )
         )
 
-    if intermediate.uses_set_operations(symbol_table):
-        files.append(
-            java_common.JavaFile(
-                "SetHelpers.java", f"{_generate_set_helpers(package)}\n"
-            )
+    with_operations = intermediate.uses_set_operations(symbol_table)
+    with_sorting = java_common.has_set_properties(symbol_table)
+    if with_operations or with_sorting:
+        set_helpers = _generate_set_helpers(
+            package=package,
+            with_operations=with_operations,
+            with_sorting=with_sorting,
+            ranked_enumerations=java_common.enumerations_in_set_properties(
+                symbol_table
+            ),
         )
+        files.append(java_common.JavaFile("SetHelpers.java", f"{set_helpers}\n"))
 
     for arity in range(1, java_common.MAX_TUPLE_ARITY + 1):
         name = f"Tuple{arity}"

@@ -616,10 +616,11 @@ for {loop_var} in self.{prop_name}:
             continue
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            # NOTE (mristin):
+            # A set holds only primitives and enumeration literals, never
+            # a reference to one of our own classes, so there is nothing to
+            # descend into.
+            continue
 
         else:
             # noinspection PyTypeChecker
@@ -1091,7 +1092,13 @@ def _generate_class(
 
         if isinstance(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+        ) and isinstance(
+            prop.type_annotation.value,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
+            # NOTE (mristin):
+            # The order of the items of a set is undefined, and the caller must
+            # not depend on it.
             prop_name = python_naming.property_name(prop.name)
             items_type = python_common.generate_type(prop.type_annotation.value.items)
 
@@ -1962,16 +1969,29 @@ def generate(
         if len(symbol_table.named_unions) == 0:
             typing_imports.append(Identifier("Union"))
 
-    typing_imports.extend(
-        python_common.typing_imports_for_sets(
-            [
-                method
-                for cls in symbol_table.classes
-                for method in cls.methods
-                if method.specified_for is cls
-            ]
-        )
+    set_imports = python_common.typing_imports_for_sets(
+        [
+            method
+            for cls in symbol_table.classes
+            for method in cls.methods
+            if method.specified_for is cls
+        ]
     )
+
+    # NOTE (mristin):
+    # The set properties and the corresponding arguments of the constructors are
+    # always mutable, so they are annotated as ``Set``.
+    if Identifier("Set") not in set_imports and any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    ):
+        set_imports.append(Identifier("Set"))
+
+    typing_imports.extend(set_imports)
 
     typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
 

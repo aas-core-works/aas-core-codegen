@@ -6,7 +6,12 @@ from typing import List, Optional
 from icontract import ensure
 
 from aas_core_codegen import intermediate, naming
-from aas_core_codegen.common import Stripped, Identifier, indent_but_first_line
+from aas_core_codegen.common import (
+    Stripped,
+    Identifier,
+    assert_never,
+    indent_but_first_line,
+)
 from aas_core_codegen.python import common as python_common, naming as python_naming
 from aas_core_codegen.python.common import (
     INDENT as I,
@@ -31,7 +36,10 @@ def _generate_test_case(cls: intermediate.ConcreteClass) -> Optional[Stripped]:
     for prop in cls.properties:
         if not (
             isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-            and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
+            and isinstance(
+                prop.type_annotation.value,
+                (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+            )
         ):
             continue
 
@@ -44,6 +52,23 @@ def _generate_test_case(cls: intermediate.ConcreteClass) -> Optional[Stripped]:
         )
 
         file_name = f"{over_x_or_empty_name}.trace"
+
+        traced: Stripped
+        if isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+            traced = Stripped(f"list(instance.{over_x_or_empty_name}())")
+        elif isinstance(prop.type_annotation.value, intermediate.SetTypeAnnotation):
+            # NOTE (mristin):
+            # The order of the items of a set is undefined, so we sort the traces of
+            # the items to make the test independent of it.
+            traced = Stripped(
+                f"""\
+sorted(
+{I}tests.common.trace(item)
+{I}for item in instance.{over_x_or_empty_name}()
+)"""
+            )
+        else:
+            assert_never(prop.type_annotation.value)
 
         test_methods.append(
             Stripped(
@@ -67,7 +92,7 @@ def {test_case_method_name}(self) -> None:
 
 {II}log = [
 {III}tests.common.trace(
-{IIII}list(instance.{over_x_or_empty_name}())
+{IIII}{indent_but_first_line(traced, IIII)}
 {III})
 {II}]
 

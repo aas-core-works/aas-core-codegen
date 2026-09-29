@@ -124,9 +124,8 @@ def _parser_name(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
         )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        return Identifier(
+            f"_set_of__{python_common.atomic_moniker(type_anno.items)}_from_jsonable"
         )
 
     else:
@@ -226,6 +225,44 @@ def {name}(
 {I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
 {I}"""
 {I}return _list_from_jsonable(
+{II}jsonable,
+{II}{parse_item}
+{I})'''
+            ),
+        )
+
+    def _register_set_parser(
+        self, type_annotation: intermediate.SetTypeAnnotation
+    ) -> None:
+        """Register the parser of a set with the items of the ``type_annotation``."""
+        self.note_needed_helper("_set_from_jsonable")
+
+        self.register_parser(type_annotation.items)
+
+        name = _parser_name(type_annotation)
+
+        item_type = python_common.generate_type(
+            type_annotation.items, types_module=Identifier("aas_types")
+        )
+
+        parse_item = _parser_name(type_annotation.items)
+
+        self._add(
+            name,
+            Stripped(
+                f'''\
+def {name}(
+{I}jsonable: Jsonable
+) -> Set[{item_type}]:
+{I}"""
+{I}Parse :paramref:`jsonable` as a set of
+{I}{python_common.describe_atomic_type(type_annotation.items)}.
+
+{I}:param jsonable: JSON-able structure to be parsed
+{I}:return: parsed set
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+{I}"""
+{I}return _set_from_jsonable(
 {II}jsonable,
 {II}{parse_item}
 {I})'''
@@ -336,10 +373,7 @@ def {name}(
             self._register_tuple_parser(type_anno)
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            self._register_set_parser(type_anno)
 
         else:
             assert_never(type_anno)
@@ -356,6 +390,7 @@ _HELPER_DEPENDENCIES = {
     "_str_from_jsonable": [],
     "_bytes_from_jsonable": [],
     "_list_from_jsonable": [],
+    "_set_from_jsonable": [],
     "_json_value_from_jsonable": [],
     "_json_array_from_jsonable": ["_json_value_from_jsonable"],
     "_json_object_from_jsonable": ["_json_value_from_jsonable"],
@@ -618,6 +653,49 @@ def _list_from_jsonable(
 {III}raise
 
 {II}result.append(item)
+
+{I}return result'''
+        ),
+        "_set_from_jsonable": Stripped(
+            f'''\
+def _set_from_jsonable(
+{I}jsonable: Jsonable,
+{I}parse_item: _Parser[_ValueT]
+) -> Set[_ValueT]:
+{I}"""
+{I}Parse :paramref:`jsonable` as a set, applying :paramref:`parse_item` on
+{I}every item.
+
+{I}We accept the items in any order, but refuse the duplicates, so that no
+{I}item is silently lost.
+
+{I}:param jsonable: JSON-able structure to be parsed
+{I}:param parse_item: to parse a single item of the array
+{I}:return: parsed set
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+{I}"""
+{I}array_like = aas_common.try_to_cast_to_array_like(jsonable)
+{I}if array_like is None:
+{II}raise DeserializationException(
+{III}f"Expected something array-like, but got: {{type(jsonable)}}"
+{II})
+
+{I}result = set()  # type: Set[_ValueT]
+{I}for i, jsonable_item in enumerate(array_like):
+{II}try:
+{III}item = parse_item(jsonable_item)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(IndexSegment(array_like, i))
+{III}raise
+
+{II}if item in result:
+{III}duplicate_exception = DeserializationException(
+{IIII}"Expected unique items in the set, but the item is a duplicate"
+{III})
+{III}duplicate_exception.path._prepend(IndexSegment(array_like, i))
+{III}raise duplicate_exception
+
+{II}result.add(item)
 
 {I}return result'''
         ),
@@ -1608,6 +1686,15 @@ def _list_serializer_name(
     )
 
 
+def _set_serializer_name(
+    type_annotation: intermediate.SetTypeAnnotation,
+) -> Identifier:
+    """Give out the name of the serializer of a set of the ``type_annotation``."""
+    return Identifier(
+        f"_set_of__{python_common.atomic_moniker(type_annotation.items)}_to_jsonable"
+    )
+
+
 def _tuple_serializer_name(
     type_annotation: intermediate.TupleTypeAnnotation,
 ) -> Identifier:
@@ -1849,10 +1936,16 @@ def _generate_serialization(
         serializer_name = _tuple_serializer_name(type_anno)
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
+        # NOTE (mristin):
+        # We serialize a set as an array of sorted items so that the output is
+        # the same in all the targets. Python sorts ``False`` before ``True``,
+        # the integers numerically and the strings by their code points, which
+        # is exactly the order which we need. The enumeration literals are sorted
+        # by their rank, see :py:func:`python_common.rank_function_name`.
+        if _serialized_as_it_is(type_anno.items):
+            serializer_name = Identifier("sorted")
+        else:
+            serializer_name = _set_serializer_name(type_anno)
 
     else:
         assert_never(type_anno)
@@ -1995,6 +2088,81 @@ def {name}(
             ),
         )
 
+    def _register_set_serializer(
+        self, type_annotation: intermediate.SetTypeAnnotation
+    ) -> None:
+        """Register the serializer of a set with items of the ``type_annotation``."""
+        items_type_anno = type_annotation.items
+
+        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            f"Expected the items of a set to be atomic, as the sets of other items "
+            f"are refused in intermediate._translate._verify_items_of_sets, "
+            f"but got: {type_annotation}"
+        )
+
+        # NOTE (mristin):
+        # See :py:func:`_generate_serialization` on why the sets of the values
+        # which JSON carries as they come are served by ``sorted`` instead of by
+        # a serializer of their own.
+        if _serialized_as_it_is(items_type_anno):
+            return
+
+        self.register_serializer(items_type_anno)
+
+        name = _set_serializer_name(type_annotation)
+
+        set_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("aas_types")
+        )
+
+        item_serialization = _generate_atomic_serialization(
+            Stripped("item"), items_type_anno
+        )
+
+        sorted_that: str
+        if isinstance(items_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            items_type_anno.our_type, intermediate.Enumeration
+        ):
+            rank_function = python_common.rank_function_name(items_type_anno.our_type)
+            sorted_that = f"sorted(that, key=aas_stringification.{rank_function})"
+        else:
+            sorted_that = "sorted(that)"
+
+        # NOTE (mristin):
+        # The index refers to the position of the item in the sorted order, which
+        # is also its position in the serialized array.
+        body = Stripped(
+            f"""\
+jsonable = []  # type: List[MutableJsonable]
+for i, item in enumerate({sorted_that}):
+{I}try:
+{II}jsonable.append(
+{III}{indent_but_first_line(item_serialization, III)}
+{II})
+{I}except SerializationException as exception:
+{II}exception._prepend_index(i)
+{II}raise
+return jsonable"""
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f'''\
+def {name}(
+{I}that: {set_type}
+) -> List[MutableJsonable]:
+{I}"""
+{I}Serialize :paramref:`that` as a sorted list of
+{I}{python_common.describe_atomic_type(items_type_anno)}.
+
+{I}:param that: set to be serialized
+{I}:return: JSON-able representation of :paramref:`that`
+{I}"""
+{I}{indent_but_first_line(body, I)}'''
+            ),
+        )
+
     def _register_tuple_serializer(
         self, type_annotation: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -2126,10 +2294,7 @@ def {name}(
             self._register_tuple_serializer(type_anno)
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            self._register_set_serializer(type_anno)
 
         else:
             assert_never(type_anno)
@@ -2455,6 +2620,11 @@ def generate(
         else ""
     )
 
+    # NOTE (mristin):
+    # A set property is always parsed by the shared helper, so we import ``Set``
+    # only then so that the import is never unused.
+    set_import = f"{I}Set,\n" if "_set_from_jsonable" in needed_helpers else ""
+
     # endregion
 
     blocks = [
@@ -2485,6 +2655,7 @@ from typing import (
 {I}MutableMapping,
 {I}Optional,
 {I}Sequence,
+{set_import}\
 {I}Tuple,
 {I}TypeVar,
 {I}Union,

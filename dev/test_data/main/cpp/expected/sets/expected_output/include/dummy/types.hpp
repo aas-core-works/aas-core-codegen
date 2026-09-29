@@ -31,7 +31,8 @@ namespace types {
  * For example, switch statements can be implemented as jump tables.
  */
 enum class ModelType : std::uint32_t {
-  kSomething = 0
+  kSomething = 0,
+  kCollection = 1
 };
 
 enum class Kind : std::uint32_t {
@@ -40,6 +41,12 @@ enum class Kind : std::uint32_t {
   kGamma = 2,
 };  // enum class Kind
 
+enum class Direction : std::uint32_t {
+  kNorth = 0,
+  kSouth = 1,
+  kEast = 2,
+};  // enum class Direction
+
 // endregion Enumerations
 
 // region Forward declaration of interfaces
@@ -47,6 +54,8 @@ enum class Kind : std::uint32_t {
 // endregion Forward declaration of interfaces
 
 class ISomething;
+
+class ICollection;
 
 // region Class interfaces
 
@@ -157,6 +166,85 @@ class ISomething
   ) const = 0;
 
   virtual ~ISomething() = default;
+};
+
+class ICollection
+    : virtual public IClass {
+ public:
+  virtual const std::unordered_set<std::wstring>& texts() const = 0;
+
+  virtual std::unordered_set<std::wstring>& mutable_texts() = 0;
+
+  virtual void set_texts(
+    std::unordered_set<std::wstring> value
+  ) = 0;
+
+  virtual const std::unordered_set<int64_t>& numbers() const = 0;
+
+  virtual std::unordered_set<int64_t>& mutable_numbers() = 0;
+
+  virtual void set_numbers(
+    std::unordered_set<int64_t> value
+  ) = 0;
+
+  virtual const std::unordered_set<bool>& flags() const = 0;
+
+  virtual std::unordered_set<bool>& mutable_flags() = 0;
+
+  virtual void set_flags(
+    std::unordered_set<bool> value
+  ) = 0;
+
+  virtual const std::unordered_set<Direction, common::EnumHash>& directions() const = 0;
+
+  virtual std::unordered_set<Direction, common::EnumHash>& mutable_directions() = 0;
+
+  virtual void set_directions(
+    std::unordered_set<Direction, common::EnumHash> value
+  ) = 0;
+
+  virtual const std::unordered_set<std::wstring>& codes() const = 0;
+
+  virtual std::unordered_set<std::wstring>& mutable_codes() = 0;
+
+  virtual void set_codes(
+    std::unordered_set<std::wstring> value
+  ) = 0;
+
+  virtual const common::optional<
+    std::unordered_set<std::wstring>
+  >& optional_texts() const = 0;
+
+  virtual common::optional<
+    std::unordered_set<std::wstring>
+  >& mutable_optional_texts() = 0;
+
+  virtual void set_optional_texts(
+    common::optional<
+      std::unordered_set<std::wstring>
+    > value
+  ) = 0;
+
+  virtual const common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  >& optional_directions() const = 0;
+
+  virtual common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  >& mutable_optional_directions() = 0;
+
+  virtual void set_optional_directions(
+    common::optional<
+      std::unordered_set<Direction, common::EnumHash>
+    > value
+  ) = 0;
+
+  /// \brief Check the difference of a set property and a set argument.
+  virtual bool TextsAreNotAllIn(
+    const std::unordered_set<std::wstring>& others
+  ) const = 0;
+
+  virtual ~ICollection() = default;
 };
 
 // endregion
@@ -339,6 +427,147 @@ class Something
   common::optional<Kind> optional_kind_;
 };
 
+class Collection
+    : public ICollection {
+ public:
+  Collection(
+    std::unordered_set<std::wstring> texts,
+    std::unordered_set<int64_t> numbers,
+    std::unordered_set<bool> flags,
+    std::unordered_set<Direction, common::EnumHash> directions,
+    std::unordered_set<std::wstring> codes,
+    common::optional<
+      std::unordered_set<std::wstring>
+    > optional_texts = common::nullopt,
+    common::optional<
+      std::unordered_set<Direction, common::EnumHash>
+    > optional_directions = common::nullopt
+  );
+
+  ModelType model_type() const override;
+
+  // region Get and set texts_
+
+  const std::unordered_set<std::wstring>& texts() const override;
+
+  std::unordered_set<std::wstring>& mutable_texts() override;
+
+  void set_texts(
+    std::unordered_set<std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set numbers_
+
+  const std::unordered_set<int64_t>& numbers() const override;
+
+  std::unordered_set<int64_t>& mutable_numbers() override;
+
+  void set_numbers(
+    std::unordered_set<int64_t> value
+  ) override;
+
+  // endregion
+
+  // region Get and set flags_
+
+  const std::unordered_set<bool>& flags() const override;
+
+  std::unordered_set<bool>& mutable_flags() override;
+
+  void set_flags(
+    std::unordered_set<bool> value
+  ) override;
+
+  // endregion
+
+  // region Get and set directions_
+
+  const std::unordered_set<Direction, common::EnumHash>& directions() const override;
+
+  std::unordered_set<Direction, common::EnumHash>& mutable_directions() override;
+
+  void set_directions(
+    std::unordered_set<Direction, common::EnumHash> value
+  ) override;
+
+  // endregion
+
+  // region Get and set codes_
+
+  const std::unordered_set<std::wstring>& codes() const override;
+
+  std::unordered_set<std::wstring>& mutable_codes() override;
+
+  void set_codes(
+    std::unordered_set<std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set optional_texts_
+
+  const common::optional<
+    std::unordered_set<std::wstring>
+  >& optional_texts() const override;
+
+  common::optional<
+    std::unordered_set<std::wstring>
+  >& mutable_optional_texts() override;
+
+  void set_optional_texts(
+    common::optional<
+      std::unordered_set<std::wstring>
+    > value
+  ) override;
+
+  // endregion
+
+  // region Get and set optional_directions_
+
+  const common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  >& optional_directions() const override;
+
+  common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  >& mutable_optional_directions() override;
+
+  void set_optional_directions(
+    common::optional<
+      std::unordered_set<Direction, common::EnumHash>
+    > value
+  ) override;
+
+  // endregion
+
+  bool TextsAreNotAllIn(
+    const std::unordered_set<std::wstring>& others
+  ) const override;
+
+  ~Collection() override = default;
+
+ private:
+  std::unordered_set<std::wstring> texts_;
+
+  std::unordered_set<int64_t> numbers_;
+
+  std::unordered_set<bool> flags_;
+
+  std::unordered_set<Direction, common::EnumHash> directions_;
+
+  std::unordered_set<std::wstring> codes_;
+
+  common::optional<
+    std::unordered_set<std::wstring>
+  > optional_texts_;
+
+  common::optional<
+    std::unordered_set<Direction, common::EnumHash>
+  > optional_directions_;
+};
+
 // endregion
 
 // region Is-a functions
@@ -355,6 +584,21 @@ class Something
  * an instance of \ref ISomething
  */
 bool IsSomething(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref ICollection.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref ICollection
+ */
+bool IsCollection(
   const IClass& that
 );
 

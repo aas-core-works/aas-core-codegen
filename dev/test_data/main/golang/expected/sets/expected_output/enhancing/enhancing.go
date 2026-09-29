@@ -188,6 +188,144 @@ func wrapSomething[E any](
 	return
 }
 
+type enhancedCollection[E any] struct {
+	instance aastypes.ICollection
+	enhancement E
+}
+
+func (ec *enhancedCollection[E]) ModelType(
+) aastypes.ModelType {
+	return ec.instance.ModelType()
+}
+
+func (ec *enhancedCollection[E]) DescendOnce(
+	action func(aastypes.IClass)bool,
+) bool {
+	return ec.instance.DescendOnce(action)
+}
+
+func (ec *enhancedCollection[E]) Descend(
+	action func(aastypes.IClass) bool,
+) bool {
+	return ec.instance.Descend(action)
+}
+
+func (ec *enhancedCollection[E]) Texts(
+) map[string]struct{} {
+	return ec.instance.Texts()
+}
+
+func (ec *enhancedCollection[E]) SetTexts(
+	value map[string]struct{},
+) {
+	ec.instance.SetTexts(value)
+}
+
+func (ec *enhancedCollection[E]) Numbers(
+) map[int64]struct{} {
+	return ec.instance.Numbers()
+}
+
+func (ec *enhancedCollection[E]) SetNumbers(
+	value map[int64]struct{},
+) {
+	ec.instance.SetNumbers(value)
+}
+
+func (ec *enhancedCollection[E]) Flags(
+) map[bool]struct{} {
+	return ec.instance.Flags()
+}
+
+func (ec *enhancedCollection[E]) SetFlags(
+	value map[bool]struct{},
+) {
+	ec.instance.SetFlags(value)
+}
+
+func (ec *enhancedCollection[E]) Directions(
+) map[aastypes.Direction]struct{} {
+	return ec.instance.Directions()
+}
+
+func (ec *enhancedCollection[E]) SetDirections(
+	value map[aastypes.Direction]struct{},
+) {
+	ec.instance.SetDirections(value)
+}
+
+func (ec *enhancedCollection[E]) Codes(
+) map[string]struct{} {
+	return ec.instance.Codes()
+}
+
+func (ec *enhancedCollection[E]) SetCodes(
+	value map[string]struct{},
+) {
+	ec.instance.SetCodes(value)
+}
+
+func (ec *enhancedCollection[E]) OptionalTexts(
+) map[string]struct{} {
+	return ec.instance.OptionalTexts()
+}
+
+func (ec *enhancedCollection[E]) SetOptionalTexts(
+	value map[string]struct{},
+) {
+	ec.instance.SetOptionalTexts(value)
+}
+
+func (ec *enhancedCollection[E]) OptionalDirections(
+) map[aastypes.Direction]struct{} {
+	return ec.instance.OptionalDirections()
+}
+
+func (ec *enhancedCollection[E]) SetOptionalDirections(
+	value map[aastypes.Direction]struct{},
+) {
+	ec.instance.SetOptionalDirections(value)
+}
+
+func (c *enhancedCollection[E]) TextsAreNotAllIn(
+	others map[string]struct{},
+) bool {
+	return c.instance.TextsAreNotAllIn(
+		others,
+	)
+}
+
+func (ec *enhancedCollection[E]) getEnhancement(
+) E {
+	return ec.enhancement
+}
+
+func (ec *enhancedCollection[E]) setEnhancement(
+	value E,
+) {
+	ec.enhancement = value
+}
+
+func wrapCollection[E any](
+	that aastypes.ICollection,
+	factory func(aastypes.IClass) (E, bool),
+) (result aastypes.ICollection) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedCollection[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	return
+}
+
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.
 //
 // The factory returns the enhancement, and a boolean "should-enhance". If
@@ -214,6 +352,11 @@ func Wrap[E any](
 	case aastypes.ModelTypeSomething:
 		result = wrapSomething[E](
 			that.(aastypes.ISomething),
+			factory,
+		)
+	case aastypes.ModelTypeCollection:
+		result = wrapCollection[E](
+			that.(aastypes.ICollection),
 			factory,
 		)
 	default:

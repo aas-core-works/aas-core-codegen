@@ -69,6 +69,63 @@ public class Stringification {
       return Optional.of(value);
     }
   }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * <p>If {@code that} is not a valid literal, return {@code Optional#empty()}.
+   */
+  public static Optional<String> toString(Direction that)
+  {
+    return (that == null)
+      ? Optional.empty()
+      : Optional.of(that.literalText());
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(Direction that)
+  {
+    if (that == null) {
+      throw new IllegalArgumentException("Invalid literal of Direction: " + that);
+    }
+    return that.literalText();
+  }
+
+  private static final Map<String, Direction> directionFromString;
+  static {
+    final Map<String, Direction> temp = new HashMap<>();
+
+    temp.put("up", Direction.NORTH);
+    temp.put("down", Direction.SOUTH);
+    temp.put("right", Direction.EAST);
+
+    if (!temp.values().containsAll(Arrays.asList(Direction.values()))) {
+      throw new IllegalStateException("Unmapped Direction");
+    }
+
+    directionFromString = Collections.unmodifiableMap(temp);
+  }
+
+  /**
+   * Parse the string representation of {@link Direction}.
+   *
+   * <p>If {@code text} is not a valid string representation
+   * of a literal of {@link Direction},
+   * return {@code Optional#empty()}.
+   */
+  public static Optional<Direction> directionFromString(String text)
+  {
+    Direction value = directionFromString.get(text);
+    if (value == null) {
+      return Optional.empty();
+    } else {
+      return Optional.of(value);
+    }
+  }
 }
 
 /*

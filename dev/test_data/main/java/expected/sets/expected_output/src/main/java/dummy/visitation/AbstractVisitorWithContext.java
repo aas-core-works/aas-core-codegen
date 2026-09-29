@@ -25,6 +25,10 @@ public abstract class AbstractVisitorWithContext<ContextT>
     ISomething that,
     ContextT context
   );
+  public abstract void visitCollection(
+    ICollection that,
+    ContextT context
+  );
 }
 
 /*

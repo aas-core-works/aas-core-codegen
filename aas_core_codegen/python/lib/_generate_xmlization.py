@@ -1075,9 +1075,8 @@ def _content_reader_name(
         )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
+        return Identifier(
+            f"_read_set_of__{python_common.atomic_moniker(type_anno.items)}"
         )
 
     else:
@@ -1261,6 +1260,44 @@ def {name}(
             ),
         )
 
+    def _register_set_reader(
+        self, type_annotation: intermediate.SetTypeAnnotation
+    ) -> None:
+        """Register the reader of a set with the items of the ``type_annotation``."""
+        self.note_needed_helper("_read_set_of_items")
+
+        items_type_anno = type_annotation.items
+
+        self._register_element_reader(items_type_anno, expected_tag="v")
+
+        name = _content_reader_name(type_annotation)
+
+        item_type = python_common.generate_type(
+            items_type_anno, types_module=Identifier("aas_types")
+        )
+
+        read_item = _element_reader_name(items_type_anno, expected_tag="v")
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> Set[{item_type}]:
+{I}\"\"\"
+{I}Read the items of :paramref:`element` as a set of
+{I}{python_common.describe_atomic_type(items_type_anno)}.
+{I}\"\"\"
+{I}return _read_set_of_items(
+{II}element,
+{II}iterator,
+{II}{read_item}
+{I})"""
+            ),
+        )
+
     def _register_tuple_reader(
         self, type_annotation: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -1437,10 +1474,7 @@ def {name}(
             self._register_tuple_reader(type_anno)
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            self._register_set_reader(type_anno)
 
         else:
             assert_never(type_anno)
@@ -1888,6 +1922,13 @@ def _tuple_writer_name(type_annotation: intermediate.TupleTypeAnnotation) -> Ide
     )
 
 
+def _set_writer_name(type_annotation: intermediate.SetTypeAnnotation) -> Identifier:
+    """Give out the name of the writer of a set of the ``type_annotation``."""
+    return Identifier(
+        f"_write_set_of__{python_common.atomic_moniker(type_annotation.items)}"
+    )
+
+
 def _element_writer_call(
     type_annotation: intermediate.TypeAnnotationUnion,
     prop_name: Optional[str],
@@ -2036,10 +2077,7 @@ def _element_writer_call(
         return (_tuple_writer_name(type_anno), [prop_literal, value, "serializer"])
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
+        return (_set_writer_name(type_anno), [prop_literal, value, "serializer"])
 
     else:
         assert_never(type_anno)
@@ -2187,6 +2225,89 @@ def {name}(
             ),
         )
 
+    def _register_set_writer(
+        self, type_annotation: intermediate.SetTypeAnnotation
+    ) -> None:
+        """Register the writer of a set with the items of the ``type_annotation``."""
+        self.note_needed_helper("_write_list_of_items")
+
+        items_type_anno = type_annotation.items
+
+        self.register_property_writer(items_type_anno)
+
+        name = _set_writer_name(type_annotation)
+
+        value_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("aas_types")
+        )
+
+        items_primitive_type = intermediate.try_primitive_type(items_type_anno)
+
+        write_item: str
+        sorted_value: str
+
+        # NOTE (mristin):
+        # Python sorts ``False`` before ``True``, the integers numerically and
+        # the strings by their code points, which is exactly the order in which all
+        # the SDKs serialize a set. The enumeration literals are sorted by their
+        # rank, see :py:func:`python_common.rank_function_name`.
+        if items_primitive_type is not None:
+            write_item = _WRITE_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
+            sorted_value = "sorted(value)"
+
+        elif isinstance(items_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            items_type_anno.our_type, intermediate.Enumeration
+        ):
+            write_item = "_write_enum_as_element"
+            rank_function = python_common.rank_function_name(items_type_anno.our_type)
+            sorted_value = f"sorted(value, key=aas_stringification.{rank_function})"
+
+        else:
+            raise AssertionError(
+                f"Expected the items of a set to be primitives, constrained "
+                f"primitives or enumeration literals, as the sets of other items "
+                f"are refused in intermediate._translate._verify_items_of_sets, "
+                f"but got: {type_annotation}"
+            )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}name: str,
+{I}prop_name: Optional[str],
+{I}value: {value_type},
+{I}serializer: '_Serializer'
+) -> None:
+{I}\"\"\"
+{I}Write the items of :paramref:`value` sorted, enclosed in
+{I}the :paramref:`name` element.
+
+{I}The items are sorted in the same order in all the SDKs, and then written
+{I}exactly as a list, see :py:func:`_write_list_of_items`.
+
+{I}:param name: of the enclosing element
+{I}:param prop_name:
+{II}name of the property, as spelled in Python, whose value is written, or
+{II}``None`` if the access to the value is recorded by an enclosing writer
+{I}:param value: to be serialized
+{I}:param serializer: to write to
+{I}:raise: :py:class:`SerializationException` if the value could not be written
+{I}\"\"\"
+{I}try:
+{II}_write_list_of_items(
+{III}name,
+{III}None,
+{III}{sorted_value},
+{III}{write_item},
+{III}serializer
+{II})
+{I}except Exception as exception:
+{II}_attribute_to_property(exception, prop_name)"""
+            ),
+        )
+
     def register_property_writer(
         self, type_annotation: intermediate.TypeAnnotationUnion
     ) -> None:
@@ -2267,10 +2388,7 @@ def {name}(
             self._register_tuple_writer(type_anno)
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_anno}"
-            )
+            self._register_set_writer(type_anno)
 
         else:
             assert_never(type_anno)
@@ -2637,6 +2755,7 @@ _HELPER_DEPENDENCIES = {
     "_read_dispatched": [],
     "_read_properties": [],
     "_read_list_of_items": [],
+    "_read_set_of_items": [],
     "_read_tuple_item": [],
     "_read_instance_from_iterparse": [],
     "_remove_whitespace": [],
@@ -2953,6 +3072,83 @@ def _read_list_of_items(
 {III}raise
 
 {II}result.append(item)
+
+{I}return result"""
+        ),
+        "_read_set_of_items": Stripped(
+            f"""\
+def _read_set_of_items(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]],
+{I}read_item: _ContentReader[_ValueT]
+) -> Set[_ValueT]:
+{I}\"\"\"
+{I}Read the children of :paramref:`element` as a set of items.
+
+{I}We accept the items in any order, but refuse the duplicates, so that no item
+{I}is silently lost.
+
+{I}:paramref:`read_item` is responsible for verifying the tag of each item
+{I}element itself, see :py:func:`_read_list_of_items`.
+
+{I}The end element corresponding to :paramref:`element` will be read as well.
+
+{I}:param element: start element enclosing the set
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:param read_item: to read a single item, including its own end element
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed items
+{I}\"\"\"
+{I}if element.text is not None and len(element.text.strip()) != 0:
+{II}raise DeserializationException(
+{III}f"Expected only item elements and whitespace text, "
+{III}f"but got text: {{element.text!r}}"
+{II})
+
+{I}result = set()  # type: Set[_ValueT]
+
+{I}while True:
+{II}next_event_element = next(iterator, None)
+{II}if next_event_element is None:
+{III}raise DeserializationException(
+{IIII}f"Expected an item element or the end element corresponding "
+{IIII}f"to {{element.tag}}, but got the end-of-input"
+{III})
+
+{II}next_event, item_element = next_event_element
+{II}if next_event == 'end' and item_element.tag == element.tag:
+{III}# We reached the end element enclosing the items.
+{III}break
+
+{II}if next_event != 'start':
+{III}raise DeserializationException(
+{IIII}f"Expected a start element corresponding to an item, "
+{IIII}f"but got event {{next_event!r}} "
+{IIII}f"and element {{item_element.tag!r}}"
+{III})
+
+{II}# NOTE (mristin):
+{II}# We raise on a duplicate, so the number of the items read so far is also
+{II}# the index of the item element.
+{II}index = len(result)
+
+{II}try:
+{III}item = read_item(item_element, iterator)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(IndexSegment(item_element, index))
+{III}raise
+
+{II}if item in result:
+{III}duplicate_exception = DeserializationException(
+{IIII}"Expected unique items in the set, but the item is a duplicate"
+{III})
+{III}duplicate_exception.path._prepend(IndexSegment(item_element, index))
+{III}raise duplicate_exception
+
+{II}result.add(item)
 
 {I}return result"""
         ),
@@ -3955,6 +4151,19 @@ def generate(
         else ""
     )
 
+    # NOTE (mristin):
+    # We import ``Set`` only for the set properties so that the import is never
+    # unused.
+    uses_set_properties = any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for concrete_cls in symbol_table.concrete_classes
+        for prop in concrete_cls.properties
+    )
+    set_import = f"{I}Set,\n" if uses_set_properties else ""
+
     blocks = [
         _generate_module_docstring(
             symbol_table=symbol_table, qualified_module_name=qualified_module_name
@@ -3980,6 +4189,7 @@ from typing import (
 {I}NoReturn,
 {I}Optional,
 {I}Sequence,
+{set_import}\
 {I}TextIO,
 {I}Tuple,
 {I}TypeVar,

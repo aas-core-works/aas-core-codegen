@@ -44,8 +44,12 @@ def generate(
             if isinstance(
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
             ) and isinstance(
-                prop.type_annotation.value, intermediate.ListTypeAnnotation
+                prop.type_annotation.value,
+                (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
             ):
+                # NOTE (mristin):
+                # We only count the items, so the test does not depend on
+                # the order in which a set is iterated over.
                 blocks.append(
                     Stripped(
                         f"""\

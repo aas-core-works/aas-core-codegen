@@ -123,6 +123,89 @@ export function setDifference<T>(
     ),
 ]
 
+#: Sort the items of the sets in the properties in the same order as all the SDKs
+SET_SORTING: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+/**
+ * Compare `that` and `other` so that `false` comes before `true`.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns negative, zero or positive, as `that` is before, equal to or
+ * after `other`
+ */
+export function compareBooleans(that: boolean, other: boolean): number {{
+{I}return (that ? 1 : 0) - (other ? 1 : 0);
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Compare the numbers `that` and `other` numerically.
+ *
+ * @remarks
+ * The default sort of an array compares the items as text, so that `10` would
+ * come before `3`.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns negative, zero or positive, as `that` is before, equal to or
+ * after `other`
+ */
+export function compareNumbers(that: number, other: number): number {{
+{I}return that - other;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Compare `that` and `other` by their code points.
+ *
+ * @remarks
+ * The default sort and the operator `<` compare the UTF-16 code units instead,
+ * which puts a character outside the Basic Multilingual Plane, encoded as
+ * a surrogate pair in the range U+D800 to U+DFFF, before the characters
+ * U+E000 to U+FFFF. We compare the first differing code units after shifting
+ * the surrogates above all the other code units, which gives the order of
+ * the code points without decoding them.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns negative, zero or positive, as `that` is before, equal to or
+ * after `other`
+ */
+export function compareByCodePoints(that: string, other: string): number {{
+{I}const length = Math.min(that.length, other.length);
+{I}for (let i = 0; i < length; i++) {{
+{II}const thatUnit = that.charCodeAt(i);
+{II}const otherUnit = other.charCodeAt(i);
+{II}if (thatUnit !== otherUnit) {{
+{III}return shiftSurrogates(thatUnit) - shiftSurrogates(otherUnit);
+{II}}}
+{I}}}
+
+{I}return that.length - other.length;
+}}
+
+/**
+ * Shift the surrogate `unit` above all the other UTF-16 code units.
+ *
+ * @param unit - UTF-16 code unit
+ * @returns key of `unit` in the order of the code points
+ */
+function shiftSurrogates(unit: number): number {{
+{I}if (unit >= 0xd800 && unit <= 0xdfff) {{
+{II}return unit + 0x2000;
+{I}}}
+{I}if (unit >= 0xe000) {{
+{II}return unit - 0x800;
+{I}}}
+{I}return unit;
+}}"""
+    ),
+]
+
 #: Parse a text as a safe integer; this is how we transpile the built-in ``int``.
 #:
 #: We deliberately do not use the native ``parseInt`` or ``Number``. They accept
@@ -861,6 +944,13 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # an intersection or a difference of sets.
     if intermediate.uses_set_operations(symbol_table):
         for block in SET_OPERATIONS:
+            blocks.insert(len(blocks) - 1, block)
+
+    # NOTE (mristin):
+    # Analogous to the modulo, we add the helpers only if the meta-model has
+    # a set in a property, which we serialize as a sorted array.
+    if typescript_common.has_set_properties(symbol_table):
+        for block in SET_SORTING:
             blocks.insert(len(blocks) - 1, block)
 
     # NOTE (mristin):

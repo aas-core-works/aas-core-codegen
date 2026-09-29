@@ -1377,10 +1377,65 @@ for key := range that.{getter_name}() {{
         block = Stripped("\n\n".join(blocks_of_json))
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_anno}"
-        )
+        # NOTE (mristin):
+        # A set holds only primitives, constrained primitives and enumeration
+        # literals. Only the latter two need to be verified.
+        if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            assert isinstance(
+                type_anno.items.our_type,
+                (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
+            ), (
+                f"NOTE (mristin): We expect only sets of enumeration literals and "
+                f"constrained primitives, as we refuse the others in "
+                f"intermediate._translate._verify_items_of_sets, "
+                f"but you specified {type_anno}."
+            )
+
+            verify_function_name = golang_naming.function_name(
+                Identifier(f"verify_{type_anno.items.our_type.name}")
+            )
+
+            # NOTE (mristin):
+            # A set has no index, so we report the position of the item in
+            # the sorted order. This is the index of the item in the serialized
+            # array, so that the path resolves in the serialized data.
+            loop_head = "for i, v := range "
+
+            # NOTE (mristin):
+            # The loop is nested in the check of the property's presence, so it
+            # is indented by two tabs.
+            sorted_items_expr = golang_common.sorted_set_items_expr(
+                f"that.{getter_name}()",
+                type_anno.items,
+                column=2 * golang_common.TAB_WIDTH + len(loop_head),
+            )
+
+            block = Stripped(
+                f"""\
+{loop_head}{sorted_items_expr} {{
+{I}abort = {verify_function_name}(
+{II}v,
+{II}func(err *VerificationError) bool {{
+{III}err.Path.PrependIndex(
+{IIII}&aasreporting.IndexSegment{{
+{IIIII}Index: i,
+{IIII}}},
+{III})
+
+{III}err.Path.PrependName(
+{IIII}&aasreporting.NameSegment{{
+{IIIII}Name: {prop_name_literal},
+{IIII}}},
+{III})
+
+{III}return onError(err)
+{II}}},
+{I})
+{I}if abort {{
+{II}return
+{I}}}
+}}"""
+            )
 
     else:
         assert_never(type_anno)
@@ -1401,7 +1456,10 @@ for key := range that.{getter_name}() {{
                 ),
             )
         )
-        or isinstance(type_anno, intermediate.ListTypeAnnotation)
+        or isinstance(
+            type_anno,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        )
     )
 
     if not optional and is_reference and block is None:
@@ -1971,6 +2029,10 @@ def generate(
 
     reporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
+    stringification_url_literal = golang_common.string_literal(
+        f"{repo_url}/stringification"
+    )
+
     types_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
@@ -2178,6 +2240,10 @@ func (ve *VerificationError) PathString() string {{
         ("aascommon", f"{I}aascommon {common_url_literal}"),
         ("aasconstants", f"{I}aasconstants {constants_url_literal}"),
         ("aasreporting", f"{I}aasreporting {reporting_url_literal}"),
+        (
+            "aasstringification",
+            f"{I}aasstringification {stringification_url_literal}",
+        ),
         ("aastypes", f"{I}aastypes {types_url_literal}"),
     ):
         if golang_common.names_package(blocks, module):

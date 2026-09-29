@@ -134,7 +134,11 @@ def _translate_constraints(
 
     if isinstance(
         type_annotation,
-        (intermediate.ListTypeAnnotation, intermediate.JsonArrayTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+        ),
     ):
         if constraints.len_constraint is not None:
             if constraints.len_constraint.min_value is not None:
@@ -260,14 +264,28 @@ def _define_type(
             else:
                 assert_never(type_annotation.our_type)
 
-        elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-            assert not isinstance(
-                type_annotation.items, intermediate.OptionalTypeAnnotation
-            ), (
-                "NOTE (mristin): Lists of optional values were not expected "
-                "at the time when we implemented this. Please contact the developers "
-                "if you need this functionality."
-            )
+        elif isinstance(
+            type_annotation,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
+            if isinstance(type_annotation, intermediate.ListTypeAnnotation):
+                assert not isinstance(
+                    type_annotation.items, intermediate.OptionalTypeAnnotation
+                ), (
+                    "NOTE (mristin): Lists of optional values were not expected "
+                    "at the time when we implemented this. Please contact "
+                    "the developers if you need this functionality."
+                )
+            elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+                assert not isinstance(
+                    type_annotation.items, intermediate.OptionalTypeAnnotation
+                ), (
+                    "NOTE (mristin): Sets of optional values were not expected "
+                    "at the time when we implemented this. Please contact "
+                    "the developers if you need this functionality."
+                )
+            else:
+                assert_never(type_annotation)
 
             items_type_definition, items_error = _define_type(
                 type_annotation=type_annotation.items,
@@ -282,6 +300,12 @@ def _define_type(
 
             definition["type"] = "array"
             definition["items"] = items_type_definition
+
+            # NOTE (mristin):
+            # We serialize a set as an array of sorted items. JSON Schema can not
+            # express the order, but it can express the uniqueness.
+            if isinstance(type_annotation, intermediate.SetTypeAnnotation):
+                definition["uniqueItems"] = True
 
         elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
             items_type_definitions = []  # type: List[MutableMapping[str, Any]]
@@ -362,12 +386,6 @@ def _define_type(
                         key_all_of
                     )
 
-        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set in a property, as the sets are allowed only "
-                f"in the arguments: {type_annotation}"
-            )
-
         else:
             assert_never(type_annotation)
 
@@ -440,7 +458,10 @@ def _over_non_optional_type_annotations(
     if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         yield from _over_non_optional_type_annotations(type_annotation.value)
 
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+    elif isinstance(
+        type_annotation,
+        (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+    ):
         yield from _over_non_optional_type_annotations(type_annotation.items)
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
@@ -460,12 +481,6 @@ def _over_non_optional_type_annotations(
 
     elif isinstance(type_annotation, intermediate.JsonObjectTypeAnnotation):
         yield from _over_non_optional_type_annotations(type_annotation.key)
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected set in a property, as the sets are allowed only "
-            f"in the arguments: {type_annotation}"
-        )
 
     else:
         # noinspection PyTypeChecker

@@ -33,6 +33,13 @@ void AbstractVisitor::Visit(
         >(that)
       );
       break;
+    case types::ModelType::kCollection:
+      VisitCollection(
+        std::dynamic_pointer_cast<
+          types::ICollection
+        >(that)
+      );
+      break;
     default:
       throw std::logic_error(
         common::Concat(
@@ -51,6 +58,12 @@ void AbstractVisitor::Visit(
 
 void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>&
+) {
+  // No properties to be passed through.
+}
+
+void PassThroughVisitor::VisitCollection(
+  const std::shared_ptr<types::ICollection>&
 ) {
   // No properties to be passed through.
 }

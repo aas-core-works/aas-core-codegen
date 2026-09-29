@@ -230,6 +230,68 @@ func TestKindRuntimeRange(t *testing.T) {
 	}
 }
 
+func TestDirectionRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyDirection(
+		aastypes.Direction(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyDirection(
+		aastypes.Direction(2),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyDirection(
+		aastypes.Direction(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyDirection(
+		aastypes.Direction(2 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
 func TestSomethingOK(t *testing.T) {
 	pths := aastesting.FindFilesBySuffixRecursively(
 		filepath.Join(
@@ -328,6 +390,136 @@ func TestSomethingFail(t *testing.T) {
 			)
 
 			deserialized, deseriaErr := aasjsonization.SomethingFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*aasverification.VerificationError
+			aasverification.Verify(
+				deserialized,
+				func(err *aasverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestCollectionOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Json",
+			"Expected",
+			"Collection",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := aastesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := aasjsonization.CollectionFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*aasverification.VerificationError
+		aasverification.Verify(
+			deserialized,
+			func(veriErr *aasverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestCollectionFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"Collection",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := aastesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := aasjsonization.CollectionFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {

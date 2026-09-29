@@ -35,7 +35,8 @@ def generate(
             if isinstance(
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
             ) and isinstance(
-                prop.type_annotation.value, intermediate.ListTypeAnnotation
+                prop.type_annotation.value,
+                (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
             ):
                 blocks.append(
                     Stripped(
