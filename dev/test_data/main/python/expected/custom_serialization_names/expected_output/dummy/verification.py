@@ -37,6 +37,7 @@ from typing import (
     Pattern,
     Sequence,
     Set,
+    Tuple,
     Union
 )
 

@@ -423,21 +423,13 @@ class _TranspilableVerificationTranspiler(java_transpilation.Transpiler):
             node.identifier in self._variable_name_set
             or node.identifier in self._argument_name_set
         ):
-            variable = java_naming.variable_name(node.identifier)
-
-            # NOTE (mristin):
-            # We unwrap an optional variable analogously to an optional property,
-            # see :py:meth:`java_transpilation.Transpiler.transform_member`.
-            if self._optional_map[node]:
-                if node in self._beneath_none_check:
-                    return Stripped(variable), None
-
-                if node in self._beneath_call:
-                    return Stripped(f"{variable}.orElse(null)"), None
-
-                return Stripped(f"{variable}.get()"), None
-
-            return Stripped(variable), None
+            return (
+                self._unwrap_if_optional(
+                    node=node,
+                    variable=Stripped(java_naming.variable_name(node.identifier)),
+                ),
+                None,
+            )
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = java_naming.property_name(node.identifier)

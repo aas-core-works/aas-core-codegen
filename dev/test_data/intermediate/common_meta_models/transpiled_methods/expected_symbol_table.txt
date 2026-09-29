@@ -414,6 +414,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               For(
@@ -445,6 +446,7 @@ SymbolTable(
                             original_node=...)],
                         original_node=...),
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)"""),
             textwrap.dedent("""\
@@ -699,6 +701,7 @@ SymbolTable(
                         original_node=...),
                       name='count',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -743,6 +746,7 @@ SymbolTable(
                     original_node=...),
                   name='count',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -808,6 +812,7 @@ SymbolTable(
                     value=Name(
                       identifier='text',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -856,6 +861,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Assignment(
@@ -871,6 +877,7 @@ SymbolTable(
                     original_node=...),
                   name='Alpha',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -913,6 +920,7 @@ SymbolTable(
                     value=1,
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Return(
@@ -1226,6 +1234,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               For(
@@ -1257,6 +1266,7 @@ SymbolTable(
                             original_node=...)],
                         original_node=...),
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)"""),
             textwrap.dedent("""\
@@ -1511,6 +1521,7 @@ SymbolTable(
                         original_node=...),
                       name='count',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -1555,6 +1566,7 @@ SymbolTable(
                     original_node=...),
                   name='count',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -1620,6 +1632,7 @@ SymbolTable(
                     value=Name(
                       identifier='text',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -1668,6 +1681,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Assignment(
@@ -1683,6 +1697,7 @@ SymbolTable(
                     original_node=...),
                   name='Alpha',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -1725,6 +1740,7 @@ SymbolTable(
                     value=1,
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Return(
@@ -2036,6 +2052,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               For(
@@ -2067,6 +2084,7 @@ SymbolTable(
                             original_node=...)],
                         original_node=...),
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)"""),
             textwrap.dedent("""\
@@ -2321,6 +2339,7 @@ SymbolTable(
                         original_node=...),
                       name='count',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -2365,6 +2384,7 @@ SymbolTable(
                     original_node=...),
                   name='count',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -2430,6 +2450,7 @@ SymbolTable(
                     value=Name(
                       identifier='text',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           arguments_by_name=...),
@@ -2478,6 +2499,7 @@ SymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Assignment(
@@ -2493,6 +2515,7 @@ SymbolTable(
                     original_node=...),
                   name='Alpha',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
@@ -2535,6 +2558,7 @@ SymbolTable(
                     value=1,
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Return(

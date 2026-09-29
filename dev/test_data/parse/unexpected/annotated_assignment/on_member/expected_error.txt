@@ -1,0 +1,1 @@
+Only a variable can be declared with a type annotation, such as ``x: int = 0``, but not a property, an item or a parenthesized target.

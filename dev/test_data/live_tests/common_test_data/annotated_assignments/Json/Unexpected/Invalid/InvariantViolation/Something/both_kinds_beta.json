@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "number": 0,
+  "flag": false,
+  "kind": "beta",
+  "code": "c",
+  "item": {
+    "name": "item"
+  },
+  "parent": {
+    "aOnly": 1,
+    "modelType": "ChildA"
+  },
+  "parents": [],
+  "texts": [],
+  "optionalKind": "beta"
+}

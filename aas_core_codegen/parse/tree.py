@@ -299,10 +299,10 @@ class FunctionCall(Expression):
 
 
 class Constant(Expression):
-    """Represent a constant value."""
+    """Represent a constant value, where ``None`` stands for the literal ``None``."""
 
     def __init__(
-        self, value: Union[bool, int, float, str], original_node: ast.AST
+        self, value: Optional[Union[bool, int, float, str]], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Expression.__init__(self, original_node=original_node)
@@ -625,15 +625,30 @@ class All(Expression):
 
 
 class Assignment(Statement):
-    """Represent an assignment of a single value to a single target."""
+    """
+    Represent an assignment of a single value to a single target.
+
+    The :attr:`annotation` is given if the assignment declares a variable with
+    a type annotation, such as ``x: Optional[Something] = None``. We keep
+    the annotation as an expression, *e.g.*, ``Optional[Something]`` is an index
+    of the name ``Optional``, and resolve it in the type inference.
+
+    The visitors and the transformers do not descend into the :attr:`annotation`,
+    as it is a type, not a value.
+    """
 
     def __init__(
-        self, target: Expression, value: Expression, original_node: ast.AST
+        self,
+        target: Expression,
+        value: Expression,
+        annotation: Optional[Expression],
+        original_node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         Statement.__init__(self, original_node=original_node)
         self.target = target
         self.value = value
+        self.annotation = annotation
 
     def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
@@ -1612,6 +1627,14 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("target", self.transform(node.target)),
                 stringify.Property("value", self.transform(node.value)),
+                stringify.Property(
+                    "annotation",
+                    (
+                        self.transform(node.annotation)
+                        if node.annotation is not None
+                        else None
+                    ),
+                ),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )

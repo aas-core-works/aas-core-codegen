@@ -571,9 +571,17 @@ def analyze(
 
     for definition, binding in collector.binding_by_definition.items():
         if isinstance(definition, parse_tree.Assignment):
-            if _categorize(type_map[definition.value]) is not _Category.CONTAINER:
+            if _categorize(type_map[definition.target]) is not _Category.CONTAINER:
                 declaration_by_definition[definition] = Declaration.DEFAULT
                 continue
+
+            # NOTE (mristin):
+            # A variable declared with a type different from the type of its value,
+            # *e.g.*, ``Optional[List[str]]`` for a ``List[str]``, holds a converted
+            # copy of the value in C++, so it can not reference the value.
+            is_converted = str(type_map[definition.target]) != str(
+                type_map[definition.value]
+            )
 
             path = path_of(definition.value)
             if path is None:
@@ -583,11 +591,28 @@ def analyze(
                 continue
 
             is_reference_faithful = (
-                binding not in collector.reassigned
+                not is_converted
+                and binding not in collector.reassigned
                 and reference_is_faithful(path, through_item=False)
             )
 
             if binding in mutable_bindings:
+                if is_converted:
+                    errors.append(
+                        Error(
+                            definition.original_node,
+                            f"The variable {binding.identifier!r} is mutated in "
+                            f"place, so we would need to declare it as a reference "
+                            f"in C++. However, the variable is declared with "
+                            f"the type {type_map[definition.target]}, while its "
+                            f"value is of the type {type_map[definition.value]}, "
+                            f"so C++ would mutate a converted copy instead of "
+                            f"the value. Please declare the variable with the type "
+                            f"of its value.",
+                        )
+                    )
+                    continue
+
                 if not is_reference_faithful:
                     errors.append(
                         Error(

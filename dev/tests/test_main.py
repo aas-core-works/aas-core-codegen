@@ -263,6 +263,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="annotated_assignments",
+        )
+
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="arithmetic"
@@ -475,6 +481,12 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="annotated_assignments",
+        )
+
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="arithmetic"
@@ -663,6 +675,12 @@ class Test_golang(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="annotated_assignments",
         )
 
     def test_expected_arithmetic(self) -> None:
@@ -857,6 +875,12 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="annotated_assignments",
+        )
+
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="arithmetic"
@@ -1044,6 +1068,12 @@ class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="annotated_assignments",
         )
 
     def test_expected_arithmetic(self) -> None:
@@ -1250,6 +1280,12 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="annotated_assignments",
+        )
+
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="arithmetic"
@@ -1432,6 +1468,12 @@ class Test_typescript(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="annotated_assignments",
         )
 
     def test_expected_arithmetic(self) -> None:
@@ -1634,6 +1676,12 @@ class Test_xsd(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_annotated_assignments(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="annotated_assignments",
         )
 
     def test_expected_arithmetic(self) -> None:

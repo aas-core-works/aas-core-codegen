@@ -625,6 +625,28 @@ def _assignable(
                 in target_type.our_type.descendant_id_set
             )
 
+        elif isinstance(target_type.our_type, _types.NamedUnion):
+            if not isinstance(value_type, OurTypeAnnotation):
+                return False
+
+            # NOTE (mristin):
+            # We assume the named unions to be invariant among themselves, as
+            # the targets would need to re-wrap the value of one named union into
+            # another. On the other hand, an instance of a class can be wrapped
+            # into the named union if the class is a root of the union, or
+            # a descendant of a root.
+            if isinstance(value_type.our_type, _types.NamedUnion):
+                return value_type.our_type is target_type.our_type
+
+            if isinstance(value_type.our_type, _types.ClassUnionAsTuple):
+                value_cls = value_type.our_type
+                return any(
+                    value_cls.is_subclass_of(root)
+                    for root in target_type.our_type.roots
+                )
+
+            return False
+
     elif isinstance(target_type, VerificationTypeAnnotation):
         if not isinstance(value_type, VerificationTypeAnnotation):
             return False
@@ -680,6 +702,14 @@ def _assignable(
             )
 
     elif isinstance(target_type, OptionalTypeAnnotation):
+        # NOTE (mristin):
+        # We can always assign ``None`` to an optional.
+        if (
+            isinstance(value_type, PrimitiveTypeAnnotation)
+            and value_type.a_type is PrimitiveType.NONE
+        ):
+            return True
+
         # NOTE (mristin):
         # We can always assign a non-optional to an optional.
         if not isinstance(value_type, OptionalTypeAnnotation):
@@ -743,6 +773,24 @@ def _assignable(
         assert_never(target_type)
 
     return False
+
+
+def needs_wrapping_into_named_union(
+    target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
+) -> bool:
+    """
+    Check whether the value needs to be wrapped into the named union of the target.
+
+    This is the case if we assign an instance of a class to a named union, possibly
+    optional, since some targets represent the named unions as wrappers or variants.
+    """
+    target_type_beneath = beneath_optional(target_type)
+    return (
+        isinstance(target_type_beneath, OurTypeAnnotation)
+        and isinstance(target_type_beneath.our_type, _types.NamedUnion)
+        and isinstance(value_type, OurTypeAnnotation)
+        and isinstance(value_type.our_type, _types.ClassUnionAsTuple)
+    )
 
 
 for _types_primitive_type in _types.PrimitiveType:
@@ -1966,6 +2014,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         representation_map: Mapping[parse_tree.Node, str],
         argument_by_name: Mapping[Identifier, _types.Argument],
         enclosing_method: Optional[_types.UnderstoodMethod],
+        returns: Optional[_types.TypeAnnotationUnion],
     ) -> None:
         """
         Initialize with the given values.
@@ -1974,6 +2023,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         of the method, and is empty for an invariant.
 
         The ``enclosing_method`` is the method whose body we infer, if any.
+
+        The ``returns`` is the return type of the verification function or
+        of the method, and ``None`` for a procedure or an invariant.
         """
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
@@ -1984,6 +2036,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self._argument_by_name = argument_by_name
 
         self._enclosing_method = enclosing_method
+
+        self._returns = (
+            convert_type_annotation(returns)
+            if returns is not None
+            else PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        )  # type: Final[TypeAnnotationUnion]
 
         # NOTE (mristin):
         # We keep track of the variables whose values can be mutated in place,
@@ -3327,14 +3385,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
-    def _check_mutable_arguments(
+    def _check_arguments(
         self,
         args: Sequence[parse_tree.Expression],
         arguments: Sequence[_types.Argument],
         what: str,
     ) -> bool:
         """
-        Check that the ``args`` passed to the mutable ``arguments`` are mutable.
+        Check that the ``args`` fit the ``arguments`` beyond their types.
+
+        We check that the ``args`` passed to the mutable ``arguments`` are mutable,
+        and that ``None`` is passed only to the optional ``arguments``.
 
         The ``what`` describes the called function or method in the error messages,
         *e.g.*, ``the verification function 'foo'``.
@@ -3343,6 +3404,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         """
         ok = True
         for arg_node, argument in zip(args, arguments):
+            if (
+                isinstance(arg_node, parse_tree.Constant)
+                and arg_node.value is None
+                and not isinstance(
+                    argument.type_annotation, _types.OptionalTypeAnnotation
+                )
+            ):
+                self.errors.append(
+                    Error(
+                        arg_node.original_node,
+                        f"The argument {argument.name!r} of {what} is not "
+                        f"optional, but got None.",
+                    )
+                )
+                ok = False
+                continue
+
             if not argument.mutable:
                 continue
 
@@ -3423,7 +3501,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        if not self._check_mutable_arguments(
+        if not self._check_arguments(
             args=node.args,
             arguments=member_type.method.arguments,
             what=f"the method {node.member.name!r}",
@@ -3574,7 +3652,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if isinstance(
             func_type, VerificationTypeAnnotation
-        ) and not self._check_mutable_arguments(
+        ) and not self._check_arguments(
             args=node.args,
             arguments=func_type.func.arguments,
             what=f"the verification function {func_type.func.name!r}",
@@ -3704,7 +3782,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
     ) -> Optional["TypeAnnotationUnion"]:
         result: TypeAnnotationUnion
 
-        if isinstance(node.value, bool):
+        if node.value is None:
+            result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        elif isinstance(node.value, bool):
             result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         elif isinstance(node.value, int):
             result = PrimitiveTypeAnnotation(PrimitiveType.INT)
@@ -4450,6 +4530,130 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         finally:
             self._facts = facts
 
+    def _resolve_annotation(
+        self, node: parse_tree.Expression
+    ) -> Optional["TypeAnnotationUnion"]:
+        """
+        Resolve the type annotation of a variable declaration.
+
+        We resolve the primitive types, our types, including the named unions,
+        and ``Optional``, ``List``, ``Sequence`` and ``Tuple`` of them. We refuse
+        inline ``Union[...]``, as the targets need a named type to represent a union.
+
+        Record the error, if any, and return ``None`` on failure.
+        """
+        if isinstance(node, parse_tree.Constant) and isinstance(node.value, str):
+            # NOTE (mristin):
+            # We resolve the forward references such as ``"Parent"`` just as
+            # the names themselves.
+            name = Identifier(node.value)
+        elif isinstance(node, parse_tree.Name):
+            name = node.identifier
+        elif isinstance(node, parse_tree.Index) and isinstance(
+            node.collection, parse_tree.Name
+        ):
+            generic = node.collection.identifier
+
+            if generic == "Union":
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        "We do not support inline unions such as ``Union[A, B]`` "
+                        "in the type annotations of the variables. The targets "
+                        "need a named type to represent a union, such as "
+                        "a variant in C++ or a wrapper class in C#, so only "
+                        "the named unions of the meta-model are accepted. Please "
+                        "define a named union at the module level, *e.g.*, "
+                        "``Some_union = Union[A, B]``, and annotate "
+                        "the variable with it, *e.g.*, ``x: Some_union = ...``. "
+                        "For an optional value, please use ``Optional[...]``.",
+                    )
+                )
+                return None
+
+            if generic == "Optional":
+                value = self._resolve_annotation(node.index)
+                if value is None:
+                    return None
+
+                if isinstance(value, OptionalTypeAnnotation):
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"We do not support nested optionals, "
+                            f"but got: Optional[{value}]",
+                        )
+                    )
+                    return None
+
+                return OptionalTypeAnnotation(value=value)
+
+            # NOTE (mristin):
+            # The ``Sequence`` marks a read-only list in the arguments. The variables
+            # are read-only if their values are, so both denote the same list here.
+            if generic in ("List", "Sequence"):
+                items = self._resolve_annotation(node.index)
+                if items is None:
+                    return None
+
+                return ListTypeAnnotation(items=items)
+
+            if generic == "Tuple":
+                item_nodes = (
+                    node.index.values
+                    if isinstance(node.index, parse_tree.Tuple)
+                    else [node.index]
+                )
+
+                tuple_items = []  # type: List[TypeAnnotationUnion]
+                for item_node in item_nodes:
+                    item = self._resolve_annotation(item_node)
+                    if item is None:
+                        return None
+
+                    tuple_items.append(item)
+
+                return TupleTypeAnnotation(items=tuple_items)
+
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We support only ``Optional[...]``, ``List[...]``, "
+                    f"``Sequence[...]`` and ``Tuple[...]`` as generic types in "
+                    f"the type annotations of the variables, but got: "
+                    f"{generic}[...]",
+                )
+            )
+            return None
+        else:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We support only the primitive types, our types, and "
+                    f"``Optional[...]``, ``List[...]``, ``Sequence[...]`` and "
+                    f"``Tuple[...]`` of them in the type annotations of "
+                    f"the variables, but got: "
+                    f"{ast.unparse(node.original_node)}",
+                )
+            )
+            return None
+
+        primitive_type = _types.STR_TO_PRIMITIVE_TYPE.get(name, None)
+        if primitive_type is not None:
+            return PrimitiveTypeAnnotation(a_type=PRIMITIVE_TYPE_MAP[primitive_type])
+
+        our_type = self._environment.find_our_type(name)
+        if our_type is None:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"The type {name!r} in the type annotation is not defined.",
+                )
+            )
+            return None
+
+        return OurTypeAnnotation(our_type=our_type)
+
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Optional["TypeAnnotationUnion"]:
@@ -4474,7 +4678,33 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
             target_type = self._environment.find(node.target.identifier)
-            if target_type is None:
+
+            if node.annotation is not None:
+                if target_type is not None:
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"The variable {node.target.identifier!r} has been "
+                            f"already defined before with the type {target_type}, "
+                            f"so it can not be declared again with a type "
+                            f"annotation. Please assign to it without "
+                            f"the annotation, or use a different name.",
+                        )
+                    )
+                    return None
+
+                # NOTE (mristin):
+                # The declared type is the type of the variable, while the type of
+                # the value only needs to be assignable to it. For example,
+                # ``x: Optional[Parent] = None`` declares ``x`` as
+                # ``Optional[Parent]``, so that we can re-assign it later.
+                target_type = self._resolve_annotation(node.annotation)
+                if target_type is None:
+                    return None
+
+                is_new_variable = True
+
+            elif target_type is None:
                 is_new_variable = True
         elif isinstance(node.target, parse_tree.Member):
             target_type = self._transform_as_target(node.target)
@@ -4566,6 +4796,28 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if (not is_new_variable and target_type is None) or (value_type is None):
             return None
 
+        if (
+            is_new_variable
+            and target_type is None
+            and try_primitive_type(value_type) is PrimitiveType.NONE
+        ):
+            assert isinstance(node.target, parse_tree.Name)
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We can not infer the type of the variable "
+                    f"{node.target.identifier!r} from ``None``. Please declare "
+                    f"the variable with a type annotation, *e.g.*, "
+                    f"``{node.target.identifier}: Optional[...] = None``.",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The type of a new variable is its declared type, if it has been annotated,
+        # and the type of the assigned value otherwise.
+        variable_type = target_type if target_type is not None else value_type
+
         if is_new_variable:
             assert isinstance(node.target, parse_tree.Name)
             if node.target.identifier in self._types_of_variables_in_closed_scopes[-1]:
@@ -4587,11 +4839,39 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 # We still define the variable so that the subsequent statements
                 # do not report it as unknown, which would only confuse the user.
                 self._environment.set(
-                    identifier=node.target.identifier, type_annotation=value_type
+                    identifier=node.target.identifier, type_annotation=variable_type
                 )
                 return None
 
-        if target_type is not None and not _assignable(
+        # NOTE (mristin):
+        # We wrap a class instance into a named union in the targets which represent
+        # the named unions as wrappers or variants, such as C# or C++. We can not wrap
+        # a null, so we refuse to assign an optional instance to a named union.
+        target_type_beneath = (
+            beneath_optional(target_type) if target_type is not None else None
+        )
+        if (
+            isinstance(target_type_beneath, OurTypeAnnotation)
+            and isinstance(target_type_beneath.our_type, _types.NamedUnion)
+            and isinstance(value_type, OptionalTypeAnnotation)
+            and isinstance(value_type.value, OurTypeAnnotation)
+            and isinstance(value_type.value.our_type, _types.ClassUnionAsTuple)
+        ):
+            self.errors.append(
+                Error(
+                    node.value.original_node,
+                    f"The value assigned to the named union "
+                    f"{target_type_beneath.our_type.name!r} might be None, "
+                    f"since it is inferred to be {value_type}. We need to wrap "
+                    f"the instance into the named union in some targets, "
+                    f"which we can not do for a None. Please check first that "
+                    f"the value is not None, *e.g.*, with "
+                    f"``if {self._representation_map[node.value]} is not None:``.",
+                )
+            )
+            is_refused = True
+
+        elif target_type is not None and not _assignable(
             target_type=target_type, value_type=value_type
         ):
             self.errors.append(
@@ -4602,6 +4882,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     f"be {value_type}. We do not know how to model this assignment.",
                 )
             )
+            is_refused = True
+
+        else:
+            is_refused = False
+
+        if is_refused:
+            if is_new_variable:
+                assert isinstance(node.target, parse_tree.Name)
+
+                # NOTE (mristin):
+                # We still define the declared variable so that the subsequent
+                # statements do not report it as unknown, which would only confuse
+                # the user.
+                self._environment.set(
+                    identifier=node.target.identifier, type_annotation=variable_type
+                )
+
             return None
 
         if isinstance(node.target, (parse_tree.Member, parse_tree.Index)):
@@ -4682,19 +4979,25 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
+        if isinstance(node.target, parse_tree.Name):
+            # NOTE (mristin):
+            # We record the type of the variable, not narrowed by any facts, so that
+            # the targets can declare the variable with it.
+            self.type_map[node.target] = variable_type
+
         if is_new_variable:
             assert isinstance(node.target, parse_tree.Name)
 
             self._environment.set(
-                identifier=node.target.identifier, type_annotation=value_type
+                identifier=node.target.identifier, type_annotation=variable_type
             )
 
             if not self._check_consistent_type_of_definition(
-                variable=node.target, type_annotation=value_type
+                variable=node.target, type_annotation=variable_type
             ):
                 return None
 
-            if _can_be_mutated(value_type):
+            if _can_be_mutated(variable_type):
                 reason = self._read_only_reason(node.value)
                 if reason is None:
                     self._mutable_name_set.add(node.target.identifier)
@@ -4734,10 +5037,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # generate, *e.g.*, ``((Aas.IChildB)x).BOnly`` in C# on ``x.b_only`` after
         # the last assignment.
         #
-        # A new variable has no facts yet, and its type is already the type of
-        # the assigned value, so there is nothing to invalidate nor to narrow.
-        # For example, ``y = child_b`` defines ``y`` as ``Child_b``, not as
-        # ``Parent``.
+        # A new variable has no facts yet, so there is nothing to invalidate. Its type
+        # is the type of the assigned value, *e.g.*, ``y = child_b`` defines ``y`` as
+        # ``Child_b``, not as ``Parent``, or the declared type.
+        #
+        # We deliberately do not narrow a declared variable by its initial value,
+        # as mypy does not do that either. For example, ``y: Parent = child_b``
+        # declares ``y`` as ``Parent``, and ``y.b_only`` is refused. Only
+        # the subsequent assignments narrow the variable.
         if not is_new_variable:
             assert target_type is not None
 
@@ -4750,8 +5057,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # non-null.
             facts_about_value = []  # type: List[_Fact]
 
-            if isinstance(target_type, OptionalTypeAnnotation) and not isinstance(
-                value_type, OptionalTypeAnnotation
+            # NOTE (mristin):
+            # The ``None`` is not an optional value, but it is certainly not
+            # a non-null either.
+            if isinstance(target_type, OptionalTypeAnnotation) and not (
+                isinstance(value_type, OptionalTypeAnnotation)
+                or try_primitive_type(value_type) is PrimitiveType.NONE
             ):
                 facts_about_value.append(self._fact_about(node.target, _NonNull()))
 
@@ -4788,10 +5099,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             if not success:
                 return None
 
-        # Treat ``return`` as a statement
-        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
-        self.type_map[node] = result
-        return result
+        # NOTE (mristin):
+        # We record the return type of the function on the return statement, so
+        # that the targets know whether they need to unwrap or wrap an optional,
+        # *e.g.*, when they return a variable narrowed down to non-null.
+        self.type_map[node] = self._returns
+        return self._returns
 
     def _transform_in_new_scope(
         self,
@@ -5403,6 +5716,77 @@ class InferenceOfFunction:
         self.downcast_map = downcast_map
 
 
+def _check_nones(
+    body: Sequence[parse_tree.Node],
+    returns: Optional[_types.TypeAnnotationUnion],
+) -> List[Error]:
+    """
+    Check that the ``None`` literals in the ``body`` can be transpiled.
+
+    We transpile ``None`` as the value of an assignment, as an argument of a call
+    and as the returned value, where the optionals are expected, as every target
+    represents the ``None`` of an optional. Elsewhere, such as in the comparisons
+    or in the tuples, the targets would need a type for the ``None`` on its own.
+
+    The types of the assigned values and of the arguments are checked in
+    the inference. Here, we check that the returned ``None`` fits the ``returns``
+    of the function, which is ``None`` for the invariants and the procedures.
+    """
+    allowed_set = set()  # type: Set[parse_tree.Node]
+    nones = []  # type: List[parse_tree.Constant]
+    returns_of_none = []  # type: List[parse_tree.Return]
+
+    for node_in_body in body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if isinstance(node, parse_tree.Assignment):
+                allowed_set.add(node.value)
+
+            elif isinstance(node, (parse_tree.FunctionCall, parse_tree.MethodCall)):
+                allowed_set.update(node.args)
+
+            elif isinstance(node, parse_tree.Return) and node.value is not None:
+                allowed_set.add(node.value)
+
+                if (
+                    isinstance(node.value, parse_tree.Constant)
+                    and node.value.value is None
+                ):
+                    returns_of_none.append(node)
+
+            elif isinstance(node, parse_tree.Constant) and node.value is None:
+                nones.append(node)
+
+    errors = [
+        Error(
+            none.original_node,
+            "We can transpile ``None`` only as the value of an assignment, "
+            "as an argument of a call or as the returned value, since the targets "
+            "need to know the type of the optional which is ``None``. To check "
+            "whether a value is ``None``, please use ``is None`` or "
+            "``is not None``.",
+        )
+        for none in nones
+        if none not in allowed_set
+    ]  # type: List[Error]
+
+    if not isinstance(returns, _types.OptionalTypeAnnotation):
+        for return_of_none in returns_of_none:
+            errors.append(
+                Error(
+                    return_of_none.original_node,
+                    (
+                        "The function returns nothing, so please use a bare "
+                        "``return`` instead of ``return None``."
+                        if returns is None
+                        else f"The function returns a non-optional {returns}, "
+                        f"but got a ``return None``."
+                    ),
+                )
+            )
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_for_function(
     body: Sequence[parse_tree.Node],
@@ -5429,10 +5813,13 @@ def _infer_for_function(
         representation_map=canonicalizer.representation_map,
         argument_by_name={arg.name: arg for arg in arguments},
         enclosing_method=enclosing_method,
+        returns=returns,
     )
 
     for node_in_body in body:
         _ = type_inferrer.transform(node_in_body)
+
+    type_inferrer.errors.extend(_check_nones(body=body, returns=returns))
 
     # NOTE (mristin):
     # Some targets, such as Go or Java, refuse to compile a function which misses
@@ -5600,9 +5987,12 @@ def infer_for_invariant(
         representation_map=canonicalizer.representation_map,
         argument_by_name=dict(),
         enclosing_method=None,
+        returns=None,
     )
 
     _ = type_inferrer.transform(invariant.body)
+
+    type_inferrer.errors.extend(_check_nones(body=[invariant.body], returns=None))
 
     if len(type_inferrer.errors):
         return None, Error(

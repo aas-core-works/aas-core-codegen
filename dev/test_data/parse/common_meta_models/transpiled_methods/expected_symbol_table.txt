@@ -142,6 +142,7 @@ UnverifiedSymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               For(
@@ -173,6 +174,7 @@ UnverifiedSymbolTable(
                             original_node=...)],
                         original_node=...),
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)"""),
             textwrap.dedent("""\
@@ -437,6 +439,7 @@ UnverifiedSymbolTable(
                         original_node=...),
                       name='count',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           node=...,
@@ -486,6 +489,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   name='count',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           node=...,
           arguments_by_name=...),
@@ -552,6 +556,7 @@ UnverifiedSymbolTable(
                     value=Name(
                       identifier='text',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)""")],
           node=...,
@@ -602,6 +607,7 @@ UnverifiedSymbolTable(
                 value=Constant(
                   value=0,
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Assignment(
@@ -617,6 +623,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   name='Alpha',
                   original_node=...),
+                annotation=None,
                 original_node=...)""")],
           node=...,
           arguments_by_name=...),
@@ -661,6 +668,7 @@ UnverifiedSymbolTable(
                     value=1,
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)"""),
             textwrap.dedent("""\
               Return(

@@ -1034,6 +1034,7 @@ UnverifiedSymbolTable(
                     identifier='number',
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...),
               Return(
                 value=Comparison(
@@ -1340,6 +1341,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value=0,
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           If(
@@ -1374,6 +1376,7 @@ UnverifiedSymbolTable(
                     value=Name(
                       identifier='number',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...),
               IfBranch(
@@ -1396,6 +1399,7 @@ UnverifiedSymbolTable(
                         identifier='number',
                         original_node=...),
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)],
             default=None,
@@ -1446,6 +1450,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value=0,
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           For(
@@ -1508,6 +1513,7 @@ UnverifiedSymbolTable(
                     value=1,
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)],
             original_node=...)"""),
         textwrap.dedent("""\
@@ -2004,6 +2010,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value=0,
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           For(
@@ -2070,6 +2077,7 @@ UnverifiedSymbolTable(
                         original_node=...)],
                     original_node=...),
                   original_node=...),
+                annotation=None,
                 original_node=...)],
             original_node=...)"""),
         textwrap.dedent("""\
@@ -2121,6 +2129,7 @@ UnverifiedSymbolTable(
                 original_node=...),
               name='optional_text',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           If(
@@ -2139,6 +2148,7 @@ UnverifiedSymbolTable(
                     value=Constant(
                       value='default',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)],
             default=None,
@@ -2204,6 +2214,7 @@ UnverifiedSymbolTable(
             value=Name(
               identifier='parent',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           For(
@@ -2236,6 +2247,7 @@ UnverifiedSymbolTable(
                         value=Name(
                           identifier='other',
                           original_node=...),
+                        annotation=None,
                         original_node=...),
                       If(
                         branches=[

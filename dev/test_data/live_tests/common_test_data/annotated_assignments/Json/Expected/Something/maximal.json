@@ -1,0 +1,49 @@
+{
+  "text": "hello",
+  "number": 3,
+  "flag": true,
+  "kind": "beta",
+  "code": "code",
+  "item": {
+    "name": "item"
+  },
+  "parent": {
+    "optionalText": "parent",
+    "bOnly": 2,
+    "modelType": "ChildB"
+  },
+  "parents": [
+    {
+      "bOnly": 4,
+      "modelType": "ChildB"
+    },
+    {
+      "optionalText": "abc",
+      "aOnly": 7,
+      "modelType": "ChildA"
+    },
+    {
+      "bOnly": 3,
+      "modelType": "ChildB"
+    }
+  ],
+  "texts": [
+    "a",
+    "b"
+  ],
+  "optionalText": "short",
+  "optionalKind": "alpha",
+  "optionalParent": {
+    "optionalText": "x",
+    "aOnly": 4,
+    "modelType": "ChildA"
+  },
+  "optionalTexts": [
+    "c"
+  ],
+  "optionalData": "AQI=",
+  "optionalMember": {
+    "aOnly": 12,
+    "modelType": "ChildA"
+  }
+}

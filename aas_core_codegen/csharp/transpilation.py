@@ -35,6 +35,112 @@ from aas_core_codegen.intermediate import type_inference as intermediate_type_in
 from aas_core_codegen.parse import tree as parse_tree
 
 
+def _is_value_type(
+    type_annotation: intermediate_type_inference.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether ``type_annotation`` is represented as a C# value type.
+
+    This mirrors :py:func:`aas_core_codegen.csharp.common.is_value_type` for
+    the type annotations of the type inference.
+    """
+    primitive_type = intermediate_type_inference.try_primitive_type(type_annotation)
+    if primitive_type is not None:
+        return primitive_type in (
+            intermediate_type_inference.PrimitiveType.BOOL,
+            intermediate_type_inference.PrimitiveType.INT,
+            intermediate_type_inference.PrimitiveType.FLOAT,
+        )
+
+    if isinstance(
+        type_annotation, intermediate_type_inference.OurTypeAnnotation
+    ) and isinstance(type_annotation.our_type, intermediate.Enumeration):
+        return True
+
+    return isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation)
+
+
+def generate_type(
+    type_annotation: intermediate_type_inference.TypeAnnotationUnion,
+) -> Tuple[Optional[Stripped], Optional[str]]:
+    """
+    Generate the C# type for the given type annotation.
+
+    We assume that our types are referred to with the ``Aas.`` prefix.
+
+    We handle only the type annotations which can be declared for the variables.
+    Otherwise, we return an error message.
+    """
+    if isinstance(type_annotation, intermediate_type_inference.PrimitiveTypeAnnotation):
+        if type_annotation.a_type in (
+            intermediate_type_inference.PrimitiveType.LENGTH,
+            intermediate_type_inference.PrimitiveType.NONE,
+        ):
+            return None, f"Unexpected primitive type: {type_annotation}"
+
+        return (
+            csharp_common.PRIMITIVE_TYPE_MAP[
+                intermediate.PrimitiveType(type_annotation.a_type.value)
+            ],
+            None,
+        )
+
+    elif isinstance(type_annotation, intermediate_type_inference.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(f"Aas.{csharp_naming.enum_name(our_type.name)}"), None
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return csharp_common.PRIMITIVE_TYPE_MAP[our_type.constrainee], None
+        elif isinstance(our_type, intermediate.Class):
+            return (
+                Stripped(f"Aas.{csharp_naming.interface_name(our_type.name)}"),
+                None,
+            )
+        elif isinstance(our_type, intermediate.NamedUnion):
+            return Stripped(f"Aas.{csharp_naming.class_name(our_type.name)}"), None
+        else:
+            assert_never(our_type)
+
+    elif isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
+        item_type, error_message = generate_type(type_annotation.items)
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"List<{item_type}>"), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
+        item_types = []  # type: List[Stripped]
+        for item in type_annotation.items:
+            item_type, error_message = generate_type(item)
+            if error_message is not None:
+                return None, error_message
+
+            assert item_type is not None
+            item_types.append(item_type)
+
+        joined_item_types = ", ".join(item_types)
+
+        if len(item_types) == 1:
+            # NOTE (mristin):
+            # A single-element value tuple has no literal syntax in C#, so we have
+            # to spell out the generic type explicitly.
+            return Stripped(f"System.ValueTuple<{joined_item_types}>"), None
+
+        return Stripped(f"({joined_item_types})"), None
+
+    elif isinstance(
+        type_annotation, intermediate_type_inference.OptionalTypeAnnotation
+    ):
+        value_type, error_message = generate_type(type_annotation.value)
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"{value_type}?"), None
+
+    return None, f"Unexpected type annotation of a variable: {type_annotation}"
+
+
 class Transpiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
@@ -191,6 +297,40 @@ class Transpiler(
 
         return Stripped(f"{instance}.{member_name}"), None
 
+    def _is_declared_nullable(self, node: parse_tree.Expression) -> bool:
+        """
+        Check whether the ``node`` has been declared as optional.
+
+        The type inference strips ``Optional`` from the types of the nodes which have
+        been narrowed down by a guard such as ``x is not None``. However, C# keeps
+        the declared type, so that a narrowed integer or floating-point number is
+        still a nullable value type (``long?`` or ``double?``) in C#. The lifted
+        operators work on nullable value types, but we need to explicitly unwrap
+        them with ``.Value`` before passing them to a method.
+        """
+        if isinstance(node, parse_tree.Member):
+            instance_type = self.type_map.get(node.instance, None)
+            if isinstance(
+                instance_type, intermediate_type_inference.OurTypeAnnotation
+            ) and isinstance(
+                instance_type.our_type,
+                (intermediate.ConcreteClass, intermediate.AbstractClass),
+            ):
+                prop = instance_type.our_type.properties_by_name.get(node.name, None)
+                return prop is not None and isinstance(
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                )
+
+            return False
+
+        elif isinstance(node, parse_tree.Name):
+            return isinstance(
+                self._environment.find(node.identifier),
+                intermediate_type_inference.OptionalTypeAnnotation,
+            )
+
+        return False
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_index(
         self, node: parse_tree.Index
@@ -239,6 +379,13 @@ class Transpiler(
             )
             if not isinstance(node.collection, tuple_no_parentheses_types):
                 collection = Stripped(f"({collection})")
+
+            # NOTE (mristin):
+            # A tuple is a value type in C#, so an optional tuple is
+            # a ``System.Nullable`` even if narrowed to non-null, and we need to
+            # unwrap it before we access its items.
+            if self._is_declared_nullable(node.collection):
+                collection = Stripped(f"{collection}.Value")
 
             return Stripped(f"{collection}.Item{index_value + 1}"), None
 
@@ -735,40 +882,6 @@ class Transpiler(
         else:
             return Stripped(f"{instance}.{method_name}({joined_args})"), None
 
-    def _is_declared_nullable(self, node: parse_tree.Expression) -> bool:
-        """
-        Check whether the ``node`` has been declared as optional.
-
-        The type inference strips ``Optional`` from the types of the nodes which have
-        been narrowed down by a guard such as ``x is not None``. However, C# keeps
-        the declared type, so that a narrowed integer or floating-point number is
-        still a nullable value type (``long?`` or ``double?``) in C#. The lifted
-        operators work on nullable value types, but we need to explicitly unwrap
-        them with ``.Value`` before passing them to a method.
-        """
-        if isinstance(node, parse_tree.Member):
-            instance_type = self.type_map.get(node.instance, None)
-            if isinstance(
-                instance_type, intermediate_type_inference.OurTypeAnnotation
-            ) and isinstance(
-                instance_type.our_type,
-                (intermediate.ConcreteClass, intermediate.AbstractClass),
-            ):
-                prop = instance_type.our_type.properties_by_name.get(node.name, None)
-                return prop is not None and isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
-                )
-
-            return False
-
-        elif isinstance(node, parse_tree.Name):
-            return isinstance(
-                self._environment.find(node.identifier),
-                intermediate_type_inference.OptionalTypeAnnotation,
-            )
-
-        return False
-
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(
         self, node: parse_tree.FunctionCall
@@ -959,7 +1072,9 @@ class Transpiler(
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("null"), None
+        elif isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
         elif isinstance(node.value, (int, float)):
             return Stripped(str(node.value)), None
@@ -1152,6 +1267,27 @@ class Transpiler(
                 writer.write(f"\n|| {value}")
 
         return Stripped(writer.getvalue()), None
+
+    def _transform_and_unwrap_narrowed_nullable_value(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
+
+        A value type such as ``long?`` stays nullable in C# even if the type
+        inference narrowed it down to non-null, so we need to unwrap it with
+        ``.Value`` before we assign it to a non-nullable or return it.
+        """
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
+            return Stripped(f"{code}.Value"), None
+
+        return code, None
 
     def _transform_as_method_argument(
         self, node: parse_tree.Expression
@@ -1546,7 +1682,7 @@ Enumerable.Range(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        value, error = self.transform(node.value)
+        value, error = self._transform_and_unwrap_narrowed_nullable_value(node.value)
         if error is not None:
             errors.append(error)
 
@@ -1559,7 +1695,7 @@ Enumerable.Range(
             # This is a variable definition as we did not specify the identifier
             # in the environment.
 
-            type_anno = self.type_map[node.value]
+            type_anno = self.type_map[node.target]
             self._variable_name_set.add(node.target.identifier)
             self._environment.set(
                 identifier=node.target.identifier, type_annotation=type_anno
@@ -1568,6 +1704,15 @@ Enumerable.Range(
             target, error = self.transform_name(node=node.target)
             if error is not None:
                 errors.append(error)
+            elif node.annotation is not None:
+                # NOTE (mristin):
+                # We spell out the declared type, as it might differ from the type
+                # of the value, *e.g.*, for ``null``.
+                declared_type, error_message = generate_type(type_anno)
+                if error_message is not None:
+                    errors.append(Error(node.annotation.original_node, error_message))
+                else:
+                    target = Stripped(f"{declared_type} {target}")
             elif (
                 isinstance(
                     type_anno, intermediate_type_inference.PrimitiveTypeAnnotation
@@ -1598,6 +1743,28 @@ Enumerable.Range(
         assert target is not None
         assert value is not None
 
+        target_type = self.type_map[node.target]
+        value_type = self.type_map[node.value]
+        if intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            # NOTE (mristin):
+            # A named union is a wrapper class in C#, so we wrap the instance
+            # as the most specific root of the union.
+            union_type = intermediate_type_inference.beneath_optional(target_type)
+            assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+            assert isinstance(union_type.our_type, intermediate.NamedUnion)
+            assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+            assert isinstance(value_type.our_type, intermediate.Class)
+
+            root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+            union_name = csharp_naming.class_name(union_type.our_type.name)
+            from_method_name = csharp_naming.method_name(
+                Identifier(f"from_{root.name}")
+            )
+            value = Stripped(f"Aas.{union_name}.{from_method_name}({value})")
+
         # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
@@ -1619,7 +1786,17 @@ Enumerable.Range(
         if node.value is None:
             return Stripped("return;"), None
 
-        value, error = self.transform(node.value)
+        # NOTE (mristin):
+        # The type inference records the return type of the function on the return.
+        # A narrowed nullable value type needs to be unwrapped only if the function
+        # returns a non-optional.
+        value, error = (
+            self.transform(node.value)
+            if isinstance(
+                self.type_map[node], intermediate_type_inference.OptionalTypeAnnotation
+            )
+            else self._transform_and_unwrap_narrowed_nullable_value(node.value)
+        )
         if error is not None:
             return None, error
 

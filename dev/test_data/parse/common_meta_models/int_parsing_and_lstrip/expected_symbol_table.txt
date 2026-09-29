@@ -394,6 +394,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='^[-+]?[0-9]+$',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -462,6 +463,7 @@ UnverifiedSymbolTable(
                   value='0',
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -645,6 +647,7 @@ UnverifiedSymbolTable(
                   value='0',
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           If(
@@ -716,6 +719,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -735,6 +739,7 @@ UnverifiedSymbolTable(
                   end=None,
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Switch(

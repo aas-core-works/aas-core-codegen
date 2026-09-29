@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ChildA": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "aOnly": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "ChildA"
+            }
+          },
+          "required": [
+            "aOnly"
+          ]
+        }
+      ]
+    },
+    "ChildB": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "bOnly": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "ChildB"
+            }
+          },
+          "required": [
+            "bOnly"
+          ]
+        }
+      ]
+    },
+    "Item": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Kind": {
+      "type": "string",
+      "enum": [
+        "alpha",
+        "beta"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "ChildA",
+        "ChildB"
+      ]
+    },
+    "Parent": {
+      "type": "object",
+      "properties": {
+        "optionalText": {
+          "type": "string"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
+    },
+    "ParentOrItem_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ChildA"
+        },
+        {
+          "$ref": "#/definitions/ChildB"
+        },
+        {
+          "$ref": "#/definitions/Item"
+        }
+      ]
+    },
+    "Parent_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ChildA"
+        },
+        {
+          "$ref": "#/definitions/ChildB"
+        }
+      ]
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "number": {
+          "type": "integer"
+        },
+        "flag": {
+          "type": "boolean"
+        },
+        "kind": {
+          "$ref": "#/definitions/Kind"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item": {
+          "$ref": "#/definitions/Item"
+        },
+        "parent": {
+          "$ref": "#/definitions/Parent_choice"
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parent_choice"
+          }
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optionalText": {
+          "type": "string"
+        },
+        "optionalKind": {
+          "$ref": "#/definitions/Kind"
+        },
+        "optionalParent": {
+          "$ref": "#/definitions/Parent_choice"
+        },
+        "optionalTexts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optionalData": {
+          "type": "string",
+          "contentEncoding": "base64"
+        },
+        "optionalMember": {
+          "$ref": "#/definitions/ParentOrItem_choice"
+        }
+      },
+      "required": [
+        "text",
+        "number",
+        "flag",
+        "kind",
+        "code",
+        "item",
+        "parent",
+        "parents",
+        "texts"
+      ]
+    },
+    "WideUnion_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ChildA"
+        },
+        {
+          "$ref": "#/definitions/ChildB"
+        },
+        {
+          "$ref": "#/definitions/Item"
+        }
+      ]
+    }
+  }
+}

@@ -1258,13 +1258,25 @@ class _MethodTranspiler(java_transpilation.Transpiler):
         self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
-            return Stripped(java_naming.variable_name(node.identifier)), None
+            return (
+                self._unwrap_if_optional(
+                    node=node,
+                    variable=Stripped(java_naming.variable_name(node.identifier)),
+                ),
+                None,
+            )
 
         if node.identifier == "self":
             return Stripped("this"), None
 
         if node.identifier in self._argument_name_set:
-            return Stripped(java_naming.argument_name(node.identifier)), None
+            return (
+                self._unwrap_if_optional(
+                    node=node,
+                    variable=Stripped(java_naming.argument_name(node.identifier)),
+                ),
+                None,
+            )
 
         our_type = self._environment.find_our_type(node.identifier)
         if isinstance(our_type, intermediate.Enumeration):

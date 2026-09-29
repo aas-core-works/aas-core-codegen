@@ -410,7 +410,10 @@ class _ParseConstant(_Parse):
         # fmt: off
         return (
                 isinstance(node, ast.Constant)
-                and isinstance(node.value, (bool, int, float, str))
+                and (
+                    node.value is None
+                    or isinstance(node.value, (bool, int, float, str))
+                )
         ) or (
             isinstance(node, ast.UnaryOp)
             and isinstance(node.op, ast.USub)
@@ -424,7 +427,10 @@ class _ParseConstant(_Parse):
         # fmt: off
         assert (
                 isinstance(node, ast.Constant)
-                and isinstance(node.value, (bool, int, float, str))
+                and (
+                    node.value is None
+                    or isinstance(node.value, (bool, int, float, str))
+                )
         ) or (
             isinstance(node, ast.UnaryOp)
             and isinstance(node.op, ast.USub)
@@ -434,7 +440,7 @@ class _ParseConstant(_Parse):
         # fmt: on
 
         if isinstance(node, ast.Constant):
-            assert isinstance(node.value, (bool, int, float, str))
+            assert node.value is None or isinstance(node.value, (bool, int, float, str))
             return tree.Constant(value=node.value, original_node=node), None
 
         elif isinstance(node, ast.UnaryOp):
@@ -913,7 +919,63 @@ class _ParseAssignment(_Parse):
         assert isinstance(value, tree.Expression), f"{value=}"
 
         return (
-            tree.Assignment(target=target, value=value, original_node=node),
+            tree.Assignment(
+                target=target, value=value, annotation=None, original_node=node
+            ),
+            None,
+        )
+
+
+class _ParseAnnotatedAssignment(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.AnnAssign)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.AnnAssign)
+
+        # NOTE (mristin):
+        # Python sets ``simple`` to 0 for the parenthesized names such as
+        # ``(x): int = 1``, which do not declare a variable.
+        if not isinstance(node.target, ast.Name) or node.simple != 1:
+            return None, Error(
+                node.target,
+                "Only a variable can be declared with a type annotation, "
+                "such as ``x: int = 0``, but not a property, an item or "
+                "a parenthesized target.",
+            )
+
+        if node.value is None:
+            return None, Error(
+                node,
+                f"The declaration of the variable {node.target.id!r} needs "
+                f"an initial value, such as ``{node.target.id}: ... = None``. "
+                f"The variables of the target languages with block scopes need "
+                f"to be definitely assigned before they are read.",
+            )
+
+        target, error = ast_node_to_our_node(node.target)
+        if error is not None:
+            return None, error
+
+        assert isinstance(target, tree.Name), f"{target=}"
+
+        value, error = ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        assert isinstance(value, tree.Expression), f"{value=}"
+
+        annotation, error = ast_node_to_our_node(node.annotation)
+        if error is not None:
+            return None, error
+
+        assert isinstance(annotation, tree.Expression), f"{annotation=}"
+
+        return (
+            tree.Assignment(
+                target=target, value=value, annotation=annotation, original_node=node
+            ),
             None,
         )
 
@@ -1412,6 +1474,7 @@ _CHAIN_OF_RULES = [
     _ParseExpression(),
     _ParseJoinedStr(),
     _ParseAssignment(),
+    _ParseAnnotatedAssignment(),
     _ParseReturn(),
     _ParseSwitch(),
     _ParseFor(),

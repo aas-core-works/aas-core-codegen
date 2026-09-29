@@ -155,7 +155,7 @@ def generate_type(
             interface_name = cpp_naming.interface_name(our_type.name)
 
             if types_namespace is None:
-                return interface_name, None
+                return Stripped(f"std::shared_ptr<{interface_name}>"), None
 
             return (
                 Stripped(f"std::shared_ptr<{types_namespace}::{interface_name}>"),
@@ -1629,7 +1629,9 @@ common::{contains_function}(
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("common::nullopt"), None
+        elif isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
         elif isinstance(node.value, (int, float)):
             return Stripped(cpp_common.float_literal(node.value)), None
@@ -2342,7 +2344,10 @@ common::{qualifier_function}<{variable_type_cpp}>(
 
                 is_definition = True
 
-                target_type = value_type
+                # NOTE (mristin):
+                # The type inference recorded the type of the variable, which is
+                # the declared type if the variable is annotated.
+                target_type = self.type_map[node.target]
                 self._variable_name_set.add(node.target.identifier)
                 self._environment.set(
                     identifier=node.target.identifier, type_annotation=target_type
@@ -2438,6 +2443,46 @@ common::{qualifier_function}<{variable_type_cpp}>(
             return None, error
         assert value is not None
 
+        if intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            # NOTE (mristin):
+            # A named union is a ``common::variant`` over the shared pointers to its
+            # roots. We up-cast the instance explicitly to the most specific root so
+            # that the alternative of the variant is unambiguous, even if the roots
+            # overlap.
+            union_type = intermediate_type_inference.beneath_optional(target_type)
+            assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+            assert isinstance(union_type.our_type, intermediate.NamedUnion)
+            assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+            assert isinstance(value_type.our_type, intermediate.Class)
+
+            root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+            union_code, error_msg = generate_type(
+                type_annotation=union_type, types_namespace=self._types_namespace
+            )
+            if error_msg is not None:
+                return None, Error(node.value.original_node, error_msg)
+            assert union_code is not None
+
+            if root is not value_type.our_type:
+                interface_name = cpp_naming.interface_name(root.name)
+                qualified_interface_name = (
+                    interface_name
+                    if self._types_namespace is None
+                    else f"{self._types_namespace}::{interface_name}"
+                )
+
+                value = _generate_call_with_single_argument(
+                    function=f"std::static_pointer_cast<{qualified_interface_name}>",
+                    argument=value,
+                )
+
+            value = _generate_call_with_single_argument(
+                function=union_code, argument=value
+            )
+
         if isinstance(node.target, parse_tree.Member):
             # NOTE (mristin):
             # This is a rudimentary heuristic for basic line breaks, but works well
@@ -2456,7 +2501,31 @@ common::{qualifier_function}<{variable_type_cpp}>(
             return Stripped(f"{target}({value});"), None
 
         maybe_definition_prefix = ""
-        if is_definition:
+        if is_definition and node.annotation is not None:
+            # NOTE (mristin):
+            # We spell out the declared type, as it might differ from the type of
+            # the value, *e.g.*, ``common::optional<...>`` for ``None``.
+            declared_type, error_msg = generate_type(
+                type_annotation=target_type, types_namespace=self._types_namespace
+            )
+            if error_msg is not None:
+                return None, Error(node.annotation.original_node, error_msg)
+
+            assert declared_type is not None
+
+            if (
+                declaration is cpp_aliasing.Declaration.DEFAULT
+                or declaration is cpp_aliasing.Declaration.COPY
+            ):
+                maybe_definition_prefix = f"{declared_type} "
+            elif declaration is cpp_aliasing.Declaration.CONST_REF:
+                maybe_definition_prefix = f"const {declared_type}& "
+            elif declaration is cpp_aliasing.Declaration.MUT_REF:
+                maybe_definition_prefix = f"{declared_type}& "
+            else:
+                assert_never(declaration)
+
+        elif is_definition:
             if declaration is cpp_aliasing.Declaration.DEFAULT:
                 # NOTE (mristin):
                 # We spell out the primitive types, as ``auto`` would deduce the type
@@ -2503,7 +2572,18 @@ common::{qualifier_function}<{variable_type_cpp}>(
         if node.value is None:
             return Stripped("return;"), None
 
-        value, error = self.transform(node.value)
+        # NOTE (mristin):
+        # A value narrowed down to non-null is still a ``common::optional`` in C++,
+        # so we de-reference it if the function returns a non-optional. The type
+        # inference records the return type of the function on the return.
+        value: Optional[Stripped]
+        if isinstance(
+            self.type_map[node], intermediate_type_inference.OptionalTypeAnnotation
+        ):
+            value, error = self.transform(node.value)
+        else:
+            value, error = self._transform_and_value_if_necessary(node.value)
+
         if error is not None:
             return None, error
 
