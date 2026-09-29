@@ -916,6 +916,7 @@ function parsePropertiesOfSomething(
   AasTypes.Something,
   DeserializationError
 > {
+  let theItem: AasTypes.Simple | null = null;
   let theSomeItems: Array<AasTypes.IAbstractItem> | null = null;
   let theSomeSimples: Array<AasTypes.Simple> | null = null;
 
@@ -924,6 +925,15 @@ function parsePropertiesOfSomething(
 
     let propertyError: DeserializationError | null = null;
     switch (key) {
+      case "item": {
+        const parsed = simpleFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theItem = parsed.value;
+        break;
+      }
+
       case "someItems": {
         const parsed = parseArray(
           jsonableValue,
@@ -967,6 +977,14 @@ function parsePropertiesOfSomething(
     }
   }
 
+  if (theItem === null) {
+    return newDeserializationError<
+      AasTypes.Something
+    >(
+      "The required property 'item' is missing"
+    );
+  }
+
   if (theSomeItems === null) {
     return newDeserializationError<
       AasTypes.Something
@@ -988,6 +1006,7 @@ function parsePropertiesOfSomething(
     DeserializationError
   >(
     new AasTypes.Something(
+      theItem,
       theSomeItems,
       theSomeSimples
     ),
@@ -1200,6 +1219,10 @@ function serializeSomething(
   // The property being serialized, for the path of a failure.
   let prop = "";
   try {
+    prop = "item";
+    jsonable["item"] =
+      serializeSimple(that.item);
+
     prop = "someItems";
     jsonable["someItems"] =
       serialize_ListOf_IAbstractItem(that.someItems);

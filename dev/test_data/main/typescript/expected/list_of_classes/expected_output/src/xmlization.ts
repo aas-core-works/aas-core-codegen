@@ -538,6 +538,7 @@ function parseSimpleFromSequence(
 function parseSomethingFromSequence(
   cursor: XmlCursor
 ): AasCommon.Either<AasTypes.Something, DeserializationError> {
+  let theItem: AasTypes.Simple | null = null;
   let theSomeItems: Array<AasTypes.IAbstractItem> | null = null;
   let theSomeSimples: Array<AasTypes.Simple> | null = null;
 
@@ -561,6 +562,22 @@ function parseSomethingFromSequence(
 
     let propertyError: DeserializationError | null = null;
     switch (propertyLocalName) {
+      case "item": {
+        if (theItem !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parseSimpleFromSequence
+        );
+        propertyError = parsed.error;
+        theItem = parsed.value;
+        break;
+      }
+
       case "someItems": {
         if (theSomeItems !== null) {
           propertyError = duplicatePropertyError(propertyLocalName);
@@ -612,6 +629,12 @@ function parseSomethingFromSequence(
     cursor.skipIgnorable();
   }
 
+  if (theItem === null) {
+    return newDeserializationError<AasTypes.Something>(
+      "The required property 'item' is missing"
+    );
+  }
+
   if (theSomeItems === null) {
     return newDeserializationError<AasTypes.Something>(
       "The required property 'someItems' is missing"
@@ -625,6 +648,7 @@ function parseSomethingFromSequence(
   }
 
   const instance = new AasTypes.Something(
+    theItem,
     theSomeItems,
     theSomeSimples
   );
@@ -698,6 +722,12 @@ function writeSomethingAsSequence(
   parts: Array<string>,
   that: AasTypes.Something
 ): void {
+  writeProperty(
+    parts,
+    "item",
+    that.item,
+    writeSimpleAsSequence
+  );
   writeProperty(
     parts,
     "someItems",

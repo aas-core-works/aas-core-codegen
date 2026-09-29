@@ -580,6 +580,7 @@ def something_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
+    the_item: Optional[aas_types.Simple] = None
     the_some_items: Optional[List[aas_types.AbstractItem]] = None
     the_some_simples: Optional[List[aas_types.Simple]] = None
 
@@ -588,6 +589,8 @@ def something_from_jsonable(
             if key == 'modelType':
                 # The model type is redundant for this class, and we simply accept it.
                 pass
+            elif key == 'item':
+                the_item = simple_from_jsonable(jsonable_value)
             elif key == 'someItems':
                 the_some_items = _list_of__abstract_item_from_jsonable(jsonable_value)
             elif key == 'someSimples':
@@ -602,6 +605,11 @@ def something_from_jsonable(
         )
         raise
 
+    if the_item is None:
+        raise DeserializationException(
+            "The required property 'item' is missing"
+        )
+
     if the_some_items is None:
         raise DeserializationException(
             "The required property 'someItems' is missing"
@@ -613,6 +621,7 @@ def something_from_jsonable(
         )
 
     return aas_types.Something(
+        the_item,
         the_some_items,
         the_some_simples
     )
@@ -803,6 +812,13 @@ def _something_to_jsonable(
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
+    try:
+        jsonable['item'] = _simple_to_jsonable(
+            that.item
+        )
+    except SerializationException as exception:
+        exception._prepend_property('item')
+        raise
     try:
         jsonable['someItems'] = _list_of__abstract_item_to_jsonable(
             that.some_items

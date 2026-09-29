@@ -31,6 +31,16 @@ public class EnhancedSomething<EnhancementT>
   }
 
   @Override
+  public ISimple getItem() {
+    return instance.getItem();
+  }
+
+  @Override
+  public void setItem(ISimple item) {
+    instance.setItem(item);
+  }
+
+  @Override
   public List<IAbstractItem> getSomeItems() {
     return instance.getSomeItems();
   }

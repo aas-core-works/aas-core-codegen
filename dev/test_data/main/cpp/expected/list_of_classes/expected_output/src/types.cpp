@@ -94,6 +94,7 @@ void Simple::set_name(
 // region Something
 
 Something::Something(
+  std::shared_ptr<ISimple> item,
   std::vector<
     std::shared_ptr<IAbstractItem>
   > some_items,
@@ -101,6 +102,8 @@ Something::Something(
     std::shared_ptr<ISimple>
   > some_simples
 ) {
+  item_ = std::move(item);
+
   some_items_ = std::move(some_items);
 
   some_simples_ = std::move(some_simples);
@@ -108,6 +111,20 @@ Something::Something(
 
 ModelType Something::model_type() const {
   return ModelType::kSomething;
+}
+
+const std::shared_ptr<ISimple>& Something::item() const {
+  return item_;
+}
+
+std::shared_ptr<ISimple>& Something::mutable_item() {
+  return item_;
+}
+
+void Something::set_item(
+  std::shared_ptr<ISimple> value
+) {
+  item_ = value;
 }
 
 const std::vector<

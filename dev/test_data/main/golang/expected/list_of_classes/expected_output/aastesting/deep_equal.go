@@ -63,6 +63,15 @@ func deepEqualSomething(
 	that aastypes.ISomething,
 	other aastypes.ISomething,
 ) bool {
+	thatItem := that.Item()
+	otherItem := other.Item()
+	if !DeepEqual(
+		thatItem,
+		otherItem,
+	) {
+		return false
+	}
+
 	thatSomeItems := that.SomeItems()
 	otherSomeItems := other.SomeItems()
 	if 

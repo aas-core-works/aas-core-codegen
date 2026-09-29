@@ -215,6 +215,12 @@ namespace dummy
                 _instance = instance;
             }
 
+            public ISimple Item
+            {
+                get => _instance.Item;
+                set => _instance.Item = value;
+            }
+
             public List<IAbstractItem> SomeItems
             {
                 get => _instance.SomeItems;
@@ -347,6 +353,17 @@ namespace dummy
                         $"The instance has been already enhanced: {that}"
                     );
                 }
+
+                var transformedItem = Transform(
+                    that.Item
+                );
+                var castedItem = (
+                    transformedItem as Aas.ISimple
+                ) ?? throw new System.InvalidOperationException(
+                    "Expected the transformed value to be a ISimple, " +
+                    $"but got: {transformedItem}"
+                );
+                that.Item = castedItem;
 
                 that.SomeItems = (
                     that.SomeItems

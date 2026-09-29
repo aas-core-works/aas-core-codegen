@@ -117,6 +117,14 @@ class ISimple
 class ISomething
     : virtual public IClass {
  public:
+  virtual const std::shared_ptr<ISimple>& item() const = 0;
+
+  virtual std::shared_ptr<ISimple>& mutable_item() = 0;
+
+  virtual void set_item(
+    std::shared_ptr<ISimple> value
+  ) = 0;
+
   virtual const std::vector<
     std::shared_ptr<IAbstractItem>
   >& some_items() const = 0;
@@ -237,6 +245,7 @@ class Something
     : public ISomething {
  public:
   Something(
+    std::shared_ptr<ISimple> item,
     std::vector<
       std::shared_ptr<IAbstractItem>
     > some_items,
@@ -246,6 +255,18 @@ class Something
   );
 
   ModelType model_type() const override;
+
+  // region Get and set item_
+
+  const std::shared_ptr<ISimple>& item() const override;
+
+  std::shared_ptr<ISimple>& mutable_item() override;
+
+  void set_item(
+    std::shared_ptr<ISimple> value
+  ) override;
+
+  // endregion
 
   // region Get and set some_items_
 
@@ -286,6 +307,8 @@ class Something
   ~Something() override = default;
 
  private:
+  std::shared_ptr<ISimple> item_;
+
   std::vector<
     std::shared_ptr<IAbstractItem>
   > some_items_;

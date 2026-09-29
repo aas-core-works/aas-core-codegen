@@ -107,6 +107,32 @@ func VerifySomething(
 ) (abort bool) {
 	abort = false
 
+	if that.Item() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Item",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		abort = Verify(
+			that.Item(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Item",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
 	if that.SomeItems() == nil {
 		abort = onError(
 			newVerificationError(

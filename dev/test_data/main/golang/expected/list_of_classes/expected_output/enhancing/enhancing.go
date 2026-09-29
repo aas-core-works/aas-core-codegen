@@ -231,6 +231,17 @@ func (es *enhancedSomething[E]) Descend(
 	return es.instance.Descend(action)
 }
 
+func (es *enhancedSomething[E]) Item(
+) aastypes.ISimple {
+	return es.instance.Item()
+}
+
+func (es *enhancedSomething[E]) SetItem(
+	value aastypes.ISimple,
+) {
+	es.instance.SetItem(value)
+}
+
 func (es *enhancedSomething[E]) SomeItems(
 ) []aastypes.IAbstractItem {
 	return es.instance.SomeItems()
@@ -280,6 +291,14 @@ func wrapSomething[E any](
 	} else {
 		result = that
 	}
+
+	theItem := that.Item()
+	that.SetItem(
+		Wrap[E](
+			theItem,
+			factory,
+		).(aastypes.ISimple),
+	)
 
 	theSomeItems := that.SomeItems()
 	for i, v := range theSomeItems {

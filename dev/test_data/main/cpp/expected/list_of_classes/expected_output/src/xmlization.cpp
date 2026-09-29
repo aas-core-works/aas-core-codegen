@@ -1608,8 +1608,9 @@ enum class OfSimple : std::uint32_t {
 };  // enum class OfSimple
 
 enum class OfSomething : std::uint32_t {
-  kSomeItems = 0,
-  kSomeSimples = 1
+  kItem = 0,
+  kSomeItems = 1,
+  kSomeSimples = 2
 };  // enum class OfSomething
 
 const std::size_t kPropertyCountOfSomeItem = 1;
@@ -1648,12 +1649,16 @@ const std::unordered_map<
   }
 };
 
-const std::size_t kPropertyCountOfSomething = 2;
+const std::size_t kPropertyCountOfSomething = 3;
 
 const std::unordered_map<
   std::string,
   OfSomething
 > kMapOfSomething = {
+  {
+    "item",
+    OfSomething::kItem
+  },
   {
     "someItems",
     OfSomething::kSomeItems
@@ -1917,6 +1922,8 @@ std::pair<
 ) {
   // region Initialization
 
+  common::optional<std::shared_ptr<types::ISimple> > the_item;
+
   common::optional<
     std::vector<
       std::shared_ptr<types::IAbstractItem>
@@ -1942,6 +1949,13 @@ std::pair<
         properties::OfSomething property
       ) -> common::optional<DeserializationError> {
         switch (property) {
+          case properties::OfSomething::kItem:
+            return ReadInto(
+              the_item,
+              SimpleFromSequence<
+                types::ISimple
+              >(reader)
+            );
           case properties::OfSomething::kSomeItems:
             return ReadInto(
               the_some_items,
@@ -1982,6 +1996,14 @@ std::pair<
 
   // region Check required properties
 
+  if (!the_item.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property item is missing"
+    );
+  }
+
   if (!the_some_items.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<T>
@@ -2008,6 +2030,7 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::Something(
+        std::move(*the_item),
         std::move(*the_some_items),
         std::move(*the_some_simples)
       )
@@ -2819,6 +2842,17 @@ common::optional<xml_common::SerializationError> SerializeSomethingAsSequence(
   xml_common::SelfClosingWriter& writer
 ) {
   common::optional<xml_common::SerializationError> error;
+
+  error = WriteProperty(
+    "item",
+    that.item(),
+    writer,
+    iteration::Property::kItem,
+    SerializeSimpleAsSequence
+  );
+  if (error.has_value()) {
+    return error;
+  }
 
   error = WriteListOfInstancesProperty(
     "someItems",

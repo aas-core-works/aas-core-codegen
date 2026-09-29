@@ -36,12 +36,22 @@ class Simple:
 
 
 class Something:
+    # NOTE (mristin):
+    # The property ``item`` comes before the lists of classes on purpose, so that
+    # its local variable is visible in the lambdas which transform the list items
+    # in the generated code, *e.g.*, in the Java enhancing. The lambda parameters
+    # must not collide with it.
+    item: Simple
     some_items: List[Abstract_item]
     some_simples: List[Simple]
 
     def __init__(
-        self, some_items: List[Abstract_item], some_simples: List[Simple]
+        self,
+        item: Simple,
+        some_items: List[Abstract_item],
+        some_simples: List[Simple],
     ) -> None:
+        self.item = item
         self.some_items = some_items
         self.some_simples = some_simples
 

@@ -57,15 +57,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<ILangString> langStrings = that.getLangStrings();
     List<ILangString> transformedLangStrings = langStrings.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof ILangString)) {
+      .map(langStringsItem -> {
+        IClass transformedLangStringsItem =
+          transform(langStringsItem);
+        if (!(transformedLangStringsItem instanceof ILangString)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a ILangString " +
-            ", but got: " + transformed
+            ", but got: " + transformedLangStringsItem
           );
         }
-        return (ILangString) transformed;
+        return (ILangString) transformedLangStringsItem;
       }).collect(Collectors.toList());
     that.setLangStrings(transformedLangStrings);
 
@@ -92,15 +93,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDefinition().isPresent()) {
       List<ILangString> definition = that.getDefinition().get();
       List<ILangString> transformedDefinition = definition.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangString)) {
+        .map(definitionItem -> {
+          IClass transformedDefinitionItem =
+            transform(definitionItem);
+          if (!(transformedDefinitionItem instanceof ILangString)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangString " +
-              ", but got: " + transformed
+              ", but got: " + transformedDefinitionItem
             );
           }
-          return (ILangString) transformed;
+          return (ILangString) transformedDefinitionItem;
         }).collect(Collectors.toList());
       that.setDefinition(transformedDefinition);
     }
@@ -178,30 +180,32 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<ILangStringSet> langStringSets = that.getLangStringSets();
     List<ILangStringSet> transformedLangStringSets = langStringSets.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof ILangStringSet)) {
+      .map(langStringSetsItem -> {
+        IClass transformedLangStringSetsItem =
+          transform(langStringSetsItem);
+        if (!(transformedLangStringSetsItem instanceof ILangStringSet)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a ILangStringSet " +
-            ", but got: " + transformed
+            ", but got: " + transformedLangStringSetsItem
           );
         }
-        return (ILangStringSet) transformed;
+        return (ILangStringSet) transformedLangStringSetsItem;
       }).collect(Collectors.toList());
     that.setLangStringSets(transformedLangStringSets);
 
     if (that.getSpecifications().isPresent()) {
       List<ISpecification> specifications = that.getSpecifications().get();
       List<ISpecification> transformedSpecifications = specifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISpecification)) {
+        .map(specificationsItem -> {
+          IClass transformedSpecificationsItem =
+            transform(specificationsItem);
+          if (!(transformedSpecificationsItem instanceof ISpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedSpecificationsItem
             );
           }
-          return (ISpecification) transformed;
+          return (ISpecification) transformedSpecificationsItem;
         }).collect(Collectors.toList());
       that.setSpecifications(transformedSpecifications);
     }

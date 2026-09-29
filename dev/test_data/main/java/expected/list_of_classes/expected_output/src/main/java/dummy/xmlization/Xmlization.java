@@ -507,6 +507,7 @@ public class Xmlization {
     private static Reporting.Result<Something> readSomethingFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
+      ISimple theItem = null;
       List<IAbstractItem> theSomeItems = null;
       List<ISimple> theSomeSimples = null;
 
@@ -523,6 +524,21 @@ public class Xmlization {
           Reporting.Error valueError = null;
 
           switch (elementName) {
+            case "item": {
+              if (theItem != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Simple> value =
+                readSimpleFromSequence(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theItem = value.getResult();
+              }
+              break;
+            }
             case "someItems": {
               if (theSomeItems != null) {
                 valueError = duplicatePropertyError(elementName);
@@ -571,6 +587,10 @@ public class Xmlization {
         }
       }
 
+      if (theItem == null) {
+        return missingRequiredProperty("item", "Something");
+      }
+
       if (theSomeItems == null) {
         return missingRequiredProperty("someItems", "Something");
       }
@@ -580,6 +600,7 @@ public class Xmlization {
       }
 
       return Reporting.Result.success(new Something(
+        theItem,
         theSomeItems,
         theSomeSimples));
     }
@@ -906,6 +927,13 @@ public class Xmlization {
     private static void writeSomethingAsSequence(
       ISomething that,
       XMLStreamWriter writer) {
+      writeProperty(
+        "item",
+        "getItem()",
+        that.getItem(),
+        writer,
+        _VisitorWithWriter::writeSimpleAsSequence);
+
       writeProperty(
         "someItems",
         "getSomeItems()",

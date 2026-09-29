@@ -28,19 +28,37 @@ import java.util.List;
 import java.util.Objects;
 
 public class Something implements ISomething {
+  private ISimple item;
+
   private List<IAbstractItem> someItems;
 
   private List<ISimple> someSimples;
 
   public Something(
+    ISimple item,
     List<IAbstractItem> someItems,
     List<ISimple> someSimples) {
+    this.item = Objects.requireNonNull(
+      item,
+      "Argument \"item\" must be non-null.");
     this.someItems = Objects.requireNonNull(
       someItems,
       "Argument \"someItems\" must be non-null.");
     this.someSimples = Objects.requireNonNull(
       someSimples,
       "Argument \"someSimples\" must be non-null.");
+  }
+
+  @Override
+  public ISimple getItem() {
+    return item;
+  }
+
+  @Override
+  public void setItem(ISimple item) {
+    this.item = Objects.requireNonNull(
+      item,
+      "Argument \"item\" must be non-null.");
   }
 
   @Override
@@ -144,6 +162,11 @@ public class Something implements ISomething {
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
 
+      if (item != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.<IClass>of(Something.this.item));
+      }
+
       if (someItems != null) {
         memberStream = Stream.concat(memberStream,
           Something.this.someItems.stream());
@@ -182,6 +205,12 @@ public class Something implements ISomething {
 
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
+
+      if (item != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.concat(Stream.<IClass>of(Something.this.item),
+            StreamSupport.stream(Something.this.item.descend().spliterator(), false)));
+      }
 
       if (someItems != null) {
         memberStream = Stream.concat(memberStream,

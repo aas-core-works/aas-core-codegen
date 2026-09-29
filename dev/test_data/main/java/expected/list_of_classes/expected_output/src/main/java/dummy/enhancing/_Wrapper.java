@@ -95,31 +95,44 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
+    ISimple item = that.getItem();
+    IClass transformedItem = transform(item);
+    if (!(transformedItem instanceof ISimple)) {
+      throw new UnsupportedOperationException(
+        "Expected the transformed value to be a ISimple " +
+        ", but got: " + transformedItem
+      );
+    }
+    ISimple castedItem = (ISimple) transformedItem;
+    that.setItem(castedItem);
+
     List<IAbstractItem> someItems = that.getSomeItems();
     List<IAbstractItem> transformedSomeItems = someItems.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IAbstractItem)) {
+      .map(someItemsItem -> {
+        IClass transformedSomeItemsItem =
+          transform(someItemsItem);
+        if (!(transformedSomeItemsItem instanceof IAbstractItem)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IAbstractItem " +
-            ", but got: " + transformed
+            ", but got: " + transformedSomeItemsItem
           );
         }
-        return (IAbstractItem) transformed;
+        return (IAbstractItem) transformedSomeItemsItem;
       }).collect(Collectors.toList());
     that.setSomeItems(transformedSomeItems);
 
     List<ISimple> someSimples = that.getSomeSimples();
     List<ISimple> transformedSomeSimples = someSimples.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof ISimple)) {
+      .map(someSimplesItem -> {
+        IClass transformedSomeSimplesItem =
+          transform(someSimplesItem);
+        if (!(transformedSomeSimplesItem instanceof ISimple)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a ISimple " +
-            ", but got: " + transformed
+            ", but got: " + transformedSomeSimplesItem
           );
         }
-        return (ISimple) transformed;
+        return (ISimple) transformedSomeSimplesItem;
       }).collect(Collectors.toList());
     that.setSomeSimples(transformedSomeSimples);
 

@@ -14,6 +14,10 @@ import dummy.types.model.IClass;
 import java.util.Optional;
 
 public interface ISomething extends IClass {
+  ISimple getItem();
+
+  void setItem(ISimple item);
+
   List<IAbstractItem> getSomeItems();
 
   void setSomeItems(List<IAbstractItem> someItems);

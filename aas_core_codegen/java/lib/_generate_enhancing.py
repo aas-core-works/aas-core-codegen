@@ -681,22 +681,35 @@ List<{item_type}> {transformed_name} = {prop_name}.stream()
 that.{setter_name}({transformed_name});"""
                 )
             else:
+                # NOTE (mristin):
+                # A lambda parameter must not shadow a local variable in Java, and
+                # we define a local variable for each property of the class,
+                # *e.g.*, ``item`` for a property named ``item``. Hence, we derive
+                # the names of the lambda parameter and of its transformed value
+                # from the property, the same way as we derive the names of
+                # the other local variables such as ``transformed_{prop.name}``.
+                item_name = java_naming.variable_name(Identifier(f"{prop.name}_item"))
+                transformed_item_name = java_naming.variable_name(
+                    Identifier(f"transformed_{prop.name}_item")
+                )
+
                 item_transform_stmt = Stripped(
                     f"""\
-IClass transformed = transform(item);
-if (!(transformed instanceof {item_type})) {{
+IClass {transformed_item_name} =
+{I}transform({item_name});
+if (!({transformed_item_name} instanceof {item_type})) {{
 {I}throw new UnsupportedOperationException(
 {II}"Expected the transformed value to be a {item_type} " +
-{II}", but got: " + transformed
+{II}", but got: " + {transformed_item_name}
 {I});
 }}
-return ({item_type}) transformed;"""
+return ({item_type}) {transformed_item_name};"""
                 )
 
                 stmt = Stripped(
                     f"""\
 List<{item_type}> {transformed_name} = {prop_name}.stream()
-{I}.map(item -> {{
+{I}.map({item_name} -> {{
 {II}{indent_but_first_line(item_transform_stmt, II)}
 {I}}}).collect(Collectors.toList());
 that.{setter_name}({transformed_name});"""

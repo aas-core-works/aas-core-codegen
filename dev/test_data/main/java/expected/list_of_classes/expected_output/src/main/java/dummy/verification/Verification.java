@@ -75,6 +75,15 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getItem())
+          .flatMap(Verification::verifyToErrorStream)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("item"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
         Verification.zip(
           IntStream.iterate(0, i -> i + 1).boxed(),
           that.getSomeItems().stream())

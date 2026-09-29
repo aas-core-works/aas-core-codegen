@@ -511,9 +511,11 @@ func readSomethingAsSequence(
 	next xml.Token,
 	err error,
 ) {
+	var theItem aastypes.ISimple
 	var theSomeItems []aastypes.IAbstractItem
 	var theSomeSimples []aastypes.ISimple
 
+	foundItem := false
 	foundSomeItems := false
 	foundSomeSimples := false
 
@@ -530,6 +532,15 @@ func readSomethingAsSequence(
 
 		var valueErr error
 		switch local {
+		case "item":
+			if foundItem {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theItem, current, valueErr = readSimpleAsSequence(
+				decoder, current,
+			)
+			foundItem = true
 		case "someItems":
 			if foundSomeItems {
 				valueErr = duplicatePropertyError(local)
@@ -562,6 +573,11 @@ func readSomethingAsSequence(
 
 	next = current
 
+	if !foundItem {
+		err = missingProperty("item")
+		return
+	}
+
 	if !foundSomeItems {
 		err = missingProperty("someItems")
 		return
@@ -573,6 +589,7 @@ func readSomethingAsSequence(
 	}
 
 	instance = aastypes.NewSomething(
+		theItem,
 		theSomeItems,
 		theSomeSimples,
 	)
@@ -937,6 +954,16 @@ func writeSomethingAsSequence(
 	encoder *xml.Encoder,
 	that aastypes.ISomething,
 ) (err error) {
+	err = finishProperty(
+		"Item()",
+		xmlcommon.WriteElement(
+			encoder, "item", that.Item(), writeSimpleAsSequence,
+		),
+	)
+	if err != nil {
+		return
+	}
+
 	err = finishProperty(
 		"SomeItems()",
 		xmlcommon.WriteElement(

@@ -648,14 +648,20 @@ func somethingFromMapWithoutDispatch(
 	result aastypes.ISomething,
 	err error,
 ) {
+	var theItem aastypes.ISimple
 	var theSomeItems []aastypes.IAbstractItem
 	var theSomeSimples []aastypes.ISimple
 
+	foundItem := false
 	foundSomeItems := false
 	foundSomeSimples := false
 
 	for k, v := range m {
 		switch k {
+		case "item":
+			theItem, err = SimpleFromJsonable(v)
+			foundItem = true
+
 		case "someItems":
 			theSomeItems, err = parseArray(v, AbstractItemFromJsonable)
 			foundSomeItems = true
@@ -680,6 +686,13 @@ func somethingFromMapWithoutDispatch(
 		}
 	}
 
+	if !foundItem {
+		err = newDeserializationError(
+			"The required property 'item' is missing",
+		)
+		return
+	}
+
 	if !foundSomeItems {
 		err = newDeserializationError(
 			"The required property 'someItems' is missing",
@@ -695,6 +708,7 @@ func somethingFromMapWithoutDispatch(
 	}
 
 	result = aastypes.NewSomething(
+		theItem,
 		theSomeItems,
 		theSomeSimples,
 	)
@@ -999,6 +1013,12 @@ func somethingToMap(
 	that aastypes.ISomething,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
+
+	result["item"], err = ToJsonable(that.Item())
+	if err != nil {
+		mustSerializationError(err).prependName("Item()")
+		return
+	}
 
 	result["someItems"], err = serializeArray(
 		that.SomeItems(), classAsJsonableInterface[aastypes.IAbstractItem],

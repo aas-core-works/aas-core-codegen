@@ -51,15 +51,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -67,15 +68,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getRefersTo().isPresent()) {
       List<IReference> refersTo = that.getRefersTo().get();
       List<IReference> transformedRefersTo = refersTo.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(refersToItem -> {
+          IClass transformedRefersToItem =
+            transform(refersToItem);
+          if (!(transformedRefersToItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedRefersToItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedRefersToItem;
         }).collect(Collectors.toList());
       that.setRefersTo(transformedRefersTo);
     }
@@ -103,15 +105,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -165,15 +168,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -214,15 +218,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -230,15 +235,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -246,15 +252,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -275,15 +282,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -315,15 +323,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSubmodels().isPresent()) {
       List<IReference> submodels = that.getSubmodels().get();
       List<IReference> transformedSubmodels = submodels.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(submodelsItem -> {
+          IClass transformedSubmodelsItem =
+            transform(submodelsItem);
+          if (!(transformedSubmodelsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSubmodelsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSubmodelsItem;
         }).collect(Collectors.toList());
       that.setSubmodels(transformedSubmodels);
     }
@@ -351,15 +360,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSpecificAssetIds().isPresent()) {
       List<ISpecificAssetId> specificAssetIds = that.getSpecificAssetIds().get();
       List<ISpecificAssetId> transformedSpecificAssetIds = specificAssetIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISpecificAssetId)) {
+        .map(specificAssetIdsItem -> {
+          IClass transformedSpecificAssetIdsItem =
+            transform(specificAssetIdsItem);
+          if (!(transformedSpecificAssetIdsItem instanceof ISpecificAssetId)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISpecificAssetId " +
-              ", but got: " + transformed
+              ", but got: " + transformedSpecificAssetIdsItem
             );
           }
-          return (ISpecificAssetId) transformed;
+          return (ISpecificAssetId) transformedSpecificAssetIdsItem;
         }).collect(Collectors.toList());
       that.setSpecificAssetIds(transformedSpecificAssetIds);
     }
@@ -433,15 +443,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -482,15 +493,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -498,15 +510,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -514,15 +527,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -556,15 +570,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -572,15 +587,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -588,15 +604,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -604,15 +621,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSubmodelElements().isPresent()) {
       List<ISubmodelElement> submodelElements = that.getSubmodelElements().get();
       List<ISubmodelElement> transformedSubmodelElements = submodelElements.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISubmodelElement)) {
+        .map(submodelElementsItem -> {
+          IClass transformedSubmodelElementsItem =
+            transform(submodelElementsItem);
+          if (!(transformedSubmodelElementsItem instanceof ISubmodelElement)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISubmodelElement " +
-              ", but got: " + transformed
+              ", but got: " + transformedSubmodelElementsItem
             );
           }
-          return (ISubmodelElement) transformed;
+          return (ISubmodelElement) transformedSubmodelElementsItem;
         }).collect(Collectors.toList());
       that.setSubmodelElements(transformedSubmodelElements);
     }
@@ -640,15 +658,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -656,15 +675,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -672,15 +692,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -701,15 +722,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -717,15 +739,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -733,15 +756,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -791,15 +815,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -807,15 +832,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -823,15 +849,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -852,15 +879,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -868,15 +896,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -884,15 +913,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -913,15 +943,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getValue().isPresent()) {
       List<ISubmodelElement> value = that.getValue().get();
       List<ISubmodelElement> transformedValue = value.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISubmodelElement)) {
+        .map(valueItem -> {
+          IClass transformedValueItem =
+            transform(valueItem);
+          if (!(transformedValueItem instanceof ISubmodelElement)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISubmodelElement " +
-              ", but got: " + transformed
+              ", but got: " + transformedValueItem
             );
           }
-          return (ISubmodelElement) transformed;
+          return (ISubmodelElement) transformedValueItem;
         }).collect(Collectors.toList());
       that.setValue(transformedValue);
     }
@@ -949,15 +980,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -965,15 +997,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -981,15 +1014,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1010,15 +1044,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1026,15 +1061,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1042,15 +1078,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1058,15 +1095,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getValue().isPresent()) {
       List<ISubmodelElement> value = that.getValue().get();
       List<ISubmodelElement> transformedValue = value.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISubmodelElement)) {
+        .map(valueItem -> {
+          IClass transformedValueItem =
+            transform(valueItem);
+          if (!(transformedValueItem instanceof ISubmodelElement)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISubmodelElement " +
-              ", but got: " + transformed
+              ", but got: " + transformedValueItem
             );
           }
-          return (ISubmodelElement) transformed;
+          return (ISubmodelElement) transformedValueItem;
         }).collect(Collectors.toList());
       that.setValue(transformedValue);
     }
@@ -1094,15 +1132,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1110,15 +1149,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1126,15 +1166,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1155,15 +1196,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1171,15 +1213,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1187,15 +1230,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1236,15 +1280,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1252,15 +1297,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1268,15 +1314,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1297,15 +1344,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1313,15 +1361,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1329,15 +1378,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1345,15 +1395,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getValue().isPresent()) {
       List<ILangStringTextType> value = that.getValue().get();
       List<ILangStringTextType> transformedValue = value.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(valueItem -> {
+          IClass transformedValueItem =
+            transform(valueItem);
+          if (!(transformedValueItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedValueItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedValueItem;
         }).collect(Collectors.toList());
       that.setValue(transformedValue);
     }
@@ -1394,15 +1445,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1410,15 +1462,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1426,15 +1479,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1455,15 +1509,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1471,15 +1526,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1487,15 +1543,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1523,15 +1580,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1539,15 +1597,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1555,15 +1614,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1584,15 +1644,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1600,15 +1661,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1616,15 +1678,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1665,15 +1728,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1681,15 +1745,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1697,15 +1762,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1726,15 +1792,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1742,15 +1809,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1758,15 +1826,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1794,15 +1863,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1810,15 +1880,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1826,15 +1897,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1855,15 +1927,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -1871,15 +1944,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -1887,15 +1961,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -1923,15 +1998,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -1939,15 +2015,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -1955,15 +2032,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -1984,15 +2062,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -2000,15 +2079,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -2016,15 +2096,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2054,15 +2135,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getAnnotations().isPresent()) {
       List<IDataElement> annotations = that.getAnnotations().get();
       List<IDataElement> transformedAnnotations = annotations.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IDataElement)) {
+        .map(annotationsItem -> {
+          IClass transformedAnnotationsItem =
+            transform(annotationsItem);
+          if (!(transformedAnnotationsItem instanceof IDataElement)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IDataElement " +
-              ", but got: " + transformed
+              ", but got: " + transformedAnnotationsItem
             );
           }
-          return (IDataElement) transformed;
+          return (IDataElement) transformedAnnotationsItem;
         }).collect(Collectors.toList());
       that.setAnnotations(transformedAnnotations);
     }
@@ -2090,15 +2172,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -2106,15 +2189,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -2122,15 +2206,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -2151,15 +2236,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -2167,15 +2253,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -2183,15 +2270,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2199,15 +2287,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getStatements().isPresent()) {
       List<ISubmodelElement> statements = that.getStatements().get();
       List<ISubmodelElement> transformedStatements = statements.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISubmodelElement)) {
+        .map(statementsItem -> {
+          IClass transformedStatementsItem =
+            transform(statementsItem);
+          if (!(transformedStatementsItem instanceof ISubmodelElement)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISubmodelElement " +
-              ", but got: " + transformed
+              ", but got: " + transformedStatementsItem
             );
           }
-          return (ISubmodelElement) transformed;
+          return (ISubmodelElement) transformedStatementsItem;
         }).collect(Collectors.toList());
       that.setStatements(transformedStatements);
     }
@@ -2215,15 +2304,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSpecificAssetIds().isPresent()) {
       List<ISpecificAssetId> specificAssetIds = that.getSpecificAssetIds().get();
       List<ISpecificAssetId> transformedSpecificAssetIds = specificAssetIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISpecificAssetId)) {
+        .map(specificAssetIdsItem -> {
+          IClass transformedSpecificAssetIdsItem =
+            transform(specificAssetIdsItem);
+          if (!(transformedSpecificAssetIdsItem instanceof ISpecificAssetId)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISpecificAssetId " +
-              ", but got: " + transformed
+              ", but got: " + transformedSpecificAssetIdsItem
             );
           }
-          return (ISpecificAssetId) transformed;
+          return (ISpecificAssetId) transformedSpecificAssetIdsItem;
         }).collect(Collectors.toList());
       that.setSpecificAssetIds(transformedSpecificAssetIds);
     }
@@ -2332,15 +2422,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -2348,15 +2439,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -2364,15 +2456,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -2393,15 +2486,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -2409,15 +2503,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -2425,15 +2520,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2485,15 +2581,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -2501,15 +2598,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -2517,15 +2615,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -2546,15 +2645,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -2562,15 +2662,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -2578,15 +2679,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2594,15 +2696,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getInputVariables().isPresent()) {
       List<IOperationVariable> inputVariables = that.getInputVariables().get();
       List<IOperationVariable> transformedInputVariables = inputVariables.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IOperationVariable)) {
+        .map(inputVariablesItem -> {
+          IClass transformedInputVariablesItem =
+            transform(inputVariablesItem);
+          if (!(transformedInputVariablesItem instanceof IOperationVariable)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IOperationVariable " +
-              ", but got: " + transformed
+              ", but got: " + transformedInputVariablesItem
             );
           }
-          return (IOperationVariable) transformed;
+          return (IOperationVariable) transformedInputVariablesItem;
         }).collect(Collectors.toList());
       that.setInputVariables(transformedInputVariables);
     }
@@ -2610,15 +2713,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getOutputVariables().isPresent()) {
       List<IOperationVariable> outputVariables = that.getOutputVariables().get();
       List<IOperationVariable> transformedOutputVariables = outputVariables.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IOperationVariable)) {
+        .map(outputVariablesItem -> {
+          IClass transformedOutputVariablesItem =
+            transform(outputVariablesItem);
+          if (!(transformedOutputVariablesItem instanceof IOperationVariable)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IOperationVariable " +
-              ", but got: " + transformed
+              ", but got: " + transformedOutputVariablesItem
             );
           }
-          return (IOperationVariable) transformed;
+          return (IOperationVariable) transformedOutputVariablesItem;
         }).collect(Collectors.toList());
       that.setOutputVariables(transformedOutputVariables);
     }
@@ -2626,15 +2730,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getInoutputVariables().isPresent()) {
       List<IOperationVariable> inoutputVariables = that.getInoutputVariables().get();
       List<IOperationVariable> transformedInoutputVariables = inoutputVariables.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IOperationVariable)) {
+        .map(inoutputVariablesItem -> {
+          IClass transformedInoutputVariablesItem =
+            transform(inoutputVariablesItem);
+          if (!(transformedInoutputVariablesItem instanceof IOperationVariable)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IOperationVariable " +
-              ", but got: " + transformed
+              ", but got: " + transformedInoutputVariablesItem
             );
           }
-          return (IOperationVariable) transformed;
+          return (IOperationVariable) transformedInoutputVariablesItem;
         }).collect(Collectors.toList());
       that.setInoutputVariables(transformedInoutputVariables);
     }
@@ -2693,15 +2798,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -2709,15 +2815,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -2725,15 +2832,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -2754,15 +2862,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSupplementalSemanticIds().isPresent()) {
       List<IReference> supplementalSemanticIds = that.getSupplementalSemanticIds().get();
       List<IReference> transformedSupplementalSemanticIds = supplementalSemanticIds.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(supplementalSemanticIdsItem -> {
+          IClass transformedSupplementalSemanticIdsItem =
+            transform(supplementalSemanticIdsItem);
+          if (!(transformedSupplementalSemanticIdsItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedSupplementalSemanticIdsItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedSupplementalSemanticIdsItem;
         }).collect(Collectors.toList());
       that.setSupplementalSemanticIds(transformedSupplementalSemanticIds);
     }
@@ -2770,15 +2879,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getQualifiers().isPresent()) {
       List<IQualifier> qualifiers = that.getQualifiers().get();
       List<IQualifier> transformedQualifiers = qualifiers.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IQualifier)) {
+        .map(qualifiersItem -> {
+          IClass transformedQualifiersItem =
+            transform(qualifiersItem);
+          if (!(transformedQualifiersItem instanceof IQualifier)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IQualifier " +
-              ", but got: " + transformed
+              ", but got: " + transformedQualifiersItem
             );
           }
-          return (IQualifier) transformed;
+          return (IQualifier) transformedQualifiersItem;
         }).collect(Collectors.toList());
       that.setQualifiers(transformedQualifiers);
     }
@@ -2786,15 +2896,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2822,15 +2933,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getExtensions().isPresent()) {
       List<IExtension> extensions = that.getExtensions().get();
       List<IExtension> transformedExtensions = extensions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IExtension)) {
+        .map(extensionsItem -> {
+          IClass transformedExtensionsItem =
+            transform(extensionsItem);
+          if (!(transformedExtensionsItem instanceof IExtension)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IExtension " +
-              ", but got: " + transformed
+              ", but got: " + transformedExtensionsItem
             );
           }
-          return (IExtension) transformed;
+          return (IExtension) transformedExtensionsItem;
         }).collect(Collectors.toList());
       that.setExtensions(transformedExtensions);
     }
@@ -2838,15 +2950,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDisplayName().isPresent()) {
       List<ILangStringNameType> displayName = that.getDisplayName().get();
       List<ILangStringNameType> transformedDisplayName = displayName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringNameType)) {
+        .map(displayNameItem -> {
+          IClass transformedDisplayNameItem =
+            transform(displayNameItem);
+          if (!(transformedDisplayNameItem instanceof ILangStringNameType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringNameType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDisplayNameItem
             );
           }
-          return (ILangStringNameType) transformed;
+          return (ILangStringNameType) transformedDisplayNameItem;
         }).collect(Collectors.toList());
       that.setDisplayName(transformedDisplayName);
     }
@@ -2854,15 +2967,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDescription().isPresent()) {
       List<ILangStringTextType> description = that.getDescription().get();
       List<ILangStringTextType> transformedDescription = description.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringTextType)) {
+        .map(descriptionItem -> {
+          IClass transformedDescriptionItem =
+            transform(descriptionItem);
+          if (!(transformedDescriptionItem instanceof ILangStringTextType)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringTextType " +
-              ", but got: " + transformed
+              ", but got: " + transformedDescriptionItem
             );
           }
-          return (ILangStringTextType) transformed;
+          return (ILangStringTextType) transformedDescriptionItem;
         }).collect(Collectors.toList());
       that.setDescription(transformedDescription);
     }
@@ -2883,15 +2997,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getEmbeddedDataSpecifications().isPresent()) {
       List<IEmbeddedDataSpecification> embeddedDataSpecifications = that.getEmbeddedDataSpecifications().get();
       List<IEmbeddedDataSpecification> transformedEmbeddedDataSpecifications = embeddedDataSpecifications.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IEmbeddedDataSpecification)) {
+        .map(embeddedDataSpecificationsItem -> {
+          IClass transformedEmbeddedDataSpecificationsItem =
+            transform(embeddedDataSpecificationsItem);
+          if (!(transformedEmbeddedDataSpecificationsItem instanceof IEmbeddedDataSpecification)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IEmbeddedDataSpecification " +
-              ", but got: " + transformed
+              ", but got: " + transformedEmbeddedDataSpecificationsItem
             );
           }
-          return (IEmbeddedDataSpecification) transformed;
+          return (IEmbeddedDataSpecification) transformedEmbeddedDataSpecificationsItem;
         }).collect(Collectors.toList());
       that.setEmbeddedDataSpecifications(transformedEmbeddedDataSpecifications);
     }
@@ -2899,15 +3014,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getIsCaseOf().isPresent()) {
       List<IReference> isCaseOf = that.getIsCaseOf().get();
       List<IReference> transformedIsCaseOf = isCaseOf.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IReference)) {
+        .map(isCaseOfItem -> {
+          IClass transformedIsCaseOfItem =
+            transform(isCaseOfItem);
+          if (!(transformedIsCaseOfItem instanceof IReference)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IReference " +
-              ", but got: " + transformed
+              ", but got: " + transformedIsCaseOfItem
             );
           }
-          return (IReference) transformed;
+          return (IReference) transformedIsCaseOfItem;
         }).collect(Collectors.toList());
       that.setIsCaseOf(transformedIsCaseOf);
     }
@@ -2947,15 +3063,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<IKey> keys = that.getKeys();
     List<IKey> transformedKeys = keys.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IKey)) {
+      .map(keysItem -> {
+        IClass transformedKeysItem =
+          transform(keysItem);
+        if (!(transformedKeysItem instanceof IKey)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IKey " +
-            ", but got: " + transformed
+            ", but got: " + transformedKeysItem
           );
         }
-        return (IKey) transformed;
+        return (IKey) transformedKeysItem;
       }).collect(Collectors.toList());
     that.setKeys(transformedKeys);
 
@@ -3042,15 +3159,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getAssetAdministrationShells().isPresent()) {
       List<IAssetAdministrationShell> assetAdministrationShells = that.getAssetAdministrationShells().get();
       List<IAssetAdministrationShell> transformedAssetAdministrationShells = assetAdministrationShells.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IAssetAdministrationShell)) {
+        .map(assetAdministrationShellsItem -> {
+          IClass transformedAssetAdministrationShellsItem =
+            transform(assetAdministrationShellsItem);
+          if (!(transformedAssetAdministrationShellsItem instanceof IAssetAdministrationShell)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IAssetAdministrationShell " +
-              ", but got: " + transformed
+              ", but got: " + transformedAssetAdministrationShellsItem
             );
           }
-          return (IAssetAdministrationShell) transformed;
+          return (IAssetAdministrationShell) transformedAssetAdministrationShellsItem;
         }).collect(Collectors.toList());
       that.setAssetAdministrationShells(transformedAssetAdministrationShells);
     }
@@ -3058,15 +3176,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getSubmodels().isPresent()) {
       List<ISubmodel> submodels = that.getSubmodels().get();
       List<ISubmodel> transformedSubmodels = submodels.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ISubmodel)) {
+        .map(submodelsItem -> {
+          IClass transformedSubmodelsItem =
+            transform(submodelsItem);
+          if (!(transformedSubmodelsItem instanceof ISubmodel)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ISubmodel " +
-              ", but got: " + transformed
+              ", but got: " + transformedSubmodelsItem
             );
           }
-          return (ISubmodel) transformed;
+          return (ISubmodel) transformedSubmodelsItem;
         }).collect(Collectors.toList());
       that.setSubmodels(transformedSubmodels);
     }
@@ -3074,15 +3193,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getConceptDescriptions().isPresent()) {
       List<IConceptDescription> conceptDescriptions = that.getConceptDescriptions().get();
       List<IConceptDescription> transformedConceptDescriptions = conceptDescriptions.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof IConceptDescription)) {
+        .map(conceptDescriptionsItem -> {
+          IClass transformedConceptDescriptionsItem =
+            transform(conceptDescriptionsItem);
+          if (!(transformedConceptDescriptionsItem instanceof IConceptDescription)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a IConceptDescription " +
-              ", but got: " + transformed
+              ", but got: " + transformedConceptDescriptionsItem
             );
           }
-          return (IConceptDescription) transformed;
+          return (IConceptDescription) transformedConceptDescriptionsItem;
         }).collect(Collectors.toList());
       that.setConceptDescriptions(transformedConceptDescriptions);
     }
@@ -3202,15 +3322,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<IValueReferencePair> valueReferencePairs = that.getValueReferencePairs();
     List<IValueReferencePair> transformedValueReferencePairs = valueReferencePairs.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IValueReferencePair)) {
+      .map(valueReferencePairsItem -> {
+        IClass transformedValueReferencePairsItem =
+          transform(valueReferencePairsItem);
+        if (!(transformedValueReferencePairsItem instanceof IValueReferencePair)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IValueReferencePair " +
-            ", but got: " + transformed
+            ", but got: " + transformedValueReferencePairsItem
           );
         }
-        return (IValueReferencePair) transformed;
+        return (IValueReferencePair) transformedValueReferencePairsItem;
       }).collect(Collectors.toList());
     that.setValueReferencePairs(transformedValueReferencePairs);
 
@@ -3296,30 +3417,32 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<ILangStringPreferredNameTypeIec61360> preferredName = that.getPreferredName();
     List<ILangStringPreferredNameTypeIec61360> transformedPreferredName = preferredName.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof ILangStringPreferredNameTypeIec61360)) {
+      .map(preferredNameItem -> {
+        IClass transformedPreferredNameItem =
+          transform(preferredNameItem);
+        if (!(transformedPreferredNameItem instanceof ILangStringPreferredNameTypeIec61360)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a ILangStringPreferredNameTypeIec61360 " +
-            ", but got: " + transformed
+            ", but got: " + transformedPreferredNameItem
           );
         }
-        return (ILangStringPreferredNameTypeIec61360) transformed;
+        return (ILangStringPreferredNameTypeIec61360) transformedPreferredNameItem;
       }).collect(Collectors.toList());
     that.setPreferredName(transformedPreferredName);
 
     if (that.getShortName().isPresent()) {
       List<ILangStringShortNameTypeIec61360> shortName = that.getShortName().get();
       List<ILangStringShortNameTypeIec61360> transformedShortName = shortName.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringShortNameTypeIec61360)) {
+        .map(shortNameItem -> {
+          IClass transformedShortNameItem =
+            transform(shortNameItem);
+          if (!(transformedShortNameItem instanceof ILangStringShortNameTypeIec61360)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringShortNameTypeIec61360 " +
-              ", but got: " + transformed
+              ", but got: " + transformedShortNameItem
             );
           }
-          return (ILangStringShortNameTypeIec61360) transformed;
+          return (ILangStringShortNameTypeIec61360) transformedShortNameItem;
         }).collect(Collectors.toList());
       that.setShortName(transformedShortName);
     }
@@ -3340,15 +3463,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     if (that.getDefinition().isPresent()) {
       List<ILangStringDefinitionTypeIec61360> definition = that.getDefinition().get();
       List<ILangStringDefinitionTypeIec61360> transformedDefinition = definition.stream()
-        .map(item -> {
-          IClass transformed = transform(item);
-          if (!(transformed instanceof ILangStringDefinitionTypeIec61360)) {
+        .map(definitionItem -> {
+          IClass transformedDefinitionItem =
+            transform(definitionItem);
+          if (!(transformedDefinitionItem instanceof ILangStringDefinitionTypeIec61360)) {
             throw new UnsupportedOperationException(
               "Expected the transformed value to be a ILangStringDefinitionTypeIec61360 " +
-              ", but got: " + transformed
+              ", but got: " + transformedDefinitionItem
             );
           }
-          return (ILangStringDefinitionTypeIec61360) transformed;
+          return (ILangStringDefinitionTypeIec61360) transformedDefinitionItem;
         }).collect(Collectors.toList());
       that.setDefinition(transformedDefinition);
     }

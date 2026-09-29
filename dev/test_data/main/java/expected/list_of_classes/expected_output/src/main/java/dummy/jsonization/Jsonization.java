@@ -486,6 +486,7 @@ public class Jsonization {
           return notAJsonObject(node);
         }
 
+        ISimple theItem = null;
         List<IAbstractItem> theSomeItems = null;
         List<ISimple> theSomeSimples = null;
 
@@ -495,6 +496,14 @@ public class Jsonization {
           final JsonNode value = keyValue.getValue();
 
           switch (key) {
+            case "item": {
+              final Reporting.Result<? extends ISimple> parsed = trySimpleFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theItem = parsed.getResult();
+              break;
+            }
             case "someItems": {
               final Reporting.Result<List<IAbstractItem>> parsed = parseListOf_IAbstractItem(value);
               if (parsed.isError()) {
@@ -516,6 +525,10 @@ public class Jsonization {
           }
         }
 
+        if (theItem == null) {
+          return missingRequiredProperty("item");
+        }
+
         if (theSomeItems == null) {
           return missingRequiredProperty("someItems");
         }
@@ -525,6 +538,7 @@ public class Jsonization {
         }
 
         return Reporting.Result.success(new Something(
+          theItem,
           theSomeItems,
           theSomeSimples));
       }
@@ -876,6 +890,8 @@ public class Jsonization {
         ISomething that
       ) {
         final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setProperty(result, "item", "getItem()", that.getItem(), _Transformer::transformClass);
 
         setProperty(
           result, "someItems", "getSomeItems()",

@@ -66,7 +66,10 @@ public class TestCopying {
       Something casted = (Something) that;
 
       return (
-        that.getSomeItems().equals(casted.getSomeItems())
+        transform(
+          that.getItem(),
+          casted.getItem())
+        && that.getSomeItems().equals(casted.getSomeItems())
         && that.getSomeSimples().equals(casted.getSomeSimples()));
     }
   } // class _DeepEqualiser
@@ -153,7 +156,8 @@ public class TestCopying {
     Something that,
     Something other) {
     return (
-      that.getSomeItems().equals(other.getSomeItems())
+      that.getItem().equals(other.getItem())
+      && that.getSomeItems().equals(other.getSomeItems())
       && that.getSomeSimples().equals(other.getSomeSimples()));
   }
 
