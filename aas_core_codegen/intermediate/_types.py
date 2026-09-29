@@ -4254,6 +4254,35 @@ def uses_abs(symbol_table: SymbolTable) -> bool:
     )
 
 
+def uses_lstrip(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls ``str.lstrip`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``lstrip``.
+
+    We do not distinguish between ``str.lstrip`` and a method of our class
+    named ``lstrip``. In the worst case, we generate unused helpers.
+    """
+    return any(
+        isinstance(node, parse_tree.MethodCall) and node.member.name == "lstrip"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def uses_int(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls the built-in ``int`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for parsing the integers.
+    """
+    return any(
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "int"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
 def collect_ids_of_our_types_in_properties(
     symbol_table: SymbolTable,
 ) -> Set[IdOfOurType]:

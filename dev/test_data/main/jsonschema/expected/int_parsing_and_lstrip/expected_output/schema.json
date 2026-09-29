@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ModelType": {
+      "type": "string",
+      "enum": []
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "padded": {
+          "type": "string"
+        },
+        "decimal": {
+          "type": "string",
+          "pattern": "^[-+]?[0-9]+$"
+        },
+        "longText": {
+          "type": "string"
+        },
+        "maybeNumber": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "number",
+        "padded",
+        "decimal",
+        "longText"
+      ]
+    }
+  }
+}

@@ -5,12 +5,13 @@ import textwrap
 from typing import Final, List
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped
+from aas_core_codegen.common import Stripped, indent_but_first_line
 from aas_core_codegen.csharp import common as csharp_common
 from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
+    INDENT4 as IIII,
 )
 
 
@@ -32,9 +33,9 @@ public static class TupleHelpers
 )
 
 
-def _generate_string_helpers() -> Stripped:
+def _generate_string_helpers(symbol_table: intermediate.SymbolTable) -> Stripped:
     """
-    Generate the helpers for ``len``, slicing strings and ``find``.
+    Generate the helpers for ``len``, slicing strings, ``find`` and ``lstrip``.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -50,6 +51,224 @@ def _generate_string_helpers() -> Stripped:
     # not check whether ``IndexOf`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
+    members = [
+        Stripped(
+            f"""\
+/// <summary>
+/// Check whether a surrogate pair starts at <paramref name="offset" />
+/// in <paramref name="text" />.
+/// </summary>
+private static bool IsSurrogatePairAt(string text, int offset)
+{{
+{I}return (
+{II}offset + 1 < text.Length
+{II}&& char.IsHighSurrogate(text[offset])
+{II}&& char.IsLowSurrogate(text[offset + 1])
+{I});
+}}"""
+        )
+    ]  # type: List[Stripped]
+
+    if intermediate.uses_len_slicing_or_find(symbol_table):
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Count the characters of <paramref name="text" /> between the UTF-16
+/// offsets <paramref name="startOffset" /> and <paramref name="endOffset" />.
+/// </summary>
+private static int CountCharacters(
+{I}string text,
+{I}int startOffset,
+{I}int endOffset
+)
+{{
+{I}int count = 0;
+{I}int offset = startOffset;
+{I}while (offset < endOffset)
+{I}{{
+{II}offset += IsSurrogatePairAt(text, offset) ? 2 : 1;
+{II}count++;
+{I}}}
+
+{I}return count;
+}}
+
+/// <summary>
+/// Compute the UTF-16 offset of the character at <paramref name="position" />
+/// in <paramref name="text" />.
+/// </summary>
+private static int OffsetOf(string text, int position)
+{{
+{I}int offset = 0;
+{I}for (int i = 0; i < position; i++)
+{I}{{
+{II}offset += IsSurrogatePairAt(text, offset) ? 2 : 1;
+{I}}}
+
+{I}return offset;
+}}
+
+/// <summary>
+/// Resolve <paramref name="position" /> in a string of
+/// <paramref name="length" /> as Python does in slicing.
+/// </summary>
+/// <remarks>
+/// A negative position counts from the end, and the positions out of range
+/// are clamped to the string.
+/// </remarks>
+private static int ResolvePosition(long position, int length)
+{{
+{I}if (position < 0)
+{I}{{
+{II}return (int)System.Math.Max(position + length, 0);
+{I}}}
+
+{I}return (int)System.Math.Min(position, length);
+}}
+
+/// <summary>
+/// Count the characters (code points) of <paramref name="text" />.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of <c>len</c>, since Python is
+/// the language of the meta-model specifications. Hence, a character beyond
+/// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
+/// </remarks>
+public static int Len(string text)
+{{
+{I}return CountCharacters(text, 0, text.Length);
+}}
+
+/// <summary>
+/// Slice <paramref name="text" /> from <paramref name="start" /> up to
+/// <paramref name="end" />, exclusive.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of slicing, since Python is
+/// the language of the meta-model specifications. Hence, the positions count
+/// the characters (code points), a negative position counts from the end,
+/// the positions out of range are clamped to the string, and the slice is
+/// empty if <paramref name="start" /> is not before <paramref name="end" />.
+/// If <paramref name="end" /> is not given, we slice up to the end of
+/// <paramref name="text" />.
+/// </remarks>
+public static string Slice(string text, long start, long? end = null)
+{{
+{I}int length = Len(text);
+{I}int theStart = ResolvePosition(start, length);
+{I}int theEnd = end is null
+{II}? length
+{II}: ResolvePosition(end.Value, length);
+
+{I}if (theStart >= theEnd)
+{I}{{
+{II}return "";
+{I}}}
+
+{I}int startOffset = OffsetOf(text, theStart);
+{I}int endOffset = OffsetOf(text, theEnd);
+{I}return text.Substring(startOffset, endOffset - startOffset);
+}}
+
+/// <summary>
+/// Find the first <paramref name="sub" /> in <paramref name="text" /> from
+/// <paramref name="start" /> on.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of <c>str.find</c>, since Python is
+/// the language of the meta-model specifications. Hence, the positions count
+/// the characters (code points), a negative <paramref name="start" /> counts
+/// from the end, and a <paramref name="start" /> beyond the end of
+/// <paramref name="text" /> gives -1. We compare the strings ordinally.
+/// </remarks>
+/// <returns>
+/// The position of <paramref name="sub" /> in <paramref name="text" />,
+/// or -1 if not found
+/// </returns>
+public static long Find(string text, string sub, long start = 0)
+{{
+{I}int length = Len(text);
+{I}long theStart = start < 0
+{II}? System.Math.Max(start + length, 0)
+{II}: start;
+
+{I}if (theStart > length)
+{I}{{
+{II}return -1;
+{I}}}
+
+{I}int startOffset = OffsetOf(text, (int)theStart);
+{I}int offset = text.IndexOf(
+{II}sub,
+{II}startOffset,
+{II}System.StringComparison.Ordinal
+{I});
+
+{I}if (offset == -1)
+{I}{{
+{II}return -1;
+{I}}}
+
+{I}return theStart + CountCharacters(text, startOffset, offset);
+}}"""
+            )
+        )
+
+    if intermediate.uses_lstrip(symbol_table):
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Strip the longest prefix of <paramref name="text" /> which consists only
+/// of the characters listed in <paramref name="chars" />.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of <c>str.lstrip</c>, since Python is
+/// the language of the meta-model specifications. Hence, we strip
+/// the characters (code points), and not the UTF-16 code units. Otherwise,
+/// we would strip a half of a surrogate pair if a character in
+/// <paramref name="chars" /> shared the high surrogate with it.
+/// </remarks>
+public static string LStrip(string text, string chars)
+{{
+{I}int offset = 0;
+{I}while (offset < text.Length)
+{I}{{
+{II}int width = IsSurrogatePairAt(text, offset) ? 2 : 1;
+
+{II}bool found = false;
+{II}int charsOffset = 0;
+{II}while (charsOffset < chars.Length)
+{II}{{
+{III}int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
+{III}if (
+{IIII}charsWidth == width
+{IIII}&& string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
+{III})
+{III}{{
+{IIII}found = true;
+{IIII}break;
+{III}}}
+
+{III}charsOffset += charsWidth;
+{II}}}
+
+{II}if (!found)
+{II}{{
+{III}break;
+{II}}}
+
+{II}offset += width;
+{I}}}
+
+{I}return text.Substring(offset);
+}}"""
+            )
+        )
+
+    members_joined = "\n\n".join(members)
+
     return Stripped(
         f"""\
 /// <summary>
@@ -64,158 +283,7 @@ def _generate_string_helpers() -> Stripped:
 /// </remarks>
 public static class StringHelpers
 {{
-{I}/// <summary>
-{I}/// Check whether a surrogate pair starts at <paramref name="offset" />
-{I}/// in <paramref name="text" />.
-{I}/// </summary>
-{I}private static bool IsSurrogatePairAt(string text, int offset)
-{I}{{
-{II}return (
-{III}offset + 1 < text.Length
-{III}&& char.IsHighSurrogate(text[offset])
-{III}&& char.IsLowSurrogate(text[offset + 1])
-{II});
-{I}}}
-
-{I}/// <summary>
-{I}/// Count the characters of <paramref name="text" /> between the UTF-16
-{I}/// offsets <paramref name="startOffset" /> and <paramref name="endOffset" />.
-{I}/// </summary>
-{I}private static int CountCharacters(
-{II}string text,
-{II}int startOffset,
-{II}int endOffset
-{I})
-{I}{{
-{II}int count = 0;
-{II}int offset = startOffset;
-{II}while (offset < endOffset)
-{II}{{
-{III}offset += IsSurrogatePairAt(text, offset) ? 2 : 1;
-{III}count++;
-{II}}}
-
-{II}return count;
-{I}}}
-
-{I}/// <summary>
-{I}/// Compute the UTF-16 offset of the character at <paramref name="position" />
-{I}/// in <paramref name="text" />.
-{I}/// </summary>
-{I}private static int OffsetOf(string text, int position)
-{I}{{
-{II}int offset = 0;
-{II}for (int i = 0; i < position; i++)
-{II}{{
-{III}offset += IsSurrogatePairAt(text, offset) ? 2 : 1;
-{II}}}
-
-{II}return offset;
-{I}}}
-
-{I}/// <summary>
-{I}/// Resolve <paramref name="position" /> in a string of
-{I}/// <paramref name="length" /> as Python does in slicing.
-{I}/// </summary>
-{I}/// <remarks>
-{I}/// A negative position counts from the end, and the positions out of range
-{I}/// are clamped to the string.
-{I}/// </remarks>
-{I}private static int ResolvePosition(long position, int length)
-{I}{{
-{II}if (position < 0)
-{II}{{
-{III}return (int)System.Math.Max(position + length, 0);
-{II}}}
-
-{II}return (int)System.Math.Min(position, length);
-{I}}}
-
-{I}/// <summary>
-{I}/// Count the characters (code points) of <paramref name="text" />.
-{I}/// </summary>
-{I}/// <remarks>
-{I}/// We follow the Python implementation of <c>len</c>, since Python is
-{I}/// the language of the meta-model specifications. Hence, a character beyond
-{I}/// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
-{I}/// </remarks>
-{I}public static int Len(string text)
-{I}{{
-{II}return CountCharacters(text, 0, text.Length);
-{I}}}
-
-{I}/// <summary>
-{I}/// Slice <paramref name="text" /> from <paramref name="start" /> up to
-{I}/// <paramref name="end" />, exclusive.
-{I}/// </summary>
-{I}/// <remarks>
-{I}/// We follow the Python implementation of slicing, since Python is
-{I}/// the language of the meta-model specifications. Hence, the positions count
-{I}/// the characters (code points), a negative position counts from the end,
-{I}/// the positions out of range are clamped to the string, and the slice is
-{I}/// empty if <paramref name="start" /> is not before <paramref name="end" />.
-{I}/// If <paramref name="end" /> is not given, we slice up to the end of
-{I}/// <paramref name="text" />.
-{I}/// </remarks>
-{I}public static string Slice(string text, long start, long? end = null)
-{I}{{
-{II}int length = Len(text);
-{II}int theStart = ResolvePosition(start, length);
-{II}int theEnd = end is null
-{III}? length
-{III}: ResolvePosition(end.Value, length);
-
-{II}if (theStart >= theEnd)
-{II}{{
-{III}return "";
-{II}}}
-
-{II}int startOffset = OffsetOf(text, theStart);
-{II}int endOffset = OffsetOf(text, theEnd);
-{II}return text.Substring(startOffset, endOffset - startOffset);
-{I}}}
-
-{I}/// <summary>
-{I}/// Find the first <paramref name="sub" /> in <paramref name="text" /> from
-{I}/// <paramref name="start" /> on.
-{I}/// </summary>
-{I}/// <remarks>
-{I}/// We follow the Python implementation of <c>str.find</c>, since Python is
-{I}/// the language of the meta-model specifications. Hence, the positions count
-{I}/// the characters (code points), a negative <paramref name="start" /> counts
-{I}/// from the end, and a <paramref name="start" /> beyond the end of
-{I}/// <paramref name="text" /> gives -1. We compare the strings ordinally.
-{I}/// </remarks>
-{I}/// <returns>
-{I}/// The position of <paramref name="sub" /> in <paramref name="text" />,
-{I}/// or -1 if not found
-{I}/// </returns>
-{I}public static long Find(string text, string sub, long start = 0)
-{I}{{
-{II}int length = Len(text);
-{II}long theStart = start < 0
-{III}? System.Math.Max(start + length, 0)
-{III}: start;
-
-{II}if (theStart > length)
-{II}{{
-{III}return -1;
-{II}}}
-
-{II}int startOffset = OffsetOf(text, (int)theStart);
-{II}int offset = text.IndexOf(
-{III}sub,
-{III}startOffset,
-{III}System.StringComparison.Ordinal
-{II});
-
-{II}if (offset == -1)
-{II}{{
-{III}return -1;
-{II}}}
-
-{II}return theStart + CountCharacters(text, startOffset, offset);
-{I}}}
+{I}{indent_but_first_line(members_joined, I)}
 }}  // public static class StringHelpers"""
     )
 
@@ -271,6 +339,79 @@ public static long FloorMod(long dividend, long divisor)
 )
 
 
+#: Parse a text as a safe integer; this is how we transpile the built-in ``int``.
+#:
+#: We do not use the native ``long.Parse`` as it depends on the culture, and
+#: accepts the numbers beyond the safe integers. The safe integers are the integers
+#: which a double-precision floating-point number represents exactly. We limit
+#: ourselves to them so that all the SDKs behave the same, including TypeScript,
+#: which represents the integers as ``number``.
+PARSE_SAFE_INT = Stripped(
+    f"""\
+/// <summary>
+/// Parse <paramref name="text" /> as a safe integer.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The meta-model calls <c>int</c> on strings, and this is its transpilation.
+/// </para>
+/// <para>
+/// We accept only an optional sign followed by the ASCII digits, and only
+/// the safe integers, <em>i.e.</em>, the integers within <c>-(2^53 - 1)</c>
+/// and <c>2^53 - 1</c>, which a double-precision floating-point number
+/// represents exactly. This way, all the SDKs behave the same.
+/// </para>
+/// </remarks>
+/// <param name="text">to be parsed</param>
+/// <returns>the parsed integer</returns>
+/// <exception cref="System.ArgumentException">
+/// Thrown if <paramref name="text" /> is not a safe integer.
+/// </exception>
+public static long ParseSafeInt(string text)
+{{
+{I}int start = 0;
+{I}bool negative = false;
+{I}if (text.Length > 0 && (text[0] == '+' || text[0] == '-'))
+{I}{{
+{II}negative = text[0] == '-';
+{II}start = 1;
+{I}}}
+
+{I}if (start == text.Length)
+{I}{{
+{II}throw new System.ArgumentException(
+{III}"Expected an optional sign followed by the ASCII digits, " +
+{III}$"but got: {{text}}");
+{I}}}
+
+{I}long value = 0;
+{I}for (int i = start; i < text.Length; i++)
+{I}{{
+{II}char character = text[i];
+{II}if (character < '0' || character > '9')
+{II}{{
+{III}throw new System.ArgumentException(
+{IIII}"Expected an optional sign followed by the ASCII digits, " +
+{IIII}$"but got: {{text}}");
+{II}}}
+
+{II}// NOTE: The value is at most 2^53 - 1 before this step, so it can not
+{II}// overflow a long.
+{II}value = value * 10 + (character - '0');
+
+{II}// NOTE: This is 2^53 - 1.
+{II}if (value > 9007199254740991L)
+{II}{{
+{III}throw new System.ArgumentException(
+{IIII}$"Expected a safe integer, but got a text out of its range: {{text}}");
+{II}}}
+{I}}}
+
+{I}return negative ? -value : value;
+}}"""
+)
+
+
 def generate(
     symbol_table: intermediate.SymbolTable,
     namespace: csharp_common.NamespaceIdentifier,
@@ -285,8 +426,10 @@ def generate(
     """
     blocks = [_TUPLE_HELPERS]  # type: List[Stripped]
 
-    if intermediate.uses_len_slicing_or_find(symbol_table):
-        blocks.append(_generate_string_helpers())
+    if intermediate.uses_len_slicing_or_find(symbol_table) or intermediate.uses_lstrip(
+        symbol_table
+    ):
+        blocks.append(_generate_string_helpers(symbol_table))
 
     # NOTE (mristin):
     # We add the helper only if the meta-model uses the modulo so that we do not
@@ -294,6 +437,12 @@ def generate(
     # rely on it, and so that we can unit-test it.
     if intermediate.uses_modulo(symbol_table):
         blocks.append(FLOOR_MOD)
+
+    # NOTE (mristin):
+    # We add the helper only if the meta-model calls int so that we do not
+    # clutter the code otherwise.
+    if intermediate.uses_int(symbol_table):
+        blocks.append(PARSE_SAFE_INT)
 
     writer = io.StringIO()
     writer.write(csharp_common.WARNING)

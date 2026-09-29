@@ -18,6 +18,8 @@ from aas_core_codegen.golang.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
+    INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -114,6 +116,78 @@ func {golang_transpilation.ABS_INT64_FUNCTION_NAME}(x int64) int64 {{
 )
 
 
+#: Helper to parse a string as a safe integer, which transpiles the built-in ``int``.
+#:
+#: We deliberately do not use ``strconv.ParseInt`` directly, so that the helper
+#: reads the same as in the other SDKs. We accept only an optional sign followed by
+#: the ASCII digits, and only the safe integers, *i.e.*, the integers which
+#: a double-precision floating-point number represents exactly. We limit ourselves
+#: to the safe integers as TypeScript represents the integers as ``number``, and
+#: the invariants must behave the same in all the SDKs.
+#:
+#: The accumulated value never overflows, as we check the bound after each digit,
+#: and ten times the largest safe integer plus nine still fits into ``int64``.
+PARSE_SAFE_INT = Stripped(
+    f"""\
+// {golang_transpilation.PARSE_SAFE_INT_FUNCTION_NAME} parses text as a safe integer.
+//
+// The meta-model calls `int` on strings, and this is its transpilation. We accept
+// only an optional sign followed by the ASCII digits, and only the safe integers,
+// i.e., the integers within -(2^53 - 1) and 2^53 - 1, which a double-precision
+// floating-point number represents exactly. This way, all the SDKs behave the same.
+//
+// Panics if text is not a safe integer. The meta-model is expected to check
+// the text before it calls `int`, so a panic signals a bug in the meta-model.
+func {golang_transpilation.PARSE_SAFE_INT_FUNCTION_NAME}(text string) int64 {{
+{I}digits := text
+{I}negative := false
+{I}if len(digits) > 0 && (digits[0] == '+' || digits[0] == '-') {{
+{II}negative = digits[0] == '-'
+{II}digits = digits[1:]
+{I}}}
+
+{I}if len(digits) == 0 {{
+{II}panic(
+{III}fmt.Sprintf(
+{IIII}"Expected an optional sign followed by the ASCII digits, but got: %q",
+{IIII}text,
+{III}),
+{II})
+{I}}}
+
+{I}var value int64
+{I}for i := 0; i < len(digits); i++ {{
+{II}digit := digits[i]
+{II}if digit < '0' || digit > '9' {{
+{III}panic(
+{IIII}fmt.Sprintf(
+{IIIII}"Expected an optional sign followed by the ASCII digits, but got: %q",
+{IIIII}text,
+{IIII}),
+{III})
+{II}}}
+
+{II}value = value*10 + int64(digit-'0')
+
+{II}// NOTE: This is 2^53 - 1.
+{II}if value > 9007199254740991 {{
+{III}panic(
+{IIII}fmt.Sprintf(
+{IIIII}"Expected a safe integer, but got a text out of its range: %q",
+{IIIII}text,
+{IIII}),
+{III})
+{II}}}
+{I}}}
+
+{I}if negative {{
+{II}return -value
+{I}}}
+{I}return value
+}}"""
+)
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -123,6 +197,20 @@ func {golang_transpilation.ABS_INT64_FUNCTION_NAME}(x int64) int64 {{
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
     """Generate code of common functionality."""
+    # NOTE (mristin):
+    # An unused import does not compile in Go, so we import only what the helpers
+    # below need.
+    import_lines = []  # type: List[str]
+    if intermediate.uses_int(symbol_table):
+        import_lines.append(f'{I}"fmt"')
+
+    import_lines.append(f'{I}"strings"')
+
+    if intermediate.uses_len_slicing_or_find(symbol_table):
+        import_lines.append(f'{I}"unicode/utf8"')
+
+    import_lines_joined = "\n".join(import_lines)
+
     blocks = [
         Stripped(
             """\
@@ -133,13 +221,7 @@ package common"""
         Stripped(
             f"""\
 import (
-{I}"strings"
-{I}"unicode/utf8"
-)"""
-            if intermediate.uses_len_slicing_or_find(symbol_table)
-            else f"""\
-import (
-{I}"strings"
+{import_lines_joined}
 )"""
         ),
         Stripped(
@@ -380,6 +462,9 @@ func FindStr(text string, sub string, start int64) int64 {{
 
     if intermediate.uses_abs(symbol_table):
         blocks.append(ABS_INT64)
+
+    if intermediate.uses_int(symbol_table):
+        blocks.append(PARSE_SAFE_INT)
 
     blocks.append(golang_common.WARNING)
 

@@ -92,6 +92,16 @@ test("verification error stores provided path", () => {{
         if arg_type.a_type != intermediate.PrimitiveType.STR:
             continue
 
+        # NOTE (mristin):
+        # A verification function might also return a value other than a boolean,
+        # and, given an arbitrary text, legitimately throw, *e.g.*, if it parses
+        # an integer which the caller has to check beforehand.
+        if not (
+            isinstance(verification.returns, intermediate.PrimitiveTypeAnnotation)
+            and verification.returns.a_type is intermediate.PrimitiveType.BOOL
+        ):
+            continue
+
         verification_name = typescript_naming.function_name(verification.name)
 
         blocks.append(

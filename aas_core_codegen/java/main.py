@@ -354,6 +354,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them so that
+    # we do not clutter the tests otherwise.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path,
+                lambda: (
+                    java_tests.generate_test_lstrip_and_int(
+                        package=package, symbol_table=context.symbol_table
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

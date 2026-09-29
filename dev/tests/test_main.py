@@ -332,6 +332,12 @@ class Test_cpp(_TestCase):
             case_name="int_length_interplay",
         )
 
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="int_parsing_and_lstrip",
+        )
+
     def test_expected_is_instance(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="is_instance"
@@ -533,6 +539,12 @@ class Test_csharp(_TestCase):
             case_name="int_length_interplay",
         )
 
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="int_parsing_and_lstrip",
+        )
+
     def test_expected_is_instance(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="is_instance"
@@ -715,6 +727,12 @@ class Test_golang(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG,
             case_name="int_length_interplay",
+        )
+
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="int_parsing_and_lstrip",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -908,6 +926,12 @@ class Test_java(_TestCase):
             case_name="int_length_interplay",
         )
 
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="int_parsing_and_lstrip",
+        )
+
     def test_expected_is_instance(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="is_instance"
@@ -1087,6 +1111,12 @@ class Test_jsonschema(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
             case_name="int_length_interplay",
+        )
+
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="int_parsing_and_lstrip",
         )
 
     def test_expected_json_types(self) -> None:
@@ -1284,6 +1314,12 @@ class Test_python(_TestCase):
             case_name="int_length_interplay",
         )
 
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="int_parsing_and_lstrip",
+        )
+
     def test_expected_is_instance(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="is_instance"
@@ -1472,6 +1508,12 @@ class Test_typescript(_TestCase):
             case_name="int_length_interplay",
         )
 
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="int_parsing_and_lstrip",
+        )
+
     def test_expected_is_instance(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="is_instance"
@@ -1655,6 +1697,12 @@ class Test_xsd(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD,
             case_name="int_length_interplay",
+        )
+
+    def test_expected_int_parsing_and_lstrip(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="int_parsing_and_lstrip",
         )
 
     def test_expected_json_types(self) -> None:

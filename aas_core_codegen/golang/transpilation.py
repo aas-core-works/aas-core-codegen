@@ -66,6 +66,13 @@ FLOOR_MOD_FUNCTION_NAME = Identifier("FloorMod")
 #: ``math.Abs`` works only on ``float64``.
 ABS_INT64_FUNCTION_NAME = Identifier("AbsInt64")
 
+#: Name of the helper function in the common package which parses a string
+#: as a safe integer.
+#:
+#: See :py:data:`aas_core_codegen.golang.lib._generate_common.PARSE_SAFE_INT`
+#: on why we do not use ``strconv.ParseInt`` directly.
+PARSE_SAFE_INT_FUNCTION_NAME = Identifier("ParseSafeInt")
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate_type(
@@ -971,6 +978,15 @@ aascommon.MapContains(
                     None,
                 )
 
+            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+                # NOTE (mristin):
+                # The native ``strings.TrimLeft`` strips the characters (runes) as
+                # the Python ``str.lstrip`` does.
+                return (
+                    Stripped(f"strings.TrimLeft({instance}, {args[0]})"),
+                    None,
+                )
+
             return None, Error(
                 node.original_node,
                 f"The handling of the built-in method {member_type.method.name!r} "
@@ -1194,6 +1210,32 @@ aascommon.MapContains(
                     )
 
                 return Stripped(f"{abs_function}({args[0]})"), None
+
+            elif func_type.func.name == "int":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # We parse the strings with our own helper so that all the SDKs
+                # accept the very same texts, see
+                # :py:data:`aas_core_codegen.golang.lib._generate_common.PARSE_SAFE_INT`.
+                if "\n" in args[0]:
+                    return (
+                        Stripped(
+                            f"""\
+aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
+{I}{indent_but_first_line(args[0], I)},
+)"""
+                        ),
+                        None,
+                    )
+
+                return (
+                    Stripped(f"aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}({args[0]})"),
+                    None,
+                )
 
             else:
                 return None, Error(

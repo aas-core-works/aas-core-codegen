@@ -751,7 +751,9 @@ def _read_int_from_element_text(
         Input stream of ``(event, element)`` coming from
         :py:func:`xml.etree.ElementTree.iterparse` with the argument
         ``events=["start", "end"]``
-    :raise: :py:class:`DeserializationException` if unexpected input
+    :raise:
+        :py:class:`DeserializationException` if unexpected input, including
+        a value outside of the 64-bit range of ``xs:long``
     :return: parsed value
     """
     text = collapse_whitespace(
@@ -775,19 +777,27 @@ def _read_int_from_element_text(
             f"but got an element with text: {text!r}"
         )
 
-    try:
-        value = int(text)
-    except ValueError:
-        # pylint: disable=raise-missing-from
+    # NOTE (mristin):
+    # We count the significant digits before we call ``int``. The conversion is
+    # quadratic in the length of the text, and Python refuses a text of more than
+    # 4300 digits, leading zeros included, although ``xs:long`` allows arbitrarily
+    # many leading zeros. The largest magnitude, 2^63, has 19 digits.
+    digits = text.lstrip("+-").lstrip("0")
+    if len(digits) > 19:
         raise DeserializationException(
-            f"Expected an integer, "
-            f"but got an element with text: {text!r}"
+            f"Expected a value as xs:long, "
+            f"but got an element with text out of its range: {text!r}"
         )
+
+    value = int(digits) if len(digits) > 0 else 0
+    if text[0] == "-":
+        value = -value
 
     # NOTE (mristin):
     # An ``int`` is unbounded in Python, while ``xs:long`` is a 64-bit integer,
-    # so the range has to be checked explicitly. Every other target gets this
-    # for free from a parser which refuses what does not fit.
+    # so the range has to be checked explicitly, as a number of 19 digits might
+    # still not fit. Every other target gets this for free from a parser which
+    # refuses what does not fit.
     if value < -9223372036854775808 or value > 9223372036854775807:
         raise DeserializationException(
             f"Expected a value as xs:long, "

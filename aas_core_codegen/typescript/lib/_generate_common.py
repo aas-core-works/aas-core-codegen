@@ -82,6 +82,74 @@ export function floorMod(dividend: number, divisor: number): number {{
 )
 
 
+#: Parse a text as a safe integer; this is how we transpile the built-in ``int``.
+#:
+#: We deliberately do not use the native ``parseInt`` or ``Number``. They accept
+#: much more than the other targets, *e.g.*, the white space, ``1e3`` or ``0x10``,
+#: and silently lose the precision beyond ``Number.MAX_SAFE_INTEGER``.
+PARSE_SAFE_INT = Stripped(
+    f"""\
+/**
+ * Parse `text` as a safe integer.
+ *
+ * @remarks
+ *
+ * The meta-model calls `int` on strings, and this is its transpilation.
+ * We are stricter than the Python `int` so that all the SDKs behave the same.
+ * We accept only an optional sign followed by the ASCII digits, and only
+ * the safe integers, *i.e.*, the integers within `Number.MIN_SAFE_INTEGER` and
+ * `Number.MAX_SAFE_INTEGER`, which a double-precision floating-point number
+ * represents exactly.
+ *
+ * @param text - to be parsed
+ * @returns the parsed integer
+ * @throws {{@link Error}} if `text` is not a safe integer
+ */
+export function parseSafeInt(text: string): number {{
+{I}let start = 0;
+{I}if (text.length > 0 && (text[0] === "+" || text[0] === "-")) {{
+{II}start = 1;
+{I}}}
+
+{I}if (start === text.length) {{
+{II}throw new Error(
+{III}"Expected an optional sign followed by the ASCII digits, " +
+{IIII}`but got: ${{JSON.stringify(text)}}`
+{II});
+{I}}}
+
+{I}let value = 0;
+{I}for (let i = start; i < text.length; i++) {{
+{II}const code = text.charCodeAt(i);
+{II}if (code < 48 || code > 57) {{
+{III}throw new Error(
+{IIII}"Expected an optional sign followed by the ASCII digits, " +
+{IIIII}`but got: ${{JSON.stringify(text)}}`
+{III});
+{II}}}
+
+{II}const digit = code - 48;
+
+{II}// NOTE (mristin):
+{II}// We check the range before we accumulate so that the arithmetic stays
+{II}// exact. The number 900719925474099 is Number.MAX_SAFE_INTEGER divided by 10,
+{II}// and 1 is its last digit.
+{II}if (value > 900719925474099 || (value === 900719925474099 && digit > 1)) {{
+{III}throw new Error(
+{IIII}"Expected a safe integer, but got a text out of its range: " +
+{IIIII}JSON.stringify(text)
+{III});
+{II}}}
+
+{II}value = value * 10 + digit;
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// We do not negate a zero so that we never return a negative zero.
+{I}return text[0] === "-" && value !== 0 ? -value : value;
+}}"""
+)
+
 # fmt: off
 @ensure(
     lambda result:
@@ -740,6 +808,55 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # so that the clients can rely on it, and so that we can unit-test it.
     if intermediate.uses_modulo(symbol_table):
         blocks.insert(len(blocks) - 1, FLOOR_MOD)
+
+    # NOTE (mristin):
+    # Analogous to the modulo, we add the helper only if the meta-model calls
+    # the built-in ``int``.
+    if intermediate.uses_int(symbol_table):
+        blocks.insert(len(blocks) - 1, PARSE_SAFE_INT)
+
+    # NOTE (mristin):
+    # We need a helper which follows the Python implementation of ``str.lstrip``,
+    # as TypeScript has no native equivalent which strips the given characters.
+    # The helper is generated only for a meta-model which calls ``lstrip``.
+    if intermediate.uses_lstrip(symbol_table):
+        blocks.insert(
+            len(blocks) - 1,
+            Stripped(
+                f"""\
+/**
+ * Strip the longest prefix of `text` which consists only of the characters
+ * listed in `chars`.
+ *
+ * @remarks
+ * We follow the Python implementation of `str.lstrip`, since Python is
+ * the language of the meta-model specifications. Hence, we strip
+ * the characters (code points) rather than the UTF-16 code units, so that
+ * a character beyond the Basic Multilingual Plane is never split in half.
+ *
+ * @param text - to be stripped
+ * @param chars - to be stripped from the start of `text`
+ * @returns `text` without the stripped prefix
+ */
+export function lstrip(text: string, chars: string): string {{
+{I}// NOTE (mristin):
+{I}// A string is iterated over its characters (code points), not over its
+{I}// UTF-16 code units.
+{I}const charSet = new Set<string>(chars);
+
+{I}let offset = 0;
+{I}for (const character of text) {{
+{II}if (!charSet.has(character)) {{
+{III}break;
+{II}}}
+
+{II}offset += character.length;
+{I}}}
+
+{I}return text.substring(offset);
+}}"""
+            ),
+        )
 
     writer = io.StringIO()
     for i, block in enumerate(blocks):

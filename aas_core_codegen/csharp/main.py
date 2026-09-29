@@ -363,6 +363,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path / "TestLStripAndInt.cs",
+                lambda: (
+                    csharp_tests.generate_test_lstrip_and_int(
+                        namespace=namespace, symbol_table=context.symbol_table
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

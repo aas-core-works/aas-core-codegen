@@ -362,6 +362,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them so that
+    # the other SDKs, which need helper functions, test the very same cases.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                tests_rel_path / "test_lstrip_and_int.py",
+                lambda: (
+                    python_tests.generate_test_lstrip_and_int(
+                        symbol_table=context.symbol_table,
+                        qualified_module_name=qualified_module_name,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 

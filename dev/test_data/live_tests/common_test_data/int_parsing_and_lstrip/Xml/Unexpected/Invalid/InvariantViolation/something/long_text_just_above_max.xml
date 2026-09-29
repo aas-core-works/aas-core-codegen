@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><number>-0999</number><padded>000123</padded><decimal>+9007199254740991</decimal><longText>9223372036854775808</longText><maybeNumber>-0009007199254740991</maybeNumber></something>

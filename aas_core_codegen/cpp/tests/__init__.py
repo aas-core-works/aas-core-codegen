@@ -11,6 +11,7 @@ from aas_core_codegen.cpp.tests import (
     _generate_test_jsonization_dispatch,
     _generate_test_json_value_verification,
     _generate_test_jsonization_of_concrete_classes,
+    _generate_test_lstrip_and_int,
     _generate_test_revm,
     _generate_test_stringification_base64,
     _generate_test_string_helpers,
@@ -43,6 +44,9 @@ generate_common_xmlization_implementation = (
 
 generate_test_arithmetic_implementation = (
     _generate_test_arithmetic.generate_implementation
+)
+generate_test_lstrip_and_int_implementation = (
+    _generate_test_lstrip_and_int.generate_implementation
 )
 generate_test_assignment_targets_implementation = (
     _generate_test_assignment_targets.generate_implementation

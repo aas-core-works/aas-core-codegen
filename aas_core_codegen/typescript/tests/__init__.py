@@ -29,6 +29,7 @@ from aas_core_codegen.typescript.tests import (
     _generate_types_x_or_default_spec,
     _generate_verification_arithmetic_spec,
     _generate_verification_json_value_spec,
+    _generate_verification_lstrip_and_int_spec,
     _generate_verification_spec,
     _generate_xml_rpc_spec,
 )
@@ -70,5 +71,9 @@ generate_verification_spec = _generate_verification_spec.generate
 generate_verification_arithmetic_spec = _generate_verification_arithmetic_spec.generate
 
 generate_verification_json_value_spec = _generate_verification_json_value_spec.generate
+
+generate_verification_lstrip_and_int_spec = (
+    _generate_verification_lstrip_and_int_spec.generate
+)
 
 generate_xml_rpc_spec = _generate_xml_rpc_spec.generate

@@ -12,6 +12,7 @@ from aas_core_codegen.csharp.tests import (
     _generate_test_jsonization_of_concrete_classes,
     _generate_test_jsonization_of_enums,
     _generate_test_jsonization_of_interfaces,
+    _generate_test_lstrip_and_int,
     _generate_test_over_x_or_empty,
     _generate_test_string_helpers,
     _generate_test_verification_of_enums,
@@ -39,6 +40,7 @@ generate_test_jsonization_of_enums = _generate_test_jsonization_of_enums.generat
 generate_test_jsonization_of_interfaces = (
     _generate_test_jsonization_of_interfaces.generate
 )
+generate_test_lstrip_and_int = _generate_test_lstrip_and_int.generate
 generate_test_over_x_or_empty = _generate_test_over_x_or_empty.generate
 generate_test_string_helpers = _generate_test_string_helpers.generate
 generate_test_verification_of_enums = _generate_test_verification_of_enums.generate

@@ -4478,7 +4478,7 @@ class _ContractChecker(parse_tree.Visitor):
 
         if verification_function is not None:
             expected_argument_count = len(verification_function.arguments)
-        elif node.name.identifier in ("len", "abs"):
+        elif node.name.identifier in ("len", "abs", "int"):
             expected_argument_count = 1
         else:
             self.errors.append(

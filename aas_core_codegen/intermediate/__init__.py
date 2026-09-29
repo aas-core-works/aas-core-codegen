@@ -85,6 +85,8 @@ uses_json_types = _types.uses_json_types
 uses_len_slicing_or_find = _types.uses_len_slicing_or_find
 uses_modulo = _types.uses_modulo
 uses_abs = _types.uses_abs
+uses_lstrip = _types.uses_lstrip
+uses_int = _types.uses_int
 
 NumericPlace = _types.NumericPlace
 numeric_places = _types.numeric_places

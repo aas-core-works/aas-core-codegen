@@ -743,6 +743,17 @@ AasCommon.at(
                     None,
                 )
 
+            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+                # NOTE (mristin):
+                # TypeScript has no native equivalent of the Python ``str.lstrip``
+                # with the given characters. See ``lstrip`` in the generated
+                # common module, which strips the characters (code points) instead
+                # of the UTF-16 code units.
+                return (
+                    Stripped(f"AasCommon.lstrip({instance}, {args[0]})"),
+                    None,
+                )
+
             return None, Error(
                 node.original_node,
                 f"The handling of the built-in method {member_type.method.name!r} "
@@ -954,6 +965,29 @@ AasCommon.at(
                 assert arg is not None
 
                 return Stripped(f"Math.abs({arg})"), None
+
+            elif func_type.func.name == "int":
+                assert len(node.args) == 1, (
+                    f"Expected exactly one argument, but got: {node.args}; "
+                    f"this should have been caught before."
+                )
+
+                arg, error = self.transform(node.args[0])
+                if error is not None:
+                    return None, Error(
+                        node.original_node,
+                        "Failed to transpile the argument of int",
+                        [error],
+                    )
+
+                assert arg is not None
+
+                # NOTE (mristin):
+                # We do not use the native ``parseInt`` or ``Number`` as they accept
+                # much more than the other targets, *e.g.*, the white space, ``1e3``
+                # or ``0x10``, and silently lose the precision beyond the safe
+                # integers. See ``parseSafeInt`` in the generated common module.
+                return Stripped(f"AasCommon.parseSafeInt({arg})"), None
 
             else:
                 return None, Error(

@@ -666,13 +666,32 @@ class Transpiler(
 
         assert instance is not None
 
+        member_type = self.type_map[node.member]
+
+        if (
+            isinstance(
+                member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+            )
+            and member_type.method is intermediate_type_inference.STR_LSTRIP
+        ):
+            # NOTE (mristin):
+            # We do not use the native ``TrimStart`` as it strips the UTF-16 code
+            # units instead of the characters, unlike Python. See
+            # ``StringHelpers.LStrip`` in the generated common class.
+            return (
+                Stripped(
+                    f"{csharp_common.COMMON_CLASS}.StringHelpers.LStrip"
+                    f"({instance}, {args[0]})"
+                ),
+                None,
+            )
+
         if not isinstance(
             node.member.instance,
             (parse_tree.Name, parse_tree.Member, parse_tree.Slice),
         ):
             instance = Stripped(f"({instance})")
 
-        member_type = self.type_map[node.member]
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
@@ -910,6 +929,21 @@ class Transpiler(
                     arg = Stripped(f"{arg}.Value")
 
                 return Stripped(f"System.Math.Abs({arg})"), None
+
+            elif func_type.func.name == "int":
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                # NOTE (mristin):
+                # We do not use the native ``long.Parse`` as it depends on
+                # the culture, and accepts the numbers beyond the safe integers.
+                # See ``ParseSafeInt`` in the generated common class.
+                return (
+                    Stripped(f"{csharp_common.COMMON_CLASS}.ParseSafeInt({args[0]})"),
+                    None,
+                )
 
             else:
                 return None, Error(

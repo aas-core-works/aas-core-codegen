@@ -269,9 +269,27 @@ STR_FIND = BuiltinMethod(
 )
 
 
+#: Represent ``str.lstrip(chars)``.
+#:
+#: The result is the string without the longest prefix of the characters listed
+#: in ``chars``.
+#:
+#: The transpiled code follows the Python implementation of ``str.lstrip``, and
+#: strips the characters (code points). We do not support ``lstrip`` without
+#: an argument, since what counts as a white space differs among the target
+#: languages.
+STR_LSTRIP = BuiltinMethod(
+    name=Identifier("lstrip"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.STR),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
 #: Map the names of the built-in methods on strings to their definitions
 STR_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
     STR_FIND.name: STR_FIND,
+    STR_LSTRIP.name: STR_LSTRIP,
 }
 
 
@@ -2727,6 +2745,18 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             if not success:
                 return None
+
+        elif method is STR_LSTRIP:
+            if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the stripped characters of ``lstrip`` to be "
+                        f"a string, but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
         else:
             raise AssertionError(f"Unexpected built-in method: {method.name!r}")
 
@@ -3076,6 +3106,29 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # NOTE (mristin):
             # The type of the result depends on the argument.
             result = PrimitiveTypeAnnotation(a_type=a_type)
+
+        if (
+            isinstance(func_type, BuiltinFunctionTypeAnnotation)
+            and func_type.func.name == "int"
+            and len(arg_types) == 1
+        ):
+            arg_type = arg_types[0]
+            assert arg_type is not None
+
+            # NOTE (mristin):
+            # We parse only strings. The conversions of the other types, such as
+            # truncating a floating-point number, differ among the target languages,
+            # and we have no use case for them at the moment.
+            if try_primitive_type(arg_type) is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the argument of ``int`` to be a non-None string, "
+                        f"since we support only parsing the integers from "
+                        f"the strings, but got: {arg_type}",
+                    )
+                )
+                return None
 
         assert result is not None
 
@@ -4418,6 +4471,20 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         # at the call site.
         Identifier("abs"): BuiltinFunctionTypeAnnotation(
             func=BuiltinFunction(name=Identifier("abs"), returns=None)
+        ),
+        # NOTE (mristin):
+        # We support ``int`` only to parse a string. The transpiled code is
+        # stricter than Python: it accepts only an optional sign followed by
+        # the ASCII digits, and only the safe integers, *i.e.*, the integers
+        # which a double-precision floating-point number represents exactly.
+        # Otherwise, it throws. We limit ourselves to the safe integers as
+        # TypeScript represents the integers as ``number``. The meta-model has
+        # to check the text before it calls ``int``.
+        Identifier("int"): BuiltinFunctionTypeAnnotation(
+            func=BuiltinFunction(
+                name=Identifier("int"),
+                returns=PrimitiveTypeAnnotation(PrimitiveType.INT),
+            )
         ),
     }
 

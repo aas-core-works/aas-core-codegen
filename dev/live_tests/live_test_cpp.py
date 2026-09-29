@@ -59,6 +59,7 @@ def _generate_cmake_lists(
     uses_variant: bool,
     uses_string_helpers: bool,
     uses_arithmetic: bool,
+    uses_lstrip_and_int: bool,
     uses_assignment_targets: bool,
 ) -> Stripped:
     project_name = _cmake_project_name(namespace)
@@ -122,6 +123,20 @@ def _generate_cmake_lists(
     )
 """
         if uses_arithmetic
+        else ""
+    )
+
+    test_lstrip_and_int_block = (
+        f"""\
+
+    add_executable(test_lstrip_and_int test/test_lstrip_and_int.cpp)
+    target_link_libraries(test_lstrip_and_int {target_prefix}_static)
+    add_test(
+            NAME test_lstrip_and_int
+            COMMAND $<TARGET_FILE:test_lstrip_and_int>
+    )
+"""
+        if uses_lstrip_and_int
         else ""
     )
 
@@ -533,7 +548,7 @@ if (${{BUILD_TESTS}})
             COMMAND $<TARGET_FILE:test_x_or_default>
     )
     # endregion
-{test_xml_rpc_block}{test_string_helpers_block}{test_arithmetic_block}\
+{test_xml_rpc_block}{test_string_helpers_block}{test_arithmetic_block}{test_lstrip_and_int_block}\
 {test_assignment_targets_block}endif ()"""
     )
 
@@ -647,6 +662,12 @@ def prepare_project(
         case_dir / "expected_output" / "test" / "test_arithmetic.cpp"
     ).exists()
 
+    # Likewise, the unit test of ``str.lstrip`` and ``int`` is only generated if
+    # the meta-model uses them.
+    uses_lstrip_and_int = (
+        case_dir / "expected_output" / "test" / "test_lstrip_and_int.cpp"
+    ).exists()
+
     # Likewise, the unit test of the assignments to the properties and the list
     # items is only generated for the meta-model which defines the corresponding
     # verification functions.
@@ -665,6 +686,7 @@ def prepare_project(
         uses_variant=uses_variant,
         uses_string_helpers=uses_string_helpers,
         uses_arithmetic=uses_arithmetic,
+        uses_lstrip_and_int=uses_lstrip_and_int,
         uses_assignment_targets=uses_assignment_targets,
     )
     (project_dir / "CMakeLists.txt").write_text(cmake_lists_text, encoding="utf-8")

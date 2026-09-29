@@ -415,6 +415,24 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ]
 
+    # NOTE (mristin):
+    # We test ``lstrip`` and ``int`` only if the meta-model uses them, as we
+    # generate the helper functions only in that case.
+    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+        context.symbol_table
+    ):
+        rel_paths_generators = list(rel_paths_generators) + [
+            (
+                test_rel_path / "verification.lstripAndInt.spec.ts",
+                lambda: (
+                    typescript_tests.generate_verification_lstrip_and_int_spec(
+                        symbol_table=verified_ir_table,
+                    ),
+                    None,
+                ),
+            ),
+        ]
+
     for rel_path, generator_func in rel_paths_generators:
         assert not rel_path.is_absolute()
 
