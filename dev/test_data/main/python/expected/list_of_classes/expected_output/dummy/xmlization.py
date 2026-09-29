@@ -1851,8 +1851,14 @@ def _read_something_as_sequence(
         _READERS_FOR_SOMETHING
     )
 
+    the_item: Optional[aas_types.Simple] = values.get('item')
     the_some_items: Optional[List[aas_types.AbstractItem]] = values.get('someItems')
     the_some_simples: Optional[List[aas_types.Simple]] = values.get('someSimples')
+
+    if the_item is None:
+        raise DeserializationException(
+            "The required property 'item' is missing"
+        )
 
     if the_some_items is None:
         raise DeserializationException(
@@ -1865,6 +1871,7 @@ def _read_something_as_sequence(
         )
 
     return aas_types.Something(
+        the_item,
         the_some_items,
         the_some_simples
     )
@@ -1989,6 +1996,7 @@ _READERS_FOR_SOMETHING: Mapping[
     str,
     _ContentReader[Any]
 ] = {
+    'item': _read_simple_as_sequence,
     'someItems': _read_list_of__abstract_item,
     'someSimples': _read_list_of__simple,
 }
@@ -2281,6 +2289,7 @@ def _write_something_as_element(
     """
     try:
         serializer.writer.write_start_element(name)
+        _write_simple_as_element('item', 'item', that.item, serializer)
         _write_list_of_instances('someItems', 'some_items', that.some_items, serializer)
         _write_list_of_instances(
             'someSimples', 'some_simples', that.some_simples, serializer

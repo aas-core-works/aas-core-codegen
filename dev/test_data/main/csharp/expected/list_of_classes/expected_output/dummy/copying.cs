@@ -72,7 +72,7 @@ namespace dummy
                 Aas.ISomething that
             )
             {
-                return new Aas.Something(that.SomeItems, that.SomeSimples);
+                return new Aas.Something(that.Item, that.SomeItems, that.SomeSimples);
             }
         }  // internal class ShallowCopier
 
@@ -124,6 +124,7 @@ namespace dummy
                 }
 
                 return new Aas.Something(
+                    Deep(that.Item),
                     theSomeItems,
                     theSomeSimples
                 );

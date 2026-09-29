@@ -284,6 +284,8 @@ namespace dummy
 
     public interface ISomething : IClass
     {
+        public ISimple Item { get; set; }
+
         public List<IAbstractItem> SomeItems { get; set; }
 
         public List<ISimple> SomeSimples { get; set; }
@@ -291,6 +293,8 @@ namespace dummy
 
     public class Something : ISomething
     {
+        public ISimple Item { get; set; }
+
         public List<IAbstractItem> SomeItems { get; set; }
 
         public List<ISimple> SomeSimples { get; set; }
@@ -301,6 +305,8 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
+            yield return Item;
+
             foreach (var anItem in SomeItems)
             {
                 yield return anItem;
@@ -317,6 +323,14 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
+            yield return Item;
+
+            // Recurse
+            foreach (var anItem in Item.Descend())
+            {
+                yield return anItem;
+            }
+
             foreach (var anItem in SomeItems)
             {
                 yield return anItem;
@@ -381,9 +395,11 @@ namespace dummy
         }
 
         public Something(
+            ISimple item,
             List<IAbstractItem> someItems,
             List<ISimple> someSimples)
         {
+            Item = item;
             SomeItems = someItems;
             SomeSimples = someSimples;
         }

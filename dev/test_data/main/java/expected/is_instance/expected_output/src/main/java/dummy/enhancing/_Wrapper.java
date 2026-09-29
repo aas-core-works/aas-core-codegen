@@ -57,15 +57,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<IElement> children = that.getChildren();
     List<IElement> transformedChildren = children.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IElement)) {
+      .map(childrenItem -> {
+        IClass transformedChildrenItem =
+          transform(childrenItem);
+        if (!(transformedChildrenItem instanceof IElement)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IElement " +
-            ", but got: " + transformed
+            ", but got: " + transformedChildrenItem
           );
         }
-        return (IElement) transformed;
+        return (IElement) transformedChildrenItem;
       }).collect(Collectors.toList());
     that.setChildren(transformedChildren);
 
@@ -91,15 +92,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<IElement> children = that.getChildren();
     List<IElement> transformedChildren = children.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IElement)) {
+      .map(childrenItem -> {
+        IClass transformedChildrenItem =
+          transform(childrenItem);
+        if (!(transformedChildrenItem instanceof IElement)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IElement " +
-            ", but got: " + transformed
+            ", but got: " + transformedChildrenItem
           );
         }
-        return (IElement) transformed;
+        return (IElement) transformedChildrenItem;
       }).collect(Collectors.toList());
     that.setChildren(transformedChildren);
 

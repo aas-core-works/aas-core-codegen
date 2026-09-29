@@ -1,4 +1,7 @@
 {
+  "item": {
+    "name": "ITEM-001"
+  },
   "someItems": [],
   "someSimples": []
 }

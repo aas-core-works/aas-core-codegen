@@ -720,6 +720,7 @@ enum class OfSimple : std::uint32_t {
 };  // enum class OfSimple
 
 enum class OfSomething : std::uint32_t {
+  kItem,
   kSomeItems,
   kSomeSimples
 };  // enum class OfSomething
@@ -766,6 +767,10 @@ const std::unordered_map<
   std::string,
   OfSomething
 > kMapOfSomething = {
+  {
+    "item",
+    OfSomething::kItem
+  },
   {
     "someItems",
     OfSomething::kSomeItems
@@ -1573,6 +1578,8 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
+  common::optional<std::shared_ptr<types::ISimple> > the_item;
+
   common::optional<
     std::vector<
       std::shared_ptr<types::IAbstractItem>
@@ -1595,6 +1602,14 @@ std::pair<
         const nlohmann::json& value
       ) -> common::optional<DeserializationError> {
         switch (property) {
+          case properties::OfSomething::kItem:
+            return ParseInto(
+              the_item,
+              DeserializeSimple(
+                value,
+                additional_properties
+              )
+            );
           case properties::OfSomething::kSomeItems:
             return ParseInto(
               the_some_items,
@@ -1635,6 +1650,14 @@ std::pair<
     );
   }
 
+  if (!the_item.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::ISomething>
+    >(
+      L"The required property item is missing"
+    );
+  }
+
   if (!the_some_items.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<types::ISomething>
@@ -1659,6 +1682,7 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::Something(
+        std::move(*the_item),
         std::move(*the_some_items),
         std::move(*the_some_simples)
       )
@@ -2426,6 +2450,10 @@ std::pair<
   nlohmann::json result = nlohmann::json::object();
 
   common::optional<SerializationError> error;
+
+  result["item"] = SerializeSimple(
+    *(that.item())
+  );
 
   error = SerializeInto(
     result,

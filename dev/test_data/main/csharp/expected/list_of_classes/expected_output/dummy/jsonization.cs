@@ -620,6 +620,7 @@ namespace dummy
                     return default!;
                 }
 
+                ISimple? theItem = null;
                 List<IAbstractItem>? theSomeItems = null;
                 List<ISimple>? theSomeSimples = null;
 
@@ -627,6 +628,10 @@ namespace dummy
                 {
                     switch (keyValue.Key)
                     {
+                        case "item":
+                            theItem = SimpleFrom(
+                                keyValue.Value, out error);
+                            break;
                         case "someItems":
                             theSomeItems = Parse_ListOf_IAbstractItem(
                                 keyValue.Value, out error);
@@ -650,6 +655,13 @@ namespace dummy
                     }
                 }
 
+                if (theItem == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"item\" is missing");
+                    return default!;
+                }
+
                 if (theSomeItems == null)
                 {
                     error = new Reporting.Error(
@@ -665,6 +677,9 @@ namespace dummy
                 }
 
                 return new Aas.Something(
+                    theItem
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
                     theSomeItems
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1007,6 +1022,8 @@ namespace dummy
 
             private static readonly Serializer<long> Serialize_long = ToJsonValue;
 
+            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
             /// <paramref name="result" /> to <paramref name="that" />, serialized by
@@ -1085,6 +1102,8 @@ namespace dummy
             )
             {
                 var result = new Nodes.JsonObject();
+
+                SetProperty(result, "item", "Item", that.Item, Serialize_IClass);
 
                 SetProperty(
                     result,

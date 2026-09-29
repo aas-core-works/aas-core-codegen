@@ -91,6 +91,9 @@
     "Something": {
       "type": "object",
       "properties": {
+        "item": {
+          "$ref": "#/definitions/Simple"
+        },
         "someItems": {
           "type": "array",
           "items": {
@@ -105,6 +108,7 @@
         }
       },
       "required": [
+        "item",
         "someItems",
         "someSimples"
       ]

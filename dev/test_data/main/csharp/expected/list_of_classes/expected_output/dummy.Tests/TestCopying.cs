@@ -79,7 +79,10 @@ namespace dummy.Tests
                 }
 
                 return (
-                    that.SomeItems.Count == casted.SomeItems.Count
+                    Transform(
+                        that.Item,
+                        casted.Item)
+                    && that.SomeItems.Count == casted.SomeItems.Count
                     && (
                         that.SomeItems
                             .Zip(
@@ -124,7 +127,8 @@ namespace dummy.Tests
             Aas.Something other)
         {
             return (
-                that.SomeItems == other.SomeItems
+                that.Item == other.Item
+                && that.SomeItems == other.SomeItems
                 && that.SomeSimples == other.SomeSimples);
         }
 

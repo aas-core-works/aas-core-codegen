@@ -280,6 +280,20 @@ class EnhancedSomething
     return types::ModelType::kSomething;
   }
 
+  const std::shared_ptr<types::ISimple>& item() const override {
+    return instance_->item();
+  }
+
+  std::shared_ptr<types::ISimple>& mutable_item() override {
+    return instance_->mutable_item();
+  }
+
+  void set_item(
+    std::shared_ptr<types::ISimple> value
+  ) override {
+    instance_->set_item(value);
+  }
+
   const std::vector<
     std::shared_ptr<types::IAbstractItem>
   >& some_items() const override {
@@ -478,6 +492,13 @@ std::shared_ptr<types::ISomething> WrapSomething(
 ) {
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
+
+  that->set_item(
+    Wrap<E>(
+      that->item(),
+      factory
+    )
+  );
 
   {
     const std::vector<

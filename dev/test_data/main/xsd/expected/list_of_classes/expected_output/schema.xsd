@@ -28,6 +28,7 @@
   </xs:group>
   <xs:group name="something">
     <xs:sequence>
+      <xs:element name="item" type="simple_t"/>
       <xs:element name="someItems">
         <xs:complexType>
           <xs:sequence>

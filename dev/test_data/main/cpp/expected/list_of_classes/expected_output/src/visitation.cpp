@@ -91,6 +91,11 @@ void PassThroughVisitor::VisitSimple(
 void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
+  // mutable_item
+  Visit(
+    that->mutable_item()
+  );
+
   // mutable_some_items
   for (
     const std::shared_ptr<types::IAbstractItem>& item :

@@ -299,6 +299,8 @@ class Simple(Class):
 class Something(Class):
     # pylint: disable=missing-class-docstring
 
+    item: 'Simple'
+
     some_items: List['AbstractItem']
 
     some_simples: List['Simple']
@@ -311,6 +313,8 @@ class Something(Class):
 
         :yield: instances directly referenced from this instance
         """
+        yield self.item
+
         yield from self.some_items
 
         yield from self.some_simples
@@ -321,6 +325,10 @@ class Something(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        yield self.item
+
+        yield from self.item.descend()
+
         for an_item in self.some_items:
             yield an_item
 
@@ -363,10 +371,12 @@ class Something(Class):
 
     def __init__(
             self,
+            item: 'Simple',
             some_items: List['AbstractItem'],
             some_simples: List['Simple']
     ) -> None:
         """Initialize with the given values."""
+        self.item = item
         self.some_items = some_items
         self.some_simples = some_simples
 

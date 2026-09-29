@@ -261,6 +261,16 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
+          name='item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Simple',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          json_name='item',
+          xml_name='item',
+          parsed=...),
+        Property(
           name='some_items',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -288,6 +298,14 @@ SymbolTable(
       constructor=Constructor(
         name='__init__',
         arguments=[
+          Argument(
+            name='item',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Simple',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
           Argument(
             name='some_items',
             type_annotation=ListTypeAnnotation(
@@ -319,6 +337,11 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             AssignArgument(
+              name='item',
+              argument='item',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
               name='some_items',
               argument='some_items',
               default=None)"""),
@@ -328,6 +351,11 @@ SymbolTable(
               argument='some_simples',
               default=None)""")],
         inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='item',
+              argument='item',
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='some_items',

@@ -78,6 +78,14 @@ namespace dummy
                 Aas.ISomething that
             )
             {
+                foreach (var error in Verification.Verify(that.Item))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "item"));
+                    yield return error;
+                }
+
                 int indexSomeItems = 0;
                 foreach (var item in that.SomeItems)
                 {

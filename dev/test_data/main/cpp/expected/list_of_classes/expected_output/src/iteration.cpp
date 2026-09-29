@@ -20,6 +20,8 @@ std::wstring PropertyToWstring(
   Property property
 ) {
   switch (property) {
+    case Property::kItem:
+      return L"item";
     case Property::kName:
       return L"name";
     case Property::kSerialNumber:
@@ -679,6 +681,10 @@ std::unique_ptr<impl::IIterator> Over_Something(
   bool recursive
 ) {
   return Chain(
+    InProperty(
+      Property::kItem,
+      OneThenOver(that.item(), recursive)
+    ),
     InProperty(
       Property::kSomeItems,
       Over_listOf_AbstractItem(that.some_items(), recursive)

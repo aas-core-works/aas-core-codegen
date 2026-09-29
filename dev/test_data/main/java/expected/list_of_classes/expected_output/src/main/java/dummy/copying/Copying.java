@@ -76,7 +76,10 @@ public class Copying
         public IClass transformSomething(
             ISomething that
         ) {
-            return new Something(that.getSomeItems(), that.getSomeSimples());
+            return new Something(
+                that.getItem(),
+                that.getSomeItems(),
+                that.getSomeSimples());
         }
     }
 
@@ -126,6 +129,7 @@ public class Copying
             }
 
             return new Something(
+                deep(that.getItem()),
                 theSomeItems,
                 theSomeSimples
             );

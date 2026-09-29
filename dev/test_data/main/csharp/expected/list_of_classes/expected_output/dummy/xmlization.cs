@@ -398,6 +398,9 @@ namespace dummy
             private static readonly ContentReader<long> Read_long = (
                 AsText<long>(ReadContentAsLong));
 
+            private static readonly ContentReader<ISimple> Read_ISimple = (
+                SimpleFromSequence);
+
             private static readonly ContentReader<List<IAbstractItem>> Read_ListOf_IAbstractItem = (
                 AsList<IAbstractItem>(
                     IAbstractItemFromElement));
@@ -739,6 +742,7 @@ namespace dummy
             {
                 error = null;
 
+                ISimple? theItem = null;
                 List<IAbstractItem>? theSomeItems = null;
                 List<ISimple>? theSomeSimples = null;
 
@@ -761,6 +765,15 @@ namespace dummy
                     {
                         switch (elementName)
                         {
+                            case "item":
+                                if (theItem != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theItem = Read_ISimple(
+                                    reader, isEmptyProperty, out error);
+                                break;
                             case "someItems":
                                 if (theSomeItems != null)
                                 {
@@ -816,6 +829,14 @@ namespace dummy
                     }
                 }
 
+                if (theItem == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Item has not been given " +
+                        "in the XML representation of an instance of class Something");
+                    return default!;
+                }
+
                 if (theSomeItems == null)
                 {
                     error = new Reporting.Error(
@@ -833,6 +854,9 @@ namespace dummy
                 }
 
                 return new Aas.Something(
+                    theItem
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
                     theSomeItems
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1195,6 +1219,9 @@ namespace dummy
             private static readonly ContentWriter<long> Write_long = (
                 (that, writer) => writer.WriteValue(that));
 
+            private static readonly ContentWriter<ISimple> Write_ISimple = (
+                SimpleToSequence);
+
             private static readonly ContentWriter<
                 List<IAbstractItem>
             > Write_ListOf_IAbstractItem = (
@@ -1272,6 +1299,9 @@ namespace dummy
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
             {
+                WriteProperty(
+                    "item", "Item", that.Item, writer, Write_ISimple);
+
                 WriteProperty(
                     "someItems", "SomeItems", that.SomeItems, writer, Write_ListOf_IAbstractItem);
 

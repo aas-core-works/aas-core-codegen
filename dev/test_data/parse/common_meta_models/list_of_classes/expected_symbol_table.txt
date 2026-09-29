@@ -160,6 +160,15 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[
         Property(
+          name='item',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Simple',
+            node=...),
+          description=None,
+          json_name=None,
+          xml_name=None,
+          node=...),
+        Property(
           name='some_items',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='List',
@@ -194,6 +203,13 @@ UnverifiedSymbolTable(
             Argument(
               name='self',
               type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...),
+            Argument(
+              name='item',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Simple',
+                node=...),
               default=None,
               node=...),
             Argument(

@@ -107,6 +107,15 @@ class _Transformer(
             self,
             that: aas_types.Something
     ) -> Iterator[Error]:
+        for error in self.transform(that.item):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'item'
+                )
+            )
+            yield error
+
         for i, an_item in enumerate(that.some_items):
             for error in self.transform(an_item):
                 error.path._prepend(

@@ -57,15 +57,16 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     List<IItem> items = that.getItems();
     List<IItem> transformedItems = items.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof IItem)) {
+      .map(itemsItem -> {
+        IClass transformedItemsItem =
+          transform(itemsItem);
+        if (!(transformedItemsItem instanceof IItem)) {
           throw new UnsupportedOperationException(
             "Expected the transformed value to be a IItem " +
-            ", but got: " + transformed
+            ", but got: " + transformedItemsItem
           );
         }
-        return (IItem) transformed;
+        return (IItem) transformedItemsItem;
       }).collect(Collectors.toList());
     that.setItems(transformedItems);
 

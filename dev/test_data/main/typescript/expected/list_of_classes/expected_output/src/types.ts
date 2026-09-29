@@ -385,6 +385,8 @@ export class Something extends Class {
     return <ModelType>3;  // Something
   }
 
+  item: Simple;
+
   someItems: Array<IAbstractItem>;
 
   someSimples: Array<Simple>;
@@ -397,6 +399,8 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
+    yield this.item;
+
     yield * this.someItems;
 
     yield * this.someSimples;
@@ -408,6 +412,10 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
+    yield this.item;
+
+    yield * this.item.descend();
+
     for (const anItem of this.someItems) {
       yield anItem;
 
@@ -474,10 +482,12 @@ export class Something extends Class {
   }
 
   constructor(
+    item: Simple,
     someItems: Array<IAbstractItem>,
     someSimples: Array<Simple>
   ) {
     super();
+    this.item = item;
     this.someItems = someItems;
     this.someSimples = someSimples;
   }

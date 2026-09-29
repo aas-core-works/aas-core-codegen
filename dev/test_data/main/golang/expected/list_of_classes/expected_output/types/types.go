@@ -317,6 +317,12 @@ func NewSimple(
 type ISomething interface {
 	IClass
 
+	Item() ISimple;
+
+	SetItem(
+		value ISimple,
+	);
+
 	SomeItems() []IAbstractItem;
 
 	SetSomeItems(
@@ -344,8 +350,20 @@ func IsSomething(
 
 // Implements ISomething.
 type Something struct {
+	item ISimple
 	someItems []IAbstractItem
 	someSimples []ISimple
+}
+
+func (s *Something) Item(
+) ISimple {
+	return s.item
+}
+
+func (s *Something) SetItem(
+	value ISimple,
+) {
+	s.item = value
 }
 
 func (s *Something) SomeItems(
@@ -386,6 +404,13 @@ func (s *Something) ModelType(
 func (s *Something) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
+	abort = action(
+		s.item,
+	)
+	if abort {
+		return
+	}
+
 	for _, v := range s.someItems {
 		abort = action(v);
 		if abort {
@@ -412,6 +437,19 @@ func (s *Something) DescendOnce(
 func (s *Something) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	abort = action(
+		s.item,
+	)
+	if abort {
+		return
+	}
+	abort = s.item.Descend(
+		action,
+	)
+	if abort {
+		return
+	}
+
 	for _, v := range s.someItems {
 		abort = action(v);
 		if abort {
@@ -446,10 +484,12 @@ func (s *Something) Descend(
 // Create a new instance of Something with
 // the given properties.
 func NewSomething(
+	item ISimple,
 	someItems []IAbstractItem,
 	someSimples []ISimple,
 ) *Something {
 	return &Something{
+		item: item,
 		someItems: someItems,
 		someSimples: someSimples,
 	}
