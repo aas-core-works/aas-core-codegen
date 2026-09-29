@@ -182,6 +182,303 @@ public class TestJsonizationOfConcreteClasses {
   } // public void testItemVerificationFail
 
   @Test
+  public void testChildAOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildA");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final ChildA instance = Jsonization.Deserialize.deserializeChildA(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testChildAOk
+
+  @Test
+  public void testChildADeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final ChildA unused = Jsonization.Deserialize.deserializeChildA(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testChildADeserializationFromNonObjectFail
+
+  @Test
+  public void testChildADeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("ChildA");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildA for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final ChildA var = Jsonization.Deserialize.deserializeChildA(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testChildADeserializationFail
+
+  @Test
+  public void testChildAVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("ChildA");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildA for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final ChildA instance = Jsonization.Deserialize.deserializeChildA(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testChildAVerificationFail
+
+  @Test
+  public void testChildBOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildB");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final ChildB instance = Jsonization.Deserialize.deserializeChildB(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testChildBOk
+
+  @Test
+  public void testChildBDeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final ChildB unused = Jsonization.Deserialize.deserializeChildB(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testChildBDeserializationFromNonObjectFail
+
+  @Test
+  public void testChildBDeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("ChildB");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildB for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final ChildB var = Jsonization.Deserialize.deserializeChildB(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testChildBDeserializationFail
+
+  @Test
+  public void testChildBVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("ChildB");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildB for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final ChildB instance = Jsonization.Deserialize.deserializeChildB(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testChildBVerificationFail
+
+  @Test
+  public void testContainerOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Container");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final Container instance = Jsonization.Deserialize.deserializeContainer(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testContainerOk
+
+  @Test
+  public void testContainerDeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final Container unused = Jsonization.Deserialize.deserializeContainer(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testContainerDeserializationFromNonObjectFail
+
+  @Test
+  public void testContainerDeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("Container");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Container for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final Container var = Jsonization.Deserialize.deserializeContainer(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testContainerDeserializationFail
+
+  @Test
+  public void testContainerVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("Container");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Container for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final Container instance = Jsonization.Deserialize.deserializeContainer(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testContainerVerificationFail
+
+  @Test
   public void testSomethingOk() throws IOException {
     final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -296,6 +593,52 @@ public class TestJsonizationOfConcreteClasses {
 
     return CommonJson.readFromFile(paths.get(0));
   }
+
+  @Test
+  public void testChildAAOnlySerializationOutofrange() throws IOException {
+    for (long value : new long[] {9007199254740992L, -9007199254740992L}) {
+      final ChildA instance =
+        Jsonization.Deserialize.deserializeChildA(
+          loadTheFirstExpected("ChildA"));
+
+      instance.setAOnly(value);
+
+      try {
+        Jsonization.Serialize.toJsonObject(instance);
+        fail(
+          "Expected the serialization to fail at "
+            + "getAOnly()"
+            + ", but it succeeded");
+      } catch (Jsonization.SerializeException exception) {
+        assertEquals(
+          "getAOnly()",
+          exception.getPath().orElse(null));
+      }
+    }
+  } // public void testChildAAOnlySerializationOutofrange
+
+  @Test
+  public void testChildBBOnlySerializationOutofrange() throws IOException {
+    for (long value : new long[] {9007199254740992L, -9007199254740992L}) {
+      final ChildB instance =
+        Jsonization.Deserialize.deserializeChildB(
+          loadTheFirstExpected("ChildB"));
+
+      instance.setBOnly(value);
+
+      try {
+        Jsonization.Serialize.toJsonObject(instance);
+        fail(
+          "Expected the serialization to fail at "
+            + "getBOnly()"
+            + ", but it succeeded");
+      } catch (Jsonization.SerializeException exception) {
+        assertEquals(
+          "getBOnly()",
+          exception.getPath().orElse(null));
+      }
+    }
+  } // public void testChildBBOnlySerializationOutofrange
 
   @Test
   public void testSomethingNumberSerializationOutofrange() throws IOException {

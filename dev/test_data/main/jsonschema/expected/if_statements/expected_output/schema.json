@@ -9,6 +9,66 @@
   ],
   "$id": "https://dummy.com",
   "definitions": {
+    "ChildA": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "aOnly": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "ChildA"
+            }
+          },
+          "required": [
+            "aOnly"
+          ]
+        }
+      ]
+    },
+    "ChildB": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "bOnly": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "ChildB"
+            }
+          },
+          "required": [
+            "bOnly"
+          ]
+        }
+      ]
+    },
+    "Container": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "children": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Parent_choice"
+              }
+            },
+            "modelType": {
+              "const": "Container"
+            }
+          }
+        }
+      ]
+    },
     "Item": {
       "type": "object",
       "properties": {
@@ -33,7 +93,38 @@
     },
     "ModelType": {
       "type": "string",
-      "enum": []
+      "enum": [
+        "ChildA",
+        "ChildB",
+        "Container"
+      ]
+    },
+    "Parent": {
+      "type": "object",
+      "properties": {
+        "optionalText": {
+          "type": "string"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
+    },
+    "Parent_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ChildA"
+        },
+        {
+          "$ref": "#/definitions/ChildB"
+        },
+        {
+          "$ref": "#/definitions/Container"
+        }
+      ]
     },
     "Something": {
       "type": "object",
@@ -52,6 +143,15 @@
         },
         "item": {
           "$ref": "#/definitions/Item"
+        },
+        "optionalParent": {
+          "$ref": "#/definitions/Parent_choice"
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parent_choice"
+          }
         }
       },
       "required": [

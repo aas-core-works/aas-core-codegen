@@ -6,7 +6,10 @@
  */
 export enum ModelType {
   Item = 0,
-  Something = 1
+  ChildA = 1,
+  ChildB = 2,
+  Container = 3,
+  Something = 4
 }
 
 /**
@@ -24,7 +27,10 @@ export function *overModelType (
   // We yield numbers instead of literals to avoid name lookups on platforms
   // which do not provide JIT compilation of hot paths.
   yield <ModelType>0;  // Item
-  yield <ModelType>1;  // Something
+  yield <ModelType>1;  // ChildA
+  yield <ModelType>2;  // ChildB
+  yield <ModelType>3;  // Container
+  yield <ModelType>4;  // Something
 }
 
 /**
@@ -210,6 +216,325 @@ export class Item extends Class {
   }
 }
 
+export interface IParent extends Class {
+  optionalText: string | null;
+}
+
+export class ChildA
+  extends Class
+  implements IParent {
+  /**
+   * Indicate the runtime model type of the instance.
+   */
+  modelType(): ModelType {
+    // NOTE (mristin):
+    // We yield numbers instead of literals to avoid name lookups on platforms
+    // which do not provide JIT compilation of hot paths.
+    return <ModelType>1;  // ChildA
+  }
+
+  optionalText: string | null;
+
+  aOnly: number;
+
+  /**
+   * Iterate over the instances referenced from this instance.
+   *
+   * We do not recurse into the referenced instances.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descendOnce(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Iterate recursively over the instances referenced from this instance.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descend(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Dispatch `visitor` on this instance.
+   *
+   * @param visitor - to visit this instance
+   */
+  accept(visitor: AbstractVisitor): void {
+    visitor.visitChildA(this);
+  }
+
+  /**
+   * Dispatch `visitor` with `context` on this instance.
+   *
+   * @param visitor - to visit this instance
+   * @param context - to be passed along to the dispatched visitor method
+   * @typeParam ContextT - type of the context
+   */
+  acceptWithContext<ContextT>(
+    visitor: AbstractVisitorWithContext<ContextT>,
+    context: ContextT
+  ) {
+    visitor.visitChildAWithContext(this, context);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance.
+   *
+   * @param transformer - to transform this instance
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   */
+  transform<T>(transformer: AbstractTransformer<T>): T {
+    return transformer.transformChildA(this);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance in `context`.
+   *
+   * @param transformer - to transform this instance
+   * @param context - to be passed along to the `transformer`
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   * @paramType ContextT - type of the transformation context
+   */
+  transformWithContext<ContextT, T>(
+    transformer: AbstractTransformerWithContext<ContextT, T>,
+    context: ContextT
+  ): T {
+    return transformer.transformChildAWithContext(
+      this, context
+    );
+  }
+
+  constructor(
+    aOnly: number,
+    optionalText: string | null = null
+  ) {
+    super();
+    this.optionalText = optionalText;
+    this.aOnly = aOnly;
+  }
+}
+
+export class ChildB
+  extends Class
+  implements IParent {
+  /**
+   * Indicate the runtime model type of the instance.
+   */
+  modelType(): ModelType {
+    // NOTE (mristin):
+    // We yield numbers instead of literals to avoid name lookups on platforms
+    // which do not provide JIT compilation of hot paths.
+    return <ModelType>2;  // ChildB
+  }
+
+  optionalText: string | null;
+
+  bOnly: number;
+
+  /**
+   * Iterate over the instances referenced from this instance.
+   *
+   * We do not recurse into the referenced instances.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descendOnce(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Iterate recursively over the instances referenced from this instance.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descend(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Dispatch `visitor` on this instance.
+   *
+   * @param visitor - to visit this instance
+   */
+  accept(visitor: AbstractVisitor): void {
+    visitor.visitChildB(this);
+  }
+
+  /**
+   * Dispatch `visitor` with `context` on this instance.
+   *
+   * @param visitor - to visit this instance
+   * @param context - to be passed along to the dispatched visitor method
+   * @typeParam ContextT - type of the context
+   */
+  acceptWithContext<ContextT>(
+    visitor: AbstractVisitorWithContext<ContextT>,
+    context: ContextT
+  ) {
+    visitor.visitChildBWithContext(this, context);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance.
+   *
+   * @param transformer - to transform this instance
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   */
+  transform<T>(transformer: AbstractTransformer<T>): T {
+    return transformer.transformChildB(this);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance in `context`.
+   *
+   * @param transformer - to transform this instance
+   * @param context - to be passed along to the `transformer`
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   * @paramType ContextT - type of the transformation context
+   */
+  transformWithContext<ContextT, T>(
+    transformer: AbstractTransformerWithContext<ContextT, T>,
+    context: ContextT
+  ): T {
+    return transformer.transformChildBWithContext(
+      this, context
+    );
+  }
+
+  constructor(
+    bOnly: number,
+    optionalText: string | null = null
+  ) {
+    super();
+    this.optionalText = optionalText;
+    this.bOnly = bOnly;
+  }
+}
+
+export class Container
+  extends Class
+  implements IParent {
+  /**
+   * Indicate the runtime model type of the instance.
+   */
+  modelType(): ModelType {
+    // NOTE (mristin):
+    // We yield numbers instead of literals to avoid name lookups on platforms
+    // which do not provide JIT compilation of hot paths.
+    return <ModelType>3;  // Container
+  }
+
+  optionalText: string | null;
+
+  children: Array<IParent> | null;
+
+  /**
+   * Yield from {@link children} if it is set, or yield nothing.
+   */
+  *overChildrenOrEmpty(): IterableIterator<IParent> {
+    if (this.children !== null) {
+      yield * this.children;
+    }
+    return;
+  }
+
+  /**
+   * Iterate over the instances referenced from this instance.
+   *
+   * We do not recurse into the referenced instances.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descendOnce(): IterableIterator<Class> {
+    if (this.children !== null) {
+      yield * this.children;
+    }
+  }
+
+  /**
+   * Iterate recursively over the instances referenced from this instance.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descend(): IterableIterator<Class> {
+    if (this.children !== null) {
+      for (const anItem of this.children) {
+        yield anItem;
+
+        yield * anItem.descend();
+      }
+    }
+  }
+
+  /**
+   * Dispatch `visitor` on this instance.
+   *
+   * @param visitor - to visit this instance
+   */
+  accept(visitor: AbstractVisitor): void {
+    visitor.visitContainer(this);
+  }
+
+  /**
+   * Dispatch `visitor` with `context` on this instance.
+   *
+   * @param visitor - to visit this instance
+   * @param context - to be passed along to the dispatched visitor method
+   * @typeParam ContextT - type of the context
+   */
+  acceptWithContext<ContextT>(
+    visitor: AbstractVisitorWithContext<ContextT>,
+    context: ContextT
+  ) {
+    visitor.visitContainerWithContext(this, context);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance.
+   *
+   * @param transformer - to transform this instance
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   */
+  transform<T>(transformer: AbstractTransformer<T>): T {
+    return transformer.transformContainer(this);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance in `context`.
+   *
+   * @param transformer - to transform this instance
+   * @param context - to be passed along to the `transformer`
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   * @paramType ContextT - type of the transformation context
+   */
+  transformWithContext<ContextT, T>(
+    transformer: AbstractTransformerWithContext<ContextT, T>,
+    context: ContextT
+  ): T {
+    return transformer.transformContainerWithContext(
+      this, context
+    );
+  }
+
+  constructor(
+    optionalText: string | null = null,
+    children: Array<IParent> | null = null
+  ) {
+    super();
+    this.optionalText = optionalText;
+    this.children = children;
+  }
+}
+
 export class Something extends Class {
   /**
    * Indicate the runtime model type of the instance.
@@ -218,7 +543,7 @@ export class Something extends Class {
     // NOTE (mristin):
     // We yield numbers instead of literals to avoid name lookups on platforms
     // which do not provide JIT compilation of hot paths.
-    return <ModelType>1;  // Something
+    return <ModelType>4;  // Something
   }
 
   kind: Kind;
@@ -231,6 +556,20 @@ export class Something extends Class {
 
   item: Item;
 
+  optionalParent: IParent | null;
+
+  parents: Array<IParent> | null;
+
+  /**
+   * Yield from {@link parents} if it is set, or yield nothing.
+   */
+  *overParentsOrEmpty(): IterableIterator<IParent> {
+    if (this.parents !== null) {
+      yield * this.parents;
+    }
+    return;
+  }
+
   /**
    * Iterate over the instances referenced from this instance.
    *
@@ -240,6 +579,14 @@ export class Something extends Class {
    */
   *descendOnce(): IterableIterator<Class> {
     yield this.item;
+
+    if (this.optionalParent !== null) {
+      yield this.optionalParent;
+    }
+
+    if (this.parents !== null) {
+      yield * this.parents;
+    }
   }
 
   /**
@@ -251,6 +598,20 @@ export class Something extends Class {
     yield this.item;
 
     yield * this.item.descend();
+
+    if (this.optionalParent !== null) {
+      yield this.optionalParent;
+
+      yield * this.optionalParent.descend();
+    }
+
+    if (this.parents !== null) {
+      for (const anItem of this.parents) {
+        yield anItem;
+
+        yield * anItem.descend();
+      }
+    }
   }
 
   /**
@@ -310,7 +671,9 @@ export class Something extends Class {
     text: string,
     number: number,
     flag: boolean,
-    item: Item
+    item: Item,
+    optionalParent: IParent | null = null,
+    parents: Array<IParent> | null = null
   ) {
     super();
     this.kind = kind;
@@ -318,6 +681,8 @@ export class Something extends Class {
     this.number = number;
     this.flag = flag;
     this.item = item;
+    this.optionalParent = optionalParent;
+    this.parents = parents;
   }
 }
 
@@ -339,6 +704,33 @@ export abstract class AbstractVisitor {
    */
   abstract visitItem(
     that: Item
+  ): void;
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  abstract visitChildA(
+    that: ChildA
+  ): void;
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  abstract visitChildB(
+    that: ChildB
+  ): void;
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  abstract visitContainer(
+    that: Container
   ): void;
 
   /**
@@ -387,6 +779,39 @@ export abstract class AbstractVisitorWithContext<ContextT> {
    * @param that - instance to be visited
    * @param context - of the visitation
    */
+  abstract visitChildAWithContext(
+    that: ChildA,
+    context: ContextT
+  ): void;
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
+  abstract visitChildBWithContext(
+    that: ChildB,
+    context: ContextT
+  ): void;
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
+  abstract visitContainerWithContext(
+    that: Container,
+    context: ContextT
+  ): void;
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
   abstract visitSomethingWithContext(
     that: Something,
     context: ContextT
@@ -408,6 +833,45 @@ export class PassThroughVisitor extends AbstractVisitor {
    */
   visitItem(
     that: Item
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visit(another);
+    }
+  }
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  visitChildA(
+    that: ChildA
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visit(another);
+    }
+  }
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  visitChildB(
+    that: ChildB
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visit(another);
+    }
+  }
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  visitContainer(
+    that: Container
   ): void {
     for (const another of that.descendOnce()) {
       this.visit(another);
@@ -468,6 +932,51 @@ export class PassThroughVisitorWithContext<ContextT>
    * @param that - instance to be visited
    * @param context - of the visitation
    */
+  visitChildAWithContext(
+    that: ChildA,
+    context: ContextT
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visitWithContext(another, context);
+    }
+  }
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
+  visitChildBWithContext(
+    that: ChildB,
+    context: ContextT
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visitWithContext(another, context);
+    }
+  }
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
+  visitContainerWithContext(
+    that: Container,
+    context: ContextT
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visitWithContext(another, context);
+    }
+  }
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
   visitSomethingWithContext(
     that: Something,
     context: ContextT
@@ -499,6 +1008,36 @@ export abstract class AbstractTransformer<T> {
    */
   abstract transformItem(
     that: Item
+  ): T;
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  abstract transformChildA(
+    that: ChildA
+  ): T;
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  abstract transformChildB(
+    that: ChildB
+  ): T;
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  abstract transformContainer(
+    that: Container
   ): T;
 
   /**
@@ -552,6 +1091,42 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
    * @param context - of the transformation
    * @returns transformed `that`
    */
+  abstract transformChildAWithContext(
+    that: ChildA,
+    context: ContextT
+  ): T;
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the transformation
+   * @returns transformed `that`
+   */
+  abstract transformChildBWithContext(
+    that: ChildB,
+    context: ContextT
+  ): T;
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the transformation
+   * @returns transformed `that`
+   */
+  abstract transformContainerWithContext(
+    that: Container,
+    context: ContextT
+  ): T;
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the transformation
+   * @returns transformed `that`
+   */
   abstract transformSomethingWithContext(
     that: Something,
     context: ContextT
@@ -592,6 +1167,48 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   transformItem(
     that: Item
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildA(
+    that: ChildA
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildB(
+    that: ChildB
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformContainer(
+    that: Container
   ): T {
     return this.defaultResult;
   }
@@ -663,6 +1280,54 @@ export class TransformerWithDefaultAndContext<ContextT, T>
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildAWithContext(
+    that: ChildA,
+    context: ContextT
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the visitation
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildBWithContext(
+    that: ChildB,
+    context: ContextT
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the visitation
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformContainerWithContext(
+    that: Container,
+    context: ContextT
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the visitation
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   transformSomethingWithContext(
     that: Something,
     context: ContextT
@@ -697,6 +1362,155 @@ export function isItem(
   that: Class
 ): that is Item {
   return that instanceof Item;
+}
+
+/**
+ * Try to cast an instance of the model to {@link IParent}.
+ */
+class AsParentTransformer
+    extends AbstractTransformer<IParent | null> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformItem(
+    that: Item
+  ): IParent | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  transformChildA(
+    that: ChildA
+  ): IParent | null {
+    return that as IParent;
+  }
+
+  transformChildB(
+    that: ChildB
+  ): IParent | null {
+    return that as IParent;
+  }
+
+  transformContainer(
+    that: Container
+  ): IParent | null {
+    return that as IParent;
+  }
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSomething(
+    that: Something
+  ): IParent | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+}
+
+const AS_PARENT_TRANSFORMER =
+  new AsParentTransformer();
+
+/**
+ * Try to cast `that` instance to
+ * the interface {@link IParent}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asParent(
+  that: Class
+): IParent | null {
+  return AS_PARENT_TRANSFORMER.transform(that);
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isParent(
+  that: Class
+): that is IParent {
+  return asParent(that) !== null;
+}
+
+/**
+ * Try to cast `that` instance to
+ * the class {@link ChildA}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asChildA(
+  that: Class
+): ChildA | null {
+  return (that instanceof ChildA)
+    ? <ChildA>that
+    : null;
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isChildA(
+  that: Class
+): that is ChildA {
+  return that instanceof ChildA;
+}
+
+/**
+ * Try to cast `that` instance to
+ * the class {@link ChildB}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asChildB(
+  that: Class
+): ChildB | null {
+  return (that instanceof ChildB)
+    ? <ChildB>that
+    : null;
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isChildB(
+  that: Class
+): that is ChildB {
+  return that instanceof ChildB;
+}
+
+/**
+ * Try to cast `that` instance to
+ * the class {@link Container}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asContainer(
+  that: Class
+): Container | null {
+  return (that instanceof Container)
+    ? <Container>that
+    : null;
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isContainer(
+  that: Class
+): that is Container {
+  return that instanceof Container;
 }
 
 /**
@@ -736,6 +1550,33 @@ class TypeMatcher extends AbstractTransformerWithContext<
     other: Class
   ): boolean {
     return isItem(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildAWithContext(
+    that: ChildA,
+    other: Class
+  ): boolean {
+    return isChildA(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformChildBWithContext(
+    that: ChildB,
+    other: Class
+  ): boolean {
+    return isChildB(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformContainerWithContext(
+    that: Container,
+    other: Class
+  ): boolean {
+    return isContainer(other);
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
 

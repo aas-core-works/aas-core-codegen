@@ -159,6 +159,142 @@ func IfWithContinueInFor(
 	return count != 3
 }
 
+// Check the narrowing in the body of a branch by its condition.
+func NarrowingInBody(
+	parent aastypes.IParent,
+) bool {
+	if (
+		(parent != nil) &&
+		aastypes.IsChildA(parent)) {
+		return parent.(aastypes.IChildA).AOnly() < 100
+	}
+	return true
+}
+
+// Check the narrowing by the negation of the previous conditions.
+func NarrowingInElifAndElse(
+	parent aastypes.IParent,
+) bool {
+	if parent == nil {
+		return true
+	} else if !aastypes.IsChildB(parent) {
+		return (parent.OptionalText() == nil) ||
+			*parent.OptionalText() != "forbidden"
+	} else {
+		return parent.(aastypes.IChildB).BOnly() > 0
+	}
+}
+
+// Check the narrowing after an if-statement whose branch always returns.
+func NarrowingAfterEarlyReturn(
+	parent aastypes.IParent,
+) bool {
+	if (
+		(parent == nil) ||
+		(!aastypes.IsChildB(parent))) {
+		return true
+	}
+	return parent.(aastypes.IChildB).BOnly() < 50
+}
+
+// Check the narrowing after an if-statement whose `else` always returns.
+func NarrowingAfterTheOnlyCompletingBranch(
+	parent aastypes.IParent,
+) bool {
+	if (
+		(parent != nil) &&
+		aastypes.IsChildA(parent)) {
+	} else {
+		return true
+	}
+	return parent.(aastypes.IChildA).AOnly() > -10
+}
+
+// Check the narrowing after the `continue` and the early return in a loop.
+func ChildAsHaveTexts(
+	parents []aastypes.IParent,
+) bool {
+	for _, parent := range parents {
+		if !aastypes.IsChildA(parent) {
+			continue
+		}
+		if parent.(aastypes.IChildA).OptionalText() == nil {
+			return false
+		}
+		if aascommon.LenStr(*parent.(aastypes.IChildA).OptionalText()) < 1 {
+			return false
+		}
+	}
+	return true
+}
+
+// Check the narrowing after the `continue` in a loop with a `break`.
+func TextsBeforeContainerAreShort(
+	parents []aastypes.IParent,
+) bool {
+	total := int64(0)
+	for _, parent := range parents {
+		if aastypes.IsContainer(parent) {
+			break
+		}
+		if parent.OptionalText() == nil {
+			continue
+		}
+		total =
+			total + int64(aascommon.LenStr(*parent.OptionalText()))
+	}
+	return total < 20
+}
+
+// Check the narrowing by the value assigned in a branch.
+func TextOrDefaultIsShort(
+	parent aastypes.IParent,
+) bool {
+	text := parent.OptionalText()
+	if text == nil {
+		text = aascommon.NewAndPointTo("default")
+	}
+	return aascommon.LenStr(*text) < 10
+}
+
+// Check the narrowing of a variable to a class by the assigned value.
+func LastChildAIsSmall(
+	parent aastypes.IParent,
+	parents []aastypes.IParent,
+) bool {
+	last := parent
+	for _, other := range parents {
+		if aastypes.IsChildA(other) {
+			last = other.(aastypes.IChildA)
+			if last.(aastypes.IChildA).AOnly() >= 1000 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// Check the recursive chain of `isinstance` checks with early returns.
+func HasMarkerInTree(
+	parent aastypes.IParent,
+) bool {
+	if (
+		(parent.OptionalText() != nil) &&
+		*parent.OptionalText() == "marker") {
+		return true
+	}
+	if aastypes.IsContainer(parent) {
+		return (parent.(aastypes.IContainer).Children() != nil) &&
+			aascommon.Some(
+				func(child aastypes.IParent) bool {
+					return HasMarkerInTree(child)
+				},
+				parent.(aastypes.IContainer).Children(),
+			)
+	}
+	return false
+}
+
 // Verify `that` instance of [aastypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -172,6 +308,81 @@ func VerifyItem(
 	abort = false
 
 	// No verification has been defined for IItem.
+
+	return
+}
+
+// Verify `that` instance of [aastypes.IChildA].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyChildA(
+	that aastypes.IChildA,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	// No verification has been defined for IChildA.
+
+	return
+}
+
+// Verify `that` instance of [aastypes.IChildB].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyChildB(
+	that aastypes.IChildB,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	// No verification has been defined for IChildB.
+
+	return
+}
+
+// Verify `that` instance of [aastypes.IContainer].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyContainer(
+	that aastypes.IContainer,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if that.Children() != nil {
+		for i, v := range that.Children() {
+			abort = Verify(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Children",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
+		}
+	}
 
 	return
 }
@@ -258,6 +469,115 @@ func VerifySomething(
 		}
 	}
 
+	if !(
+		!(that.OptionalParent() != nil) ||
+		(!HasMarkerInTree(that.OptionalParent()))) {
+		abort = onError(
+			newVerificationError(
+				"Optional parent must have no marker in its tree",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!((that.OptionalParent() != nil) &&
+		(that.Parents() != nil)) ||
+		LastChildAIsSmall(
+			that.OptionalParent(),
+			that.Parents(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Parents as Child_a must have a_only below one thousand",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.OptionalParent() != nil) ||
+		TextOrDefaultIsShort(that.OptionalParent())) {
+		abort = onError(
+			newVerificationError(
+				"Text of the optional parent must be short",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.Parents() != nil) ||
+		TextsBeforeContainerAreShort(that.Parents())) {
+		abort = onError(
+			newVerificationError(
+				"Texts of parents before the first container must be short",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.Parents() != nil) ||
+		ChildAsHaveTexts(that.Parents())) {
+		abort = onError(
+			newVerificationError(
+				"Parents as Child_a must have non-empty texts",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		NarrowingAfterTheOnlyCompletingBranch(
+			that.OptionalParent(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Optional parent as Child_a must have a_only above minus ten",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NarrowingAfterEarlyReturn(that.OptionalParent()) {
+		abort = onError(
+			newVerificationError(
+				"Optional parent as Child_b must have a small b_only",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NarrowingInElifAndElse(that.OptionalParent()) {
+		abort = onError(
+			newVerificationError(
+				"Optional parent must have an allowed text or a positive " +
+				"b_only",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NarrowingInBody(that.OptionalParent()) {
+		abort = onError(
+			newVerificationError(
+				"Optional parent as Child_a must have a small a_only",),
+		)
+		if abort {
+			return
+		}
+	}
+
 	abort = VerifyKind(
 		that.Kind(),
 		func(err *VerificationError) bool {
@@ -296,6 +616,49 @@ func VerifySomething(
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.OptionalParent() != nil {
+		abort = Verify(
+			that.OptionalParent(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "OptionalParent",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Parents() != nil {
+		for i, v := range that.Parents() {
+			abort = Verify(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Parents",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -346,6 +709,21 @@ func Verify(
 	case aastypes.ModelTypeItem:
 		abort = VerifyItem(
 			that.(aastypes.IItem),
+			onError,
+		)
+	case aastypes.ModelTypeChildA:
+		abort = VerifyChildA(
+			that.(aastypes.IChildA),
+			onError,
+		)
+	case aastypes.ModelTypeChildB:
+		abort = VerifyChildB(
+			that.(aastypes.IChildB),
+			onError,
+		)
+	case aastypes.ModelTypeContainer:
+		abort = VerifyContainer(
+			that.(aastypes.IContainer),
 			onError,
 		)
 	case aastypes.ModelTypeSomething:

@@ -301,6 +301,285 @@ public class TestXmlizationOfConcreteClasses {
   } // public void testItemVerificationFail
 
   @Test
+  public void testChildAOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "childA");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final ChildA instance =
+        Xmlization.Deserialize.deserializeChildA(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testChildAOk
+
+  @Test
+  public void testChildADeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("childA");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildA for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializeChildA(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testChildADeserializationFail
+
+  @Test
+  public void testChildAVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "childA");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildA for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final ChildA instance =
+          Xmlization.Deserialize.deserializeChildA(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testChildAVerificationFail
+
+  @Test
+  public void testChildBOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "childB");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final ChildB instance =
+        Xmlization.Deserialize.deserializeChildB(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testChildBOk
+
+  @Test
+  public void testChildBDeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("childB");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildB for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializeChildB(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testChildBDeserializationFail
+
+  @Test
+  public void testChildBVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "childB");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of ChildB for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final ChildB instance =
+          Xmlization.Deserialize.deserializeChildB(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testChildBVerificationFail
+
+  @Test
+  public void testContainerOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "container");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final Container instance =
+        Xmlization.Deserialize.deserializeContainer(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testContainerOk
+
+  @Test
+  public void testContainerDeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("container");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Container for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializeContainer(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testContainerDeserializationFail
+
+  @Test
+  public void testContainerVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "container");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Container for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final Container instance =
+          Xmlization.Deserialize.deserializeContainer(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testContainerVerificationFail
+
+  @Test
   public void testSomethingOk() throws IOException, XMLStreamException {
     final Path searchPath =
       Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "something");

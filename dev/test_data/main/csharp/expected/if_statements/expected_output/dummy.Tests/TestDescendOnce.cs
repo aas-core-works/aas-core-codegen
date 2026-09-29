@@ -73,6 +73,51 @@ namespace dummy.Tests
         }  // public void Test_Item
 
         [Test]
+        public void Test_ChildA()
+        {
+            Aas.ChildA instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "ChildA",
+                    "maximal.json.trace"));
+        }  // public void Test_ChildA
+
+        [Test]
+        public void Test_ChildB()
+        {
+            Aas.ChildB instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "ChildB",
+                    "maximal.json.trace"));
+        }  // public void Test_ChildB
+
+        [Test]
+        public void Test_Container()
+        {
+            Aas.Container instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "Container",
+                    "maximal.json.trace"));
+        }  // public void Test_Container
+
+        [Test]
         public void Test_Something()
         {
             Aas.Something instance = (

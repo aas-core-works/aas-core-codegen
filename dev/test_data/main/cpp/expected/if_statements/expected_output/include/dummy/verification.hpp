@@ -258,6 +258,66 @@ bool IfWithContinueInFor(
   int64_t number
 );
 
+/// \brief Check the narrowing in the body of a branch by its condition.
+bool NarrowingInBody(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+);
+
+/// \brief Check the narrowing by the negation of the previous conditions.
+bool NarrowingInElifAndElse(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+);
+
+/// \brief Check the narrowing after an if-statement whose branch always returns.
+bool NarrowingAfterEarlyReturn(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+);
+
+/// \brief Check the narrowing after an if-statement whose `else` always returns.
+bool NarrowingAfterTheOnlyCompletingBranch(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+);
+
+/// \brief Check the narrowing after the `continue` and the early return in a loop.
+bool ChildAsHaveTexts(
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+);
+
+/// \brief Check the narrowing after the `continue` in a loop with a `break`.
+bool TextsBeforeContainerAreShort(
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+);
+
+/// \brief Check the narrowing by the value assigned in a branch.
+bool TextOrDefaultIsShort(
+  const std::shared_ptr<types::IParent>& parent
+);
+
+/// \brief Check the narrowing of a variable to a class by the assigned value.
+bool LastChildAIsSmall(
+  const std::shared_ptr<types::IParent>& parent,
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+);
+
+/// \brief Check the recursive chain of `isinstance` checks with early returns.
+bool HasMarkerInTree(
+  const std::shared_ptr<types::IParent>& parent
+);
+
 // endregion Verification functions
 
 }  // namespace verification

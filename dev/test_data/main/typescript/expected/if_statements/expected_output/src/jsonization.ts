@@ -652,6 +652,447 @@ export function itemFromJsonable(
 }
 
 /**
+ * Parse `jsonable` as an instance
+ * of {@link types!IParent}.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed instance, or error if `jsonable` is invalid
+ */
+export function parentFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.IParent,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new AasCommon.Either<
+      AasTypes.IParent,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeOrError = extractModelType(jsonObject);
+  if (modelTypeOrError.error !== null) {
+    return new AasCommon.Either<
+      AasTypes.IParent,
+      DeserializationError
+    >(
+      null,
+      modelTypeOrError.error
+    );
+  }
+
+  const modelType = modelTypeOrError.mustValue();
+
+  switch (modelType) {
+    case "ChildA":
+      return parsePropertiesOfChildA(jsonObject);
+
+    case "ChildB":
+      return parsePropertiesOfChildB(jsonObject);
+
+    case "Container":
+      return parsePropertiesOfContainer(jsonObject);
+
+    default:
+      return newDeserializationError<AasTypes.IParent>(
+        `Unexpected model type for IParent: ${modelType}`
+      );
+  }
+}
+
+/**
+ * Parse the properties of an instance
+ * of {@link types!ChildA} from `jsonObject`.
+ *
+ * The `modelType` is expected to have been already verified by the caller,
+ * and is therefore skipped here.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!ChildA},
+ * or an error if any
+ */
+function parsePropertiesOfChildA(
+  jsonObject: JsonObject
+): AasCommon.Either<
+  AasTypes.ChildA,
+  DeserializationError
+> {
+  let theOptionalText: string | null = null;
+  let theAOnly: number | null = null;
+
+  for (const key in jsonObject) {
+    const jsonableValue = jsonObject[key];
+
+    let propertyError: DeserializationError | null = null;
+    switch (key) {
+      case "optionalText": {
+        const parsed = stringFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "aOnly": {
+        const parsed = integerFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theAOnly = parsed.value;
+        break;
+      }
+
+      case "modelType": {
+        // The model type has already been verified by the caller.
+        break;
+      }
+
+      // NOTE (mristin):
+      // Since we conflate here a JavaScript object with a JSON object, we ignore
+      // properties which we do not know how to de-serialize and assume they are
+      // related to the *JavaScript* properties of the object or `Object` prototype.
+      default: {
+        continue;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(
+        new PropertySegment(jsonObject, key)
+      );
+      return new AasCommon.Either<
+        AasTypes.ChildA,
+        DeserializationError
+      >(
+        null,
+        propertyError
+      );
+    }
+  }
+
+  if (theAOnly === null) {
+    return newDeserializationError<
+      AasTypes.ChildA
+    >(
+      "The required property 'aOnly' is missing"
+    );
+  }
+
+  return new AasCommon.Either<
+    AasTypes.ChildA,
+    DeserializationError
+  >(
+    new AasTypes.ChildA(
+      theAOnly,
+      theOptionalText
+    ),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!ChildA} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!ChildA},
+ * or an error if any
+ */
+export function childAFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.ChildA,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new AasCommon.Either<
+      AasTypes.ChildA,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeError = checkModelType(jsonObject, "ChildA");
+  if (modelTypeError !== null) {
+    return new AasCommon.Either<
+      AasTypes.ChildA,
+      DeserializationError
+    >(
+      null,
+      modelTypeError
+    );
+  }
+
+  return parsePropertiesOfChildA(jsonObject);
+}
+
+/**
+ * Parse the properties of an instance
+ * of {@link types!ChildB} from `jsonObject`.
+ *
+ * The `modelType` is expected to have been already verified by the caller,
+ * and is therefore skipped here.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!ChildB},
+ * or an error if any
+ */
+function parsePropertiesOfChildB(
+  jsonObject: JsonObject
+): AasCommon.Either<
+  AasTypes.ChildB,
+  DeserializationError
+> {
+  let theOptionalText: string | null = null;
+  let theBOnly: number | null = null;
+
+  for (const key in jsonObject) {
+    const jsonableValue = jsonObject[key];
+
+    let propertyError: DeserializationError | null = null;
+    switch (key) {
+      case "optionalText": {
+        const parsed = stringFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "bOnly": {
+        const parsed = integerFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theBOnly = parsed.value;
+        break;
+      }
+
+      case "modelType": {
+        // The model type has already been verified by the caller.
+        break;
+      }
+
+      // NOTE (mristin):
+      // Since we conflate here a JavaScript object with a JSON object, we ignore
+      // properties which we do not know how to de-serialize and assume they are
+      // related to the *JavaScript* properties of the object or `Object` prototype.
+      default: {
+        continue;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(
+        new PropertySegment(jsonObject, key)
+      );
+      return new AasCommon.Either<
+        AasTypes.ChildB,
+        DeserializationError
+      >(
+        null,
+        propertyError
+      );
+    }
+  }
+
+  if (theBOnly === null) {
+    return newDeserializationError<
+      AasTypes.ChildB
+    >(
+      "The required property 'bOnly' is missing"
+    );
+  }
+
+  return new AasCommon.Either<
+    AasTypes.ChildB,
+    DeserializationError
+  >(
+    new AasTypes.ChildB(
+      theBOnly,
+      theOptionalText
+    ),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!ChildB} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!ChildB},
+ * or an error if any
+ */
+export function childBFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.ChildB,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new AasCommon.Either<
+      AasTypes.ChildB,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeError = checkModelType(jsonObject, "ChildB");
+  if (modelTypeError !== null) {
+    return new AasCommon.Either<
+      AasTypes.ChildB,
+      DeserializationError
+    >(
+      null,
+      modelTypeError
+    );
+  }
+
+  return parsePropertiesOfChildB(jsonObject);
+}
+
+/**
+ * Parse the properties of an instance
+ * of {@link types!Container} from `jsonObject`.
+ *
+ * The `modelType` is expected to have been already verified by the caller,
+ * and is therefore skipped here.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!Container},
+ * or an error if any
+ */
+function parsePropertiesOfContainer(
+  jsonObject: JsonObject
+): AasCommon.Either<
+  AasTypes.Container,
+  DeserializationError
+> {
+  let theOptionalText: string | null = null;
+  let theChildren: Array<AasTypes.IParent> | null = null;
+
+  for (const key in jsonObject) {
+    const jsonableValue = jsonObject[key];
+
+    let propertyError: DeserializationError | null = null;
+    switch (key) {
+      case "optionalText": {
+        const parsed = stringFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "children": {
+        const parsed = parseArray(
+          jsonableValue,
+          parentFromJsonable
+        );
+        propertyError = parsed.error;
+        theChildren = parsed.value;
+        break;
+      }
+
+      case "modelType": {
+        // The model type has already been verified by the caller.
+        break;
+      }
+
+      // NOTE (mristin):
+      // Since we conflate here a JavaScript object with a JSON object, we ignore
+      // properties which we do not know how to de-serialize and assume they are
+      // related to the *JavaScript* properties of the object or `Object` prototype.
+      default: {
+        continue;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(
+        new PropertySegment(jsonObject, key)
+      );
+      return new AasCommon.Either<
+        AasTypes.Container,
+        DeserializationError
+      >(
+        null,
+        propertyError
+      );
+    }
+  }
+
+  return new AasCommon.Either<
+    AasTypes.Container,
+    DeserializationError
+  >(
+    new AasTypes.Container(
+      theOptionalText,
+      theChildren
+    ),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!Container} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!Container},
+ * or an error if any
+ */
+export function containerFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.Container,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new AasCommon.Either<
+      AasTypes.Container,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeError = checkModelType(jsonObject, "Container");
+  if (modelTypeError !== null) {
+    return new AasCommon.Either<
+      AasTypes.Container,
+      DeserializationError
+    >(
+      null,
+      modelTypeError
+    );
+  }
+
+  return parsePropertiesOfContainer(jsonObject);
+}
+
+/**
  * Parse the properties of an instance
  * of {@link types!Something} from `jsonObject`.
  *
@@ -670,6 +1111,8 @@ function parsePropertiesOfSomething(
   let theNumber: number | null = null;
   let theFlag: boolean | null = null;
   let theItem: AasTypes.Item | null = null;
+  let theOptionalParent: AasTypes.IParent | null = null;
+  let theParents: Array<AasTypes.IParent> | null = null;
 
   for (const key in jsonObject) {
     const jsonableValue = jsonObject[key];
@@ -718,6 +1161,25 @@ function parsePropertiesOfSomething(
         );
         propertyError = parsed.error;
         theItem = parsed.value;
+        break;
+      }
+
+      case "optionalParent": {
+        const parsed = parentFromJsonable(
+          jsonableValue
+        );
+        propertyError = parsed.error;
+        theOptionalParent = parsed.value;
+        break;
+      }
+
+      case "parents": {
+        const parsed = parseArray(
+          jsonableValue,
+          parentFromJsonable
+        );
+        propertyError = parsed.error;
+        theParents = parsed.value;
         break;
       }
 
@@ -793,7 +1255,9 @@ function parsePropertiesOfSomething(
       theText,
       theNumber,
       theFlag,
-      theItem
+      theItem,
+      theOptionalParent,
+      theParents
     ),
     null
   );
@@ -964,6 +1428,113 @@ function serializeItem(
  * @param that - instance to be serialized
  * @returns JSON-able representation
  */
+function serializeChildA(
+  that: AasTypes.ChildA
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  // The property being serialized, for the path of a failure.
+  let prop = "";
+  try {
+    if (that.optionalText !== null) {
+      prop = "optionalText";
+      jsonable["optionalText"] =
+        that.optionalText;
+    }
+
+    prop = "aOnly";
+    jsonable["aOnly"] =
+      integerToJsonable(that.aOnly);
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependProperty(prop);
+    }
+    throw error;
+  }
+
+  jsonable["modelType"] = "ChildA";
+
+  return jsonable;
+}
+
+/**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
+function serializeChildB(
+  that: AasTypes.ChildB
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  // The property being serialized, for the path of a failure.
+  let prop = "";
+  try {
+    if (that.optionalText !== null) {
+      prop = "optionalText";
+      jsonable["optionalText"] =
+        that.optionalText;
+    }
+
+    prop = "bOnly";
+    jsonable["bOnly"] =
+      integerToJsonable(that.bOnly);
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependProperty(prop);
+    }
+    throw error;
+  }
+
+  jsonable["modelType"] = "ChildB";
+
+  return jsonable;
+}
+
+/**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
+function serializeContainer(
+  that: AasTypes.Container
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  // The property being serialized, for the path of a failure.
+  let prop = "";
+  try {
+    if (that.optionalText !== null) {
+      prop = "optionalText";
+      jsonable["optionalText"] =
+        that.optionalText;
+    }
+
+    if (that.children !== null) {
+      prop = "children";
+      jsonable["children"] =
+        serialize_ListOf_IParent(that.children);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependProperty(prop);
+    }
+    throw error;
+  }
+
+  jsonable["modelType"] = "Container";
+
+  return jsonable;
+}
+
+/**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
 function serializeSomething(
   that: AasTypes.Something
 ): JsonObject {
@@ -991,6 +1562,18 @@ function serializeSomething(
     prop = "item";
     jsonable["item"] =
       serializeItem(that.item);
+
+    if (that.optionalParent !== null) {
+      prop = "optionalParent";
+      jsonable["optionalParent"] =
+        serializeClass(that.optionalParent);
+    }
+
+    if (that.parents !== null) {
+      prop = "parents";
+      jsonable["parents"] =
+        serialize_ListOf_IParent(that.parents);
+    }
   } catch (error) {
     if (error instanceof SerializationError) {
       error.prependProperty(prop);
@@ -1002,6 +1585,30 @@ function serializeSomething(
 }
 
 /**
+ * Serialize `that` to a JSON-able array.
+ *
+ * @param that - list to be serialized
+ * @returns JSON-able array
+ */
+function serialize_ListOf_IParent(
+  that: ReadonlyArray<AasTypes.IParent>
+): Array<JsonObject> {
+  const result = new Array<JsonObject>(that.length);
+  let i = 0;
+  try {
+    for (; i < that.length; i++) {
+      result[i] = serializeClass(that[i]);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependIndex(i);
+    }
+    throw error;
+  }
+  return result;
+}
+
+/**
  * Dispatch the serialization on the run-time type of an instance.
  */
 class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
@@ -1009,6 +1616,24 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     that: AasTypes.Item
   ): JsonObject {
     return serializeItem(that);
+  }
+
+  transformChildA(
+    that: AasTypes.ChildA
+  ): JsonObject {
+    return serializeChildA(that);
+  }
+
+  transformChildB(
+    that: AasTypes.ChildB
+  ): JsonObject {
+    return serializeChildB(that);
+  }
+
+  transformContainer(
+    that: AasTypes.Container
+  ): JsonObject {
+    return serializeContainer(that);
   }
 
   transformSomething(

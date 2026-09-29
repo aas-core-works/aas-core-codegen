@@ -78,6 +78,198 @@ export function loadMinimalItem(
 }
 
 /**
+ * Load a maximal XML example of {@link types.ChildA}
+ * from the test data directory.
+ */
+export function loadMaximalChildA(
+): AasTypes.ChildA {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "childA",
+    "maximal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildA(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildA in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal XML example of {@link types.ChildA}
+ * from the test data directory.
+ */
+export function loadMinimalChildA(
+): AasTypes.ChildA {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "childA",
+    "minimal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildA(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildA in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a maximal XML example of {@link types.ChildB}
+ * from the test data directory.
+ */
+export function loadMaximalChildB(
+): AasTypes.ChildB {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "childB",
+    "maximal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildB(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildB in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal XML example of {@link types.ChildB}
+ * from the test data directory.
+ */
+export function loadMinimalChildB(
+): AasTypes.ChildB {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "childB",
+    "minimal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildB(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildB in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a maximal XML example of {@link types.Container}
+ * from the test data directory.
+ */
+export function loadMaximalContainer(
+): AasTypes.Container {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "container",
+    "maximal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asContainer(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Container in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal XML example of {@link types.Container}
+ * from the test data directory.
+ */
+export function loadMinimalContainer(
+): AasTypes.Container {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "container",
+    "minimal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asContainer(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Container in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal XML example of {@link types.Something}
  * from the test data directory.
  */

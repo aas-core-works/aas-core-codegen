@@ -6,5 +6,31 @@
   "item": {
     "name": "item",
     "optionalText": "short"
-  }
+  },
+  "optionalParent": {
+    "optionalText": "short",
+    "aOnly": 5,
+    "modelType": "ChildA"
+  },
+  "parents": [
+    {
+      "optionalText": "abc",
+      "aOnly": 7,
+      "modelType": "ChildA"
+    },
+    {
+      "bOnly": 3,
+      "modelType": "ChildB"
+    },
+    {
+      "children": [
+        {
+          "optionalText": "x",
+          "bOnly": 4,
+          "modelType": "ChildB"
+        }
+      ],
+      "modelType": "Container"
+    }
+  ]
 }

@@ -79,6 +79,81 @@ std::pair<
 
 std::pair<
   common::optional<
+    std::shared_ptr<types::IParent>
+  >,
+  common::optional<DeserializationError>
+> ParentFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IChildA>
+  >,
+  common::optional<DeserializationError>
+> ChildAFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ChildAFromSequence(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IChildB>
+  >,
+  common::optional<DeserializationError>
+> ChildBFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ChildBFromSequence(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IContainer>
+  >,
+  common::optional<DeserializationError>
+> ContainerFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ContainerFromSequence(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
     std::shared_ptr<types::ISomething>
   >,
   common::optional<DeserializationError>
@@ -111,6 +186,18 @@ const std::unordered_map<
   {
     "item",
     types::ModelType::kItem
+  },
+  {
+    "childA",
+    types::ModelType::kChildA
+  },
+  {
+    "childB",
+    types::ModelType::kChildB
+  },
+  {
+    "container",
+    types::ModelType::kContainer
   },
   {
     "something",
@@ -843,6 +930,18 @@ std::pair<
           return ItemFromSequence<
             types::IClass
           >(a_reader);
+        case types::ModelType::kChildA:
+          return ChildAFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kChildB:
+          return ChildBFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kContainer:
+          return ContainerFromSequence<
+            types::IClass
+          >(a_reader);
         case types::ModelType::kSomething:
           return SomethingFromSequence<
             types::IClass
@@ -878,6 +977,110 @@ std::pair<
     L"IItem",
     types::ModelType::kItem,
     ItemFromSequence<types::IItem>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IParent>
+  >,
+  common::optional<DeserializationError>
+> ParentFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeFromElement<
+    std::shared_ptr<types::IParent>
+  >(
+    reader,
+    L"IParent",
+    [](
+      xml_common::ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IParent> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kChildA:
+          return ChildAFromSequence<
+            types::IParent
+          >(a_reader);
+        case types::ModelType::kChildB:
+          return ChildBFromSequence<
+            types::IParent
+          >(a_reader);
+        case types::ModelType::kContainer:
+          return ContainerFromSequence<
+            types::IParent
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IParent>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IParent from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IChildA>
+  >,
+  common::optional<DeserializationError>
+> ChildAFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::IChildA>
+  >(
+    reader,
+    L"IChildA",
+    types::ModelType::kChildA,
+    ChildAFromSequence<types::IChildA>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IChildB>
+  >,
+  common::optional<DeserializationError>
+> ChildBFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::IChildB>
+  >(
+    reader,
+    L"IChildB",
+    types::ModelType::kChildB,
+    ChildBFromSequence<types::IChildB>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IContainer>
+  >,
+  common::optional<DeserializationError>
+> ContainerFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::IContainer>
+  >(
+    reader,
+    L"IContainer",
+    types::ModelType::kContainer,
+    ContainerFromSequence<types::IContainer>
   );
 }
 
@@ -1315,6 +1518,104 @@ std::pair<
 
 // endregion De-serialize primitives
 
+template <typename T, typename DeserializeT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  xml_common::ReaderMergingText& reader,
+  const DeserializeT& deserialize_item
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == xml_common::NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeWstring. "
+      "DeserializeWstring expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<DeserializationError> error;
+
+  error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // If we encounter the stop element then we reached the end of the list. If this is
+  // the first node we encounter then the list is empty, *i.e.*, contains no items.
+  if (reader.node().kind() == xml_common::NodeKind::Stop) {
+    return std::make_pair(
+      std::vector<T>(),
+      common::nullopt
+    );
+  } else {
+    // NOTE (mristin):
+    // We use std::deque here as it is a buffered list, while a std::list
+    // would incur a memory allocation on each push. We do not want to use
+    // std::vector as the number of elements in a list can be arbitrarily large
+    // leading potentially to out-of-memory errors since std::vector's double
+    // their size for amortized time complexity of O(1) for insertions.
+
+    std::deque<T> items;
+
+    size_t i = 0;
+
+    while (true) {
+      common::optional<T> item;
+
+      std::tie(
+        item,
+        error
+      ) = deserialize_item(reader);
+
+      if (error.has_value()) {
+        error->path.segments.emplace_front(
+          common::make_unique<xml_path::IndexSegment>(i)
+        );
+        break;
+      }
+
+      error = SkipWhitespace(reader);
+      if (error.has_value()) {
+        break;
+      }
+
+      items.emplace_back(*item);
+
+      if (reader.node().kind() == xml_common::NodeKind::Stop) {
+        break;
+      }
+
+      ++i;
+    }
+
+    if (!error.has_value()) {
+      auto result = std::vector<T>();
+      result.reserve(items.size());
+
+      for (auto& item : items) {
+        result.emplace_back(
+          std::move(item)
+        );
+    }
+
+      return std::make_pair(
+        std::move(result),
+        common::nullopt
+      );
+    } else {
+      return std::make_pair(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
+}
+
 std::pair<
   common::optional<types::Kind>,
   common::optional<DeserializationError>
@@ -1405,12 +1706,29 @@ enum class OfItem : std::uint32_t {
   kOptionalText = 1
 };  // enum class OfItem
 
+enum class OfChildA : std::uint32_t {
+  kOptionalText = 0,
+  kAOnly = 1
+};  // enum class OfChildA
+
+enum class OfChildB : std::uint32_t {
+  kOptionalText = 0,
+  kBOnly = 1
+};  // enum class OfChildB
+
+enum class OfContainer : std::uint32_t {
+  kOptionalText = 0,
+  kChildren = 1
+};  // enum class OfContainer
+
 enum class OfSomething : std::uint32_t {
   kKind = 0,
   kText = 1,
   kNumber = 2,
   kFlag = 3,
-  kItem = 4
+  kItem = 4,
+  kOptionalParent = 5,
+  kParents = 6
 };  // enum class OfSomething
 
 const std::size_t kPropertyCountOfItem = 2;
@@ -1429,7 +1747,55 @@ const std::unordered_map<
   }
 };
 
-const std::size_t kPropertyCountOfSomething = 5;
+const std::size_t kPropertyCountOfChildA = 2;
+
+const std::unordered_map<
+  std::string,
+  OfChildA
+> kMapOfChildA = {
+  {
+    "optionalText",
+    OfChildA::kOptionalText
+  },
+  {
+    "aOnly",
+    OfChildA::kAOnly
+  }
+};
+
+const std::size_t kPropertyCountOfChildB = 2;
+
+const std::unordered_map<
+  std::string,
+  OfChildB
+> kMapOfChildB = {
+  {
+    "optionalText",
+    OfChildB::kOptionalText
+  },
+  {
+    "bOnly",
+    OfChildB::kBOnly
+  }
+};
+
+const std::size_t kPropertyCountOfContainer = 2;
+
+const std::unordered_map<
+  std::string,
+  OfContainer
+> kMapOfContainer = {
+  {
+    "optionalText",
+    OfContainer::kOptionalText
+  },
+  {
+    "children",
+    OfContainer::kChildren
+  }
+};
+
+const std::size_t kPropertyCountOfSomething = 7;
 
 const std::unordered_map<
   std::string,
@@ -1454,6 +1820,14 @@ const std::unordered_map<
   {
     "item",
     OfSomething::kItem
+  },
+  {
+    "optionalParent",
+    OfSomething::kOptionalParent
+  },
+  {
+    "parents",
+    OfSomething::kParents
   }
 };
 
@@ -1549,6 +1923,264 @@ std::pair<
 template <
   typename T,
   typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ChildAFromSequence(
+  xml_common::ReaderMergingText& reader
+) {
+  // region Initialization
+
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<int64_t> the_a_only;
+
+  // endregion Initialization
+
+  common::optional<DeserializationError> error(
+    ReadProperties<
+      properties::kPropertyCountOfChildA
+    >(
+      reader,
+      properties::kMapOfChildA,
+      L"IChildA",
+      [&](
+        properties::OfChildA property
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfChildA::kOptionalText:
+            return ReadInto(
+              the_optional_text,
+              DeserializeWstring(reader)
+            );
+          case properties::OfChildA::kAOnly:
+            return ReadInto(
+              the_a_only,
+              DeserializeInt64(reader)
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfChildA",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  // region Check required properties
+
+  if (!the_a_only.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property aOnly is missing"
+    );
+  }
+
+  // endregion Check required properties
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::ChildA(
+        std::move(*the_a_only),
+        std::move(the_optional_text)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ChildBFromSequence(
+  xml_common::ReaderMergingText& reader
+) {
+  // region Initialization
+
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<int64_t> the_b_only;
+
+  // endregion Initialization
+
+  common::optional<DeserializationError> error(
+    ReadProperties<
+      properties::kPropertyCountOfChildB
+    >(
+      reader,
+      properties::kMapOfChildB,
+      L"IChildB",
+      [&](
+        properties::OfChildB property
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfChildB::kOptionalText:
+            return ReadInto(
+              the_optional_text,
+              DeserializeWstring(reader)
+            );
+          case properties::OfChildB::kBOnly:
+            return ReadInto(
+              the_b_only,
+              DeserializeInt64(reader)
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfChildB",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  // region Check required properties
+
+  if (!the_b_only.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property bOnly is missing"
+    );
+  }
+
+  // endregion Check required properties
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::ChildB(
+        std::move(*the_b_only),
+        std::move(the_optional_text)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ContainerFromSequence(
+  xml_common::ReaderMergingText& reader
+) {
+  // region Initialization
+
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  > the_children;
+
+  // endregion Initialization
+
+  common::optional<DeserializationError> error(
+    ReadProperties<
+      properties::kPropertyCountOfContainer
+    >(
+      reader,
+      properties::kMapOfContainer,
+      L"IContainer",
+      [&](
+        properties::OfContainer property
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfContainer::kOptionalText:
+            return ReadInto(
+              the_optional_text,
+              DeserializeWstring(reader)
+            );
+          case properties::OfContainer::kChildren:
+            return ReadInto(
+              the_children,
+              DeserializeList<
+                std::shared_ptr<types::IParent>
+              >(
+                reader,
+                ParentFromElement
+              )
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfContainer",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::Container(
+        std::move(the_optional_text),
+        std::move(the_children)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
     std::is_base_of<T, types::ISomething>::value
   >::type*
 >
@@ -1569,6 +2201,16 @@ std::pair<
   common::optional<bool> the_flag;
 
   common::optional<std::shared_ptr<types::IItem> > the_item;
+
+  common::optional<
+    std::shared_ptr<types::IParent>
+  > the_optional_parent;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  > the_parents;
 
   // endregion Initialization
 
@@ -1609,6 +2251,21 @@ std::pair<
               ItemFromSequence<
                 types::IItem
               >(reader)
+            );
+          case properties::OfSomething::kOptionalParent:
+            return ReadInto(
+              the_optional_parent,
+              ParentFromElement(reader)
+            );
+          case properties::OfSomething::kParents:
+            return ReadInto(
+              the_parents,
+              DeserializeList<
+                std::shared_ptr<types::IParent>
+              >(
+                reader,
+                ParentFromElement
+              )
             );
           default:
             throw UnexpectedPropertyLiteralError(
@@ -1684,7 +2341,9 @@ std::pair<
         std::move(*the_text),
         std::move(*the_number),
         std::move(*the_flag),
-        std::move(*the_item)
+        std::move(*the_item),
+        std::move(the_optional_parent),
+        std::move(the_parents)
       )
     ),
     common::nullopt
@@ -1773,6 +2432,70 @@ common::expected<
     is,
     options,
     ItemFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IParent>,
+  DeserializationError
+> ParentFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IParent>
+  >(
+    is,
+    options,
+    ParentFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IChildA>,
+  DeserializationError
+> ChildAFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IChildA>
+  >(
+    is,
+    options,
+    ChildAFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IChildB>,
+  DeserializationError
+> ChildBFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IChildB>
+  >(
+    is,
+    options,
+    ChildBFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IContainer>,
+  DeserializationError
+> ContainerFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IContainer>
+  >(
+    is,
+    options,
+    ContainerFromElement
   );
 }
 
@@ -2022,6 +2745,86 @@ common::optional<xml_common::SerializationError> WriteProperty(
 }
 
 /**
+ * \brief Write \p list as the XML element of \p property, every item as
+ * an XML element of its own.
+ *
+ * An instance is self-describing -- the name of its XML element is its model
+ * type -- so an item needs no positional tag here. A value encoded as text
+ * does need one, which is why a list of values is written by a function of
+ * its own instead of by this one with the name of the item passed in.
+ *
+ * \param name of the XML element
+ * \param list of the instances
+ * \param writer to write to
+ * \param property which the element stands for, for the path of the error
+ * \param write_item writes an item as an XML element of its own
+ * \return an error, if any
+ */
+template <typename T, typename WriteItemT>
+common::optional<xml_common::SerializationError> WriteListOfInstancesProperty(
+  const char* name,
+  const std::vector<T>& list,
+  xml_common::SelfClosingWriter& writer,
+  iteration::Property property,
+  const WriteItemT& write_item
+) {
+  return WriteProperty(
+    name,
+    list,
+    writer,
+    property,
+    [&write_item](
+      const std::vector<T>& a_list,
+      xml_common::SelfClosingWriter& a_writer
+    ) -> common::optional<xml_common::SerializationError> {
+      for (size_t i = 0; i < a_list.size(); ++i) {
+        common::optional<xml_common::SerializationError> error(
+          write_item(a_list[i], a_writer)
+        );
+
+        if (error.has_value()) {
+          error->path.segments.emplace_front(
+            common::make_unique<iteration::IndexSegment>(i)
+          );
+
+          return error;
+        }
+      }
+
+      return common::nullopt;
+    }
+  );
+}
+
+/**
+ * \brief Write \p list as the XML element of \p property, or nothing at all
+ * if the property has not been given.
+ *
+ * See the overload which takes the list itself for what is written and
+ * for the path of the error.
+ */
+template <typename T, typename WriteItemT>
+common::optional<xml_common::SerializationError> WriteListOfInstancesProperty(
+  const char* name,
+  const common::optional<std::vector<T> >& list,
+  xml_common::SelfClosingWriter& writer,
+  iteration::Property property,
+  const WriteItemT& write_item
+) {
+  if (!list.has_value()) {
+    return common::nullopt;
+  }
+
+  return WriteListOfInstancesProperty(
+    name,
+    *list,
+    writer,
+    property,
+    write_item
+  );
+}
+
+/**
  * Serialize the literal of Kind
  * to XML text.
  */
@@ -2070,6 +2873,121 @@ common::optional<xml_common::SerializationError> SerializeItemAsElement(
 /** @copybrief SerializeItemAsElement(const types::IItem&, xml_common::SelfClosingWriter& */
 common::optional<xml_common::SerializationError> SerializeItemPtrAsElement(
   const std::shared_ptr<types::IItem>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance by dispatching to the appropriate concrete
+ * serialization function.
+ *
+ * \param that instance to be serialized
+ * \param writer to be write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeParentAsElement(
+  const types::IParent& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeParentAsElement(const types::IParent&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeParentPtrAsElement(
+  const std::shared_ptr<types::IParent>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildAAsSequence(
+  const types::IChildA& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * Serialize \p that instance to an XML element
+ * `<childA>`.
+ *
+ * \param that instance to be serialized
+ * \return an error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildAAsElement(
+  const types::IChildA& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeChildAAsElement(const types::IChildA&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeChildAPtrAsElement(
+  const std::shared_ptr<types::IChildA>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildBAsSequence(
+  const types::IChildB& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * Serialize \p that instance to an XML element
+ * `<childB>`.
+ *
+ * \param that instance to be serialized
+ * \return an error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildBAsElement(
+  const types::IChildB& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeChildBAsElement(const types::IChildB&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeChildBPtrAsElement(
+  const std::shared_ptr<types::IChildB>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeContainerAsSequence(
+  const types::IContainer& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * Serialize \p that instance to an XML element
+ * `<container>`.
+ *
+ * \param that instance to be serialized
+ * \return an error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeContainerAsElement(
+  const types::IContainer& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeContainerAsElement(const types::IContainer&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeContainerPtrAsElement(
+  const std::shared_ptr<types::IContainer>& that,
   xml_common::SelfClosingWriter& writer
 );
 
@@ -2164,6 +3082,230 @@ common::optional<xml_common::SerializationError> SerializeItemPtrAsElement(
   return SerializeItemAsElement(*that, writer);
 }
 
+common::optional<xml_common::SerializationError> SerializeParentAsElement(
+  const types::IParent& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  // NOTE (mristin):
+  // The dynamic casts are necessary due to virtual inheritance. Otherwise,
+  // we would have used static casts.
+
+  switch (that.model_type()) {
+    case types::ModelType::kChildA:
+      return SerializeChildAAsElement(
+        dynamic_cast<
+          const types::IChildA&
+        >(that),
+        writer
+      );
+    case types::ModelType::kChildB:
+      return SerializeChildBAsElement(
+        dynamic_cast<
+          const types::IChildB&
+        >(that),
+        writer
+      );
+    case types::ModelType::kContainer:
+      return SerializeContainerAsElement(
+        dynamic_cast<
+          const types::IContainer&
+        >(that),
+        writer
+      );
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Invalid model type: ",
+          stringification::to_string(that.model_type())
+        )
+      );
+  };
+}
+
+common::optional<xml_common::SerializationError> SerializeParentPtrAsElement(
+  const std::shared_ptr<types::IParent>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeParentAsElement(*that, writer);
+}
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildAAsSequence(
+  const types::IChildA& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  common::optional<xml_common::SerializationError> error;
+
+  error = WriteProperty(
+    "optionalText",
+    that.optional_text(),
+    writer,
+    iteration::Property::kOptionalText,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteProperty(
+    "aOnly",
+    that.a_only(),
+    writer,
+    iteration::Property::kAOnly,
+    WriteInt64
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+common::optional<xml_common::SerializationError> SerializeChildAAsElement(
+  const types::IChildA& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return WriteElement(
+    "childA",
+    that,
+    writer,
+    SerializeChildAAsSequence
+  );
+}
+
+common::optional<xml_common::SerializationError> SerializeChildAPtrAsElement(
+  const std::shared_ptr<types::IChildA>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeChildAAsElement(*that, writer);
+}
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeChildBAsSequence(
+  const types::IChildB& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  common::optional<xml_common::SerializationError> error;
+
+  error = WriteProperty(
+    "optionalText",
+    that.optional_text(),
+    writer,
+    iteration::Property::kOptionalText,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteProperty(
+    "bOnly",
+    that.b_only(),
+    writer,
+    iteration::Property::kBOnly,
+    WriteInt64
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+common::optional<xml_common::SerializationError> SerializeChildBAsElement(
+  const types::IChildB& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return WriteElement(
+    "childB",
+    that,
+    writer,
+    SerializeChildBAsSequence
+  );
+}
+
+common::optional<xml_common::SerializationError> SerializeChildBPtrAsElement(
+  const std::shared_ptr<types::IChildB>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeChildBAsElement(*that, writer);
+}
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeContainerAsSequence(
+  const types::IContainer& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  common::optional<xml_common::SerializationError> error;
+
+  error = WriteProperty(
+    "optionalText",
+    that.optional_text(),
+    writer,
+    iteration::Property::kOptionalText,
+    WriteWstring
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteListOfInstancesProperty(
+    "children",
+    that.children(),
+    writer,
+    iteration::Property::kChildren,
+    SerializeParentPtrAsElement
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+common::optional<xml_common::SerializationError> SerializeContainerAsElement(
+  const types::IContainer& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return WriteElement(
+    "container",
+    that,
+    writer,
+    SerializeContainerAsSequence
+  );
+}
+
+common::optional<xml_common::SerializationError> SerializeContainerPtrAsElement(
+  const std::shared_ptr<types::IContainer>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeContainerAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -2234,6 +3376,28 @@ common::optional<xml_common::SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
+  error = WriteProperty(
+    "optionalParent",
+    that.optional_parent(),
+    writer,
+    iteration::Property::kOptionalParent,
+    SerializeParentAsElement
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
+  error = WriteListOfInstancesProperty(
+    "parents",
+    that.parents(),
+    writer,
+    iteration::Property::kParents,
+    SerializeParentPtrAsElement
+  );
+  if (error.has_value()) {
+    return error;
+  }
+
   return common::nullopt;
 }
 
@@ -2269,6 +3433,27 @@ common::optional<xml_common::SerializationError> WriteClass(
       return SerializeItemAsElement(
         dynamic_cast<
           const types::IItem&
+        >(that),
+        writer
+      );
+    case types::ModelType::kChildA:
+      return SerializeChildAAsElement(
+        dynamic_cast<
+          const types::IChildA&
+        >(that),
+        writer
+      );
+    case types::ModelType::kChildB:
+      return SerializeChildBAsElement(
+        dynamic_cast<
+          const types::IChildB&
+        >(that),
+        writer
+      );
+    case types::ModelType::kContainer:
+      return SerializeContainerAsElement(
+        dynamic_cast<
+          const types::IContainer&
         >(that),
         writer
       );

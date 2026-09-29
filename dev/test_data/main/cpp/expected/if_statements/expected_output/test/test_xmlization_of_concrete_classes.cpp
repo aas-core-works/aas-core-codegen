@@ -139,6 +139,159 @@ TEST_CASE("Test the de-serialization failure on an unexpected Item") {
   }
 }
 
+TEST_CASE("Test the round-trip of an expected ChildA") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childA",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path &path : paths) {
+    AssertRoundTrip(path);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected ChildA") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "childA",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure(
+        path,
+        error_path
+      );
+    }
+  }
+}
+
+TEST_CASE("Test the round-trip of an expected ChildB") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childB",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path &path : paths) {
+    AssertRoundTrip(path);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected ChildB") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "childB",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure(
+        path,
+        error_path
+      );
+    }
+  }
+}
+
+TEST_CASE("Test the round-trip of an expected Container") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "container",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path &path : paths) {
+    AssertRoundTrip(path);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected Container") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "container",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure(
+        path,
+        error_path
+      );
+    }
+  }
+}
+
 TEST_CASE("Test the round-trip of an expected Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

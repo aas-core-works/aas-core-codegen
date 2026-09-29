@@ -24,6 +24,18 @@ public interface ITransformerWithContext<ContextT, T> {
     IItem that,
     ContextT context
   );
+  T transformChildA(
+    IChildA that,
+    ContextT context
+  );
+  T transformChildB(
+    IChildB that,
+    ContextT context
+  );
+  T transformContainer(
+    IContainer that,
+    ContextT context
+  );
   T transformSomething(
     ISomething that,
     ContextT context

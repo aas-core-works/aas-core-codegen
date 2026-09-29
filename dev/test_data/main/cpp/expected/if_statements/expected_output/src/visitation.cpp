@@ -33,6 +33,27 @@ void AbstractVisitor::Visit(
         >(that)
       );
       break;
+    case types::ModelType::kChildA:
+      VisitChildA(
+        std::dynamic_pointer_cast<
+          types::IChildA
+        >(that)
+      );
+      break;
+    case types::ModelType::kChildB:
+      VisitChildB(
+        std::dynamic_pointer_cast<
+          types::IChildB
+        >(that)
+      );
+      break;
+    case types::ModelType::kContainer:
+      VisitContainer(
+        std::dynamic_pointer_cast<
+          types::IContainer
+        >(that)
+      );
+      break;
     case types::ModelType::kSomething:
       VisitSomething(
         std::dynamic_pointer_cast<
@@ -62,6 +83,40 @@ void PassThroughVisitor::VisitItem(
   // No properties to be passed through.
 }
 
+void PassThroughVisitor::VisitChildA(
+  const std::shared_ptr<types::IChildA>&
+) {
+  // No properties to be passed through.
+}
+
+void PassThroughVisitor::VisitChildB(
+  const std::shared_ptr<types::IChildB>&
+) {
+  // No properties to be passed through.
+}
+
+void PassThroughVisitor::VisitContainer(
+  const std::shared_ptr<types::IContainer>& that
+) {
+  // region mutable_children
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& maybe_children(
+    that->mutable_children()
+  );
+  if (maybe_children.has_value()) {
+    for (
+      const std::shared_ptr<types::IParent>& item :
+      maybe_children.value()
+    ) {
+      Visit(item);
+    }
+  }
+  // endregion
+}
+
 void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
@@ -69,6 +124,37 @@ void PassThroughVisitor::VisitSomething(
   Visit(
     that->mutable_item()
   );
+
+  // region mutable_optional_parent
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& maybe_optional_parent(
+    that->mutable_optional_parent()
+  );
+  if (maybe_optional_parent.has_value()) {
+    Visit(
+      maybe_optional_parent.value()
+    );
+  }
+  // endregion
+
+  // region mutable_parents
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& maybe_parents(
+    that->mutable_parents()
+  );
+  if (maybe_parents.has_value()) {
+    for (
+      const std::shared_ptr<types::IParent>& item :
+      maybe_parents.value()
+    ) {
+      Visit(item);
+    }
+  }
+  // endregion
 }
 
 // endregion

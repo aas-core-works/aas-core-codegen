@@ -46,6 +46,78 @@ class TestRoundTrips(unittest.TestCase):
             )
             self.assertListEqual([], list(map(str, mismatches)))
 
+    def test_child_a(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'ChildA'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = aas_jsonization.child_a_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = aas_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
+    def test_child_b(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'ChildB'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = aas_jsonization.child_b_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = aas_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
+    def test_container(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'Container'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = aas_jsonization.container_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = aas_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
     def test_something(self) -> None:
         for path in sorted(
             (
@@ -91,6 +163,42 @@ def _load_the_first_expected(model_type: str) -> Any:
 
 
 class TestSerializationFailures(unittest.TestCase):
+    def test_child_a_a_only_out_of_range(self) -> None:
+        for value in [9007199254740992, -9007199254740992]:
+            instance = aas_jsonization.child_a_from_jsonable(
+                _load_the_first_expected('ChildA')
+            )
+
+            instance.a_only = value
+
+            with self.assertRaises(
+                aas_jsonization.SerializationException
+            ) as context_manager:
+                aas_jsonization.to_jsonable(instance)
+
+            self.assertEqual(
+                '.a_only',
+                context_manager.exception.path
+            )
+
+    def test_child_b_b_only_out_of_range(self) -> None:
+        for value in [9007199254740992, -9007199254740992]:
+            instance = aas_jsonization.child_b_from_jsonable(
+                _load_the_first_expected('ChildB')
+            )
+
+            instance.b_only = value
+
+            with self.assertRaises(
+                aas_jsonization.SerializationException
+            ) as context_manager:
+                aas_jsonization.to_jsonable(instance)
+
+            self.assertEqual(
+                '.b_only',
+                context_manager.exception.path
+            )
+
     def test_something_number_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
             instance = aas_jsonization.something_from_jsonable(

@@ -19,6 +19,18 @@ const std::unordered_map<
     types::ModelType::kItem
   },
   {
+    "ChildA",
+    types::ModelType::kChildA
+  },
+  {
+    "ChildB",
+    types::ModelType::kChildB
+  },
+  {
+    "Container",
+    types::ModelType::kContainer
+  },
+  {
     "Something",
     types::ModelType::kSomething
   }
@@ -59,6 +71,12 @@ std::string to_string(
   switch (model_type) {
     case types::ModelType::kItem:
     return "Item";
+    case types::ModelType::kChildA:
+    return "ChildA";
+    case types::ModelType::kChildB:
+    return "ChildB";
+    case types::ModelType::kContainer:
+    return "Container";
     case types::ModelType::kSomething:
     return "Something";
     default:

@@ -35,6 +35,45 @@ public class TestCopying {
     }
 
     @Override
+    public Boolean transformChildA(IChildA that, IClass other) {
+      if (!(other instanceof ChildA)) {
+        return false;
+      }
+
+      ChildA casted = (ChildA) that;
+
+      return (
+        that.getOptionalText().equals(casted.getOptionalText())
+        && that.getAOnly().equals(casted.getAOnly()));
+    }
+
+    @Override
+    public Boolean transformChildB(IChildB that, IClass other) {
+      if (!(other instanceof ChildB)) {
+        return false;
+      }
+
+      ChildB casted = (ChildB) that;
+
+      return (
+        that.getOptionalText().equals(casted.getOptionalText())
+        && that.getBOnly().equals(casted.getBOnly()));
+    }
+
+    @Override
+    public Boolean transformContainer(IContainer that, IClass other) {
+      if (!(other instanceof Container)) {
+        return false;
+      }
+
+      Container casted = (Container) that;
+
+      return (
+        that.getOptionalText().equals(casted.getOptionalText())
+        && that.getChildren().equals(casted.getChildren()));
+    }
+
+    @Override
     public Boolean transformSomething(ISomething that, IClass other) {
       if (!(other instanceof Something)) {
         return false;
@@ -49,7 +88,12 @@ public class TestCopying {
         && that.getFlag().equals(casted.getFlag())
         && transform(
           that.getItem(),
-          casted.getItem()));
+          casted.getItem())
+        && (that.getOptionalParent().isPresent()
+          ? casted.getOptionalParent().isPresent()
+          && transform( that.getOptionalParent().get(), casted.getOptionalParent().get())
+          : ! casted.getOptionalParent().isPresent())
+        && that.getParents().equals(casted.getParents()));
     }
   } // class _DeepEqualiser
 
@@ -121,6 +165,30 @@ public class TestCopying {
       && that.getOptionalText().equals(other.getOptionalText()));
   }
 
+  private static Boolean ChildAShallowEquals(
+    ChildA that,
+    ChildA other) {
+    return (
+      that.getOptionalText().equals(other.getOptionalText())
+      && that.getAOnly().equals(other.getAOnly()));
+  }
+
+  private static Boolean ChildBShallowEquals(
+    ChildB that,
+    ChildB other) {
+    return (
+      that.getOptionalText().equals(other.getOptionalText())
+      && that.getBOnly().equals(other.getBOnly()));
+  }
+
+  private static Boolean ContainerShallowEquals(
+    Container that,
+    Container other) {
+    return (
+      that.getOptionalText().equals(other.getOptionalText())
+      && that.getChildren().equals(other.getChildren()));
+  }
+
   private static Boolean SomethingShallowEquals(
     Something that,
     Something other) {
@@ -129,10 +197,24 @@ public class TestCopying {
       && that.getText().equals(other.getText())
       && that.getNumber().equals(other.getNumber())
       && that.getFlag().equals(other.getFlag())
-      && that.getItem().equals(other.getItem()));
+      && that.getItem().equals(other.getItem())
+      && that.getOptionalParent().equals(other.getOptionalParent())
+      && that.getParents().equals(other.getParents()));
   }
 
   private static Boolean ItemDeepEquals(Item that, Item other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean ChildADeepEquals(ChildA that, ChildA other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean ChildBDeepEquals(ChildB that, ChildB other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean ContainerDeepEquals(Container that, Container other) {
     return DeepEqualiserInstance.transform(that, other);
   }
 
@@ -159,6 +241,66 @@ public class TestCopying {
       ItemDeepEquals(instance, instanceCopy),
       "Item");
   } // public void testItemDeepCopy
+
+  @Test
+  public void testChildAShallowCopy() throws IOException {
+    final ChildA instance = CommonJsonization.loadMaximalChildA();
+    final ChildA instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      ChildAShallowEquals(instance, instanceCopy),
+      "ChildA");
+  } // public void testChildAShallowCopy
+
+  @Test
+  public void testChildADeepCopy() throws IOException {
+    final ChildA instance = CommonJsonization.loadMaximalChildA();
+    final ChildA instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      ChildADeepEquals(instance, instanceCopy),
+      "ChildA");
+  } // public void testChildADeepCopy
+
+  @Test
+  public void testChildBShallowCopy() throws IOException {
+    final ChildB instance = CommonJsonization.loadMaximalChildB();
+    final ChildB instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      ChildBShallowEquals(instance, instanceCopy),
+      "ChildB");
+  } // public void testChildBShallowCopy
+
+  @Test
+  public void testChildBDeepCopy() throws IOException {
+    final ChildB instance = CommonJsonization.loadMaximalChildB();
+    final ChildB instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      ChildBDeepEquals(instance, instanceCopy),
+      "ChildB");
+  } // public void testChildBDeepCopy
+
+  @Test
+  public void testContainerShallowCopy() throws IOException {
+    final Container instance = CommonJsonization.loadMaximalContainer();
+    final Container instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      ContainerShallowEquals(instance, instanceCopy),
+      "Container");
+  } // public void testContainerShallowCopy
+
+  @Test
+  public void testContainerDeepCopy() throws IOException {
+    final Container instance = CommonJsonization.loadMaximalContainer();
+    final Container instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      ContainerDeepEquals(instance, instanceCopy),
+      "Container");
+  } // public void testContainerDeepCopy
 
   @Test
   public void testSomethingShallowCopy() throws IOException {

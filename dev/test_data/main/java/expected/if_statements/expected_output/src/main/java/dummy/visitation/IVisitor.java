@@ -20,6 +20,15 @@ public interface IVisitor
   void visitItem(
     IItem that
   );
+  void visitChildA(
+    IChildA that
+  );
+  void visitChildB(
+    IChildB that
+  );
+  void visitContainer(
+    IContainer that
+  );
   void visitSomething(
     ISomething that
   );

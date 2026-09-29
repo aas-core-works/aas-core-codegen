@@ -148,6 +148,278 @@ namespace dummy
         }
     }
 
+    public interface IParent : IClass
+    {
+        public string? OptionalText { get; set; }
+    }
+
+    public interface IChildA : IParent
+    {
+        public long AOnly { get; set; }
+    }
+
+    public class ChildA : IChildA
+    {
+        public string? OptionalText { get; set; }
+
+        public long AOnly { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitChildA(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitChildA(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformChildA(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformChildA(this, context);
+        }
+
+        public ChildA(
+            long aOnly,
+            string? optionalText = null)
+        {
+            OptionalText = optionalText;
+            AOnly = aOnly;
+        }
+    }
+
+    public interface IChildB : IParent
+    {
+        public long BOnly { get; set; }
+    }
+
+    public class ChildB : IChildB
+    {
+        public string? OptionalText { get; set; }
+
+        public long BOnly { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitChildB(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitChildB(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformChildB(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformChildB(this, context);
+        }
+
+        public ChildB(
+            long bOnly,
+            string? optionalText = null)
+        {
+            OptionalText = optionalText;
+            BOnly = bOnly;
+        }
+    }
+
+    public interface IContainer : IParent
+    {
+        public List<IParent>? Children { get; set; }
+
+        /// <summary>
+        /// Iterate over Children, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IParent> OverChildrenOrEmpty();
+    }
+
+    public class Container : IContainer
+    {
+        public string? OptionalText { get; set; }
+
+        public List<IParent>? Children { get; set; }
+
+        /// <summary>
+        /// Iterate over Children, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IParent> OverChildrenOrEmpty()
+        {
+            return Children
+                ?? System.Linq.Enumerable.Empty<IParent>();
+        }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            if (Children != null)
+            {
+                foreach (var anItem in Children)
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            if (Children != null)
+            {
+                foreach (var anItem in Children)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitContainer(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitContainer(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformContainer(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformContainer(this, context);
+        }
+
+        public Container(
+            string? optionalText = null,
+            List<IParent>? children = null)
+        {
+            OptionalText = optionalText;
+            Children = children;
+        }
+    }
+
     public interface ISomething : IClass
     {
         public Kind Kind { get; set; }
@@ -159,6 +431,15 @@ namespace dummy
         public bool Flag { get; set; }
 
         public IItem Item { get; set; }
+
+        public IParent? OptionalParent { get; set; }
+
+        public List<IParent>? Parents { get; set; }
+
+        /// <summary>
+        /// Iterate over Parents, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IParent> OverParentsOrEmpty();
     }
 
     public class Something : ISomething
@@ -173,6 +454,19 @@ namespace dummy
 
         public IItem Item { get; set; }
 
+        public IParent? OptionalParent { get; set; }
+
+        public List<IParent>? Parents { get; set; }
+
+        /// <summary>
+        /// Iterate over Parents, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IParent> OverParentsOrEmpty()
+        {
+            return Parents
+                ?? System.Linq.Enumerable.Empty<IParent>();
+        }
+
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
@@ -180,6 +474,19 @@ namespace dummy
         public IEnumerable<IClass> DescendOnce()
         {
             yield return Item;
+
+            if (OptionalParent != null)
+            {
+                yield return OptionalParent;
+            }
+
+            if (Parents != null)
+            {
+                foreach (var anItem in Parents)
+                {
+                    yield return anItem;
+                }
+            }
         }
 
         /// <summary>
@@ -193,6 +500,31 @@ namespace dummy
             foreach (var anItem in Item.Descend())
             {
                 yield return anItem;
+            }
+
+            if (OptionalParent != null)
+            {
+                yield return OptionalParent;
+
+                // Recurse
+                foreach (var anItem in OptionalParent.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Parents != null)
+            {
+                foreach (var anItem in Parents)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
             }
         }
 
@@ -241,13 +573,17 @@ namespace dummy
             string text,
             long number,
             bool flag,
-            IItem item)
+            IItem item,
+            IParent? optionalParent = null,
+            List<IParent>? parents = null)
         {
             Kind = kind;
             Text = text;
             Number = number;
             Flag = flag;
             Item = item;
+            OptionalParent = optionalParent;
+            Parents = parents;
         }
     }
 }  // namespace dummy

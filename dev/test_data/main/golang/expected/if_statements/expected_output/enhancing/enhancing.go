@@ -92,6 +92,242 @@ func wrapItem[E any](
 	return
 }
 
+type enhancedChildA[E any] struct {
+	instance aastypes.IChildA
+	enhancement E
+}
+
+func (eca *enhancedChildA[E]) ModelType(
+) aastypes.ModelType {
+	return eca.instance.ModelType()
+}
+
+func (eca *enhancedChildA[E]) DescendOnce(
+	action func(aastypes.IClass)bool,
+) bool {
+	return eca.instance.DescendOnce(action)
+}
+
+func (eca *enhancedChildA[E]) Descend(
+	action func(aastypes.IClass) bool,
+) bool {
+	return eca.instance.Descend(action)
+}
+
+func (eca *enhancedChildA[E]) OptionalText(
+) *string {
+	return eca.instance.OptionalText()
+}
+
+func (eca *enhancedChildA[E]) SetOptionalText(
+	value *string,
+) {
+	eca.instance.SetOptionalText(value)
+}
+
+func (eca *enhancedChildA[E]) AOnly(
+) int64 {
+	return eca.instance.AOnly()
+}
+
+func (eca *enhancedChildA[E]) SetAOnly(
+	value int64,
+) {
+	eca.instance.SetAOnly(value)
+}
+
+func (eca *enhancedChildA[E]) getEnhancement(
+) E {
+	return eca.enhancement
+}
+
+func (eca *enhancedChildA[E]) setEnhancement(
+	value E,
+) {
+	eca.enhancement = value
+}
+
+func wrapChildA[E any](
+	that aastypes.IChildA,
+	factory func(aastypes.IClass) (E, bool),
+) (result aastypes.IChildA) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedChildA[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	return
+}
+
+type enhancedChildB[E any] struct {
+	instance aastypes.IChildB
+	enhancement E
+}
+
+func (ecb *enhancedChildB[E]) ModelType(
+) aastypes.ModelType {
+	return ecb.instance.ModelType()
+}
+
+func (ecb *enhancedChildB[E]) DescendOnce(
+	action func(aastypes.IClass)bool,
+) bool {
+	return ecb.instance.DescendOnce(action)
+}
+
+func (ecb *enhancedChildB[E]) Descend(
+	action func(aastypes.IClass) bool,
+) bool {
+	return ecb.instance.Descend(action)
+}
+
+func (ecb *enhancedChildB[E]) OptionalText(
+) *string {
+	return ecb.instance.OptionalText()
+}
+
+func (ecb *enhancedChildB[E]) SetOptionalText(
+	value *string,
+) {
+	ecb.instance.SetOptionalText(value)
+}
+
+func (ecb *enhancedChildB[E]) BOnly(
+) int64 {
+	return ecb.instance.BOnly()
+}
+
+func (ecb *enhancedChildB[E]) SetBOnly(
+	value int64,
+) {
+	ecb.instance.SetBOnly(value)
+}
+
+func (ecb *enhancedChildB[E]) getEnhancement(
+) E {
+	return ecb.enhancement
+}
+
+func (ecb *enhancedChildB[E]) setEnhancement(
+	value E,
+) {
+	ecb.enhancement = value
+}
+
+func wrapChildB[E any](
+	that aastypes.IChildB,
+	factory func(aastypes.IClass) (E, bool),
+) (result aastypes.IChildB) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedChildB[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	return
+}
+
+type enhancedContainer[E any] struct {
+	instance aastypes.IContainer
+	enhancement E
+}
+
+func (ec *enhancedContainer[E]) ModelType(
+) aastypes.ModelType {
+	return ec.instance.ModelType()
+}
+
+func (ec *enhancedContainer[E]) DescendOnce(
+	action func(aastypes.IClass)bool,
+) bool {
+	return ec.instance.DescendOnce(action)
+}
+
+func (ec *enhancedContainer[E]) Descend(
+	action func(aastypes.IClass) bool,
+) bool {
+	return ec.instance.Descend(action)
+}
+
+func (ec *enhancedContainer[E]) OptionalText(
+) *string {
+	return ec.instance.OptionalText()
+}
+
+func (ec *enhancedContainer[E]) SetOptionalText(
+	value *string,
+) {
+	ec.instance.SetOptionalText(value)
+}
+
+func (ec *enhancedContainer[E]) Children(
+) []aastypes.IParent {
+	return ec.instance.Children()
+}
+
+func (ec *enhancedContainer[E]) SetChildren(
+	value []aastypes.IParent,
+) {
+	ec.instance.SetChildren(value)
+}
+
+func (ec *enhancedContainer[E]) getEnhancement(
+) E {
+	return ec.enhancement
+}
+
+func (ec *enhancedContainer[E]) setEnhancement(
+	value E,
+) {
+	ec.enhancement = value
+}
+
+func wrapContainer[E any](
+	that aastypes.IContainer,
+	factory func(aastypes.IClass) (E, bool),
+) (result aastypes.IContainer) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedContainer[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	theChildren := that.Children()
+	if theChildren != nil {
+		for i, v := range theChildren {
+			// Update in-situ
+			theChildren[i] = Wrap[E](
+				v,
+				factory,
+			).(aastypes.IParent)
+		}
+	}
+
+	return
+}
+
 type enhancedSomething[E any] struct {
 	instance aastypes.ISomething
 	enhancement E
@@ -169,6 +405,28 @@ func (es *enhancedSomething[E]) SetItem(
 	es.instance.SetItem(value)
 }
 
+func (es *enhancedSomething[E]) OptionalParent(
+) aastypes.IParent {
+	return es.instance.OptionalParent()
+}
+
+func (es *enhancedSomething[E]) SetOptionalParent(
+	value aastypes.IParent,
+) {
+	es.instance.SetOptionalParent(value)
+}
+
+func (es *enhancedSomething[E]) Parents(
+) []aastypes.IParent {
+	return es.instance.Parents()
+}
+
+func (es *enhancedSomething[E]) SetParents(
+	value []aastypes.IParent,
+) {
+	es.instance.SetParents(value)
+}
+
 func (es *enhancedSomething[E]) getEnhancement(
 ) E {
 	return es.enhancement
@@ -205,6 +463,27 @@ func wrapSomething[E any](
 		).(aastypes.IItem),
 	)
 
+	theOptionalParent := that.OptionalParent()
+	if theOptionalParent != nil {
+		that.SetOptionalParent(
+			Wrap[E](
+				theOptionalParent,
+				factory,
+			).(aastypes.IParent),
+		)
+	}
+
+	theParents := that.Parents()
+	if theParents != nil {
+		for i, v := range theParents {
+			// Update in-situ
+			theParents[i] = Wrap[E](
+				v,
+				factory,
+			).(aastypes.IParent)
+		}
+	}
+
 	return
 }
 
@@ -234,6 +513,21 @@ func Wrap[E any](
 	case aastypes.ModelTypeItem:
 		result = wrapItem[E](
 			that.(aastypes.IItem),
+			factory,
+		)
+	case aastypes.ModelTypeChildA:
+		result = wrapChildA[E](
+			that.(aastypes.IChildA),
+			factory,
+		)
+	case aastypes.ModelTypeChildB:
+		result = wrapChildB[E](
+			that.(aastypes.IChildB),
+			factory,
+		)
+	case aastypes.ModelTypeContainer:
+		result = wrapContainer[E](
+			that.(aastypes.IContainer),
 			factory,
 		)
 	case aastypes.ModelTypeSomething:

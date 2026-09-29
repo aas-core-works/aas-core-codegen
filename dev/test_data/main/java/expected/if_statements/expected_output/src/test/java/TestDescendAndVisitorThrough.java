@@ -95,6 +95,69 @@ public class TestDescendAndVisitorThrough {
     } // public void testDescendAgainstVisitorThroughForItem
 
     @Test
+    public void testDescendOfChildA() throws IOException {
+      final ChildA instance = CommonJsonization.loadMaximalChildA();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "ChildA",
+          "maximal.json.trace"));
+    } // public void testDescendOfChildA
+
+    @Test
+    public void testDescendAgainstVisitorThroughForChildA() throws IOException {
+      ChildA instance = (
+        CommonJsonization.loadMaximalChildA());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForChildA
+
+    @Test
+    public void testDescendOfChildB() throws IOException {
+      final ChildB instance = CommonJsonization.loadMaximalChildB();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "ChildB",
+          "maximal.json.trace"));
+    } // public void testDescendOfChildB
+
+    @Test
+    public void testDescendAgainstVisitorThroughForChildB() throws IOException {
+      ChildB instance = (
+        CommonJsonization.loadMaximalChildB());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForChildB
+
+    @Test
+    public void testDescendOfContainer() throws IOException {
+      final Container instance = CommonJsonization.loadMaximalContainer();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "Container",
+          "maximal.json.trace"));
+    } // public void testDescendOfContainer
+
+    @Test
+    public void testDescendAgainstVisitorThroughForContainer() throws IOException {
+      Container instance = (
+        CommonJsonization.loadMaximalContainer());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForContainer
+
+    @Test
     public void testDescendOfSomething() throws IOException {
       final Something instance = CommonJsonization.loadMaximalSomething();
 

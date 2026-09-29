@@ -520,6 +520,254 @@ func itemFromMapWithoutDispatch(
 	return
 }
 
+// Parse `jsonable` as an instance of [aastypes.IParent],
+// or return an error.
+func ParentFromJsonable(
+	jsonable interface{},
+) (
+	result aastypes.IParent,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	return parentFromMap(m)
+}
+
+// Parse `jsonable` as an instance of [aastypes.IChildA],
+// or return an error.
+func ChildAFromJsonable(
+	jsonable interface{},
+) (
+	result aastypes.IChildA,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	err = checkModelType(m, "ChildA")
+	if err != nil {
+		return
+	}
+
+	return childAFromMapWithoutDispatch(m)
+}
+
+// Parse [aastypes.IChildA] from a map,
+// or return an error, if any.
+func childAFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result aastypes.IChildA,
+	err error,
+) {
+	var theOptionalText *string
+	var theAOnly int64
+
+	foundAOnly := false
+
+	for k, v := range m {
+		switch k {
+		case "optionalText":
+			theOptionalText, err = parseOptional(stringFromJsonable(v))
+
+		case "aOnly":
+			theAOnly, err = int64FromJsonable(v)
+			foundAOnly = true
+
+		case "modelType":
+			// The model type has already been checked before the loop.
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+
+		if err != nil {
+			mustDeserializationError(err).prependName(k)
+			return
+		}
+	}
+
+	if !foundAOnly {
+		err = newDeserializationError(
+			"The required property 'aOnly' is missing",
+		)
+		return
+	}
+
+	result = aastypes.NewChildA(
+		theAOnly,
+	)
+	result.SetOptionalText(
+		theOptionalText,
+	)
+
+	return
+}
+
+// Parse `jsonable` as an instance of [aastypes.IChildB],
+// or return an error.
+func ChildBFromJsonable(
+	jsonable interface{},
+) (
+	result aastypes.IChildB,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	err = checkModelType(m, "ChildB")
+	if err != nil {
+		return
+	}
+
+	return childBFromMapWithoutDispatch(m)
+}
+
+// Parse [aastypes.IChildB] from a map,
+// or return an error, if any.
+func childBFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result aastypes.IChildB,
+	err error,
+) {
+	var theOptionalText *string
+	var theBOnly int64
+
+	foundBOnly := false
+
+	for k, v := range m {
+		switch k {
+		case "optionalText":
+			theOptionalText, err = parseOptional(stringFromJsonable(v))
+
+		case "bOnly":
+			theBOnly, err = int64FromJsonable(v)
+			foundBOnly = true
+
+		case "modelType":
+			// The model type has already been checked before the loop.
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+
+		if err != nil {
+			mustDeserializationError(err).prependName(k)
+			return
+		}
+	}
+
+	if !foundBOnly {
+		err = newDeserializationError(
+			"The required property 'bOnly' is missing",
+		)
+		return
+	}
+
+	result = aastypes.NewChildB(
+		theBOnly,
+	)
+	result.SetOptionalText(
+		theOptionalText,
+	)
+
+	return
+}
+
+// Parse `jsonable` as an instance of [aastypes.IContainer],
+// or return an error.
+func ContainerFromJsonable(
+	jsonable interface{},
+) (
+	result aastypes.IContainer,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	err = checkModelType(m, "Container")
+	if err != nil {
+		return
+	}
+
+	return containerFromMapWithoutDispatch(m)
+}
+
+// Parse [aastypes.IContainer] from a map,
+// or return an error, if any.
+func containerFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result aastypes.IContainer,
+	err error,
+) {
+	var theOptionalText *string
+	var theChildren []aastypes.IParent
+
+	for k, v := range m {
+		switch k {
+		case "optionalText":
+			theOptionalText, err = parseOptional(stringFromJsonable(v))
+
+		case "children":
+			theChildren, err = parseArray(v, ParentFromJsonable)
+
+		case "modelType":
+			// The model type has already been checked before the loop.
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+
+		if err != nil {
+			mustDeserializationError(err).prependName(k)
+			return
+		}
+	}
+
+	result = aastypes.NewContainer()
+	result.SetOptionalText(
+		theOptionalText,
+	)
+	result.SetChildren(
+		theChildren,
+	)
+
+	return
+}
+
 // Parse `jsonable` as an instance of [aastypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
@@ -550,6 +798,8 @@ func somethingFromMapWithoutDispatch(
 	var theNumber int64
 	var theFlag bool
 	var theItem aastypes.IItem
+	var theOptionalParent aastypes.IParent
+	var theParents []aastypes.IParent
 
 	foundKind := false
 	foundText := false
@@ -578,6 +828,12 @@ func somethingFromMapWithoutDispatch(
 		case "item":
 			theItem, err = ItemFromJsonable(v)
 			foundItem = true
+
+		case "optionalParent":
+			theOptionalParent, err = ParentFromJsonable(v)
+
+		case "parents":
+			theParents, err = parseArray(v, ParentFromJsonable)
 
 		default:
 			err = newDeserializationError(
@@ -637,6 +893,46 @@ func somethingFromMapWithoutDispatch(
 		theFlag,
 		theItem,
 	)
+	result.SetOptionalParent(
+		theOptionalParent,
+	)
+	result.SetParents(
+		theParents,
+	)
+
+	return
+}
+
+// De-serialize an instance of [aastypes.IParent]
+// from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
+func parentFromMap(
+	m map[string]interface{},
+) (
+	result aastypes.IParent,
+	err error,
+) {
+	var modelType string
+	modelType, err = modelTypeFromMap(m)
+	if err != nil {
+		return
+	}
+
+	switch modelType {
+	case "ChildA":
+		result, err = childAFromMapWithoutDispatch(m)
+	case "ChildB":
+		result, err = childBFromMapWithoutDispatch(m)
+	case "Container":
+		result, err = containerFromMapWithoutDispatch(m)
+	default:
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Unexpected model type " +
+				"for IParent: %s",
+				modelType,
+			),
+		)
+	}
 
 	return
 }
@@ -823,6 +1119,23 @@ func serializeArray[T any](
 	return
 }
 
+// Serialize `that` to a JSON-able value, or return an error.
+//
+// `ToJsonable` takes an `aastypes.IClass`, but a list or a tuple item's own
+// (more specific) interface type, e.g., `aastypes.ISomeItem`, can not be
+// unified with that when passing `ToJsonable` itself as a
+// `func(item T) (interface{}, error)` value -- Go function values are
+// invariant in their parameter type (no contravariance, unlike, say, a C#
+// delegate). Making this wrapper itself generic (instead of fixing its
+// parameter to `aastypes.IClass`) lets the very same one be passed on bare,
+// uninstantiated, for every class-typed item regardless of its
+// concrete interface: Go infers both the item's type and this
+// wrapper's own type parameter together from the context of the
+// `serializeArray`/`serializeTupleN` call.
+func classAsJsonableInterface[T aastypes.IClass](that T) (interface{}, error) {
+	return ToJsonable(that)
+}
+
 // Serialize `that` to a string, or return an error.
 func KindToJsonable(
 	that aastypes.Kind,
@@ -864,6 +1177,88 @@ func itemToMap(
 	return
 }
 
+// Serialize [aastypes.IChildA] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [aastypes.IChildA] with proper dispatch, call
+// [ToJsonable].
+func childAToMap(
+	that aastypes.IChildA,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	if that.OptionalText() != nil {
+		result["optionalText"] = *that.OptionalText()
+	}
+
+	result["aOnly"], err = int64ToJsonable(that.AOnly())
+	if err != nil {
+		mustSerializationError(err).prependName("AOnly()")
+		return
+	}
+
+	result["modelType"] = "ChildA"
+
+	return
+}
+
+// Serialize [aastypes.IChildB] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [aastypes.IChildB] with proper dispatch, call
+// [ToJsonable].
+func childBToMap(
+	that aastypes.IChildB,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	if that.OptionalText() != nil {
+		result["optionalText"] = *that.OptionalText()
+	}
+
+	result["bOnly"], err = int64ToJsonable(that.BOnly())
+	if err != nil {
+		mustSerializationError(err).prependName("BOnly()")
+		return
+	}
+
+	result["modelType"] = "ChildB"
+
+	return
+}
+
+// Serialize [aastypes.IContainer] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [aastypes.IContainer] with proper dispatch, call
+// [ToJsonable].
+func containerToMap(
+	that aastypes.IContainer,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	if that.OptionalText() != nil {
+		result["optionalText"] = *that.OptionalText()
+	}
+
+	if that.Children() != nil {
+		result["children"], err = serializeArray(
+			that.Children(), classAsJsonableInterface[aastypes.IParent],
+		)
+		if err != nil {
+			mustSerializationError(err).prependName("Children()")
+			return
+		}
+	}
+
+	result["modelType"] = "Container"
+
+	return
+}
+
 // Serialize [aastypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
@@ -897,6 +1292,24 @@ func somethingToMap(
 		return
 	}
 
+	if that.OptionalParent() != nil {
+		result["optionalParent"], err = ToJsonable(that.OptionalParent())
+		if err != nil {
+			mustSerializationError(err).prependName("OptionalParent()")
+			return
+		}
+	}
+
+	if that.Parents() != nil {
+		result["parents"], err = serializeArray(
+			that.Parents(), classAsJsonableInterface[aastypes.IParent],
+		)
+		if err != nil {
+			mustSerializationError(err).prependName("Parents()")
+			return
+		}
+	}
+
 	return
 }
 
@@ -911,6 +1324,18 @@ func ToJsonable(
 	case aastypes.ModelTypeItem:
 		result, err = itemToMap(
 			that.(aastypes.IItem),
+		)
+	case aastypes.ModelTypeChildA:
+		result, err = childAToMap(
+			that.(aastypes.IChildA),
+		)
+	case aastypes.ModelTypeChildB:
+		result, err = childBToMap(
+			that.(aastypes.IChildB),
+		)
+	case aastypes.ModelTypeContainer:
+		result, err = containerToMap(
+			that.(aastypes.IContainer),
 		)
 	case aastypes.ModelTypeSomething:
 		result, err = somethingToMap(

@@ -342,6 +342,179 @@ export function ifWithContinueInFor(
 }
 
 /**
+ * Check the narrowing in the body of a branch by its condition.
+ */
+export function narrowingInBody(
+  parent: AasTypes.IParent | null
+): boolean {
+  if (
+    (
+      (parent !== null)
+      && AasTypes.isChildA(parent)
+    )
+  ) {
+    return (parent as AasTypes.ChildA).aOnly < 100;
+  }
+  return true;
+}
+
+/**
+ * Check the narrowing by the negation of the previous conditions.
+ */
+export function narrowingInElifAndElse(
+  parent: AasTypes.IParent | null
+): boolean {
+  if (parent === null) {
+    return true;
+  } else if (!AasTypes.isChildB(parent)) {
+    return (
+      (parent.optionalText === null)
+      || parent.optionalText != "forbidden"
+    );
+  } else {
+    return (parent as AasTypes.ChildB).bOnly > 0;
+  }
+}
+
+/**
+ * Check the narrowing after an if-statement whose branch always returns.
+ */
+export function narrowingAfterEarlyReturn(
+  parent: AasTypes.IParent | null
+): boolean {
+  if (
+    (
+      (parent === null)
+      || (!AasTypes.isChildB(parent))
+    )
+  ) {
+    return true;
+  }
+  return (parent as AasTypes.ChildB).bOnly < 50;
+}
+
+/**
+ * Check the narrowing after an if-statement whose `else` always returns.
+ */
+export function narrowingAfterTheOnlyCompletingBranch(
+  parent: AasTypes.IParent | null
+): boolean {
+  if (
+    (
+      (parent !== null)
+      && AasTypes.isChildA(parent)
+    )
+  ) {
+    // Intentionally empty.
+  } else {
+    return true;
+  }
+  return (parent as AasTypes.ChildA).aOnly > -10;
+}
+
+/**
+ * Check the narrowing after the `continue` and the early return in a loop.
+ */
+export function childAsHaveTexts(
+  parents: Array<AasTypes.IParent>
+): boolean {
+  for (const parent of parents) {
+    if (!AasTypes.isChildA(parent)) {
+      continue;
+    }
+    if ((parent as AasTypes.ChildA).optionalText === null) {
+      return false;
+    }
+    if (AasCommon.lenStr((parent as AasTypes.ChildA).optionalText) < 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Check the narrowing after the `continue` in a loop with a `break`.
+ */
+export function textsBeforeContainerAreShort(
+  parents: Array<AasTypes.IParent>
+): boolean {
+  let total = 0;
+  for (const parent of parents) {
+    if (AasTypes.isContainer(parent)) {
+      break;
+    }
+    if (parent.optionalText === null) {
+      continue;
+    }
+    total = total + AasCommon.lenStr(parent.optionalText);
+  }
+  return total < 20;
+}
+
+/**
+ * Check the narrowing by the value assigned in a branch.
+ */
+export function textOrDefaultIsShort(
+  parent: AasTypes.IParent
+): boolean {
+  let text = parent.optionalText;
+  if (text === null) {
+    text = "default";
+  }
+  return AasCommon.lenStr(text) < 10;
+}
+
+/**
+ * Check the narrowing of a variable to a class by the assigned value.
+ */
+export function lastChildAIsSmall(
+  parent: AasTypes.IParent,
+  parents: Array<AasTypes.IParent>
+): boolean {
+  let last = parent;
+  for (const other of parents) {
+    if (AasTypes.isChildA(other)) {
+      last = (other as AasTypes.ChildA);
+      if ((last as AasTypes.ChildA).aOnly >= 1000) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Check the recursive chain of `isinstance` checks with early returns.
+ */
+export function hasMarkerInTree(
+  parent: AasTypes.IParent
+): boolean {
+  if (
+    (
+      (parent.optionalText !== null)
+      && parent.optionalText == "marker"
+    )
+  ) {
+    return true;
+  }
+  if (AasTypes.isContainer(parent)) {
+    return (
+      ((parent as AasTypes.Container).children !== null)
+      && (
+        AasCommon.some(
+          AasCommon.map(
+            (parent as AasTypes.Container).children,
+            child =>
+              hasMarkerInTree(child)
+          )
+        )
+      )
+    );
+  }
+  return false;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -355,6 +528,53 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     // No verification has been defined for Item.
+  }
+
+  *transformChildAWithContext(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    that: AasTypes.ChildA,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    // No verification has been defined for ChildA.
+  }
+
+  *transformChildBWithContext(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    that: AasTypes.ChildB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    // No verification has been defined for ChildB.
+  }
+
+  *transformContainerWithContext(
+    that: AasTypes.Container,
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    if (context === true) {
+      if (that.children !== null) {
+        let childrenIndex = 0;
+        for (const item of that.children) {
+          for (const error of this.transformWithContext(item, context)) {
+            error.path.prepend(
+              new IndexSegment(
+                that.children,
+                childrenIndex
+              )
+            );
+            error.path.prepend(
+              new PropertySegment(
+                that,
+                "children"
+              )
+            );
+            yield error;
+          }
+          childrenIndex++;
+        }
+      }
+    }
   }
 
   *transformSomethingWithContext(
@@ -403,6 +623,85 @@ class Verifier
       )
     }
 
+    if (!(
+      !(that.optionalParent !== null)
+      || (!hasMarkerInTree(that.optionalParent))
+    )) {
+      yield new VerificationError(
+        "Optional parent must have no marker in its tree"
+      )
+    }
+
+    if (!(
+      !(
+        (
+          (that.optionalParent !== null)
+          && (that.parents !== null)
+        )
+      )
+      || lastChildAIsSmall(that.optionalParent, that.parents)
+    )) {
+      yield new VerificationError(
+        "Parents as Child_a must have a_only below one thousand"
+      )
+    }
+
+    if (!(
+      !(that.optionalParent !== null)
+      || textOrDefaultIsShort(that.optionalParent)
+    )) {
+      yield new VerificationError(
+        "Text of the optional parent must be short"
+      )
+    }
+
+    if (!(
+      !(that.parents !== null)
+      || textsBeforeContainerAreShort(that.parents)
+    )) {
+      yield new VerificationError(
+        "Texts of parents before the first container must be short"
+      )
+    }
+
+    if (!(
+      !(that.parents !== null)
+      || childAsHaveTexts(that.parents)
+    )) {
+      yield new VerificationError(
+        "Parents as Child_a must have non-empty texts"
+      )
+    }
+
+    if (!(
+      narrowingAfterTheOnlyCompletingBranch(
+        that.optionalParent
+      )
+    )) {
+      yield new VerificationError(
+        "Optional parent as Child_a must have a_only above minus ten"
+      )
+    }
+
+    if (!narrowingAfterEarlyReturn(that.optionalParent)) {
+      yield new VerificationError(
+        "Optional parent as Child_b must have a small b_only"
+      )
+    }
+
+    if (!narrowingInElifAndElse(that.optionalParent)) {
+      yield new VerificationError(
+        "Optional parent must have an allowed text or a positive " +
+        "b_only"
+      )
+    }
+
+    if (!narrowingInBody(that.optionalParent)) {
+      yield new VerificationError(
+        "Optional parent as Child_a must have a small a_only"
+      )
+    }
+
     if (context === true) {
       for (const error of this.transformWithContext(that.item, context)) {
         error.path.prepend(
@@ -412,6 +711,42 @@ class Verifier
           )
         );
         yield error;
+      }
+
+      if (that.optionalParent !== null) {
+        for (const error of this.transformWithContext(
+            that.optionalParent, context)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "optionalParent"
+            )
+          );
+          yield error;
+        }
+      }
+
+      if (that.parents !== null) {
+        let parentsIndex = 0;
+        for (const item of that.parents) {
+          for (const error of this.transformWithContext(item, context)) {
+            error.path.prepend(
+              new IndexSegment(
+                that.parents,
+                parentsIndex
+              )
+            );
+            error.path.prepend(
+              new PropertySegment(
+                that,
+                "parents"
+              )
+            );
+            yield error;
+          }
+          parentsIndex++;
+        }
       }
     }
   }

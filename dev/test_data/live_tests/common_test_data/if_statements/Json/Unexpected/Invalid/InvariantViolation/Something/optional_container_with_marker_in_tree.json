@@ -1,0 +1,41 @@
+{
+  "kind": "beta",
+  "text": "hello",
+  "number": 3,
+  "flag": true,
+  "item": {
+    "name": "item",
+    "optionalText": "short"
+  },
+  "optionalParent": {
+    "children": [
+      {
+        "optionalText": "marker",
+        "bOnly": 3,
+        "modelType": "ChildB"
+      }
+    ],
+    "modelType": "Container"
+  },
+  "parents": [
+    {
+      "optionalText": "abc",
+      "aOnly": 7,
+      "modelType": "ChildA"
+    },
+    {
+      "bOnly": 3,
+      "modelType": "ChildB"
+    },
+    {
+      "children": [
+        {
+          "optionalText": "x",
+          "bOnly": 4,
+          "modelType": "ChildB"
+        }
+      ],
+      "modelType": "Container"
+    }
+  ]
+}

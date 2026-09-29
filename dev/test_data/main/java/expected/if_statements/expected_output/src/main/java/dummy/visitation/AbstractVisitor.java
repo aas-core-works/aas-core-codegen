@@ -20,6 +20,15 @@ public abstract class AbstractVisitor implements IVisitor
   public abstract void visitItem(
     IItem that
   );
+  public abstract void visitChildA(
+    IChildA that
+  );
+  public abstract void visitChildB(
+    IChildB that
+  );
+  public abstract void visitContainer(
+    IContainer that
+  );
   public abstract void visitSomething(
     ISomething that
   );

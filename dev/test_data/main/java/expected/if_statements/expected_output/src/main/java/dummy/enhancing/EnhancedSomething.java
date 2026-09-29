@@ -80,6 +80,30 @@ public class EnhancedSomething<EnhancementT>
     instance.setItem(item);
   }
 
+  @Override
+  public Optional<IParent> getOptionalParent() {
+    return instance.getOptionalParent();
+  }
+
+  @Override
+  public void setOptionalParent(IParent optionalParent) {
+    instance.setOptionalParent(optionalParent);
+  }
+
+  @Override
+  public Optional<List<IParent>> getParents() {
+    return instance.getParents();
+  }
+
+  @Override
+  public void setParents(List<IParent> parents) {
+    instance.setParents(parents);
+  }
+
+  public Iterable<IParent> overParentsOrEmpty() {
+    return instance.overParentsOrEmpty();
+  }
+
   public Iterable<IClass> descendOnce() {
     return instance.descendOnce();
   }

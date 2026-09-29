@@ -22,6 +22,15 @@ public interface ITransformer<T> {
   T transformItem(
     IItem that
   );
+  T transformChildA(
+    IChildA that
+  );
+  T transformChildB(
+    IChildB that
+  );
+  T transformContainer(
+    IContainer that
+  );
   T transformSomething(
     ISomething that
   );

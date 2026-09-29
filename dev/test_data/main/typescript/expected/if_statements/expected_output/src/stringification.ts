@@ -13,6 +13,18 @@ const MODEL_TYPE_FROM_STRING = new Map<string, AasTypes.ModelType>([
     AasTypes.ModelType.Item
   ],
   [
+    "ChildA",
+    AasTypes.ModelType.ChildA
+  ],
+  [
+    "ChildB",
+    AasTypes.ModelType.ChildB
+  ],
+  [
+    "Container",
+    AasTypes.ModelType.Container
+  ],
+  [
     "Something",
     AasTypes.ModelType.Something
   ]
@@ -36,6 +48,9 @@ export function modelTypeFromString(
 // so we index into an array instead of looking the text up in a map.
 const MODEL_TYPE_TO_STRING: readonly string[] = [
   "Item",
+  "ChildA",
+  "ChildB",
+  "Container",
   "Something"
 ];
 

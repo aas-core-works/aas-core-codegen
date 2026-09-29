@@ -122,6 +122,411 @@ SymbolTable(
       methods_by_name=...,
       method_id_set=...,
       invariant_id_set=...),
+    AbstractClass(
+      name='Parent',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=Interface(
+        base='Reference to AbstractClass Parent',
+        name='Parent',
+        inheritances=[],
+        implementers=[
+          'Reference to ConcreteClass Child_a',
+          'Reference to ConcreteClass Child_b',
+          'Reference to ConcreteClass Container'],
+        properties=[
+          Property(
+            name='optional_text',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            description=None,
+            specified_for='Reference to AbstractClass Parent',
+            json_name='optionalText',
+            xml_name='optionalText',
+            parsed=...)],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Child_a',
+        'Reference to ConcreteClass Child_b',
+        'Reference to ConcreteClass Container'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Child_a',
+        'Reference to ConcreteClass Child_b',
+        'Reference to ConcreteClass Container'],
+      properties=[
+        Property(
+          name='optional_text',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Parent',
+          json_name='optionalText',
+          xml_name='optionalText',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='optional_text',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_text',
+              argument='optional_text',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_text',
+              argument='optional_text',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Child_a',
+      inheritances=[
+        'Reference to AbstractClass Parent'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Parent'],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='optional_text',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Parent',
+          json_name='optionalText',
+          xml_name='optionalText',
+          parsed=...),
+        Property(
+          name='a_only',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Child_a',
+          json_name='aOnly',
+          xml_name='aOnly',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='a_only',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='optional_text',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Parent')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='a_only',
+              argument='a_only',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_text',
+              argument='optional_text',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='a_only',
+              argument='a_only',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Child_b',
+      inheritances=[
+        'Reference to AbstractClass Parent'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Parent'],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='optional_text',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Parent',
+          json_name='optionalText',
+          xml_name='optionalText',
+          parsed=...),
+        Property(
+          name='b_only',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Child_b',
+          json_name='bOnly',
+          xml_name='bOnly',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='b_only',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='optional_text',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Parent')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='b_only',
+              argument='b_only',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_text',
+              argument='optional_text',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='b_only',
+              argument='b_only',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Container',
+      inheritances=[
+        'Reference to AbstractClass Parent'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Parent'],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='optional_text',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Parent',
+          json_name='optionalText',
+          xml_name='optionalText',
+          parsed=...),
+        Property(
+          name='children',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Parent',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          json_name='children',
+          xml_name='children',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='optional_text',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='children',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Parent',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Parent')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='children',
+              argument='children',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_text',
+              argument='optional_text',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='children',
+              argument='children',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
     ConcreteClass(
       name='Something',
       inheritances=[],
@@ -183,6 +588,32 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Something',
           json_name='item',
           xml_name='item',
+          parsed=...),
+        Property(
+          name='optional_parent',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          json_name='optionalParent',
+          xml_name='optionalParent',
+          parsed=...),
+        Property(
+          name='parents',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Parent',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          json_name='parents',
+          xml_name='parents',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -227,6 +658,32 @@ SymbolTable(
               parsed=...),
             default=None,
             mutable=False,
+            parsed=...),
+          Argument(
+            name='optional_parent',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Parent',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='parents',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Parent',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
             parsed=...)],
         returns=None,
         description=None,
@@ -261,6 +718,16 @@ SymbolTable(
             AssignArgument(
               name='item',
               argument='item',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_parent',
+              argument='optional_parent',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='parents',
+              argument='parents',
               default=None)""")],
         inlined_statements=[
           textwrap.dedent("""\
@@ -287,6 +754,16 @@ SymbolTable(
             AssignArgument(
               name='item',
               argument='item',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_parent',
+              argument='optional_parent',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='parents',
+              argument='parents',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -411,6 +888,210 @@ SymbolTable(
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Optional parent must have no marker in its tree',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...),
+                original_node=...),
+              consequent=Not(
+                operand=FunctionCall(
+                  name='has_marker_in_tree',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='optional_parent',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Parents as Child_a must have a_only below one thousand',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='optional_parent',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='parents',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='last_child_a_is_small',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='optional_parent',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='parents',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Text of the optional parent must be short',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='text_or_default_is_short',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='optional_parent',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Texts of parents before the first container must be short',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='parents',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='texts_before_container_are_short',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='parents',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Parents as Child_a must have non-empty texts',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='parents',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='child_as_have_texts',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='parents',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Optional parent as Child_a must have a_only above minus ten',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='narrowing_after_the_only_completing_branch',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Optional parent as Child_b must have a small b_only',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='narrowing_after_early_return',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Optional parent must have an allowed text or a positive b_only',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='narrowing_in_elif_and_else',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Optional parent as Child_a must have a small a_only',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='narrowing_in_body',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_parent',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -422,6 +1103,10 @@ SymbolTable(
       method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
+    'Reference to our type Parent',
+    'Reference to our type Child_a',
+    'Reference to our type Child_b',
+    'Reference to our type Container',
     'Reference to our type Item',
     'Reference to our type Something'],
   enumerations=[
@@ -429,9 +1114,16 @@ SymbolTable(
   constrained_primitives=[],
   classes=[
     'Reference to our type Item',
+    'Reference to our type Parent',
+    'Reference to our type Child_a',
+    'Reference to our type Child_b',
+    'Reference to our type Container',
     'Reference to our type Something'],
   concrete_classes=[
     'Reference to our type Item',
+    'Reference to our type Child_a',
+    'Reference to our type Child_b',
+    'Reference to our type Container',
     'Reference to our type Something'],
   named_unions=[],
   constants=[],
@@ -646,6 +1338,271 @@ SymbolTable(
         parsed=...),
       description=DescriptionOfSignature(
         summary='<paragraph>Check the <literal>continue</literal> in a branch of an if-statement nested in a for-loop.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='narrowing_in_body',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing in the body of a branch by its condition.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='narrowing_in_elif_and_else',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing by the negation of the previous conditions.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='narrowing_after_early_return',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing after an if-statement whose branch always returns.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='narrowing_after_the_only_completing_branch',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing after an if-statement whose <literal>else</literal> always returns.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='child_as_have_texts',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parents',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing after the <literal>continue</literal> and the early return in a loop.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='texts_before_container_are_short',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parents',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing after the <literal>continue</literal> in a loop with a <literal>break</literal>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='text_or_default_is_short',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Parent',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing by the value assigned in a branch.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='last_child_a_is_small',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Parent',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='parents',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Parent',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the narrowing of a variable to a class by the assigned value.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='has_marker_in_tree',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='parent',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Parent',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the recursive chain of <literal>isinstance</literal> checks with early returns.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,

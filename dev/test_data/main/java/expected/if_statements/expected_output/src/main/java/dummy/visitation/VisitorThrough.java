@@ -29,6 +29,33 @@ public class VisitorThrough implements IVisitor {
     }
   }
 
+  public void visitChildA(
+    IChildA that
+  ) {
+    // Just descend through, do nothing with {@code that}
+    for (IClass something : that.descendOnce()) {
+      visit(something);
+    }
+  }
+
+  public void visitChildB(
+    IChildB that
+  ) {
+    // Just descend through, do nothing with {@code that}
+    for (IClass something : that.descendOnce()) {
+      visit(something);
+    }
+  }
+
+  public void visitContainer(
+    IContainer that
+  ) {
+    // Just descend through, do nothing with {@code that}
+    for (IClass something : that.descendOnce()) {
+      visit(something);
+    }
+  }
+
   public void visitSomething(
     ISomething that
   ) {

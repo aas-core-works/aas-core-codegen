@@ -21,6 +21,15 @@ namespace dummy
             public void VisitItem(
                 IItem that
             );
+            public void VisitChildA(
+                IChildA that
+            );
+            public void VisitChildB(
+                IChildB that
+            );
+            public void VisitContainer(
+                IContainer that
+            );
             public void VisitSomething(
                 ISomething that
             );
@@ -43,6 +52,39 @@ namespace dummy
 
             public virtual void VisitItem(
                 IItem that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public virtual void VisitChildA(
+                IChildA that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public virtual void VisitChildB(
+                IChildB that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public virtual void VisitContainer(
+                IContainer that
             )
             {
                 // Just descend through, do nothing with <c>that</c>
@@ -76,6 +118,15 @@ namespace dummy
             public abstract void VisitItem(
                 IItem that
             );
+            public abstract void VisitChildA(
+                IChildA that
+            );
+            public abstract void VisitChildB(
+                IChildB that
+            );
+            public abstract void VisitContainer(
+                IContainer that
+            );
             public abstract void VisitSomething(
                 ISomething that
             );
@@ -95,6 +146,18 @@ namespace dummy
             public void Visit(IClass that, TContext context);
             public void VisitItem(
                 IItem that,
+                TContext context
+            );
+            public void VisitChildA(
+                IChildA that,
+                TContext context
+            );
+            public void VisitChildB(
+                IChildB that,
+                TContext context
+            );
+            public void VisitContainer(
+                IContainer that,
                 TContext context
             );
             public void VisitSomething(
@@ -119,6 +182,18 @@ namespace dummy
                 IItem that,
                 TContext context
             );
+            public abstract void VisitChildA(
+                IChildA that,
+                TContext context
+            );
+            public abstract void VisitChildB(
+                IChildB that,
+                TContext context
+            );
+            public abstract void VisitContainer(
+                IContainer that,
+                TContext context
+            );
             public abstract void VisitSomething(
                 ISomething that,
                 TContext context
@@ -141,6 +216,15 @@ namespace dummy
             public T TransformItem(
                 IItem that
             );
+            public T TransformChildA(
+                IChildA that
+            );
+            public T TransformChildB(
+                IChildB that
+            );
+            public T TransformContainer(
+                IContainer that
+            );
             public T TransformSomething(
                 ISomething that
             );
@@ -160,6 +244,18 @@ namespace dummy
 
             public abstract T TransformItem(
                 IItem that
+            );
+
+            public abstract T TransformChildA(
+                IChildA that
+            );
+
+            public abstract T TransformChildB(
+                IChildB that
+            );
+
+            public abstract T TransformContainer(
+                IContainer that
             );
 
             public abstract T TransformSomething(
@@ -183,6 +279,18 @@ namespace dummy
             public T Transform(IClass that, TContext context);
             public T TransformItem(
                 IItem that,
+                TContext context
+            );
+            public T TransformChildA(
+                IChildA that,
+                TContext context
+            );
+            public T TransformChildB(
+                IChildB that,
+                TContext context
+            );
+            public T TransformContainer(
+                IContainer that,
                 TContext context
             );
             public T TransformSomething(
@@ -212,6 +320,21 @@ namespace dummy
 
             public abstract T TransformItem(
                 IItem that,
+                TContext context
+            );
+
+            public abstract T TransformChildA(
+                IChildA that,
+                TContext context
+            );
+
+            public abstract T TransformChildB(
+                IChildB that,
+                TContext context
+            );
+
+            public abstract T TransformContainer(
+                IContainer that,
                 TContext context
             );
 

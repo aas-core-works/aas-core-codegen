@@ -27,6 +27,8 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
+import java.util.Optional;
 
 public class Verification {
   /**
@@ -159,6 +161,152 @@ public class Verification {
   }
 
   /**
+   * Check the narrowing in the body of a branch by its condition.
+   */
+  public static Boolean narrowingInBody(
+    Optional<IParent> parent) {
+    if (
+        (parent.isPresent())
+        && parent.get() instanceof IChildA
+    ) {
+        return ((IChildA) parent.get()).getAOnly() < 100;
+    }
+    return true;
+  }
+
+  /**
+   * Check the narrowing by the negation of the previous conditions.
+   */
+  public static Boolean narrowingInElifAndElse(
+    Optional<IParent> parent) {
+    if (!parent.isPresent()) {
+        return true;
+    } else if (!(parent.get() instanceof IChildB)) {
+        return (!parent.get().getOptionalText().isPresent())
+        || !Objects.equals(parent.get().getOptionalText().get(), "forbidden");
+    } else {
+        return ((IChildB) parent.get()).getBOnly() > 0;
+    }
+  }
+
+  /**
+   * Check the narrowing after an if-statement whose branch always returns.
+   */
+  public static Boolean narrowingAfterEarlyReturn(
+    Optional<IParent> parent) {
+    if (
+        (!parent.isPresent())
+        || (!(parent.get() instanceof IChildB))
+    ) {
+        return true;
+    }
+    return ((IChildB) parent.get()).getBOnly() < 50;
+  }
+
+  /**
+   * Check the narrowing after an if-statement whose {@code else} always returns.
+   */
+  public static Boolean narrowingAfterTheOnlyCompletingBranch(
+    Optional<IParent> parent) {
+    if (
+        (parent.isPresent())
+        && parent.get() instanceof IChildA
+    ) {} else {
+        return true;
+    }
+    return ((IChildA) parent.get()).getAOnly() > -10;
+  }
+
+  /**
+   * Check the narrowing after the {@code continue} and the early return in a loop.
+   */
+  public static Boolean childAsHaveTexts(
+    List<IParent> parents) {
+    for (var parent : parents) {
+        if (!(parent instanceof IChildA)) {
+            continue;
+        }
+        if (!((IChildA) parent).getOptionalText().isPresent()) {
+            return false;
+        }
+        if (StringHelpers.len(((IChildA) parent).getOptionalText().get()) < 1) {
+            return false;
+        }
+    }
+    return true;
+  }
+
+  /**
+   * Check the narrowing after the {@code continue} in a loop with a {@code break}.
+   */
+  public static Boolean textsBeforeContainerAreShort(
+    List<IParent> parents) {
+    long total = 0;
+    for (var parent : parents) {
+        if (parent instanceof IContainer) {
+            break;
+        }
+        if (!parent.getOptionalText().isPresent()) {
+            continue;
+        }
+        total = (
+            total + StringHelpers.len(parent.getOptionalText().get()));
+    }
+    return total < 20;
+  }
+
+  /**
+   * Check the narrowing by the value assigned in a branch.
+   */
+  public static Boolean textOrDefaultIsShort(
+    IParent parent) {
+    var text = parent.getOptionalText();
+    if (!text.isPresent()) {
+        text = Optional.of("default");
+    }
+    return StringHelpers.len(text.get()) < 10;
+  }
+
+  /**
+   * Check the narrowing of a variable to a class by the assigned value.
+   */
+  public static Boolean lastChildAIsSmall(
+    IParent parent,
+    List<IParent> parents) {
+    var last = parent;
+    for (var other : parents) {
+        if (other instanceof IChildA) {
+            last = ((IChildA) other);
+            if (((IChildA) last).getAOnly() >= 1000) {
+                return false;
+            }
+        }
+    }
+    return true;
+  }
+
+  /**
+   * Check the recursive chain of {@code isinstance} checks with early returns.
+   */
+  public static Boolean hasMarkerInTree(
+    IParent parent) {
+    if (
+        (parent.getOptionalText().isPresent())
+        && Objects.equals(parent.getOptionalText().get(), "marker")
+    ) {
+        return true;
+    }
+    if (parent instanceof IContainer) {
+        return (((IContainer) parent).getChildren().isPresent())
+        && (
+            ((IContainer) parent).getChildren().get().stream().anyMatch(
+                child -> hasMarkerInTree(child))
+        );
+    }
+    return false;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -187,6 +335,55 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       // No verification has been defined for Item.
+
+      return errorStream;
+    }
+
+    @Override
+    public Stream<Reporting.Error> transformChildA(
+      IChildA that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      // No verification has been defined for ChildA.
+
+      return errorStream;
+    }
+
+    @Override
+    public Stream<Reporting.Error> transformChildB(
+      IChildB that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      // No verification has been defined for ChildB.
+
+      return errorStream;
+    }
+
+    @Override
+    public Stream<Reporting.Error> transformContainer(
+      IContainer that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (that.getChildren().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Verification.zip(
+            IntStream.iterate(0, i -> i + 1).boxed(),
+            that.getChildren().get().stream())
+              .flatMap(elemTuple -> {
+                final int index = elemTuple.getFirst();
+                final IParent elem = elemTuple.getSecond();
+                return Verification.verifyToErrorStream(elem)
+                  .map(error -> {
+                    error.prependSegment(new Reporting.IndexSegment(index));
+                    return error;
+                  });
+              })
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("children"));
+              return error;
+            }));
+      }
 
       return errorStream;
     }
@@ -246,6 +443,87 @@ public class Verification {
             "Text must be at most 10 characters long")));
       }
 
+      if (!(
+        !(that.getOptionalParent().isPresent())
+        || (!hasMarkerInTree(that.getOptionalParent().orElse(null))))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional parent must have no marker in its tree")));
+      }
+
+      if (!(
+        !(
+            (that.getOptionalParent().isPresent())
+            && (that.getParents().isPresent())
+        )
+        || lastChildAIsSmall(
+            that.getOptionalParent().orElse(null),
+            that.getParents().orElse(null)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Parents as Child_a must have a_only below one thousand")));
+      }
+
+      if (!(
+        !(that.getOptionalParent().isPresent())
+        || textOrDefaultIsShort(that.getOptionalParent().orElse(null)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Text of the optional parent must be short")));
+      }
+
+      if (!(
+        !(that.getParents().isPresent())
+        || textsBeforeContainerAreShort(that.getParents().orElse(null)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts of parents before the first container must be short")));
+      }
+
+      if (!(
+        !(that.getParents().isPresent())
+        || childAsHaveTexts(that.getParents().orElse(null)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Parents as Child_a must have non-empty texts")));
+      }
+
+      if (!(
+        narrowingAfterTheOnlyCompletingBranch(that.getOptionalParent()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional parent as Child_a must have a_only above minus ten")));
+      }
+
+      if (!(
+        narrowingAfterEarlyReturn(that.getOptionalParent()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional parent as Child_b must have a small b_only")));
+      }
+
+      if (!narrowingInElifAndElse(that.getOptionalParent())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional parent must have an allowed text or a positive " +
+            "b_only")));
+      }
+
+      if (!narrowingInBody(that.getOptionalParent())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional parent as Child_a must have a small a_only")));
+      }
+
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getKind())
           .flatMap(Verification::verifyKind)
@@ -263,6 +541,38 @@ public class Verification {
                 new Reporting.NameSegment("item"));
               return error;
             }));
+
+      if (that.getOptionalParent().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(that.getOptionalParent().get())
+            .flatMap(Verification::verifyToErrorStream)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("optionalParent"));
+                return error;
+              }));
+      }
+
+      if (that.getParents().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Verification.zip(
+            IntStream.iterate(0, i -> i + 1).boxed(),
+            that.getParents().get().stream())
+              .flatMap(elemTuple -> {
+                final int index = elemTuple.getFirst();
+                final IParent elem = elemTuple.getSecond();
+                return Verification.verifyToErrorStream(elem)
+                  .map(error -> {
+                    error.prependSegment(new Reporting.IndexSegment(index));
+                    return error;
+                  });
+              })
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("parents"));
+              return error;
+            }));
+      }
 
       return errorStream;
     }

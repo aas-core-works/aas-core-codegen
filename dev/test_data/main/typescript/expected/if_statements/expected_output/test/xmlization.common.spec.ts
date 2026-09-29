@@ -12,6 +12,21 @@ test("commonXmlization loaders for Item", () => {
   expect(TestCommonXmlization.loadMaximalItem()).not.toBeNull();
 });
 
+test("commonXmlization loaders for ChildA", () => {
+  expect(TestCommonXmlization.loadMinimalChildA()).not.toBeNull();
+  expect(TestCommonXmlization.loadMaximalChildA()).not.toBeNull();
+});
+
+test("commonXmlization loaders for ChildB", () => {
+  expect(TestCommonXmlization.loadMinimalChildB()).not.toBeNull();
+  expect(TestCommonXmlization.loadMaximalChildB()).not.toBeNull();
+});
+
+test("commonXmlization loaders for Container", () => {
+  expect(TestCommonXmlization.loadMinimalContainer()).not.toBeNull();
+  expect(TestCommonXmlization.loadMaximalContainer()).not.toBeNull();
+});
+
 test("commonXmlization loaders for Something", () => {
   expect(TestCommonXmlization.loadMinimalSomething()).not.toBeNull();
   expect(TestCommonXmlization.loadMaximalSomething()).not.toBeNull();

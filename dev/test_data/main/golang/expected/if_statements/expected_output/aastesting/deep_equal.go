@@ -40,6 +40,110 @@ func deepEqualItem(
 // Perform a comparison for deep equality between `that` and `other` instance.
 //
 // The deep equality means that all the properties are checked for equality recursively.
+func deepEqualChildA(
+	that aastypes.IChildA,
+	other aastypes.IChildA,
+) bool {
+	thatOptionalText := that.OptionalText()
+	otherOptionalText := other.OptionalText()
+	if
+		(thatOptionalText == nil && otherOptionalText != nil) ||
+		(thatOptionalText != nil && otherOptionalText == nil) {
+		return false
+	}
+	if thatOptionalText != nil {
+		if *thatOptionalText != *otherOptionalText {
+			return false
+		}
+	}
+
+	thatAOnly := that.AOnly()
+	otherAOnly := other.AOnly()
+	if thatAOnly != otherAOnly {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
+func deepEqualChildB(
+	that aastypes.IChildB,
+	other aastypes.IChildB,
+) bool {
+	thatOptionalText := that.OptionalText()
+	otherOptionalText := other.OptionalText()
+	if
+		(thatOptionalText == nil && otherOptionalText != nil) ||
+		(thatOptionalText != nil && otherOptionalText == nil) {
+		return false
+	}
+	if thatOptionalText != nil {
+		if *thatOptionalText != *otherOptionalText {
+			return false
+		}
+	}
+
+	thatBOnly := that.BOnly()
+	otherBOnly := other.BOnly()
+	if thatBOnly != otherBOnly {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
+func deepEqualContainer(
+	that aastypes.IContainer,
+	other aastypes.IContainer,
+) bool {
+	thatOptionalText := that.OptionalText()
+	otherOptionalText := other.OptionalText()
+	if
+		(thatOptionalText == nil && otherOptionalText != nil) ||
+		(thatOptionalText != nil && otherOptionalText == nil) {
+		return false
+	}
+	if thatOptionalText != nil {
+		if *thatOptionalText != *otherOptionalText {
+			return false
+		}
+	}
+
+	thatChildren := that.Children()
+	otherChildren := other.Children()
+	if
+		(thatChildren == nil && otherChildren != nil) ||
+		(thatChildren != nil && otherChildren == nil) {
+		return false
+	}
+	if thatChildren != nil {
+		if 
+			len(thatChildren) !=
+			len(otherChildren) {
+			return false
+		}
+		for i := range thatChildren {
+			if !DeepEqual(
+				thatChildren[i],
+				otherChildren[i],
+			) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
 func deepEqualSomething(
 	that aastypes.ISomething,
 	other aastypes.ISomething,
@@ -77,6 +181,45 @@ func deepEqualSomething(
 		return false
 	}
 
+	thatOptionalParent := that.OptionalParent()
+	otherOptionalParent := other.OptionalParent()
+	if
+		(thatOptionalParent == nil && otherOptionalParent != nil) ||
+		(thatOptionalParent != nil && otherOptionalParent == nil) {
+		return false
+	}
+	if thatOptionalParent != nil {
+		if !DeepEqual(
+			thatOptionalParent,
+			otherOptionalParent,
+		) {
+			return false
+		}
+	}
+
+	thatParents := that.Parents()
+	otherParents := other.Parents()
+	if
+		(thatParents == nil && otherParents != nil) ||
+		(thatParents != nil && otherParents == nil) {
+		return false
+	}
+	if thatParents != nil {
+		if 
+			len(thatParents) !=
+			len(otherParents) {
+			return false
+		}
+		for i := range thatParents {
+			if !DeepEqual(
+				thatParents[i],
+				otherParents[i],
+			) {
+				return false
+			}
+		}
+	}
+
 	return true
 }
 
@@ -93,6 +236,21 @@ func DeepEqual(
 		return deepEqualItem(
 			that.(aastypes.IItem),
 			other.(aastypes.IItem),
+		)
+	case aastypes.ModelTypeChildA:
+		return deepEqualChildA(
+			that.(aastypes.IChildA),
+			other.(aastypes.IChildA),
+		)
+	case aastypes.ModelTypeChildB:
+		return deepEqualChildB(
+			that.(aastypes.IChildB),
+			other.(aastypes.IChildB),
+		)
+	case aastypes.ModelTypeContainer:
+		return deepEqualContainer(
+			that.(aastypes.IContainer),
+			other.(aastypes.IContainer),
 		)
 	case aastypes.ModelTypeSomething:
 		return deepEqualSomething(

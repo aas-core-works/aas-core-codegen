@@ -1,0 +1,30 @@
+{
+  "kind": "beta",
+  "text": "hello",
+  "number": 3,
+  "flag": true,
+  "item": {
+    "name": "item",
+    "optionalText": "short"
+  },
+  "optionalParent": {
+    "optionalText": "short",
+    "aOnly": 5,
+    "modelType": "ChildA"
+  },
+  "parents": [
+    {
+      "optionalText": "0123456789",
+      "bOnly": 3,
+      "modelType": "ChildB"
+    },
+    {
+      "optionalText": "0123456789",
+      "bOnly": 3,
+      "modelType": "ChildB"
+    },
+    {
+      "modelType": "Container"
+    }
+  ]
+}

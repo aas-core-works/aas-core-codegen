@@ -18,7 +18,53 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public class TestJsonizationOfInterfaces {
-  
+  @Test
+  public void testRoundTripIParentFromChildA()
+    throws IOException, JsonProcessingException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    ChildA instance = CommonJsonization.loadMaximalChildA();
+    final JsonNode jsonObject = Jsonization.Serialize.toJsonObject(instance);
+
+    IParent anotherInstance = Jsonization.Deserialize.deserializeIParent(
+      jsonObject);
+    final JsonNode anotherJsonObject = Jsonization.Serialize.toJsonObject(anotherInstance);
+
+    assertEquals(
+      objectMapper.readTree(jsonObject.toString()), objectMapper.readTree(anotherJsonObject.toString()));
+  } // void testRoundTripIParentFromChildA
+
+  @Test
+  public void testRoundTripIParentFromChildB()
+    throws IOException, JsonProcessingException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    ChildB instance = CommonJsonization.loadMaximalChildB();
+    final JsonNode jsonObject = Jsonization.Serialize.toJsonObject(instance);
+
+    IParent anotherInstance = Jsonization.Deserialize.deserializeIParent(
+      jsonObject);
+    final JsonNode anotherJsonObject = Jsonization.Serialize.toJsonObject(anotherInstance);
+
+    assertEquals(
+      objectMapper.readTree(jsonObject.toString()), objectMapper.readTree(anotherJsonObject.toString()));
+  } // void testRoundTripIParentFromChildB
+
+  @Test
+  public void testRoundTripIParentFromContainer()
+    throws IOException, JsonProcessingException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    Container instance = CommonJsonization.loadMaximalContainer();
+    final JsonNode jsonObject = Jsonization.Serialize.toJsonObject(instance);
+
+    IParent anotherInstance = Jsonization.Deserialize.deserializeIParent(
+      jsonObject);
+    final JsonNode anotherJsonObject = Jsonization.Serialize.toJsonObject(anotherInstance);
+
+    assertEquals(
+      objectMapper.readTree(jsonObject.toString()), objectMapper.readTree(anotherJsonObject.toString()));
+  } // void testRoundTripIParentFromContainer
 } // class TestJsonizationOfInterfaces
 
 // package dummy.tests

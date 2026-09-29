@@ -23,6 +23,18 @@ public interface IVisitorWithContext<ContextT>
     IItem that,
     ContextT context
   );
+  void visitChildA(
+    IChildA that,
+    ContextT context
+  );
+  void visitChildB(
+    IChildB that,
+    ContextT context
+  );
+  void visitContainer(
+    IContainer that,
+    ContextT context
+  );
   void visitSomething(
     ISomething that,
     ContextT context

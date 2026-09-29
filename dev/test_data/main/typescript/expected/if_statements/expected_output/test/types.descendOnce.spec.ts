@@ -69,6 +69,48 @@ test("descendOnce of Item", () => {
   );
 });
 
+test("descendOnce of ChildA", () => {
+  const instance = TestCommonJsonization.loadMaximalChildA();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descendOnce",
+      "ChildA",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descendOnce of ChildB", () => {
+  const instance = TestCommonJsonization.loadMaximalChildB();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descendOnce",
+      "ChildB",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descendOnce of Container", () => {
+  const instance = TestCommonJsonization.loadMaximalContainer();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descendOnce",
+      "Container",
+      "maximal.json.trace"
+    )
+  );
+});
+
 test("descendOnce of Something", () => {
   const instance = TestCommonJsonization.loadMaximalSomething();
 

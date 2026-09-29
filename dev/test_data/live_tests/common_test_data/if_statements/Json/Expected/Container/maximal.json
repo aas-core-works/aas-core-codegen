@@ -1,0 +1,15 @@
+{
+  "optionalText": "short",
+  "children": [
+    {
+      "optionalText": "short",
+      "aOnly": 5,
+      "modelType": "ChildA"
+    },
+    {
+      "bOnly": 3,
+      "modelType": "ChildB"
+    }
+  ],
+  "modelType": "Container"
+}

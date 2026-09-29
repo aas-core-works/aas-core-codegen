@@ -33,6 +33,19 @@ public interface ISomething extends IClass {
   IItem getItem();
 
   void setItem(IItem item);
+
+  Optional<IParent> getOptionalParent();
+
+  void setOptionalParent(IParent optionalParent);
+
+  Optional<List<IParent>> getParents();
+
+  void setParents(List<IParent> parents);
+
+  /**
+   * Iterate over parents, if set, and otherwise return an empty enumerable.
+   */
+  Iterable<IParent> overParentsOrEmpty();
 }
 
 /*

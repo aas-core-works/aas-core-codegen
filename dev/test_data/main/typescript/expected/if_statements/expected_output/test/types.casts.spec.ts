@@ -20,10 +20,179 @@ test("casts over an instance of Item", () => {
   ).toStrictEqual(theItem);
 
   expect(
+    AasTypes.isParent(theItem)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asParent(theItem)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildA(theItem)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildA(theItem)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildB(theItem)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildB(theItem)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isContainer(theItem)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asContainer(theItem)
+  ).toBeNull();
+
+  expect(
     AasTypes.isSomething(theItem)
   ).toStrictEqual(false);
   expect(
     AasTypes.asSomething(theItem)
+  ).toBeNull();
+});
+
+test("casts over an instance of ChildA", () => {
+  const theChildA =
+    TestCommonJsonization.loadMinimalChildA();
+
+  expect(
+    AasTypes.isItem(theChildA)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asItem(theChildA)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isParent(theChildA)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asParent(theChildA)
+  ).toStrictEqual(theChildA);
+
+  expect(
+    AasTypes.isChildA(theChildA)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asChildA(theChildA)
+  ).toStrictEqual(theChildA);
+
+  expect(
+    AasTypes.isChildB(theChildA)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildB(theChildA)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isContainer(theChildA)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asContainer(theChildA)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isSomething(theChildA)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theChildA)
+  ).toBeNull();
+});
+
+test("casts over an instance of ChildB", () => {
+  const theChildB =
+    TestCommonJsonization.loadMinimalChildB();
+
+  expect(
+    AasTypes.isItem(theChildB)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asItem(theChildB)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isParent(theChildB)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asParent(theChildB)
+  ).toStrictEqual(theChildB);
+
+  expect(
+    AasTypes.isChildA(theChildB)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildA(theChildB)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildB(theChildB)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asChildB(theChildB)
+  ).toStrictEqual(theChildB);
+
+  expect(
+    AasTypes.isContainer(theChildB)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asContainer(theChildB)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isSomething(theChildB)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theChildB)
+  ).toBeNull();
+});
+
+test("casts over an instance of Container", () => {
+  const theContainer =
+    TestCommonJsonization.loadMinimalContainer();
+
+  expect(
+    AasTypes.isItem(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asItem(theContainer)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isParent(theContainer)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asParent(theContainer)
+  ).toStrictEqual(theContainer);
+
+  expect(
+    AasTypes.isChildA(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildA(theContainer)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildB(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildB(theContainer)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isContainer(theContainer)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asContainer(theContainer)
+  ).toStrictEqual(theContainer);
+
+  expect(
+    AasTypes.isSomething(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theContainer)
   ).toBeNull();
 });
 
@@ -36,6 +205,34 @@ test("casts over an instance of Something", () => {
   ).toStrictEqual(false);
   expect(
     AasTypes.asItem(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isParent(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asParent(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildA(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildA(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isChildB(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asChildB(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isContainer(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asContainer(theSomething)
   ).toBeNull();
 
   expect(

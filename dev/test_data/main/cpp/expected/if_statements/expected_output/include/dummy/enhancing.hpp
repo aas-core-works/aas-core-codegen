@@ -39,6 +39,62 @@ std::shared_ptr<
 
 template <typename E>
 std::shared_ptr<
+  types::IParent
+> Wrap(
+  const std::shared_ptr<
+    types::IParent
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
+  types::IChildA
+> Wrap(
+  const std::shared_ptr<
+    types::IChildA
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
+  types::IChildB
+> Wrap(
+  const std::shared_ptr<
+    types::IChildB
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
+  types::IContainer
+> Wrap(
+  const std::shared_ptr<
+    types::IContainer
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
   types::ISomething
 > Wrap(
   const std::shared_ptr<
@@ -138,6 +194,219 @@ class EnhancedItem
 };
 
 template<class E>
+class EnhancedChildA
+    : virtual public types::IChildA,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kChildA;
+  }
+
+  const common::optional<std::wstring>& optional_text() const override {
+    return instance_->optional_text();
+  }
+
+  common::optional<std::wstring>& mutable_optional_text() override {
+    return instance_->mutable_optional_text();
+  }
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override {
+    instance_->set_optional_text(value);
+  }
+
+  int64_t a_only() const override {
+    return instance_->a_only();
+  }
+
+  int64_t& mutable_a_only() override {
+    return instance_->mutable_a_only();
+  }
+
+  void set_a_only(
+    int64_t value
+  ) override {
+    instance_->set_a_only(value);
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedChildA(
+    std::shared_ptr<types::IChildA> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedChildA() = default;
+
+ private:
+  std::shared_ptr<types::IChildA> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
+template<class E>
+class EnhancedChildB
+    : virtual public types::IChildB,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kChildB;
+  }
+
+  const common::optional<std::wstring>& optional_text() const override {
+    return instance_->optional_text();
+  }
+
+  common::optional<std::wstring>& mutable_optional_text() override {
+    return instance_->mutable_optional_text();
+  }
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override {
+    instance_->set_optional_text(value);
+  }
+
+  int64_t b_only() const override {
+    return instance_->b_only();
+  }
+
+  int64_t& mutable_b_only() override {
+    return instance_->mutable_b_only();
+  }
+
+  void set_b_only(
+    int64_t value
+  ) override {
+    instance_->set_b_only(value);
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedChildB(
+    std::shared_ptr<types::IChildB> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedChildB() = default;
+
+ private:
+  std::shared_ptr<types::IChildB> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
+template<class E>
+class EnhancedContainer
+    : virtual public types::IContainer,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kContainer;
+  }
+
+  const common::optional<std::wstring>& optional_text() const override {
+    return instance_->optional_text();
+  }
+
+  common::optional<std::wstring>& mutable_optional_text() override {
+    return instance_->mutable_optional_text();
+  }
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override {
+    instance_->set_optional_text(value);
+  }
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& children() const override {
+    return instance_->children();
+  }
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& mutable_children() override {
+    return instance_->mutable_children();
+  }
+
+  void set_children(
+    common::optional<
+      std::vector<
+        std::shared_ptr<types::IParent>
+      >
+    > value
+  ) override {
+    instance_->set_children(value);
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedContainer(
+    std::shared_ptr<types::IContainer> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedContainer() = default;
+
+ private:
+  std::shared_ptr<types::IContainer> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
+template<class E>
 class EnhancedSomething
     : virtual public types::ISomething,
     virtual public IEnhanced<E> {
@@ -216,6 +485,52 @@ class EnhancedSomething
     instance_->set_item(value);
   }
 
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& optional_parent() const override {
+    return instance_->optional_parent();
+  }
+
+  common::optional<
+    std::shared_ptr<types::IParent>
+  >& mutable_optional_parent() override {
+    return instance_->mutable_optional_parent();
+  }
+
+  void set_optional_parent(
+    common::optional<
+      std::shared_ptr<types::IParent>
+    > value
+  ) override {
+    instance_->set_optional_parent(value);
+  }
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& parents() const override {
+    return instance_->parents();
+  }
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& mutable_parents() override {
+    return instance_->mutable_parents();
+  }
+
+  void set_parents(
+    common::optional<
+      std::vector<
+        std::shared_ptr<types::IParent>
+      >
+    > value
+  ) override {
+    instance_->set_parents(value);
+  }
+
   const std::shared_ptr<E>& enhancement() const {
     return enhancement_;
   }
@@ -292,6 +607,144 @@ std::shared_ptr<types::IItem> WrapItem(
  * \tparam E type of the enhancement
  */
 template<typename E>
+std::shared_ptr<types::IChildA> WrapChildA(
+  const std::shared_ptr<types::IChildA>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  // No properties to be recursively enhanced.
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::IChildA>(
+      new EnhancedChildA<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::shared_ptr<types::IChildB> WrapChildB(
+  const std::shared_ptr<types::IChildB>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  // No properties to be recursively enhanced.
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::IChildB>(
+      new EnhancedChildB<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::shared_ptr<types::IContainer> WrapContainer(
+  const std::shared_ptr<types::IContainer>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  if (that->children().has_value()) {
+    const std::vector<
+        std::shared_ptr<types::IParent>
+      >& value(
+      that->children().value()
+    );
+    const std::size_t size = value.size();
+
+    std::vector<
+      std::shared_ptr<types::IParent>
+    > wrapped;
+    wrapped.reserve(size);
+
+    for (
+      const std::shared_ptr<types::IParent>& item
+      : value
+    ) {
+      wrapped.emplace_back(
+        Wrap<E>(
+          item,
+          factory
+        )
+      );
+    }
+
+    that->set_children(
+      common::make_optional(
+        std::move(wrapped)
+      )
+    );
+  }
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::IContainer>(
+      new EnhancedContainer<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
 std::shared_ptr<types::ISomething> WrapSomething(
   const std::shared_ptr<types::ISomething>& that,
   const std::function<
@@ -309,6 +762,59 @@ std::shared_ptr<types::ISomething> WrapSomething(
       factory
     )
   );
+
+  if (that->optional_parent().has_value()) {
+    const std::shared_ptr<types::IParent>& value(
+      that->optional_parent().value()
+    );
+
+    std::shared_ptr<
+      types::IParent
+    > wrapped(
+      Wrap<E>(
+        value,
+        factory
+      )
+    );
+
+    that->set_optional_parent(
+      common::make_optional(
+        std::move(wrapped)
+      )
+    );
+  }
+
+  if (that->parents().has_value()) {
+    const std::vector<
+        std::shared_ptr<types::IParent>
+      >& value(
+      that->parents().value()
+    );
+    const std::size_t size = value.size();
+
+    std::vector<
+      std::shared_ptr<types::IParent>
+    > wrapped;
+    wrapped.reserve(size);
+
+    for (
+      const std::shared_ptr<types::IParent>& item
+      : value
+    ) {
+      wrapped.emplace_back(
+        Wrap<E>(
+          item,
+          factory
+        )
+      );
+    }
+
+    that->set_parents(
+      common::make_optional(
+        std::move(wrapped)
+      )
+    );
+  }
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -403,6 +909,30 @@ std::shared_ptr<
         factory
       );
       break;
+    case types::ModelType::kChildA:
+      return impl::WrapChildA<E>(
+        std::dynamic_pointer_cast<
+          types::IChildA
+        >(that),
+        factory
+      );
+      break;
+    case types::ModelType::kChildB:
+      return impl::WrapChildB<E>(
+        std::dynamic_pointer_cast<
+          types::IChildB
+        >(that),
+        factory
+      );
+      break;
+    case types::ModelType::kContainer:
+      return impl::WrapContainer<E>(
+        std::dynamic_pointer_cast<
+          types::IContainer
+        >(that),
+        factory
+      );
+      break;
     case types::ModelType::kSomething:
       return impl::WrapSomething<E>(
         std::dynamic_pointer_cast<
@@ -447,6 +977,184 @@ std::shared_ptr<
   switch (that->model_type()) {
     case types::ModelType::kItem:
       return impl::WrapItem<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IParent
+> Wrap(
+  const std::shared_ptr<
+    types::IParent
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IParent
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kChildA:
+      return impl::WrapChildA<E>(
+        std::dynamic_pointer_cast<
+          types::IChildA
+        >(that),
+        factory
+      );
+      break;
+    case types::ModelType::kChildB:
+      return impl::WrapChildB<E>(
+        std::dynamic_pointer_cast<
+          types::IChildB
+        >(that),
+        factory
+      );
+      break;
+    case types::ModelType::kContainer:
+      return impl::WrapContainer<E>(
+        std::dynamic_pointer_cast<
+          types::IContainer
+        >(that),
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IChildA
+> Wrap(
+  const std::shared_ptr<
+    types::IChildA
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IChildA
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kChildA:
+      return impl::WrapChildA<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IChildB
+> Wrap(
+  const std::shared_ptr<
+    types::IChildB
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IChildB
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kChildB:
+      return impl::WrapChildB<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IContainer
+> Wrap(
+  const std::shared_ptr<
+    types::IContainer
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IContainer
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kContainer:
+      return impl::WrapContainer<E>(
         that,
         factory
       );
