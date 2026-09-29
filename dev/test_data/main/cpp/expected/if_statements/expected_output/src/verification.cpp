@@ -161,6 +161,177 @@ bool IfWithContinueInFor(
   return count != 3;
 }
 
+bool NarrowingInBody(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+) {
+  if (
+    (
+      (parent.has_value())
+      && types::IsChildA(*(*parent))
+    )
+  ) {
+    return (
+      std::dynamic_pointer_cast<types::IChildA>(*parent)->a_only() < 100
+    );
+  }
+  return true;
+}
+
+bool NarrowingInElifAndElse(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+) {
+  if (!(parent.has_value())) {
+    return true;
+  } else if (!types::IsChildB(*(*parent))) {
+    return (
+      (
+        (!((*parent)->optional_text().has_value()))
+        || (*((*parent)->optional_text())) != L"forbidden"
+      )
+    );
+  } else {
+    return (
+      std::dynamic_pointer_cast<types::IChildB>(*parent)->b_only() > 0
+    );
+  }
+}
+
+bool NarrowingAfterEarlyReturn(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+) {
+  if (
+    (
+      (!(parent.has_value()))
+      || (!types::IsChildB(*(*parent)))
+    )
+  ) {
+    return true;
+  }
+  return (
+    std::dynamic_pointer_cast<types::IChildB>(*parent)->b_only() < 50
+  );
+}
+
+bool NarrowingAfterTheOnlyCompletingBranch(
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& parent
+) {
+  if (
+    (
+      (parent.has_value())
+      && types::IsChildA(*(*parent))
+    )
+  ) {} else {
+    return true;
+  }
+  return (
+    std::dynamic_pointer_cast<types::IChildA>(*parent)->a_only() > -10
+  );
+}
+
+bool ChildAsHaveTexts(
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+) {
+  for (const std::shared_ptr<types::IParent>& parent : parents) {
+    if (!types::IsChildA(*parent)) {
+      continue;
+    }
+    if (!(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text().has_value())) {
+      return false;
+    }
+    if (common::LenStr((*(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text()))) < 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool TextsBeforeContainerAreShort(
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+) {
+  int64_t total = 0;
+  for (const std::shared_ptr<types::IParent>& parent : parents) {
+    if (types::IsContainer(*parent)) {
+      break;
+    }
+    if (!(parent->optional_text().has_value())) {
+      continue;
+    }
+    total = (
+      total + static_cast<int64_t>(common::LenStr((*(parent->optional_text()))))
+    );
+  }
+  return total < 20;
+}
+
+bool TextOrDefaultIsShort(
+  const std::shared_ptr<types::IParent>& parent
+) {
+  auto text = parent->optional_text();
+  if (!(text.has_value())) {
+    text = L"default";
+  }
+  return common::LenStr((*text)) < 10;
+}
+
+bool LastChildAIsSmall(
+  const std::shared_ptr<types::IParent>& parent,
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& parents
+) {
+  auto last = parent;
+  for (const std::shared_ptr<types::IParent>& other : parents) {
+    if (types::IsChildA(*other)) {
+      last = std::dynamic_pointer_cast<types::IChildA>(other);
+      if (std::dynamic_pointer_cast<types::IChildA>(last)->a_only() >= 1000) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool HasMarkerInTree(
+  const std::shared_ptr<types::IParent>& parent
+) {
+  if (
+    (
+      (parent->optional_text().has_value())
+      && (*(parent->optional_text())) == L"marker"
+    )
+  ) {
+    return true;
+  }
+  if (types::IsContainer(*parent)) {
+    return (
+      (
+        (std::dynamic_pointer_cast<types::IContainer>(parent)->children().has_value())
+        && common::Some(
+          [&](const std::shared_ptr<types::IParent>& child) -> bool {
+            return HasMarkerInTree(
+              child
+            );
+          },
+          (*(std::dynamic_pointer_cast<types::IContainer>(parent)->children()))
+        )
+      )
+    );
+  }
+  return false;
+}
+
 // endregion Verification functions
 
 namespace {
@@ -273,6 +444,114 @@ bool Something_6(
   );
 }
 
+bool Something_7(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->optional_parent().has_value())
+  || (!verification::HasMarkerInTree(
+    (*(that->optional_parent()))
+  ));
+}
+
+bool Something_8(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !((
+    (that->optional_parent().has_value())
+    && (that->parents().has_value())
+  ))
+  || verification::LastChildAIsSmall(
+    (*(that->optional_parent())),
+    (*(that->parents()))
+  );
+}
+
+bool Something_9(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->optional_parent().has_value())
+  || verification::TextOrDefaultIsShort(
+    (*(that->optional_parent()))
+  );
+}
+
+bool Something_10(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->parents().has_value())
+  || verification::TextsBeforeContainerAreShort(
+    (*(that->parents()))
+  );
+}
+
+bool Something_11(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !(that->parents().has_value())
+  || verification::ChildAsHaveTexts(
+    (*(that->parents()))
+  );
+}
+
+bool Something_12(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::NarrowingAfterTheOnlyCompletingBranch(
+    that->optional_parent()
+  );
+}
+
+bool Something_13(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::NarrowingAfterEarlyReturn(
+    that->optional_parent()
+  );
+}
+
+bool Something_14(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::NarrowingInElifAndElse(
+    that->optional_parent()
+  );
+}
+
+bool Something_15(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::NarrowingInBody(
+    that->optional_parent()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -307,6 +586,43 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_6,
           L"Text must be at most 10 characters long"
+        },
+        {
+          &Something_7,
+          L"Optional parent must have no marker in its tree"
+        },
+        {
+          &Something_8,
+          L"Parents as Child_a must have a_only below one thousand"
+        },
+        {
+          &Something_9,
+          L"Text of the optional parent must be short"
+        },
+        {
+          &Something_10,
+          L"Texts of parents before the first container must be short"
+        },
+        {
+          &Something_11,
+          L"Parents as Child_a must have non-empty texts"
+        },
+        {
+          &Something_12,
+          L"Optional parent as Child_a must have a_only above minus ten"
+        },
+        {
+          &Something_13,
+          L"Optional parent as Child_b must have a small b_only"
+        },
+        {
+          &Something_14,
+          L"Optional parent must have an allowed text or a positive "
+          L"b_only"
+        },
+        {
+          &Something_15,
+          L"Optional parent as Child_a must have a small a_only"
         }
       };
       return checks;

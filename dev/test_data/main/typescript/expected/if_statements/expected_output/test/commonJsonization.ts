@@ -77,6 +77,198 @@ export function loadMinimalItem(
 }
 
 /**
+ * Load a maximal example of {@link types.ChildA} from
+ * the test data directory.
+ */
+export function loadMaximalChildA(
+): AasTypes.ChildA {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "ChildA",
+    "maximal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.childAFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildA(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildA in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal example of {@link types.ChildA} from
+ * the test data directory.
+ */
+export function loadMinimalChildA(
+): AasTypes.ChildA {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "ChildA",
+    "minimal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.childAFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildA(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildA in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a maximal example of {@link types.ChildB} from
+ * the test data directory.
+ */
+export function loadMaximalChildB(
+): AasTypes.ChildB {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "ChildB",
+    "maximal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.childBFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildB(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildB in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal example of {@link types.ChildB} from
+ * the test data directory.
+ */
+export function loadMinimalChildB(
+): AasTypes.ChildB {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "ChildB",
+    "minimal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.childBFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asChildB(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of ChildB in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a maximal example of {@link types.Container} from
+ * the test data directory.
+ */
+export function loadMaximalContainer(
+): AasTypes.Container {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "Container",
+    "maximal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.containerFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asContainer(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Container in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal example of {@link types.Container} from
+ * the test data directory.
+ */
+export function loadMinimalContainer(
+): AasTypes.Container {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "Container",
+    "minimal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.containerFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asContainer(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Container in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal example of {@link types.Something} from
  * the test data directory.
  */

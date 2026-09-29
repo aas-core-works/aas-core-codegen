@@ -338,6 +338,722 @@ def item_from_str(
     )
 
 
+def parent_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.parent_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Parent` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_parent_as_element,
+        'Parent'
+    )
+
+
+def parent_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.parent_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Parent` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Parent` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return parent_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def parent_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.parent_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Parent` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Parent` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return parent_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def parent_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.parent_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Parent` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Parent` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return parent_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def child_a_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.child_a_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildA` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_child_a_as_element,
+        'ChildA'
+    )
+
+
+def child_a_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.child_a_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.ChildA` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildA` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return child_a_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def child_a_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.child_a_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.ChildA` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildA` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return child_a_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def child_a_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.child_a_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.ChildA` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildA` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return child_a_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def child_b_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.child_b_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildB` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_child_b_as_element,
+        'ChildB'
+    )
+
+
+def child_b_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.child_b_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.ChildB` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildB` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return child_b_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def child_b_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.child_b_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.ChildB` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildB` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return child_b_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def child_b_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.child_b_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.ChildB` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.ChildB` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return child_b_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def container_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.container_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Container` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_container_as_element,
+        'Container'
+    )
+
+
+def container_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.container_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Container` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Container` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return container_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def container_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.container_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Container` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Container` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return container_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def container_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.container_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Container` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Container` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return container_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
 def something_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
 ) -> aas_types.Something:
@@ -762,6 +1478,60 @@ def _read_named_element(
     return read_content(element, iterator)
 
 
+def _read_nested_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_element: _ContentReader[_ValueT],
+    expected_what: str
+) -> _ValueT:
+    """
+    Read the instance nested in :paramref:`element` as a discriminator element.
+
+    This looks redundant next to reading a list item, and it is not. A property
+    wraps its instance in an element of its own, so the discriminator's name has to
+    be prepended to the error path, which then reads ``value/property/idShort``.
+    A list item is not wrapped -- the item element *is* the indexed child -- so the
+    same prepend would give ``annotations/*[0]/property/idShort``, which walks one
+    level past the element that ``*[0]`` already selects, and resolves to nothing.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the discriminator element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_element: to read the nested element, dispatching on its tag
+    :param expected_what: name of the expected type, for the error messages
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    next_event_element = next(iterator, None)
+    if next_event_element is None:
+        raise DeserializationException(
+            f"Expected a discriminator start element corresponding "
+            f"to {expected_what}, but got end-of-input"
+        )
+
+    next_event, nested_element = next_event_element
+    if next_event != 'start':
+        raise DeserializationException(
+            f"Expected a discriminator start element corresponding "
+            f"to {expected_what}, "
+            f"but got event {next_event!r} and element {nested_element.tag!r}"
+        )
+
+    try:
+        result = read_element(nested_element, iterator)
+    except DeserializationException as exception:
+        exception.path._prepend(ElementSegment(nested_element))
+        raise
+
+    read_end_element(element, iterator)
+
+    return result
+
+
 def _read_dispatched(
     element: Element,
     iterator: Iterator[Tuple[str, Element]],
@@ -881,6 +1651,72 @@ def _read_properties(
             raise
 
     return values
+
+
+def _read_list_of_items(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_item: _ContentReader[_ValueT]
+) -> List[_ValueT]:
+    """
+    Read the children of :paramref:`element` as a list of items.
+
+    :paramref:`read_item` is responsible for verifying the tag of each item
+    element itself -- *e.g.*, by wrapping a scalar/enumeration reader with
+    :py:func:`_read_named_element`, or by relying on a class's own dispatch by
+    its natural element tag.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the list
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_item: to read a single item, including its own end element
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed items
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only item elements and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    result = []  # type: List[_ValueT]
+
+    while True:
+        # NOTE (mristin):
+        # We pull the next item element here instead of delegating it to a helper,
+        # as this loop runs once for every item of every list.
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                f"Expected an item element or the end element corresponding "
+                f"to {element.tag}, but got the end-of-input"
+            )
+
+        next_event, item_element = next_event_element
+        if next_event == 'end' and item_element.tag == element.tag:
+            # We reached the end element enclosing the items.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                f"Expected a start element corresponding to an item, "
+                f"but got event {next_event!r} "
+                f"and element {item_element.tag!r}"
+            )
+
+        try:
+            item = read_item(item_element, iterator)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(item_element, len(result)))
+            raise
+
+        result.append(item)
+
+    return result
 
 
 def _read_instance_from_iterparse(
@@ -1061,6 +1897,37 @@ def _read_enum_from_element_text(
     return literal
 
 
+def _read_list_of__parent(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> List[aas_types.Parent]:
+    """
+    Read the items of :paramref:`element` as a list of
+    :py:class:`.types.Parent`.
+    """
+    return _read_list_of_items(
+        element,
+        iterator,
+        _read_parent_as_element
+    )
+
+
+def _read_nested__parent(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` nested in
+    :paramref:`element` as a discriminator element.
+    """
+    return _read_nested_element(
+        element,
+        iterator,
+        _read_parent_as_element,
+        'Parent'
+    )
+
+
 def _read_kind_from_element_text(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1149,6 +2016,214 @@ def _read_item_as_element(
     )
 
 
+def _read_parent_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Parent:
+    """
+    Read an instance of :py:class:`.types.Parent` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_dispatched(
+        element,
+        iterator,
+        _DISPATCH_FOR_PARENT,
+        "a concrete instance of 'Parent'"
+    )
+
+
+def _read_child_a_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    values = _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_CHILD_A
+    )
+
+    the_optional_text: Optional[str] = values.get('optionalText')
+    the_a_only: Optional[int] = values.get('aOnly')
+
+    if the_a_only is None:
+        raise DeserializationException(
+            "The required property 'aOnly' is missing"
+        )
+
+    return aas_types.ChildA(
+        the_a_only,
+        the_optional_text
+    )
+
+
+def _read_child_a_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildA:
+    """
+    Read an instance of :py:class:`.types.ChildA` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'childA',
+        _read_child_a_as_sequence
+    )
+
+
+def _read_child_b_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    values = _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_CHILD_B
+    )
+
+    the_optional_text: Optional[str] = values.get('optionalText')
+    the_b_only: Optional[int] = values.get('bOnly')
+
+    if the_b_only is None:
+        raise DeserializationException(
+            "The required property 'bOnly' is missing"
+        )
+
+    return aas_types.ChildB(
+        the_b_only,
+        the_optional_text
+    )
+
+
+def _read_child_b_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.ChildB:
+    """
+    Read an instance of :py:class:`.types.ChildB` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'childB',
+        _read_child_b_as_sequence
+    )
+
+
+def _read_container_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    values = _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_CONTAINER
+    )
+
+    the_optional_text: Optional[str] = values.get('optionalText')
+    the_children: Optional[List[aas_types.Parent]] = values.get('children')
+
+    return aas_types.Container(
+        the_optional_text,
+        the_children
+    )
+
+
+def _read_container_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Container:
+    """
+    Read an instance of :py:class:`.types.Container` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'container',
+        _read_container_as_sequence
+    )
+
+
 def _read_something_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
@@ -1179,6 +2254,8 @@ def _read_something_as_sequence(
     the_number: Optional[int] = values.get('number')
     the_flag: Optional[bool] = values.get('flag')
     the_item: Optional[aas_types.Item] = values.get('item')
+    the_optional_parent: Optional[aas_types.Parent] = values.get('optionalParent')
+    the_parents: Optional[List[aas_types.Parent]] = values.get('parents')
 
     if the_kind is None:
         raise DeserializationException(
@@ -1210,7 +2287,9 @@ def _read_something_as_sequence(
         the_text,
         the_number,
         the_flag,
-        the_item
+        the_item,
+        the_optional_parent,
+        the_parents
     )
 
 
@@ -1262,6 +2341,24 @@ def _read_as_element(
 
 
 #: Dispatch XML class names to read-as-sequence functions
+#: corresponding to concrete descendants of Parent
+_DISPATCH_FOR_PARENT: Mapping[
+    str,
+    Callable[
+        [
+            Element,
+            Iterator[Tuple[str, Element]]
+        ],
+        aas_types.Parent
+    ]
+] = {
+    'childA': _read_child_a_as_sequence,
+    'childB': _read_child_b_as_sequence,
+    'container': _read_container_as_sequence,
+}
+
+
+#: Dispatch XML class names to read-as-sequence functions
 #: corresponding to the concrete classes
 _GENERAL_DISPATCH: Mapping[
     str,
@@ -1274,6 +2371,9 @@ _GENERAL_DISPATCH: Mapping[
     ]
 ] = {
     'item': _read_item_as_sequence,
+    'childA': _read_child_a_as_sequence,
+    'childB': _read_child_b_as_sequence,
+    'container': _read_container_as_sequence,
     'something': _read_something_as_sequence,
 }
 
@@ -1290,6 +2390,39 @@ _READERS_FOR_ITEM: Mapping[
 
 
 #: Read the content of a property of
+#: :py:class:`.types.ChildA`, by the XML name of the property
+_READERS_FOR_CHILD_A: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
+    'optionalText': read_str_from_element_text,
+    'aOnly': _read_int_from_element_text,
+}
+
+
+#: Read the content of a property of
+#: :py:class:`.types.ChildB`, by the XML name of the property
+_READERS_FOR_CHILD_B: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
+    'optionalText': read_str_from_element_text,
+    'bOnly': _read_int_from_element_text,
+}
+
+
+#: Read the content of a property of
+#: :py:class:`.types.Container`, by the XML name of the property
+_READERS_FOR_CONTAINER: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
+    'optionalText': read_str_from_element_text,
+    'children': _read_list_of__parent,
+}
+
+
+#: Read the content of a property of
 #: :py:class:`.types.Something`, by the XML name of the property
 _READERS_FOR_SOMETHING: Mapping[
     str,
@@ -1300,6 +2433,8 @@ _READERS_FOR_SOMETHING: Mapping[
     'number': _read_int_from_element_text,
     'flag': _read_bool_from_element_text,
     'item': _read_item_as_sequence,
+    'optionalParent': _read_nested__parent,
+    'parents': _read_list_of__parent,
 }
 
 
@@ -1511,6 +2646,80 @@ def _write_enum_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_nested_element(
+    name: str,
+    prop_name: Optional[str],
+    value: aas_types.Class,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`value` nested in the :paramref:`name` element.
+
+    The instance writes the element which designates its model type, so it has to be
+    nested in an element of its own when it is the value of a property. Mind that
+    an *item* of a list is not nested that way -- see
+    :py:func:`_write_list_of_instances` -- as it is the item's own element which
+    already sits in the list's element.
+
+    The element which designates the model type contributes no segment to the path
+    of a :py:class:`SerializationException`. The path points into the instance which
+    was handed over for the serialization, and there that element is no level of its
+    own: ``.value.id_short`` is exactly what you would write in Python.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        serializer.visit(value)
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_list_of_instances(
+    name: str,
+    prop_name: Optional[str],
+    items: Sequence[aas_types.Class],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`items` enclosed in the :paramref:`name` element.
+
+    Every item writes the element which designates its model type, so no positional
+    tag is necessary. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param items: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(items) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for index, item in enumerate(items):
+                try:
+                    serializer.visit(item)
+                except Exception as exception:
+                    _attribute_to_item(exception, index)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_item_as_element(
     name: str,
     prop_name: Optional[str],
@@ -1540,6 +2749,106 @@ def _write_item_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_child_a_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: aas_types.ChildA,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        if that.optional_text is not None:
+            _write_str_as_element(
+                'optionalText', 'optional_text', that.optional_text, serializer
+            )
+        _write_int_as_element('aOnly', 'a_only', that.a_only, serializer)
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_child_b_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: aas_types.ChildB,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        if that.optional_text is not None:
+            _write_str_as_element(
+                'optionalText', 'optional_text', that.optional_text, serializer
+            )
+        _write_int_as_element('bOnly', 'b_only', that.b_only, serializer)
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_container_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: aas_types.Container,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    All the properties are optional, so the element is collapsed to an empty one
+    if none of them is set.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        # We optimize for the case where all the optional properties are not set,
+        # so that we can simply output an empty element.
+        if (
+                that.optional_text is None
+                and that.children is None
+        ):
+            serializer.writer.write_empty_element(name)
+            return
+
+        serializer.writer.write_start_element(name)
+        if that.optional_text is not None:
+            _write_str_as_element(
+                'optionalText', 'optional_text', that.optional_text, serializer
+            )
+        if that.children is not None:
+            _write_list_of_instances('children', 'children', that.children, serializer)
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_something_as_element(
     name: str,
     prop_name: Optional[str],
@@ -1564,6 +2873,12 @@ def _write_something_as_element(
         _write_int_as_element('number', 'number', that.number, serializer)
         _write_bool_as_element('flag', 'flag', that.flag, serializer)
         _write_item_as_element('item', 'item', that.item, serializer)
+        if that.optional_parent is not None:
+            _write_nested_element(
+                'optionalParent', 'optional_parent', that.optional_parent, serializer
+            )
+        if that.parents is not None:
+            _write_list_of_instances('parents', 'parents', that.parents, serializer)
         serializer.writer.write_end_element(name)
     except Exception as exception:
         _attribute_to_property(exception, prop_name)
@@ -1602,6 +2917,48 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         _write_item_as_element('item', None, that, self)
+
+    def visit_child_a(
+        self,
+        that: aas_types.ChildA
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_child_a_as_element('childA', None, that, self)
+
+    def visit_child_b(
+        self,
+        that: aas_types.ChildB
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_child_b_as_element('childB', None, that, self)
+
+    def visit_container(
+        self,
+        that: aas_types.Container
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_container_as_element('container', None, that, self)
 
     def visit_something(
         self,

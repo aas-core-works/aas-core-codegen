@@ -45,6 +45,83 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
   }
 
   @Override
+  public IClass transformChildA(
+    IChildA that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedChildA<>(
+        that,
+        enhancement.get()
+      );
+  }
+
+  @Override
+  public IClass transformChildB(
+    IChildB that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedChildB<>(
+        that,
+        enhancement.get()
+      );
+  }
+
+  @Override
+  public IClass transformContainer(
+    IContainer that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    if (that.getChildren().isPresent()) {
+      List<IParent> children = that.getChildren().get();
+      List<IParent> transformedChildren = children.stream()
+        .map(childrenItem -> {
+          IClass transformedChildrenItem =
+            transform(childrenItem);
+          if (!(transformedChildrenItem instanceof IParent)) {
+            throw new UnsupportedOperationException(
+              "Expected the transformed value to be a IParent " +
+              ", but got: " + transformedChildrenItem
+            );
+          }
+          return (IParent) transformedChildrenItem;
+        }).collect(Collectors.toList());
+      that.setChildren(transformedChildren);
+    }
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedContainer<>(
+        that,
+        enhancement.get()
+      );
+  }
+
+  @Override
   public IClass transformSomething(
     ISomething that
   ) {
@@ -65,6 +142,36 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     }
     IItem castedItem = (IItem) transformedItem;
     that.setItem(castedItem);
+
+    if (that.getOptionalParent().isPresent()) {
+      IParent optionalParent = that.getOptionalParent().get();
+      IClass transformedOptionalParent = transform(optionalParent);
+      if (!(transformedOptionalParent instanceof IParent)) {
+        throw new UnsupportedOperationException(
+          "Expected the transformed value to be a IParent " +
+          ", but got: " + transformedOptionalParent
+        );
+      }
+      IParent castedOptionalParent = (IParent) transformedOptionalParent;
+      that.setOptionalParent(castedOptionalParent);
+    }
+
+    if (that.getParents().isPresent()) {
+      List<IParent> parents = that.getParents().get();
+      List<IParent> transformedParents = parents.stream()
+        .map(parentsItem -> {
+          IClass transformedParentsItem =
+            transform(parentsItem);
+          if (!(transformedParentsItem instanceof IParent)) {
+            throw new UnsupportedOperationException(
+              "Expected the transformed value to be a IParent " +
+              ", but got: " + transformedParentsItem
+            );
+          }
+          return (IParent) transformedParentsItem;
+        }).collect(Collectors.toList());
+      that.setParents(transformedParents);
+    }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()

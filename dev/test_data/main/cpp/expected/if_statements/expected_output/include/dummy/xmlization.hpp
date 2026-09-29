@@ -100,6 +100,74 @@ common::expected<
 );
 
 /**
+ * Deserialize an instance of types::IParent from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IParent, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IParent>,
+  DeserializationError
+> ParentFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
+ * Deserialize an instance of types::IChildA from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IChildA, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IChildA>,
+  DeserializationError
+> ChildAFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
+ * Deserialize an instance of types::IChildB from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IChildB, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IChildB>,
+  DeserializationError
+> ChildBFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
+ * Deserialize an instance of types::IContainer from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IContainer, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IContainer>,
+  DeserializationError
+> ContainerFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
  * Deserialize an instance of types::ISomething from an XML
  * read from the stream \p is.
  *

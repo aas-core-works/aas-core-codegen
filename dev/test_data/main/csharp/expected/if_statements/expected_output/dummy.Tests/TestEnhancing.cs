@@ -71,6 +71,96 @@ namespace dummy.Tests
         }  // public void Test_Item
 
         [Test]
+        public void Test_ChildA()
+        {
+            var instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA()
+            );
+
+            var enhancer = CreateEnhancer();
+
+            Assert.IsNull(enhancer.Unwrap(instance));
+
+            var wrapped = enhancer.Wrap(instance);
+            Assert.IsNotNull(wrapped);
+
+            var idSet = new HashSet<long>();
+
+            idSet.Add(enhancer.MustUnwrap(wrapped).SomeCustomId);
+            idSet.UnionWith(
+                wrapped
+                    .Descend()
+                    .Select(
+                        (descendant) =>
+                            enhancer.MustUnwrap(descendant).SomeCustomId
+                        )
+            );
+
+            Assert.AreEqual(1, idSet.Min());
+            Assert.AreEqual(idSet.Count, idSet.Max());
+        }  // public void Test_ChildA
+
+        [Test]
+        public void Test_ChildB()
+        {
+            var instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB()
+            );
+
+            var enhancer = CreateEnhancer();
+
+            Assert.IsNull(enhancer.Unwrap(instance));
+
+            var wrapped = enhancer.Wrap(instance);
+            Assert.IsNotNull(wrapped);
+
+            var idSet = new HashSet<long>();
+
+            idSet.Add(enhancer.MustUnwrap(wrapped).SomeCustomId);
+            idSet.UnionWith(
+                wrapped
+                    .Descend()
+                    .Select(
+                        (descendant) =>
+                            enhancer.MustUnwrap(descendant).SomeCustomId
+                        )
+            );
+
+            Assert.AreEqual(1, idSet.Min());
+            Assert.AreEqual(idSet.Count, idSet.Max());
+        }  // public void Test_ChildB
+
+        [Test]
+        public void Test_Container()
+        {
+            var instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer()
+            );
+
+            var enhancer = CreateEnhancer();
+
+            Assert.IsNull(enhancer.Unwrap(instance));
+
+            var wrapped = enhancer.Wrap(instance);
+            Assert.IsNotNull(wrapped);
+
+            var idSet = new HashSet<long>();
+
+            idSet.Add(enhancer.MustUnwrap(wrapped).SomeCustomId);
+            idSet.UnionWith(
+                wrapped
+                    .Descend()
+                    .Select(
+                        (descendant) =>
+                            enhancer.MustUnwrap(descendant).SomeCustomId
+                        )
+            );
+
+            Assert.AreEqual(1, idSet.Min());
+            Assert.AreEqual(idSet.Count, idSet.Max());
+        }  // public void Test_Container
+
+        [Test]
         public void Test_Something()
         {
             var instance = (

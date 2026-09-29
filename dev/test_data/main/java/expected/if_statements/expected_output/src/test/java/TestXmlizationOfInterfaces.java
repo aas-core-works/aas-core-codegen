@@ -17,7 +17,101 @@ import javax.xml.stream.*;
 import org.junit.jupiter.api.Test;
 
 public class TestXmlizationOfInterfaces {
-  
+  @Test
+  public void testRoundTripIParentFromChildA()
+    throws IOException, XMLStreamException {
+    // We load from JSON here just to jump-start the round trip.
+    // The round-trip goes then over XML.
+    final IParent instance =
+      CommonJsonization.loadMaximalChildA();
+
+    // The round-trip starts here.
+    final StringWriter stringOut = new StringWriter();
+    final XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+    final XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(stringOut);
+
+    Xmlization.Serialize.to(instance, xmlWriter);
+    String outputText = stringOut.toString();
+
+    // De-serialize from XML
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    final XMLEventReader xmlReader =
+      xmlInputFactory.createXMLEventReader(new StringReader(outputText));
+    final IParent anotherInstance =
+      Xmlization.Deserialize.deserializeIParent(xmlReader);
+
+    // Serialize back to XML
+    final StringWriter anotherStringOut = new StringWriter();
+    final XMLStreamWriter anotherXmlWriter = outputFactory.createXMLStreamWriter(anotherStringOut);
+    Xmlization.Serialize.to(anotherInstance, anotherXmlWriter);
+
+    // Compare
+    assertEquals(outputText, anotherStringOut.toString());
+  } // void testRoundTripIParentFromChildA
+
+  @Test
+  public void testRoundTripIParentFromChildB()
+    throws IOException, XMLStreamException {
+    // We load from JSON here just to jump-start the round trip.
+    // The round-trip goes then over XML.
+    final IParent instance =
+      CommonJsonization.loadMaximalChildB();
+
+    // The round-trip starts here.
+    final StringWriter stringOut = new StringWriter();
+    final XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+    final XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(stringOut);
+
+    Xmlization.Serialize.to(instance, xmlWriter);
+    String outputText = stringOut.toString();
+
+    // De-serialize from XML
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    final XMLEventReader xmlReader =
+      xmlInputFactory.createXMLEventReader(new StringReader(outputText));
+    final IParent anotherInstance =
+      Xmlization.Deserialize.deserializeIParent(xmlReader);
+
+    // Serialize back to XML
+    final StringWriter anotherStringOut = new StringWriter();
+    final XMLStreamWriter anotherXmlWriter = outputFactory.createXMLStreamWriter(anotherStringOut);
+    Xmlization.Serialize.to(anotherInstance, anotherXmlWriter);
+
+    // Compare
+    assertEquals(outputText, anotherStringOut.toString());
+  } // void testRoundTripIParentFromChildB
+
+  @Test
+  public void testRoundTripIParentFromContainer()
+    throws IOException, XMLStreamException {
+    // We load from JSON here just to jump-start the round trip.
+    // The round-trip goes then over XML.
+    final IParent instance =
+      CommonJsonization.loadMaximalContainer();
+
+    // The round-trip starts here.
+    final StringWriter stringOut = new StringWriter();
+    final XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+    final XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(stringOut);
+
+    Xmlization.Serialize.to(instance, xmlWriter);
+    String outputText = stringOut.toString();
+
+    // De-serialize from XML
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    final XMLEventReader xmlReader =
+      xmlInputFactory.createXMLEventReader(new StringReader(outputText));
+    final IParent anotherInstance =
+      Xmlization.Deserialize.deserializeIParent(xmlReader);
+
+    // Serialize back to XML
+    final StringWriter anotherStringOut = new StringWriter();
+    final XMLStreamWriter anotherXmlWriter = outputFactory.createXMLStreamWriter(anotherStringOut);
+    Xmlization.Serialize.to(anotherInstance, anotherXmlWriter);
+
+    // Compare
+    assertEquals(outputText, anotherStringOut.toString());
+  } // void testRoundTripIParentFromContainer
 } // class TestXmlizationOfInterfaces
 
 // package dummy.tests

@@ -13,6 +13,7 @@ import dummy.types.model.*;
 import dummy.stringification.Stringification;
 import dummy.visitation.AbstractTransformer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
@@ -148,6 +149,16 @@ public class Jsonization {
       }
 
       /**
+       * Mark the error of {@code result} as coming from the item at {@code index}.
+       */
+      private static <T> Reporting.Result<T> prependIndex(
+        Reporting.Result<?> result, int index) {
+        final Reporting.Error error = result.getError();
+        error.prependSegment(new Reporting.IndexSegment(index));
+        return Reporting.Result.failure(error);
+      }
+
+      /**
        * Report that {@code node} is no JSON object.
        */
       private static <T> Reporting.Result<T> notAJsonObject(JsonNode node) {
@@ -155,6 +166,15 @@ public class Jsonization {
           new Reporting.Error(
             "Expected a JsonObject, but got " +
             (node == null ? "null" : node.getNodeType())));
+      }
+
+      /**
+       * Report that {@code node} is no JSON array.
+       */
+      private static <T> Reporting.Result<T> notAJsonArray(JsonNode node) {
+        return Reporting.Result.failure(
+          new Reporting.Error(
+            "Expected a JsonArray, but got " + node.getNodeType()));
       }
 
       /**
@@ -172,6 +192,58 @@ public class Jsonization {
         return Reporting.Result.failure(
           new Reporting.Error(
             "Required property \"" + name + "\" is missing"));
+      }
+
+      /**
+       * Extract the {@code modelType} property of {@code node} as a string.
+       *
+       * <p>This is the only place which knows how the model type is spelled on
+       * the wire. Both the dispatch on the model type and its check in a concrete
+       * class go through it.
+       *
+       * @param node JSON object to be inspected
+       */
+      private static Reporting.Result<String> tryModelTypeFrom(JsonNode node) {
+        final JsonNode modelTypeNode = node.get("modelType");
+        if (modelTypeNode == null) {
+          return missingRequiredProperty("modelType");
+        }
+
+        final Reporting.Result<String> result = tryStringFrom(modelTypeNode);
+        if (result.isError()) {
+          return prependName(result, "modelType");
+        }
+
+        return result;
+      }
+
+      /**
+       * Check that {@code node} gives the {@code expected} model type, and return
+       * the error if it does not.
+       *
+       * <p>The model type is checked before the properties are read, so that a wrong
+       * one is reported without de-serializing any of them first, and so that
+       * the property loop carries nothing but the properties.
+       *
+       * @param node JSON object to be inspected
+       * @param expected model type of the class being de-serialized
+       */
+      private static Reporting.Error checkModelType(JsonNode node, String expected) {
+        final Reporting.Result<String> result = tryModelTypeFrom(node);
+        if (result.isError()) {
+          return result.getError();
+        }
+
+        final String modelType = result.getResult();
+        if (!modelType.equals(expected)) {
+          final Reporting.Error error = new Reporting.Error(
+            "Expected the model type '" + expected + "', " +
+            "but got '" + modelType + "'");
+          error.prependSegment(new Reporting.NameSegment("modelType"));
+          return error;
+        }
+
+        return null;
       }
 
       /**
@@ -204,6 +276,45 @@ public class Jsonization {
         }
 
         return Reporting.Result.success(parsed.get());
+      }
+
+      /**
+       * Parse {@code node} as a JSON array, and every of its items with
+       * {@code parseItem}.
+       *
+       * @param node JSON node to be parsed
+       * @param parseItem to parse a single item of the array
+       */
+      private static <T> Reporting.Result<List<T>> parseArray(
+        JsonNode node,
+        Function<JsonNode, Reporting.Result<? extends T>> parseItem) {
+        if (!node.isArray()) {
+          return notAJsonArray(node);
+        }
+
+        final List<T> result = new ArrayList<>(node.size());
+
+        int index = 0;
+        for (JsonNode item : node) {
+          final Reporting.Result<? extends T> parsedItem = parseItem.apply(item);
+          if (parsedItem.isError()) {
+            return prependIndex(parsedItem, index);
+          }
+
+          result.add(parsedItem.getResult());
+          index++;
+        }
+
+        return Reporting.Result.success(result);
+      }
+
+      /**
+       * Parse {@code node} as a list of {@code IParent}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<List<IParent>> parseListOf_IParent(JsonNode node) {
+        return parseArray(node, _DeserializeImplementation::tryIParentFrom);
       }
 
       /**
@@ -265,6 +376,234 @@ public class Jsonization {
       }
 
       /**
+       * Deserialize an instance of IParent by dispatching
+       * based on {@code modelType} property of the {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Reporting.Result<? extends IParent> tryIParentFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Result<String> modelTypeResult = tryModelTypeFrom(node);
+        if (modelTypeResult.isError()) {
+          return modelTypeResult.castTo(IParent.class);
+        }
+
+        switch (modelTypeResult.getResult()) {
+          case "ChildA":
+            return tryChildAFromObject(node);
+          case "ChildB":
+            return tryChildBFromObject(node);
+          case "Container":
+            return tryContainerFromObject(node);
+          default: {
+            final Reporting.Error error = new Reporting.Error(
+              "Unexpected model type for IParent: " + modelTypeResult.getResult());
+            return Reporting.Result.failure(error);
+          }
+        }
+      }
+
+      /**
+       * Deserialize an instance of ChildA from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<ChildA> tryChildAFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Error modelTypeError = checkModelType(node, "ChildA");
+        if (modelTypeError != null) {
+          return Reporting.Result.failure(modelTypeError);
+        }
+
+        return tryChildAFromObject(node);
+      }
+
+      /**
+       * Deserialize an instance of ChildA from the JSON object {@code node} whose
+       * model type has already been checked.
+       *
+       * @param node JSON object to be parsed
+       */
+      private static Reporting.Result<ChildA> tryChildAFromObject(JsonNode node) {
+        Long theAOnly = null;
+        String theOptionalText = null;
+
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+          final JsonNode value = keyValue.getValue();
+
+          switch (key) {
+            case "aOnly": {
+              final Reporting.Result<? extends Long> parsed = tryLongFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theAOnly = parsed.getResult();
+              break;
+            }
+            case "optionalText": {
+              final Reporting.Result<? extends String> parsed = tryStringFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalText = parsed.getResult();
+              break;
+            }
+            case "modelType":
+              // The model type has already been checked before the loop.
+              break;
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        if (theAOnly == null) {
+          return missingRequiredProperty("aOnly");
+        }
+
+        return Reporting.Result.success(new ChildA(
+          theAOnly,
+          theOptionalText));
+      }
+
+      /**
+       * Deserialize an instance of ChildB from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<ChildB> tryChildBFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Error modelTypeError = checkModelType(node, "ChildB");
+        if (modelTypeError != null) {
+          return Reporting.Result.failure(modelTypeError);
+        }
+
+        return tryChildBFromObject(node);
+      }
+
+      /**
+       * Deserialize an instance of ChildB from the JSON object {@code node} whose
+       * model type has already been checked.
+       *
+       * @param node JSON object to be parsed
+       */
+      private static Reporting.Result<ChildB> tryChildBFromObject(JsonNode node) {
+        Long theBOnly = null;
+        String theOptionalText = null;
+
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+          final JsonNode value = keyValue.getValue();
+
+          switch (key) {
+            case "bOnly": {
+              final Reporting.Result<? extends Long> parsed = tryLongFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theBOnly = parsed.getResult();
+              break;
+            }
+            case "optionalText": {
+              final Reporting.Result<? extends String> parsed = tryStringFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalText = parsed.getResult();
+              break;
+            }
+            case "modelType":
+              // The model type has already been checked before the loop.
+              break;
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        if (theBOnly == null) {
+          return missingRequiredProperty("bOnly");
+        }
+
+        return Reporting.Result.success(new ChildB(
+          theBOnly,
+          theOptionalText));
+      }
+
+      /**
+       * Deserialize an instance of Container from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Container> tryContainerFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Error modelTypeError = checkModelType(node, "Container");
+        if (modelTypeError != null) {
+          return Reporting.Result.failure(modelTypeError);
+        }
+
+        return tryContainerFromObject(node);
+      }
+
+      /**
+       * Deserialize an instance of Container from the JSON object {@code node} whose
+       * model type has already been checked.
+       *
+       * @param node JSON object to be parsed
+       */
+      private static Reporting.Result<Container> tryContainerFromObject(JsonNode node) {
+        String theOptionalText = null;
+        List<IParent> theChildren = null;
+
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+          final JsonNode value = keyValue.getValue();
+
+          switch (key) {
+            case "optionalText": {
+              final Reporting.Result<? extends String> parsed = tryStringFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalText = parsed.getResult();
+              break;
+            }
+            case "children": {
+              final Reporting.Result<List<IParent>> parsed = parseListOf_IParent(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theChildren = parsed.getResult();
+              break;
+            }
+            case "modelType":
+              // The model type has already been checked before the loop.
+              break;
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        return Reporting.Result.success(new Container(
+          theOptionalText,
+          theChildren));
+      }
+
+      /**
        * Deserialize an instance of Something from {@code node}.
        *
        * @param node JSON node to be parsed
@@ -279,6 +618,8 @@ public class Jsonization {
         Long theNumber = null;
         Boolean theFlag = null;
         IItem theItem = null;
+        IParent theOptionalParent = null;
+        List<IParent> theParents = null;
 
         for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
           final Map.Entry<String, JsonNode> keyValue = iterator.next();
@@ -326,6 +667,22 @@ public class Jsonization {
               theItem = parsed.getResult();
               break;
             }
+            case "optionalParent": {
+              final Reporting.Result<? extends IParent> parsed = tryIParentFrom(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalParent = parsed.getResult();
+              break;
+            }
+            case "parents": {
+              final Reporting.Result<List<IParent>> parsed = parseListOf_IParent(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theParents = parsed.getResult();
+              break;
+            }
             default:
               return unexpectedProperty(key);
           }
@@ -356,7 +713,9 @@ public class Jsonization {
           theText,
           theNumber,
           theFlag,
-          theItem));
+          theItem,
+          theOptionalParent,
+          theParents));
       }
     }
 
@@ -469,6 +828,74 @@ public class Jsonization {
       public static Item deserializeItem(JsonNode node) {
         final Reporting.Result<? extends Item> result =
           _DeserializeImplementation.tryItemFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of IParent from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static IParent deserializeIParent(JsonNode node) {
+        final Reporting.Result<? extends IParent> result =
+          _DeserializeImplementation.tryIParentFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of ChildA from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static ChildA deserializeChildA(JsonNode node) {
+        final Reporting.Result<? extends ChildA> result =
+          _DeserializeImplementation.tryChildAFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of ChildB from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static ChildB deserializeChildB(JsonNode node) {
+        final Reporting.Result<? extends ChildB> result =
+          _DeserializeImplementation.tryChildBFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of Container from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Container deserializeContainer(JsonNode node) {
+        final Reporting.Result<? extends Container> result =
+          _DeserializeImplementation.tryContainerFrom(
             node);
 
         return result.onError(error -> {
@@ -619,6 +1046,28 @@ public class Jsonization {
         return JsonNodeFactory.instance.numberNode(that);
       }
 
+      /**
+       * Serialize every item of {@code that} into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeListOf_IClass(
+        List<? extends IClass> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (IClass item : that) {
+          try {
+            result.add(transformClass(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
       @Override
       public JsonNode transformItem(
         IItem that
@@ -630,6 +1079,59 @@ public class Jsonization {
         setOptionalProperty(
           result, "optionalText", "getOptionalText()",
           that.getOptionalText(), _Transformer::stringToJsonNode);
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformChildA(
+        IChildA that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setOptionalProperty(
+          result, "optionalText", "getOptionalText()",
+          that.getOptionalText(), _Transformer::stringToJsonNode);
+
+        setProperty(result, "aOnly", "getAOnly()", that.getAOnly(), _Transformer::longToJsonNode);
+
+        result.put("modelType", "ChildA");
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformChildB(
+        IChildB that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setOptionalProperty(
+          result, "optionalText", "getOptionalText()",
+          that.getOptionalText(), _Transformer::stringToJsonNode);
+
+        setProperty(result, "bOnly", "getBOnly()", that.getBOnly(), _Transformer::longToJsonNode);
+
+        result.put("modelType", "ChildB");
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformContainer(
+        IContainer that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setOptionalProperty(
+          result, "optionalText", "getOptionalText()",
+          that.getOptionalText(), _Transformer::stringToJsonNode);
+
+        setOptionalProperty(
+          result, "children", "getChildren()",
+          that.getChildren(), _Transformer::serializeListOf_IClass);
+
+        result.put("modelType", "Container");
 
         return result;
       }
@@ -651,6 +1153,14 @@ public class Jsonization {
         setProperty(result, "flag", "getFlag()", that.getFlag(), _Transformer::boolToJsonNode);
 
         setProperty(result, "item", "getItem()", that.getItem(), _Transformer::transformClass);
+
+        setOptionalProperty(
+          result, "optionalParent", "getOptionalParent()",
+          that.getOptionalParent(), _Transformer::transformClass);
+
+        setOptionalProperty(
+          result, "parents", "getParents()",
+          that.getParents(), _Transformer::serializeListOf_IClass);
 
         return result;
       }

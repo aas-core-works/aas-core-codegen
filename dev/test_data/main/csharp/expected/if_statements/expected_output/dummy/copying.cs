@@ -54,6 +54,27 @@ namespace dummy
                 return new Aas.Item(that.Name, that.OptionalText);
             }
 
+            public override Aas.IClass TransformChildA(
+                Aas.IChildA that
+            )
+            {
+                return new Aas.ChildA(that.AOnly, that.OptionalText);
+            }
+
+            public override Aas.IClass TransformChildB(
+                Aas.IChildB that
+            )
+            {
+                return new Aas.ChildB(that.BOnly, that.OptionalText);
+            }
+
+            public override Aas.IClass TransformContainer(
+                Aas.IContainer that
+            )
+            {
+                return new Aas.Container(that.OptionalText, that.Children);
+            }
+
             public override Aas.IClass TransformSomething(
                 Aas.ISomething that
             )
@@ -63,7 +84,9 @@ namespace dummy
                     that.Text,
                     that.Number,
                     that.Flag,
-                    that.Item);
+                    that.Item,
+                    that.OptionalParent,
+                    that.Parents);
             }
         }  // internal class ShallowCopier
 
@@ -79,16 +102,72 @@ namespace dummy
                 );
             }
 
+            public override Aas.IClass TransformChildA(
+                Aas.IChildA that
+            )
+            {
+                return new Aas.ChildA(
+                    that.AOnly,
+                    that.OptionalText
+                );
+            }
+
+            public override Aas.IClass TransformChildB(
+                Aas.IChildB that
+            )
+            {
+                return new Aas.ChildB(
+                    that.BOnly,
+                    that.OptionalText
+                );
+            }
+
+            public override Aas.IClass TransformContainer(
+                Aas.IContainer that
+            )
+            {
+                List<IParent>? theChildren = null;
+                if (that.Children != null)
+                {
+                    theChildren = new List<IParent>(
+                        that.Children.Count);
+                    foreach (var item in that.Children)
+                    {
+                        theChildren.Add(Deep(item));
+                    }
+                }
+
+                return new Aas.Container(
+                    that.OptionalText,
+                    theChildren
+                );
+            }
+
             public override Aas.IClass TransformSomething(
                 Aas.ISomething that
             )
             {
+                List<IParent>? theParents = null;
+                if (that.Parents != null)
+                {
+                    theParents = new List<IParent>(
+                        that.Parents.Count);
+                    foreach (var item in that.Parents)
+                    {
+                        theParents.Add(Deep(item));
+                    }
+                }
+
                 return new Aas.Something(
                     that.Kind,
                     that.Text,
                     that.Number,
                     that.Flag,
-                    Deep(that.Item)
+                    Deep(that.Item),
+                    (that.OptionalParent != null)
+                        ? Deep(that.OptionalParent)
+                        : null,
+                    theParents
                 );
             }
         }  // internal class DeepCopier

@@ -20,10 +20,166 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 		)
 	}
 
+	if aastypes.IsChildA(instance) {
+		t.Errorf(
+			"Expected IsChildA to be false on an instance " +
+			"of IItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildB(instance) {
+		t.Errorf(
+			"Expected IsChildB to be false on an instance " +
+			"of IItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be false on an instance " +
+			"of IItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
 	if aastypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
+	instance := aastesting.MustLoadMinimalChildA()
+
+	if aastypes.IsItem(instance) {
+		t.Errorf(
+			"Expected IsItem to be false on an instance " +
+			"of IChildA with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !aastypes.IsChildA(instance) {
+		t.Errorf(
+			"Expected IsChildA to be true on an instance " +
+			"of IChildA with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildB(instance) {
+		t.Errorf(
+			"Expected IsChildB to be false on an instance " +
+			"of IChildA with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be false on an instance " +
+			"of IChildA with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of IChildA with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
+	instance := aastesting.MustLoadMinimalChildB()
+
+	if aastypes.IsItem(instance) {
+		t.Errorf(
+			"Expected IsItem to be false on an instance " +
+			"of IChildB with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildA(instance) {
+		t.Errorf(
+			"Expected IsChildA to be false on an instance " +
+			"of IChildB with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !aastypes.IsChildB(instance) {
+		t.Errorf(
+			"Expected IsChildB to be true on an instance " +
+			"of IChildB with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be false on an instance " +
+			"of IChildB with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of IChildB with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
+	instance := aastesting.MustLoadMinimalContainer()
+
+	if aastypes.IsItem(instance) {
+		t.Errorf(
+			"Expected IsItem to be false on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildA(instance) {
+		t.Errorf(
+			"Expected IsChildA to be false on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildB(instance) {
+		t.Errorf(
+			"Expected IsChildB to be false on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !aastypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be true on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
 	}
@@ -35,6 +191,30 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 	if aastypes.IsItem(instance) {
 		t.Errorf(
 			"Expected IsItem to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildA(instance) {
+		t.Errorf(
+			"Expected IsChildA to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsChildB(instance) {
+		t.Errorf(
+			"Expected IsChildB to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)

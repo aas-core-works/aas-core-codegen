@@ -24,6 +24,48 @@ TEST_CASE("Test ModelType round-trip") {
   );
 
   REQUIRE(
+    aas::types::ModelType::kChildA
+    == aas::wstringification::MustModelTypeFromWstring(
+      L"ChildA"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::ModelType::kChildA
+    )
+    == L"ChildA"
+  );
+
+  REQUIRE(
+    aas::types::ModelType::kChildB
+    == aas::wstringification::MustModelTypeFromWstring(
+      L"ChildB"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::ModelType::kChildB
+    )
+    == L"ChildB"
+  );
+
+  REQUIRE(
+    aas::types::ModelType::kContainer
+    == aas::wstringification::MustModelTypeFromWstring(
+      L"Container"
+    )
+  );
+
+  REQUIRE(
+    aas::wstringification::to_wstring(
+      aas::types::ModelType::kContainer
+    )
+    == L"Container"
+  );
+
+  REQUIRE(
     aas::types::ModelType::kSomething
     == aas::wstringification::MustModelTypeFromWstring(
       L"Something"

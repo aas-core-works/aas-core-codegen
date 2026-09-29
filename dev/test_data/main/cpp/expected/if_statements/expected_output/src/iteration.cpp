@@ -20,6 +20,12 @@ std::wstring PropertyToWstring(
   Property property
 ) {
   switch (property) {
+    case Property::kAOnly:
+      return L"a_only";
+    case Property::kBOnly:
+      return L"b_only";
+    case Property::kChildren:
+      return L"children";
     case Property::kFlag:
       return L"flag";
     case Property::kItem:
@@ -30,8 +36,12 @@ std::wstring PropertyToWstring(
       return L"name";
     case Property::kNumber:
       return L"number";
+    case Property::kOptionalParent:
+      return L"optional_parent";
     case Property::kOptionalText:
       return L"optional_text";
+    case Property::kParents:
+      return L"parents";
     case Property::kText:
       return L"text";
     default:
@@ -245,65 +255,6 @@ std::unique_ptr<impl::IIterator> Empty() {
 }
 
 /**
- * Iterate over the instances of the \p child, which lives in a property.
- */
-class InPropertyIterator : public impl::IIterator {
- public:
-  InPropertyIterator(
-    Property property,
-    std::unique_ptr<impl::IIterator> child
-  ) :
-    property_(property),
-    child_(std::move(child)) {
-    // Intentionally empty.
-  }
-
-  InPropertyIterator(const InPropertyIterator& other) :
-    property_(other.property_),
-    child_(other.child_->Clone()) {
-    // Intentionally empty.
-  }
-
-  void Start() override {
-    child_->Start();
-  }
-
-  void Next() override {
-    child_->Next();
-  }
-
-  bool Done() const override {
-    return child_->Done();
-  }
-
-  const std::shared_ptr<types::IClass>& Get() const override {
-    return child_->Get();
-  }
-
-  void AppendToPath(Path& path) const override {
-    path.segments.emplace_back(
-      common::make_unique<PropertySegment>(property_)
-    );
-    child_->AppendToPath(path);
-  }
-
-  std::unique_ptr<impl::IIterator> Clone() const override {
-    return common::make_unique<InPropertyIterator>(*this);
-  }
-
- private:
-  Property property_;
-  std::unique_ptr<impl::IIterator> child_;
-};  // class InPropertyIterator
-
-std::unique_ptr<impl::IIterator> InProperty(
-  Property property,
-  std::unique_ptr<impl::IIterator> child
-) {
-  return common::make_unique<InPropertyIterator>(property, std::move(child));
-}
-
-/**
  * \brief Iterate over the instances of the children, one child after another.
  *
  * A child is started only once the previous child is done.
@@ -404,6 +355,176 @@ std::unique_ptr<impl::IIterator> Chain(
   CollectChildren(collected, std::move(children)...);
 
   return common::make_unique<ChainIterator>(std::move(collected));
+}
+
+/**
+ * Iterate over the instances of the \p child, which lives in a property.
+ */
+class InPropertyIterator : public impl::IIterator {
+ public:
+  InPropertyIterator(
+    Property property,
+    std::unique_ptr<impl::IIterator> child
+  ) :
+    property_(property),
+    child_(std::move(child)) {
+    // Intentionally empty.
+  }
+
+  InPropertyIterator(const InPropertyIterator& other) :
+    property_(other.property_),
+    child_(other.child_->Clone()) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    child_->Start();
+  }
+
+  void Next() override {
+    child_->Next();
+  }
+
+  bool Done() const override {
+    return child_->Done();
+  }
+
+  const std::shared_ptr<types::IClass>& Get() const override {
+    return child_->Get();
+  }
+
+  void AppendToPath(Path& path) const override {
+    path.segments.emplace_back(
+      common::make_unique<PropertySegment>(property_)
+    );
+    child_->AppendToPath(path);
+  }
+
+  std::unique_ptr<impl::IIterator> Clone() const override {
+    return common::make_unique<InPropertyIterator>(*this);
+  }
+
+ private:
+  Property property_;
+  std::unique_ptr<impl::IIterator> child_;
+};  // class InPropertyIterator
+
+std::unique_ptr<impl::IIterator> InProperty(
+  Property property,
+  std::unique_ptr<impl::IIterator> child
+) {
+  return common::make_unique<InPropertyIterator>(property, std::move(child));
+}
+
+/**
+ * \brief Iterate over the instances of every item of a list, one item after another.
+ *
+ * The iterator over an item is built only once the iteration reaches the item.
+ */
+template<typename T>
+class EachIterator : public impl::IIterator {
+ public:
+  /**
+   * Build the iterator over the instances of an item
+   */
+  typedef std::unique_ptr<impl::IIterator> (*OverItem)(
+    const T& item,
+    bool recursive
+  );
+
+  EachIterator(
+    const std::vector<T>* items,
+    OverItem over_item,
+    bool recursive
+  ) :
+    items_(items),
+    over_item_(over_item),
+    recursive_(recursive),
+    index_(0) {
+    // Intentionally empty.
+  }
+
+  EachIterator(const EachIterator<T>& other) :
+    items_(other.items_),
+    over_item_(other.over_item_),
+    recursive_(other.recursive_),
+    index_(other.index_),
+    item_(other.item_ == nullptr ? nullptr : other.item_->Clone()) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    index_ = 0;
+    item_ = nullptr;
+    SkipDoneItems();
+  }
+
+  void Next() override {
+    item_->Next();
+    SkipDoneItems();
+  }
+
+  bool Done() const override {
+    return index_ >= items_->size();
+  }
+
+  const std::shared_ptr<types::IClass>& Get() const override {
+    return item_->Get();
+  }
+
+  void AppendToPath(Path& path) const override {
+    path.segments.emplace_back(
+      common::make_unique<IndexSegment>(index_)
+    );
+    item_->AppendToPath(path);
+  }
+
+  std::unique_ptr<impl::IIterator> Clone() const override {
+    return common::make_unique<EachIterator<T> >(*this);
+  }
+
+ private:
+  const std::vector<T>* items_;
+  OverItem over_item_;
+  bool recursive_;
+
+  /**
+   * Index of the item we currently iterate over
+   */
+  std::size_t index_;
+
+  /**
+   * Iterator over the current item, built once we reached the item
+   */
+  std::unique_ptr<impl::IIterator> item_;
+
+  /**
+   * Move on to the next items, and build their iterators, until one is not done.
+   */
+  void SkipDoneItems() {
+    while (index_ < items_->size()) {
+      if (item_ == nullptr) {
+        item_ = over_item_((*items_)[index_], recursive_);
+        item_->Start();
+      }
+
+      if (!item_->Done()) {
+        return;
+      }
+
+      item_ = nullptr;
+      ++index_;
+    }
+  }
+};  // class EachIterator
+
+template<typename T>
+std::unique_ptr<impl::IIterator> Each(
+  const std::vector<T>& items,
+  std::unique_ptr<impl::IIterator> (*over_item)(const T& item, bool recursive),
+  bool recursive
+) {
+  return common::make_unique<EachIterator<T> >(&items, over_item, recursive);
 }
 
 /**
@@ -547,13 +668,50 @@ std::unique_ptr<impl::IIterator> OneThenOver(
   return Chain(One(instance), Over(*instance, recursive));
 }
 
+using listOf_Parent = std::vector<
+  std::shared_ptr<types::IParent>
+>;
+
+std::unique_ptr<impl::IIterator> Over_listOf_Parent(
+  const listOf_Parent& value,
+  bool recursive
+) {
+  return Each(value, &OneThenOver<types::IParent>, recursive);
+}
+
+std::unique_ptr<impl::IIterator> Over_Container(
+  const types::IContainer& that,
+  bool recursive
+) {
+  return InProperty(
+    Property::kChildren,
+    that.children().has_value()
+      ? Over_listOf_Parent((*that.children()), recursive)
+      : Empty()
+  );
+}
+
 std::unique_ptr<impl::IIterator> Over_Something(
   const types::ISomething& that,
   bool recursive
 ) {
-  return InProperty(
-    Property::kItem,
-    OneThenOver(that.item(), recursive)
+  return Chain(
+    InProperty(
+      Property::kItem,
+      OneThenOver(that.item(), recursive)
+    ),
+    InProperty(
+      Property::kOptionalParent,
+      that.optional_parent().has_value()
+        ? OneThenOver((*that.optional_parent()), recursive)
+        : Empty()
+    ),
+    InProperty(
+      Property::kParents,
+      that.parents().has_value()
+        ? Over_listOf_Parent((*that.parents()), recursive)
+        : Empty()
+    )
   );
 }
 
@@ -569,6 +727,11 @@ std::unique_ptr<impl::IIterator> DispatchOnModelType(
   bool recursive
 ) {
   switch (instance.model_type()) {
+    case types::ModelType::kContainer:
+      return Over_Container(
+        dynamic_cast<const types::IContainer&>(instance),
+        recursive
+      );
     case types::ModelType::kSomething:
       return Over_Something(
         dynamic_cast<const types::ISomething&>(instance),

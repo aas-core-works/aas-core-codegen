@@ -45,6 +45,81 @@ class TestVerificationOfValidInstances(unittest.TestCase):
                     )
                 )
 
+    def test_child_a(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'ChildA'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                jsonable = json.load(fid)
+
+            instance = aas_jsonization.child_a_from_jsonable(jsonable)
+
+            errors = list(aas_verification.verify(instance))
+
+            if len(errors) > 0:
+                self.fail(
+                    f"Expected no errors when verifying the instance de-serialized "
+                    f"from {path}, but got {len(errors)} error(s):\n"
+                    + "\n".join(
+                        f"{error.path}: {error.cause}" for error in errors
+                    )
+                )
+
+    def test_child_b(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'ChildB'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                jsonable = json.load(fid)
+
+            instance = aas_jsonization.child_b_from_jsonable(jsonable)
+
+            errors = list(aas_verification.verify(instance))
+
+            if len(errors) > 0:
+                self.fail(
+                    f"Expected no errors when verifying the instance de-serialized "
+                    f"from {path}, but got {len(errors)} error(s):\n"
+                    + "\n".join(
+                        f"{error.path}: {error.cause}" for error in errors
+                    )
+                )
+
+    def test_container(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'Container'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                jsonable = json.load(fid)
+
+            instance = aas_jsonization.container_from_jsonable(jsonable)
+
+            errors = list(aas_verification.verify(instance))
+
+            if len(errors) > 0:
+                self.fail(
+                    f"Expected no errors when verifying the instance de-serialized "
+                    f"from {path}, but got {len(errors)} error(s):\n"
+                    + "\n".join(
+                        f"{error.path}: {error.cause}" for error in errors
+                    )
+                )
+
     def test_something(self) -> None:
         for path in sorted(
             (
@@ -97,6 +172,129 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                     jsonable = json.load(fid)
 
                 instance = aas_jsonization.item_from_jsonable(jsonable)
+
+                errors = list(aas_verification.verify(instance))
+
+                if len(errors) == 0:
+                    self.fail(
+                        f"Expected at least one verification error "
+                        f"when verifying the instance de-serialized "
+                        f"from {path}, but got none"
+                    )
+
+                got = "\n".join(
+                    f"{error.path}: {error.cause}" for error in errors
+                ) + "\n"
+
+                tests.common.record_or_check(expected_path, got)
+
+    def test_child_a(self) -> None:
+        for cause_dir in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Unexpected"
+                / "Invalid"
+            ).iterdir()
+        ):
+            for path in sorted(
+                (cause_dir / 'ChildA').glob("**/*.json")
+            ):
+                rel_path = path.relative_to(tests.common.TEST_DATA_DIR)
+
+                expected_path = (
+                    tests.common.TEST_DATA_DIR
+                    / "VerificationError"
+                    / rel_path.parent
+                    / f"{rel_path.name}.errors"
+                )
+
+                with path.open("rt") as fid:
+                    jsonable = json.load(fid)
+
+                instance = aas_jsonization.child_a_from_jsonable(jsonable)
+
+                errors = list(aas_verification.verify(instance))
+
+                if len(errors) == 0:
+                    self.fail(
+                        f"Expected at least one verification error "
+                        f"when verifying the instance de-serialized "
+                        f"from {path}, but got none"
+                    )
+
+                got = "\n".join(
+                    f"{error.path}: {error.cause}" for error in errors
+                ) + "\n"
+
+                tests.common.record_or_check(expected_path, got)
+
+    def test_child_b(self) -> None:
+        for cause_dir in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Unexpected"
+                / "Invalid"
+            ).iterdir()
+        ):
+            for path in sorted(
+                (cause_dir / 'ChildB').glob("**/*.json")
+            ):
+                rel_path = path.relative_to(tests.common.TEST_DATA_DIR)
+
+                expected_path = (
+                    tests.common.TEST_DATA_DIR
+                    / "VerificationError"
+                    / rel_path.parent
+                    / f"{rel_path.name}.errors"
+                )
+
+                with path.open("rt") as fid:
+                    jsonable = json.load(fid)
+
+                instance = aas_jsonization.child_b_from_jsonable(jsonable)
+
+                errors = list(aas_verification.verify(instance))
+
+                if len(errors) == 0:
+                    self.fail(
+                        f"Expected at least one verification error "
+                        f"when verifying the instance de-serialized "
+                        f"from {path}, but got none"
+                    )
+
+                got = "\n".join(
+                    f"{error.path}: {error.cause}" for error in errors
+                ) + "\n"
+
+                tests.common.record_or_check(expected_path, got)
+
+    def test_container(self) -> None:
+        for cause_dir in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Unexpected"
+                / "Invalid"
+            ).iterdir()
+        ):
+            for path in sorted(
+                (cause_dir / 'Container').glob("**/*.json")
+            ):
+                rel_path = path.relative_to(tests.common.TEST_DATA_DIR)
+
+                expected_path = (
+                    tests.common.TEST_DATA_DIR
+                    / "VerificationError"
+                    / rel_path.parent
+                    / f"{rel_path.name}.errors"
+                )
+
+                with path.open("rt") as fid:
+                    jsonable = json.load(fid)
+
+                instance = aas_jsonization.container_from_jsonable(jsonable)
 
                 errors = list(aas_verification.verify(instance))
 

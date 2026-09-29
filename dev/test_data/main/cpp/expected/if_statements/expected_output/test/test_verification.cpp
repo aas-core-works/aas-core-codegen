@@ -175,6 +175,150 @@ TEST_CASE("Test verification of invalid cases for Item") {
   }
 }
 
+TEST_CASE("Test verification of a valid ChildA") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childA",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertNoVerificationError(path);
+  }
+}
+
+TEST_CASE("Test verification of invalid cases for ChildA") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Invalid"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "childA",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+            / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+          / (path.filename().string() + ".errors")
+      );
+
+      AssertVerificationFailure(path, error_path);
+    }
+  }
+}
+
+TEST_CASE("Test verification of a valid ChildB") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childB",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertNoVerificationError(path);
+  }
+}
+
+TEST_CASE("Test verification of invalid cases for ChildB") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Invalid"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "childB",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+            / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+          / (path.filename().string() + ".errors")
+      );
+
+      AssertVerificationFailure(path, error_path);
+    }
+  }
+}
+
+TEST_CASE("Test verification of a valid Container") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "container",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertNoVerificationError(path);
+  }
+}
+
+TEST_CASE("Test verification of invalid cases for Container") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Invalid"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "container",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+            / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+          / (path.filename().string() + ".errors")
+      );
+
+      AssertVerificationFailure(path, error_path);
+    }
+  }
+}
+
 TEST_CASE("Test verification of a valid Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

@@ -297,6 +297,393 @@ namespace dummy.Tests
         }  // public void Test_Item_verification_fail
 
         [Test]
+        public void Test_ChildA_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "childA"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                var instance = Aas.Xmlization.Deserialize.ChildAFrom(
+                    xmlReader);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    instance, path);
+            }
+        }  // public void Test_ChildA_ok
+
+        [Test]
+        public void Test_ChildA_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "childA"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildA for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    Aas.Xmlization.Exception? exception = null;
+
+                    try
+                    {
+                        _ = Aas.Xmlization.Deserialize.ChildAFrom(
+                            xmlReader);
+                    }
+                    catch (Aas.Xmlization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_ChildA_deserialization_fail
+
+        [Test]
+        public void Test_ChildA_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "childA"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildA for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    var instance = Aas.Xmlization.Deserialize.ChildAFrom(
+                        xmlReader);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_ChildA_verification_fail
+
+        [Test]
+        public void Test_ChildB_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "childB"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                var instance = Aas.Xmlization.Deserialize.ChildBFrom(
+                    xmlReader);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    instance, path);
+            }
+        }  // public void Test_ChildB_ok
+
+        [Test]
+        public void Test_ChildB_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "childB"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildB for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    Aas.Xmlization.Exception? exception = null;
+
+                    try
+                    {
+                        _ = Aas.Xmlization.Deserialize.ChildBFrom(
+                            xmlReader);
+                    }
+                    catch (Aas.Xmlization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_ChildB_deserialization_fail
+
+        [Test]
+        public void Test_ChildB_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "childB"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildB for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    var instance = Aas.Xmlization.Deserialize.ChildBFrom(
+                        xmlReader);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_ChildB_verification_fail
+
+        [Test]
+        public void Test_Container_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "container"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                var instance = Aas.Xmlization.Deserialize.ContainerFrom(
+                    xmlReader);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    instance, path);
+            }
+        }  // public void Test_Container_ok
+
+        [Test]
+        public void Test_Container_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "container"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Container for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    Aas.Xmlization.Exception? exception = null;
+
+                    try
+                    {
+                        _ = Aas.Xmlization.Deserialize.ContainerFrom(
+                            xmlReader);
+                    }
+                    catch (Aas.Xmlization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_Container_deserialization_fail
+
+        [Test]
+        public void Test_Container_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "container"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Container for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    var instance = Aas.Xmlization.Deserialize.ContainerFrom(
+                        xmlReader);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_Container_verification_fail
+
+        [Test]
         public void Test_Something_ok()
         {
             var paths = Directory.GetFiles(

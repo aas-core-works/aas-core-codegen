@@ -32,6 +32,21 @@ public abstract class AbstractTransformerWithContext<ContextT, T>
     ContextT context
   );
 
+  public abstract T transformChildA(
+    IChildA that,
+    ContextT context
+  );
+
+  public abstract T transformChildB(
+    IChildB that,
+    ContextT context
+  );
+
+  public abstract T transformContainer(
+    IContainer that,
+    ContextT context
+  );
+
   public abstract T transformSomething(
     ISomething that,
     ContextT context

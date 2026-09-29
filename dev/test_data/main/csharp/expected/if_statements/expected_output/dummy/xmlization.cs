@@ -349,11 +349,166 @@ namespace dummy
             }
 
             /// <summary>
+            /// Read a sequence of list items with <paramref name="readItem" />,
+            /// stopping (without consuming) at the first non-element node.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by everything of a list type, whatever its items are and
+            /// however deeply it is nested, since the items are read through
+            /// an <see cref="ElementReader{T}" /> like any other element.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static List<T> ReadList<T>(
+                Xml.XmlReader reader,
+                ElementReader<T> readItem,
+                out Reporting.Error? error
+                )
+            {
+                error = null;
+                var result = new List<T>();
+
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                int index = 0;
+                while (reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    T item = readItem(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(item);
+
+                    index++;
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a content as a list of items, each read with
+            /// <paramref name="readItem" />.
+            /// </summary>
+            /// <remarks>
+            /// A self-closing element represents an empty list.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static ContentReader<List<T>> AsList<T>(
+                ElementReader<T> readItem
+                )
+            {
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+
+                    if (isEmpty)
+                    {
+                        return new List<T>();
+                    }
+
+                    return ReadList<T>(
+                        reader, readItem, out error);
+                };
+            }
+
+            /// <summary>
+            /// Read a content whose value is dispatched by its own discriminator
+            /// element, such as an interface or a named union.
+            /// </summary>
+            /// <typeparam name="T">Type of the value</typeparam>
+            private static ContentReader<T> AsElement<T>(
+                ElementReader<T> readFromElement
+                )
+            {
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+
+                    if (isEmpty)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing the value, " +
+                            "but the element was self-closing");
+                        return default!;
+                    }
+
+                    // We need to skip the whitespace here in order to be able to look ahead
+                    // the discriminator element shortly.
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing the value, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+
+                    // Try to look ahead the discriminator name;
+                    // we need this name only for the error reporting below.
+                    // The de-serialization function will perform more sophisticated checks.
+                    string? discriminatorElementName = null;
+                    if (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        discriminatorElementName = reader.LocalName;
+                    }
+
+                    T result = readFromElement(reader, out error);
+                    if (error != null)
+                    {
+                        if (discriminatorElementName != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    discriminatorElementName));
+                        }
+                        return default!;
+                    }
+
+                    return result;
+                };
+            }
+
+            /// <summary>
             /// Read an instance of class Item from its XML element.
             /// </summary>
             internal static readonly ElementReader<Aas.Item> ItemFromElement = (
                 AtElement<Aas.Item>(
                     ItemFromSequence, "item"));
+
+            /// <summary>
+            /// Read an instance of class ChildA from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Aas.ChildA> ChildAFromElement = (
+                AtElement<Aas.ChildA>(
+                    ChildAFromSequence, "childA"));
+
+            /// <summary>
+            /// Read an instance of class ChildB from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Aas.ChildB> ChildBFromElement = (
+                AtElement<Aas.ChildB>(
+                    ChildBFromSequence, "childB"));
+
+            /// <summary>
+            /// Read an instance of class Container from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Aas.Container> ContainerFromElement = (
+                AtElement<Aas.Container>(
+                    ContainerFromSequence, "container"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
@@ -365,18 +520,26 @@ namespace dummy
             private static readonly ContentReader<string> Read_string = (
                 AsText<string>(ReadContentAsString, ""));
 
+            private static readonly ContentReader<long> Read_long = (
+                AsText<long>(ReadContentAsLong));
+
+            private static readonly ContentReader<List<IParent>> Read_ListOf_IParent = (
+                AsList<IParent>(
+                    IParentFromElement));
+
             private static readonly ContentReader<Kind> Read_Kind = (
                 AsEnum<Aas.Kind>(
                     Stringification.KindFromString));
-
-            private static readonly ContentReader<long> Read_long = (
-                AsText<long>(ReadContentAsLong));
 
             private static readonly ContentReader<bool> Read_bool = (
                 AsText<bool>(ReadContentAsBoolean));
 
             private static readonly ContentReader<IItem> Read_IItem = (
                 ItemFromSequence);
+
+            private static readonly ContentReader<IParent> Read_IParent = (
+                AsElement<Aas.IParent>(
+                    IParentFromElement));
 
             /// <summary>
             /// Deserialize an instance of class Item from a sequence of XML elements.
@@ -486,6 +649,350 @@ namespace dummy
             }  // internal static Aas.Item? ItemFromSequence
 
             /// <summary>
+            /// Deserialize an instance of IParent from an XML element.
+            /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            internal static Aas.IParent IParentFromElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error)
+            {
+                string elementName = XmlCommon.PeekElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                switch (elementName)
+                {
+                    case "childA":
+                        return ChildAFromElement(
+                            reader, out error);
+                    case "childB":
+                        return ChildBFromElement(
+                            reader, out error);
+                    case "container":
+                        return ContainerFromElement(
+                            reader, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return default!;
+                }
+            }  // internal static Aas.IParent? IParentFromElement
+
+            /// <summary>
+            /// Deserialize an instance of class ChildA from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.ChildA ChildAFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                string? theOptionalText = null;
+                long? theAOnly = null;
+
+                if (!isEmptySequence)
+                {
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class ChildA, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+                    while (TryNextProperty(
+                            reader,
+                            out string elementName,
+                            out bool isEmptyProperty,
+                            out error))
+                    {
+                        switch (elementName)
+                        {
+                            case "optionalText":
+                                if (theOptionalText != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalText = Read_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "aOnly":
+                                if (theAOnly != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theAOnly = Read_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class ChildA, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {elementName}");
+                                return default!;
+                        }
+
+                        // NOTE (mristin):
+                        // Every property is read in this very loop, so we mark the error with
+                        // the property's own element name here, once, instead of at every
+                        // single case above. For a matched case, elementName *is* that name.
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    elementName));
+                            return default!;
+                        }
+
+                        XmlCommon.ConsumeEndElement(
+                            reader, elementName, isEmptyProperty, out error);
+                        if (error != null)
+                        {
+                            return default!;
+                        }
+                    }
+
+                    // NOTE (mristin):
+                    // The loop also ends when the next property could not be read at all,
+                    // which is the only way out of it that is a failure.
+                    if (error != null)
+                    {
+                        return default!;
+                    }
+                }
+
+                if (theAOnly == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property AOnly has not been given " +
+                        "in the XML representation of an instance of class ChildA");
+                    return default!;
+                }
+
+                return new Aas.ChildA(
+                    theAOnly
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalText);
+            }  // internal static Aas.ChildA? ChildAFromSequence
+
+            /// <summary>
+            /// Deserialize an instance of class ChildB from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.ChildB ChildBFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                string? theOptionalText = null;
+                long? theBOnly = null;
+
+                if (!isEmptySequence)
+                {
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class ChildB, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+                    while (TryNextProperty(
+                            reader,
+                            out string elementName,
+                            out bool isEmptyProperty,
+                            out error))
+                    {
+                        switch (elementName)
+                        {
+                            case "optionalText":
+                                if (theOptionalText != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalText = Read_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "bOnly":
+                                if (theBOnly != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theBOnly = Read_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class ChildB, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {elementName}");
+                                return default!;
+                        }
+
+                        // NOTE (mristin):
+                        // Every property is read in this very loop, so we mark the error with
+                        // the property's own element name here, once, instead of at every
+                        // single case above. For a matched case, elementName *is* that name.
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    elementName));
+                            return default!;
+                        }
+
+                        XmlCommon.ConsumeEndElement(
+                            reader, elementName, isEmptyProperty, out error);
+                        if (error != null)
+                        {
+                            return default!;
+                        }
+                    }
+
+                    // NOTE (mristin):
+                    // The loop also ends when the next property could not be read at all,
+                    // which is the only way out of it that is a failure.
+                    if (error != null)
+                    {
+                        return default!;
+                    }
+                }
+
+                if (theBOnly == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property BOnly has not been given " +
+                        "in the XML representation of an instance of class ChildB");
+                    return default!;
+                }
+
+                return new Aas.ChildB(
+                    theBOnly
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalText);
+            }  // internal static Aas.ChildB? ChildBFromSequence
+
+            /// <summary>
+            /// Deserialize an instance of class Container from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.Container ContainerFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                string? theOptionalText = null;
+                List<IParent>? theChildren = null;
+
+                if (!isEmptySequence)
+                {
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class Container, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+                    while (TryNextProperty(
+                            reader,
+                            out string elementName,
+                            out bool isEmptyProperty,
+                            out error))
+                    {
+                        switch (elementName)
+                        {
+                            case "optionalText":
+                                if (theOptionalText != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalText = Read_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "children":
+                                if (theChildren != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theChildren = Read_ListOf_IParent(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class Container, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {elementName}");
+                                return default!;
+                        }
+
+                        // NOTE (mristin):
+                        // Every property is read in this very loop, so we mark the error with
+                        // the property's own element name here, once, instead of at every
+                        // single case above. For a matched case, elementName *is* that name.
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    elementName));
+                            return default!;
+                        }
+
+                        XmlCommon.ConsumeEndElement(
+                            reader, elementName, isEmptyProperty, out error);
+                        if (error != null)
+                        {
+                            return default!;
+                        }
+                    }
+
+                    // NOTE (mristin):
+                    // The loop also ends when the next property could not be read at all,
+                    // which is the only way out of it that is a failure.
+                    if (error != null)
+                    {
+                        return default!;
+                    }
+                }
+
+                return new Aas.Container(
+                    theOptionalText,
+                    theChildren);
+            }  // internal static Aas.Container? ContainerFromSequence
+
+            /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
             /// </summary>
             /// <remarks>
@@ -505,6 +1012,8 @@ namespace dummy
                 long? theNumber = null;
                 bool? theFlag = null;
                 IItem? theItem = null;
+                IParent? theOptionalParent = null;
+                List<IParent>? theParents = null;
 
                 if (!isEmptySequence)
                 {
@@ -568,6 +1077,24 @@ namespace dummy
                                     break;
                                 }
                                 theItem = Read_IItem(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "optionalParent":
+                                if (theOptionalParent != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalParent = Read_IParent(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "parents":
+                                if (theParents != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theParents = Read_ListOf_IParent(
                                     reader, isEmptyProperty, out error);
                                 break;
                             default:
@@ -662,7 +1189,9 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theItem
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                            "Unexpected null, had to be handled before"),
+                    theOptionalParent,
+                    theParents);
             }  // internal static Aas.Something? SomethingFromSequence
         }  // internal static class DeserializeImplementation
 
@@ -722,6 +1251,142 @@ namespace dummy
                 }
 
                 Aas.Item result = DeserializeImplementation.ItemFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IParent from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of IParent.
+            /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IParent IParentFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IParent, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Aas.IParent result = DeserializeImplementation.IParentFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ChildA from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of ChildA.
+            /// </exception>
+            public static Aas.ChildA ChildAFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ChildA, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Aas.ChildA result = DeserializeImplementation.ChildAFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ChildB from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of ChildB.
+            /// </exception>
+            public static Aas.ChildB ChildBFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ChildB, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Aas.ChildB result = DeserializeImplementation.ChildBFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Container from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of Container.
+            /// </exception>
+            public static Aas.Container ContainerFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Container, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Aas.Container result = DeserializeImplementation.ContainerFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -885,6 +1550,38 @@ namespace dummy
             }
 
             /// <summary>
+            /// Write the items of a list, each with <paramref name="writeItem" />.
+            /// </summary>
+            /// <remarks>
+            /// An empty list writes no items at all, which the reading sees as
+            /// a self-closing element.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static ContentWriter<List<T>> WriteList<T>(
+                ContentWriter<T> writeItem
+                )
+            {
+                return (that, writer) =>
+                {
+                    int index = 0;
+                    foreach (var item in that)
+                    {
+                        try
+                        {
+                            writeItem(item, writer);
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.IndexSegment(index));
+                            throw;
+                        }
+                        index++;
+                    }
+                };
+            }
+
+            /// <summary>
             /// The one instance through which the writing is dispatched.
             /// </summary>
             /// <remarks>
@@ -916,18 +1613,25 @@ namespace dummy
             private static readonly ContentWriter<string> Write_string = (
                 (that, writer) => writer.WriteValue(that));
 
+            private static readonly ContentWriter<long> Write_long = (
+                (that, writer) => writer.WriteValue(that));
+
+            private static readonly ContentWriter<List<IParent>> Write_ListOf_IParent = (
+                WriteList<IParent>(
+                    WriteIClass));
+
             private static readonly ContentWriter<Kind> Write_Kind = (
                 WriteEnum<Aas.Kind>(
                     Stringification.ToString));
-
-            private static readonly ContentWriter<long> Write_long = (
-                (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<bool> Write_bool = (
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<IItem> Write_IItem = (
                 ItemToSequence);
+
+            private static readonly ContentWriter<IParent> Write_IParent = (
+                WriteIClass);
 
             private static void ItemToSequence(
                 Aas.IItem that,
@@ -956,6 +1660,90 @@ namespace dummy
                 writer.WriteEndElement();
             }
 
+            private static void ChildAToSequence(
+                Aas.IChildA that,
+                Xml.XmlWriter writer)
+            {
+                if (that.OptionalText != null)
+                {
+                    WriteProperty(
+                        "optionalText", "OptionalText", that.OptionalText, writer, Write_string);
+                }
+
+                WriteProperty(
+                    "aOnly", "AOnly", that.AOnly, writer, Write_long);
+            }  // private static void ChildAToSequence
+
+            public override void VisitChildA(
+                Aas.IChildA that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "childA",
+                    NS);
+                ChildAToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private static void ChildBToSequence(
+                Aas.IChildB that,
+                Xml.XmlWriter writer)
+            {
+                if (that.OptionalText != null)
+                {
+                    WriteProperty(
+                        "optionalText", "OptionalText", that.OptionalText, writer, Write_string);
+                }
+
+                WriteProperty(
+                    "bOnly", "BOnly", that.BOnly, writer, Write_long);
+            }  // private static void ChildBToSequence
+
+            public override void VisitChildB(
+                Aas.IChildB that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "childB",
+                    NS);
+                ChildBToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private static void ContainerToSequence(
+                Aas.IContainer that,
+                Xml.XmlWriter writer)
+            {
+                if (that.OptionalText != null)
+                {
+                    WriteProperty(
+                        "optionalText", "OptionalText", that.OptionalText, writer, Write_string);
+                }
+
+                if (that.Children != null)
+                {
+                    WriteProperty(
+                        "children", "Children", that.Children, writer, Write_ListOf_IParent);
+                }
+            }  // private static void ContainerToSequence
+
+            public override void VisitContainer(
+                Aas.IContainer that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "container",
+                    NS);
+                ContainerToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
             private static void SomethingToSequence(
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
@@ -974,6 +1762,22 @@ namespace dummy
 
                 WriteProperty(
                     "item", "Item", that.Item, writer, Write_IItem);
+
+                if (that.OptionalParent != null)
+                {
+                    WriteProperty(
+                        "optionalParent",
+                        "OptionalParent",
+                        that.OptionalParent,
+                        writer,
+                        Write_IParent);
+                }
+
+                if (that.Parents != null)
+                {
+                    WriteProperty(
+                        "parents", "Parents", that.Parents, writer, Write_ListOf_IParent);
+                }
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(

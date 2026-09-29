@@ -45,6 +45,15 @@ class IVisitor {
   virtual void VisitItem(
     const std::shared_ptr<types::IItem>& that
   ) = 0;
+  virtual void VisitChildA(
+    const std::shared_ptr<types::IChildA>& that
+  ) = 0;
+  virtual void VisitChildB(
+    const std::shared_ptr<types::IChildB>& that
+  ) = 0;
+  virtual void VisitContainer(
+    const std::shared_ptr<types::IContainer>& that
+  ) = 0;
   virtual void VisitSomething(
     const std::shared_ptr<types::ISomething>& that
   ) = 0;
@@ -74,6 +83,15 @@ class PassThroughVisitor
  protected:
   void VisitItem(
     const std::shared_ptr<types::IItem>& that
+  ) override;
+  void VisitChildA(
+    const std::shared_ptr<types::IChildA>& that
+  ) override;
+  void VisitChildB(
+    const std::shared_ptr<types::IChildB>& that
+  ) override;
+  void VisitContainer(
+    const std::shared_ptr<types::IContainer>& that
   ) override;
   void VisitSomething(
     const std::shared_ptr<types::ISomething>& that

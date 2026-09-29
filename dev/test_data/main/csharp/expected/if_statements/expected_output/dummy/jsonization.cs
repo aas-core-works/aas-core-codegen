@@ -241,6 +241,114 @@ namespace dummy
             }
 
             /// <summary>
+            /// De-serialize a value from <paramref name="node" />.
+            /// </summary>
+            /// <remarks>
+            /// This is the one shape of every de-serialization, which is what lets
+            /// the de-serializations be composed: an <c>As*</c> combinator turns
+            /// the de-serializers of the items into the de-serializer of a list or
+            /// of a tuple of them, and the <c>...From</c> function of a primitive,
+            /// an enumeration, a class, an interface or a named union already is one.
+            ///
+            /// Return the value; on failure it is meaningless and
+            /// <paramref name="error" /> says why. A plain <c>T</c> rather than
+            /// a <c>T?</c>, so that one unconstrained delegate serves both the value
+            /// and the reference types: for a value type an unconstrained <c>T?</c>
+            /// erases to plain <c>T</c> rather than to <c>System.Nullable&lt;T&gt;</c>,
+            /// so a <c>T?</c> would have to be split into a <c>class</c>- and
+            /// a <c>struct</c>-constrained variant, and anything ranging over both --
+            /// such as the items of a tuple -- would then need an adapter between them.
+            ///
+            /// The <paramref name="node" /> is nullable since a JSON null is represented
+            /// as a null node. Each de-serializer rejects it with a message of its own,
+            /// so that the check is paid once per type instead of once per property.
+            ///
+            /// <typeparamref name="T" /> is covariant, so that the de-serializer of
+            /// a concrete class can be used as the de-serializer of an item of a list of
+            /// its interface.
+            /// </remarks>
+            /// <typeparam name="T">Type of the de-serialized value</typeparam>
+            private delegate T Deserializer<out T>(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error);
+
+            /// <summary>
+            /// De-serialize every item of a JSON array with
+            /// <paramref name="deserializeItem" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed constructor arguments, regardless of
+            /// whether their items de-serialize into a reference or into a value type.
+            /// The result is cached in a <c>static readonly</c> field per item type
+            /// (see <c>Parse_ListOf_*</c>), so that composing it costs nothing at
+            /// the point of use.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single array item</typeparam>
+            private static Deserializer<List<T>> AsArrayOf<T>(
+                Deserializer<T> deserializeItem)
+            {
+                return (
+                    Nodes.JsonNode? node,
+                    out Reporting.Error? error) =>
+                    {
+                        error = null;
+
+                        Nodes.JsonArray? array = node as Nodes.JsonArray;
+                        if (array == null)
+                        {
+                            error = new Reporting.Error(
+                                $"Expected a JsonArray, but got {Describe(node)}");
+                            return default!;
+                        }
+
+                        List<T> result = new List<T>(array.Count);
+
+                        int index = 0;
+                        foreach (Nodes.JsonNode? item in array)
+                        {
+                            T parsedItem = deserializeItem(item, out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.IndexSegment(
+                                        index));
+                                return default!;
+                            }
+
+                            result.Add(parsedItem);
+
+                            index++;
+                        }
+
+                        return result;
+                    };
+            }
+
+            /// <summary>
+            /// Extract the <c>modelType</c> property of <paramref name="obj" />.
+            /// </summary>
+            /// <param name="obj">JSON object to be inspected</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            private static string ModelTypeFrom(
+                Nodes.JsonObject obj,
+                out Reporting.Error? error)
+            {
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return default!;
+                }
+
+                return StringFrom(modelTypeNode, out error);
+            }
+
+            private static readonly Deserializer<List<IParent>> Parse_ListOf_IParent = (
+                AsArrayOf<IParent>(
+                    IParentFrom));
+
+            /// <summary>
             /// Deserialize the enumeration Kind from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -330,6 +438,286 @@ namespace dummy
             }  // internal static ItemFrom
 
             /// <summary>
+            /// Deserialize an instance of IParent by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            public static Aas.IParent IParentFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing IParent, but got {Describe(node)}");
+                    return default!;
+                }
+
+                string modelType = ModelTypeFrom(obj, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                switch (modelType)
+                {
+                case "ChildA":
+                    return ChildAFrom(
+                        node, out error);
+                case "ChildB":
+                    return ChildBFrom(
+                        node, out error);
+                case "Container":
+                    return ContainerFrom(
+                        node, out error);
+                default:
+                    error = new Reporting.Error(
+                        $"Unexpected model type for IParent: {modelType}");
+                    return default!;
+                }
+            }  // public static Aas.IParent IParentFrom
+
+            /// <summary>
+            /// Deserialize an instance of ChildA from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ChildA ChildAFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing ChildA, but got {Describe(node)}");
+                    return default!;
+                }
+
+                long? theAOnly = null;
+                string? theOptionalText = null;
+
+                string? modelType = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "aOnly":
+                            theAOnly = LongFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalText":
+                            theOptionalText = StringFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "modelType":
+                            modelType = StringFrom(
+                                keyValue.Value, out error);
+                            if (error == null && modelType != "ChildA")
+                            {
+                                error = new Reporting.Error(
+                                    "Expected the model type 'ChildA', " +
+                                    $"but got {modelType}");
+                            }
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (theAOnly == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"aOnly\" is missing");
+                    return default!;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return default!;
+                }
+
+                return new Aas.ChildA(
+                    theAOnly
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalText);
+            }  // internal static ChildAFrom
+
+            /// <summary>
+            /// Deserialize an instance of ChildB from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ChildB ChildBFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing ChildB, but got {Describe(node)}");
+                    return default!;
+                }
+
+                long? theBOnly = null;
+                string? theOptionalText = null;
+
+                string? modelType = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "bOnly":
+                            theBOnly = LongFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalText":
+                            theOptionalText = StringFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "modelType":
+                            modelType = StringFrom(
+                                keyValue.Value, out error);
+                            if (error == null && modelType != "ChildB")
+                            {
+                                error = new Reporting.Error(
+                                    "Expected the model type 'ChildB', " +
+                                    $"but got {modelType}");
+                            }
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (theBOnly == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"bOnly\" is missing");
+                    return default!;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return default!;
+                }
+
+                return new Aas.ChildB(
+                    theBOnly
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalText);
+            }  // internal static ChildBFrom
+
+            /// <summary>
+            /// Deserialize an instance of Container from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Container ContainerFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing Container, but got {Describe(node)}");
+                    return default!;
+                }
+
+                string? theOptionalText = null;
+                List<IParent>? theChildren = null;
+
+                string? modelType = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "optionalText":
+                            theOptionalText = StringFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "children":
+                            theChildren = Parse_ListOf_IParent(
+                                keyValue.Value, out error);
+                            break;
+                        case "modelType":
+                            modelType = StringFrom(
+                                keyValue.Value, out error);
+                            if (error == null && modelType != "Container")
+                            {
+                                error = new Reporting.Error(
+                                    "Expected the model type 'Container', " +
+                                    $"but got {modelType}");
+                            }
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return default!;
+                }
+
+                return new Aas.Container(
+                    theOptionalText,
+                    theChildren);
+            }  // internal static ContainerFrom
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -353,6 +741,8 @@ namespace dummy
                 long? theNumber = null;
                 bool? theFlag = null;
                 IItem? theItem = null;
+                IParent? theOptionalParent = null;
+                List<IParent>? theParents = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -376,6 +766,14 @@ namespace dummy
                             break;
                         case "item":
                             theItem = ItemFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalParent":
+                            theOptionalParent = IParentFrom(
+                                keyValue.Value, out error);
+                            break;
+                        case "parents":
+                            theParents = Parse_ListOf_IParent(
                                 keyValue.Value, out error);
                             break;
                         default:
@@ -443,7 +841,9 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theItem
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                            "Unexpected null, had to be handled before"),
+                    theOptionalParent,
+                    theParents);
             }  // internal static SomethingFrom
         }  // public static class DeserializeImplementation
 
@@ -548,6 +948,99 @@ namespace dummy
                 Nodes.JsonNode node)
             {
                 Aas.Item result = DeserializeImplementation.ItemFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IParent from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IParent.
+            /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            public static Aas.IParent IParentFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IParent result = DeserializeImplementation.IParentFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ChildA from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of ChildA.
+            /// </exception>
+            public static Aas.ChildA ChildAFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.ChildA result = DeserializeImplementation.ChildAFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ChildB from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of ChildB.
+            /// </exception>
+            public static Aas.ChildB ChildBFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.ChildB result = DeserializeImplementation.ChildBFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Container from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Container.
+            /// </exception>
+            public static Aas.Container ContainerFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Container result = DeserializeImplementation.ContainerFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -689,11 +1182,54 @@ namespace dummy
                         "Unexpected null JSON value from a non-null string");
             }
 
+            /// <summary>
+            /// Compose the serializer of a list whose items are serialized with
+            /// <paramref name="serializeItem" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties. The composition is
+            /// performed once, when the field holding the result is initialized, so
+            /// serializing a list allocates nothing besides the JSON array itself.
+            ///
+            /// The parameter is a <c>List</c> rather than an <c>IEnumerable</c> so that
+            /// the iteration does not box the enumerator -- which is also the type that
+            /// every list-typed property actually has.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static Serializer<List<T>> SerializeList<T>(
+                Serializer<T> serializeItem)
+            {
+                return (that) =>
+                {
+                    var result = new Nodes.JsonArray();
+                    int i = 0;
+                    foreach (T item in that)
+                    {
+                        try
+                        {
+                            result.Add(serializeItem(item));
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.IndexSegment(i));
+                            throw;
+                        }
+                        i++;
+                    }
+                    return result;
+                };
+            }
+
+            private static readonly Serializer<List<IParent>> Serialize_ListOf_IParent = (
+                SerializeList<IParent>(
+                    TransformIClass));
+
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
-            private static readonly Serializer<Kind> Serialize_Kind = Serialize.KindToJsonValue;
-
             private static readonly Serializer<long> Serialize_long = ToJsonValue;
+
+            private static readonly Serializer<Kind> Serialize_Kind = Serialize.KindToJsonValue;
 
             private static readonly Serializer<bool> Serialize_bool = ToJsonValue;
 
@@ -751,6 +1287,83 @@ namespace dummy
                 return result;
             }
 
+            public override Nodes.JsonObject TransformChildA(
+                Aas.IChildA that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.OptionalText != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalText",
+                        "OptionalText",
+                        that.OptionalText,
+                        Serialize_string);
+                }
+
+                SetProperty(result, "aOnly", "AOnly", that.AOnly, Serialize_long);
+
+                result["modelType"] = "ChildA";
+
+                return result;
+            }
+
+            public override Nodes.JsonObject TransformChildB(
+                Aas.IChildB that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.OptionalText != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalText",
+                        "OptionalText",
+                        that.OptionalText,
+                        Serialize_string);
+                }
+
+                SetProperty(result, "bOnly", "BOnly", that.BOnly, Serialize_long);
+
+                result["modelType"] = "ChildB";
+
+                return result;
+            }
+
+            public override Nodes.JsonObject TransformContainer(
+                Aas.IContainer that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.OptionalText != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalText",
+                        "OptionalText",
+                        that.OptionalText,
+                        Serialize_string);
+                }
+
+                if (that.Children != null)
+                {
+                    SetProperty(
+                        result,
+                        "children",
+                        "Children",
+                        that.Children,
+                        Serialize_ListOf_IParent);
+                }
+
+                result["modelType"] = "Container";
+
+                return result;
+            }
+
             public override Nodes.JsonObject TransformSomething(
                 Aas.ISomething that
             )
@@ -766,6 +1379,26 @@ namespace dummy
                 SetProperty(result, "flag", "Flag", that.Flag, Serialize_bool);
 
                 SetProperty(result, "item", "Item", that.Item, Serialize_IClass);
+
+                if (that.OptionalParent != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalParent",
+                        "OptionalParent",
+                        that.OptionalParent,
+                        Serialize_IClass);
+                }
+
+                if (that.Parents != null)
+                {
+                    SetProperty(
+                        result,
+                        "parents",
+                        "Parents",
+                        that.Parents,
+                        Serialize_ListOf_IParent);
+                }
 
                 return result;
             }

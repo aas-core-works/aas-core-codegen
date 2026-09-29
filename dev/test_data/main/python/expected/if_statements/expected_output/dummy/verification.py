@@ -197,6 +197,164 @@ def if_with_continue_in_for(
     return count != 3
 
 
+def narrowing_in_body(
+    parent: Optional[aas_types.Parent]
+) -> bool:
+    """Check the narrowing in the body of a branch by its condition."""
+    # pylint: disable=all
+    if (
+        (
+            (parent is not None)
+            and isinstance(parent, aas_types.ChildA)
+        )
+    ):
+        return parent.a_only < 100
+    return True
+
+
+def narrowing_in_elif_and_else(
+    parent: Optional[aas_types.Parent]
+) -> bool:
+    """Check the narrowing by the negation of the previous conditions."""
+    # pylint: disable=all
+    if parent is None:
+        return True
+    elif not isinstance(parent, aas_types.ChildB):
+        return (
+            (
+                (parent.optional_text is None)
+                or parent.optional_text != 'forbidden'
+            ))
+    else:
+        return parent.b_only > 0
+
+
+def narrowing_after_early_return(
+    parent: Optional[aas_types.Parent]
+) -> bool:
+    """
+    Check the narrowing after an if-statement whose branch always returns.
+    """
+    # pylint: disable=all
+    if (
+        (
+            (parent is None)
+            or (not isinstance(parent, aas_types.ChildB))
+        )
+    ):
+        return True
+    return parent.b_only < 50
+
+
+def narrowing_after_the_only_completing_branch(
+    parent: Optional[aas_types.Parent]
+) -> bool:
+    """
+    Check the narrowing after an if-statement whose ``else`` always returns.
+    """
+    # pylint: disable=all
+    if (
+        (
+            (parent is not None)
+            and isinstance(parent, aas_types.ChildA)
+        )
+    ):
+        pass
+    else:
+        return True
+    return parent.a_only > -10
+
+
+def child_as_have_texts(
+    parents: List[aas_types.Parent]
+) -> bool:
+    """
+    Check the narrowing after the ``continue`` and the early return in a loop.
+    """
+    # pylint: disable=all
+    for parent in parents:
+        if not isinstance(parent, aas_types.ChildA):
+            continue
+        if parent.optional_text is None:
+            return False
+        if len(parent.optional_text) < 1:
+            return False
+    return True
+
+
+def texts_before_container_are_short(
+    parents: List[aas_types.Parent]
+) -> bool:
+    """
+    Check the narrowing after the ``continue`` in a loop with a ``break``.
+    """
+    # pylint: disable=all
+    total = 0
+    for parent in parents:
+        if isinstance(parent, aas_types.Container):
+            break
+        if parent.optional_text is None:
+            continue
+        total = total + len(parent.optional_text)
+    return total < 20
+
+
+def text_or_default_is_short(
+    parent: aas_types.Parent
+) -> bool:
+    """Check the narrowing by the value assigned in a branch."""
+    # pylint: disable=all
+    text = parent.optional_text
+    if text is None:
+        text = 'default'
+    return len(text) < 10
+
+
+def last_child_a_is_small(
+    parent: aas_types.Parent,
+    parents: List[aas_types.Parent]
+) -> bool:
+    """
+    Check the narrowing of a variable to a class by the assigned value.
+    """
+    # pylint: disable=all
+    last = parent
+    for other in parents:
+        if isinstance(other, aas_types.ChildA):
+            last = other
+            if last.a_only >= 1000:
+                return False
+    return True
+
+
+def has_marker_in_tree(
+    parent: aas_types.Parent
+) -> bool:
+    """
+    Check the recursive chain of ``isinstance`` checks with early returns.
+    """
+    # pylint: disable=all
+    if (
+        (
+            (parent.optional_text is not None)
+            and parent.optional_text == 'marker'
+        )
+    ):
+        return True
+    if isinstance(parent, aas_types.Container):
+        return (
+            (
+                (parent.children is not None)
+                and (
+                    any(
+                        has_marker_in_tree(child)
+                        for child in parent.children
+                    )
+                )
+            ))
+    return False
+
+
 class _Transformer(
         aas_types.AbstractTransformer[
             Iterator[Error]
@@ -213,6 +371,52 @@ class _Transformer(
         # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
         # noinspection PyUnreachableCode
         yield
+
+    # noinspection PyMethodMayBeStatic
+    def transform_child_a(
+            self,
+            that: aas_types.ChildA
+    ) -> Iterator[Error]:
+        # No verification has been defined for ChildA.
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    # noinspection PyMethodMayBeStatic
+    def transform_child_b(
+            self,
+            that: aas_types.ChildB
+    ) -> Iterator[Error]:
+        # No verification has been defined for ChildB.
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    # noinspection PyMethodMayBeStatic
+    def transform_container(
+            self,
+            that: aas_types.Container
+    ) -> Iterator[Error]:
+        if that.children is not None:
+            for i, an_item in enumerate(that.children):
+                for error in self.transform(an_item):
+                    error.path._prepend(
+                        IndexSegment(
+                            that.children,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'children'
+                        )
+                    )
+                    yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_something(
@@ -254,6 +458,79 @@ class _Transformer(
                 'Text must be at most 10 characters long'
             )
 
+        if not (
+            not (that.optional_parent is not None)
+            or (not has_marker_in_tree(that.optional_parent))
+        ):
+            yield Error(
+                'Optional parent must have no marker in its tree'
+            )
+
+        if not (
+            not (
+                (
+                    (that.optional_parent is not None)
+                    and (that.parents is not None)
+                )
+            )
+            or last_child_a_is_small(
+                that.optional_parent,
+                that.parents
+            )
+        ):
+            yield Error(
+                'Parents as Child_a must have a_only below one thousand'
+            )
+
+        if not (
+            not (that.optional_parent is not None)
+            or text_or_default_is_short(that.optional_parent)
+        ):
+            yield Error(
+                'Text of the optional parent must be short'
+            )
+
+        if not (
+            not (that.parents is not None)
+            or texts_before_container_are_short(that.parents)
+        ):
+            yield Error(
+                'Texts of parents before the first container must be short'
+            )
+
+        if not (
+            not (that.parents is not None)
+            or child_as_have_texts(that.parents)
+        ):
+            yield Error(
+                'Parents as Child_a must have non-empty texts'
+            )
+
+        if not (
+            narrowing_after_the_only_completing_branch(
+                that.optional_parent
+            )
+        ):
+            yield Error(
+                'Optional parent as Child_a must have a_only above minus ten'
+            )
+
+        if not narrowing_after_early_return(that.optional_parent):
+            yield Error(
+                'Optional parent as Child_b must have a small b_only'
+            )
+
+        if not narrowing_in_elif_and_else(that.optional_parent):
+            yield Error(
+                'Optional parent must have an allowed text or a positive ' +
+                'b_only'
+            )
+
+        if not narrowing_in_body(that.optional_parent):
+            yield Error(
+                'Optional parent as Child_a must have a small a_only'
+            )
+
         for error in self.transform(that.item):
             error.path._prepend(
                 PropertySegment(
@@ -262,6 +539,33 @@ class _Transformer(
                 )
             )
             yield error
+
+        if that.optional_parent is not None:
+            for error in self.transform(that.optional_parent):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'optional_parent'
+                    )
+                )
+                yield error
+
+        if that.parents is not None:
+            for i, an_item in enumerate(that.parents):
+                for error in self.transform(an_item):
+                    error.path._prepend(
+                        IndexSegment(
+                            that.parents,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'parents'
+                        )
+                    )
+                    yield error
 
 
 _TRANSFORMER = _Transformer()

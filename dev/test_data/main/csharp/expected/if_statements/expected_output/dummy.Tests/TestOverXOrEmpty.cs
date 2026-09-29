@@ -11,7 +11,47 @@ namespace dummy.Tests
 {
     public class TestOverXOrEmpty
     {
-        
+        [Test]
+        public void Test_Container_OverChildrenOrEmpty()
+        {
+            foreach (Aas.Container instance in new[]
+            {
+                Aas.Tests.CommonJsonization.LoadMinimalContainer(),
+                Aas.Tests.CommonJsonization.LoadMaximalContainer()
+            })
+            {
+                int count = 0;
+                foreach (var _ in instance.OverChildrenOrEmpty())
+                {
+                    count++;
+                }
+
+                Assert.AreEqual(
+                    instance.Children?.Count ?? 0,
+                    count);
+            }
+        }  // public void Test_Container_OverChildrenOrEmpty
+
+        [Test]
+        public void Test_Something_OverParentsOrEmpty()
+        {
+            foreach (Aas.Something instance in new[]
+            {
+                Aas.Tests.CommonJsonization.LoadMinimalSomething(),
+                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+            })
+            {
+                int count = 0;
+                foreach (var _ in instance.OverParentsOrEmpty())
+                {
+                    count++;
+                }
+
+                Assert.AreEqual(
+                    instance.Parents?.Count ?? 0,
+                    count);
+            }
+        }  // public void Test_Something_OverParentsOrEmpty
     }  // class TestOverXOrEmpty
 }  // namespace dummy.Tests
 

@@ -94,6 +94,258 @@ func MustLoadMinimalItem(
 	return
 }
 
+// Load a maximal example of [aastypes.IChildA] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMaximalChildA(
+) (result aastypes.IChildA) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"ChildA",
+		"maximal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ChildAFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IChildA " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IChildA)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IChildA at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a minimal example of [aastypes.IChildA] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMinimalChildA(
+) (result aastypes.IChildA) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"ChildA",
+		"minimal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ChildAFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IChildA " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IChildA)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IChildA at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a maximal example of [aastypes.IChildB] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMaximalChildB(
+) (result aastypes.IChildB) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"ChildB",
+		"maximal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ChildBFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IChildB " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IChildB)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IChildB at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a minimal example of [aastypes.IChildB] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMinimalChildB(
+) (result aastypes.IChildB) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"ChildB",
+		"minimal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ChildBFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IChildB " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IChildB)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IChildB at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a maximal example of [aastypes.IContainer] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMaximalContainer(
+) (result aastypes.IContainer) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"Container",
+		"maximal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ContainerFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IContainer " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IContainer)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IContainer at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a minimal example of [aastypes.IContainer] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMinimalContainer(
+) (result aastypes.IContainer) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"Container",
+		"minimal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.ContainerFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IContainer " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.IContainer)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IContainer at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
 // Load a maximal example of [aastypes.ISomething] from
 // the test data directory.
 //

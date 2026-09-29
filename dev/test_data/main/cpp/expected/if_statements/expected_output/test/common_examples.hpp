@@ -31,6 +31,54 @@ std::shared_ptr<
 > LoadMaxItem();
 
 /**
+ * Load a minimal example of IChildA by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IChildA
+> LoadMinChildA();
+
+/**
+ * Load a maximal example of IChildA by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IChildA
+> LoadMaxChildA();
+
+/**
+ * Load a minimal example of IChildB by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IChildB
+> LoadMinChildB();
+
+/**
+ * Load a maximal example of IChildB by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IChildB
+> LoadMaxChildB();
+
+/**
+ * Load a minimal example of IContainer by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IContainer
+> LoadMinContainer();
+
+/**
+ * Load a maximal example of IContainer by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IContainer
+> LoadMaxContainer();
+
+/**
  * Load a minimal example of ISomething by
  * de-serializing it from an XML file.
  */

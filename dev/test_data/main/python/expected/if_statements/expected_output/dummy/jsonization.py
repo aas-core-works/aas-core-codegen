@@ -269,6 +269,43 @@ def _as_mapping(
     return jsonable
 
 
+def _dispatch_from_jsonable(
+    jsonable: Jsonable,
+    dispatch: Mapping[str, _Parser[_ValueT]],
+    name: str
+) -> _ValueT:
+    """
+    Parse :paramref:`jsonable` by dispatching on its ``modelType``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param dispatch: to parse a concrete instance, by its model type
+    :param name: of the parsed type, for the error message
+    :return: parsed instance
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    model_type = mapping.get("modelType", None)
+    if model_type is None:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
+    if not isinstance(model_type, str):
+        raise DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+
+    parse = dispatch.get(model_type, None)
+    if parse is None:
+        raise DeserializationException(
+            f"Unexpected model type for {name}: {model_type}"
+        )
+
+    return parse(mapping)
+
+
 def _bool_from_jsonable(
     jsonable: Jsonable
 ) -> bool:
@@ -321,6 +358,55 @@ def _str_from_jsonable(
             f"Expected a str, but got: {type(jsonable)}"
         )
     return jsonable
+
+
+def _list_from_jsonable(
+    jsonable: Jsonable,
+    parse_item: _Parser[_ValueT]
+) -> List[_ValueT]:
+    """
+    Parse :paramref:`jsonable` as a list, applying :paramref:`parse_item` on
+    every item.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_item: to parse a single item of the array
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    if array_like is None:
+        raise DeserializationException(
+            f"Expected something array-like, but got: {type(jsonable)}"
+        )
+
+    result = []  # type: List[_ValueT]
+    for i, jsonable_item in enumerate(array_like):
+        try:
+            item = parse_item(jsonable_item)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(array_like, i))
+            raise
+
+        result.append(item)
+
+    return result
+
+
+def _list_of__parent_from_jsonable(
+    jsonable: Jsonable
+) -> List[aas_types.Parent]:
+    """
+    Parse :paramref:`jsonable` as a list of
+    :py:class:`.types.Parent`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _list_from_jsonable(
+        jsonable,
+        parent_from_jsonable
+    )
 
 
 def kind_from_jsonable(
@@ -395,6 +481,178 @@ def item_from_jsonable(
     )
 
 
+def parent_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Parent:
+    """
+    Parse an instance of :py:class:`.types.Parent` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Concrete instance of :py:class:`.types.Parent`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dispatch_from_jsonable(
+        jsonable,
+        _PARENT_FROM_JSONABLE_DISPATCH,
+        'Parent'
+    )
+
+
+def child_a_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.ChildA:
+    """
+    Parse an instance of :py:class:`.types.ChildA` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.ChildA`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    model_type = mapping.get('modelType', None)
+    if model_type != 'ChildA':
+        raise DeserializationException(
+            f"Expected modelType to be 'ChildA', "
+            f"but got: {model_type!r}"
+        )
+
+    the_optional_text: Optional[str] = None
+    the_a_only: Optional[int] = None
+
+    try:
+        for key, jsonable_value in mapping.items():
+            if key == 'modelType':
+                # The model type has already been checked above.
+                pass
+            elif key == 'optionalText':
+                the_optional_text = _str_from_jsonable(jsonable_value)
+            elif key == 'aOnly':
+                the_a_only = _int_from_jsonable(jsonable_value)
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    if the_a_only is None:
+        raise DeserializationException(
+            "The required property 'aOnly' is missing"
+        )
+
+    return aas_types.ChildA(
+        the_a_only,
+        the_optional_text
+    )
+
+
+def child_b_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.ChildB:
+    """
+    Parse an instance of :py:class:`.types.ChildB` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.ChildB`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    model_type = mapping.get('modelType', None)
+    if model_type != 'ChildB':
+        raise DeserializationException(
+            f"Expected modelType to be 'ChildB', "
+            f"but got: {model_type!r}"
+        )
+
+    the_optional_text: Optional[str] = None
+    the_b_only: Optional[int] = None
+
+    try:
+        for key, jsonable_value in mapping.items():
+            if key == 'modelType':
+                # The model type has already been checked above.
+                pass
+            elif key == 'optionalText':
+                the_optional_text = _str_from_jsonable(jsonable_value)
+            elif key == 'bOnly':
+                the_b_only = _int_from_jsonable(jsonable_value)
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    if the_b_only is None:
+        raise DeserializationException(
+            "The required property 'bOnly' is missing"
+        )
+
+    return aas_types.ChildB(
+        the_b_only,
+        the_optional_text
+    )
+
+
+def container_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Container:
+    """
+    Parse an instance of :py:class:`.types.Container` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.Container`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    model_type = mapping.get('modelType', None)
+    if model_type != 'Container':
+        raise DeserializationException(
+            f"Expected modelType to be 'Container', "
+            f"but got: {model_type!r}"
+        )
+
+    the_optional_text: Optional[str] = None
+    the_children: Optional[List[aas_types.Parent]] = None
+
+    try:
+        for key, jsonable_value in mapping.items():
+            if key == 'modelType':
+                # The model type has already been checked above.
+                pass
+            elif key == 'optionalText':
+                the_optional_text = _str_from_jsonable(jsonable_value)
+            elif key == 'children':
+                the_children = _list_of__parent_from_jsonable(jsonable_value)
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    return aas_types.Container(
+        the_optional_text,
+        the_children
+    )
+
+
 def something_from_jsonable(
         jsonable: Jsonable
 ) -> aas_types.Something:
@@ -413,6 +671,8 @@ def something_from_jsonable(
     the_number: Optional[int] = None
     the_flag: Optional[bool] = None
     the_item: Optional[aas_types.Item] = None
+    the_optional_parent: Optional[aas_types.Parent] = None
+    the_parents: Optional[List[aas_types.Parent]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -429,6 +689,10 @@ def something_from_jsonable(
                 the_flag = _bool_from_jsonable(jsonable_value)
             elif key == 'item':
                 the_item = item_from_jsonable(jsonable_value)
+            elif key == 'optionalParent':
+                the_optional_parent = parent_from_jsonable(jsonable_value)
+            elif key == 'parents':
+                the_parents = _list_of__parent_from_jsonable(jsonable_value)
             else:
                 raise DeserializationException(
                     f"Unexpected property: {key}"
@@ -469,8 +733,22 @@ def something_from_jsonable(
         the_text,
         the_number,
         the_flag,
-        the_item
+        the_item,
+        the_optional_parent,
+        the_parents
     )
+
+
+#: De-serialize a concrete instance of
+#: :py:class:`.types.Parent`, by its model type
+_PARENT_FROM_JSONABLE_DISPATCH: Mapping[
+    str,
+    _Parser[aas_types.Parent]
+] = {
+    'ChildA': child_a_from_jsonable,
+    'ChildB': child_b_from_jsonable,
+    'Container': container_from_jsonable,
+}
 
 
 # endregion
@@ -553,6 +831,28 @@ def _int_to_jsonable(
     return that
 
 
+def _list_of__parent_to_jsonable(
+    that: List[aas_types.Parent]
+) -> List[MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a list of
+    :py:class:`.types.Parent`.
+
+    :param that: list to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = []  # type: List[MutableJsonable]
+    for i, item in enumerate(that):
+        try:
+            jsonable.append(
+                item.transform(_SERIALIZER)
+            )
+        except SerializationException as exception:
+            exception._prepend_index(i)
+            raise
+    return jsonable
+
+
 def _item_to_jsonable(
     that: aas_types.Item
 ) -> MutableMapping[str, MutableJsonable]:
@@ -569,6 +869,73 @@ def _item_to_jsonable(
         except SerializationException as exception:
             exception._prepend_property('optional_text')
             raise
+    return jsonable
+
+
+def _child_a_to_jsonable(
+    that: aas_types.ChildA
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    if that.optional_text is not None:
+        try:
+            jsonable['optionalText'] = that.optional_text
+        except SerializationException as exception:
+            exception._prepend_property('optional_text')
+            raise
+    try:
+        jsonable['aOnly'] = _int_to_jsonable(
+            that.a_only
+        )
+    except SerializationException as exception:
+        exception._prepend_property('a_only')
+        raise
+    jsonable['modelType'] = 'ChildA'
+    return jsonable
+
+
+def _child_b_to_jsonable(
+    that: aas_types.ChildB
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    if that.optional_text is not None:
+        try:
+            jsonable['optionalText'] = that.optional_text
+        except SerializationException as exception:
+            exception._prepend_property('optional_text')
+            raise
+    try:
+        jsonable['bOnly'] = _int_to_jsonable(
+            that.b_only
+        )
+    except SerializationException as exception:
+        exception._prepend_property('b_only')
+        raise
+    jsonable['modelType'] = 'ChildB'
+    return jsonable
+
+
+def _container_to_jsonable(
+    that: aas_types.Container
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    if that.optional_text is not None:
+        try:
+            jsonable['optionalText'] = that.optional_text
+        except SerializationException as exception:
+            exception._prepend_property('optional_text')
+            raise
+    if that.children is not None:
+        try:
+            jsonable['children'] = _list_of__parent_to_jsonable(
+                that.children
+            )
+        except SerializationException as exception:
+            exception._prepend_property('children')
+            raise
+    jsonable['modelType'] = 'Container'
     return jsonable
 
 
@@ -606,6 +973,20 @@ def _something_to_jsonable(
     except SerializationException as exception:
         exception._prepend_property('item')
         raise
+    if that.optional_parent is not None:
+        try:
+            jsonable['optionalParent'] = that.optional_parent.transform(_SERIALIZER)
+        except SerializationException as exception:
+            exception._prepend_property('optional_parent')
+            raise
+    if that.parents is not None:
+        try:
+            jsonable['parents'] = _list_of__parent_to_jsonable(
+                that.parents
+            )
+        except SerializationException as exception:
+            exception._prepend_property('parents')
+            raise
     return jsonable
 
 
@@ -623,6 +1004,15 @@ class _Serializer(
 
     transform_item = staticmethod(
         _item_to_jsonable
+    )
+    transform_child_a = staticmethod(
+        _child_a_to_jsonable
+    )
+    transform_child_b = staticmethod(
+        _child_b_to_jsonable
+    )
+    transform_container = staticmethod(
+        _container_to_jsonable
     )
     transform_something = staticmethod(
         _something_to_jsonable

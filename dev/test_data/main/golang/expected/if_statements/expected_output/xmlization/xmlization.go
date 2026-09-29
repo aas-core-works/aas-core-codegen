@@ -374,6 +374,254 @@ func readItemAsSequence(
 	return
 }
 
+// De-serialize an instance of [aastypes.IParent] based on the `local` name
+// of its start element.
+//
+// The `current` token is expected to point to the content of that start element, and
+// the resulting `next` token points to its end element.
+func readParentDispatched(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (instance aastypes.IParent,
+	next xml.Token,
+	err error,
+) {
+	switch local {
+	case "childA":
+		instance, next, err = readChildAAsSequence(decoder, current)
+	case "childB":
+		instance, next, err = readChildBAsSequence(decoder, current)
+	case "container":
+		instance, next, err = readContainerAsSequence(decoder, current)
+	default:
+		err = unexpectedDiscriminator(local, "IParent")
+	}
+	return
+}
+
+// De-serialize the instance of [aastypes.IChildA]
+// as a sequence of XML elements, each representing a property
+// of [aastypes.IChildA].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readChildAAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.IChildA,
+	next xml.Token,
+	err error,
+) {
+	var theOptionalText *string
+	var theAOnly int64
+
+	foundOptionalText := false
+	foundAOnly := false
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "IChildA")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		case "optionalText":
+			if foundOptionalText {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalText, current, valueErr = readOptional(
+				xmlcommon.ReadText(decoder, current),
+			)
+			foundOptionalText = true
+		case "aOnly":
+			if foundAOnly {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theAOnly, current, valueErr = xmlcommon.ReadTextAs_long(
+				decoder, current,
+			)
+			foundAOnly = true
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	if !foundAOnly {
+		err = missingProperty("aOnly")
+		return
+	}
+
+	instance = aastypes.NewChildA(
+		theAOnly,
+	)
+	instance.SetOptionalText(theOptionalText)
+	return
+}
+
+// De-serialize the instance of [aastypes.IChildB]
+// as a sequence of XML elements, each representing a property
+// of [aastypes.IChildB].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readChildBAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.IChildB,
+	next xml.Token,
+	err error,
+) {
+	var theOptionalText *string
+	var theBOnly int64
+
+	foundOptionalText := false
+	foundBOnly := false
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "IChildB")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		case "optionalText":
+			if foundOptionalText {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalText, current, valueErr = readOptional(
+				xmlcommon.ReadText(decoder, current),
+			)
+			foundOptionalText = true
+		case "bOnly":
+			if foundBOnly {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theBOnly, current, valueErr = xmlcommon.ReadTextAs_long(
+				decoder, current,
+			)
+			foundBOnly = true
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	if !foundBOnly {
+		err = missingProperty("bOnly")
+		return
+	}
+
+	instance = aastypes.NewChildB(
+		theBOnly,
+	)
+	instance.SetOptionalText(theOptionalText)
+	return
+}
+
+// De-serialize the instance of [aastypes.IContainer]
+// as a sequence of XML elements, each representing a property
+// of [aastypes.IContainer].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readContainerAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.IContainer,
+	next xml.Token,
+	err error,
+) {
+	var theOptionalText *string
+	var theChildren []aastypes.IParent
+
+	foundOptionalText := false
+	foundChildren := false
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "IContainer")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		case "optionalText":
+			if foundOptionalText {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalText, current, valueErr = readOptional(
+				xmlcommon.ReadText(decoder, current),
+			)
+			foundOptionalText = true
+		case "children":
+			if foundChildren {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theChildren, current, valueErr = readListOf(
+				decoder, current, readParentDispatched,
+			)
+			foundChildren = true
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	instance = aastypes.NewContainer()
+	instance.SetOptionalText(theOptionalText)
+	instance.SetChildren(theChildren)
+	return
+}
+
 // De-serialize the instance of [aastypes.ISomething]
 // as a sequence of XML elements, each representing a property
 // of [aastypes.ISomething].
@@ -392,12 +640,16 @@ func readSomethingAsSequence(
 	var theNumber int64
 	var theFlag bool
 	var theItem aastypes.IItem
+	var theOptionalParent aastypes.IParent
+	var theParents []aastypes.IParent
 
 	foundKind := false
 	foundText := false
 	foundNumber := false
 	foundFlag := false
 	foundItem := false
+	foundOptionalParent := false
+	foundParents := false
 
 	for {
 		var local string
@@ -457,6 +709,24 @@ func readSomethingAsSequence(
 				decoder, current,
 			)
 			foundItem = true
+		case "optionalParent":
+			if foundOptionalParent {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalParent, current, valueErr = xmlcommon.ReadElementDispatched(
+				decoder, current, readParentDispatched,
+			)
+			foundOptionalParent = true
+		case "parents":
+			if foundParents {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theParents, current, valueErr = readListOf(
+				decoder, current, readParentDispatched,
+			)
+			foundParents = true
 		default:
 			valueErr = xmlcommon.NewDeserializationError(
 				"Unexpected property",
@@ -503,6 +773,8 @@ func readSomethingAsSequence(
 		theFlag,
 		theItem,
 	)
+	instance.SetOptionalParent(theOptionalParent)
+	instance.SetParents(theParents)
 	return
 }
 
@@ -522,6 +794,12 @@ func readClassDispatched(
 	switch local {
 	case "item":
 		instance, next, err = readItemAsSequence(decoder, current)
+	case "childA":
+		instance, next, err = readChildAAsSequence(decoder, current)
+	case "childB":
+		instance, next, err = readChildBAsSequence(decoder, current)
+	case "container":
+		instance, next, err = readContainerAsSequence(decoder, current)
 	case "something":
 		instance, next, err = readSomethingAsSequence(decoder, current)
 	default:
@@ -749,6 +1027,18 @@ func writeClassElement[T any](
 	return
 }
 
+// Write the items of the `list` as a sequence of XML elements.
+//
+// Do not flush.
+func writeListOf_IParent(
+	encoder *xml.Encoder,
+	list []aastypes.IParent,
+) error {
+	return writeList(
+		encoder, list, writeInstance[aastypes.IParent],
+	)
+}
+
 // Write the `value` of a property as string representation
 // of [aastypes.Kind]
 // in a text element.
@@ -801,6 +1091,111 @@ func writeItemAsSequence(
 		"OptionalText()",
 		writeOptionalPointer(
 			encoder, "optionalText", that.OptionalText(), xmlcommon.WriteAsText_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the instance
+// of [aastypes.IChildA]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writeChildAAsSequence(
+	encoder *xml.Encoder,
+	that aastypes.IChildA,
+) (err error) {
+	err = finishProperty(
+		"OptionalText()",
+		writeOptionalPointer(
+			encoder, "optionalText", that.OptionalText(), xmlcommon.WriteAsText_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"AOnly()",
+		xmlcommon.WriteElement(
+			encoder, "aOnly", that.AOnly(), xmlcommon.WriteAsText_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the instance
+// of [aastypes.IChildB]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writeChildBAsSequence(
+	encoder *xml.Encoder,
+	that aastypes.IChildB,
+) (err error) {
+	err = finishProperty(
+		"OptionalText()",
+		writeOptionalPointer(
+			encoder, "optionalText", that.OptionalText(), xmlcommon.WriteAsText_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"BOnly()",
+		xmlcommon.WriteElement(
+			encoder, "bOnly", that.BOnly(), xmlcommon.WriteAsText_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the instance
+// of [aastypes.IContainer]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writeContainerAsSequence(
+	encoder *xml.Encoder,
+	that aastypes.IContainer,
+) (err error) {
+	err = finishProperty(
+		"OptionalText()",
+		writeOptionalPointer(
+			encoder, "optionalText", that.OptionalText(), xmlcommon.WriteAsText_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Children()",
+		writeOptionalSlice(
+			encoder, "children", that.Children(), writeListOf_IParent,
 		),
 	)
 	if err != nil {
@@ -872,6 +1267,29 @@ func writeSomethingAsSequence(
 		return
 	}
 
+	err = finishProperty(
+		"OptionalParent()",
+		writeOptionalInstance(
+			encoder,
+			"optionalParent",
+			that.OptionalParent(),
+			writeInstance[aastypes.IParent],
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Parents()",
+		writeOptionalSlice(
+			encoder, "parents", that.Parents(), writeListOf_IParent,
+		),
+	)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -890,6 +1308,30 @@ func writeClass(
 	case aastypes.ModelTypeItem:
 		err = writeClassElement(
 			encoder, "item", withNamespace, that.(aastypes.IItem), writeItemAsSequence,
+		)
+	case aastypes.ModelTypeChildA:
+		err = writeClassElement(
+			encoder,
+			"childA",
+			withNamespace,
+			that.(aastypes.IChildA),
+			writeChildAAsSequence,
+		)
+	case aastypes.ModelTypeChildB:
+		err = writeClassElement(
+			encoder,
+			"childB",
+			withNamespace,
+			that.(aastypes.IChildB),
+			writeChildBAsSequence,
+		)
+	case aastypes.ModelTypeContainer:
+		err = writeClassElement(
+			encoder,
+			"container",
+			withNamespace,
+			that.(aastypes.IContainer),
+			writeContainerAsSequence,
 		)
 	case aastypes.ModelTypeSomething:
 		err = writeClassElement(

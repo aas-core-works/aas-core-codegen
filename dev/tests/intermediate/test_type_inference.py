@@ -2229,6 +2229,483 @@ def some_func(number: int) -> bool:
         )
 
 
+class Test_narrowing_in_statements(unittest.TestCase):
+    @staticmethod
+    def source_with_verification(verification: str) -> str:
+        return f"""\
+@abstract
+@serialization(with_model_type=True)
+class Parent(DBC):
+    optional_text: Optional[str]
+
+    def __init__(self, optional_text: Optional[str] = None) -> None:
+        self.optional_text = optional_text
+
+
+class Child_a(Parent, DBC):
+    a_only: int
+
+    def __init__(self, a_only: int, optional_text: Optional[str] = None) -> None:
+        Parent.__init__(self, optional_text)
+        self.a_only = a_only
+
+
+class Child_b(Parent, DBC):
+    b_only: int
+
+    def __init__(self, b_only: int, optional_text: Optional[str] = None) -> None:
+        Parent.__init__(self, optional_text)
+        self.b_only = b_only
+
+
+class Holder(DBC):
+    parents: List[Parent]
+    number: int
+    parent: Optional[Parent]
+
+    def __init__(
+        self, parents: List[Parent], number: int, parent: Optional[Parent] = None
+    ) -> None:
+        self.parent = parent
+        self.parents = parents
+        self.number = number
+
+
+{verification}
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    def expect_success(self, verification: str) -> None:
+        Test_with_smoke.execute(
+            Test_narrowing_in_statements.source_with_verification(verification)
+        )
+
+    def expect_failure(self, verification: str, expected_message: str) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_narrowing_in_statements.source_with_verification(verification),
+            expected_joined_message=expected_message,
+        )
+
+    def test_narrowing_in_body(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if x is not None and isinstance(x, Child_a):
+        return x.a_only > 0
+
+    return True"""
+        )
+
+    def test_narrowing_in_elif_and_else_by_negation(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if x is None:
+        return False
+    elif not isinstance(x, Child_a):
+        return x.optional_text is None
+    else:
+        return x.a_only > 0"""
+        )
+
+    def test_narrowing_by_de_morgan_and_not(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if not (x is None or not isinstance(x, Child_a)):
+        return x.a_only > 0
+
+    return True"""
+        )
+
+    def test_narrowing_after_early_return(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if x is None or not isinstance(x, Child_a):
+        return False
+
+    return x.a_only > 0"""
+        )
+
+    def test_narrowing_after_continue(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(parents: List[Parent]) -> bool:
+    for parent in parents:
+        if not isinstance(parent, Child_a):
+            continue
+
+        if parent.optional_text is None:
+            return False
+
+        if len(parent.optional_text) > parent.a_only:
+            return False
+
+    return True"""
+        )
+
+    def test_narrowing_after_the_only_completing_branch(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if x is not None and isinstance(x, Child_a):
+        pass
+    else:
+        return False
+
+    return x.a_only > 0"""
+        )
+
+    def test_narrowing_after_the_only_completing_middle_branch(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent], flag: bool) -> bool:
+    if flag:
+        return False
+    elif x is not None:
+        pass
+    else:
+        return False
+
+    return x.optional_text is None"""
+        )
+
+    def test_narrowing_common_to_all_completing_branches(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent], flag: bool) -> bool:
+    if x is None:
+        return False
+    elif flag:
+        pass
+    else:
+        pass
+
+    return x.optional_text is None"""
+        )
+
+    def test_no_narrowing_on_two_different_completing_branches_fails(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(x: Optional[Parent], flag: bool) -> bool:
+    if x is not None:
+        pass
+    elif flag:
+        pass
+    else:
+        return False
+
+    return x.optional_text is None""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_no_narrowing_after_if_whose_body_can_complete_fails(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(x: Optional[Parent]) -> bool:
+    if x is not None:
+        pass
+
+    return x.optional_text is None""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_narrowing_does_not_leak_out_of_branch(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(x: Optional[Parent], flag: bool) -> bool:
+    if flag:
+        if x is None:
+            return False
+
+        if x.optional_text is None:
+            return False
+
+    return x.optional_text is None""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_assignment_in_branch_does_not_leak_into_sibling(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent], y: Optional[Parent], flag: bool) -> bool:
+    if x is None:
+        return False
+
+    if flag:
+        x = y
+    elif x.optional_text is None:
+        return False
+
+    return True"""
+        )
+
+    def test_assignment_invalidates_narrowing(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(x: Optional[Parent], y: Optional[Parent]) -> bool:
+    if x is None:
+        return False
+
+    x = y
+    return x.optional_text is None""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_assignment_in_completing_branch_invalidates_narrowing(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(x: Optional[Parent], y: Optional[Parent], flag: bool) -> bool:
+    if x is None:
+        return False
+
+    if flag:
+        x = y
+
+    return x.optional_text is None""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_assignment_in_exiting_branch_keeps_narrowing(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent], y: Optional[Parent], flag: bool) -> bool:
+    if x is None:
+        return False
+
+    if flag:
+        x = y
+        return True
+
+    return x.optional_text is None"""
+        )
+
+    def test_assignment_later_in_loop_invalidates_narrowing(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(
+    x: Optional[Parent], y: Optional[Parent], numbers: List[int]
+) -> bool:
+    if x is None:
+        return False
+
+    for number in numbers:
+        if x.optional_text is None:
+            return False
+
+        x = y
+
+    return True""",
+            "Expected an instance type to be a non-None, either an "
+            "enumeration-as-type or our type, but inferred an Optional: "
+            "Optional[Parent]",
+        )
+
+    def test_assignment_to_other_property_keeps_narrowing(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(holder: Mutable[Holder]) -> bool:
+    if holder.parent is None:
+        return False
+
+    holder.number = 5
+    return holder.parent.optional_text is None"""
+        )
+
+    def test_assignment_to_prefix_invalidates_narrowing(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(holder: Mutable[Holder], parent: Mutable[Parent]) -> bool:
+    if holder.parent is None or holder.parent.optional_text is None:
+        return False
+
+    holder.parent = parent
+    return len(holder.parent.optional_text) > 0""",
+            "Expected the argument of ``len`` to be a non-None, but got: "
+            "Optional[str]. Please check for ``is not None`` first.",
+        )
+
+    def test_assignment_to_other_literal_index_keeps_narrowing(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(holder: Mutable[Holder], child: Mutable[Child_b]) -> bool:
+    if not isinstance(holder.parents[0], Child_a):
+        return False
+
+    holder.parents[1] = child
+    return holder.parents[0].a_only > 0"""
+        )
+
+    def test_assignment_to_non_literal_index_invalidates_narrowing(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(
+    holder: Mutable[Holder], child: Mutable[Child_b], i: int
+) -> bool:
+    if not isinstance(holder.parents[0], Child_a):
+        return False
+
+    holder.parents[i] = child
+    return holder.parents[0].a_only > 0""",
+            "The member 'a_only' could not be found in the class 'Parent'",
+        )
+
+    def test_assignment_to_index_variable_invalidates_only_its_narrowing(
+        self,
+    ) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(parents: List[Parent], i: int, j: int) -> bool:
+    if not isinstance(parents[i], Child_a) or not isinstance(parents[j], Child_b):
+        return False
+
+    i = i + 1
+    if parents[j].b_only > 0:
+        return False
+
+    return parents[i].a_only > 0""",
+            "The member 'a_only' could not be found in the class 'Parent'",
+        )
+
+    def test_narrowing_from_assigned_value(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(parent: Parent, child: Child_a) -> bool:
+    x = parent
+    x = child
+    return x.a_only > 0"""
+        )
+
+    def test_narrowing_from_assigned_value_in_all_completing_branches(
+        self,
+    ) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Parent) -> bool:
+    text = x.optional_text
+    if text is None:
+        text = "default"
+
+    return len(text) > 0"""
+        )
+
+    def test_narrowing_survives_assignment_satisfying_it(self) -> None:
+        self.expect_success(
+            """\
+@verification
+def some_func(x: Optional[Parent], y: Parent, flag: bool) -> bool:
+    if x is None:
+        return False
+
+    if flag:
+        x = y
+
+    return x.optional_text is None"""
+        )
+
+    def test_narrowing_from_assigned_value_does_not_outlive_its_branch(
+        self,
+    ) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(parent: Parent, child: Child_a, flag: bool) -> bool:
+    x = parent
+    if flag:
+        x = child
+
+    return x.a_only > 0""",
+            "The member 'a_only' could not be found in the class 'Parent'",
+        )
+
+    def test_narrowing_of_variable_does_not_outlive_its_scope(self) -> None:
+        self.expect_failure(
+            """\
+@verification
+def some_func(parent: Parent, child: Child_a, flag: bool) -> bool:
+    if flag:
+        x = parent
+        x = child
+    else:
+        return False
+
+    if not flag:
+        x = parent
+        return x.a_only > 0
+
+    return True""",
+            "The member 'a_only' could not be found in the class 'Parent'",
+        )
+
+    def test_narrowing_of_self_in_method(self) -> None:
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source="""\
+class Something(DBC):
+    y: int
+    x: Optional[str]
+
+    def update(self) -> int:
+        if self.x is None:
+            return 0
+
+        self.y = 5
+        return len(self.x)
+
+    def __init__(self, y: int, x: Optional[str] = None) -> None:
+        self.x = x
+        self.y = y
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        _, errors = intermediate_type_inference.infer_for_methods(
+            symbol_table=symbol_table
+        )
+        assert errors is None, tests.common.most_underlying_messages(errors)
+
+
 class Test_is_instance(unittest.TestCase):
     @staticmethod
     def infer(source: str) -> intermediate_type_inference.InferenceOfInvariant:

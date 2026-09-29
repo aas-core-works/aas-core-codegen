@@ -143,6 +143,384 @@ func TestItemDeserializationFail(t *testing.T) {
 	}
 }
 
+func TestChildARoundTripOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Xml",
+			"Expected",
+			"childA",
+		),
+		".xml",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		bb, err := os.ReadFile(pth)
+		if err != nil {
+			t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+			return
+		}
+		text := string(bb)
+
+		decoder := xml.NewDecoder(strings.NewReader(text))
+
+		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		if _, ok := deserialized.(aastypes.IChildA); !ok {
+			t.Fatalf(
+				"Expected an instance of IChildA, "+
+					"but got %T: %v",
+				deserialized, deserialized,
+			)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		encoder := xml.NewEncoder(buf)
+		encoder.Indent("", "\t")
+
+		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		roundTrip := string(buf.Bytes())
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			text,
+			roundTrip,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestChildADeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Xml",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"childA",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".xml",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			bb, err := os.ReadFile(pth)
+			if err != nil {
+				t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+				return
+			}
+			text := string(bb)
+
+			decoder := xml.NewDecoder(strings.NewReader(text))
+
+			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestChildBRoundTripOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Xml",
+			"Expected",
+			"childB",
+		),
+		".xml",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		bb, err := os.ReadFile(pth)
+		if err != nil {
+			t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+			return
+		}
+		text := string(bb)
+
+		decoder := xml.NewDecoder(strings.NewReader(text))
+
+		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		if _, ok := deserialized.(aastypes.IChildB); !ok {
+			t.Fatalf(
+				"Expected an instance of IChildB, "+
+					"but got %T: %v",
+				deserialized, deserialized,
+			)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		encoder := xml.NewEncoder(buf)
+		encoder.Indent("", "\t")
+
+		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		roundTrip := string(buf.Bytes())
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			text,
+			roundTrip,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestChildBDeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Xml",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"childB",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".xml",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			bb, err := os.ReadFile(pth)
+			if err != nil {
+				t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+				return
+			}
+			text := string(bb)
+
+			decoder := xml.NewDecoder(strings.NewReader(text))
+
+			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestContainerRoundTripOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Xml",
+			"Expected",
+			"container",
+		),
+		".xml",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		bb, err := os.ReadFile(pth)
+		if err != nil {
+			t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+			return
+		}
+		text := string(bb)
+
+		decoder := xml.NewDecoder(strings.NewReader(text))
+
+		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		if _, ok := deserialized.(aastypes.IContainer); !ok {
+			t.Fatalf(
+				"Expected an instance of IContainer, "+
+					"but got %T: %v",
+				deserialized, deserialized,
+			)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		encoder := xml.NewEncoder(buf)
+		encoder.Indent("", "\t")
+
+		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		roundTrip := string(buf.Bytes())
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			text,
+			roundTrip,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestContainerDeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Xml",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"container",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".xml",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			bb, err := os.ReadFile(pth)
+			if err != nil {
+				t.Fatalf("Failed to read the file %s: %s", pth, err.Error())
+				return
+			}
+			text := string(bb)
+
+			decoder := xml.NewDecoder(strings.NewReader(text))
+
+			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestSomethingRoundTripOK(t *testing.T) {
 	pths := aastesting.FindFilesBySuffixRecursively(
 		filepath.Join(

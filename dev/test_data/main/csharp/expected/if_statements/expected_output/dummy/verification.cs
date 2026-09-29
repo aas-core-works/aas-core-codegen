@@ -196,6 +196,194 @@ namespace dummy
         }  // public static bool IfWithContinueInFor
 
         /// <summary>
+        /// Check the narrowing in the body of a branch by its condition.
+        /// </summary>
+        public static bool NarrowingInBody(
+            IParent? parent
+        )
+        {
+            if (
+                (parent != null)
+                && parent is Aas.IChildA
+            )
+            {
+                return ((Aas.IChildA)parent).AOnly < 100;
+            }
+            return true;
+        }  // public static bool NarrowingInBody
+
+        /// <summary>
+        /// Check the narrowing by the negation of the previous conditions.
+        /// </summary>
+        public static bool NarrowingInElifAndElse(
+            IParent? parent
+        )
+        {
+            if (parent == null)
+            {
+                return true;
+            }
+            else if (!(parent is Aas.IChildB))
+            {
+                return (parent.OptionalText == null)
+                || parent.OptionalText != "forbidden";
+            }
+            else
+            {
+                return ((Aas.IChildB)parent).BOnly > 0;
+            }
+        }  // public static bool NarrowingInElifAndElse
+
+        /// <summary>
+        /// Check the narrowing after an if-statement whose branch always returns.
+        /// </summary>
+        public static bool NarrowingAfterEarlyReturn(
+            IParent? parent
+        )
+        {
+            if (
+                (parent == null)
+                || (!(parent is Aas.IChildB))
+            )
+            {
+                return true;
+            }
+            return ((Aas.IChildB)parent).BOnly < 50;
+        }  // public static bool NarrowingAfterEarlyReturn
+
+        /// <summary>
+        /// Check the narrowing after an if-statement whose <c>else</c> always returns.
+        /// </summary>
+        public static bool NarrowingAfterTheOnlyCompletingBranch(
+            IParent? parent
+        )
+        {
+            if (
+                (parent != null)
+                && parent is Aas.IChildA
+            )
+            {
+            }
+            else
+            {
+                return true;
+            }
+            return ((Aas.IChildA)parent).AOnly > -10;
+        }  // public static bool NarrowingAfterTheOnlyCompletingBranch
+
+        /// <summary>
+        /// Check the narrowing after the <c>continue</c> and the early return in a loop.
+        /// </summary>
+        public static bool ChildAsHaveTexts(
+            List<IParent> parents
+        )
+        {
+            foreach (var parent in parents)
+            {
+                if (!(parent is Aas.IChildA))
+                {
+                    continue;
+                }
+                if (((Aas.IChildA)parent).OptionalText == null)
+                {
+                    return false;
+                }
+                if (Common.StringHelpers.Len(((Aas.IChildA)parent).OptionalText) < 1)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }  // public static bool ChildAsHaveTexts
+
+        /// <summary>
+        /// Check the narrowing after the <c>continue</c> in a loop with a <c>break</c>.
+        /// </summary>
+        public static bool TextsBeforeContainerAreShort(
+            List<IParent> parents
+        )
+        {
+            long total = 0;
+            foreach (var parent in parents)
+            {
+                if (parent is Aas.IContainer)
+                {
+                    break;
+                }
+                if (parent.OptionalText == null)
+                {
+                    continue;
+                }
+                total = (
+                    total + Common.StringHelpers.Len(parent.OptionalText));
+            }
+            return total < 20;
+        }  // public static bool TextsBeforeContainerAreShort
+
+        /// <summary>
+        /// Check the narrowing by the value assigned in a branch.
+        /// </summary>
+        public static bool TextOrDefaultIsShort(
+            IParent parent
+        )
+        {
+            var text = parent.OptionalText;
+            if (text == null)
+            {
+                text = "default";
+            }
+            return Common.StringHelpers.Len(text) < 10;
+        }  // public static bool TextOrDefaultIsShort
+
+        /// <summary>
+        /// Check the narrowing of a variable to a class by the assigned value.
+        /// </summary>
+        public static bool LastChildAIsSmall(
+            IParent parent,
+            List<IParent> parents
+        )
+        {
+            var last = parent;
+            foreach (var other in parents)
+            {
+                if (other is Aas.IChildA)
+                {
+                    last = ((Aas.IChildA)other);
+                    if (((Aas.IChildA)last).AOnly >= 1000)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }  // public static bool LastChildAIsSmall
+
+        /// <summary>
+        /// Check the recursive chain of <c>isinstance</c> checks with early returns.
+        /// </summary>
+        public static bool HasMarkerInTree(
+            IParent parent
+        )
+        {
+            if (
+                (parent.OptionalText != null)
+                && parent.OptionalText == "marker"
+            )
+            {
+                return true;
+            }
+            if (parent is Aas.IContainer)
+            {
+                return (((Aas.IContainer)parent).Children != null)
+                && (
+                    ((Aas.IContainer)parent).Children.Any(
+                        child => Verification.HasMarkerInTree(child))
+                );
+            }
+            return false;
+        }  // public static bool HasMarkerInTree
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -223,6 +411,49 @@ namespace dummy
             {
                 // No verification has been defined for Item.
                 yield break;
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformChildA(
+                Aas.IChildA that
+            )
+            {
+                // No verification has been defined for ChildA.
+                yield break;
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformChildB(
+                Aas.IChildB that
+            )
+            {
+                // No verification has been defined for ChildB.
+                yield break;
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformContainer(
+                Aas.IContainer that
+            )
+            {
+                if (that.Children != null)
+                {
+                    int indexChildren = 0;
+                    foreach (var item in that.Children)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexChildren));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "children"));
+                            yield return error;
+                        }
+                        indexChildren++;
+                    }
+                }
             }
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
@@ -280,6 +511,86 @@ namespace dummy
                         "Text must be at most 10 characters long");
                 }
 
+                if (!(
+                    !(that.OptionalParent != null)
+                    || (!Verification.HasMarkerInTree(that.OptionalParent))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional parent must have no marker in its tree");
+                }
+
+                if (!(
+                    !(
+                        (that.OptionalParent != null)
+                        && (that.Parents != null)
+                    )
+                    || Verification.LastChildAIsSmall(that.OptionalParent, that.Parents)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Parents as Child_a must have a_only below one thousand");
+                }
+
+                if (!(
+                    !(that.OptionalParent != null)
+                    || Verification.TextOrDefaultIsShort(that.OptionalParent)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Text of the optional parent must be short");
+                }
+
+                if (!(
+                    !(that.Parents != null)
+                    || Verification.TextsBeforeContainerAreShort(that.Parents)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts of parents before the first container must be short");
+                }
+
+                if (!(
+                    !(that.Parents != null)
+                    || Verification.ChildAsHaveTexts(that.Parents)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Parents as Child_a must have non-empty texts");
+                }
+
+                if (!(
+                    Verification.NarrowingAfterTheOnlyCompletingBranch(that.OptionalParent)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional parent as Child_a must have a_only above minus ten");
+                }
+
+                if (!(
+                    Verification.NarrowingAfterEarlyReturn(that.OptionalParent)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional parent as Child_b must have a small b_only");
+                }
+
+                if (!(
+                    Verification.NarrowingInElifAndElse(that.OptionalParent)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional parent must have an allowed text or a positive " +
+                        "b_only");
+                }
+
+                if (!Verification.NarrowingInBody(that.OptionalParent))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional parent as Child_a must have a small a_only");
+                }
+
                 foreach (var error in Verification.VerifyKind(that.Kind))
                 {
                     error.PrependSegment(
@@ -294,6 +605,36 @@ namespace dummy
                         new Reporting.NameSegment(
                             "item"));
                     yield return error;
+                }
+
+                if (that.OptionalParent != null)
+                {
+                    foreach (var error in Verification.Verify(that.OptionalParent))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "optionalParent"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Parents != null)
+                {
+                    int indexParents = 0;
+                    foreach (var item in that.Parents)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexParents));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "parents"));
+                            yield return error;
+                        }
+                        indexParents++;
+                    }
                 }
             }
         }  // private class Transformer

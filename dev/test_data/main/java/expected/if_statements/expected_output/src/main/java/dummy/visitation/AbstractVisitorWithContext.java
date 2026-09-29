@@ -25,6 +25,18 @@ public abstract class AbstractVisitorWithContext<ContextT>
     IItem that,
     ContextT context
   );
+  public abstract void visitChildA(
+    IChildA that,
+    ContextT context
+  );
+  public abstract void visitChildB(
+    IChildB that,
+    ContextT context
+  );
+  public abstract void visitContainer(
+    IContainer that,
+    ContextT context
+  );
   public abstract void visitSomething(
     ISomething that,
     ContextT context

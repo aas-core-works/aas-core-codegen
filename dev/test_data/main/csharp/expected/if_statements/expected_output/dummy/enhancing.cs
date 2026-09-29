@@ -93,6 +93,200 @@ namespace dummy
             }
         }
 
+        public class EnhancedChildA<TEnhancement>
+            : Enhanced<TEnhancement>, Aas.IChildA
+            where TEnhancement : class
+        {
+            private readonly Aas.IChildA _instance;
+
+            public EnhancedChildA(
+                Aas.IChildA instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public string? OptionalText
+            {
+                get => _instance.OptionalText;
+                set => _instance.OptionalText = value;
+            }
+
+            public long AOnly
+            {
+                get => _instance.AOnly;
+                set => _instance.AOnly = value;
+            }
+
+            public IEnumerable<Aas.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Aas.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Aas.Visitation.IVisitor visitor)
+            {
+                visitor.VisitChildA(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitChildA(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformChildA(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformChildA(_instance, context);
+            }
+        }
+
+        public class EnhancedChildB<TEnhancement>
+            : Enhanced<TEnhancement>, Aas.IChildB
+            where TEnhancement : class
+        {
+            private readonly Aas.IChildB _instance;
+
+            public EnhancedChildB(
+                Aas.IChildB instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public string? OptionalText
+            {
+                get => _instance.OptionalText;
+                set => _instance.OptionalText = value;
+            }
+
+            public long BOnly
+            {
+                get => _instance.BOnly;
+                set => _instance.BOnly = value;
+            }
+
+            public IEnumerable<Aas.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Aas.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Aas.Visitation.IVisitor visitor)
+            {
+                visitor.VisitChildB(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitChildB(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformChildB(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformChildB(_instance, context);
+            }
+        }
+
+        public class EnhancedContainer<TEnhancement>
+            : Enhanced<TEnhancement>, Aas.IContainer
+            where TEnhancement : class
+        {
+            private readonly Aas.IContainer _instance;
+
+            public EnhancedContainer(
+                Aas.IContainer instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public string? OptionalText
+            {
+                get => _instance.OptionalText;
+                set => _instance.OptionalText = value;
+            }
+
+            public List<IParent>? Children
+            {
+                get => _instance.Children;
+                set => _instance.Children = value;
+            }
+
+            public IEnumerable<Aas.IParent> OverChildrenOrEmpty()
+            {
+                return _instance.OverChildrenOrEmpty();
+            }
+
+            public IEnumerable<Aas.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Aas.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Aas.Visitation.IVisitor visitor)
+            {
+                visitor.VisitContainer(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitContainer(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformContainer(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformContainer(_instance, context);
+            }
+        }
+
         public class EnhancedSomething<TEnhancement>
             : Enhanced<TEnhancement>, Aas.ISomething
             where TEnhancement : class
@@ -135,6 +329,23 @@ namespace dummy
             {
                 get => _instance.Item;
                 set => _instance.Item = value;
+            }
+
+            public IParent? OptionalParent
+            {
+                get => _instance.OptionalParent;
+                set => _instance.OptionalParent = value;
+            }
+
+            public List<IParent>? Parents
+            {
+                get => _instance.Parents;
+                set => _instance.Parents = value;
+            }
+
+            public IEnumerable<Aas.IParent> OverParentsOrEmpty()
+            {
+                return _instance.OverParentsOrEmpty();
             }
 
             public IEnumerable<Aas.IClass> DescendOnce()
@@ -207,6 +418,84 @@ namespace dummy
                     );
             }
 
+            public override Aas.IClass TransformChildA(
+                Aas.IChildA that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedChildA<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
+            public override Aas.IClass TransformChildB(
+                Aas.IChildB that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedChildB<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
+            public override Aas.IClass TransformContainer(
+                Aas.IContainer that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                if (that.Children != null)
+                {
+                    that.Children = (
+                        that.Children
+                        .Select(
+                            (item) => {
+                                var transformed = Transform(item);
+                                return (
+                                    transformed as Aas.IParent
+                                ) ?? throw new System.InvalidOperationException(
+                                    "Expected the transformed item to be a IParent, " +
+                                    $"but got: {transformed}"
+                                );
+                            }
+                        )
+                    ).ToList();
+                }
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedContainer<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
             public override Aas.IClass TransformSomething(
                 Aas.ISomething that
             )
@@ -228,6 +517,38 @@ namespace dummy
                     $"but got: {transformedItem}"
                 );
                 that.Item = castedItem;
+
+                if (that.OptionalParent != null)
+                {
+                    var transformedOptionalParent = Transform(
+                        that.OptionalParent
+                    );
+                    var castedOptionalParent = (
+                        transformedOptionalParent as Aas.IParent
+                    ) ?? throw new System.InvalidOperationException(
+                        "Expected the transformed value to be a IParent, " +
+                        $"but got: {transformedOptionalParent}"
+                    );
+                    that.OptionalParent = castedOptionalParent;
+                }
+
+                if (that.Parents != null)
+                {
+                    that.Parents = (
+                        that.Parents
+                        .Select(
+                            (item) => {
+                                var transformed = Transform(item);
+                                return (
+                                    transformed as Aas.IParent
+                                ) ?? throw new System.InvalidOperationException(
+                                    "Expected the transformed item to be a IParent, " +
+                                    $"but got: {transformed}"
+                                );
+                            }
+                        )
+                    ).ToList();
+                }
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)

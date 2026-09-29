@@ -52,6 +52,157 @@ void Item::set_optional_text(
 
 // endregion Item
 
+// region ChildA
+
+ChildA::ChildA(
+  int64_t a_only,
+  common::optional<std::wstring> optional_text
+) {
+  optional_text_ = std::move(optional_text);
+
+  a_only_ = a_only;
+}
+
+ModelType ChildA::model_type() const {
+  return ModelType::kChildA;
+}
+
+const common::optional<std::wstring>& ChildA::optional_text() const {
+  return optional_text_;
+}
+
+common::optional<std::wstring>& ChildA::mutable_optional_text() {
+  return optional_text_;
+}
+
+void ChildA::set_optional_text(
+  common::optional<std::wstring> value
+) {
+  optional_text_ = value;
+}
+
+int64_t ChildA::a_only() const {
+  return a_only_;
+}
+
+int64_t& ChildA::mutable_a_only() {
+  return a_only_;
+}
+
+void ChildA::set_a_only(
+  int64_t value
+) {
+  a_only_ = value;
+}
+
+// endregion ChildA
+
+// region ChildB
+
+ChildB::ChildB(
+  int64_t b_only,
+  common::optional<std::wstring> optional_text
+) {
+  optional_text_ = std::move(optional_text);
+
+  b_only_ = b_only;
+}
+
+ModelType ChildB::model_type() const {
+  return ModelType::kChildB;
+}
+
+const common::optional<std::wstring>& ChildB::optional_text() const {
+  return optional_text_;
+}
+
+common::optional<std::wstring>& ChildB::mutable_optional_text() {
+  return optional_text_;
+}
+
+void ChildB::set_optional_text(
+  common::optional<std::wstring> value
+) {
+  optional_text_ = value;
+}
+
+int64_t ChildB::b_only() const {
+  return b_only_;
+}
+
+int64_t& ChildB::mutable_b_only() {
+  return b_only_;
+}
+
+void ChildB::set_b_only(
+  int64_t value
+) {
+  b_only_ = value;
+}
+
+// endregion ChildB
+
+// region Container
+
+Container::Container(
+  common::optional<std::wstring> optional_text,
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > children
+) {
+  optional_text_ = std::move(optional_text);
+
+  children_ = std::move(children);
+}
+
+ModelType Container::model_type() const {
+  return ModelType::kContainer;
+}
+
+const common::optional<std::wstring>& Container::optional_text() const {
+  return optional_text_;
+}
+
+common::optional<std::wstring>& Container::mutable_optional_text() {
+  return optional_text_;
+}
+
+void Container::set_optional_text(
+  common::optional<std::wstring> value
+) {
+  optional_text_ = value;
+}
+
+const common::optional<
+  std::vector<
+    std::shared_ptr<IParent>
+  >
+>& Container::children() const {
+  return children_;
+}
+
+common::optional<
+  std::vector<
+    std::shared_ptr<IParent>
+  >
+>& Container::mutable_children() {
+  return children_;
+}
+
+void Container::set_children(
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > value
+) {
+  children_ = value;
+}
+
+// endregion Container
+
 // region Something
 
 Something::Something(
@@ -59,7 +210,15 @@ Something::Something(
   std::wstring text,
   int64_t number,
   bool flag,
-  std::shared_ptr<IItem> item
+  std::shared_ptr<IItem> item,
+  common::optional<
+    std::shared_ptr<IParent>
+  > optional_parent,
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > parents
 ) {
   kind_ = kind;
 
@@ -70,6 +229,10 @@ Something::Something(
   flag_ = flag;
 
   item_ = std::move(item);
+
+  optional_parent_ = std::move(optional_parent);
+
+  parents_ = std::move(parents);
 }
 
 ModelType Something::model_type() const {
@@ -146,6 +309,52 @@ void Something::set_item(
   item_ = value;
 }
 
+const common::optional<
+  std::shared_ptr<IParent>
+>& Something::optional_parent() const {
+  return optional_parent_;
+}
+
+common::optional<
+  std::shared_ptr<IParent>
+>& Something::mutable_optional_parent() {
+  return optional_parent_;
+}
+
+void Something::set_optional_parent(
+  common::optional<
+    std::shared_ptr<IParent>
+  > value
+) {
+  optional_parent_ = value;
+}
+
+const common::optional<
+  std::vector<
+    std::shared_ptr<IParent>
+  >
+>& Something::parents() const {
+  return parents_;
+}
+
+common::optional<
+  std::vector<
+    std::shared_ptr<IParent>
+  >
+>& Something::mutable_parents() {
+  return parents_;
+}
+
+void Something::set_parents(
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > value
+) {
+  parents_ = value;
+}
+
 // endregion Something
 
 // region Is-a functions
@@ -155,6 +364,116 @@ bool IsItem(
 ) {
   switch (that.model_type()) {
     case ModelType::kItem:
+      return true;
+    case ModelType::kChildA:
+      return false;
+    case ModelType::kChildB:
+      return false;
+    case ModelType::kContainer:
+      return false;
+    case ModelType::kSomething:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsParent(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kItem:
+      return false;
+    case ModelType::kChildA:
+      return true;
+    case ModelType::kChildB:
+      return true;
+    case ModelType::kContainer:
+      return true;
+    case ModelType::kSomething:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsChildA(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kItem:
+      return false;
+    case ModelType::kChildA:
+      return true;
+    case ModelType::kChildB:
+      return false;
+    case ModelType::kContainer:
+      return false;
+    case ModelType::kSomething:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsChildB(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kItem:
+      return false;
+    case ModelType::kChildA:
+      return false;
+    case ModelType::kChildB:
+      return true;
+    case ModelType::kContainer:
+      return false;
+    case ModelType::kSomething:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsContainer(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kItem:
+      return false;
+    case ModelType::kChildA:
+      return false;
+    case ModelType::kChildB:
+      return false;
+    case ModelType::kContainer:
       return true;
     case ModelType::kSomething:
       return false;
@@ -175,6 +494,12 @@ bool IsSomething(
 ) {
   switch (that.model_type()) {
     case ModelType::kItem:
+      return false;
+    case ModelType::kChildA:
+      return false;
+    case ModelType::kChildB:
+      return false;
+    case ModelType::kContainer:
       return false;
     case ModelType::kSomething:
       return true;

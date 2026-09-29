@@ -33,7 +33,9 @@ import {
   newDeserializationError,
   nextPropertyOpenTag,
   parseElementContent,
+  parseList,
   parseTextContent,
+  readNextOpenTag,
   readRequiredRootOpenTag,
   removeWhitespace,
   tokenizeXml,
@@ -52,6 +54,49 @@ export {
   SerializationError
 } from "./xmlcommon";
 export type { Segment } from "./xmlcommon";
+
+/**
+ * Read the next XML element from `cursor` and parse it with the parser which
+ * `parsersByLocalName` gives for the element's local name.
+ *
+ * An abstract class, a concrete class with descendants and a named union all
+ * prescribe no element tag of their own, so the tag is what tells us which
+ * parser to use. The set of local names which are accepted is the only thing
+ * which distinguishes one such dispatch from another, so it is the only thing
+ * which is generated -- the reading itself lives here.
+ *
+ * @param cursor - to read from
+ * @param expectedWhat - what we expected to read, for the error message
+ * @param parsersByLocalName - parser of the content, by the element's local name
+ * @returns parsed instance, or an error
+ * @typeParam T - type of the parsed instance
+ */
+function dispatchParseElement<T>(
+  cursor: XmlCursor,
+  expectedWhat: string,
+  parsersByLocalName: ReadonlyMap<string, ContentParser<T>>
+): AasCommon.Either<T, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<T, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+
+  const localName = localNameOfTag(startTagOrError.mustValue().tag);
+
+  const parseContent = parsersByLocalName.get(localName);
+  if (parseContent === undefined) {
+    return newDeserializationError<T>(
+      `Expected an instance of ${expectedWhat}, but got: ${localName}`
+    );
+  }
+
+  cursor.advance();
+
+  return parseElementContent(cursor, localName, parseContent);
+}
 
 /**
  * Parse the content of an XML element as a literal of the enumeration called
@@ -250,6 +295,15 @@ function write_Kind(
   );
 }
 
+function parse_ListOf_IParent(
+  cursor: XmlCursor
+): AasCommon.Either<Array<AasTypes.IParent>, DeserializationError> {
+  return parseList<AasTypes.IParent>(
+    cursor,
+    dispatchParseParentElement
+  );
+}
+
 /**
  * Parse the sequence of properties of an instance
  * of {@link types!Item}.
@@ -355,6 +409,311 @@ function parseItemFromSequence(
 
 /**
  * Parse the sequence of properties of an instance
+ * of {@link types!ChildA}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!ChildA} is embedded.
+ */
+function parseChildAFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ChildA, DeserializationError> {
+  let theOptionalText: string | null = null;
+  let theAOnly: number | null = null;
+
+  const className = AasTypes.ChildA.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new AasCommon.Either<AasTypes.ChildA, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "optionalText": {
+        if (theOptionalText !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_str
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "aOnly": {
+        if (theAOnly !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_int
+        );
+        propertyError = parsed.error;
+        theAOnly = parsed.value;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new AasCommon.Either<AasTypes.ChildA, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  if (theAOnly === null) {
+    return newDeserializationError<AasTypes.ChildA>(
+      "The required property 'aOnly' is missing"
+    );
+  }
+
+  const instance = new AasTypes.ChildA(
+    theAOnly,
+    theOptionalText
+  );
+  return new AasCommon.Either<AasTypes.ChildA, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ChildB}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!ChildB} is embedded.
+ */
+function parseChildBFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ChildB, DeserializationError> {
+  let theOptionalText: string | null = null;
+  let theBOnly: number | null = null;
+
+  const className = AasTypes.ChildB.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new AasCommon.Either<AasTypes.ChildB, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "optionalText": {
+        if (theOptionalText !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_str
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "bOnly": {
+        if (theBOnly !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_int
+        );
+        propertyError = parsed.error;
+        theBOnly = parsed.value;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new AasCommon.Either<AasTypes.ChildB, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  if (theBOnly === null) {
+    return newDeserializationError<AasTypes.ChildB>(
+      "The required property 'bOnly' is missing"
+    );
+  }
+
+  const instance = new AasTypes.ChildB(
+    theBOnly,
+    theOptionalText
+  );
+  return new AasCommon.Either<AasTypes.ChildB, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Container}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!Container} is embedded.
+ */
+function parseContainerFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Container, DeserializationError> {
+  let theOptionalText: string | null = null;
+  let theChildren: Array<AasTypes.IParent> | null = null;
+
+  const className = AasTypes.Container.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new AasCommon.Either<AasTypes.Container, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "optionalText": {
+        if (theOptionalText !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_str
+        );
+        propertyError = parsed.error;
+        theOptionalText = parsed.value;
+        break;
+      }
+
+      case "children": {
+        if (theChildren !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_ListOf_IParent
+        );
+        propertyError = parsed.error;
+        theChildren = parsed.value;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new AasCommon.Either<AasTypes.Container, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  // No required properties
+
+  const instance = new AasTypes.Container(
+    theOptionalText,
+    theChildren
+  );
+  return new AasCommon.Either<AasTypes.Container, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
+ * Parse the sequence of properties of an instance
  * of {@link types!Something}.
  *
  * The opening tag is expected to have been already read by the caller, and
@@ -371,6 +730,8 @@ function parseSomethingFromSequence(
   let theNumber: number | null = null;
   let theFlag: boolean | null = null;
   let theItem: AasTypes.Item | null = null;
+  let theOptionalParent: AasTypes.IParent | null = null;
+  let theParents: Array<AasTypes.IParent> | null = null;
 
   const className = AasTypes.Something.name;
 
@@ -472,6 +833,38 @@ function parseSomethingFromSequence(
         break;
       }
 
+      case "optionalParent": {
+        if (theOptionalParent !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          dispatchParseParentElement
+        );
+        propertyError = parsed.error;
+        theOptionalParent = parsed.value;
+        break;
+      }
+
+      case "parents": {
+        if (theParents !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_ListOf_IParent
+        );
+        propertyError = parsed.error;
+        theParents = parsed.value;
+        break;
+      }
+
       default: {
         propertyError = new DeserializationError(
           `Unexpected XML property: ${propertyLocalName}`
@@ -526,7 +919,9 @@ function parseSomethingFromSequence(
     theText,
     theNumber,
     theFlag,
-    theItem
+    theItem,
+    theOptionalParent,
+    theParents
   );
   return new AasCommon.Either<AasTypes.Something, DeserializationError>(
     instance,
@@ -555,6 +950,78 @@ function writeItemAsSequence(
     "optionalText",
     that.optionalText,
     write_str
+  );
+}
+
+/**
+ * Write the properties of an instance
+ * of {@link types!ChildA}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writeChildAAsSequence(
+  parts: Array<string>,
+  that: AasTypes.ChildA
+): void {
+  writeOptionalProperty(
+    parts,
+    "optionalText",
+    that.optionalText,
+    write_str
+  );
+  writeProperty(
+    parts,
+    "aOnly",
+    that.aOnly,
+    write_int
+  );
+}
+
+/**
+ * Write the properties of an instance
+ * of {@link types!ChildB}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writeChildBAsSequence(
+  parts: Array<string>,
+  that: AasTypes.ChildB
+): void {
+  writeOptionalProperty(
+    parts,
+    "optionalText",
+    that.optionalText,
+    write_str
+  );
+  writeProperty(
+    parts,
+    "bOnly",
+    that.bOnly,
+    write_int
+  );
+}
+
+/**
+ * Write the properties of an instance
+ * of {@link types!Container}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writeContainerAsSequence(
+  parts: Array<string>,
+  that: AasTypes.Container
+): void {
+  writeOptionalProperty(
+    parts,
+    "optionalText",
+    that.optionalText,
+    write_str
+  );
+  writeOptionalProperty(
+    parts,
+    "children",
+    that.children,
+    writeListOfInstances
   );
 }
 
@@ -598,6 +1065,87 @@ function writeSomethingAsSequence(
     that.item,
     writeItemAsSequence
   );
+  writeOptionalProperty(
+    parts,
+    "optionalParent",
+    that.optionalParent,
+    writeClass
+  );
+  writeOptionalProperty(
+    parts,
+    "parents",
+    that.parents,
+    writeListOfInstances
+  );
+}
+
+const PARSERS_OF_PARENT = new Map<
+  string,
+  ContentParser<AasTypes.IParent>
+>([
+  ["childA", parseChildAFromSequence],
+  ["childB", parseChildBFromSequence],
+  ["container", parseContainerFromSequence]
+]);
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IParent} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseParentElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IParent, DeserializationError> {
+  return dispatchParseElement(
+    cursor,
+    "IParent",
+    PARSERS_OF_PARENT
+  );
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IParent}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function parentFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IParent, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IParent>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IParent, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseParentElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IParent>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
 }
 
 const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
@@ -605,6 +1153,9 @@ const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
   ContentParser<AasTypes.Class>
 >([
   ["item", parseItemFromSequence],
+  ["childA", parseChildAFromSequence],
+  ["childB", parseChildBFromSequence],
+  ["container", parseContainerFromSequence],
   ["something", parseSomethingFromSequence]
 ]);
 
@@ -812,6 +1363,42 @@ class Serializer extends AasTypes.AbstractVisitorWithContext<Array<string>> {
       "item",
       that,
       writeItemAsSequence
+    );
+  }
+
+  visitChildAWithContext(
+    that: AasTypes.ChildA,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "childA",
+      that,
+      writeChildAAsSequence
+    );
+  }
+
+  visitChildBWithContext(
+    that: AasTypes.ChildB,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "childB",
+      that,
+      writeChildBAsSequence
+    );
+  }
+
+  visitContainerWithContext(
+    that: AasTypes.Container,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "container",
+      that,
+      writeContainerAsSequence
     );
   }
 

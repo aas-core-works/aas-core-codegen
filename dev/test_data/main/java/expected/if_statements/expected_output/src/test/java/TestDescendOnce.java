@@ -58,6 +58,45 @@ public class TestDescendOnce {
   } // public void testItem
 
   @Test
+  public void testChildA() throws IOException {
+    ChildA instance = CommonJsonization.loadMaximalChildA();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "ChildA",
+        "maximal.json.trace"));
+  } // public void testChildA
+
+  @Test
+  public void testChildB() throws IOException {
+    ChildB instance = CommonJsonization.loadMaximalChildB();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "ChildB",
+        "maximal.json.trace"));
+  } // public void testChildB
+
+  @Test
+  public void testContainer() throws IOException {
+    Container instance = CommonJsonization.loadMaximalContainer();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "Container",
+        "maximal.json.trace"));
+  } // public void testContainer
+
+  @Test
   public void testSomething() throws IOException {
     Something instance = CommonJsonization.loadMaximalSomething();
 

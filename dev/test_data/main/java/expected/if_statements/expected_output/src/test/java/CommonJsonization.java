@@ -42,6 +42,84 @@ public final class CommonJsonization {
     return Jsonization.Deserialize.deserializeItem(node);
   } // public static Item loadMinimalItem
 
+  public static ChildA loadMaximalChildA() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildA",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeChildA(node);
+  } // public static ChildA loadMaximalChildA
+
+  public static ChildA loadMinimalChildA() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildA",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeChildA(node);
+  } // public static ChildA loadMinimalChildA
+
+  public static ChildB loadMaximalChildB() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildB",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeChildB(node);
+  } // public static ChildB loadMaximalChildB
+
+  public static ChildB loadMinimalChildB() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "ChildB",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeChildB(node);
+  } // public static ChildB loadMinimalChildB
+
+  public static Container loadMaximalContainer() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Container",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeContainer(node);
+  } // public static Container loadMaximalContainer
+
+  public static Container loadMinimalContainer() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Container",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeContainer(node);
+  } // public static Container loadMinimalContainer
+
   public static Something loadMaximalSomething() throws IOException {
     final Path path = Paths.get(
       Common.TEST_DATA_DIR,

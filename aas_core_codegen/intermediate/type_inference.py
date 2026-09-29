@@ -13,6 +13,7 @@ import ast
 import contextlib
 import enum
 from typing import (
+    FrozenSet,
     Mapping,
     MutableMapping,
     Set,
@@ -25,7 +26,7 @@ from typing import (
     Tuple,
 )
 
-from icontract import DBC, ensure, require
+from icontract import DBC, ensure
 
 from aas_core_codegen.common import (
     Identifier,
@@ -1412,52 +1413,470 @@ def _combines_to_length(
     )
 
 
-class _CountingMap:
-    """Provide a map to track multiple counters."""
+# region Facts for the narrowing
 
-    def __init__(self) -> None:
-        self._counts = dict()  # type: MutableMapping[str, int]
+# NOTE (mristin):
+# This region implements the narrowing of the types, *i.e.*, it keeps track of what
+# we know about the values beyond their declared types at every point of the code.
+# Please read the docstring of :py:class:`_Fact` first. It explains the whole model,
+# while the functions and the classes below only document their own part.
 
-    def increment(self, key: str) -> None:
-        """Increment the counter for the ``key``."""
-        count = self._counts.get(key, None)
-        if count is None:
-            self._counts[key] = 1
+
+class _NonNull:
+    """
+    Tell that the value is not ``None``.
+
+    For example, ``x is not None`` tells us this about ``x``.
+    """
+
+
+class _MinLength:
+    """
+    Tell that the JSON-able array has at least :attr:`length` items.
+
+    For example, ``len(self.values) > 1`` tells us that ``self.values`` has at least
+    two items, so that ``self.values[0]``, ``self.values[1]``, ``self.values[-1]``
+    and ``self.values[-2]`` are all there.
+    """
+
+    def __init__(self, length: int) -> None:
+        """Initialize with the given values."""
+        self.length = length
+
+
+class _Narrowing:
+    """
+    Tell that the value is an instance of :attr:`target`.
+
+    For example, ``isinstance(x, Child_a)`` tells us that ``x`` is an instance of
+    ``Child_a``, though its declared type is ``Parent``.
+    """
+
+    def __init__(self, target: "OurTypeAnnotation") -> None:
+        """Initialize with the given values."""
+        self.target = target
+
+
+class _IndexSegment:
+    """
+    Represent an index in an access path.
+
+    For example, the access path ``items[i].x`` consists of the segments ``items``,
+    ``[i]`` and ``x``, where ``[i]`` is an index segment.
+
+    The :attr:`literal` holds the literal index, such as ``0``, ``-1`` or ``"key"``.
+    It is ``None`` if the index is not a literal, *e.g.*, ``[i]``, and we then have to
+    assume that the index can denote any item, see :py:func:`_segments_may_alias`.
+    """
+
+    def __init__(self, literal: Optional[Union[int, str]]) -> None:
+        """Initialize with the given values."""
+        self.literal = literal
+
+
+#: Segment of an access path: a variable (at the start), a member or an index
+_PathSegment = Union[Identifier, _IndexSegment]
+
+
+class _Fact:
+    """
+    Represent what we know about the value of an expression at a point of the code.
+
+    **Why we need the facts.** The meta-model is written in Python, where
+    the narrowing is implicit. The targets are statically typed, and they need to
+    know where a value is non-null, and to which class a value has been narrowed,
+    so that they can de-reference and down-cast it. They read this from
+    :py:attr:`_Inferrer.type_map` and :py:attr:`_Inferrer.downcast_map`.
+    Consider the following verification function in the meta-model:
+
+    .. code-block:: python
+
+        @verification
+        def narrowing_after_early_return(parent: Optional[Parent]) -> bool:
+            # Passes: ``parent is None`` accepts an optional value, and
+            # ``isinstance`` sees ``parent`` as non-null in the remainder of
+            # the disjunction.
+            if parent is None or not isinstance(parent, Child_b):
+                return True
+
+            # Passes: ``parent`` is a non-null ``Child_b`` here, since the only
+            # branch returns. Without the facts, this would fail with
+            # "The member 'b_only' could not be found in the class 'Parent'".
+            return parent.b_only < 50
+
+    For example, we generate the following C++ code, which de-references
+    the ``std::optional`` and down-casts the pointer based on the facts:
+
+    .. code-block:: cpp
+
+        if (
+          (
+            (!(parent.has_value()))
+            || (!types::IsChildB(*(*parent)))
+          )
+        ) {
+          return true;
+        }
+        return (
+          std::dynamic_pointer_cast<types::IChildB>(*parent)->b_only() < 50
+        );
+
+    Analogously, we generate ``((Aas.IChildB)parent).BOnly < 50`` in C#,
+    ``parent.(aastypes.IChildB).BOnly() < 50`` in Go and
+    ``((IChildB) parent.get()).getBOnly() < 50`` in Java.
+
+    **What a fact is.** A fact tells :attr:`what` we know about the value of
+    the expression identified by its canonical representation, :attr:`key`
+    (see :py:class:`_Canonicalizer`). The keys are textual, so that the two
+    occurrences of ``self.parent`` in ``self.parent is not None and
+    self.parent.x > 0`` share the facts. We know three kinds of facts:
+    :py:class:`_NonNull`, :py:class:`_MinLength` and :py:class:`_Narrowing`.
+
+    **Where the facts come from.** The facts come from three sources:
+
+    1. *The guards in the expressions* hold only for the remainder of
+       the expression. For example, ``x`` is non-null in the second value of
+       ``x is not None and len(x) > 0``, and in the second value of
+       ``x is None or len(x) > 0``, but not after the expression.
+       See :py:meth:`_Inferrer.transform_and`, :py:meth:`_Inferrer.transform_or`
+       and :py:meth:`_Inferrer.transform_implication`.
+
+    2. *The conditions of the if-statements* hold in their branches, and their
+       negations hold in the subsequent branches and, possibly, after
+       the if-statement. See :py:meth:`_Inferrer.transform_if`.
+
+    3. *The assignments* tell us about the assigned value. For example,
+       ``text = "default"`` tells us that ``text`` is non-null even though it has
+       been defined as ``Optional[str]``. See
+       :py:meth:`_Inferrer.transform_assignment`.
+
+    **How the facts flow through the statements.** The following annotated example
+    shows all the rules at once:
+
+    .. code-block:: python
+
+        @verification
+        def some_func(
+            x: Optional[Parent], y: Optional[Parent], flag: bool
+        ) -> bool:
+            if x is None:
+                # Fails: x is None here, "Expected an instance type to be
+                # a non-None, ..., but inferred an Optional: Optional[Parent]".
+                return x.optional_text is None
+            elif flag:
+                # Facts: x is non-null, by the negation of ``x is None``.
+                # Passes.
+                return x.optional_text is None
+            else:
+                # Facts: x is non-null, by the negation of ``x is None``;
+                # nothing about ``flag``, as we do not track booleans.
+                x = y
+                # Facts: none, the assignment removed "x is non-null",
+                # and ``y`` is optional.
+
+            # Facts: none. The ``if`` and the ``elif`` return, so they do not
+            # count. The ``else`` ends without ``x`` being non-null.
+            # Fails: x is optional here.
+            return x.optional_text is None
+
+    * A statement sees the facts left by the previous statement of the block.
+    * The branch ``i`` of an if-statement sees the facts before the if-statement,
+      the negations of the conditions ``0, …, i - 1``, and its own condition.
+      The ``else`` sees the negations of all the conditions. A branch never sees
+      the effects of its siblings, since only one branch executes. Hence, we reset
+      the facts at the start of each branch.
+    * After an if-statement or a switch, we keep only the facts which hold at
+      the end of *every* branch which can complete normally. The branches which
+      end in ``return``, ``continue`` or ``break`` never reach the code after
+      the if-statement, so they do not count. An absent ``else`` counts as
+      a branch which completes normally with the negations of all
+      the conditions. This is how we narrow after the early exits:
+
+      .. code-block:: python
+
+          if x is None or not isinstance(x, Child_a):
+              return False
+
+          # The only branch returns, so only the absent ``else`` counts.
+          # Facts: x is non-null and an instance of Child_a,
+          # by De Morgan: not (a or b) == (not a) and (not b).
+          # Passes.
+          return x.a_only > 0
+
+      Analogously, only the ``if`` counts in ``if c: pass else: return False``, so
+      ``c`` holds after the if-statement. See :py:meth:`_Inferrer._join`.
+    * The body of a for-loop can execute zero or more times. Before the body, we
+      remove all the facts which any assignment in the body could invalidate,
+      since the next iteration sees the effects of the previous one. After
+      the loop, we are back to the facts before the body, since the body might
+      not have executed at all. See :py:meth:`_Inferrer.transform_for`.
+    * The facts about the variables of a block are removed when we leave
+      the block, since a sibling block can define a different variable of
+      the same name. See :py:meth:`_Inferrer._transform_in_new_scope`.
+
+    **How the assignments invalidate the facts.** An assignment removes all
+    the facts which it can falsify. To that end, a fact records the :attr:`path`
+    and the :attr:`names` which its value depends on, see :py:func:`_dependencies`
+    and :py:func:`_invalidates`:
+
+    ========================= ====================== ==============================
+    Fact about                Assignment             Result
+    ========================= ====================== ==============================
+    ``self.x``                ``self.y = 5``         kept, a different property
+    ``self.x``                ``self.x = z``         removed, the same path
+    ``self.x.y``              ``self.x = z``         removed, ``self.x`` is a prefix
+    ``items[i]``              ``items[j] = z``       removed, ``i`` might equal ``j``
+    ``items[0]``              ``items[1] = z``       kept, distinct literal indices
+    ``items[i]``              ``i = i + 1``          removed, the index changed
+    ``items[j]``              ``i = i + 1``          kept, ``j`` did not change
+    ``self.items``            ``self.items[0] = z``  kept, the list is the same one
+    ========================= ====================== ==============================
+
+    The assignment then adds the facts about the assigned value, see
+    :py:meth:`_Inferrer.transform_assignment`.
+
+    **What we do not catch.** Similar to mypy, we are lax about the aliasing and
+    the calls. The following code is accepted, though it fails at run-time:
+
+    .. code-block:: python
+
+        if holder.parent is None:
+            return False
+
+        # We do not know that ``alias`` and ``holder`` are the same instance.
+        alias = holder
+        alias.parent = other_optional_parent
+        # A method might also set ``holder.parent`` to ``None`` behind our back.
+        holder.reset()
+
+        # Passes, though ``holder.parent`` might be ``None`` at run-time.
+        return holder.parent.optional_text is None
+    """
+
+    #: Canonical representation of the expression, see :py:class:`_Canonicalizer`
+    key: Final[str]
+
+    #: What we know about the value of the expression
+    what: Final[Union[_NonNull, _MinLength, _Narrowing]]
+
+    #: Access path of the expression, *e.g.*, ``self``, ``items``, ``[]`` and ``x``
+    #: for ``self.items[i].x``, or ``None`` if the expression is not an access path,
+    #: *e.g.*, ``self.f().x``
+    path: Final[Optional[Sequence[_PathSegment]]]
+
+    #: Variables used in the indices of the access path, *e.g.*, ``i`` for
+    #: ``self.items[i].x``, or all the variables of the expression if it is not
+    #: an access path, *e.g.*, ``self`` for ``self.f().x``
+    names: Final[FrozenSet[Identifier]]
+
+    def __init__(
+        self,
+        key: str,
+        what: Union[_NonNull, _MinLength, _Narrowing],
+        path: Optional[Sequence[_PathSegment]],
+        names: FrozenSet[Identifier],
+    ) -> None:
+        """Initialize with the given values."""
+        self.key = key
+        self.what = what
+        self.path = path
+        self.names = names
+
+
+def _names_in(node: parse_tree.Node) -> Set[Identifier]:
+    """
+    Collect the identifiers of all the names in the ``node``.
+
+    For example, we collect ``i`` and ``offset`` from ``i + offset``.
+    """
+    return {
+        some_node.identifier
+        for some_node in parse_tree.over_nodes(node)
+        if isinstance(some_node, parse_tree.Name)
+    }
+
+
+def _index_segment(index: parse_tree.Node) -> _IndexSegment:
+    """
+    Represent the ``index`` as a segment of an access path.
+
+    For example, we represent ``0`` as ``_IndexSegment(literal=0)``, ``"key"`` as
+    ``_IndexSegment(literal="key")``, and ``i`` or ``i + 1`` as
+    ``_IndexSegment(literal=None)``.
+    """
+    if (
+        isinstance(index, parse_tree.Constant)
+        and isinstance(index.value, (int, str))
+        and not isinstance(index.value, bool)
+    ):
+        return _IndexSegment(literal=index.value)
+
+    return _IndexSegment(literal=None)
+
+
+def _dependencies(
+    node: parse_tree.Node,
+) -> Tuple[Optional[List[_PathSegment]], Set[Identifier]]:
+    """
+    Determine the access path of the ``node`` and the variables its value depends on.
+
+    An access path is a chain of members and indices on a variable. If the ``node``
+    is an access path, we return its segments together with the variables used in
+    its indices. For example:
+
+    * ``x`` gives the path ``x`` and no variables,
+    * ``self.items[i].x`` gives the path ``self``, ``items``, ``[i]``, ``x`` and
+      the variable ``i``, and
+    * ``self.items[0]`` gives the path ``self``, ``items``, ``[0]`` and no
+      variables.
+
+    Otherwise, we return ``None`` together with all the variables of the ``node``.
+    For example, ``self.f(i).x`` gives ``None`` and the variables ``self`` and
+    ``i``, see :py:func:`_invalidates` for how we handle such facts.
+    """
+    reversed_path = []  # type: List[_PathSegment]
+    names = set()  # type: Set[Identifier]
+
+    cursor = node
+    while True:
+        if isinstance(cursor, parse_tree.Member):
+            reversed_path.append(cursor.name)
+            cursor = cursor.instance
+
+        elif isinstance(cursor, parse_tree.Index):
+            reversed_path.append(_index_segment(cursor.index))
+            names.update(_names_in(cursor.index))
+            cursor = cursor.collection
+
+        elif isinstance(cursor, parse_tree.Name):
+            reversed_path.append(cursor.identifier)
+            reversed_path.reverse()
+            return reversed_path, names
+
         else:
-            self._counts[key] = count + 1
+            return None, _names_in(node)
 
-    @ensure(lambda self, key, result: not result or self.count(key) > 0)
-    @ensure(lambda self, key, result: result or self.count(key) == 0)
-    def at_least_once(self, key: str) -> bool:
-        """Return ``True`` if the ``key`` is tracked and the count is at least 1."""
-        count = self.count(key)
-        return count >= 1
 
-    @ensure(lambda result: result >= 0)
-    def count(self, key: str) -> int:
-        """Return the number of stacked ``key``'s."""
-        result = self._counts.get(key, None)
-        return 0 if result is None else result
+def _segments_may_alias(that: _PathSegment, other: _PathSegment) -> bool:
+    """
+    Check whether the two segments of access paths may denote the same thing.
 
-    # fmt: off
-    @require(
-        lambda self, key:
-        self.at_least_once(key),
-        "Can not decrement past 1"
-    )
-    # fmt: on
-    def decrement(self, key: str) -> None:
-        """Decrement the counter for the ``key``."""
-        count = self._counts.get(key, None)
+    Two variables or two members alias only if they have the same name.
+    A variable or a member never aliases an index. Two indices alias unless we can
+    tell from their literals that they denote different items:
 
-        if count is None or count == 0:
-            raise AssertionError(f"Unexpected count == 0 for key {key!r}")
-        elif count < 0:
-            raise AssertionError(f"Unexpected count < 0 for key {key!r}")
-        elif count == 1:
-            del self._counts[key]
-        else:
-            self._counts[key] = count - 1
+    * ``[i]`` and ``[0]`` might alias, as ``i`` might be ``0``,
+    * ``[0]`` and ``[1]`` do not alias,
+    * ``[0]`` and ``[-1]`` might alias, as they denote the same item of a list with
+      a single item, and
+    * ``["a"]`` and ``["b"]`` do not alias.
+    """
+    if isinstance(that, _IndexSegment) and isinstance(other, _IndexSegment):
+        if that.literal is None or other.literal is None:
+            return True
+
+        if isinstance(that.literal, int) and isinstance(other.literal, int):
+            return that.literal == other.literal or (
+                (that.literal < 0) != (other.literal < 0)
+            )
+
+        return that.literal == other.literal
+
+    if isinstance(that, _IndexSegment) or isinstance(other, _IndexSegment):
+        return False
+
+    return that == other
+
+
+def _invalidates(target_path: Optional[Sequence[_PathSegment]], fact: _Fact) -> bool:
+    """
+    Check whether an assignment to the ``target_path`` invalidates the ``fact``.
+
+    The ``target_path`` is the access path of the target of the assignment, see
+    :py:func:`_dependencies`, or ``None`` if the target is not an access path, in
+    which case we conservatively invalidate all the facts.
+
+    The assignment invalidates the fact in the following cases:
+
+    * The target is a prefix of the path of the fact, where the indices might
+      alias, see :py:func:`_segments_may_alias`. For example, ``self.x = z``
+      invalidates the facts about ``self.x`` and ``self.x.y``, and
+      ``items[j] = z`` invalidates the facts about ``items[i]`` and
+      ``items[0].x``. However, ``self.y = z`` keeps the facts about ``self.x``,
+      and ``items[0] = z`` keeps the facts about ``items`` itself, such as its
+      length.
+
+    * The target is a variable used in an index of the fact. For example,
+      ``i = i + 1`` invalidates the facts about ``items[i]``, but keeps the facts
+      about ``items[j]``.
+
+    * The fact is not about an access path, and the target modifies one of its
+      variables. For example, both ``self = z`` and ``self.y = z`` invalidate
+      the facts about ``self.f().x``, since we do not know what ``self.f()``
+      depends on.
+
+    We are lax, and ignore the aliasing through other variables and the calls,
+    as documented in :py:class:`_Fact`.
+    """
+    if target_path is None:
+        return True
+
+    if fact.path is not None and len(target_path) <= len(fact.path):
+        if all(
+            _segments_may_alias(that, other)
+            for that, other in zip(target_path, fact.path)
+        ):
+            return True
+
+    root = target_path[0]
+    assert isinstance(root, str)
+
+    return root in fact.names and (len(target_path) == 1 or fact.path is None)
+
+
+def _same_facts(that: _Fact, other: _Fact) -> bool:
+    """
+    Check whether the two facts tell the same about the same expression.
+
+    We compare the facts by value, since the same knowledge can come from
+    different sources in different branches, and we need to recognize it when
+    we join the branches, see :py:meth:`_Inferrer._join`. For example, ``text`` is
+    non-null at the end of both branches below, once by the assignment and once by
+    the negation of the condition:
+
+    .. code-block:: python
+
+        text = parent.optional_text
+        if text is None:
+            text = "default"
+            # Facts: text is non-null, by the assignment.
+
+        # Facts at the end of the absent else: text is non-null, by the negation.
+        # Hence, text is non-null after the if-statement.
+        # Passes.
+        return len(text) < 10
+    """
+    if that.key != other.key:
+        return False
+
+    if isinstance(that.what, _NonNull):
+        return isinstance(other.what, _NonNull)
+
+    if isinstance(that.what, _MinLength):
+        return (
+            isinstance(other.what, _MinLength) and that.what.length == other.what.length
+        )
+
+    if isinstance(that.what, _Narrowing):
+        return (
+            isinstance(other.what, _Narrowing)
+            and that.what.target.our_type is other.what.target.our_type
+        )
+
+    assert_never(that.what)
+
+
+# endregion Facts for the narrowing
 
 
 TypeAnnotationUnion = Union[
@@ -1594,27 +2013,27 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self._read_only_reason_by_name = dict()  # type: MutableMapping[Identifier, str]
 
         # NOTE (mristin):
-        # We need to keep track of the expressions that can be assumed to be non-null.
-        # This member is stateful! It will constantly change, depending on the position
-        # of the iteration through the tree.
+        # We need to keep track of what we know about the values of the expressions
+        # at the current point of the iteration, such as that ``x`` is non-null,
+        # that ``x`` is an instance of a class, or that a JSON-able array has at
+        # least one item. This member is stateful! It will constantly change,
+        # depending on the position of the iteration through the tree. Please see
+        # :py:class:`_Fact` for the whole model and the examples.
         #
-        # We use canonical representation from ``representation_map`` to associate
-        # non-null assumptions with the expressions.
-        self._non_null = _CountingMap()
-
-        # NOTE (mristin):
-        # We analogously keep track of how long the JSON-able arrays are known to be,
-        # as asserted by the guards such as ``len(self.values) > 0``. The lengths are
-        # stacked, so that we can pop them as the iteration leaves the guarded scope.
-        self._min_lengths = dict()  # type: MutableMapping[str, List[int]]
-
-        # NOTE (mristin):
-        # We analogously keep track of the classes to which the values have been
-        # narrowed down by the ``isinstance`` guards. The narrowings are stacked, so
-        # that we can pop them as the iteration leaves the guarded scope. The last
-        # narrowing is always the most specific one, as we allow ``isinstance`` only
-        # on strict descendants of the value's type.
-        self._narrowings = dict()  # type: MutableMapping[str, List[OurTypeAnnotation]]
+        # The facts about the same expression are ordered such that the last
+        # narrowing is the most specific one.
+        #
+        # Mind how we change the list, as some code keeps references to it:
+        #
+        # * The expressions, such as ``x is not None and ...``, append the facts
+        #   in place, and remove exactly these facts again as their exit stack
+        #   unwinds, see :py:meth:`_assume`. Once an expression has been
+        #   transformed, the list is as it was before.
+        # * The statements never change the list in place, but always assign
+        #   a new list. Hence, :py:meth:`transform_if` and the other statements can
+        #   keep the list before a branch, or at the end of a branch, as a snapshot
+        #   without copying it.
+        self._facts = []  # type: List[_Fact]
 
         # NOTE (mristin):
         # We keep track of the variables defined in the nested scopes, *i.e.*,
@@ -1775,7 +2194,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         The ``type_annotation`` refers to the type inferred for the ``node``.
 
-        We keep track of the non-nullness over the iteration in :attr:`._non_null`.
+        We keep track of the non-nullness over the iteration in :attr:`._facts`.
         Using the canonical representation of the ``node``, we can check whether
         the type of the ``node`` is non-null.
         """
@@ -1783,7 +2202,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             return type_annotation
 
         canonical_repr = self._representation_map[node]
-        if self._non_null.at_least_once(canonical_repr):
+        if any(
+            fact.key == canonical_repr and isinstance(fact.what, _NonNull)
+            for fact in self._facts
+        ):
             return type_annotation.value
 
         return type_annotation
@@ -1793,7 +2215,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         Check whether a guard asserted the position of the ``node`` to be there.
 
         We keep track of the asserted lengths over the iteration
-        in :attr:`._min_lengths`, see :py:meth:`._assume_guard`.
+        in :attr:`._facts`, see :py:meth:`._implied_facts`.
         """
         if not _is_int_literal(node.index):
             return False
@@ -1801,11 +2223,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         assert isinstance(node.index, parse_tree.Constant)
         assert isinstance(node.index.value, int)
 
-        lengths = self._min_lengths.get(self._representation_map[node.collection], None)
-        if lengths is None or len(lengths) == 0:
-            return False
-
-        min_length = max(lengths)
+        collection_repr = self._representation_map[node.collection]
+        min_length = max(
+            (
+                fact.what.length
+                for fact in self._facts
+                if fact.key == collection_repr and isinstance(fact.what, _MinLength)
+            ),
+            default=0,
+        )
 
         # NOTE (mristin):
         # A negative index is resolved from the back of the array, so both ends
@@ -1824,13 +2250,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             and func_type.func.name == "len"
         )
 
-    def _asserted_min_length(self, node: parse_tree.Node) -> Optional[Tuple[str, int]]:
+    def _asserted_min_length(
+        self, node: parse_tree.Node
+    ) -> Optional[Tuple[parse_tree.Expression, int]]:
         """
         Determine which JSON-able array the ``node`` asserts to be how long.
 
         We understand the length checks such as ``len(self.values) > 0`` and
-        ``1 <= len(self.values)``, and return the canonical representation of
-        the array together with the asserted length.
+        ``1 <= len(self.values)``, and return the array together with the asserted
+        length.
         """
         if not isinstance(node, parse_tree.Comparison):
             return None
@@ -1877,62 +2305,62 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         ):
             return None
 
-        return self._representation_map[collection], min_length
+        return collection, min_length
 
-    def _assume_narrowing(
-        self, node: parse_tree.IsInstance, exit_stack: contextlib.ExitStack
-    ) -> None:
+    def _fact_about(
+        self,
+        node: parse_tree.Expression,
+        what: Union[_NonNull, _MinLength, _Narrowing],
+    ) -> _Fact:
         """
-        Assume that the value of the ``node`` is an instance of its class.
+        Create the fact that tells ``what`` about the value of the ``node``.
 
-        The assumption is undone as the ``exit_stack`` unwinds.
-
-        Mind that the ``node`` must have been already transformed and its types
-        successfully inferred, as we need to resolve the class.
+        For example, ``_fact_about(<self.items[i]>, _NonNull())`` gives the fact with
+        the key ``self.items[i]``, the path ``self``, ``items``, ``[]``, and
+        the names ``i``.
         """
-        if len(node.classes) != 1:
-            return
+        path, names = _dependencies(node)
 
-        cls = self._environment.find_our_type(node.classes[0].identifier)
-        assert isinstance(cls, _types.ClassUnionAsTuple), (
-            f"Expected the class of a successfully inferred isinstance "
-            f"to be resolved, but got: {cls}"
+        return _Fact(
+            key=self._representation_map[node],
+            what=what,
+            path=path,
+            names=frozenset(names),
         )
 
-        canonical_repr = self._representation_map[node.value]
-
-        narrowings = self._narrowings.setdefault(canonical_repr, [])
-        narrowings.append(OurTypeAnnotation(our_type=cls))
-
-        # fmt: off
-        exit_stack.callback(
-            lambda a_narrowings=narrowings: a_narrowings.pop()  # type: ignore
-        )
-        # fmt: on
-
-    def _assume_guard(
-        self, node: parse_tree.Node, exit_stack: contextlib.ExitStack
-    ) -> None:
+    def _implied_facts(self, node: parse_tree.Node) -> List[_Fact]:
         """
-        Assume that the ``node`` holds, and note down what it tells us about the rest.
+        Determine what the ``node`` tells us about the values if it holds.
 
-        The assumption is undone as the ``exit_stack`` unwinds, so that it holds only
-        for the expressions which the guard actually guards.
+        For example:
+
+        ==================================== =====================================
+        ``node``                             Implied facts
+        ==================================== =====================================
+        ``x is not None``                    ``x`` is non-null
+        ``isinstance(x, C)``                 ``x`` is an instance of ``C``
+        ``isinstance(x, (A, B))``            none, ``x`` is either ``A`` or ``B``
+        ``len(self.values) > 1``             ``self.values`` has at least 2 items
+        ``"key" in self.mapping``            ``self.mapping["key"]`` is non-null
+        ``x is not None and isinstance(x, C)`` both of the above about ``x``
+        ``not (x is None)``                  ``x`` is non-null, see
+                                             :py:meth:`_implied_facts_of_negation`
+        ``x is not None or y is not None``   none, we do not know which one holds
+        ==================================== =====================================
 
         Mind that the ``node`` must have been already transformed, as we need its type
         and its canonical representation.
         """
-        if isinstance(node, parse_tree.IsNotNone):
-            canonical_repr = self._representation_map[node.value]
-            self._non_null.increment(canonical_repr)
+        if isinstance(node, parse_tree.And):
+            return [
+                fact for value in node.values for fact in self._implied_facts(value)
+            ]
 
-            # fmt: off
-            exit_stack.callback(
-                lambda a_canonical_repr=canonical_repr:  # type: ignore
-                self._non_null.decrement(a_canonical_repr)
-            )
-            # fmt: on
-            return
+        if isinstance(node, parse_tree.Not):
+            return self._implied_facts_of_negation(node.operand)
+
+        if isinstance(node, parse_tree.IsNotNone):
+            return [self._fact_about(node.value, _NonNull())]
 
         # NOTE (mristin):
         # ``key in obj`` tells us that ``obj[key]`` is there. A JSON-able object is
@@ -1940,44 +2368,172 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if isinstance(node, parse_tree.IsIn) and isinstance(
             beneath_optional(self.type_map[node.container]), JsonObjectTypeAnnotation
         ):
-            canonical_repr = _Canonicalizer.index_representation(
-                collection=node.container,
-                collection_repr=self._representation_map[node.container],
-                index_repr=self._representation_map[node.member],
-            )
-            self._non_null.increment(canonical_repr)
+            path, names = _dependencies(node.container)
+            if path is not None:
+                path.append(_index_segment(node.member))
+                names.update(_names_in(node.member))
+            else:
+                names.update(_names_in(node.member))
 
-            # fmt: off
-            exit_stack.callback(
-                lambda a_canonical_repr=canonical_repr:  # type: ignore
-                self._non_null.decrement(a_canonical_repr)
-            )
-            # fmt: on
-            return
+            return [
+                _Fact(
+                    key=_Canonicalizer.index_representation(
+                        collection=node.container,
+                        collection_repr=self._representation_map[node.container],
+                        index_repr=self._representation_map[node.member],
+                    ),
+                    what=_NonNull(),
+                    path=path,
+                    names=frozenset(names),
+                )
+            ]
 
         # NOTE (mristin):
         # ``isinstance(x, C)`` tells us that ``x`` is an instance of ``C``. We can not
         # narrow on multiple classes, ``isinstance(x, (A, B))``, as the value could be
         # an instance of either of them.
         if isinstance(node, parse_tree.IsInstance):
-            self._assume_narrowing(node, exit_stack)
-            return
+            if len(node.classes) != 1:
+                return []
+
+            cls = self._environment.find_our_type(node.classes[0].identifier)
+            assert isinstance(cls, _types.ClassUnionAsTuple), (
+                f"Expected the class of a successfully inferred isinstance "
+                f"to be resolved, but got: {cls}"
+            )
+
+            return [
+                self._fact_about(
+                    node.value, _Narrowing(target=OurTypeAnnotation(our_type=cls))
+                )
+            ]
 
         # NOTE (mristin):
         # ``len(arr) > 0`` tells us that ``arr[0]`` and ``arr[-1]`` are there, and
         # so on for the longer arrays.
         asserted = self._asserted_min_length(node)
         if asserted is not None:
-            collection_repr, min_length = asserted
+            collection, min_length = asserted
+            return [self._fact_about(collection, _MinLength(length=min_length))]
 
-            lengths = self._min_lengths.setdefault(collection_repr, [])
-            lengths.append(min_length)
+        return []
 
-            # fmt: off
-            exit_stack.callback(
-                lambda a_lengths=lengths: a_lengths.pop()  # type: ignore
+    def _implied_facts_of_negation(self, node: parse_tree.Node) -> List[_Fact]:
+        """
+        Determine what the ``node`` tells us about the values if it does *not* hold.
+
+        We need the negations for the ``elif`` and ``else`` branches, which execute
+        only if the previous conditions do not hold, and for the code after
+        an if-statement whose branches exit early. For example:
+
+        ======================================= ==================================
+        ``node`` which does not hold            Implied facts
+        ======================================= ==================================
+        ``x is None``                           ``x`` is non-null
+        ``not isinstance(x, C)``                ``x`` is an instance of ``C``
+        ``x is None or not isinstance(x, C)``   both of the above about ``x``,
+                                                by De Morgan
+        ``isinstance(x, C) => x.y is not None`` ``x`` is an instance of ``C``;
+                                                nothing about ``x.y``
+        ``x is not None and isinstance(x, C)``  none, see below
+        ``isinstance(x, C)``                    none, see below
+        ``x is not None``                       none, see below
+        ======================================= ==================================
+
+        We can not tell anything from the negation of a conjunction, as we do not
+        know which of its values does not hold. Analogously, the negation of
+        ``isinstance(x, C)`` does not tell us to which class ``x`` belongs, and
+        the negation of ``x is not None`` tells us only that ``x`` is ``None``, which
+        we do not track.
+
+        Mind that the ``node`` must have been already transformed, as we need its type
+        and its canonical representation.
+        """
+        if isinstance(node, parse_tree.IsNone):
+            return [self._fact_about(node.value, _NonNull())]
+
+        if isinstance(node, parse_tree.Not):
+            return self._implied_facts(node.operand)
+
+        # NOTE (mristin):
+        # The implication ``a => b`` is ``not a or b``, so its negation is
+        # ``a and not b``.
+        if isinstance(node, parse_tree.Implication):
+            return self._implied_facts(
+                node.antecedent
+            ) + self._implied_facts_of_negation(node.consequent)
+
+        # NOTE (mristin):
+        # By De Morgan, ``not (a or b)`` is ``not a and not b``.
+        if isinstance(node, parse_tree.Or):
+            return [
+                fact
+                for value in node.values
+                for fact in self._implied_facts_of_negation(value)
+            ]
+
+        return []
+
+    def _assume(self, facts: List[_Fact], exit_stack: contextlib.ExitStack) -> None:
+        """
+        Assume the ``facts`` until the ``exit_stack`` unwinds.
+
+        We use this only in the expressions, where the facts hold for the remainder
+        of the expression. For example, while we transform ``len(x) > 0`` in
+        ``x is not None and len(x) > 0``, ``x`` is non-null.
+        """
+        self._facts.extend(facts)
+
+        for fact in facts:
+            exit_stack.callback(self._facts.remove, fact)
+
+    def _join(
+        self,
+        facts_before: List[_Fact],
+        facts_at_ends: Sequence[List[_Fact]],
+    ) -> None:
+        """
+        Set the facts after the branches of an if-statement or of a switch.
+
+        The ``facts_before`` hold before the branching, while the ``facts_at_ends``
+        hold at the ends of the branches which can complete normally.
+
+        We keep only the facts which hold at the end of every such branch. If no branch
+        can complete normally, the code after the branching is unreachable, and we
+        simply keep the ``facts_before``.
+
+        For example:
+
+        .. code-block:: python
+
+            if x is not None:
+                pass
+                # Facts at the end: x is non-null.
+            elif flag:
+                return False
+                # Can not complete normally, does not count.
+            else:
+                pass
+                # Facts at the end: none.
+
+            # Facts: none, since the else-branch knows nothing about ``x``.
+            # Fails: x is optional here.
+            return x.optional_text is None
+
+        We compare the facts by value, see :py:func:`_same_facts`.
+        """
+        if len(facts_at_ends) == 0:
+            self._facts = facts_before
+            return
+
+        self._facts = [
+            fact
+            for fact in facts_at_ends[0]
+            if all(
+                any(_same_facts(fact, other) for other in facts)
+                for facts in facts_at_ends[1:]
             )
-            # fmt: on
+        ]
 
     @ensure(lambda self, result: not (result is None) or len(self.errors) > 0)
     def transform(self, node: parse_tree.Node) -> Optional["TypeAnnotationUnion"]:
@@ -1995,15 +2551,26 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         result = super().transform(node)
 
         # NOTE (mristin):
-        # We narrow the type of the value if an ``isinstance`` guard applies to it.
-        # Analogous to non-nullness, we are lax here, and ignore the fact that
-        # calls to methods and functions can alter the value in-between.
+        # We narrow the type of the value if we know it to be an instance of
+        # a more specific class, *e.g.*, after ``isinstance(x, C)`` or after
+        # ``x = c`` where ``c`` is a ``C``, see :py:class:`_Fact`. The transpilers
+        # down-cast the value based on :py:attr:`downcast_map`.
         if isinstance(result, OurTypeAnnotation):
-            narrowings = self._narrowings.get(self._representation_map[node], None)
-            if narrowings is not None and len(narrowings) > 0:
-                self.downcast_map[node] = Downcast(source=result, target=narrowings[-1])
+            canonical_repr = self._representation_map[node]
+            narrowing = next(
+                (
+                    fact.what
+                    for fact in reversed(self._facts)
+                    if fact.key == canonical_repr and isinstance(fact.what, _Narrowing)
+                ),
+                None,
+            )
+            if narrowing is not None:
+                self.downcast_map[node] = Downcast(
+                    source=result, target=narrowing.target
+                )
 
-                result = narrowings[-1]
+                result = narrowing.target
                 self.type_map[node] = result
 
         return result
@@ -2685,11 +3252,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # start to surface, we should re-think our approach here.
 
         with contextlib.ExitStack() as exit_stack:
-            if isinstance(node.antecedent, parse_tree.And):
-                for value in node.antecedent.values:
-                    self._assume_guard(value, exit_stack)
-            else:
-                self._assume_guard(node.antecedent, exit_stack)
+            self._assume(self._implied_facts(node.antecedent), exit_stack)
 
             success = (self.transform(node.consequent) is not None) and success
 
@@ -3337,7 +3900,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                     success = False
 
-                self._assume_guard(value_node, exit_stack)
+                self._assume(self._implied_facts(value_node), exit_stack)
 
         if not success:
             return None
@@ -3368,29 +3931,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                     success = False
 
-                if isinstance(value_node, parse_tree.IsNone):
-                    canonical_repr = self._representation_map[value_node.value]
-                    self._non_null.increment(canonical_repr)
-
-                    # fmt: off
-                    exit_stack.callback(
-                        lambda a_canonical_repr=canonical_repr:  # type: ignore
-                            self._non_null.decrement(
-                            a_canonical_repr
-                        )
-                    )
-                    # fmt: on
-
                 # NOTE (mristin):
-                # Analogous to ``x is None or ...``, the remainder of
-                # the disjunction in ``not isinstance(x, C) or ...`` is evaluated only
-                # if ``x`` is an instance of ``C``.
-                if (
-                    success
-                    and isinstance(value_node, parse_tree.Not)
-                    and isinstance(value_node.operand, parse_tree.IsInstance)
-                ):
-                    self._assume_narrowing(value_node.operand, exit_stack)
+                # The remainder of the disjunction is evaluated only if the value
+                # does not hold. For example, ``x`` is non-null in the remainder of
+                # ``x is None or ...``, and an instance of ``C`` in the remainder of
+                # ``not isinstance(x, C) or ...``.
+                if success:
+                    self._assume(
+                        self._implied_facts_of_negation(value_node), exit_stack
+                    )
 
         if not success:
             return None
@@ -3862,6 +4411,45 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         return True
 
+    def _transform_as_target(
+        self, node: Union[parse_tree.Member, parse_tree.Index]
+    ) -> Optional["TypeAnnotationUnion"]:
+        """
+        Transform the ``node`` as the target of an assignment.
+
+        We infer the declared type of the target instead of its narrowed type, since
+        the assignment can set any value of the declared type. For example,
+        the following assignment is valid, though ``self.x`` is known to be
+        non-null before it:
+
+        .. code-block:: python
+
+            if self.x is None:
+                return
+
+            # Passes: the target ``self.x`` is ``Optional[str]``, not ``str``,
+            # so that we can assign the optional ``y``.
+            self.x = y
+
+            # Fails: the assignment removed "self.x is non-null".
+            return len(self.x)
+
+        The transpilers rely on the declared type of the target as well, *e.g.*, to
+        decide whether to de-reference it.
+
+        We only ignore the facts about the target itself. The facts about its
+        parts still apply, *e.g.*, ``self.parent`` is still narrowed in
+        ``self.parent.x = y`` after ``isinstance(self.parent, Child_a)``.
+        """
+        facts = self._facts
+        canonical_repr = self._representation_map[node]
+
+        self._facts = [fact for fact in facts if fact.key != canonical_repr]
+        try:
+            return self.transform(node)
+        finally:
+            self._facts = facts
+
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Optional["TypeAnnotationUnion"]:
@@ -3889,7 +4477,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             if target_type is None:
                 is_new_variable = True
         elif isinstance(node.target, parse_tree.Member):
-            target_type = self.transform(node.target)
+            target_type = self._transform_as_target(node.target)
             if target_type is None:
                 return None
 
@@ -3928,7 +4516,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
         elif isinstance(node.target, parse_tree.Index):
-            target_type = self.transform(node.target)
+            target_type = self._transform_as_target(node.target)
             if target_type is None:
                 return None
 
@@ -4113,6 +4701,79 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 else:
                     self._read_only_reason_by_name[node.target.identifier] = reason
 
+        # region Update the facts
+
+        # NOTE (mristin):
+        # An assignment falsifies the facts about the target and about everything
+        # which depends on it, and tells us new facts about the target. Please see
+        # :py:class:`_Fact` for the whole model. For example:
+        #
+        # .. code-block:: python
+        #
+        #     if x is None or not isinstance(x, Child_a):
+        #         return False
+        #     # Facts: x is non-null, x is an instance of Child_a.
+        #     # Passes.
+        #     result = x.a_only > 0
+        #
+        #     x = parent
+        #     # Facts: x is non-null, since ``parent`` is a non-optional ``Parent``;
+        #     # but x is not an instance of Child_a anymore.
+        #     # Passes.
+        #     result = x.optional_text is None
+        #     # Fails: "The member 'a_only' could not be found in the class
+        #     # 'Parent'".
+        #     result = x.a_only > 0
+        #
+        #     x = child_b
+        #     # Facts: x is non-null, x is an instance of Child_b.
+        #     # Passes.
+        #     result = x.b_only > 0
+        #
+        # For the variable ``x`` of the declared type ``Optional[Parent]``, we
+        # generate, *e.g.*, ``((Aas.IChildB)x).BOnly`` in C# on ``x.b_only`` after
+        # the last assignment.
+        #
+        # A new variable has no facts yet, and its type is already the type of
+        # the assigned value, so there is nothing to invalidate nor to narrow.
+        # For example, ``y = child_b`` defines ``y`` as ``Child_b``, not as
+        # ``Parent``.
+        if not is_new_variable:
+            assert target_type is not None
+
+            # NOTE (mristin):
+            # We derive the new facts from the type of the value, which is itself
+            # narrowed by the facts before the assignment. Therefore, we do not need
+            # to keep any of the old facts about the target: if an old fact still
+            # holds for the new value, the type of the value tells it as well. For
+            # example, ``x = y`` keeps ``x`` non-null only if ``y`` is known to be
+            # non-null.
+            facts_about_value = []  # type: List[_Fact]
+
+            if isinstance(target_type, OptionalTypeAnnotation) and not isinstance(
+                value_type, OptionalTypeAnnotation
+            ):
+                facts_about_value.append(self._fact_about(node.target, _NonNull()))
+
+            target_type_beneath = beneath_optional(target_type)
+            if (
+                isinstance(target_type_beneath, OurTypeAnnotation)
+                and isinstance(value_type, OurTypeAnnotation)
+                and isinstance(value_type.our_type, _types.ClassUnionAsTuple)
+                and value_type.our_type is not target_type_beneath.our_type
+            ):
+                facts_about_value.append(
+                    self._fact_about(node.target, _Narrowing(target=value_type))
+                )
+
+            target_path, _ = _dependencies(node.target)
+
+            self._facts = [
+                fact for fact in self._facts if not _invalidates(target_path, fact)
+            ] + facts_about_value
+
+        # endregion Update the facts
+
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
         return result
@@ -4224,6 +4885,43 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             for identifier in scope_environment.mapping:
                 self._read_only_reason_by_name.pop(identifier, None)
 
+            # NOTE (mristin):
+            # The facts about the variables of the scope must not outlive them, as
+            # a sibling scope can define a different variable with the same name.
+            # For example, the first ``x`` below is a ``Child_a``, but the second
+            # one is merely a ``Parent``, and ``x.a_only`` must be refused:
+            #
+            # .. code-block:: python
+            #
+            #     if flag:
+            #         x = parent
+            #         x = child_a
+            #     else:
+            #         return False
+            #
+            #     # Without the removal, the fact "x is an instance of Child_a"
+            #     # would survive here, as the if-branch is the only one to complete.
+            #
+            #     if not flag:
+            #         x = parent
+            #         # Fails: "The member 'a_only' could not be found in the class
+            #         # 'Parent'".
+            #         return x.a_only > 0
+            #
+            # We also remove the facts which use the variables of the scope in
+            # an index, *e.g.*, ``items[i]`` for the loop variable ``i``.
+            self._facts = [
+                fact
+                for fact in self._facts
+                if not (
+                    (
+                        fact.path is not None
+                        and fact.path[0] in scope_environment.mapping
+                    )
+                    or any(name in scope_environment.mapping for name in fact.names)
+                )
+            ]
+
             self._environment = parent_environment
 
         return success
@@ -4265,6 +4963,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
         success = True
+
+        # NOTE (mristin):
+        # The cases compare the subject against the constants, which tells us
+        # nothing we track. However, the assignments in the cases invalidate
+        # the facts, so we join the ends of the cases, analogous to
+        # :py:meth:`transform_if`. Each case starts from the facts before
+        # the switch, since only one case executes.
+        facts_before = self._facts
+        facts_at_ends = []  # type: List[List[_Fact]]
 
         for case in node.cases:
             for label in case.labels:
@@ -4310,12 +5017,24 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         )
                         success = False
 
+            self._facts = facts_before
             if not self._transform_in_new_scope(case.body):
                 success = False
 
+            if parse_tree.can_complete_normally(case.body):
+                facts_at_ends.append(self._facts)
+
+        self._facts = facts_before
         if node.default is not None:
             if not self._transform_in_new_scope(node.default):
                 success = False
+
+            if parse_tree.can_complete_normally(node.default):
+                facts_at_ends.append(self._facts)
+        else:
+            facts_at_ends.append(facts_before)
+
+        self._join(facts_before, facts_at_ends)
 
         if not success:
             return None
@@ -4354,6 +5073,41 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         ):
             self._mutable_name_set.add(loop_variable)
 
+        # NOTE (mristin):
+        # The body of the loop can be executed many times, so the assignments in
+        # the body invalidate the facts already at the start of the body. We do not
+        # know the types of the assigned values yet, so we can not narrow by them.
+        # For example, ``x.optional_text`` must be refused below, since the second
+        # iteration sees ``x = y`` of the first one:
+        #
+        # .. code-block:: python
+        #
+        #     if x is None:
+        #         return False
+        #
+        #     for number in numbers:
+        #         # Fails: x is optional, as the previous iteration might have
+        #         # executed ``x = y``.
+        #         if x.optional_text is None:
+        #             return False
+        #
+        #         x = y
+        #
+        # Mypy analyzes the body repeatedly until the types stabilize. Since
+        # the assignments only ever remove the facts here, a single pass over
+        # the assignments gives the same result.
+        for stmt in node.body:
+            for some_node in parse_tree.over_nodes(stmt):
+                if isinstance(some_node, parse_tree.Assignment):
+                    target_path, _ = _dependencies(some_node.target)
+                    self._facts = [
+                        fact
+                        for fact in self._facts
+                        if not _invalidates(target_path, fact)
+                    ]
+
+        facts_before = self._facts
+
         self._loop_variable_set.add(loop_variable)
         try:
             success = self._transform_in_new_scope(
@@ -4362,6 +5116,25 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
         finally:
             self._loop_variable_set.remove(loop_variable)
+
+            # NOTE (mristin):
+            # The body might not be executed at all, and we already removed all
+            # the facts which the body could invalidate. Hence, the facts before
+            # the body are exactly the facts after the loop. We discard the facts
+            # gained in the body, since they do not hold if the body has not been
+            # executed, or if we exited it early. For example, ``x`` is non-null at
+            # the end of the body below, but not after the loop:
+            #
+            # .. code-block:: python
+            #
+            #     for number in numbers:
+            #         if x is None:
+            #             break
+            #
+            #     # Fails: x is optional, as the loop might not have executed or
+            #     # might have been exited by the ``break``.
+            #     return x.optional_text is None
+            self._facts = facts_before
 
         if not success:
             return None
@@ -4404,17 +5177,73 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
     def transform_if(self, node: parse_tree.If) -> Optional["TypeAnnotationUnion"]:
         # NOTE (mristin):
-        # We do not narrow the types in the branches by their conditions for now.
-        # For example, ``x`` stays optional in the body of ``if x is not None:``.
+        # We narrow the types in the branches by their conditions, and by
+        # the negations of the previous conditions. After the if-statement, we keep
+        # only the facts common to the ends of the branches which can complete
+        # normally. Please see :py:class:`_Fact` for the whole model. For example:
+        #
+        # .. code-block:: python
+        #
+        #     if parent is None:
+        #         # Facts: none; we do not track that ``parent`` is ``None``.
+        #         return True
+        #     elif not isinstance(parent, Child_b):
+        #         # Facts: parent is non-null, by the negation of the first
+        #         # condition. Passes.
+        #         return parent.optional_text is None
+        #     else:
+        #         # Facts: parent is non-null, and an instance of Child_b, by
+        #         # the negations of both conditions. Passes.
+        #         return parent.b_only > 0
+        #
+        # We generate, *e.g.*, the following Go code, where the transpiler
+        # down-casts ``parent`` in the ``else`` based on the facts:
+        #
+        # .. code-block:: go
+        #
+        #     if parent == nil {
+        #         return true
+        #     } else if !aastypes.IsChildB(parent) {
+        #         return parent.OptionalText() == nil
+        #     } else {
+        #         return parent.(aastypes.IChildB).BOnly() > 0
+        #     }
+        #
+        # In contrast, the narrowing does not leak out of a branch:
+        #
+        # .. code-block:: python
+        #
+        #     if flag:
+        #         if parent is None:
+        #             return False
+        #
+        #         # Passes: the inner if-statement narrows the rest of the branch.
+        #         result = parent.optional_text is None
+        #
+        #     # Fails: the absent else knows nothing about ``parent``.
+        #     return parent.optional_text is None
 
         success = True
 
+        facts_before = self._facts
+        facts_of_negations = []  # type: List[_Fact]
+        facts_at_ends = []  # type: List[List[_Fact]]
+
         for branch in node.branches:
+            # NOTE (mristin):
+            # The branch is reached only if none of the previous conditions holds.
+            self._facts = facts_before + facts_of_negations
+
+            # NOTE (mristin):
+            # We stop at the first condition which we could not infer. We could not
+            # tell its facts, so checking the subsequent branches would only report
+            # spurious errors about the optional values.
             condition_type = self.transform(branch.condition)
             if condition_type is None:
-                success = False
+                self._facts = facts_before
+                return None
 
-            elif try_primitive_type(condition_type) is not PrimitiveType.BOOL:
+            if try_primitive_type(condition_type) is not PrimitiveType.BOOL:
                 # NOTE (mristin):
                 # We refuse the conditions which rely on Python's truthiness, such
                 # as ``if some_list:``, since the targets do not share it.
@@ -4425,14 +5254,39 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         f"a boolean, but got: {condition_type}",
                     )
                 )
-                success = False
+                self._facts = facts_before
+                return None
+
+            self._facts = self._facts + self._implied_facts(branch.condition)
 
             if not self._transform_in_new_scope(branch.body):
                 success = False
 
+            # NOTE (mristin):
+            # A branch which ends in ``return``, ``continue`` or ``break`` never
+            # reaches the code after the if-statement, so its facts do not matter
+            # there. This is what narrows ``x`` after
+            # ``if x is None: return False``.
+            if parse_tree.can_complete_normally(branch.body):
+                facts_at_ends.append(self._facts)
+
+            facts_of_negations.extend(self._implied_facts_of_negation(branch.condition))
+
+        self._facts = facts_before + facts_of_negations
+
         if node.default is not None:
             if not self._transform_in_new_scope(node.default):
                 success = False
+
+            if parse_tree.can_complete_normally(node.default):
+                facts_at_ends.append(self._facts)
+        else:
+            # NOTE (mristin):
+            # An absent ``else`` is an empty branch, which always completes
+            # normally with the negations of all the conditions.
+            facts_at_ends.append(self._facts)
+
+        self._join(facts_before, facts_at_ends)
 
         if not success:
             return None

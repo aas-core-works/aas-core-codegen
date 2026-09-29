@@ -33,6 +33,78 @@ func TestDescendOnceOnAnInstanceOfItem(
 	}
 }
 
+func TestDescendOnceOnAnInstanceOfChildA(
+	t *testing.T,
+) {
+	instance := aastesting.MustLoadMaximalChildA()
+
+	expectedPth := filepath.Join(
+		aastesting.TestDataDir,
+		"DescendOnce",
+		"ChildA",
+		"maximal.json.trace",
+	)
+
+	onlyOnce := true
+
+	message := compareOrRerecordTrace(
+		instance,
+		expectedPth,
+		onlyOnce,
+	)
+	if message != nil {
+		t.Fatal(*message)
+	}
+}
+
+func TestDescendOnceOnAnInstanceOfChildB(
+	t *testing.T,
+) {
+	instance := aastesting.MustLoadMaximalChildB()
+
+	expectedPth := filepath.Join(
+		aastesting.TestDataDir,
+		"DescendOnce",
+		"ChildB",
+		"maximal.json.trace",
+	)
+
+	onlyOnce := true
+
+	message := compareOrRerecordTrace(
+		instance,
+		expectedPth,
+		onlyOnce,
+	)
+	if message != nil {
+		t.Fatal(*message)
+	}
+}
+
+func TestDescendOnceOnAnInstanceOfContainer(
+	t *testing.T,
+) {
+	instance := aastesting.MustLoadMaximalContainer()
+
+	expectedPth := filepath.Join(
+		aastesting.TestDataDir,
+		"DescendOnce",
+		"Container",
+		"maximal.json.trace",
+	)
+
+	onlyOnce := true
+
+	message := compareOrRerecordTrace(
+		instance,
+		expectedPth,
+		onlyOnce,
+	)
+	if message != nil {
+		t.Fatal(*message)
+	}
+}
+
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {

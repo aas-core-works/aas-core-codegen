@@ -25,6 +25,18 @@ public abstract class AbstractTransformer<T> implements ITransformer<T>
     IItem that
   );
 
+  public abstract T transformChildA(
+    IChildA that
+  );
+
+  public abstract T transformChildB(
+    IChildB that
+  );
+
+  public abstract T transformContainer(
+    IContainer that
+  );
+
   public abstract T transformSomething(
     ISomething that
   );

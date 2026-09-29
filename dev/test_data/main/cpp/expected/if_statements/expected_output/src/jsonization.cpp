@@ -566,6 +566,148 @@ std::pair<
 }
 
 /**
+ * Map JSON \c modelType strings to model types.
+ */
+const std::unordered_map<
+  std::string,
+  types::ModelType
+> kModelTypeStringToModelType = {
+  {
+    "Item",
+    types::ModelType::kItem
+  },
+  {
+    "ChildA",
+    types::ModelType::kChildA
+  },
+  {
+    "ChildB",
+    types::ModelType::kChildB
+  },
+  {
+    "Container",
+    types::ModelType::kContainer
+  },
+  {
+    "Something",
+    types::ModelType::kSomething
+  }
+};
+
+common::optional<types::ModelType> ModelTypeFromModelTypeString(
+  const std::string& model_type_str
+) {
+  auto it = kModelTypeStringToModelType.find(model_type_str);
+  if (it == kModelTypeStringToModelType.end()) {
+    return common::nullopt;
+  }
+
+  return it->second;
+}
+
+/**
+ * \brief De-serialize a list of items from \p json.
+ *
+ * \param json value expected to be an array
+ * \param deserialize_item de-serializes an item
+ * \return the list, or an error, if any
+ */
+template <typename T, typename DeserializeItemT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  const nlohmann::json& json,
+  DeserializeItemT&& deserialize_item
+) {
+  if (!json.is_array()) {
+    std::wstring message = common::Concat(
+      L"Expected an array, but got: ",
+      common::Utf8ToWstring(
+        json.type_name()
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::vector<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  common::optional<std::vector<T> > list(
+    common::make_optional<std::vector<T> >()
+  );
+
+  list->reserve(json.size());
+
+  size_t index = 0;
+
+  for(const nlohmann::json& item : json) {
+    common::optional<T> deserialized;
+    common::optional<DeserializationError> error;
+
+    std::tie(deserialized, error) = deserialize_item(item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<std::vector<T> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    list->emplace_back(std::move(*deserialized));
+
+    ++index;
+  }
+
+  return std::make_pair(
+    list,
+    common::nullopt
+  );
+}
+
+/**
+ * \brief De-serialize a list of instances from \p json.
+ *
+ * \param json value expected to be an array
+ * \param additional_properties handed over to \p deserialize_item
+ * \param deserialize_item de-serializes an item
+ * \return the list, or an error, if any
+ */
+template <typename T, typename DeserializeItemT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  const nlohmann::json& json,
+  bool additional_properties,
+  DeserializeItemT&& deserialize_item
+) {
+  return DeserializeList<T>(
+    json,
+    [&additional_properties, &deserialize_item](
+      const nlohmann::json& item
+    ) {
+      return deserialize_item(item, additional_properties);
+    }
+  );
+}
+
+/**
  * \brief De-serialize a literal of an enumeration from \p json.
  *
  * \p from_wstring is a template argument taken by reference, so the call is
@@ -641,12 +783,32 @@ enum class OfItem : std::uint32_t {
   kOptionalText
 };  // enum class OfItem
 
+enum class OfChildA : std::uint32_t {
+  kOptionalText,
+  kAOnly,
+  kModelType
+};  // enum class OfChildA
+
+enum class OfChildB : std::uint32_t {
+  kOptionalText,
+  kBOnly,
+  kModelType
+};  // enum class OfChildB
+
+enum class OfContainer : std::uint32_t {
+  kOptionalText,
+  kChildren,
+  kModelType
+};  // enum class OfContainer
+
 enum class OfSomething : std::uint32_t {
   kKind,
   kText,
   kNumber,
   kFlag,
-  kItem
+  kItem,
+  kOptionalParent,
+  kParents
 };  // enum class OfSomething
 
 const std::unordered_map<
@@ -660,6 +822,60 @@ const std::unordered_map<
   {
     "optionalText",
     OfItem::kOptionalText
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfChildA
+> kMapOfChildA = {
+  {
+    "optionalText",
+    OfChildA::kOptionalText
+  },
+  {
+    "aOnly",
+    OfChildA::kAOnly
+  },
+  {
+    "modelType",
+    OfChildA::kModelType
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfChildB
+> kMapOfChildB = {
+  {
+    "optionalText",
+    OfChildB::kOptionalText
+  },
+  {
+    "bOnly",
+    OfChildB::kBOnly
+  },
+  {
+    "modelType",
+    OfChildB::kModelType
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfContainer
+> kMapOfContainer = {
+  {
+    "optionalText",
+    OfContainer::kOptionalText
+  },
+  {
+    "children",
+    OfContainer::kChildren
+  },
+  {
+    "modelType",
+    OfContainer::kModelType
   }
 };
 
@@ -686,6 +902,14 @@ const std::unordered_map<
   {
     "item",
     OfSomething::kItem
+  },
+  {
+    "optionalParent",
+    OfSomething::kOptionalParent
+  },
+  {
+    "parents",
+    OfSomething::kParents
   }
 };
 
@@ -831,6 +1055,47 @@ common::optional<DeserializationError> CheckJsonObject(
 }
 
 /**
+ * \brief Check that \p json is an object whose model type is \p expected.
+ *
+ * The model type is compared as the string which came on the wire. That refuses
+ * a value of the wrong type just as well as parsing it would, and costs neither
+ * a conversion to a wide string nor the allocation which goes with it.
+ *
+ * \param json value expected to be an object carrying a model type
+ * \param expected model type of the class
+ * \return the error, if \p json does not bear \p expected
+ */
+common::optional<DeserializationError> CheckModelType(
+  const nlohmann::json& json,
+  const char* expected
+) {
+  const std::string* model_type;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    model_type,
+    error
+  ) = GetModelTypeFrom(json);
+
+  if (error.has_value()) {
+    return error;
+  }
+
+  if (*model_type != expected) {
+    return DeserializationError(
+      common::Concat(
+        L"Expected model type '",
+        common::Utf8ToWstring(expected),
+        L"', but got: ",
+        common::Utf8ToWstring(*model_type)
+      )
+    );
+  }
+
+  return common::nullopt;
+}
+
+/**
  * \brief Assign the value parsed to \p target, or give out the error of the parse.
  *
  * We deliberately take the *result* of a parse instead of the JSON value and
@@ -897,6 +1162,175 @@ std::pair<
   >,
   common::optional<DeserializationError>
 > DeserializeItem(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Dispatch the deserialization for an instance
+ * of types::IParent.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the deserialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IParent>
+  >,
+  common::optional<DeserializationError>
+> DeserializeParent(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Parse the properties of an instance of types::IChildA.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfChildA(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::IChildA.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeChildA(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Parse the properties of an instance of types::IChildB.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfChildB(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::IChildB.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeChildB(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Parse the properties of an instance of types::IContainer.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfContainer(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::IContainer.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeContainer(
   const nlohmann::json& json,
   bool additional_properties
 );
@@ -1044,6 +1478,429 @@ std::pair<
 
 std::pair<
   common::optional<
+    std::shared_ptr<types::IParent>
+  >,
+  common::optional<DeserializationError>
+> DeserializeParent(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  const std::string* model_type_str;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    model_type_str,
+    error
+  ) = GetModelTypeFrom(json);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::IParent>
+    >(
+      std::move(*error)
+    );
+  }
+
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IParent>
+    >(
+      common::Concat(
+        L"The model type does not correspond to any known class: ",
+        common::Utf8ToWstring(*model_type_str)
+      )
+    );
+  }
+
+  switch (*model_type) {
+    case types::ModelType::kChildA:
+      return ParsePropertiesOfChildA<
+        types::IParent
+      >(json, additional_properties);
+    case types::ModelType::kChildB:
+      return ParsePropertiesOfChildB<
+        types::IParent
+      >(json, additional_properties);
+    case types::ModelType::kContainer:
+      return ParsePropertiesOfContainer<
+        types::IParent
+      >(json, additional_properties);
+    default:
+      return NoInstanceAndDeserializationErrorWithCause<
+        std::shared_ptr<types::IParent>
+      >(
+        common::Concat(
+          L"The dispatch to the JSON de-serialization of "
+          L"types::IParent "
+          L"is not defined for model type: ",
+          common::Utf8ToWstring(*model_type_str)
+        )
+      );
+  }
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfChildA(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<int64_t> the_a_only;
+
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfChildA,
+      additional_properties,
+      [&](
+        properties::OfChildA property,
+        const nlohmann::json& value
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfChildA::kOptionalText:
+            return ParseInto(
+              the_optional_text,
+              DeserializeWstring(value)
+            );
+          case properties::OfChildA::kAOnly:
+            return ParseInto(
+              the_a_only,
+              DeserializeInt64(value)
+            );
+          case properties::OfChildA::kModelType:
+            // NOTE (mristin):
+            // The model type has been verified before the loop, so there is nothing
+            // left to do with it here.
+            return common::nullopt;
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfChildA",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  if (!the_a_only.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property aOnly is missing"
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::ChildA(
+        std::move(*the_a_only),
+        std::move(the_optional_text)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildA>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeChildA(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckModelType(
+      json,
+      "ChildA"
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfChildA<T>(
+    json,
+    additional_properties
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfChildB(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<int64_t> the_b_only;
+
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfChildB,
+      additional_properties,
+      [&](
+        properties::OfChildB property,
+        const nlohmann::json& value
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfChildB::kOptionalText:
+            return ParseInto(
+              the_optional_text,
+              DeserializeWstring(value)
+            );
+          case properties::OfChildB::kBOnly:
+            return ParseInto(
+              the_b_only,
+              DeserializeInt64(value)
+            );
+          case properties::OfChildB::kModelType:
+            // NOTE (mristin):
+            // The model type has been verified before the loop, so there is nothing
+            // left to do with it here.
+            return common::nullopt;
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfChildB",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  if (!the_b_only.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property bOnly is missing"
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::ChildB(
+        std::move(*the_b_only),
+        std::move(the_optional_text)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IChildB>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeChildB(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckModelType(
+      json,
+      "ChildB"
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfChildB<T>(
+    json,
+    additional_properties
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfContainer(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<std::wstring> the_optional_text;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  > the_children;
+
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfContainer,
+      additional_properties,
+      [&](
+        properties::OfContainer property,
+        const nlohmann::json& value
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfContainer::kOptionalText:
+            return ParseInto(
+              the_optional_text,
+              DeserializeWstring(value)
+            );
+          case properties::OfContainer::kChildren:
+            return ParseInto(
+              the_children,
+              DeserializeList<
+                std::shared_ptr<types::IParent>
+              >(
+                value,
+                additional_properties,
+                DeserializeParent
+              )
+            );
+          case properties::OfContainer::kModelType:
+            // NOTE (mristin):
+            // The model type has been verified before the loop, so there is nothing
+            // left to do with it here.
+            return common::nullopt;
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfContainer",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::Container(
+        std::move(the_optional_text),
+        std::move(the_children)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IContainer>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializeContainer(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckModelType(
+      json,
+      "Container"
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfContainer<T>(
+    json,
+    additional_properties
+  );
+}
+
+std::pair<
+  common::optional<
     std::shared_ptr<types::ISomething>
   >,
   common::optional<DeserializationError>
@@ -1060,6 +1917,16 @@ std::pair<
   common::optional<bool> the_flag;
 
   common::optional<std::shared_ptr<types::IItem> > the_item;
+
+  common::optional<
+    std::shared_ptr<types::IParent>
+  > the_optional_parent;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  > the_parents;
 
   common::optional<DeserializationError> error(
     ParseProperties(
@@ -1097,6 +1964,25 @@ std::pair<
               DeserializeItem(
                 value,
                 additional_properties
+              )
+            );
+          case properties::OfSomething::kOptionalParent:
+            return ParseInto(
+              the_optional_parent,
+              DeserializeParent(
+                value,
+                additional_properties
+              )
+            );
+          case properties::OfSomething::kParents:
+            return ParseInto(
+              the_parents,
+              DeserializeList<
+                std::shared_ptr<types::IParent>
+              >(
+                value,
+                additional_properties,
+                DeserializeParent
               )
             );
           default:
@@ -1169,7 +2055,9 @@ std::pair<
         std::move(*the_text),
         std::move(*the_number),
         std::move(*the_flag),
-        std::move(*the_item)
+        std::move(*the_item),
+        std::move(the_optional_parent),
+        std::move(the_parents)
       )
     ),
     common::nullopt
@@ -1254,6 +2142,76 @@ common::expected<
     json,
     additional_properties,
     DeserializeItem
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IParent>,
+  DeserializationError
+> ParentFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IParent>
+  >(
+    json,
+    additional_properties,
+    DeserializeParent
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IChildA>,
+  DeserializationError
+> ChildAFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IChildA>
+  >(
+    json,
+    additional_properties,
+    DeserializeChildA<
+      types::IChildA
+    >
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IChildB>,
+  DeserializationError
+> ChildBFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IChildB>
+  >(
+    json,
+    additional_properties,
+    DeserializeChildB<
+      types::IChildB
+    >
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IContainer>,
+  DeserializationError
+> ContainerFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IContainer>
+  >(
+    json,
+    additional_properties,
+    DeserializeContainer<
+      types::IContainer
+    >
   );
 }
 
@@ -1534,6 +2492,92 @@ nlohmann::json SerializeListWithInfallible(
 }
 
 /**
+ * Serialize the given list of instances to a JSON array where item
+ * serialization might fail.
+ *
+ * The items are pointers, which we dereference for the item serializer.
+ */
+template<typename T, typename FallibleSerializeItemT>
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeListOfInstancesWithFallible(
+  const std::vector<std::shared_ptr<T> >& list,
+  FallibleSerializeItemT&& fallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  size_t index = 0;
+
+  for (const std::shared_ptr<T>& item : list) {
+    common::optional<nlohmann::json> json_item;
+    common::optional<SerializationError> error;
+
+    std::tie(
+      json_item,
+      error
+    ) = fallible_serialize_item(*item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    serialized.emplace_back(
+      std::move(*json_item)
+    );
+
+    ++index;
+  }
+
+  return std::make_pair(
+    std::move(serialized),
+    common::nullopt
+  );
+}
+
+/**
+ * Serialize the given list of instances to a JSON array where item
+ * serialization can not fail.
+ *
+ * The items are pointers, which we dereference for the item serializer.
+ */
+template<typename T, typename InfallibleSerializeItemT>
+nlohmann::json SerializeListOfInstancesWithInfallible(
+  const std::vector<std::shared_ptr<T> >& list,
+  InfallibleSerializeItemT&& infallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  for (const std::shared_ptr<T>& item : list) {
+    serialized.emplace_back(
+      infallible_serialize_item(*item)
+    );
+  }
+
+  return serialized;
+}
+
+/**
  * \brief Give out a failed serialization with \p cause as its message.
  *
  * \param cause human-readable description of the failure
@@ -1691,6 +2735,45 @@ nlohmann::json SerializeItem(
 );
 
 /**
+ * \brief Serialize \p that instance of types::IChildA to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeChildA(
+  const types::IChildA& that
+);
+
+/**
+ * \brief Serialize \p that instance of types::IChildB to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeChildB(
+  const types::IChildB& that
+);
+
+/**
+ * \brief Serialize \p that instance of types::IContainer to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeContainer(
+  const types::IContainer& that
+);
+
+/**
  * \brief Serialize \p that instance of types::ISomething to a JSON value.
  *
  * \param that instance to be serialized
@@ -1701,6 +2784,20 @@ std::pair<
   common::optional<SerializationError>
 > SerializeSomething(
   const types::ISomething& that
+);
+
+/**
+ * \brief Serialize \p that instance of types::IParent to a JSON value,
+ * dispatching on its model type.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeParent(
+  const types::IParent& that
 );
 
 nlohmann::json SerializeItem(
@@ -1722,6 +2819,148 @@ nlohmann::json SerializeItem(
   }
 
   return result;
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeChildA(
+  const types::IChildA& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  common::optional<SerializationError> error;
+
+  const common::optional<std::wstring>& maybe_optional_text(
+    that.optional_text()
+  );
+  if (maybe_optional_text.has_value()) {
+    result["optionalText"] = SerializeWstring(
+      *maybe_optional_text
+    );
+  }
+
+  error = SerializeInto(
+    result,
+    "aOnly",
+    iteration::Property::kAOnly,
+    SerializeInt64(
+      that.a_only()
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  result["modelType"] = "ChildA";
+
+  return std::make_pair<
+    common::optional<nlohmann::json>,
+    common::optional<SerializationError>
+  >(
+    common::make_optional<nlohmann::json>(std::move(result)),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeChildB(
+  const types::IChildB& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  common::optional<SerializationError> error;
+
+  const common::optional<std::wstring>& maybe_optional_text(
+    that.optional_text()
+  );
+  if (maybe_optional_text.has_value()) {
+    result["optionalText"] = SerializeWstring(
+      *maybe_optional_text
+    );
+  }
+
+  error = SerializeInto(
+    result,
+    "bOnly",
+    iteration::Property::kBOnly,
+    SerializeInt64(
+      that.b_only()
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  result["modelType"] = "ChildB";
+
+  return std::make_pair<
+    common::optional<nlohmann::json>,
+    common::optional<SerializationError>
+  >(
+    common::make_optional<nlohmann::json>(std::move(result)),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeContainer(
+  const types::IContainer& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  common::optional<SerializationError> error;
+
+  const common::optional<std::wstring>& maybe_optional_text(
+    that.optional_text()
+  );
+  if (maybe_optional_text.has_value()) {
+    result["optionalText"] = SerializeWstring(
+      *maybe_optional_text
+    );
+  }
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& maybe_children(
+    that.children()
+  );
+  if (maybe_children.has_value()) {
+    error = SerializeInto(
+      result,
+      "children",
+      iteration::Property::kChildren,
+      SerializeListOfInstancesWithFallible(
+        *maybe_children,
+        SerializeParent
+      )
+    );
+    if (error.has_value()) {
+      return NoJsonAndSerializationError(
+        std::move(*error)
+      );
+    }
+  }
+
+  result["modelType"] = "Container";
+
+  return std::make_pair<
+    common::optional<nlohmann::json>,
+    common::optional<SerializationError>
+  >(
+    common::make_optional<nlohmann::json>(std::move(result)),
+    common::nullopt
+  );
 }
 
 std::pair<
@@ -1764,6 +3003,51 @@ std::pair<
     *(that.item())
   );
 
+  const common::optional<
+    std::shared_ptr<types::IParent>
+  >& maybe_optional_parent(
+    that.optional_parent()
+  );
+  if (maybe_optional_parent.has_value()) {
+    error = SerializeInto(
+      result,
+      "optionalParent",
+      iteration::Property::kOptionalParent,
+      SerializeParent(
+        *(*maybe_optional_parent)
+      )
+    );
+    if (error.has_value()) {
+      return NoJsonAndSerializationError(
+        std::move(*error)
+      );
+    }
+  }
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IParent>
+    >
+  >& maybe_parents(
+    that.parents()
+  );
+  if (maybe_parents.has_value()) {
+    error = SerializeInto(
+      result,
+      "parents",
+      iteration::Property::kParents,
+      SerializeListOfInstancesWithFallible(
+        *maybe_parents,
+        SerializeParent
+      )
+    );
+    if (error.has_value()) {
+      return NoJsonAndSerializationError(
+        std::move(*error)
+      );
+    }
+  }
+
   return std::make_pair<
     common::optional<nlohmann::json>,
     common::optional<SerializationError>
@@ -1771,6 +3055,44 @@ std::pair<
     common::make_optional<nlohmann::json>(std::move(result)),
     common::nullopt
   );
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeParent(
+  const types::IParent& that
+) {
+  // NOTE (mristin):
+  // The dynamic casts are necessary due to virtual inheritance. Otherwise,
+  // we would have used static casts.
+
+  switch (that.model_type()) {
+    case types::ModelType::kChildA:
+      return SerializeChildA(
+        dynamic_cast<const types::IChildA&>(that)
+      );
+    case types::ModelType::kChildB:
+      return SerializeChildB(
+        dynamic_cast<const types::IChildB&>(that)
+      );
+    case types::ModelType::kContainer:
+      return SerializeContainer(
+        dynamic_cast<const types::IContainer&>(that)
+      );
+    default: {
+      std::string message = common::Concat(
+        "Unexpected model type: ",
+        std::to_string(
+          static_cast<std::uint32_t>(
+            that.model_type()
+          )
+        )
+      );
+
+      throw std::invalid_argument(message);
+    }
+  };
 }
 
 std::pair<
@@ -1785,6 +3107,18 @@ std::pair<
         SerializeItem(
           dynamic_cast<const types::IItem&>(that)
         )
+      );
+    case types::ModelType::kChildA:
+      return SerializeChildA(
+        dynamic_cast<const types::IChildA&>(that)
+      );
+    case types::ModelType::kChildB:
+      return SerializeChildB(
+        dynamic_cast<const types::IChildB&>(that)
+      );
+    case types::ModelType::kContainer:
+      return SerializeContainer(
+        dynamic_cast<const types::IContainer&>(that)
       );
     case types::ModelType::kSomething:
       return SerializeSomething(

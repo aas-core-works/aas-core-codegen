@@ -10,6 +10,12 @@ import * as TestCommonJsonization from "./commonJsonization";
 
 const THE_ITEM = TestCommonJsonization.loadMinimalItem();
 
+const THE_CHILD_A = TestCommonJsonization.loadMinimalChildA();
+
+const THE_CHILD_B = TestCommonJsonization.loadMinimalChildB();
+
+const THE_CONTAINER = TestCommonJsonization.loadMinimalContainer();
+
 const THE_SOMETHING = TestCommonJsonization.loadMinimalSomething();
 
 test("type matches for Item", () => {
@@ -23,6 +29,138 @@ test("type matches for Item", () => {
   expect(
     AasTypes.typesMatch(
       THE_ITEM,
+      THE_CHILD_A
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_ITEM,
+      THE_CHILD_B
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_ITEM,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_ITEM,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for ChildA", () => {
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_A,
+      THE_ITEM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_A,
+      THE_CHILD_A
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_A,
+      THE_CHILD_B
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_A,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_A,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for ChildB", () => {
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_B,
+      THE_ITEM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_B,
+      THE_CHILD_A
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_B,
+      THE_CHILD_B
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_B,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CHILD_B,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for Container", () => {
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
+      THE_ITEM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
+      THE_CHILD_A
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
+      THE_CHILD_B
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
       THE_SOMETHING
     )
   ).toStrictEqual(false);
@@ -33,6 +171,27 @@ test("type matches for Something", () => {
     AasTypes.typesMatch(
       THE_SOMETHING,
       THE_ITEM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_CHILD_A
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_CHILD_B
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_CONTAINER
     )
   ).toStrictEqual(false);
 

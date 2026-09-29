@@ -254,6 +254,486 @@ namespace dummy.Tests
         }  // public void Test_Item_verification_fail
 
         [Test]
+        public void Test_ChildA_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Json",
+                    "Expected",
+                    "ChildA"
+                ),
+                "*.json",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                var instance = Aas.Jsonization.Deserialize.ChildAFrom(
+                    node);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    node, instance, path);
+            }
+        }  // public void Test_ChildA_ok
+
+        [Test]
+        public void Test_ChildA_deserialization_from_non_object_fail()
+        {
+            var node = Nodes.JsonValue.Create("INVALID")
+                ?? throw new System.InvalidOperationException(
+                    "Unexpected failure of the node creation");
+
+            Aas.Jsonization.Exception? exception = null;
+            try
+            {
+                var _ = Aas.Jsonization.Deserialize.ChildAFrom(
+                    node);
+            }
+            catch (Aas.Jsonization.Exception observedException)
+            {
+                exception = observedException;
+            }
+
+            if (exception == null)
+            {
+                throw new AssertionException("Expected an exception, but got none");
+            }
+
+            if (
+                !exception.Message.StartsWith(
+                    "Expected a JsonObject representing ChildA, but got "))
+            {
+                throw new AssertionException(
+                    $"Unexpected exception message: {exception.Message}");
+            }
+        }  // public void Test_ChildA_deserialization_from_non_object_fail
+
+        [Test]
+        public void Test_ChildA_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "ChildA"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildA for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    Aas.Jsonization.Exception? exception = null;
+                    try
+                    {
+                        var _ = Aas.Jsonization.Deserialize.ChildAFrom(
+                            node);
+                    }
+                    catch (Aas.Jsonization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_ChildA_deserialization_fail
+
+        [Test]
+        public void Test_ChildA_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "ChildA"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildA for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    var instance = Aas.Jsonization.Deserialize.ChildAFrom(
+                        node);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_ChildA_verification_fail
+
+        [Test]
+        public void Test_ChildB_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Json",
+                    "Expected",
+                    "ChildB"
+                ),
+                "*.json",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                var instance = Aas.Jsonization.Deserialize.ChildBFrom(
+                    node);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    node, instance, path);
+            }
+        }  // public void Test_ChildB_ok
+
+        [Test]
+        public void Test_ChildB_deserialization_from_non_object_fail()
+        {
+            var node = Nodes.JsonValue.Create("INVALID")
+                ?? throw new System.InvalidOperationException(
+                    "Unexpected failure of the node creation");
+
+            Aas.Jsonization.Exception? exception = null;
+            try
+            {
+                var _ = Aas.Jsonization.Deserialize.ChildBFrom(
+                    node);
+            }
+            catch (Aas.Jsonization.Exception observedException)
+            {
+                exception = observedException;
+            }
+
+            if (exception == null)
+            {
+                throw new AssertionException("Expected an exception, but got none");
+            }
+
+            if (
+                !exception.Message.StartsWith(
+                    "Expected a JsonObject representing ChildB, but got "))
+            {
+                throw new AssertionException(
+                    $"Unexpected exception message: {exception.Message}");
+            }
+        }  // public void Test_ChildB_deserialization_from_non_object_fail
+
+        [Test]
+        public void Test_ChildB_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "ChildB"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildB for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    Aas.Jsonization.Exception? exception = null;
+                    try
+                    {
+                        var _ = Aas.Jsonization.Deserialize.ChildBFrom(
+                            node);
+                    }
+                    catch (Aas.Jsonization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_ChildB_deserialization_fail
+
+        [Test]
+        public void Test_ChildB_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "ChildB"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of ChildB for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    var instance = Aas.Jsonization.Deserialize.ChildBFrom(
+                        node);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_ChildB_verification_fail
+
+        [Test]
+        public void Test_Container_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Json",
+                    "Expected",
+                    "Container"
+                ),
+                "*.json",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                var instance = Aas.Jsonization.Deserialize.ContainerFrom(
+                    node);
+
+                var errors = Aas.Verification.Verify(instance).ToList();
+                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    node, instance, path);
+            }
+        }  // public void Test_Container_ok
+
+        [Test]
+        public void Test_Container_deserialization_from_non_object_fail()
+        {
+            var node = Nodes.JsonValue.Create("INVALID")
+                ?? throw new System.InvalidOperationException(
+                    "Unexpected failure of the node creation");
+
+            Aas.Jsonization.Exception? exception = null;
+            try
+            {
+                var _ = Aas.Jsonization.Deserialize.ContainerFrom(
+                    node);
+            }
+            catch (Aas.Jsonization.Exception observedException)
+            {
+                exception = observedException;
+            }
+
+            if (exception == null)
+            {
+                throw new AssertionException("Expected an exception, but got none");
+            }
+
+            if (
+                !exception.Message.StartsWith(
+                    "Expected a JsonObject representing Container, but got "))
+            {
+                throw new AssertionException(
+                    $"Unexpected exception message: {exception.Message}");
+            }
+        }  // public void Test_Container_deserialization_from_non_object_fail
+
+        [Test]
+        public void Test_Container_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "Container"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Container for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    Aas.Jsonization.Exception? exception = null;
+                    try
+                    {
+                        var _ = Aas.Jsonization.Deserialize.ContainerFrom(
+                            node);
+                    }
+                    catch (Aas.Jsonization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_Container_deserialization_fail
+
+        [Test]
+        public void Test_Container_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Aas.Tests.Common.TestDataDir,
+                        "Json",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "Container"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of Container for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.json",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+
+                    var instance = Aas.Jsonization.Deserialize.ContainerFrom(
+                        node);
+
+                    var errors = Aas.Verification.Verify(instance).ToList();
+                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_Container_verification_fail
+
+        [Test]
         public void Test_Something_ok()
         {
             var paths = Directory.GetFiles(
@@ -434,6 +914,76 @@ namespace dummy.Tests
 
             return Aas.Tests.CommonJson.ReadFromFile(paths[0]);
         }
+
+        [Test]
+        public void TestChildAAOnlySerializationOutOfRange()
+        {
+            foreach (var value in new long[] { 9007199254740992L, -9007199254740992L })
+            {
+                var node = LoadTheFirstExpected(
+                    "ChildA");
+
+                var instance = Aas.Jsonization.Deserialize.ChildAFrom(
+                    node);
+
+                instance.AOnly = value;
+
+                Aas.Jsonization.SerializationException? exception = null;
+                try
+                {
+                    var _ = Aas.Jsonization.Serialize.ToJsonObject(instance);
+                }
+                catch (Aas.Jsonization.SerializationException observedException)
+                {
+                    exception = observedException;
+                }
+
+                Assert.IsNotNull(
+                    exception,
+                    "Expected the serialization to fail at " +
+                        "AOnly" +
+                        ", but it succeeded");
+
+                Assert.AreEqual(
+                    "AOnly",
+                    exception!.Path);
+            }
+        }  // public void TestChildAAOnlySerializationOutOfRange
+
+        [Test]
+        public void TestChildBBOnlySerializationOutOfRange()
+        {
+            foreach (var value in new long[] { 9007199254740992L, -9007199254740992L })
+            {
+                var node = LoadTheFirstExpected(
+                    "ChildB");
+
+                var instance = Aas.Jsonization.Deserialize.ChildBFrom(
+                    node);
+
+                instance.BOnly = value;
+
+                Aas.Jsonization.SerializationException? exception = null;
+                try
+                {
+                    var _ = Aas.Jsonization.Serialize.ToJsonObject(instance);
+                }
+                catch (Aas.Jsonization.SerializationException observedException)
+                {
+                    exception = observedException;
+                }
+
+                Assert.IsNotNull(
+                    exception,
+                    "Expected the serialization to fail at " +
+                        "BOnly" +
+                        ", but it succeeded");
+
+                Assert.AreEqual(
+                    "BOnly",
+                    exception!.Path);
+            }
+        }  // public void TestChildBBOnlySerializationOutOfRange
 
         [Test]
         public void TestSomethingNumberSerializationOutOfRange()

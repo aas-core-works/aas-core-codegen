@@ -44,6 +44,56 @@ namespace dummy.Tests
                     && that.OptionalText == casted.OptionalText);
             }
 
+            public override bool TransformChildA(
+                Aas.IChildA that,
+                Aas.IClass other)
+            {
+                if (!(other is Aas.ChildA casted))
+                {
+                    return false;
+                }
+
+                return (
+                    that.OptionalText == casted.OptionalText
+                    && that.AOnly == casted.AOnly);
+            }
+
+            public override bool TransformChildB(
+                Aas.IChildB that,
+                Aas.IClass other)
+            {
+                if (!(other is Aas.ChildB casted))
+                {
+                    return false;
+                }
+
+                return (
+                    that.OptionalText == casted.OptionalText
+                    && that.BOnly == casted.BOnly);
+            }
+
+            public override bool TransformContainer(
+                Aas.IContainer that,
+                Aas.IClass other)
+            {
+                if (!(other is Aas.Container casted))
+                {
+                    return false;
+                }
+
+                return (
+                    that.OptionalText == casted.OptionalText
+                    && ((that.Children != null && casted.Children != null)
+                        ? that.Children.Count == casted.Children.Count
+                            && (
+                                that.Children
+                                    .Zip(
+                                        casted.Children,
+                                        Transform)
+                                    .All(item => item))
+                        : that.Children == null && casted.Children == null));
+            }
+
             public override bool TransformSomething(
                 Aas.ISomething that,
                 Aas.IClass other)
@@ -60,7 +110,21 @@ namespace dummy.Tests
                     && that.Flag == casted.Flag
                     && Transform(
                         that.Item,
-                        casted.Item));
+                        casted.Item)
+                    && ((that.OptionalParent != null && casted.OptionalParent != null)
+                        ? Transform(
+                                that.OptionalParent,
+                                casted.OptionalParent)
+                        : that.OptionalParent == null && casted.OptionalParent == null)
+                    && ((that.Parents != null && casted.Parents != null)
+                        ? that.Parents.Count == casted.Parents.Count
+                            && (
+                                that.Parents
+                                    .Zip(
+                                        casted.Parents,
+                                        Transform)
+                                    .All(item => item))
+                        : that.Parents == null && casted.Parents == null));
             }
         }  // internal class DeepEqualiser
 
@@ -73,6 +137,29 @@ namespace dummy.Tests
             return that.Name == other.Name && that.OptionalText == other.OptionalText;
         }
 
+        private static bool ChildAShallowEquals(
+            Aas.ChildA that,
+            Aas.ChildA other)
+        {
+            return that.OptionalText == other.OptionalText && that.AOnly == other.AOnly;
+        }
+
+        private static bool ChildBShallowEquals(
+            Aas.ChildB that,
+            Aas.ChildB other)
+        {
+            return that.OptionalText == other.OptionalText && that.BOnly == other.BOnly;
+        }
+
+        private static bool ContainerShallowEquals(
+            Aas.Container that,
+            Aas.Container other)
+        {
+            return (
+                that.OptionalText == other.OptionalText
+                && that.Children == other.Children);
+        }
+
         private static bool SomethingShallowEquals(
             Aas.Something that,
             Aas.Something other)
@@ -82,12 +169,35 @@ namespace dummy.Tests
                 && that.Text == other.Text
                 && that.Number == other.Number
                 && that.Flag == other.Flag
-                && that.Item == other.Item);
+                && that.Item == other.Item
+                && that.OptionalParent == other.OptionalParent
+                && that.Parents == other.Parents);
         }
 
         private static bool ItemDeepEquals(
             Aas.Item that,
             Aas.Item other)
+        {
+            return DeepEqualiserInstance.Transform(that, other);
+        }
+
+        private static bool ChildADeepEquals(
+            Aas.ChildA that,
+            Aas.ChildA other)
+        {
+            return DeepEqualiserInstance.Transform(that, other);
+        }
+
+        private static bool ChildBDeepEquals(
+            Aas.ChildB that,
+            Aas.ChildB other)
+        {
+            return DeepEqualiserInstance.Transform(that, other);
+        }
+
+        private static bool ContainerDeepEquals(
+            Aas.Container that,
+            Aas.Container other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -126,6 +236,90 @@ namespace dummy.Tests
                     instance, instanceCopy),
                 "Item");
         }  // public void Test_Item_deep_copy
+
+        [Test]
+        public void Test_ChildA_shallow_copy()
+        {
+            Aas.ChildA instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA());
+
+            var instanceCopy = Aas.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                ChildAShallowEquals(
+                    instance, instanceCopy),
+                "ChildA");
+        }  // public void Test_ChildA_shallow_copy
+
+        [Test]
+        public void Test_ChildA_deep_copy()
+        {
+            Aas.ChildA instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA());
+
+            var instanceCopy = Aas.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                ChildADeepEquals(
+                    instance, instanceCopy),
+                "ChildA");
+        }  // public void Test_ChildA_deep_copy
+
+        [Test]
+        public void Test_ChildB_shallow_copy()
+        {
+            Aas.ChildB instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB());
+
+            var instanceCopy = Aas.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                ChildBShallowEquals(
+                    instance, instanceCopy),
+                "ChildB");
+        }  // public void Test_ChildB_shallow_copy
+
+        [Test]
+        public void Test_ChildB_deep_copy()
+        {
+            Aas.ChildB instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB());
+
+            var instanceCopy = Aas.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                ChildBDeepEquals(
+                    instance, instanceCopy),
+                "ChildB");
+        }  // public void Test_ChildB_deep_copy
+
+        [Test]
+        public void Test_Container_shallow_copy()
+        {
+            Aas.Container instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+
+            var instanceCopy = Aas.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                ContainerShallowEquals(
+                    instance, instanceCopy),
+                "Container");
+        }  // public void Test_Container_shallow_copy
+
+        [Test]
+        public void Test_Container_deep_copy()
+        {
+            Aas.Container instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+
+            var instanceCopy = Aas.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                ContainerDeepEquals(
+                    instance, instanceCopy),
+                "Container");
+        }  // public void Test_Container_deep_copy
 
         [Test]
         public void Test_Something_shallow_copy()

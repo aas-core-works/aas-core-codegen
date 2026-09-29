@@ -119,6 +119,81 @@ namespace dummy.Tests
         }  // public void Test_Descend_against_VisitorThrough_for_Item
 
         [Test]
+        public void Test_Descend_of_ChildA()
+        {
+            Aas.ChildA instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Descend",
+                    "ChildA",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_ChildA
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_ChildA()
+        {
+            Aas.ChildA instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildA());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_ChildA
+
+        [Test]
+        public void Test_Descend_of_ChildB()
+        {
+            Aas.ChildB instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Descend",
+                    "ChildB",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_ChildB
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_ChildB()
+        {
+            Aas.ChildB instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalChildB());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_ChildB
+
+        [Test]
+        public void Test_Descend_of_Container()
+        {
+            Aas.Container instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Aas.Tests.Common.TestDataDir,
+                    "Descend",
+                    "Container",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_Container
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_Container()
+        {
+            Aas.Container instance = (
+                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_Container
+
+        [Test]
         public void Test_Descend_of_Something()
         {
             Aas.Something instance = (

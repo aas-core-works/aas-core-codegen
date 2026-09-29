@@ -31,7 +31,10 @@ namespace types {
  */
 enum class ModelType : std::uint32_t {
   kItem = 0,
-  kSomething = 1
+  kChildA = 1,
+  kChildB = 2,
+  kContainer = 3,
+  kSomething = 4
 };
 
 enum class Kind : std::uint32_t {
@@ -47,6 +50,14 @@ enum class Kind : std::uint32_t {
 // endregion Forward declaration of interfaces
 
 class IItem;
+
+class IParent;
+
+class IChildA;
+
+class IChildB;
+
+class IContainer;
 
 class ISomething;
 
@@ -84,6 +95,74 @@ class IItem
   ) = 0;
 
   virtual ~IItem() = default;
+};
+
+class IParent
+    : virtual public IClass {
+ public:
+  virtual const common::optional<std::wstring>& optional_text() const = 0;
+
+  virtual common::optional<std::wstring>& mutable_optional_text() = 0;
+
+  virtual void set_optional_text(
+    common::optional<std::wstring> value
+  ) = 0;
+
+  virtual ~IParent() = default;
+};
+
+class IChildA
+    : virtual public IParent {
+ public:
+  virtual int64_t a_only() const = 0;
+
+  virtual int64_t& mutable_a_only() = 0;
+
+  virtual void set_a_only(
+    int64_t value
+  ) = 0;
+
+  virtual ~IChildA() = default;
+};
+
+class IChildB
+    : virtual public IParent {
+ public:
+  virtual int64_t b_only() const = 0;
+
+  virtual int64_t& mutable_b_only() = 0;
+
+  virtual void set_b_only(
+    int64_t value
+  ) = 0;
+
+  virtual ~IChildB() = default;
+};
+
+class IContainer
+    : virtual public IParent {
+ public:
+  virtual const common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& children() const = 0;
+
+  virtual common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& mutable_children() = 0;
+
+  virtual void set_children(
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > value
+  ) = 0;
+
+  virtual ~IContainer() = default;
 };
 
 class ISomething
@@ -127,6 +206,40 @@ class ISomething
 
   virtual void set_item(
     std::shared_ptr<IItem> value
+  ) = 0;
+
+  virtual const common::optional<
+    std::shared_ptr<IParent>
+  >& optional_parent() const = 0;
+
+  virtual common::optional<
+    std::shared_ptr<IParent>
+  >& mutable_optional_parent() = 0;
+
+  virtual void set_optional_parent(
+    common::optional<
+      std::shared_ptr<IParent>
+    > value
+  ) = 0;
+
+  virtual const common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& parents() const = 0;
+
+  virtual common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& mutable_parents() = 0;
+
+  virtual void set_parents(
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > value
   ) = 0;
 
   virtual ~ISomething() = default;
@@ -178,6 +291,152 @@ class Item
   common::optional<std::wstring> optional_text_;
 };
 
+class ChildA
+    : public IChildA {
+ public:
+  explicit ChildA(
+    int64_t a_only,
+    common::optional<std::wstring> optional_text = common::nullopt
+  );
+
+  ModelType model_type() const override;
+
+  // region Get and set optional_text_
+
+  const common::optional<std::wstring>& optional_text() const override;
+
+  common::optional<std::wstring>& mutable_optional_text() override;
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set a_only_
+
+  int64_t a_only() const override;
+
+  int64_t& mutable_a_only() override;
+
+  void set_a_only(
+    int64_t value
+  ) override;
+
+  // endregion
+
+  ~ChildA() override = default;
+
+ private:
+  common::optional<std::wstring> optional_text_;
+
+  int64_t a_only_;
+};
+
+class ChildB
+    : public IChildB {
+ public:
+  explicit ChildB(
+    int64_t b_only,
+    common::optional<std::wstring> optional_text = common::nullopt
+  );
+
+  ModelType model_type() const override;
+
+  // region Get and set optional_text_
+
+  const common::optional<std::wstring>& optional_text() const override;
+
+  common::optional<std::wstring>& mutable_optional_text() override;
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set b_only_
+
+  int64_t b_only() const override;
+
+  int64_t& mutable_b_only() override;
+
+  void set_b_only(
+    int64_t value
+  ) override;
+
+  // endregion
+
+  ~ChildB() override = default;
+
+ private:
+  common::optional<std::wstring> optional_text_;
+
+  int64_t b_only_;
+};
+
+class Container
+    : public IContainer {
+ public:
+  Container(
+    common::optional<std::wstring> optional_text = common::nullopt,
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > children = common::nullopt
+  );
+
+  ModelType model_type() const override;
+
+  // region Get and set optional_text_
+
+  const common::optional<std::wstring>& optional_text() const override;
+
+  common::optional<std::wstring>& mutable_optional_text() override;
+
+  void set_optional_text(
+    common::optional<std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set children_
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& children() const override;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& mutable_children() override;
+
+  void set_children(
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > value
+  ) override;
+
+  // endregion
+
+  ~Container() override = default;
+
+ private:
+  common::optional<std::wstring> optional_text_;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > children_;
+};
+
 class Something
     : public ISomething {
  public:
@@ -186,7 +445,15 @@ class Something
     std::wstring text,
     int64_t number,
     bool flag,
-    std::shared_ptr<IItem> item
+    std::shared_ptr<IItem> item,
+    common::optional<
+      std::shared_ptr<IParent>
+    > optional_parent = common::nullopt,
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > parents = common::nullopt
   );
 
   ModelType model_type() const override;
@@ -251,6 +518,48 @@ class Something
 
   // endregion
 
+  // region Get and set optional_parent_
+
+  const common::optional<
+    std::shared_ptr<IParent>
+  >& optional_parent() const override;
+
+  common::optional<
+    std::shared_ptr<IParent>
+  >& mutable_optional_parent() override;
+
+  void set_optional_parent(
+    common::optional<
+      std::shared_ptr<IParent>
+    > value
+  ) override;
+
+  // endregion
+
+  // region Get and set parents_
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& parents() const override;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  >& mutable_parents() override;
+
+  void set_parents(
+    common::optional<
+      std::vector<
+        std::shared_ptr<IParent>
+      >
+    > value
+  ) override;
+
+  // endregion
+
   ~Something() override = default;
 
  private:
@@ -263,6 +572,16 @@ class Something
   bool flag_;
 
   std::shared_ptr<IItem> item_;
+
+  common::optional<
+    std::shared_ptr<IParent>
+  > optional_parent_;
+
+  common::optional<
+    std::vector<
+      std::shared_ptr<IParent>
+    >
+  > parents_;
 };
 
 // endregion
@@ -281,6 +600,66 @@ class Something
  * an instance of \ref IItem
  */
 bool IsItem(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IParent.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IParent
+ */
+bool IsParent(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IChildA.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IChildA
+ */
+bool IsChildA(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IChildB.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IChildB
+ */
+bool IsChildB(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IContainer.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IContainer
+ */
+bool IsContainer(
   const IClass& that
 );
 

@@ -114,6 +114,66 @@ test("descend against PassThroughVisitor", () => {
   expectDescendAndPassThroughVisitorSame(instance);
 });
 
+test("descend of ChildA", () => {
+  const instance = TestCommonJsonization.loadMaximalChildA();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descend",
+      "ChildA",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descend against PassThroughVisitor", () => {
+  const instance = TestCommonJsonization.loadMaximalChildA();
+
+  expectDescendAndPassThroughVisitorSame(instance);
+});
+
+test("descend of ChildB", () => {
+  const instance = TestCommonJsonization.loadMaximalChildB();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descend",
+      "ChildB",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descend against PassThroughVisitor", () => {
+  const instance = TestCommonJsonization.loadMaximalChildB();
+
+  expectDescendAndPassThroughVisitorSame(instance);
+});
+
+test("descend of Container", () => {
+  const instance = TestCommonJsonization.loadMaximalContainer();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descend",
+      "Container",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descend against PassThroughVisitor", () => {
+  const instance = TestCommonJsonization.loadMaximalContainer();
+
+  expectDescendAndPassThroughVisitorSame(instance);
+});
+
 test("descend of Something", () => {
   const instance = TestCommonJsonization.loadMaximalSomething();
 

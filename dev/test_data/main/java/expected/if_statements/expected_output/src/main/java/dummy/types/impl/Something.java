@@ -38,6 +38,10 @@ public class Something implements ISomething {
 
   private IItem item;
 
+  private IParent optionalParent;
+
+  private List<IParent> parents;
+
   public Something(
     Kind kind,
     String text,
@@ -59,6 +63,33 @@ public class Something implements ISomething {
     this.item = Objects.requireNonNull(
       item,
       "Argument \"item\" must be non-null.");
+  }
+
+  public Something(
+    Kind kind,
+    String text,
+    Long number,
+    Boolean flag,
+    IItem item,
+    IParent optionalParent,
+    List<IParent> parents) {
+    this.kind = Objects.requireNonNull(
+      kind,
+      "Argument \"kind\" must be non-null.");
+    this.text = Objects.requireNonNull(
+      text,
+      "Argument \"text\" must be non-null.");
+    this.number = Objects.requireNonNull(
+      number,
+      "Argument \"number\" must be non-null.");
+    this.flag = Objects.requireNonNull(
+      flag,
+      "Argument \"flag\" must be non-null.");
+    this.item = Objects.requireNonNull(
+      item,
+      "Argument \"item\" must be non-null.");
+    this.optionalParent = optionalParent;
+    this.parents = parents;
   }
 
   @Override
@@ -119,6 +150,34 @@ public class Something implements ISomething {
     this.item = Objects.requireNonNull(
       item,
       "Argument \"item\" must be non-null.");
+  }
+
+  @Override
+  public Optional<IParent> getOptionalParent() {
+    return Optional.ofNullable(optionalParent);
+  }
+
+  @Override
+  public void setOptionalParent(IParent optionalParent) {
+    this.optionalParent = optionalParent;
+  }
+
+  @Override
+  public Optional<List<IParent>> getParents() {
+    return Optional.ofNullable(parents);
+  }
+
+  @Override
+  public void setParents(List<IParent> parents) {
+    this.parents = parents;
+  }
+
+  /**
+   * Iterate over {@link Something#parents}, if set,
+   * and otherwise return an empty iterator.
+   */
+  public Iterable<IParent> overParentsOrEmpty() {
+    return getParents().orElseGet(Collections::emptyList);
   }
 
   /**
@@ -203,6 +262,16 @@ public class Something implements ISomething {
           Stream.<IClass>of(Something.this.item));
       }
 
+      if (optionalParent != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.<IClass>of(Something.this.optionalParent));
+      }
+
+      if (parents != null) {
+        memberStream = Stream.concat(memberStream,
+          Something.this.parents.stream());
+      }
+
       return memberStream;
     }
   }
@@ -236,6 +305,19 @@ public class Something implements ISomething {
         memberStream = Stream.concat(memberStream,
           Stream.concat(Stream.<IClass>of(Something.this.item),
             StreamSupport.stream(Something.this.item.descend().spliterator(), false)));
+      }
+
+      if (optionalParent != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.concat(Stream.<IClass>of(Something.this.optionalParent),
+            StreamSupport.stream(Something.this.optionalParent.descend().spliterator(), false)));
+      }
+
+      if (parents != null) {
+        memberStream = Stream.concat(memberStream,
+          Something.this.parents.stream()
+            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
+              StreamSupport.stream(item.descend().spliterator(), false))));
       }
 
       return memberStream;

@@ -135,6 +135,132 @@ TEST_CASE("Test DescentOnce over an Item") {
   AssertOrRerecordDescentOnce(instance, trace_path);
 }
 
+TEST_CASE("Test Descent over an ChildA") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childA",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    const std::filesystem::path parent(
+      (
+        DetermineDescentDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+      ).parent_path()
+    );
+
+    const std::filesystem::path trace_path(
+      parent
+        / (path.filename().string() + ".trace")
+    );
+
+    AssertOrRerecordDescent(path, trace_path);
+  }
+}
+
+TEST_CASE("Test DescentOnce over an ChildA") {
+  const std::shared_ptr<
+    aas::types::IChildA
+  > instance(
+    test::common::examples::LoadMaxChildA()
+  );
+
+  const std::filesystem::path trace_path(
+    DetermineDescentOnceDir()
+      / "MaxChildA.trace"
+  );
+
+  AssertOrRerecordDescentOnce(instance, trace_path);
+}
+
+TEST_CASE("Test Descent over an ChildB") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "childB",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    const std::filesystem::path parent(
+      (
+        DetermineDescentDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+      ).parent_path()
+    );
+
+    const std::filesystem::path trace_path(
+      parent
+        / (path.filename().string() + ".trace")
+    );
+
+    AssertOrRerecordDescent(path, trace_path);
+  }
+}
+
+TEST_CASE("Test DescentOnce over an ChildB") {
+  const std::shared_ptr<
+    aas::types::IChildB
+  > instance(
+    test::common::examples::LoadMaxChildB()
+  );
+
+  const std::filesystem::path trace_path(
+    DetermineDescentOnceDir()
+      / "MaxChildB.trace"
+  );
+
+  AssertOrRerecordDescentOnce(instance, trace_path);
+}
+
+TEST_CASE("Test Descent over an Container") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "container",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    const std::filesystem::path parent(
+      (
+        DetermineDescentDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+      ).parent_path()
+    );
+
+    const std::filesystem::path trace_path(
+      parent
+        / (path.filename().string() + ".trace")
+    );
+
+    AssertOrRerecordDescent(path, trace_path);
+  }
+}
+
+TEST_CASE("Test DescentOnce over an Container") {
+  const std::shared_ptr<
+    aas::types::IContainer
+  > instance(
+    test::common::examples::LoadMaxContainer()
+  );
+
+  const std::filesystem::path trace_path(
+    DetermineDescentOnceDir()
+      / "MaxContainer.trace"
+  );
+
+  AssertOrRerecordDescentOnce(instance, trace_path);
+}
+
 TEST_CASE("Test Descent over an Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

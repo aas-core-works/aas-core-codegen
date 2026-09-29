@@ -38,6 +38,93 @@ test("model type to string of Item", () => {
   );
 });
 
+test("model type of ChildA", () => {
+  const instance = TestCommonJsonization.loadMinimalChildA();
+
+  expect(instance.modelType()).toStrictEqual(
+    AasTypes.ModelType.ChildA
+  );
+});
+
+test("model type from string of ChildA", () => {
+  const text = "ChildA";
+  const literal = AasStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    AasTypes.ModelType.ChildA
+  );
+});
+
+test("model type to string of ChildA", () => {
+  const text = AasStringification.mustModelTypeToString(
+    AasTypes.ModelType.ChildA
+  );
+
+  expect(text).toStrictEqual(
+    "ChildA"
+  );
+});
+
+test("model type of ChildB", () => {
+  const instance = TestCommonJsonization.loadMinimalChildB();
+
+  expect(instance.modelType()).toStrictEqual(
+    AasTypes.ModelType.ChildB
+  );
+});
+
+test("model type from string of ChildB", () => {
+  const text = "ChildB";
+  const literal = AasStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    AasTypes.ModelType.ChildB
+  );
+});
+
+test("model type to string of ChildB", () => {
+  const text = AasStringification.mustModelTypeToString(
+    AasTypes.ModelType.ChildB
+  );
+
+  expect(text).toStrictEqual(
+    "ChildB"
+  );
+});
+
+test("model type of Container", () => {
+  const instance = TestCommonJsonization.loadMinimalContainer();
+
+  expect(instance.modelType()).toStrictEqual(
+    AasTypes.ModelType.Container
+  );
+});
+
+test("model type from string of Container", () => {
+  const text = "Container";
+  const literal = AasStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    AasTypes.ModelType.Container
+  );
+});
+
+test("model type to string of Container", () => {
+  const text = AasStringification.mustModelTypeToString(
+    AasTypes.ModelType.Container
+  );
+
+  expect(text).toStrictEqual(
+    "Container"
+  );
+});
+
 test("model type of Something", () => {
   const instance = TestCommonJsonization.loadMinimalSomething();
 

@@ -59,6 +59,33 @@ public class Copying
         }
 
         @Override
+        public IClass transformChildA(
+            IChildA that
+        ) {
+            return new ChildA(
+                that.getAOnly(),
+                that.getOptionalText().orElse(null));
+        }
+
+        @Override
+        public IClass transformChildB(
+            IChildB that
+        ) {
+            return new ChildB(
+                that.getBOnly(),
+                that.getOptionalText().orElse(null));
+        }
+
+        @Override
+        public IClass transformContainer(
+            IContainer that
+        ) {
+            return new Container(
+                that.getOptionalText().orElse(null),
+                that.getChildren().orElse(null));
+        }
+
+        @Override
         public IClass transformSomething(
             ISomething that
         ) {
@@ -67,7 +94,9 @@ public class Copying
                 that.getText(),
                 that.getNumber(),
                 that.getFlag(),
-                that.getItem());
+                that.getItem(),
+                that.getOptionalParent().orElse(null),
+                that.getParents().orElse(null));
         }
     }
 
@@ -84,15 +113,71 @@ public class Copying
         }
 
         @Override
+        public IClass transformChildA (
+            IChildA that
+        ) {
+            return new ChildA(
+                that.getAOnly(),
+                that.getOptionalText().orElse(null)
+            );
+        }
+
+        @Override
+        public IClass transformChildB (
+            IChildB that
+        ) {
+            return new ChildB(
+                that.getBOnly(),
+                that.getOptionalText().orElse(null)
+            );
+        }
+
+        @Override
+        public IClass transformContainer (
+            IContainer that
+        ) {
+            List<IParent> thatChildren =
+                that.getChildren().orElse(null);
+            List<IParent> theChildren = null;
+            if (thatChildren != null) {
+                theChildren = new ArrayList<>(
+                    thatChildren.size());
+                for (IParent item : thatChildren)
+                {
+                    theChildren.add(deep(item));
+                }
+            }
+
+            return new Container(
+                that.getOptionalText().orElse(null),
+                theChildren
+            );
+        }
+
+        @Override
         public IClass transformSomething (
             ISomething that
         ) {
+            List<IParent> thatParents =
+                that.getParents().orElse(null);
+            List<IParent> theParents = null;
+            if (thatParents != null) {
+                theParents = new ArrayList<>(
+                    thatParents.size());
+                for (IParent item : thatParents)
+                {
+                    theParents.add(deep(item));
+                }
+            }
+
             return new Something(
                 that.getKind(),
                 that.getText(),
                 that.getNumber(),
                 that.getFlag(),
-                deep(that.getItem())
+                deep(that.getItem()),
+                that.getOptionalParent().orElse(null),
+                theParents
             );
         }
     }

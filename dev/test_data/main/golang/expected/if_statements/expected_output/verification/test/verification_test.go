@@ -360,6 +360,396 @@ func TestItemFail(t *testing.T) {
 	}
 }
 
+func TestChildAOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Json",
+			"Expected",
+			"ChildA",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := aastesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := aasjsonization.ChildAFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*aasverification.VerificationError
+		aasverification.Verify(
+			deserialized,
+			func(veriErr *aasverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestChildAFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"ChildA",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := aastesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := aasjsonization.ChildAFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*aasverification.VerificationError
+			aasverification.Verify(
+				deserialized,
+				func(err *aasverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestChildBOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Json",
+			"Expected",
+			"ChildB",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := aastesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := aasjsonization.ChildBFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*aasverification.VerificationError
+		aasverification.Verify(
+			deserialized,
+			func(veriErr *aasverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestChildBFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"ChildB",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := aastesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := aasjsonization.ChildBFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*aasverification.VerificationError
+			aasverification.Verify(
+				deserialized,
+				func(err *aasverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestContainerOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Json",
+			"Expected",
+			"Container",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := aastesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := aasjsonization.ContainerFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*aasverification.VerificationError
+		aasverification.Verify(
+			deserialized,
+			func(veriErr *aasverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestContainerFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"Container",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := aastesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := aasjsonization.ContainerFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*aasverification.VerificationError
+			aasverification.Verify(
+				deserialized,
+				func(err *aasverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestSomethingOK(t *testing.T) {
 	pths := aastesting.FindFilesBySuffixRecursively(
 		filepath.Join(

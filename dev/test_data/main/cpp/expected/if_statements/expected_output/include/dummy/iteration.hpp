@@ -27,13 +27,18 @@ namespace iteration {
  * Define the properties over all the classes to compactly represent the paths.
  */
 enum class Property : std::uint32_t {
-  kFlag = 0,
-  kItem = 1,
-  kKind = 2,
-  kName = 3,
-  kNumber = 4,
-  kOptionalText = 5,
-  kText = 6
+  kAOnly = 0,
+  kBOnly = 1,
+  kChildren = 2,
+  kFlag = 3,
+  kItem = 4,
+  kKind = 5,
+  kName = 6,
+  kNumber = 7,
+  kOptionalParent = 8,
+  kOptionalText = 9,
+  kParents = 10,
+  kText = 11
 };
 
 std::wstring PropertyToWstring(

@@ -120,6 +120,12 @@ _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
     str,
     Callable[[aas_jsonization.Jsonable], aas_types.Class]
 ] = {
+    'ChildA':
+        aas_jsonization.child_a_from_jsonable,
+    'ChildB':
+        aas_jsonization.child_b_from_jsonable,
+    'Container':
+        aas_jsonization.container_from_jsonable,
     'Item':
         aas_jsonization.item_from_jsonable,
     'Something':
@@ -131,6 +137,12 @@ _MODEL_TYPE_TO_CLASS: Mapping[
     str,
     Type[aas_types.Class]
 ] = {
+    'ChildA':
+        aas_types.ChildA,
+    'ChildB':
+        aas_types.ChildB,
+    'Container':
+        aas_types.Container,
     'Item':
         aas_types.Item,
     'Something':

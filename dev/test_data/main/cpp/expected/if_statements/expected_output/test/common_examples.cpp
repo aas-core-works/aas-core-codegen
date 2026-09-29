@@ -31,6 +31,36 @@ const char* StaticTypeName<
 
 template<>
 struct StaticTypeName<
+  aas::types::IChildA
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  aas::types::IChildA
+>::name = "IChildA";
+
+template<>
+struct StaticTypeName<
+  aas::types::IChildB
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  aas::types::IChildB
+>::name = "IChildB";
+
+template<>
+struct StaticTypeName<
+  aas::types::IContainer
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  aas::types::IContainer
+>::name = "IContainer";
+
+template<>
+struct StaticTypeName<
   aas::types::ISomething
 > {
   static const char* name;
@@ -102,6 +132,207 @@ std::shared_ptr<
   );
 
   return LoadItem(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IChildA
+> LoadChildA(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    aas::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    aas::types::IChildA
+  > instance(
+    std::dynamic_pointer_cast<
+      aas::types::IChildA
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      aas::common::Concat(
+        "Failed to cast the instance to IChildA from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  aas::types::IChildA
+> LoadMinChildA() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "childA"
+      / "minimal.xml"
+  );
+
+  return LoadChildA(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IChildA
+> LoadMaxChildA() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "childA"
+      / "maximal.xml"
+  );
+
+  return LoadChildA(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IChildB
+> LoadChildB(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    aas::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    aas::types::IChildB
+  > instance(
+    std::dynamic_pointer_cast<
+      aas::types::IChildB
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      aas::common::Concat(
+        "Failed to cast the instance to IChildB from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  aas::types::IChildB
+> LoadMinChildB() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "childB"
+      / "minimal.xml"
+  );
+
+  return LoadChildB(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IChildB
+> LoadMaxChildB() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "childB"
+      / "maximal.xml"
+  );
+
+  return LoadChildB(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IContainer
+> LoadContainer(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    aas::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    aas::types::IContainer
+  > instance(
+    std::dynamic_pointer_cast<
+      aas::types::IContainer
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      aas::common::Concat(
+        "Failed to cast the instance to IContainer from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  aas::types::IContainer
+> LoadMinContainer() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "container"
+      / "minimal.xml"
+  );
+
+  return LoadContainer(
+    path
+  );
+}
+
+std::shared_ptr<
+  aas::types::IContainer
+> LoadMaxContainer() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "container"
+      / "maximal.xml"
+  );
+
+  return LoadContainer(
     path
   );
 }

@@ -11,6 +11,9 @@ package types
 type ModelType int
 const (
 	ModelTypeItem ModelType = iota
+	ModelTypeChildA
+	ModelTypeChildB
+	ModelTypeContainer
 	ModelTypeSomething
 )
 
@@ -162,6 +165,342 @@ func NewItem(
 	}
 }
 
+type IParent interface {
+	IClass
+
+	OptionalText() *string;
+
+	SetOptionalText(
+		value *string,
+	);
+}
+
+// Check whether the instance corresponds to [aastypes.IParent]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsParent(
+	that IClass,
+) (ok bool) {
+	switch that.ModelType() {
+	case ModelTypeChildA:
+		ok = true
+	case ModelTypeChildB:
+		ok = true
+	case ModelTypeContainer:
+		ok = true
+	}
+	return
+}
+
+type IChildA interface {
+	IParent
+
+	AOnly() int64;
+
+	SetAOnly(
+		value int64,
+	);
+}
+
+// Check whether the instance corresponds to [aastypes.IChildA]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsChildA(
+	that IClass,
+) (ok bool) {
+	ok = that.ModelType() == ModelTypeChildA
+	return
+}
+
+// Implements IChildA.
+type ChildA struct {
+	optionalText *string
+	aOnly int64
+}
+
+func (ca *ChildA) OptionalText(
+) *string {
+	return ca.optionalText
+}
+
+func (ca *ChildA) SetOptionalText(
+	value *string,
+) {
+	ca.optionalText = value
+}
+
+func (ca *ChildA) AOnly(
+) int64 {
+	return ca.aOnly
+}
+
+func (ca *ChildA) SetAOnly(
+	value int64,
+) {
+	ca.aOnly = value
+}
+
+func (ca *ChildA) ModelType(
+) ModelType {
+	return ModelTypeChildA
+}
+
+// Apply the action on the instances referenced from ca.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// We do not recurse into the referenced instances.
+//
+// The action is not applied on ca.
+func (ca *ChildA) DescendOnce(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Apply the action recursively on the instances referenced from ca.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on ca.
+func (ca *ChildA) Descend(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Create a new instance of ChildA with
+// the given properties.
+func NewChildA(
+	aOnly int64,
+) *ChildA {
+	return &ChildA{
+		aOnly: aOnly,
+		optionalText: nil,
+	}
+}
+
+type IChildB interface {
+	IParent
+
+	BOnly() int64;
+
+	SetBOnly(
+		value int64,
+	);
+}
+
+// Check whether the instance corresponds to [aastypes.IChildB]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsChildB(
+	that IClass,
+) (ok bool) {
+	ok = that.ModelType() == ModelTypeChildB
+	return
+}
+
+// Implements IChildB.
+type ChildB struct {
+	optionalText *string
+	bOnly int64
+}
+
+func (cb *ChildB) OptionalText(
+) *string {
+	return cb.optionalText
+}
+
+func (cb *ChildB) SetOptionalText(
+	value *string,
+) {
+	cb.optionalText = value
+}
+
+func (cb *ChildB) BOnly(
+) int64 {
+	return cb.bOnly
+}
+
+func (cb *ChildB) SetBOnly(
+	value int64,
+) {
+	cb.bOnly = value
+}
+
+func (cb *ChildB) ModelType(
+) ModelType {
+	return ModelTypeChildB
+}
+
+// Apply the action on the instances referenced from cb.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// We do not recurse into the referenced instances.
+//
+// The action is not applied on cb.
+func (cb *ChildB) DescendOnce(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Apply the action recursively on the instances referenced from cb.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on cb.
+func (cb *ChildB) Descend(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Create a new instance of ChildB with
+// the given properties.
+func NewChildB(
+	bOnly int64,
+) *ChildB {
+	return &ChildB{
+		bOnly: bOnly,
+		optionalText: nil,
+	}
+}
+
+type IContainer interface {
+	IParent
+
+	Children() []IParent;
+
+	SetChildren(
+		value []IParent,
+	);
+}
+
+// Check whether the instance corresponds to [aastypes.IContainer]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsContainer(
+	that IClass,
+) (ok bool) {
+	ok = that.ModelType() == ModelTypeContainer
+	return
+}
+
+// Implements IContainer.
+type Container struct {
+	optionalText *string
+	children []IParent
+}
+
+func (c *Container) OptionalText(
+) *string {
+	return c.optionalText
+}
+
+func (c *Container) SetOptionalText(
+	value *string,
+) {
+	c.optionalText = value
+}
+
+func (c *Container) Children(
+) []IParent {
+	return c.children
+}
+
+func (c *Container) SetChildren(
+	value []IParent,
+) {
+	c.children = value
+}
+
+func (c *Container) ModelType(
+) ModelType {
+	return ModelTypeContainer
+}
+
+// Apply the action on the instances referenced from c.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// We do not recurse into the referenced instances.
+//
+// The action is not applied on c.
+func (c *Container) DescendOnce(
+	action func(IClass) bool,
+) (abort bool) {
+	if c.children != nil {
+		for _, v := range c.children {
+			abort = action(v);
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action recursively on the instances referenced from c.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on c.
+func (c *Container) Descend(
+	action func(IClass) bool,
+) (abort bool) {
+	if c.children != nil {
+		for _, v := range c.children {
+			abort = action(v);
+			if abort {
+				return
+			}
+
+			abort = v.Descend(
+				action,
+			);
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Create a new instance of Container with
+// the given properties.
+func NewContainer() *Container {
+	return &Container{
+		optionalText: nil,
+		children: nil,
+	}
+}
+
 type ISomething interface {
 	IClass
 
@@ -194,6 +533,18 @@ type ISomething interface {
 	SetItem(
 		value IItem,
 	);
+
+	OptionalParent() IParent;
+
+	SetOptionalParent(
+		value IParent,
+	);
+
+	Parents() []IParent;
+
+	SetParents(
+		value []IParent,
+	);
 }
 
 // Check whether the instance corresponds to [aastypes.ISomething]
@@ -215,6 +566,8 @@ type Something struct {
 	number int64
 	flag bool
 	item IItem
+	optionalParent IParent
+	parents []IParent
 }
 
 func (s *Something) Kind(
@@ -272,6 +625,28 @@ func (s *Something) SetItem(
 	s.item = value
 }
 
+func (s *Something) OptionalParent(
+) IParent {
+	return s.optionalParent
+}
+
+func (s *Something) SetOptionalParent(
+	value IParent,
+) {
+	s.optionalParent = value
+}
+
+func (s *Something) Parents(
+) []IParent {
+	return s.parents
+}
+
+func (s *Something) SetParents(
+	value []IParent,
+) {
+	s.parents = value
+}
+
 func (s *Something) ModelType(
 ) ModelType {
 	return ModelTypeSomething
@@ -293,6 +668,24 @@ func (s *Something) DescendOnce(
 	)
 	if abort {
 		return
+	}
+
+	if s.optionalParent != nil {
+		abort = action(
+			s.optionalParent,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if s.parents != nil {
+		for _, v := range s.parents {
+			abort = action(v);
+			if abort {
+				return
+			}
+		}
 	}
 
 	return
@@ -320,6 +713,37 @@ func (s *Something) Descend(
 		return
 	}
 
+	if s.optionalParent != nil {
+		abort = action(
+			s.optionalParent,
+		)
+		if abort {
+			return
+		}
+		abort = s.optionalParent.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if s.parents != nil {
+		for _, v := range s.parents {
+			abort = action(v);
+			if abort {
+				return
+			}
+
+			abort = v.Descend(
+				action,
+			);
+			if abort {
+				return
+			}
+		}
+	}
+
 	return
 }
 
@@ -338,6 +762,8 @@ func NewSomething(
 		number: number,
 		flag: flag,
 		item: item,
+		optionalParent: nil,
+		parents: nil,
 	}
 }
 

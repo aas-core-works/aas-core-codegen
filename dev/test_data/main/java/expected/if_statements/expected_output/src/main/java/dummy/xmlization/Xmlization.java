@@ -184,6 +184,46 @@ public class Xmlization {
     }
 
     /**
+     * Read the items of a list, each with {@code readItem}.
+     *
+     * <p>Every start element is considered to mark the start of an item. Reading
+     * stops as soon as a non-start element is encountered.
+     */
+    private static <T> Reporting.Result<List<T>> readList(
+      XMLEventReader reader, boolean isEmpty, XmlCommon.ElementReader<T> readItem) {
+      final List<T> result = new ArrayList<>();
+      if (isEmpty) {
+        return Reporting.Result.success(result);
+      }
+
+      XmlCommon.skipWhitespaceAndComments(reader);
+      int index = 0;
+      if (!XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a start element opening an item of the list, " +
+          "but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
+        error.prependSegment(new Reporting.IndexSegment(index));
+        return Reporting.Result.failure(error);
+      }
+
+      while (XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Result<? extends T> itemResult = readItem.read(reader);
+        if (itemResult.isError()) {
+          itemResult.getError()
+            .prependSegment(
+              new Reporting.IndexSegment(index));
+          return Reporting.Result.failure(itemResult.getError());
+        }
+
+        result.add(itemResult.getResult());
+        index++;
+        XmlCommon.skipWhitespaceAndComments(reader);
+      }
+
+      return Reporting.Result.success(result);
+    }
+
+    /**
      * Check whether the sequence of the properties has ended.
      *
      * <p>Only the end tag of the enclosing element concludes a sequence. Reaching
@@ -236,15 +276,6 @@ public class Xmlization {
         "");
     }
 
-    private static Reporting.Result<Kind> readTextAs_Kind(
-      XMLEventReader reader, boolean isEmpty) {
-      return readEnum(
-        reader,
-        isEmpty,
-        Stringification::kindFromString,
-        "Kind");
-    }
-
     private static Reporting.Result<Long> readTextAs_long(
       XMLEventReader reader, boolean isEmpty) {
       return readText(
@@ -252,6 +283,21 @@ public class Xmlization {
         isEmpty,
         _DeserializeImplementation::readContentAsLong,
         "Long");
+    }
+
+    private static Reporting.Result<List<IParent>> readListOf_IParent(
+      XMLEventReader reader, boolean isEmpty) {
+      return readList(
+        reader, isEmpty, _DeserializeImplementation::readIParentFromElement);
+    }
+
+    private static Reporting.Result<Kind> readTextAs_Kind(
+      XMLEventReader reader, boolean isEmpty) {
+      return readEnum(
+        reader,
+        isEmpty,
+        Stringification::kindFromString,
+        "Kind");
     }
 
     private static Reporting.Result<Boolean> readTextAs_bool(
@@ -358,6 +404,310 @@ public class Xmlization {
     }
 
     /**
+     * Deserialize an instance of IParent from an XML element.
+     */
+    private static Reporting.Result<? extends IParent> readIParentFromElement(
+      XMLEventReader reader) {
+      // NOTE (mristin):
+      // We only peek the name, so that the whole element can be handed on to
+      // the reader which we select below.
+      final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+      if (tryElementName.isError()) {
+        return Reporting.Result.failure(tryElementName.getError());
+      }
+
+      switch (tryElementName.getResult()) {
+        case "childA":
+          return readChildAFromElement(reader);
+        case "childB":
+          return readChildBFromElement(reader);
+        case "container":
+          return readContainerFromElement(reader);
+        default:
+          return Reporting.Result.failure(new Reporting.Error(
+            "Unexpected element with the name " + tryElementName.getResult()));
+      }
+    }
+
+    /**
+     * Deserialize an instance of class ChildA from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<ChildA> readChildAFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      String theOptionalText = null;
+      Long theAOnly = null;
+
+      if (!isEmptySequence) {
+        while (!atEndOfSequence(reader)) {
+          final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+          if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+          }
+
+          final String elementName = tryElementName.getResult();
+          final boolean isEmptyProperty = XmlCommon.isEmptyElement(reader);
+
+          Reporting.Error valueError = null;
+
+          switch (elementName) {
+            case "optionalText": {
+              if (theOptionalText != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<String> value =
+                readTextAs_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalText = value.getResult();
+              }
+              break;
+            }
+            case "aOnly": {
+              if (theAOnly != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Long> value =
+                readTextAs_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theAOnly = value.getResult();
+              }
+              break;
+            }
+            default:
+              return unexpectedProperty("ChildA", elementName);
+          }
+
+          if (valueError != null) {
+            valueError.prependSegment(
+              new Reporting.NameSegment(
+                elementName));
+            return Reporting.Result.failure(valueError);
+          }
+
+          final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
+          if (endResult.isError()) {
+            return Reporting.Result.failure(endResult.getError());
+          }
+        }
+      }
+
+      if (theAOnly == null) {
+        return missingRequiredProperty("aOnly", "ChildA");
+      }
+
+      return Reporting.Result.success(new ChildA(
+        theAOnly,
+        theOptionalText));
+    }
+
+    /**
+     * Deserialize an instance of class ChildA from an XML element.
+     */
+    private static Reporting.Result<? extends ChildA> readChildAFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "childA",
+        _DeserializeImplementation::readChildAFromSequence);
+    }
+
+    /**
+     * Deserialize an instance of class ChildB from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<ChildB> readChildBFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      String theOptionalText = null;
+      Long theBOnly = null;
+
+      if (!isEmptySequence) {
+        while (!atEndOfSequence(reader)) {
+          final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+          if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+          }
+
+          final String elementName = tryElementName.getResult();
+          final boolean isEmptyProperty = XmlCommon.isEmptyElement(reader);
+
+          Reporting.Error valueError = null;
+
+          switch (elementName) {
+            case "optionalText": {
+              if (theOptionalText != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<String> value =
+                readTextAs_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalText = value.getResult();
+              }
+              break;
+            }
+            case "bOnly": {
+              if (theBOnly != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Long> value =
+                readTextAs_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theBOnly = value.getResult();
+              }
+              break;
+            }
+            default:
+              return unexpectedProperty("ChildB", elementName);
+          }
+
+          if (valueError != null) {
+            valueError.prependSegment(
+              new Reporting.NameSegment(
+                elementName));
+            return Reporting.Result.failure(valueError);
+          }
+
+          final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
+          if (endResult.isError()) {
+            return Reporting.Result.failure(endResult.getError());
+          }
+        }
+      }
+
+      if (theBOnly == null) {
+        return missingRequiredProperty("bOnly", "ChildB");
+      }
+
+      return Reporting.Result.success(new ChildB(
+        theBOnly,
+        theOptionalText));
+    }
+
+    /**
+     * Deserialize an instance of class ChildB from an XML element.
+     */
+    private static Reporting.Result<? extends ChildB> readChildBFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "childB",
+        _DeserializeImplementation::readChildBFromSequence);
+    }
+
+    /**
+     * Deserialize an instance of class Container from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<Container> readContainerFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      String theOptionalText = null;
+      List<IParent> theChildren = null;
+
+      if (!isEmptySequence) {
+        while (!atEndOfSequence(reader)) {
+          final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+          if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+          }
+
+          final String elementName = tryElementName.getResult();
+          final boolean isEmptyProperty = XmlCommon.isEmptyElement(reader);
+
+          Reporting.Error valueError = null;
+
+          switch (elementName) {
+            case "optionalText": {
+              if (theOptionalText != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<String> value =
+                readTextAs_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalText = value.getResult();
+              }
+              break;
+            }
+            case "children": {
+              if (theChildren != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<List<IParent>> value =
+                readListOf_IParent(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theChildren = value.getResult();
+              }
+              break;
+            }
+            default:
+              return unexpectedProperty("Container", elementName);
+          }
+
+          if (valueError != null) {
+            valueError.prependSegment(
+              new Reporting.NameSegment(
+                elementName));
+            return Reporting.Result.failure(valueError);
+          }
+
+          final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
+          if (endResult.isError()) {
+            return Reporting.Result.failure(endResult.getError());
+          }
+        }
+      }
+
+      return Reporting.Result.success(new Container(
+        theOptionalText,
+        theChildren));
+    }
+
+    /**
+     * Deserialize an instance of class Container from an XML element.
+     */
+    private static Reporting.Result<? extends Container> readContainerFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "container",
+        _DeserializeImplementation::readContainerFromSequence);
+    }
+
+    /**
      * Deserialize an instance of class Something from a sequence of XML elements.
      *
      * <p>If {@code isEmptySequence} is set, we should try to deserialize
@@ -372,6 +722,8 @@ public class Xmlization {
       Long theNumber = null;
       Boolean theFlag = null;
       IItem theItem = null;
+      IParent theOptionalParent = null;
+      List<IParent> theParents = null;
 
       if (!isEmptySequence) {
         while (!atEndOfSequence(reader)) {
@@ -461,6 +813,39 @@ public class Xmlization {
               }
               break;
             }
+            case "optionalParent": {
+              if (theOptionalParent != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<? extends IParent> value =
+                XmlCommon.readNestedElement(
+                  reader,
+                  isEmptyProperty,
+                  _DeserializeImplementation::readIParentFromElement);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalParent = value.getResult();
+              }
+              break;
+            }
+            case "parents": {
+              if (theParents != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<List<IParent>> value =
+                readListOf_IParent(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theParents = value.getResult();
+              }
+              break;
+            }
             default:
               return unexpectedProperty("Something", elementName);
           }
@@ -504,7 +889,9 @@ public class Xmlization {
         theText,
         theNumber,
         theFlag,
-        theItem));
+        theItem,
+        theOptionalParent,
+        theParents));
     }
 
     /**
@@ -567,6 +954,98 @@ public class Xmlization {
     }
 
     /**
+     * Deserialize an instance of IParent from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static IParent deserializeIParent(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends IParent> result =
+        _DeserializeImplementation.readIParentFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("iparent"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of ChildA from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static ChildA deserializeChildA(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends ChildA> result =
+        _DeserializeImplementation.readChildAFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("childa"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of ChildB from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static ChildB deserializeChildB(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends ChildB> result =
+        _DeserializeImplementation.readChildBFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("childb"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of Container from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static Container deserializeContainer(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends Container> result =
+        _DeserializeImplementation.readContainerFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("container"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
      * Deserialize an instance of Something from {@code reader}.
      *
      * @param reader Initialized XML reader with reader.peek() set to the element
@@ -620,6 +1099,13 @@ public class Xmlization {
       new _VisitorWithWriter(true);
 
     /**
+     * Write an element nested in another one, which never re-declares the XML
+     * namespace.
+     */
+    private static final _VisitorWithWriter NESTED =
+      new _VisitorWithWriter(false);
+
+    /**
      * Write {@code that} as the XML element of a property called
      * {@code name}.
      *
@@ -668,6 +1154,25 @@ public class Xmlization {
     }
 
     /**
+     * Write {@code that} as its own, self-describing XML element.
+     *
+     * <p>Which element that is, is decided by the run-time type of
+     * {@code that}, so this one writer serves every abstract class, every
+     * concrete class with descendants, and the item of a list or of a tuple of
+     * any class at all. The reading, which has to decide what to construct
+     * before it has read anything, needs a dispatcher per interface instead.
+     *
+     * <p>An element written from here is nested in another one by
+     * construction, so it goes through the visitor which does not re-declare
+     * the XML namespace.
+     */
+    private static void writeClass(
+      IClass that,
+      XMLStreamWriter writer) {
+      NESTED.visit(that, writer);
+    }
+
+    /**
      * Write the text of {@code that} as XML content.
      *
      * <p>This is the {@link ContentWriter} of every enumeration-typed value, be
@@ -680,6 +1185,22 @@ public class Xmlization {
       IEnum that,
       XMLStreamWriter writer) throws XMLStreamException {
       writer.writeCharacters(that.literalText());
+    }
+
+    private static void writeListOf_IClass(
+      List<? extends IClass> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (IClass item : that) {
+          writeClass(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
     }
 
     private static void writeItemAsSequence(
@@ -710,6 +1231,96 @@ public class Xmlization {
         writer,
         withNamespace,
         _VisitorWithWriter::writeItemAsSequence);
+    }
+
+    private static void writeChildAAsSequence(
+      IChildA that,
+      XMLStreamWriter writer) {
+      writeOptionalProperty(
+        "optionalText",
+        "getOptionalText()",
+        that.getOptionalText(),
+        writer,
+        XmlCommon::writeStringifiedContent);
+
+      writeProperty(
+        "aOnly",
+        "getAOnly()",
+        that.getAOnly(),
+        writer,
+        XmlCommon::writeStringifiedContent);
+    }
+
+    @Override
+    public void visitChildA(
+      IChildA that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "childA",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writeChildAAsSequence);
+    }
+
+    private static void writeChildBAsSequence(
+      IChildB that,
+      XMLStreamWriter writer) {
+      writeOptionalProperty(
+        "optionalText",
+        "getOptionalText()",
+        that.getOptionalText(),
+        writer,
+        XmlCommon::writeStringifiedContent);
+
+      writeProperty(
+        "bOnly",
+        "getBOnly()",
+        that.getBOnly(),
+        writer,
+        XmlCommon::writeStringifiedContent);
+    }
+
+    @Override
+    public void visitChildB(
+      IChildB that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "childB",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writeChildBAsSequence);
+    }
+
+    private static void writeContainerAsSequence(
+      IContainer that,
+      XMLStreamWriter writer) {
+      writeOptionalProperty(
+        "optionalText",
+        "getOptionalText()",
+        that.getOptionalText(),
+        writer,
+        XmlCommon::writeStringifiedContent);
+
+      writeOptionalProperty(
+        "children",
+        "getChildren()",
+        that.getChildren(),
+        writer,
+        _VisitorWithWriter::writeListOf_IClass);
+    }
+
+    @Override
+    public void visitContainer(
+      IContainer that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "container",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writeContainerAsSequence);
     }
 
     private static void writeSomethingAsSequence(
@@ -749,6 +1360,20 @@ public class Xmlization {
         that.getItem(),
         writer,
         _VisitorWithWriter::writeItemAsSequence);
+
+      writeOptionalProperty(
+        "optionalParent",
+        "getOptionalParent()",
+        that.getOptionalParent(),
+        writer,
+        _VisitorWithWriter::writeClass);
+
+      writeOptionalProperty(
+        "parents",
+        "getParents()",
+        that.getParents(),
+        writer,
+        _VisitorWithWriter::writeListOf_IClass);
     }
 
     @Override

@@ -269,6 +269,174 @@ TEST_CASE("Test the de-serialization failure on an unexpected Item") {
   }
 }
 
+TEST_CASE("Test the round-trip of an expected ChildA") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "ChildA",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      aas::types::IChildA
+    >(path, aas::jsonization::ChildAFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected ChildA") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "ChildA",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        aas::types::IChildA
+      >(
+        path,
+        aas::jsonization::ChildAFrom,
+        error_path
+      );
+    }
+  }
+}
+
+TEST_CASE("Test the round-trip of an expected ChildB") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "ChildB",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      aas::types::IChildB
+    >(path, aas::jsonization::ChildBFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected ChildB") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "ChildB",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        aas::types::IChildB
+      >(
+        path,
+        aas::jsonization::ChildBFrom,
+        error_path
+      );
+    }
+  }
+}
+
+TEST_CASE("Test the round-trip of an expected Container") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "Container",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      aas::types::IContainer
+    >(path, aas::jsonization::ContainerFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected Container") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "Container",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        aas::types::IContainer
+      >(
+        path,
+        aas::jsonization::ContainerFrom,
+        error_path
+      );
+    }
+  }
+}
+
 TEST_CASE("Test the round-trip of an expected Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(
@@ -322,6 +490,60 @@ TEST_CASE("Test the de-serialization failure on an unexpected Something") {
         error_path
       );
     }
+  }
+}
+
+TEST_CASE(
+  "Test the serialization failure on an integer outside the range representable in JSON "
+  "at .a_only of ChildA"
+) {
+  for (
+    const int64_t value
+    : {
+      9007199254740992LL,
+      -9007199254740992LL
+    }
+  ) {
+    std::shared_ptr<aas::types::IChildA> instance(
+      MustDeserializeTheFirstExpected<aas::types::IChildA>(
+        "ChildA",
+        aas::jsonization::ChildAFrom
+      )
+    );
+
+    instance->set_a_only(value);
+
+    AssertSerializationFailsAt(
+      *instance,
+      ".a_only"
+    );
+  }
+}
+
+TEST_CASE(
+  "Test the serialization failure on an integer outside the range representable in JSON "
+  "at .b_only of ChildB"
+) {
+  for (
+    const int64_t value
+    : {
+      9007199254740992LL,
+      -9007199254740992LL
+    }
+  ) {
+    std::shared_ptr<aas::types::IChildB> instance(
+      MustDeserializeTheFirstExpected<aas::types::IChildB>(
+        "ChildB",
+        aas::jsonization::ChildBFrom
+      )
+    );
+
+    instance->set_b_only(value);
+
+    AssertSerializationFailsAt(
+      *instance,
+      ".b_only"
+    );
   }
 }
 

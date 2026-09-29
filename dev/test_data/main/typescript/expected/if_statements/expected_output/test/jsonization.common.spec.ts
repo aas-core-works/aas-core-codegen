@@ -12,6 +12,21 @@ test("commonJsonization loaders for Item", () => {
   expect(TestCommonJsonization.loadMaximalItem()).not.toBeNull();
 });
 
+test("commonJsonization loaders for ChildA", () => {
+  expect(TestCommonJsonization.loadMinimalChildA()).not.toBeNull();
+  expect(TestCommonJsonization.loadMaximalChildA()).not.toBeNull();
+});
+
+test("commonJsonization loaders for ChildB", () => {
+  expect(TestCommonJsonization.loadMinimalChildB()).not.toBeNull();
+  expect(TestCommonJsonization.loadMaximalChildB()).not.toBeNull();
+});
+
+test("commonJsonization loaders for Container", () => {
+  expect(TestCommonJsonization.loadMinimalContainer()).not.toBeNull();
+  expect(TestCommonJsonization.loadMaximalContainer()).not.toBeNull();
+});
+
 test("commonJsonization loaders for Something", () => {
   expect(TestCommonJsonization.loadMinimalSomething()).not.toBeNull();
   expect(TestCommonJsonization.loadMaximalSomething()).not.toBeNull();

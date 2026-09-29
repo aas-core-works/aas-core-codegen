@@ -1,10 +1,46 @@
 <?xml version="1.0" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="childA">
+    <xs:sequence>
+      <xs:group ref="parent"/>
+      <xs:element name="aOnly" type="xs:long"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="childB">
+    <xs:sequence>
+      <xs:group ref="parent"/>
+      <xs:element name="bOnly" type="xs:long"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="container">
+    <xs:sequence>
+      <xs:group ref="parent"/>
+      <xs:element name="children" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="parent_choice" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:group name="item">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="optionalText" type="xs:string" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
+  </xs:group>
+  <xs:group name="parent">
+    <xs:sequence>
+      <xs:element name="optionalText" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="parent_choice">
+    <xs:choice>
+      <xs:element name="childA" type="childA_t"/>
+      <xs:element name="childB" type="childB_t"/>
+      <xs:element name="container" type="container_t"/>
+    </xs:choice>
   </xs:group>
   <xs:group name="something">
     <xs:sequence>
@@ -13,6 +49,20 @@
       <xs:element name="number" type="xs:long"/>
       <xs:element name="flag" type="xs:boolean"/>
       <xs:element name="item" type="item_t"/>
+      <xs:element name="optionalParent" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="parent_choice"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="parents" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="parent_choice" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:simpleType name="kind_t">
@@ -22,9 +72,29 @@
       <xs:enumeration value="gamma"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:complexType name="childA_t">
+    <xs:sequence>
+      <xs:group ref="childA"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="childB_t">
+    <xs:sequence>
+      <xs:group ref="childB"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="container_t">
+    <xs:sequence>
+      <xs:group ref="container"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="item_t">
     <xs:sequence>
       <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="parent_t">
+    <xs:sequence>
+      <xs:group ref="parent"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="something_t">

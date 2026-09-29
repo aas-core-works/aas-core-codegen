@@ -11,7 +11,92 @@ namespace dummy.Tests
 {
     public class TestJsonizationOfInterfaces
     {
-        
+        [Test]
+        public void Test_round_trip_IParent_from_ChildA()
+        {
+            var instance = Aas.Tests.CommonJsonization.LoadMaximalChildA();
+
+            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+
+            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+                jsonObject);
+
+            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+                anotherInstance);
+
+            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+                jsonObject,
+                anotherJsonObject,
+                out Aas.Reporting.Error? error);
+
+            if (error != null)
+            {
+                Assert.Fail(
+                    "When we serialize the complete instance of ChildA " +
+                    "as IParent, we get an error in the round trip: " +
+                    $"{Reporting.GenerateJsonPath(error.PathSegments)}: " +
+                    error.Cause
+                );
+            }
+        }  // void Test_round_trip_IParent_from_ChildA
+
+        [Test]
+        public void Test_round_trip_IParent_from_ChildB()
+        {
+            var instance = Aas.Tests.CommonJsonization.LoadMaximalChildB();
+
+            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+
+            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+                jsonObject);
+
+            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+                anotherInstance);
+
+            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+                jsonObject,
+                anotherJsonObject,
+                out Aas.Reporting.Error? error);
+
+            if (error != null)
+            {
+                Assert.Fail(
+                    "When we serialize the complete instance of ChildB " +
+                    "as IParent, we get an error in the round trip: " +
+                    $"{Reporting.GenerateJsonPath(error.PathSegments)}: " +
+                    error.Cause
+                );
+            }
+        }  // void Test_round_trip_IParent_from_ChildB
+
+        [Test]
+        public void Test_round_trip_IParent_from_Container()
+        {
+            var instance = Aas.Tests.CommonJsonization.LoadMaximalContainer();
+
+            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+
+            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+                jsonObject);
+
+            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+                anotherInstance);
+
+            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+                jsonObject,
+                anotherJsonObject,
+                out Aas.Reporting.Error? error);
+
+            if (error != null)
+            {
+                Assert.Fail(
+                    "When we serialize the complete instance of Container " +
+                    "as IParent, we get an error in the round trip: " +
+                    $"{Reporting.GenerateJsonPath(error.PathSegments)}: " +
+                    error.Cause
+                );
+            }
+        }  // void Test_round_trip_IParent_from_Container
     }  // class TestJsonizationOfInterfaces
 }  // namespace dummy.Tests
 
