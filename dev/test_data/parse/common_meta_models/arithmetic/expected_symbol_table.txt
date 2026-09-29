@@ -585,6 +585,7 @@ UnverifiedSymbolTable(
                 value=7,
                 original_node=...),
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(

@@ -539,6 +539,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value=True,
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Switch(
@@ -578,6 +579,7 @@ UnverifiedSymbolTable(
                     value=Constant(
                       value=False,
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)],
             default=[],
@@ -647,6 +649,7 @@ UnverifiedSymbolTable(
                           identifier='text',
                           original_node=...)],
                       original_node=...),
+                    annotation=None,
                     original_node=...),
                   Return(
                     value=Comparison(
@@ -680,6 +683,7 @@ UnverifiedSymbolTable(
                           identifier='text',
                           original_node=...)],
                       original_node=...),
+                    annotation=None,
                     original_node=...),
                   Return(
                     value=Comparison(
@@ -1108,6 +1112,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value=0,
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Switch(
@@ -1131,6 +1136,7 @@ UnverifiedSymbolTable(
                     value=Name(
                       identifier='number',
                       original_node=...),
+                    annotation=None,
                     original_node=...)],
                 original_node=...)],
             default=None,

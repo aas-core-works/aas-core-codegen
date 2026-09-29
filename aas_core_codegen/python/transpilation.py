@@ -33,6 +33,100 @@ from aas_core_codegen.python import (
 )
 
 
+def generate_type(
+    type_annotation: intermediate_type_inference.TypeAnnotationUnion,
+    types_module: Optional[Identifier],
+) -> Tuple[Optional[Stripped], Optional[str]]:
+    """
+    Generate the Python type for the given type annotation.
+
+    If ``types_module`` is specified, it is prepended to all our types. Otherwise,
+    we quote our types, as they might be declared later in the types module.
+
+    We handle only the type annotations which can be declared for the variables.
+    Otherwise, we return an error message.
+    """
+    if isinstance(type_annotation, intermediate_type_inference.PrimitiveTypeAnnotation):
+        if type_annotation.a_type in (
+            intermediate_type_inference.PrimitiveType.LENGTH,
+            intermediate_type_inference.PrimitiveType.NONE,
+        ):
+            return None, f"Unexpected primitive type: {type_annotation}"
+
+        return (
+            python_common.PRIMITIVE_TYPE_MAP[
+                intermediate.PrimitiveType(type_annotation.a_type.value)
+            ],
+            None,
+        )
+
+    elif isinstance(type_annotation, intermediate_type_inference.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        name: Identifier
+        if isinstance(our_type, intermediate.Enumeration):
+            name = python_naming.enum_name(our_type.name)
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return python_common.PRIMITIVE_TYPE_MAP[our_type.constrainee], None
+        elif isinstance(our_type, intermediate.Class):
+            name = python_naming.class_name(our_type.name)
+        elif isinstance(our_type, intermediate.NamedUnion):
+            name = python_naming.union_name(our_type.name)
+        else:
+            assert_never(our_type)
+
+        if types_module is None:
+            return Stripped(repr(name)), None
+
+        return Stripped(f"{types_module}.{name}"), None
+
+    elif isinstance(
+        type_annotation,
+        (
+            intermediate_type_inference.ListTypeAnnotation,
+            intermediate_type_inference.OptionalTypeAnnotation,
+        ),
+    ):
+        nested, error_message = generate_type(
+            type_annotation=(
+                type_annotation.items
+                if isinstance(
+                    type_annotation, intermediate_type_inference.ListTypeAnnotation
+                )
+                else type_annotation.value
+            ),
+            types_module=types_module,
+        )
+        if error_message is not None:
+            return None, error_message
+
+        generic = (
+            "List"
+            if isinstance(
+                type_annotation, intermediate_type_inference.ListTypeAnnotation
+            )
+            else "Optional"
+        )
+
+        return Stripped(f"{generic}[{nested}]"), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
+        item_types = []  # type: List[Stripped]
+        for item in type_annotation.items:
+            item_type, error_message = generate_type(
+                type_annotation=item, types_module=types_module
+            )
+            if error_message is not None:
+                return None, error_message
+
+            assert item_type is not None
+            item_types.append(item_type)
+
+        return Stripped(f"Tuple[{', '.join(item_types)}]"), None
+
+    return None, f"Unexpected type annotation of a variable: {type_annotation}"
+
+
 class Transpiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
@@ -610,7 +704,9 @@ not (
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("None"), None
+        elif isinstance(node.value, bool):
             return Stripped("True" if node.value else "False"), None
         elif isinstance(node.value, (int, float)):
             return Stripped(str(node.value)), None
@@ -1131,7 +1227,7 @@ range(
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
-                type_anno = self.type_map[node.value]
+                type_anno = self.type_map[node.target]
                 self._variable_name_set.add(node.target.identifier)
                 self._environment.set(
                     identifier=node.target.identifier, type_annotation=type_anno
@@ -1140,6 +1236,19 @@ range(
         target, error = self.transform(node=node.target)
         if error is not None:
             errors.append(error)
+
+        if node.annotation is not None and target is not None:
+            # NOTE (mristin):
+            # We keep the annotation so that mypy knows the declared type, *e.g.*,
+            # for a variable initialized with ``None``.
+            declared_type, error_message = generate_type(
+                type_annotation=self.type_map[node.target],
+                types_module=self._types_module,
+            )
+            if error_message is not None:
+                errors.append(Error(node.annotation.original_node, error_message))
+            else:
+                target = Stripped(f"{target}: {declared_type}")
 
         if len(errors) > 0:
             return None, Error(

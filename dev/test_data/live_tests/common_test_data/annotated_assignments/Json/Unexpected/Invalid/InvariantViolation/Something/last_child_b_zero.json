@@ -1,0 +1,25 @@
+{
+  "text": "",
+  "number": 0,
+  "flag": false,
+  "kind": "alpha",
+  "code": "c",
+  "item": {
+    "name": "item"
+  },
+  "parent": {
+    "aOnly": 1,
+    "modelType": "ChildA"
+  },
+  "parents": [
+    {
+      "aOnly": 1,
+      "modelType": "ChildA"
+    },
+    {
+      "bOnly": 0,
+      "modelType": "ChildB"
+    }
+  ],
+  "texts": []
+}

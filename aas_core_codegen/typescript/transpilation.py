@@ -107,6 +107,91 @@ def collect_reassigned_definitions(
     return result
 
 
+def generate_type(
+    type_annotation: intermediate_type_inference.TypeAnnotationUnion,
+    types_module: Optional[Identifier],
+) -> Tuple[Optional[Stripped], Optional[str]]:
+    """
+    Generate the TypeScript type for the given type annotation.
+
+    If ``types_module`` is specified, it is prepended to all our types.
+
+    We handle only the type annotations which can be declared for the variables.
+    Otherwise, we return an error message.
+    """
+    if isinstance(type_annotation, intermediate_type_inference.PrimitiveTypeAnnotation):
+        if type_annotation.a_type in (
+            intermediate_type_inference.PrimitiveType.LENGTH,
+            intermediate_type_inference.PrimitiveType.NONE,
+        ):
+            return None, f"Unexpected primitive type: {type_annotation}"
+
+        return (
+            typescript_common.PRIMITIVE_TYPE_MAP[
+                intermediate.PrimitiveType(type_annotation.a_type.value)
+            ],
+            None,
+        )
+
+    elif isinstance(type_annotation, intermediate_type_inference.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        name: Identifier
+        if isinstance(our_type, intermediate.Enumeration):
+            name = typescript_naming.enum_name(our_type.name)
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return typescript_common.PRIMITIVE_TYPE_MAP[our_type.constrainee], None
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            name = typescript_naming.class_name(our_type.name)
+        elif isinstance(our_type, intermediate.AbstractClass):
+            name = typescript_naming.interface_name(our_type.name)
+        elif isinstance(our_type, intermediate.NamedUnion):
+            name = typescript_naming.union_name(our_type.name)
+        else:
+            assert_never(our_type)
+
+        if types_module is None:
+            return Stripped(name), None
+
+        return Stripped(f"{types_module}.{name}"), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
+        item_type, error_message = generate_type(
+            type_annotation=type_annotation.items, types_module=types_module
+        )
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"Array<{item_type}>"), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
+        item_types = []  # type: List[Stripped]
+        for item in type_annotation.items:
+            item_type, error_message = generate_type(
+                type_annotation=item, types_module=types_module
+            )
+            if error_message is not None:
+                return None, error_message
+
+            assert item_type is not None
+            item_types.append(item_type)
+
+        return Stripped(f"[{', '.join(item_types)}]"), None
+
+    elif isinstance(
+        type_annotation, intermediate_type_inference.OptionalTypeAnnotation
+    ):
+        value_type, error_message = generate_type(
+            type_annotation=type_annotation.value, types_module=types_module
+        )
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"{value_type} | null"), None
+
+    return None, f"Unexpected type annotation of a variable: {type_annotation}"
+
+
 class Transpiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
@@ -1003,7 +1088,9 @@ AasCommon.at(
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("null"), None
+        elif isinstance(node.value, bool):
             return typescript_common.boolean_literal(node.value), None
         elif isinstance(node.value, int):
             if not typescript_common.representable_as_number(node.value):
@@ -1531,7 +1618,7 @@ AasCommon.range(
 
                 is_definition = True
 
-                type_anno = self.type_map[node.value]
+                type_anno = self.type_map[node.target]
                 self._variable_name_set.add(node.target.identifier)
                 self._environment.set(
                     identifier=node.target.identifier, type_annotation=type_anno
@@ -1593,6 +1680,29 @@ AasCommon.setAt(
         assert value is not None
 
         if is_definition:
+            # NOTE (mristin):
+            # The linter refuses the type annotations which are trivially inferred
+            # from a literal, *e.g.*, ``let count: number = 0``.
+            if node.annotation is not None and not (
+                isinstance(node.value, parse_tree.Constant)
+                and node.value.value is not None
+                and isinstance(
+                    self.type_map[node.target],
+                    intermediate_type_inference.PrimitiveTypeAnnotation,
+                )
+            ):
+                # NOTE (mristin):
+                # We spell out the declared type, as it might differ from the type
+                # of the value, *e.g.*, for ``null``.
+                declared_type, error_message = generate_type(
+                    type_annotation=self.type_map[node.target],
+                    types_module=self._types_module,
+                )
+                if error_message is not None:
+                    return None, Error(node.annotation.original_node, error_message)
+
+                target = Stripped(f"{target}: {declared_type}")
+
             if node in self._reassigned_definitions:
                 target = Stripped(f"let {target}")
             else:

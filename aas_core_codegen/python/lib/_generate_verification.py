@@ -1595,6 +1595,7 @@ from typing import (
 {I}Pattern,
 {I}Sequence,
 {I}Set,
+{I}Tuple,
 {I}Union
 )
 

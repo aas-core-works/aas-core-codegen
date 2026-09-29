@@ -84,6 +84,11 @@ def generate_type(
 
             return Stripped(java_naming.interface_name(our_type.name)), None
 
+        elif isinstance(our_type, intermediate.NamedUnion):
+            # NOTE (mristin):
+            # A named union is represented as a wrapper class in Java.
+            return Stripped(java_naming.union_name(our_type.name)), None
+
     elif isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
         item_type, error = generate_type(type_annotation=type_annotation.items)
         if error is not None:
@@ -115,7 +120,9 @@ def generate_type(
     elif isinstance(
         type_annotation, intermediate_type_inference.OptionalTypeAnnotation
     ):
-        value_type = generate_type(type_annotation=type_annotation.value)
+        value_type, error = generate_type(type_annotation=type_annotation.value)
+        if error is not None:
+            return None, error
 
         return Stripped(f"Optional<{value_type}>"), None
 
@@ -187,6 +194,23 @@ class Transpiler(
         # Keep track whenever we define a variable name, so that we can know how to
         # generate the reference in the Java code.
         self._variable_name_set = set()  # type: Set[Identifier]
+
+    def _unwrap_if_optional(
+        self, node: parse_tree.Name, variable: Stripped
+    ) -> Stripped:
+        """
+        Unwrap the ``variable`` referenced by ``node`` if it holds an ``Optional``.
+
+        We unwrap an optional variable analogously to an optional property, see
+        :py:meth:`transform_member`.
+        """
+        if not self._optional_map[node] or node in self._beneath_none_check:
+            return variable
+
+        if node in self._beneath_call:
+            return Stripped(f"{variable}.orElse(null)")
+
+        return Stripped(f"{variable}.get()")
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform(
@@ -1064,7 +1088,9 @@ class Transpiler(
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("Optional.empty()"), None
+        elif isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
         elif isinstance(node.value, int):
             # NOTE (mristin):
@@ -1632,6 +1658,36 @@ class Transpiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_any_or_all(node)
 
+    @staticmethod
+    def _wrap_into_named_union_if_necessary(
+        value: Stripped,
+        target_type: intermediate_type_inference.TypeAnnotationUnion,
+        value_type: intermediate_type_inference.TypeAnnotationUnion,
+    ) -> Stripped:
+        """
+        Wrap the instance of a class, given as ``value``, into the named union.
+
+        A named union is a wrapper class in Java, so we wrap the instance as
+        the most specific root of the union.
+        """
+        if not intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            return value
+
+        union_type = intermediate_type_inference.beneath_optional(target_type)
+        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(union_type.our_type, intermediate.NamedUnion)
+        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(value_type.our_type, intermediate.Class)
+
+        root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+        union_name = java_naming.union_name(union_type.our_type.name)
+        root_class_name = java_naming.class_name(root.name)
+
+        return Stripped(f"{union_name}.from{root_class_name}({value})")
+
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1644,11 +1700,15 @@ class Transpiler(
             # with ``List.set``, respectively. The value is an argument to these
             # methods, so we pass in ``null`` for an empty optional, and render
             # an integer literal as ``long``.
-            self._beneath_call.add(node.value)
-            value, error = self._transform_as_long(node.value)
-            self._beneath_call.remove(node.value)
-            if error is not None:
-                errors.append(error)
+            value: Optional[Stripped]
+            if isinstance(node.value, parse_tree.Constant) and node.value.value is None:
+                value = Stripped("null")
+            else:
+                self._beneath_call.add(node.value)
+                value, error = self._transform_as_long(node.value)
+                self._beneath_call.remove(node.value)
+                if error is not None:
+                    errors.append(error)
 
             receiver_node = (
                 node.target.instance
@@ -1675,6 +1735,12 @@ class Transpiler(
 
             assert value is not None
             assert receiver is not None
+
+            value = self._wrap_into_named_union_if_necessary(
+                value=value,
+                target_type=self.type_map[node.target],
+                value_type=self.type_map[node.value],
+            )
 
             if not isinstance(
                 receiver_node,
@@ -1739,10 +1805,31 @@ class Transpiler(
         # NOTE (mristin):
         # A variable of an optional type holds an ``Optional``, as we keep
         # the nullability explicit.
-        if isinstance(node.target, parse_tree.Name) and isinstance(
-            self._environment.find(identifier=node.target.identifier)
-            or self.type_map[node.value],
-            intermediate_type_inference.OptionalTypeAnnotation,
+        #
+        # The type inference records the type of the variable on the target.
+        target_type = self.type_map[node.target]
+        value_type = self.type_map[node.value]
+
+        if intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            # NOTE (mristin):
+            # We wrap the instance into the named union first, and only then into
+            # an ``Optional``, if the variable is optional.
+            value, error = self.transform(node.value)
+            if error is None:
+                assert value is not None
+                value = self._wrap_into_named_union_if_necessary(
+                    value=value, target_type=target_type, value_type=value_type
+                )
+
+                if isinstance(
+                    target_type, intermediate_type_inference.OptionalTypeAnnotation
+                ):
+                    value = Stripped(f"Optional.of({value})")
+
+        elif isinstance(
+            target_type, intermediate_type_inference.OptionalTypeAnnotation
         ):
             value, error = self._transform_as_optional(node.value)
         else:
@@ -1762,7 +1849,7 @@ class Transpiler(
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
-                type_anno = self.type_map[node.value]
+                type_anno = self.type_map[node.target]
                 self._variable_name_set.add(node.target.identifier)
                 self._environment.set(
                     identifier=node.target.identifier, type_annotation=type_anno
@@ -1771,6 +1858,18 @@ class Transpiler(
                 target, error = self.transform_name(node=node.target)
                 if error is not None:
                     errors.append(error)
+                elif node.annotation is not None and (
+                    intermediate_type_inference.try_primitive_type(type_anno)
+                    is not intermediate_type_inference.PrimitiveType.INT
+                ):
+                    # NOTE (mristin):
+                    # We spell out the declared type, as it might differ from
+                    # the type of the value, *e.g.*, for ``Optional.empty()``.
+                    declared_type, java_error = generate_type(type_anno)
+                    if java_error is not None:
+                        errors.append(java_error)
+                    else:
+                        target = Stripped(f"{declared_type} {target}")
                 elif (
                     intermediate_type_inference.try_primitive_type(type_anno)
                     is intermediate_type_inference.PrimitiveType.INT
@@ -1825,7 +1924,16 @@ class Transpiler(
         # An integer literal or a length can only be returned from a function
         # returning an integer, which we represent as ``Long``. Java does not convert
         # an ``int`` to ``Long`` implicitly, so we render them as ``long``'s.
-        value, error = self._transform_as_long(node.value)
+        #
+        # The type inference records the return type of the function on the return.
+        # A function returning an optional returns an ``Optional``.
+        value, error = (
+            self._transform_as_optional(node.value)
+            if isinstance(
+                self.type_map[node], intermediate_type_inference.OptionalTypeAnnotation
+            )
+            else self._transform_as_long(node.value)
+        )
         if error is not None:
             return None, error
 

@@ -376,10 +376,18 @@ class Transpiler(
 
         assert code is not None
 
+        # NOTE (mristin):
+        # A value of an optional type which is not narrowed down, *e.g.*, the result
+        # of a method returning an optional, is already a pointer, if the optional
+        # is represented as a pointer at all.
         if (
-            isinstance(node, (parse_tree.Name, parse_tree.Member, parse_tree.Index))
-            and self._is_pointer_map[node]
-        ) or (isinstance(node, parse_tree.Constant) and node.value is None):
+            (
+                isinstance(node, (parse_tree.Name, parse_tree.Member, parse_tree.Index))
+                and self._is_pointer_map[node]
+            )
+            or (isinstance(node, parse_tree.Constant) and node.value is None)
+            or golang_pointering.is_pointer_type(self.type_map[node])
+        ):
             return code, None
 
         # NOTE (mristin):
@@ -1251,7 +1259,9 @@ aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
+        if node.value is None:
+            return Stripped("nil"), None
+        elif isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
         elif isinstance(node.value, (int, float)):
             return Stripped(str(node.value)), None
@@ -1982,6 +1992,39 @@ aascommon.{qualifier_function}(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_any_or_all(node)
 
+    def _wrap_into_named_union_if_necessary(
+        self,
+        value: Stripped,
+        target_type: intermediate_type_inference.TypeAnnotationUnion,
+        value_type: intermediate_type_inference.TypeAnnotationUnion,
+    ) -> Stripped:
+        """
+        Wrap the instance of a class, given as ``value``, into the named union.
+
+        A named union is a pointer to a wrapper struct in Go, so we wrap
+        the instance as the most specific root of the union.
+        """
+        if not intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            return value
+
+        union_type = intermediate_type_inference.beneath_optional(target_type)
+        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(union_type.our_type, intermediate.NamedUnion)
+        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(value_type.our_type, intermediate.Class)
+
+        root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+        function_name = self._our_type_name(
+            golang_naming.function_name(
+                Identifier(f"new_{union_type.our_type.name}_from_{root.name}")
+            )
+        )
+
+        return Stripped(f"{function_name}({value})")
+
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -2024,6 +2067,12 @@ aascommon.{qualifier_function}(
 
             assert instance is not None
             assert value is not None
+
+            value = self._wrap_into_named_union_if_necessary(
+                value=value,
+                target_type=self.type_map[node.target],
+                value_type=self.type_map[node.value],
+            )
 
             setter_name = golang_naming.setter_name(node.target.name)
 
@@ -2073,7 +2122,7 @@ aascommon.{qualifier_function}(
 
             is_definition = True
 
-            type_anno = self.type_map[node.value]
+            type_anno = self.type_map[node.target]
             self._variable_name_set.add(node.target.identifier)
             self._environment.set(
                 identifier=node.target.identifier, type_annotation=type_anno
@@ -2105,8 +2154,9 @@ aascommon.{qualifier_function}(
         # NOTE (mristin):
         # A length can be assigned to an integer variable or an integer item of
         # a list, which are ``int64``'s, while the lengths are ``int``'s. A variable
-        # defined by a length is an ``int`` itself.
-        if not is_definition and not rebinds_pointer:
+        # defined by a length is an ``int`` itself, unless it is declared as
+        # an integer with a type annotation.
+        if (not is_definition or node.annotation is not None) and not rebinds_pointer:
             target_type = (
                 self._environment.find(node.target.identifier)
                 if isinstance(node.target, parse_tree.Name)
@@ -2135,7 +2185,27 @@ aascommon.{qualifier_function}(
         ):
             value = Stripped(f"int64({value})")
 
+        value = self._wrap_into_named_union_if_necessary(
+            value=value,
+            target_type=self.type_map[node.target],
+            value_type=self.type_map[node.value],
+        )
+
         assignment = "=" if not is_definition else ":="
+
+        if is_definition and node.annotation is not None:
+            # NOTE (mristin):
+            # We spell out the declared type, as it might differ from the type of
+            # the value, *e.g.*, for ``nil``.
+            declared_type, error_msg = generate_type(
+                type_annotation=self.type_map[node.target],
+                types_package=self._types_package,
+            )
+            if error_msg is not None:
+                return None, Error(node.annotation.original_node, error_msg)
+
+            target = Stripped(f"var {target} {declared_type}")
+            assignment = "="
 
         # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
@@ -2159,17 +2229,22 @@ aascommon.{qualifier_function}(
             return Stripped("return"), None
 
         # NOTE (mristin):
-        # This is a potential source of error. We infer the types based on nullability
-        # checks, so the inferred type might be a non-nullable, but Golang pointers
-        # remain pointers even after we check for them.
-        #
-        # The following transformation can not be resolved unless we know the explicit
-        # return type that we are expected — if it is an optional, we should return
-        # the value as-is, and if it is a non-optional we have to de-reference it.
-        # For now, we leave it as-is, and will revisit this part of the code once
-        # the meta-model requires it.
+        # The type inference narrows the types based on the nullability checks, so
+        # the inferred type of the value might be a non-nullable, but Golang pointers
+        # remain pointers even after we check for them. The type inference records
+        # the return type of the function on the return, so we know whether to
+        # return a pointer or de-reference it.
+        returns = self.type_map[node]
+        value_type = self.type_map[node.value]
 
-        value, error = self.transform(node.value)
+        value: Optional[Stripped]
+        if isinstance(value_type, intermediate_type_inference.OptionalTypeAnnotation):
+            value, error = self.transform(node.value)
+        elif golang_pointering.is_pointer_type(returns):
+            value, error = self._transform_as_pointer(node.value)
+        else:
+            value, error = self._transform_and_dereference_if_necessary(node.value)
+
         if error is not None:
             return None, error
 

@@ -1,0 +1,1 @@
+The declaration of the variable 'x' needs an initial value, such as ``x: ... = None``. The variables of the target languages with block scopes need to be definitely assigned before they are read.

@@ -12701,6 +12701,7 @@ UnverifiedSymbolTable(
               values=[
                 '^[a-zA-Z][a-zA-Z0-9_]*$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -12752,6 +12753,7 @@ UnverifiedSymbolTable(
               values=[
                 '^(0|[1-9][0-9]*)$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -12803,6 +12805,7 @@ UnverifiedSymbolTable(
               values=[
                 '^(0|[1-9][0-9]*)$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -12853,6 +12856,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12895,6 +12899,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12905,6 +12910,7 @@ UnverifiedSymbolTable(
               values=[
                 '((0[1-9])|(1[0-2]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12921,6 +12927,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')|(3[01]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12937,6 +12944,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')|(2[0-3]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12952,6 +12960,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12974,6 +12983,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '+)?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12983,6 +12993,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='24:00:00(\\\\.0+)?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -12992,6 +13003,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(Z|\\\\+00:00|-00:00)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13048,6 +13060,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13064,6 +13077,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -13139,6 +13153,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value="[!#$%&'*+\\\\-.^_`|~0-9a-zA-Z]",
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13155,6 +13170,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13169,6 +13185,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13183,6 +13200,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13192,6 +13210,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[ \\t]*',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13201,6 +13220,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\x80-\\\\xff]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13217,6 +13237,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13233,6 +13254,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13255,6 +13277,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*"'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13282,6 +13305,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13321,6 +13345,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -13371,6 +13396,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9A-Fa-f]{1,4}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13380,6 +13406,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13412,6 +13439,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13440,6 +13468,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13612,6 +13641,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?::)'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13621,6 +13651,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z0-9\\\\-._~]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13630,6 +13661,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value="[!$&'()*+,;=]",
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13652,6 +13684,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|:)+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13674,6 +13707,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')\\\\]'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13683,6 +13717,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='%[0-9A-Fa-f][0-9A-Fa-f]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13711,6 +13746,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13739,6 +13775,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13755,6 +13792,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13783,6 +13821,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|[:@])'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13799,6 +13838,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13815,6 +13855,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13837,6 +13878,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*)?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13858,6 +13900,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13872,6 +13915,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13894,6 +13938,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13903,6 +13948,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='file',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13923,6 +13969,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13939,6 +13986,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -13989,6 +14037,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z0-9]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -13998,6 +14047,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9A-WY-Za-wy-z]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14019,6 +14069,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '){2,8})+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14028,6 +14079,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z]{3}(-[a-zA-Z]{3}){,2}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14037,6 +14089,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14046,6 +14099,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14068,6 +14122,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14084,6 +14139,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?|[a-zA-Z]{4}|[a-zA-Z]{5,8})'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14093,6 +14149,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z]{4}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14102,6 +14159,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='([a-zA-Z]{2}|[0-9]{3})',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14124,6 +14182,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '){3})'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14140,6 +14199,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '){1,8})+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14185,6 +14245,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14213,6 +14274,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14229,6 +14291,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -14337,6 +14400,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='^[\\\\x09\\\\x0A\\\\x0D\\\\x20-\\\\uD7FF\\\\uE000-\\\\uFFFD\\\\U00010000-\\\\U0010FFFF]*$',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -14387,6 +14451,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z][a-zA-Z0-9+\\\\-.]*',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14396,6 +14461,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\xa0-\\\\ud7ff\\\\uf900-\\\\ufdcf\\\\ufdf0-\\\\uffef\\\\U00010000-\\\\U0001fffd\\\\U00020000-\\\\U0002fffd\\\\U00030000-\\\\U0003fffd\\\\U00040000-\\\\U0004fffd\\\\U00050000-\\\\U0005fffd\\\\U00060000-\\\\U0006fffd\\\\U00070000-\\\\U0007fffd\\\\U00080000-\\\\U0008fffd\\\\U00090000-\\\\U0009fffd\\\\U000a0000-\\\\U000afffd\\\\U000b0000-\\\\U000bfffd\\\\U000c0000-\\\\U000cfffd\\\\U000d0000-\\\\U000dfffd\\\\U000e1000-\\\\U000efffd]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14412,6 +14478,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14421,6 +14488,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='%[0-9A-Fa-f][0-9A-Fa-f]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14430,6 +14498,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value="[!$&'()*+,;=]",
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14458,6 +14527,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|:)*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14467,6 +14537,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9A-Fa-f]{1,4}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14476,6 +14547,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14508,6 +14580,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14536,6 +14609,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14708,6 +14782,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?::)'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14717,6 +14792,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[a-zA-Z0-9\\\\-._~]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14739,6 +14815,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|:)+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14761,6 +14838,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')\\\\]'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14789,6 +14867,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14817,6 +14896,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14826,6 +14906,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9]*',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14854,6 +14935,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14882,6 +14964,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|[:@])'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14898,6 +14981,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14914,6 +14998,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14930,6 +15015,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14952,6 +15038,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*)?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14973,6 +15060,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -14989,6 +15077,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '){0}'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15028,6 +15117,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15037,6 +15127,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\ue000-\\\\uf8ff\\\\U000f0000-\\\\U000ffffd\\\\U00100000-\\\\U0010fffd]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15059,6 +15150,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|[/?])*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15075,6 +15167,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|[/?])*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15103,6 +15196,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|@)+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15124,6 +15218,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')*'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15163,6 +15258,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15190,6 +15286,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15223,6 +15320,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15245,6 +15343,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15261,6 +15360,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -15311,6 +15411,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[AQgw]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15326,6 +15427,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '\\\\x20?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15335,6 +15437,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[AEIMQUYcgkosw048]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15350,6 +15453,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '\\\\x20?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15359,6 +15463,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[A-Za-z0-9+/]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15374,6 +15479,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '\\\\x20?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15405,6 +15511,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15436,6 +15543,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15456,6 +15564,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '= ?='],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15481,6 +15590,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '='],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15509,6 +15619,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15531,6 +15642,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15547,6 +15659,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -15597,6 +15710,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='^(true|false|1|0)$',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -15647,6 +15761,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15689,6 +15804,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15699,6 +15815,7 @@ UnverifiedSymbolTable(
               values=[
                 '((0[1-9])|(1[0-2]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15715,6 +15832,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')|(3[01]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15730,6 +15848,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15752,6 +15871,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|14:00))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15784,6 +15904,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15800,6 +15921,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -15850,6 +15972,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15892,6 +16015,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15902,6 +16026,7 @@ UnverifiedSymbolTable(
               values=[
                 '((0[1-9])|(1[0-2]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15918,6 +16043,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')|(3[01]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15934,6 +16060,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')|(2[0-3]))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15949,6 +16076,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15971,6 +16099,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '+)?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -15980,6 +16109,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='24:00:00(\\\\.0+)?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16002,6 +16132,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '|14:00))'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16059,6 +16190,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '?'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16075,6 +16207,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16150,6 +16283,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[0-9]',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16165,6 +16299,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16180,6 +16315,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16195,6 +16331,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '+'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16223,6 +16360,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16238,6 +16376,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...)],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16260,6 +16399,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 ')'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16276,6 +16416,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16326,6 +16467,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|-?INF|NaN)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16342,6 +16484,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16392,6 +16535,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\\\.[0-9]+)?S)?|([0-9]+(\\\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\\\.[0-9]+)?S)?|([0-9]+(\\\\.[0-9]+)?S))))',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16408,6 +16552,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16458,6 +16603,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|-?INF|NaN)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16474,6 +16620,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16524,6 +16671,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='---(0[1-9]|[12][0-9]|3[01])(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16540,6 +16688,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16590,6 +16739,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='--(0[1-9]|1[0-2])(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16606,6 +16756,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16656,6 +16807,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16672,6 +16824,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16722,6 +16875,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16738,6 +16892,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16788,6 +16943,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16804,6 +16960,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16854,6 +17011,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='([0-9a-fA-F]{2})*',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16870,6 +17028,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16920,6 +17079,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\\\.[0-9]+)?|(24:00:00(\\\\.0+)?))(Z|(\\\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -16936,6 +17096,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -16986,6 +17147,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\-+]?[0-9]+',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17002,6 +17164,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17052,6 +17215,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\-+]?0*[0-9]{1,20}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17068,6 +17232,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17118,6 +17283,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\-+]?0*[0-9]{1,10}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17134,6 +17300,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17184,6 +17351,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\-+]?0*[0-9]{1,5}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17200,6 +17368,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17250,6 +17419,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='[\\\\-+]?0*[0-9]{1,3}',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17266,6 +17436,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17316,6 +17487,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0|\\\\+?[0-9]+)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17332,6 +17504,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17382,6 +17555,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='\\\\+?0*[1-9][0-9]*',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17398,6 +17572,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17448,6 +17623,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0|\\\\+?0*[0-9]{1,20})',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17464,6 +17640,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17514,6 +17691,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0|\\\\+?0*[0-9]{1,10})',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17530,6 +17708,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17580,6 +17759,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0|\\\\+?0*[0-9]{1,5})',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17596,6 +17776,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17646,6 +17827,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0|\\\\+?0*[0-9]{1,3})',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17662,6 +17844,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17712,6 +17895,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(\\\\+0|0|-[0-9]+)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17728,6 +17912,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17778,6 +17963,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='(-0*[1-9][0-9]*)',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Assignment(
@@ -17794,6 +17980,7 @@ UnverifiedSymbolTable(
                   original_node=...),
                 '$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -17844,6 +18031,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='^[\\\\x09\\\\x0A\\\\x0D\\\\x20-\\\\uD7FF\\\\uE000-\\\\uFFFD\\\\U00010000-\\\\U0010FFFF]*$',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
@@ -18523,6 +18711,7 @@ UnverifiedSymbolTable(
               values=[
                 '^(en|EN)(-.*)?$'],
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(

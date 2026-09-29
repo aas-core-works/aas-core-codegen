@@ -3,7 +3,7 @@
 import ast
 import textwrap
 import unittest
-from typing import List, Mapping, Tuple
+from typing import Final, List, Mapping, Tuple
 
 import tests.common
 from aas_core_codegen import intermediate
@@ -3823,6 +3823,337 @@ __xml_namespace__ = "https://dummy.com"
             "support only parsing the integers from the strings, "
             "but got: Optional[str]",
             str(context.exception),
+        )
+
+
+_ANNOTATED_ASSIGNMENT_PRELUDE: Final[
+    str
+] = """\
+@abstract
+class Parent(DBC):
+    def __init__(self) -> None:
+        pass
+
+
+class Child_a(Parent):
+    a_only: int
+
+    def __init__(self, a_only: int) -> None:
+        self.a_only = a_only
+
+
+class Item(DBC):
+    name: str
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+
+Some_union = Union[Child_a, Item]
+
+"""
+
+_ANNOTATED_ASSIGNMENT_EPILOGUE: Final[
+    str
+] = """
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+
+class Test_annotated_assignment(unittest.TestCase):
+    def expect_type_inference_to_fail(self, body: str, expected_message: str) -> None:
+        """Expect the type inference of the verification functions to fail."""
+        source = _ANNOTATED_ASSIGNMENT_PRELUDE + body + _ANNOTATED_ASSIGNMENT_EPILOGUE
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        messages = []  # type: List[str]
+        for verification in symbol_table.verification_functions:
+            assert isinstance(verification, intermediate.TranspilableVerification)
+
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            if inference_error is not None:
+                messages.append(
+                    tests.common.most_underlying_messages([inference_error])
+                )
+
+        self.assertEqual(expected_message, "\n".join(messages), source)
+
+    def test_mismatched_declared_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    x: int = text
+    return x > 0
+""",
+            expected_message=(
+                "We inferred the target type of the assignment to be int, while the "
+                "value type is inferred to be str. We do not know how to model this "
+                "assignment."
+            ),
+        )
+
+    def test_reannotated_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: int = number
+    x: int = 0
+    return x > 0
+""",
+            expected_message=(
+                "The variable 'x' has been already defined before with the type "
+                "int, so it can not be declared again with a type annotation. "
+                "Please assign to it without the annotation, or use a different "
+                "name."
+            ),
+        )
+
+    def test_unknown_type_in_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Unknown_type = number
+    return True
+""",
+            expected_message=(
+                "The type 'Unknown_type' in the type annotation is not defined."
+            ),
+        )
+
+    def test_unsupported_generic_in_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    x: Set[str] = texts
+    return True
+""",
+            expected_message=(
+                "We support only ``Optional[...]``, ``List[...]``, "
+                "``Sequence[...]`` and ``Tuple[...]`` as generic types in the type "
+                "annotations of the variables, but got: Set[...]"
+            ),
+        )
+
+    def test_nested_optional_in_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Optional[Optional[int]] = None
+    return True
+""",
+            expected_message=(
+                "We do not support nested optionals, but got: "
+                "Optional[Optional[int]]"
+            ),
+        )
+
+    def test_inline_union_in_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(item: Item) -> bool:
+    x: Union[Child_a, Item] = item
+    return True
+""",
+            expected_message=(
+                "We do not support inline unions such as ``Union[A, B]`` in the "
+                "type annotations of the variables. The targets need a named type "
+                "to represent a union, such as a variant in C++ or a wrapper class "
+                "in C#, so only the named unions of the meta-model are accepted. "
+                "Please define a named union at the module level, *e.g.*, "
+                "``Some_union = Union[A, B]``, and annotate the variable with it, "
+                "*e.g.*, ``x: Some_union = ...``. For an optional value, please use "
+                "``Optional[...]``."
+            ),
+        )
+
+    def test_new_variable_from_none_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x = None
+    return True
+""",
+            expected_message=(
+                "We can not infer the type of the variable 'x' from ``None``. "
+                "Please declare the variable with a type annotation, *e.g.*, ``x: "
+                "Optional[...] = None``."
+            ),
+        )
+
+    def test_member_access_after_reset_to_none_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(child: Child_a) -> bool:
+    x: Optional[Child_a] = child
+    x = None
+    return x.a_only > 0
+""",
+            expected_message=(
+                "Expected an instance type to be a non-None, either an "
+                "enumeration-as-type or our type, but inferred an Optional: "
+                "Optional[Child_a]"
+            ),
+        )
+
+    def test_none_for_non_optional_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def is_short(text: str) -> bool:
+    return len(text) < 10
+
+
+@verification
+def some_func(number: int) -> bool:
+    return is_short(None)
+""",
+            expected_message=(
+                "The argument 'text' of the verification function 'is_short' is not "
+                "optional, but got None."
+            ),
+        )
+
+    def test_none_returned_from_non_optional_function_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    if number > 0:
+        return None
+
+    return True
+""",
+            expected_message=(
+                "The function returns a non-optional bool, but got a ``return "
+                "None``."
+            ),
+        )
+
+    def test_none_in_comparison_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    return text == None
+""",
+            expected_message=(
+                "We can transpile ``None`` only as the value of an assignment, as "
+                "an argument of a call or as the returned value, since the targets "
+                "need to know the type of the optional which is ``None``. To check "
+                "whether a value is ``None``, please use ``is None`` or ``is not "
+                "None``.\n"
+                "Expected the left operand to be a non-None, but got: Optional[str]"
+            ),
+        )
+
+    def test_none_in_tuple_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x = (None, number)
+    return True
+""",
+            expected_message=(
+                "We can transpile ``None`` only as the value of an assignment, as "
+                "an argument of a call or as the returned value, since the targets "
+                "need to know the type of the optional which is ``None``. To check "
+                "whether a value is ``None``, please use ``is None`` or ``is not "
+                "None``."
+            ),
+        )
+
+    def test_class_not_in_named_union_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+class Other(DBC):
+    def __init__(self) -> None:
+        pass
+
+
+@verification
+def some_func(other: Other) -> bool:
+    x: Some_union = other
+    return True
+""",
+            expected_message=(
+                "We inferred the target type of the assignment to be Some_union, "
+                "while the value type is inferred to be Other. We do not know how "
+                "to model this assignment."
+            ),
+        )
+
+    def test_named_union_assigned_to_class_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(union_value: Some_union) -> bool:
+    x: Child_a = union_value
+    return True
+""",
+            expected_message=(
+                "We inferred the target type of the assignment to be Child_a, while "
+                "the value type is inferred to be Some_union. We do not know how to "
+                "model this assignment."
+            ),
+        )
+
+    def test_optional_class_assigned_to_named_union_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(child: Optional[Child_a]) -> bool:
+    x: Some_union = child
+    return True
+""",
+            expected_message=(
+                "The value assigned to the named union 'Some_union' might be None, "
+                "since it is inferred to be Optional[Child_a]. We need to wrap the "
+                "instance into the named union in some targets, which we can not do "
+                "for a None. Please check first that the value is not None, *e.g.*, "
+                "with ``if child is not None:``."
+            ),
+        )
+
+    def test_parent_assigned_to_optional_child_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(parent: Parent) -> bool:
+    x: Optional[Child_a] = parent
+    return True
+""",
+            expected_message=(
+                "We inferred the target type of the assignment to be "
+                "Optional[Child_a], while the value type is inferred to be Parent. "
+                "We do not know how to model this assignment."
+            ),
         )
 
 

@@ -272,6 +272,7 @@ UnverifiedSymbolTable(
             value=Constant(
               value='^[0-9]+$',
               original_node=...),
+            annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(

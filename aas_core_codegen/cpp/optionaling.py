@@ -390,6 +390,9 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         return None
 
     def transform_constant(self, node: parse_tree.Constant) -> Optional[Error]:
+        # NOTE (mristin):
+        # The ``None`` is transpiled as ``common::nullopt``, which is not
+        # a ``common::optional`` itself and must never be de-referenced.
         self.is_optional_map[node] = False
         return None
 
@@ -679,10 +682,12 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         ):
             # NOTE (mristin):
             # This is a variable definition, so we introduce the variable in
-            # the current scope.
+            # the current scope. The type inference recorded the type of
+            # the variable on the target, which is the declared type if
+            # the variable has been annotated, and the type of the value otherwise.
             self._environment.set(
                 identifier=node.target.identifier,
-                type_annotation=self._type_map[node.value],
+                type_annotation=self._type_map[node.target],
             )
 
         error = self.transform(node.target)
