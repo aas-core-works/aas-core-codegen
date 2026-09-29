@@ -423,6 +423,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="problematic_keywords"
         )
 
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="sets"
+        )
+
     def test_expected_string_slicing_and_find(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="string_slicing_and_find"
@@ -626,6 +631,11 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="problematic_keywords"
         )
 
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="sets"
+        )
+
     def test_expected_string_slicing_and_find(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP,
@@ -820,6 +830,11 @@ class Test_golang(_TestCase):
     def test_expected_problematic_keywords(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="problematic_keywords"
+        )
+
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="sets"
         )
 
     def test_expected_string_slicing_and_find(self) -> None:
@@ -1023,6 +1038,11 @@ class Test_java(_TestCase):
     def test_expected_problematic_keywords(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="problematic_keywords"
+        )
+
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="sets"
         )
 
     def test_expected_string_slicing_and_find(self) -> None:
@@ -1240,6 +1260,11 @@ class Test_jsonschema(_TestCase):
             case_name="regression_when_len_constraints_on_inherited_property",
         )
 
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="sets"
+        )
+
     def test_expected_string_slicing_and_find(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
@@ -1423,6 +1448,11 @@ class Test_python(_TestCase):
     def test_expected_problematic_keywords(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="problematic_keywords"
+        )
+
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="sets"
         )
 
     def test_expected_string_slicing_and_find(self) -> None:
@@ -1632,6 +1662,11 @@ class Test_typescript(_TestCase):
             case_name="problematic_keywords",
         )
 
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="sets"
+        )
+
     def test_expected_string_slicing_and_find(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
@@ -1838,6 +1873,11 @@ class Test_xsd(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD,
             case_name="regression_when_len_constraints_on_inherited_property",
+        )
+
+    def test_expected_sets(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="sets"
         )
 
     def test_expected_string_slicing_and_find(self) -> None:

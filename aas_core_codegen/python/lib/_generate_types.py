@@ -615,6 +615,12 @@ for {loop_var} in self.{prop_name}:
             # own classes, so there is nothing to descend into.
             continue
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -993,7 +999,7 @@ def _transpile_method(
     arg_codes = [Stripped("self")] + [
         Stripped(
             f"{python_naming.argument_name(arg.name)}: "
-            f"{python_common.generate_type(type_annotation=arg.type_annotation)}"
+            f"{python_common.generate_argument_type(arg)}"
         )
         for arg in method.arguments
     ]
@@ -1955,6 +1961,17 @@ def generate(
 
         if len(symbol_table.named_unions) == 0:
             typing_imports.append(Identifier("Union"))
+
+    typing_imports.extend(
+        python_common.typing_imports_for_sets(
+            [
+                method
+                for cls in symbol_table.classes
+                for method in cls.methods
+                if method.specified_for is cls
+            ]
+        )
+    )
 
     typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
 

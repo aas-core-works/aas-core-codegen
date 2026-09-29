@@ -2272,6 +2272,11 @@ def _generate_transform_property(
         # :py:func:`_item_type_annotations`, which names the offending type,
         # and through which every use of the items goes.
         serializer = Stripped(_serializer_name(type_anno))
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
     else:
         serializer = _serialize_function(type_anno)
 
@@ -2441,6 +2446,12 @@ def _called_serialize_functions(
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+            if isinstance(type_anno, intermediate.SetTypeAnnotation):
+                raise AssertionError(
+                    f"Unexpected set in a property, as the sets are allowed only "
+                    f"in the arguments: {type_anno}"
+                )
 
             item_type_annos = (
                 _item_type_annotations(type_anno)

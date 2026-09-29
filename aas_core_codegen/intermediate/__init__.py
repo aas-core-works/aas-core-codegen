@@ -14,6 +14,7 @@ PYTHON_TYPE_TO_PRIMITIVE_TYPE = _types.PYTHON_TYPE_TO_PRIMITIVE_TYPE
 PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
+SetTypeAnnotation = _types.SetTypeAnnotation
 TupleTypeAnnotation = _types.TupleTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
 JsonValueTypeAnnotation = _types.JsonValueTypeAnnotation
@@ -87,6 +88,9 @@ uses_modulo = _types.uses_modulo
 uses_abs = _types.uses_abs
 uses_lstrip = _types.uses_lstrip
 uses_int = _types.uses_int
+uses_set_operations = _types.uses_set_operations
+uses_sets = _types.uses_sets
+declares_local_set = _types.declares_local_set
 
 NumericPlace = _types.NumericPlace
 numeric_places = _types.numeric_places

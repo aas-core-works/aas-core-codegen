@@ -18,7 +18,7 @@ public static bool DataSpecificationIec61360sForReferenceHaveAppropriateDataType
             if (
                 iec61360.DataType == null
                 || !Constants.DataTypeIec61360ForReference.Contains(
-                    iec61360.DataType)
+                    iec61360.DataType.Value)
             )
             {
                 return false;

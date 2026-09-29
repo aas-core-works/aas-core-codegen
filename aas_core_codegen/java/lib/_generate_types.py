@@ -518,6 +518,12 @@ Stream.concat(
                 f"descendable: {type_anno}"
             )
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             assert_never(type_anno)
 
@@ -663,6 +669,8 @@ def _generate_imports_for_interface(
         )
     )
 
+    imports.extend(java_common.set_imports_if_necessary(cls.methods, with_bodies=False))
+
     if len(cls.inheritances) == 0:
         import_name = Stripped(f"{package}.types.{java_common.INTERFACE_PKG}.IClass")
         imports.append(import_name)
@@ -711,6 +719,8 @@ def _generate_imports_for_class(
             prop.type_annotation for prop in cls.properties
         )
     )
+
+    imports.extend(java_common.set_imports_if_necessary(cls.methods, with_bodies=True))
 
     if _has_descendable_properties(cls):
         imports.extend(

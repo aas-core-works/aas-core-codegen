@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "Kind": {
+      "type": "string",
+      "enum": [
+        "alpha",
+        "beta",
+        "gamma"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": []
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "number": {
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/definitions/Kind"
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Kind"
+          }
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "optionalTexts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optionalKind": {
+          "$ref": "#/definitions/Kind"
+        }
+      },
+      "required": [
+        "text",
+        "number",
+        "kind",
+        "texts",
+        "numbers",
+        "kinds",
+        "codes",
+        "flags"
+      ]
+    }
+  }
+}

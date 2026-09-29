@@ -164,6 +164,15 @@ def generate_type(
 
         return Stripped(f"Array<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        item_type, error_message = generate_type(
+            type_annotation=type_annotation.items, types_module=types_module
+        )
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"Set<{item_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -839,6 +848,27 @@ AasCommon.at(
                     None,
                 )
 
+            if member_type.method is intermediate_type_inference.SET_ADD:
+                return Stripped(f"{instance}.add({args[0]})"), None
+
+            if (
+                member_type.method is intermediate_type_inference.SET_INTERSECTION
+                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            ):
+                # NOTE (mristin):
+                # See ``setIntersection`` and ``setDifference`` in the generated
+                # common module, which give a new set as Python does.
+                function_name = (
+                    "setIntersection"
+                    if member_type.method
+                    is intermediate_type_inference.SET_INTERSECTION
+                    else "setDifference"
+                )
+                return (
+                    Stripped(f"AasCommon.{function_name}({instance}, {args[0]})"),
+                    None,
+                )
+
             return None, Error(
                 node.original_node,
                 f"The handling of the built-in method {member_type.method.name!r} "
@@ -1050,6 +1080,15 @@ AasCommon.at(
                 assert arg is not None
 
                 return Stripped(f"Math.abs({arg})"), None
+
+            elif func_type.func.name == "set":
+                set_type, error_message = generate_type(
+                    self.type_map[node], types_module=self._types_module
+                )
+                if error_message is not None:
+                    return None, Error(node.original_node, error_message)
+
+                return Stripped(f"new {set_type}()"), None
 
             elif func_type.func.name == "int":
                 assert len(node.args) == 1, (

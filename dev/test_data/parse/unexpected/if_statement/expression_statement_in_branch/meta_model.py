@@ -1,7 +1,7 @@
 @verification
 def some_func(text: str) -> bool:
     if len(text) > 0:
-        len(text)
+        len(text) > 1
 
     return True
 

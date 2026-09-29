@@ -66,6 +66,7 @@ from aas_core_codegen.parse._types import (
     PRIMITIVE_TYPES,
     GENERIC_TYPES,
     MUTABILITY_TYPES,
+    SET_TYPES,
     JSON_VALUE_TYPE_NAME,
     JSON_ARRAY_TYPE_NAME,
     Description,
@@ -113,6 +114,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("Optional", "typing"),
             ("Sequence", "typing"),
             ("Set", "typing"),
+            ("AbstractSet", "typing"),
             ("Tuple", "typing"),
             ("Union", "typing"),
             ("DBC", "icontract"),
@@ -781,6 +783,18 @@ def _ann_assign_to_constant(
         )
     elif isinstance(type_annotation, SubscriptedTypeAnnotation):
         if type_annotation.identifier == "Set":
+            return (
+                None,
+                Error(
+                    node.annotation,
+                    f"The constant set {node.target.id!r} is immutable, but "
+                    f"``Set[...]`` declares a mutable set. Please declare it "
+                    f"as ``AbstractSet[...]``, *e.g.*, "
+                    f"``{node.target.id}: AbstractSet[...] = constant_set(...)``.",
+                ),
+            )
+
+        if type_annotation.identifier == "AbstractSet":
             if len(type_annotation.subscripts) != 1:
                 return (
                     None,
@@ -2546,7 +2560,14 @@ def _verify_arity_of_type_annotation_subscript(
 
         return None
 
-    expected_arity_map = {"List": 1, "Optional": 1, "Sequence": 1, "Mutable": 1}
+    expected_arity_map = {
+        "List": 1,
+        "Optional": 1,
+        "Sequence": 1,
+        "Mutable": 1,
+        "Set": 1,
+        "AbstractSet": 1,
+    }
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
         raise AssertionError(
@@ -3193,6 +3214,18 @@ def _verify_symbol_table(
                 f"Please use {replacement} instead.",
             )
 
+        if type_annotation.identifier in SET_TYPES and not allowed:
+            return Error(
+                type_annotation.node,
+                f"The type annotation {type_annotation} is not allowed "
+                f"in {where}. We support the sets only in the arguments of "
+                f"the verification functions and of the methods, at the top of "
+                f"the argument's type annotation or directly under Optional, "
+                f"and in the constant sets. The properties, the return values "
+                f"and the nested type annotations can not be sets at the moment. "
+                f"Please contact the developers if you need this feature.",
+            )
+
         if type_annotation.identifier == "Mutable" and allowed:
             wrapped = type_annotation.subscripts[0]
             while (
@@ -3202,27 +3235,41 @@ def _verify_symbol_table(
                 wrapped = wrapped.subscripts[0]
 
             if isinstance(wrapped, SubscriptedTypeAnnotation) and (
-                wrapped.identifier in ("List", "Sequence")
+                wrapped.identifier in ("List", "Sequence", "Set", "AbstractSet")
             ):
                 items = ", ".join(str(subscript) for subscript in wrapped.subscripts)
 
-                if wrapped.identifier == "Sequence":
+                if wrapped.identifier in ("List", "Sequence"):
+                    what = "list"
+                    mutable_generic = "List"
+                    read_only_generic = "Sequence"
+                    read_only_article = "a"
+                else:
+                    what = "set"
+                    mutable_generic = "Set"
+                    read_only_generic = "AbstractSet"
+                    read_only_article = "an"
+
+                if wrapped.identifier == read_only_generic:
                     return Error(
                         type_annotation.node,
                         f"The type annotation {type_annotation} is contradictory: "
-                        f"a Sequence declares a read-only list, while Mutable "
-                        f"declares that the function mutates the argument. "
-                        f"If the function mutates the list, please declare it "
-                        f"as List[{items}], which is mutable. Otherwise, please "
-                        f"declare it as Sequence[{items}] without Mutable.",
+                        f"{read_only_article} {read_only_generic} declares "
+                        f"a read-only {what}, "
+                        f"while Mutable declares that the function mutates "
+                        f"the argument. If the function mutates the {what}, "
+                        f"please declare it as {mutable_generic}[{items}], which "
+                        f"is mutable. Otherwise, please declare it "
+                        f"as {read_only_generic}[{items}] without Mutable.",
                     )
 
                 return Error(
                     type_annotation.node,
                     f"The type annotation {type_annotation} is redundant, since "
-                    f"a List already declares a mutable list. Please declare it "
-                    f"as List[{items}] without Mutable, or as Sequence[{items}] if "
-                    f"the function does not mutate the list.",
+                    f"a {mutable_generic} already declares a mutable {what}. "
+                    f"Please declare it as {mutable_generic}[{items}] without "
+                    f"Mutable, or as {read_only_generic}[{items}] if the function "
+                    f"does not mutate the {what}.",
                 )
 
         subscripts_allowed = allowed and type_annotation.identifier == "Optional"

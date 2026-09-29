@@ -194,6 +194,12 @@ def generate_header(
 
     include_guard_var = cpp_common.include_guard_var(namespace)
 
+    unordered_set_include = (
+        "#include <unordered_set>\n"
+        if cpp_common.uses_sets(symbol_table.verification_functions)
+        else ""
+    )
+
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     blocks = [
@@ -212,6 +218,7 @@ def generate_header(
 
 #pragma warning(push, 0)
 #include <set>
+{unordered_set_include}\
 #pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
@@ -2188,6 +2195,12 @@ class _Analysis:
         ):
             return True
 
+        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_annotation}"
+            )
+
         else:
             assert_never(type_annotation)
 
@@ -2399,6 +2412,12 @@ def _generate_over_expression(
             "EachKey", [expr, f"Shape::{_shape_literal(key_constrained_primitive)}"]
         )
         return cpp_over.generate_call("Chain", [one, each_key])
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
 
     else:
         assert_never(type_annotation)

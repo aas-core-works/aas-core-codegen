@@ -171,6 +171,13 @@ def generate_type(
 
         return Stripped(f"List<{item_type}>")
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
+        )
+
+        return Stripped(f"HashSet<{item_type}>")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, our_type_qualifier=our_type_qualifier)

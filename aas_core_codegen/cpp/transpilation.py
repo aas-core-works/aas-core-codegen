@@ -227,6 +227,21 @@ std::tuple<
 
         return Stripped(f"common::optional<{value_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        item_type, error_msg = generate_type(
+            type_annotation=type_annotation.items, types_namespace=types_namespace
+        )
+
+        if error_msg is not None:
+            return None, error_msg
+
+        assert item_type is not None
+
+        if item_type.endswith(">"):
+            return Stripped(f"std::unordered_set<{item_type} >"), None
+
+        return Stripped(f"std::unordered_set<{item_type}>"), None
+
     else:
         return None, (
             f"(mristin): We do not handle "
@@ -990,6 +1005,22 @@ std::make_tuple(
 
         return Stripped(f"({left}) {comparator} ({right})"), None
 
+    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
+        """
+        Convert the transpiled position ``node`` to an ``int64_t``.
+
+        The string helpers take the positions as ``int64_t``'s, our integers,
+        while the lengths are ``size_t``'s.
+        """
+        type_anno = self.type_map[node]
+        if (
+            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
+            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            return Stripped(f"static_cast<int64_t>({code})")
+
+        return code
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
         self, node: parse_tree.IsIn
@@ -1052,6 +1083,29 @@ std::make_tuple(
                 f"the container of type {container_type}. Only a JSON-able "
                 f"object, whose keys the membership is about, is supported. "
                 f"Please contact the developers if you need this feature.",
+            )
+
+        # NOTE (mristin):
+        # We look up the member in a set in constant time, while
+        # ``common::Contains`` iterates over all the items.
+        if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
+            member = self._as_int64_position(node.member, member)
+
+            if not isinstance(node.container, parse_tree.Name):
+                container = Stripped(f"({container})")
+
+            one_liner = f"{container}.find({member}) != {container}.end()"
+            if "\n" not in one_liner and len(one_liner) <= 60:
+                return Stripped(one_liner), None
+
+            return (
+                Stripped(
+                    f"""\
+{container}.find(
+{I}{indent_but_first_line(member, I)}
+) != {container}.end()"""
+                ),
+                None,
             )
 
         contains_function = cpp_naming.function_name(Identifier("contains"))
@@ -1155,6 +1209,19 @@ common::{contains_function}(
             None,
         )
 
+    def _is_set_membership(self, node: parse_tree.Node) -> bool:
+        """
+        Check whether ``node`` is a membership in a set.
+
+        We transpile it as a comparison, ``find(...) != end()``, so it needs
+        parentheses under a negation, unlike the other memberships, which we
+        transpile as function calls.
+        """
+        return isinstance(node, parse_tree.IsIn) and isinstance(
+            self.type_map[node.container],
+            intermediate_type_inference.SetTypeAnnotation,
+        )
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_implication(
         self, node: parse_tree.Implication
@@ -1190,7 +1257,9 @@ common::{contains_function}(
             parse_tree.Any,
         )
 
-        if isinstance(node.antecedent, no_parentheses_types_in_this_context):
+        if isinstance(
+            node.antecedent, no_parentheses_types_in_this_context
+        ) and not self._is_set_membership(node.antecedent):
             not_antecedent = f"!{antecedent}"
         else:
             not_antecedent = f"!({antecedent})"
@@ -1199,22 +1268,6 @@ common::{contains_function}(
             consequent = Stripped(f"({consequent})")
 
         return Stripped(f"{not_antecedent}\n|| {consequent}"), None
-
-    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
-        """
-        Convert the transpiled position ``node`` to an ``int64_t``.
-
-        The string helpers take the positions as ``int64_t``'s, our integers,
-        while the lengths are ``size_t``'s.
-        """
-        type_anno = self.type_map[node]
-        if (
-            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
-            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            return Stripped(f"static_cast<int64_t>({code})")
-
-        return code
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
@@ -1340,6 +1393,40 @@ common::{contains_function}(
                 None,
             )
 
+        if method is intermediate_type_inference.SET_ADD:
+            # NOTE (mristin):
+            # The lengths are ``size_t``'s, so we convert them to our integers.
+            item = self._as_int64_position(node.args[0], args[0])
+
+            if not isinstance(node.member.instance, parse_tree.Name):
+                instance = Stripped(f"({instance})")
+
+            return Stripped(f"{instance}.insert({item})"), None
+
+        if (
+            method is intermediate_type_inference.SET_INTERSECTION
+            or method is intermediate_type_inference.SET_DIFFERENCE
+        ):
+            # NOTE (mristin):
+            # See ``Intersection`` and ``Difference`` in the generated common
+            # module, which give a new set as Python does.
+            function_name = (
+                "Intersection"
+                if method is intermediate_type_inference.SET_INTERSECTION
+                else "Difference"
+            )
+
+            return (
+                Stripped(
+                    f"""\
+common::{function_name}(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(args[0], I)}
+)"""
+                ),
+                None,
+            )
+
         return None, Error(
             node.original_node,
             f"The handling of the built-in method {method.name!r} "
@@ -1363,7 +1450,10 @@ common::{contains_function}(
         for arg_node, argument in zip(arg_nodes, arguments):
             if argument.mutable and isinstance(
                 intermediate_type_inference.beneath_optional(self.type_map[arg_node]),
-                intermediate_type_inference.ListTypeAnnotation,
+                (
+                    intermediate_type_inference.ListTypeAnnotation,
+                    intermediate_type_inference.SetTypeAnnotation,
+                ),
             ):
                 mutable_arg_set.add(arg_node)
 
@@ -1615,6 +1705,16 @@ common::{contains_function}(
                     None,
                 )
 
+            elif func_type.func.name == "set":
+                set_type, error_msg = generate_type(
+                    self.type_map[node], types_namespace=self._types_namespace
+                )
+                if error_msg is not None:
+                    return None, Error(node.original_node, error_msg)
+
+                assert set_type is not None
+                return Stripped(f"{set_type}()"), None
+
             else:
                 return None, Error(
                     node.original_node,
@@ -1730,7 +1830,9 @@ common::{contains_function}(
             parse_tree.All,
             parse_tree.Any,
         )
-        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+        if not isinstance(
+            node.operand, no_parentheses_types_in_this_context
+        ) or self._is_set_membership(node.operand):
             return Stripped(f"!({operand})"), None
         else:
             return Stripped(f"!{operand}"), None

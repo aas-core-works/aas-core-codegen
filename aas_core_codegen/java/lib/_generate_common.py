@@ -309,6 +309,71 @@ public final class StringHelpers {{
     return Stripped("\n\n".join(blocks))
 
 
+def _generate_set_helpers(package: java_common.PackageIdentifier) -> Stripped:
+    """
+    Generate the helpers for the operations on sets.
+
+    Python gives a new set as the result of an operation, so the helpers copy
+    the sets instead of mutating them in place, as the native ``retainAll`` and
+    ``removeAll`` do.
+    """
+    code = Stripped(
+        f"""\
+/**
+ * Provide the operations on sets which give a new set, as in Python.
+ */
+public final class SetHelpers {{
+{I}private SetHelpers() {{
+{II}// Prevent instantiation
+{I}}}
+
+{I}/**
+{I} * Give a new set of the items which are both in {{@code that}} and
+{I} * in {{@code other}}.
+{I} *
+{I} * @param that set to be intersected
+{I} * @param other set to intersect with
+{I} * @param <T> type of the items
+{I} * @return new set with the common items
+{I} */
+{I}public static <T> Set<T> intersection(Set<T> that, Set<T> other) {{
+{II}final Set<T> result = new HashSet<>(that);
+{II}result.retainAll(other);
+{II}return result;
+{I}}}
+
+{I}/**
+{I} * Give a new set of the items which are in {{@code that}}, but not
+{I} * in {{@code other}}.
+{I} *
+{I} * @param that set to be subtracted from
+{I} * @param other set of the items to be left out
+{I} * @param <T> type of the items
+{I} * @return new set with the remaining items
+{I} */
+{I}public static <T> Set<T> difference(Set<T> that, Set<T> other) {{
+{II}final Set<T> result = new HashSet<>(that);
+{II}result.removeAll(other);
+{II}return result;
+{I}}}
+}}"""
+    )
+
+    blocks = [
+        java_common.WARNING,
+        Stripped(f"package {package}.common;"),
+        Stripped(
+            """\
+import java.util.HashSet;
+import java.util.Set;"""
+        ),
+        code,
+        java_common.WARNING,
+    ]  # type: List[Stripped]
+
+    return Stripped("\n\n".join(blocks))
+
+
 def generate(
     package: java_common.PackageIdentifier,
     symbol_table: intermediate.SymbolTable,
@@ -334,6 +399,13 @@ def generate(
             java_common.JavaFile(
                 "StringHelpers.java",
                 f"{_generate_string_helpers(package, symbol_table)}\n",
+            )
+        )
+
+    if intermediate.uses_set_operations(symbol_table):
+        files.append(
+            java_common.JavaFile(
+                "SetHelpers.java", f"{_generate_set_helpers(package)}\n"
             )
         )
 

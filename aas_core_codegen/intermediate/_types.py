@@ -318,9 +318,30 @@ class TupleTypeAnnotation(TypeAnnotation):
         return f"Tuple[{items_joined}]"
 
 
+class SetTypeAnnotation(TypeAnnotation):
+    """
+    Represent a type annotation involving a ``Set[...]`` or an ``AbstractSet[...]``.
+
+    An ``AbstractSet`` is a read-only set. We keep the read-only flag on
+    the argument, see :py:attr:`Argument.mutable`, so that the generators need
+    not distinguish the two.
+
+    The sets are allowed only in the arguments of the verification functions and
+    of the methods, but not in the properties or the return values.
+    """
+
+    def __init__(self, items: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
+        self.items = items
+
+    def __str__(self) -> str:
+        return f"Set[{self.items}]"
+
+
 # NOTE (mristin):
-# We do not support other generic types except for ``List`` and ``Tuple``. In the
-# future we might add support for ``Set``, ``MutableMapping`` *etc.*
+# We do not support other generic types except for ``List``, ``Tuple`` and ``Set``.
+# In the future we might add support for ``MutableMapping`` *etc.*
 
 
 class OptionalTypeAnnotation(TypeAnnotation):
@@ -392,6 +413,7 @@ TypeAnnotationUnion = Union[
     OurTypeAnnotation,
     ListTypeAnnotation,
     TupleTypeAnnotation,
+    SetTypeAnnotation,
     OptionalTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
@@ -407,6 +429,7 @@ TypeAnnotationUnionAsTuple = (
     OurTypeAnnotation,
     ListTypeAnnotation,
     TupleTypeAnnotation,
+    SetTypeAnnotation,
     OptionalTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
@@ -420,6 +443,7 @@ TypeAnnotationExceptOptional = Union[
     OurTypeAnnotation,
     ListTypeAnnotation,
     TupleTypeAnnotation,
+    SetTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
     JsonObjectTypeAnnotation,
@@ -436,6 +460,7 @@ TypeAnnotationExceptOptionalAsTuple = (
     OurTypeAnnotation,
     ListTypeAnnotation,
     TupleTypeAnnotation,
+    SetTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
     JsonObjectTypeAnnotation,
@@ -485,6 +510,7 @@ assert_union_without_excluded(
     excluded=[
         ListTypeAnnotation,
         TupleTypeAnnotation,
+        SetTypeAnnotation,
         OptionalTypeAnnotation,
     ],
 )
@@ -501,6 +527,10 @@ assert_union_without_excluded(
     original_union=TypeAnnotationUnion,
     subset_union=ContainerTypeAnnotation,
     excluded=[
+        # NOTE (mristin):
+        # The sets are allowed only in the arguments, so they are never
+        # de/serialized.
+        SetTypeAnnotation,
         PrimitiveTypeAnnotation,
         OurTypeAnnotation,
         JsonValueTypeAnnotation,
@@ -532,6 +562,10 @@ def type_annotations_equal(
 
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
+        return type_annotations_equal(that.items, other.items)
+
+    elif isinstance(that, SetTypeAnnotation):
+        assert isinstance(other, SetTypeAnnotation)
         return type_annotations_equal(that.items, other.items)
 
     elif isinstance(that, TupleTypeAnnotation):
@@ -3848,7 +3882,7 @@ def map_descendability(
             mapping[a_type_annotation] = result
             return result
 
-        elif isinstance(a_type_annotation, ListTypeAnnotation):
+        elif isinstance(a_type_annotation, (ListTypeAnnotation, SetTypeAnnotation)):
             result = recurse(a_type_annotation=a_type_annotation.items)
             mapping[a_type_annotation] = result
             return result
@@ -3917,7 +3951,7 @@ def over_type_annotation_and_nested_type_annotations(
             type_annotation.value
         )
 
-    elif isinstance(type_annotation, ListTypeAnnotation):
+    elif isinstance(type_annotation, (ListTypeAnnotation, SetTypeAnnotation)):
         yield from over_type_annotation_and_nested_type_annotations(
             type_annotation.items
         )
@@ -4270,6 +4304,86 @@ def uses_lstrip(symbol_table: SymbolTable) -> bool:
     )
 
 
+def declares_local_set(function: Union[Verification, Method]) -> bool:
+    """
+    Check whether the body of the ``function`` declares a local set.
+
+    A local set is declared with a type annotation, *e.g.*,
+    ``x: Set[str] = set()``. The implementation-specific functions have no body
+    that we know of, so they declare no local sets.
+    """
+    body = None  # type: Optional[Sequence[parse_tree.Node]]
+    if isinstance(function, TranspilableVerification):
+        body = function.parsed.body
+    elif isinstance(function, UnderstoodMethod):
+        body = function.body
+    else:
+        pass
+
+    if body is None:
+        return False
+
+    return any(
+        isinstance(node, parse_tree.Assignment)
+        and node.annotation is not None
+        and any(
+            isinstance(annotation_node, parse_tree.Name)
+            and annotation_node.identifier == "Set"
+            for annotation_node in parse_tree.over_nodes(node.annotation)
+        )
+        for body_node in body
+        for node in parse_tree.over_nodes(body_node)
+    )
+
+
+def uses_sets(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model might use the sets in transpilable code.
+
+    The sets are the constant sets, the set arguments and the local sets.
+    The generators use this function to decide whether they need to generate
+    the helper functions for the sets.
+    """
+    if any(
+        isinstance(
+            constant, (ConstantSetOfPrimitives, ConstantSetOfEnumerationLiterals)
+        )
+        for constant in symbol_table.constants
+    ):
+        return True
+
+    functions = [
+        *symbol_table.verification_functions,
+        *(method for cls in symbol_table.classes for method in cls.methods),
+    ]  # type: List[Union[Verification, Method]]
+
+    return any(
+        any(
+            isinstance(beneath_optional(argument.type_annotation), SetTypeAnnotation)
+            for argument in function.arguments
+        )
+        or declares_local_set(function)
+        for function in functions
+    )
+
+
+def uses_set_operations(symbol_table: SymbolTable) -> bool:
+    """
+    Check whether the meta-model computes an intersection or a difference of sets.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions for the operations on sets.
+
+    We do not distinguish between the methods of the sets and the methods of our
+    classes of the same name. In the worst case, we generate unused helpers.
+    """
+    return any(
+        isinstance(node, parse_tree.MethodCall)
+        and node.member.name in ("intersection", "difference")
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
 def uses_int(symbol_table: SymbolTable) -> bool:
     """
     Check whether the meta-model calls the built-in ``int`` in transpilable code.
@@ -4300,7 +4414,7 @@ def collect_ids_of_our_types_in_properties(
 
                 if isinstance(type_anno, OptionalTypeAnnotation):
                     stack.append(type_anno.value)
-                elif isinstance(type_anno, ListTypeAnnotation):
+                elif isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation)):
                     stack.append(type_anno.items)
                 elif isinstance(type_anno, TupleTypeAnnotation):
                     stack.extend(type_anno.items)

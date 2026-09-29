@@ -2269,7 +2269,7 @@ namespace AasCore.Aas3_0
                     if (
                         iec61360.DataType == null
                         || !Constants.DataTypeIec61360ForPropertyOrValue.Contains(
-                            iec61360.DataType)
+                            iec61360.DataType.Value)
                     )
                     {
                         return false;
@@ -2300,7 +2300,7 @@ namespace AasCore.Aas3_0
                     if (
                         iec61360.DataType == null
                         || !Constants.DataTypeIec61360ForReference.Contains(
-                            iec61360.DataType)
+                            iec61360.DataType.Value)
                     )
                     {
                         return false;
@@ -2331,7 +2331,7 @@ namespace AasCore.Aas3_0
                     if (
                         iec61360.DataType == null
                         || !Constants.DataTypeIec61360ForDocument.Contains(
-                            iec61360.DataType)
+                            iec61360.DataType.Value)
                     )
                     {
                         return false;
@@ -9299,7 +9299,7 @@ namespace AasCore.Aas3_0
                 if (!(
                     !(
                         (that.DataType != null)
-                        && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType)
+                        && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType.Value)
                     )
                     || (
                         (that.Unit != null)

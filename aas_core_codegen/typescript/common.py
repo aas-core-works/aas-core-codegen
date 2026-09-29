@@ -401,6 +401,13 @@ def generate_type(
 
         return Stripped(f"Array<{item_type}>")
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, types_module=types_module
+        )
+
+        return Stripped(f"Set<{item_type}>")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, types_module=types_module)

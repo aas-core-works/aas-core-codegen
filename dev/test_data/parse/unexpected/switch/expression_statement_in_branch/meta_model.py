@@ -9,7 +9,7 @@ class Kind(Enum):
 @verification
 def some_func(kind: Kind, text: str) -> bool:
     if kind == Kind.Alpha:
-        len(text)
+        len(text) > 1
 
     return True
 

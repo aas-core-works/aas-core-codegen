@@ -618,6 +618,12 @@ that->{setter_name}(
             # Nothing to recurse into.
             return Stripped("")
 
+        elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno.items}"
+            )
+
         else:
             assert_never(type_anno.items)
 
@@ -705,6 +711,12 @@ std::get<{i}>(wrapped) = Wrap<E>(
         # a reference to one of our own classes, so there is nothing to
         # recurse into.
         return Stripped("")
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
 
     else:
         # noinspection PyTypeChecker
@@ -970,6 +982,12 @@ if (that->{getter_name}().has_value()) {{
         # a reference to one of our own classes, so there is nothing to
         # recurse into.
         return Stripped("")
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
 
     else:
         # noinspection PyTypeChecker

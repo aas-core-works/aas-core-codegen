@@ -3076,6 +3076,12 @@ def _generate_deserialize_property_expr(
 
             return Stripped(f"{deserialize_function}(reader)")
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -4842,6 +4848,12 @@ def _type_annotation_contains_list(
     ):
         return False
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
+
     else:
         # noinspection PyTypeChecker
         assert_never(type_annotation)
@@ -4905,6 +4917,12 @@ def _type_annotation_contains_tuple_with_atomic_non_class_item(
         ),
     ):
         return False
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
 
     else:
         # noinspection PyTypeChecker
@@ -4984,6 +5002,12 @@ def _type_annotation_contains_list_of_atomic_non_class_values(
             # exactly like a primitive or an enumeration.
             return True
 
+        elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_annotation.items}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation.items)
@@ -5010,6 +5034,12 @@ def _type_annotation_contains_list_of_atomic_non_class_values(
         ),
     ):
         return False
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
 
     else:
         # noinspection PyTypeChecker
@@ -5084,6 +5114,12 @@ def _type_annotation_contains_list_of_instances(
             # a reference to one of our own classes.
             return False
 
+        elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_annotation.items}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation.items)
@@ -5106,6 +5142,12 @@ def _type_annotation_contains_list_of_instances(
         ),
     ):
         return False
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
 
     else:
         # noinspection PyTypeChecker

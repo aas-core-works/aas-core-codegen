@@ -1,0 +1,36 @@
+{
+  "text": "some text",
+  "number": 1,
+  "kind": "alpha",
+  "texts": [
+    "a",
+    "bb",
+    "ccc"
+  ],
+  "numbers": [
+    1,
+    2,
+    0,
+    1,
+    2
+  ],
+  "kinds": [
+    "alpha",
+    "beta",
+    "gamma"
+  ],
+  "codes": [
+    "x",
+    "y"
+  ],
+  "flags": [
+    true,
+    true
+  ],
+  "optionalTexts": [
+    "reserved",
+    "reserved",
+    "dddd"
+  ],
+  "optionalKind": "alpha"
+}

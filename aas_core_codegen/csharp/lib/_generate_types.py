@@ -860,6 +860,12 @@ foreach (var {_OUTER_ITEM_VAR} in {access_expr})
             # to descend into.
             continue
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)

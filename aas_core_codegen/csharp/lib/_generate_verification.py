@@ -1033,6 +1033,12 @@ foreach (var member in {source_expr})
                 )
             )
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 

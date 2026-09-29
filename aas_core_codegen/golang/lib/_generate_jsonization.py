@@ -1145,6 +1145,12 @@ def _generate_deserialization_switch_statement(
                     _determine_parse_function_for_atomic_value(item_type_anno)
                 )
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -2259,8 +2265,13 @@ assert_union_without_excluded(
     # NOTE (mristin):
     # ``ListTypeAnnotation`` and ``TupleTypeAnnotation`` are handled directly in
     # the calling code (see ``_generate_cls_to_map``), which unrolls them into
-    # calls of this function on the atomic items.
-    excluded=[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation],
+    # calls of this function on the atomic items. The sets are allowed only in
+    # the arguments, so they are never serialized.
+    excluded=[
+        intermediate.ListTypeAnnotation,
+        intermediate.TupleTypeAnnotation,
+        intermediate.SetTypeAnnotation,
+    ],
 )
 
 

@@ -1,0 +1,1 @@
+The type annotation Mutable[AbstractSet[str]] is contradictory: an AbstractSet declares a read-only set, while Mutable declares that the function mutates the argument. If the function mutates the set, please declare it as Set[str], which is mutable. Otherwise, please declare it as AbstractSet[str] without Mutable.

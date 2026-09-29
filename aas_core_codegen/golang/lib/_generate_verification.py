@@ -1376,6 +1376,12 @@ for key := range that.{getter_name}() {{
 
         block = Stripped("\n\n".join(blocks_of_json))
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 

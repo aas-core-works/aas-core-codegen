@@ -141,6 +141,18 @@ def generate_type(
 
         return Stripped(f"[]{item_type}"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        item_type, error_msg = generate_type(
+            type_annotation=type_annotation.items, types_package=types_package
+        )
+
+        if error_msg is not None:
+            return None, error_msg
+
+        assert item_type is not None
+
+        return Stripped(f"map[{item_type}]struct{{}}"), None
+
     elif isinstance(
         type_annotation, intermediate_type_inference.OptionalTypeAnnotation
     ):
@@ -783,6 +795,12 @@ len(
         container_type = self.type_map[node.container]
 
         # NOTE (mristin):
+        # The lengths are ``int``'s, so we convert them to our integers to look
+        # them up in a set.
+        if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
+            member = self._as_int64_position(node.member, member)
+
+        # NOTE (mristin):
         # A JSON-able object is a ``map[string]interface{}``, so the membership
         # is a question about its keys, just as it is for a set.
         if isinstance(
@@ -994,6 +1012,43 @@ aascommon.MapContains(
                     Stripped(f"strings.TrimLeft({instance}, {args[0]})"),
                     None,
                 )
+
+            if (
+                member_type.method is intermediate_type_inference.SET_INTERSECTION
+                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            ):
+                # NOTE (mristin):
+                # See ``SetIntersection`` and ``SetDifference`` in the generated
+                # common package, which give a new set as Python does.
+                function_name = (
+                    "SetIntersection"
+                    if member_type.method
+                    is intermediate_type_inference.SET_INTERSECTION
+                    else "SetDifference"
+                )
+                return (
+                    Stripped(
+                        f"""\
+aascommon.{function_name}(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(args[0], I)},
+)"""
+                    ),
+                    None,
+                )
+
+            if member_type.method is intermediate_type_inference.SET_ADD:
+                # NOTE (mristin):
+                # A set is a map to empty structs. A narrowed optional is still
+                # a pointer, so we de-reference it, and the lengths are ``int``'s,
+                # so we convert them to our integers.
+                item, error = self._transform_and_dereference_if_necessary(node.args[0])
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                item = self._as_int64_position(node.args[0], item)
+                return Stripped(f"{instance}[{item}] = struct{{}}{{}}"), None
 
             return None, Error(
                 node.original_node,
@@ -1218,6 +1273,16 @@ aascommon.MapContains(
                     )
 
                 return Stripped(f"{abs_function}({args[0]})"), None
+
+            elif func_type.func.name == "set":
+                set_type, error_msg = generate_type(
+                    self.type_map[node], types_package=self._types_package
+                )
+                if error_msg is not None:
+                    return None, Error(node.original_node, error_msg)
+
+                assert set_type is not None
+                return Stripped(f"make({set_type})"), None
 
             elif func_type.func.name == "int":
                 assert len(args) == 1, (
@@ -1911,11 +1976,19 @@ fmt.Sprintf(
         if isinstance(node.generator, parse_tree.ForEach):
             assert iteration is not None
 
+            # NOTE (mristin):
+            # A set is a map, so we iterate over its keys, see ``SomeKey`` and
+            # ``AllKeys`` in the generated common package.
+            over_set = isinstance(
+                self.type_map[node.generator.iteration],
+                intermediate_type_inference.SetTypeAnnotation,
+            )
+
             qualifier_function: str
             if isinstance(node, parse_tree.Any):
-                qualifier_function = "Some"
+                qualifier_function = "SomeKey" if over_set else "Some"
             elif isinstance(node, parse_tree.All):
-                qualifier_function = "All"
+                qualifier_function = "AllKeys" if over_set else "All"
             else:
                 assert_never(node)
 
@@ -2387,15 +2460,25 @@ return {indent_but_first_line(value, I)}"""
         if isinstance(node.generator, parse_tree.ForEach):
             # NOTE (mristin):
             # Lists are represented as slices in Go, which are never pointers.
+            # Sets are represented as maps, and we iterate over their keys.
             iteration, error = self.transform(node.generator.iteration)
             if error is not None:
                 errors.append(error)
             else:
                 assert iteration is not None
-                header = (
-                    f"for _, {variable} := range "
-                    f"{indent_but_first_line(iteration, I)}"
-                )
+                if isinstance(
+                    self.type_map[node.generator.iteration],
+                    intermediate_type_inference.SetTypeAnnotation,
+                ):
+                    header = (
+                        f"for {variable} := range "
+                        f"{indent_but_first_line(iteration, I)}"
+                    )
+                else:
+                    header = (
+                        f"for _, {variable} := range "
+                        f"{indent_but_first_line(iteration, I)}"
+                    )
 
         elif isinstance(node.generator, parse_tree.ForRange):
             assert isinstance(

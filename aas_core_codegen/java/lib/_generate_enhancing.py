@@ -463,6 +463,13 @@ def _generate_enhanced(
             )
         )
 
+        imports.extend(
+            Stripped(f"import {set_import};")
+            for set_import in java_common.set_imports_if_necessary(
+                cls.methods, with_bodies=False
+            )
+        )
+
         blocks = [
             java_common.WARNING,
             Stripped(f"package {package}.enhancing;"),
@@ -848,6 +855,12 @@ if (that.{getter_name}().isPresent()) {{
             # A JSON-able value is plain data, never one of our own classes,
             # so there is nothing to enhance.
             continue
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             assert_never(type_anno.our_type)

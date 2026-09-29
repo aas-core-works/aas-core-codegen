@@ -278,6 +278,13 @@ def generate_type(
 
         return Stripped(f"[]{item_type}")
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, types_package=types_package
+        )
+
+        return Stripped(f"map[{item_type}]struct{{}}")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, types_package=types_package)

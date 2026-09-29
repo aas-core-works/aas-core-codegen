@@ -159,14 +159,15 @@ def _generate_constant_set_of_primitives(
         set_type = "map[bool]struct{}"
         for literal in constant.literals:
             assert isinstance(literal.value, bool)
-            literal_codes.append(golang_common.boolean_literal(literal.value))
+            literal_value = golang_common.boolean_literal(literal.value)
+            literal_codes.append(f"{literal_value}: struct{{}}{{}}")
 
     elif constant.a_type is intermediate.PrimitiveType.INT:
         set_type = "map[int64]struct{}"
         for literal in constant.literals:
             assert isinstance(literal.value, int)
 
-            literal_codes.append(str(literal.value))
+            literal_codes.append(f"{literal.value}: struct{{}}{{}}")
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
         set_type = "map[float64]struct{}"
@@ -174,7 +175,8 @@ def _generate_constant_set_of_primitives(
         for literal in constant.literals:
             assert isinstance(literal.value, float)
 
-            literal_codes.append(golang_common.float_literal(literal.value))
+            literal_value = golang_common.float_literal(literal.value)
+            literal_codes.append(f"{literal_value}: struct{{}}{{}}")
 
     elif constant.a_type is intermediate.PrimitiveType.STR:
         set_type = "map[string]struct{}"
@@ -195,6 +197,13 @@ def _generate_constant_set_of_primitives(
 
     else:
         assert_never(constant.a_type)
+
+    if len(errors) > 0:
+        return None, Error(
+            constant.parsed.node,
+            f"Failed to generate the constant set {constant.name!r}",
+            errors,
+        )
 
     literals_joined = ",\n".join(literal_codes)
 

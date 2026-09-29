@@ -758,7 +758,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_set_of_primitives(self) -> None:
         source = """\
-Something: Set[str] = constant_set(
+Something: AbstractSet[str] = constant_set(
     values=["hello", "world"]
 )
 
@@ -792,7 +792,7 @@ class SomeEnum(Enum):
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
 
-Something: Set[SomeEnum] = constant_set(
+Something: AbstractSet[SomeEnum] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 
@@ -895,7 +895,7 @@ class SomeEnum(Enum):
     Another_literal = "ANOTHER-LITERAL"
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
-SomeSet: Set[SomeEnum] = constant_set(
+SomeSet: AbstractSet[SomeEnum] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 
@@ -993,7 +993,7 @@ __xml_namespace__ = "https://dummy.com"
 class SomeEnum(Enum):
     Some_literal = "SOME-LITERAL"
 
-SomeSet: Set[str] = constant_set(
+SomeSet: AbstractSet[str] = constant_set(
     values=["hello", "world"]
 )
 
@@ -1044,7 +1044,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_set_of_primitives(self) -> None:
         source = """\
-SomeSet: Set[str] = constant_set(
+SomeSet: AbstractSet[str] = constant_set(
     values=["hello", "world", "test"]
 )
 
@@ -1072,7 +1072,7 @@ class SomeEnum(Enum):
     Another_literal = "ANOTHER-LITERAL"
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
-SomeSet: Set[SomeEnum] = constant_set(
+SomeSet: AbstractSet[SomeEnum] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 

@@ -528,6 +528,12 @@ that.{prop_name} = {tuple_literal};"""
             # We can not enhance a JSON-able value; nothing to do here.
             continue
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             assert_never(type_anno)
 

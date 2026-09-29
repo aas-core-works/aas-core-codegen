@@ -1,1 +1,1 @@
-Expected only statements in a switch branch, but got an expression: len(text)
+Only the calls can be used as statements, since the other expressions have no effect

@@ -3,7 +3,7 @@
 import io
 import math
 import re
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Sequence, Union
 
 from icontract import ensure, require
 
@@ -530,6 +530,21 @@ std::vector<
 >"""
         )
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, types_namespace=types_namespace
+        )
+
+        if "<" not in item_type:
+            return Stripped(f"std::unordered_set<{item_type}>")
+
+        return Stripped(
+            f"""\
+std::unordered_set<
+{INDENT}{indent_but_first_line(item_type, INDENT)}
+>"""
+        )
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, types_namespace=types_namespace)
@@ -627,6 +642,9 @@ def is_referencable(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
         elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
             return True
 
+        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+            return True
+
         elif isinstance(
             type_annotation,
             (
@@ -681,8 +699,8 @@ def generate_argument_type(
     """
     Generate the C++ type of the ``argument`` of a verification function or a method.
 
-    The mutable lists are passed in as mutable references so that the caller
-    observes the mutations, as in Python. The instances are always passed in as
+    The mutable lists and sets are passed in as mutable references so that
+    the caller observes the mutations, as in Python. The instances are always passed in as
     constant references to the shared pointers, as the instance is mutable through
     the pointer anyway, and the type inference already refuses to mutate
     the read-only instances.
@@ -691,7 +709,7 @@ def generate_argument_type(
     """
     if argument.mutable and isinstance(
         intermediate.beneath_optional(argument.type_annotation),
-        intermediate.ListTypeAnnotation,
+        (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
     ):
         return generate_type_with_ref(
             type_annotation=argument.type_annotation,
@@ -701,6 +719,27 @@ def generate_argument_type(
     return generate_type_with_const_ref_if_applicable(
         type_annotation=argument.type_annotation,
         types_namespace=types_namespace,
+    )
+
+
+def uses_sets(
+    functions: Sequence[Union[intermediate.Verification, intermediate.Method]]
+) -> bool:
+    """
+    Check whether the ``functions`` take the sets as arguments or declare local sets.
+
+    We use this check to include ``<unordered_set>`` only where it is needed.
+    """
+    return any(
+        any(
+            isinstance(
+                intermediate.beneath_optional(argument.type_annotation),
+                intermediate.SetTypeAnnotation,
+            )
+            for argument in function.arguments
+        )
+        or intermediate.declares_local_set(function)
+        for function in functions
     )
 
 
