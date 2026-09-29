@@ -31,6 +31,8 @@ GENERIC_TYPES = {
     Identifier("JSONObject"),
     Identifier("Sequence"),
     Identifier("Mutable"),
+    Identifier("Set"),
+    Identifier("AbstractSet"),
 }
 
 #: Generic types which declare the mutability of the parameters of the verification
@@ -38,6 +40,16 @@ GENERIC_TYPES = {
 MUTABILITY_TYPES = {
     Identifier("Sequence"),
     Identifier("Mutable"),
+}
+
+#: Generic types of the sets, which are allowed only in the arguments of
+#: the verification functions and of the methods, and in the constant sets.
+#:
+#: A ``Set`` is mutable, while an ``AbstractSet`` is read-only, just as
+#: a ``List`` and a ``Sequence``, respectively.
+SET_TYPES = {
+    Identifier("Set"),
+    Identifier("AbstractSet"),
 }
 
 #: Name of the special atomic type annotation denoting an arbitrary, open

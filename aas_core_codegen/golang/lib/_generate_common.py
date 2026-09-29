@@ -1,7 +1,7 @@
 """Generate code of common functionality."""
 
 import io
-from typing import List
+from typing import Final, List, Sequence
 
 from icontract import ensure
 
@@ -44,6 +44,74 @@ func (tuple {name}[{type_args}]) Len() int {{
 }}"""
     )
 
+
+#: Check if any or all the items of a set satisfy the condition
+SOME_AND_ALL_KEYS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+// Check if any of the items of the set satisfy the condition.
+//
+// The set is represented as a map to empty structs.
+func SomeKey[K comparable](condition func(K) bool, set map[K]struct{{}}) bool {{
+{I}for k := range set {{
+{II}if condition(k) {{
+{III}return true
+{II}}}
+{I}}}
+{I}return false
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Check if all the items of the set satisfy the condition.
+//
+// The set is represented as a map to empty structs.
+func AllKeys[K comparable](condition func(K) bool, set map[K]struct{{}}) bool {{
+{I}for k := range set {{
+{II}if !condition(k) {{
+{III}return false
+{II}}}
+{I}}}
+{I}return true
+}}"""
+    ),
+]
+
+#: Give a new set as the intersection or the difference of two sets, as in Python
+SET_OPERATIONS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+// Give a new set of the items which are both in `that` and in `other`.
+func SetIntersection[K comparable](
+{I}that map[K]struct{{}},
+{I}other map[K]struct{{}},
+) map[K]struct{{}} {{
+{I}result := make(map[K]struct{{}})
+{I}for k := range that {{
+{II}if _, ok := other[k]; ok {{
+{III}result[k] = struct{{}}{{}}
+{II}}}
+{I}}}
+{I}return result
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Give a new set of the items which are in `that`, but not in `other`.
+func SetDifference[K comparable](
+{I}that map[K]struct{{}},
+{I}other map[K]struct{{}},
+) map[K]struct{{}} {{
+{I}result := make(map[K]struct{{}})
+{I}for k := range that {{
+{II}if _, ok := other[k]; !ok {{
+{III}result[k] = struct{{}}{{}}
+{II}}}
+{I}}}
+{I}return result
+}}"""
+    ),
+]
 
 #: Helper to compute the remainder of the floored division as in Python.
 #:
@@ -465,6 +533,12 @@ func FindStr(text string, sub string, start int64) int64 {{
 
     if intermediate.uses_int(symbol_table):
         blocks.append(PARSE_SAFE_INT)
+
+    if intermediate.uses_sets(symbol_table):
+        blocks.extend(SOME_AND_ALL_KEYS)
+
+    if intermediate.uses_set_operations(symbol_table):
+        blocks.extend(SET_OPERATIONS)
 
     blocks.append(golang_common.WARNING)
 

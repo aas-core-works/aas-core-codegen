@@ -347,6 +347,12 @@ for i, v := range {prop_var} {{
                 # classes, so there is nothing to enhance.
                 continue
 
+            elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
+                raise AssertionError(
+                    f"Unexpected set in a property, as the sets are allowed only "
+                    f"in the arguments: {type_anno.items}"
+                )
+
             else:
                 assert_never(type_anno.items)
 
@@ -415,6 +421,12 @@ that.{prop_setter_name}(
             # A JSON-able value is plain data, never one of our own classes, so
             # there is nothing to enhance.
             continue
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             # noinspection PyTypeChecker

@@ -42,7 +42,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_property_in_set(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
 @invariant(
@@ -101,10 +101,10 @@ Constraints(
 
     def test_property_in_set_in_conjunction(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
-Another_set: Set[str] = constant_set(
+Another_set: AbstractSet[str] = constant_set(
     values=["B", "C"])
 
 @invariant(
@@ -160,7 +160,7 @@ Constraints(
 
     def test_property_in_set_in_implication(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
 @invariant(
@@ -220,10 +220,10 @@ Constraints(
 
     def test_property_in_set_in_implication_and_conjunction(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
-Another_set: Set[str] = constant_set(
+Another_set: AbstractSet[str] = constant_set(
     values=["B", "C"])
 
 @invariant(
@@ -284,7 +284,7 @@ Constraints(
 class Test_stacking(unittest.TestCase):
     def test_only_inherited_and_no_constraints_of_its_own(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
 @invariant(
@@ -347,10 +347,10 @@ Constraints(
 
     def test_merge_with_parent(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B"])
 
-Another_set: Set[str] = constant_set(
+Another_set: AbstractSet[str] = constant_set(
     values=["B", "C"])
 
 @invariant(
@@ -414,13 +414,13 @@ Constraints(
 
     def test_merge_with_parent_and_grand_parent(self) -> None:
         source = """\
-Some_set: Set[str] = constant_set(
+Some_set: AbstractSet[str] = constant_set(
     values=["A", "B", "C"])
 
-Another_set: Set[str] = constant_set(
+Another_set: AbstractSet[str] = constant_set(
     values=["B", "C", "D"])
 
-Yet_another_set: Set[str] = constant_set(
+Yet_another_set: AbstractSet[str] = constant_set(
     values=["C", "D", "E"])
 
 @invariant(

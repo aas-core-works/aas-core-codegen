@@ -1074,6 +1074,12 @@ def _content_reader_name(
             f"_read_tuple{len(type_anno.items)}_of__" + "__".join(monikers)
         )
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1429,6 +1435,12 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_reader(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             assert_never(type_anno)
@@ -2023,6 +2035,12 @@ def _element_writer_call(
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return (_tuple_writer_name(type_anno), [prop_literal, value, "serializer"])
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2247,6 +2265,12 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_writer(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             assert_never(type_anno)

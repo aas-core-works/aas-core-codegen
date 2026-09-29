@@ -458,6 +458,12 @@ that.{getter_name}().isPresent()
                 else:
                     constructor_arg_exprs.append(f"that.{getter_name}().deepCopy()")
 
+            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+                raise AssertionError(
+                    f"Unexpected set in a property, as the sets are allowed only "
+                    f"in the arguments: {type_anno}"
+                )
+
             else:
                 assert_never(type_anno)
 

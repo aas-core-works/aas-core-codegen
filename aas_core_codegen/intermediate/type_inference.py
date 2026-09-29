@@ -231,11 +231,16 @@ class BuiltinMethod:
     def __init__(
         self,
         name: Identifier,
-        returns: "TypeAnnotationUnion",
+        returns: Optional["TypeAnnotationUnion"],
         min_arg_count: int,
         max_arg_count: int,
     ) -> None:
-        """Initialize with the given values."""
+        """
+        Initialize with the given values.
+
+        If ``returns`` is None, the returned type depends on the instance, and is
+        inferred at the call site (*e.g.*, ``set.intersection``).
+        """
         self.name = name
         self.returns = returns
         self.min_arg_count = min_arg_count
@@ -291,6 +296,50 @@ STR_LSTRIP = BuiltinMethod(
 STR_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
     STR_FIND.name: STR_FIND,
     STR_LSTRIP.name: STR_LSTRIP,
+}
+
+
+#: Represent ``set.add(item)``.
+#:
+#: The item has to be assignable to the items of the set, and the set has to be
+#: mutable. The call returns nothing, so it can only be a statement on its own.
+SET_ADD = BuiltinMethod(
+    name=Identifier("add"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.NONE),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
+#: Represent ``set.intersection(other)``.
+#:
+#: The result is a new set with the items which are in both sets. The other set
+#: has to hold the items of the same type.
+SET_INTERSECTION = BuiltinMethod(
+    name=Identifier("intersection"),
+    returns=None,
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
+#: Represent ``set.difference(other)``.
+#:
+#: The result is a new set with the items which are not in the other set.
+#: The other set has to hold the items of the same type.
+SET_DIFFERENCE = BuiltinMethod(
+    name=Identifier("difference"),
+    returns=None,
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
+#: Map the names of the built-in methods on sets to their definitions
+SET_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
+    SET_ADD.name: SET_ADD,
+    SET_INTERSECTION.name: SET_INTERSECTION,
+    SET_DIFFERENCE.name: SET_DIFFERENCE,
 }
 
 
@@ -819,6 +868,9 @@ def convert_type_annotation(
     elif isinstance(type_annotation, _types.ListTypeAnnotation):
         return ListTypeAnnotation(items=convert_type_annotation(type_annotation.items))
 
+    elif isinstance(type_annotation, _types.SetTypeAnnotation):
+        return SetTypeAnnotation(items=convert_type_annotation(type_annotation.items))
+
     elif isinstance(type_annotation, _types.TupleTypeAnnotation):
         return TupleTypeAnnotation(
             items=[convert_type_annotation(item) for item in type_annotation.items]
@@ -844,6 +896,88 @@ def convert_type_annotation(
         assert_never(type_annotation)
 
     raise AssertionError("Should not have gotten here")
+
+
+def refusal_of_set_items(items: "TypeAnnotationUnion") -> Optional[str]:
+    """
+    Explain why the ``items`` can not be the items of a set.
+
+    We support only the sets of booleans, integers, strings, the constrained
+    primitives of them, and the enumeration literals.
+
+    :return: the explanation, or None if the ``items`` are supported
+    """
+    a_type = try_primitive_type(items)
+
+    if a_type is PrimitiveType.FLOAT:
+        return (
+            f"We do not support the sets of floating-point numbers, "
+            f"but got the items of type {items}. The targets disagree on "
+            f"the equality of floating-point numbers in a set: Python finds "
+            f"a NaN only if it is the very same object, C++ and Go never find "
+            f"a NaN, while C#, Java and TypeScript always do. Moreover, Java "
+            f"tells 0.0 and -0.0 apart, while the other targets do not."
+        )
+
+    if a_type is PrimitiveType.BYTEARRAY:
+        return (
+            f"We do not support the sets of byte arrays, but got the items "
+            f"of type {items}. A bytearray is mutable and hence unhashable in "
+            f"Python, so ``set().add(bytearray(...))`` raises a ``TypeError``."
+        )
+
+    if a_type is not None:
+        return None
+
+    if isinstance(items, OurTypeAnnotation):
+        if isinstance(items.our_type, _types.Enumeration):
+            return None
+
+        return (
+            f"We support only the sets of primitive values and enumeration "
+            f"literals, but got the items of type {items}, which is "
+            f"a {'named union' if isinstance(items.our_type, _types.NamedUnion) else 'class'}. "
+            f"Please contact the developers if you need the sets of instances."
+        )
+
+    if isinstance(items, OptionalTypeAnnotation):
+        return (
+            f"We do not support None as an item of a set, but got the items "
+            f"of type {items}. Some targets can not hold a null item in a set, "
+            f"*e.g.*, a string key of a map in Go can not be nil. If the whole "
+            f"set is optional, please declare it as ``Optional[Set[...]]``."
+        )
+
+    if isinstance(items, (ListTypeAnnotation, SetTypeAnnotation)):
+        return (
+            f"We do not support the sets of lists or sets, but got the items "
+            f"of type {items}. The lists and the sets are mutable and hence "
+            f"unhashable in Python, so they can not be items of a set."
+        )
+
+    if isinstance(items, TupleTypeAnnotation):
+        return (
+            f"We do not support the sets of tuples, but got the items "
+            f"of type {items}. Only some of the targets can hash a tuple "
+            f"out of the box. Please contact the developers if you need "
+            f"this feature."
+        )
+
+    if isinstance(
+        items,
+        (JsonValueTypeAnnotation, JsonArrayTypeAnnotation, JsonObjectTypeAnnotation),
+    ):
+        return (
+            f"We do not support the sets of JSON-able values, but got the items "
+            f"of type {items}. The JSON-able arrays and objects are mutable and "
+            f"hence unhashable in Python, so they can not be items of a set."
+        )
+
+    return (
+        f"We support only the sets of booleans, integers, strings, "
+        f"the constrained primitives of them, and the enumeration literals, "
+        f"but got the items of type {items}."
+    )
 
 
 class Environment(DBC):
@@ -1949,13 +2083,13 @@ def _can_be_mutated(type_annotation: "TypeAnnotationUnion") -> bool:
     """
     Check whether a value of ``type_annotation`` can be mutated in place.
 
-    Only the lists and the instances of the classes can be mutated, possibly
-    reached through a tuple. The primitive values and the enumerations are
+    Only the lists, the sets and the instances of the classes can be mutated,
+    possibly reached through a tuple. The primitive values and the enumerations are
     immutable, and we do not support mutating the JSON-able values.
     """
     type_anno = beneath_optional(type_annotation)
 
-    if isinstance(type_anno, ListTypeAnnotation):
+    if isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation)):
         return True
 
     if isinstance(type_anno, OurTypeAnnotation):
@@ -1986,6 +2120,33 @@ def _is_access_path(node: parse_tree.Expression) -> bool:
         node = node.instance if isinstance(node, parse_tree.Member) else node.collection
 
     return isinstance(node, parse_tree.Name)
+
+
+def _is_set_call(node: parse_tree.Node) -> bool:
+    """Check whether ``node`` is a call to the built-in ``set``."""
+    return isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "set"
+
+
+def _is_new_set(
+    node: parse_tree.Node,
+    type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+) -> bool:
+    """
+    Check whether ``node`` gives a new set.
+
+    A new set is created by ``set()``, ``intersection`` or ``difference``, so it
+    shares nothing with any other set.
+    """
+    if _is_set_call(node):
+        return True
+
+    if not isinstance(node, parse_tree.MethodCall):
+        return False
+
+    member_type = type_map.get(node.member, None)
+    return isinstance(member_type, BuiltinMethodTypeAnnotation) and (
+        member_type.method is SET_INTERSECTION or member_type.method is SET_DIFFERENCE
+    )
 
 
 class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
@@ -2183,6 +2344,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         f"if the {what} mutates it"
                     )
 
+                if isinstance(
+                    beneath_optional(convert_type_annotation(argument.type_annotation)),
+                    SetTypeAnnotation,
+                ):
+                    return (
+                        f"the argument {identifier!r} is declared as "
+                        f"an AbstractSet, which is read-only. Please declare it as "
+                        f"a Set if the {what} mutates it"
+                    )
+
                 return (
                     f"the argument {identifier!r} is read-only. Please declare it "
                     f"as Mutable[...] if the {what} mutates it"
@@ -2202,6 +2373,18 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     f"the loop variable {identifier!r} iterates over "
                     f"a read-only collection"
                 )
+
+            # NOTE (mristin):
+            # The constant sets are the only sets defined in the global scope,
+            # which is immutable.
+            environment = self._environment  # type: Optional[Environment]
+            while environment is not None and identifier not in environment.mapping:
+                environment = environment.parent
+
+            if isinstance(environment, ImmutableEnvironment) and isinstance(
+                environment.mapping[identifier], SetTypeAnnotation
+            ):
+                return f"the constant set {identifier!r} is immutable"
 
             definition_reason = self._read_only_reason_by_name.get(identifier, None)
             if definition_reason is not None:
@@ -2234,6 +2417,11 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if isinstance(node, parse_tree.Slice):
             # NOTE (mristin):
             # A copy of a list is a fresh value, and hence mutable.
+            return None
+
+        if _is_new_set(node, self.type_map):
+            # NOTE (mristin):
+            # A new set is a fresh value, and hence mutable.
             return None
 
         if isinstance(node, parse_tree.MethodCall):
@@ -2640,6 +2828,25 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if instance_type is None:
             return None
+
+        if isinstance(instance_type, SetTypeAnnotation):
+            set_method = SET_METHODS_BY_NAME.get(node.name, None)
+            if set_method is None:
+                supported = ", ".join(
+                    repr(name) for name in sorted(SET_METHODS_BY_NAME.keys())
+                )
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The member {node.name!r} is not supported on sets; "
+                        f"we support only the following methods: {supported}",
+                    )
+                )
+                return None
+
+            set_method_type = BuiltinMethodTypeAnnotation(method=set_method)
+            self.type_map[node] = set_method_type
+            return set_method_type
 
         if try_primitive_type(instance_type) is PrimitiveType.STR:
             builtin_method = STR_METHODS_BY_NAME.get(node.name, None)
@@ -3156,6 +3363,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if not success:
             return None
 
+        # NOTE (mristin):
+        # The targets look up the member in a hash set, so the member has to be of
+        # the same type as the items. We accept the constrained primitives in
+        # either direction, as they are represented by their constrainees.
+        if isinstance(container_type, SetTypeAnnotation) and not (
+            _assignable(target_type=container_type.items, value_type=member_type)
+            or _assignable(target_type=member_type, value_type=container_type.items)
+        ):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"Expected the member to be of the type of the items of "
+                    f"the set {container_type}, but got: {member_type}",
+                )
+            )
+            return None
+
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
         return result
@@ -3378,10 +3602,59 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
+        elif method is SET_ADD:
+            set_type = self.type_map[node.member.instance]
+            assert isinstance(set_type, SetTypeAnnotation)
+
+            if not _assignable(target_type=set_type.items, value_type=arg_types[0]):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the item added to {set_type} to be "
+                        f"assignable to {set_type.items}, but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
+            reason = self._read_only_reason(node.member.instance)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The ``add`` mutates the set, but {reason}.",
+                    )
+                )
+                return None
+
+        elif method is SET_INTERSECTION or method is SET_DIFFERENCE:
+            set_type = self.type_map[node.member.instance]
+            assert isinstance(set_type, SetTypeAnnotation)
+
+            if not _assignable(target_type=set_type, value_type=arg_types[0]):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the argument of ``{method.name}`` to be "
+                        f"a set of the same items, {set_type}, "
+                        f"but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
         else:
             raise AssertionError(f"Unexpected built-in method: {method.name!r}")
 
-        result = method.returns
+        result: TypeAnnotationUnion
+        if method.returns is not None:
+            result = method.returns
+        else:
+            # NOTE (mristin):
+            # The intersection and the difference give a new set of the items
+            # of the instance.
+            set_type = self.type_map[node.member.instance]
+            assert isinstance(set_type, SetTypeAnnotation)
+            result = SetTypeAnnotation(items=set_type.items)
+
         self.type_map[node] = result
         return result
 
@@ -3404,6 +3677,30 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         """
         ok = True
         for arg_node, argument in zip(args, arguments):
+            # NOTE (mristin):
+            # We do not check the types of the arguments in general. However, we
+            # have to check the sets, since the targets represent them with
+            # different types which only the checks here make compatible.
+            arg_type = self.type_map.get(arg_node, None)
+            argument_type = convert_type_annotation(argument.type_annotation)
+            if (
+                arg_type is not None
+                and (
+                    isinstance(beneath_optional(arg_type), SetTypeAnnotation)
+                    or isinstance(beneath_optional(argument_type), SetTypeAnnotation)
+                )
+                and not _assignable(target_type=argument_type, value_type=arg_type)
+            ):
+                self.errors.append(
+                    Error(
+                        arg_node.original_node,
+                        f"The argument {argument.name!r} of {what} is "
+                        f"of type {argument_type}, but got: {arg_type}",
+                    )
+                )
+                ok = False
+                continue
+
             if (
                 isinstance(arg_node, parse_tree.Constant)
                 and arg_node.value is None
@@ -3597,7 +3894,19 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
 
             elif isinstance(func_type, BuiltinFunctionTypeAnnotation):
-                if func_type.func.returns is not None:
+                if func_type.func.name == "set":
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            "We support ``set()`` only as the value assigned to "
+                            "a variable declared as a set, *e.g.*, "
+                            "``x: Set[str] = set()``, since the targets need to "
+                            "know the type of the items of the new set.",
+                        )
+                    )
+                    failed = True
+
+                elif func_type.func.returns is not None:
                     result = func_type.func.returns
                 else:
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
@@ -3710,6 +4019,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     arg_type,
                     (
                         ListTypeAnnotation,
+                        SetTypeAnnotation,
                         TupleTypeAnnotation,
                         JsonArrayTypeAnnotation,
                         JsonObjectTypeAnnotation,
@@ -3720,7 +4030,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     Error(
                         node.args[0].original_node,
                         f"Expected the argument of ``len`` to be a string, "
-                        f"a bytearray, a list, a tuple, a JSONArray or "
+                        f"a bytearray, a list, a set, a tuple, a JSONArray or "
                         f"a JSONObject, since we know how to compute the length "
                         f"only of these types in all the target languages, "
                         f"but got: {arg_type}",
@@ -4282,11 +4592,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        if not isinstance(iter_type, ListTypeAnnotation):
+        # NOTE (mristin):
+        # The order of the items in a set differs among the targets. The meta-model
+        # has to make sure that the result does not depend on it.
+        if not isinstance(iter_type, (ListTypeAnnotation, SetTypeAnnotation)):
             self.errors.append(
                 Error(
                     node.iteration.original_node,
-                    f"Expected an iteration over a list, but got: {iter_type}",
+                    f"Expected an iteration over a list or a set, "
+                    f"but got: {iter_type}",
                 )
             )
             return None
@@ -4537,7 +4851,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         Resolve the type annotation of a variable declaration.
 
         We resolve the primitive types, our types, including the named unions,
-        and ``Optional``, ``List``, ``Sequence`` and ``Tuple`` of them. We refuse
+        and ``Optional``, ``List``, ``Sequence``, ``Set`` and ``Tuple`` of them. We refuse
         inline ``Union[...]``, as the targets need a named type to represent a union.
 
         Record the error, if any, and return ``None`` on failure.
@@ -4598,6 +4912,32 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
                 return ListTypeAnnotation(items=items)
 
+            if generic == "AbstractSet":
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        "We do not support declaring a variable as "
+                        "an ``AbstractSet[...]``, since it would share a set "
+                        "with another variable, and the targets disagree on "
+                        "that: C++ copies the set, while the other targets share "
+                        "it. Please declare a new set as ``Set[...]`` and "
+                        "initialize it with ``set()``.",
+                    )
+                )
+                return None
+
+            if generic == "Set":
+                set_items = self._resolve_annotation(node.index)
+                if set_items is None:
+                    return None
+
+                refusal = refusal_of_set_items(set_items)
+                if refusal is not None:
+                    self.errors.append(Error(node.original_node, refusal))
+                    return None
+
+                return SetTypeAnnotation(items=set_items)
+
             if generic == "Tuple":
                 item_nodes = (
                     node.index.values
@@ -4619,9 +4959,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 Error(
                     node.original_node,
                     f"We support only ``Optional[...]``, ``List[...]``, "
-                    f"``Sequence[...]`` and ``Tuple[...]`` as generic types in "
-                    f"the type annotations of the variables, but got: "
-                    f"{generic}[...]",
+                    f"``Sequence[...]``, ``Set[...]`` and ``Tuple[...]`` as "
+                    f"generic types in the type annotations of the variables, "
+                    f"but got: {generic}[...]",
                 )
             )
             return None
@@ -4630,9 +4970,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 Error(
                     node.original_node,
                     f"We support only the primitive types, our types, and "
-                    f"``Optional[...]``, ``List[...]``, ``Sequence[...]`` and "
-                    f"``Tuple[...]`` of them in the type annotations of "
-                    f"the variables, but got: "
+                    f"``Optional[...]``, ``List[...]``, ``Sequence[...]``, "
+                    f"``Set[...]`` and ``Tuple[...]`` of them in the type "
+                    f"annotations of the variables, but got: "
                     f"{ast.unparse(node.original_node)}",
                 )
             )
@@ -4653,6 +4993,54 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             return None
 
         return OurTypeAnnotation(our_type=our_type)
+
+    def _transform_new_set(
+        self,
+        node: parse_tree.FunctionCall,
+        target_type: Optional["TypeAnnotationUnion"],
+    ) -> Optional["TypeAnnotationUnion"]:
+        """
+        Infer the type of ``set()`` from the ``target_type`` it is assigned to.
+
+        Python infers the type of the items from the declaration, *e.g.*,
+        ``x: Set[str] = set()``, and so do we.
+        """
+        if self.transform(node.name) is None:
+            return None
+
+        if len(node.args) > 0:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We support only ``set()`` without arguments to create "
+                    f"a new set, but got {len(node.args)} argument(s). Please "
+                    f"add the items one by one with ``add``.",
+                )
+            )
+            return None
+
+        target_type_beneath = (
+            beneath_optional(target_type) if target_type is not None else None
+        )
+        if not isinstance(target_type_beneath, SetTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    "We support ``set()`` only as the value assigned to "
+                    "a variable declared as a set, *e.g.*, "
+                    "``x: Set[str] = set()``, since the targets need to "
+                    "know the type of the items of the new set"
+                    + (
+                        "."
+                        if target_type is None
+                        else f", but the target is of type {target_type}."
+                    ),
+                )
+            )
+            return None
+
+        self.type_map[node] = target_type_beneath
+        return target_type_beneath
 
     def transform_assignment(
         self, node: parse_tree.Assignment
@@ -4791,7 +5179,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        value_type = self.transform(node.value)
+        if _is_set_call(node.value):
+            assert isinstance(node.value, parse_tree.FunctionCall)
+            value_type = self._transform_new_set(
+                node=node.value, target_type=target_type
+            )
+        else:
+            value_type = self.transform(node.value)
 
         if (not is_new_variable and target_type is None) or (value_type is None):
             return None
@@ -4998,7 +5392,18 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
             if _can_be_mutated(variable_type):
-                reason = self._read_only_reason(node.value)
+                # NOTE (mristin):
+                # An optional set declared with ``None`` is mutable, since it can
+                # later be assigned only a new set, see :py:func:`_check_sets`.
+                reason = (
+                    None
+                    if (
+                        isinstance(beneath_optional(variable_type), SetTypeAnnotation)
+                        and isinstance(node.value, parse_tree.Constant)
+                        and node.value.value is None
+                    )
+                    else self._read_only_reason(node.value)
+                )
                 if reason is None:
                     self._mutable_name_set.add(node.target.identifier)
                 else:
@@ -5655,6 +6060,14 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         ),
     }
 
+    # NOTE (mristin):
+    # The type of ``set()`` is given by the declaration of the variable which it
+    # initializes, *e.g.*, ``x: Set[str] = set()``, see
+    # :py:meth:`_Inferrer.transform_assignment`.
+    mapping[Identifier("set")] = BuiltinFunctionTypeAnnotation(
+        func=BuiltinFunction(name=Identifier("set"), returns=None)
+    )
+
     for constant in symbol_table.constants:
         if isinstance(constant, _types.ConstantPrimitive):
             mapping[constant.name] = PrimitiveTypeAnnotation(
@@ -5787,6 +6200,164 @@ def _check_nones(
     return errors
 
 
+def _check_sets(
+    body: Sequence[parse_tree.Node],
+    type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+    representation_map: Mapping[parse_tree.Node, str],
+) -> List[Error]:
+    """
+    Check that the sets in the ``body`` are used only where we can transpile them.
+
+    A set can be the container of ``in``, the collection of a for-loop,
+    the receiver of its methods, an argument of a call, the target of
+    an assignment and the value of a nullness check. A new set, *e.g.*, from
+    ``set()`` or ``intersection``, can also be assigned. Elsewhere, *e.g.*, in
+    ``b = a``, the targets would need to either copy or share the set, and they
+    disagree on that: C++ copies it, while the other targets share it. The type
+    inference checks the arguments of the calls with more specific errors, *e.g.*,
+    that a set is passed only to a set argument.
+
+    The ``add`` returns nothing, so it can only be a statement on its own.
+
+    A set can not be mutated in a for-loop over it, as the targets disagree on
+    that: Python and Java throw, C++ is undefined, while Go and TypeScript carry on.
+    """
+    allowed_set = set()  # type: Set[parse_tree.Node]
+    statement_calls = set()  # type: Set[parse_tree.Node]
+    set_nodes = []  # type: List[parse_tree.Node]
+    adds = []  # type: List[parse_tree.MethodCall]
+
+    # NOTE (mristin):
+    # We collect the sets passed to the mutable arguments together with the calls.
+    mutated_set_nodes = []  # type: List[parse_tree.Expression]
+
+    loops_over_sets = []  # type: List[parse_tree.For]
+
+    for node_in_body in body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if (
+                isinstance(node, parse_tree.For)
+                and isinstance(node.generator, parse_tree.ForEach)
+                and isinstance(
+                    type_map.get(node.generator.iteration, None), SetTypeAnnotation
+                )
+            ):
+                loops_over_sets.append(node)
+
+            arguments = None  # type: Optional[Sequence[_types.Argument]]
+            call_args = ()  # type: Sequence[parse_tree.Expression]
+            if isinstance(node, parse_tree.FunctionCall):
+                func_type = type_map.get(node.name, None)
+                if isinstance(func_type, VerificationTypeAnnotation):
+                    arguments = func_type.func.arguments
+                    call_args = node.args
+            elif isinstance(node, parse_tree.MethodCall):
+                method_type = type_map.get(node.member, None)
+                if isinstance(method_type, MethodTypeAnnotation):
+                    arguments = method_type.method.arguments
+                    call_args = node.args
+            else:
+                pass
+
+            if arguments is not None:
+                for arg_node, argument in zip(call_args, arguments):
+                    arg_type = type_map.get(arg_node, None)
+                    if (
+                        argument.mutable
+                        and arg_type is not None
+                        and isinstance(beneath_optional(arg_type), SetTypeAnnotation)
+                    ):
+                        mutated_set_nodes.append(arg_node)
+
+            if isinstance(node, parse_tree.IsIn):
+                allowed_set.add(node.container)
+
+            elif isinstance(node, (parse_tree.IsNone, parse_tree.IsNotNone)):
+                allowed_set.add(node.value)
+
+            elif isinstance(node, parse_tree.Assignment):
+                allowed_set.add(node.target)
+                if _is_new_set(node.value, type_map):
+                    allowed_set.add(node.value)
+
+            elif isinstance(node, parse_tree.ExpressionStatement):
+                statement_calls.add(node.expression)
+
+            elif isinstance(node, parse_tree.MethodCall):
+                allowed_set.update(node.args)
+
+                member_type = type_map.get(node.member, None)
+                if (
+                    isinstance(member_type, BuiltinMethodTypeAnnotation)
+                    and member_type.method is SET_ADD
+                ):
+                    adds.append(node)
+
+            elif isinstance(node, parse_tree.FunctionCall):
+                allowed_set.update(node.args)
+
+            elif isinstance(node, parse_tree.Member):
+                allowed_set.add(node.instance)
+
+            elif isinstance(node, parse_tree.ForEach):
+                allowed_set.add(node.iteration)
+
+            if isinstance(node, parse_tree.Expression):
+                type_anno = type_map.get(node, None)
+                if type_anno is not None and isinstance(
+                    beneath_optional(type_anno), SetTypeAnnotation
+                ):
+                    set_nodes.append(node)
+
+    errors = [
+        Error(
+            node.original_node,
+            "We support a set only as the container of ``in``, the collection "
+            "of a for-loop, the receiver of its methods, an argument of a call, "
+            "the target of an assignment, the value of a nullness check, and "
+            "a new set as the assigned value. Elsewhere, the targets would need "
+            "to either copy or share the set, and they disagree on that: C++ "
+            "copies it, while the other targets share it.",
+        )
+        for node in set_nodes
+        if node not in allowed_set
+    ]  # type: List[Error]
+
+    errors.extend(
+        Error(
+            add.original_node,
+            "The ``add`` of a set returns nothing, so it can only be called as "
+            "a statement on its own.",
+        )
+        for add in adds
+        if add not in statement_calls
+    )
+
+    mutated_set_nodes.extend(add.member.instance for add in adds)
+
+    for loop in loops_over_sets:
+        assert isinstance(loop.generator, parse_tree.ForEach)
+        iterated = representation_map[loop.generator.iteration]
+
+        nodes_in_loop = {
+            node for stmt in loop.body for node in parse_tree.over_nodes(stmt)
+        }
+
+        errors.extend(
+            Error(
+                mutated.original_node,
+                f"The set {iterated} can not be mutated in the for-loop over it, "
+                f"since the targets disagree on that: Python and Java throw "
+                f"an exception, the behavior is undefined in C++, while Go and "
+                f"TypeScript carry on.",
+            )
+            for mutated in mutated_set_nodes
+            if mutated in nodes_in_loop and representation_map[mutated] == iterated
+        )
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_for_function(
     body: Sequence[parse_tree.Node],
@@ -5820,6 +6391,13 @@ def _infer_for_function(
         _ = type_inferrer.transform(node_in_body)
 
     type_inferrer.errors.extend(_check_nones(body=body, returns=returns))
+    type_inferrer.errors.extend(
+        _check_sets(
+            body=body,
+            type_map=type_inferrer.type_map,
+            representation_map=canonicalizer.representation_map,
+        )
+    )
 
     # NOTE (mristin):
     # Some targets, such as Go or Java, refuse to compile a function which misses
@@ -5993,6 +6571,13 @@ def infer_for_invariant(
     _ = type_inferrer.transform(invariant.body)
 
     type_inferrer.errors.extend(_check_nones(body=[invariant.body], returns=None))
+    type_inferrer.errors.extend(
+        _check_sets(
+            body=[invariant.body],
+            type_map=type_inferrer.type_map,
+            representation_map=canonicalizer.representation_map,
+        )
+    )
 
     if len(type_inferrer.errors):
         return None, Error(

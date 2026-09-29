@@ -2418,6 +2418,12 @@ DeserializeList<
 
         return Stripped(f"{deserialize_function}(value)")
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         # noinspection PyTypeChecker
         assert_never(type_anno)
@@ -4349,6 +4355,12 @@ Serialize{union_name}(
             f"but got: {type_anno}"
         )
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         # noinspection PyTypeChecker
         assert_never(type_anno)
@@ -5173,6 +5185,12 @@ def _type_annotation_contains_list(
         ),
     ):
         return False
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_annotation}"
+        )
 
     else:
         # noinspection PyTypeChecker

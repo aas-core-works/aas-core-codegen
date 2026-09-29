@@ -1,6 +1,7 @@
 """Generate code of common functionality."""
 
 import io
+from typing import Final, Sequence
 
 from icontract import ensure
 
@@ -81,6 +82,46 @@ export function floorMod(dividend: number, divisor: number): number {{
 }}"""
 )
 
+
+#: Give a new set as the intersection or the difference of two sets, as in Python
+SET_OPERATIONS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+/**
+ * Give a new set of the items which are both in `that` and in `other`.
+ */
+export function setIntersection<T>(
+{I}that: Set<T>,
+{I}other: Set<T>
+): Set<T> {{
+{I}const result = new Set<T>();
+{I}for (const item of that) {{
+{II}if (other.has(item)) {{
+{III}result.add(item);
+{II}}}
+{I}}}
+{I}return result;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Give a new set of the items which are in `that`, but not in `other`.
+ */
+export function setDifference<T>(
+{I}that: Set<T>,
+{I}other: Set<T>
+): Set<T> {{
+{I}const result = new Set<T>();
+{I}for (const item of that) {{
+{II}if (!other.has(item)) {{
+{III}result.add(item);
+{II}}}
+{I}}}
+{I}return result;
+}}"""
+    ),
+]
 
 #: Parse a text as a safe integer; this is how we transpile the built-in ``int``.
 #:
@@ -814,6 +855,13 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # the built-in ``int``.
     if intermediate.uses_int(symbol_table):
         blocks.insert(len(blocks) - 1, PARSE_SAFE_INT)
+
+    # NOTE (mristin):
+    # Analogous to the modulo, we add the helpers only if the meta-model computes
+    # an intersection or a difference of sets.
+    if intermediate.uses_set_operations(symbol_table):
+        for block in SET_OPERATIONS:
+            blocks.insert(len(blocks) - 1, block)
 
     # NOTE (mristin):
     # We need a helper which follows the Python implementation of ``str.lstrip``,

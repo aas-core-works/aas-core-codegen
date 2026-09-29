@@ -1,6 +1,6 @@
-Something: Set[str] = constant_set(values=["some literal", "another literal"])
+Something: AbstractSet[str] = constant_set(values=["some literal", "another literal"])
 
-Something_extended: Set[str] = constant_set(
+Something_extended: AbstractSet[str] = constant_set(
     values=[
         "some literal",
         "another literal",

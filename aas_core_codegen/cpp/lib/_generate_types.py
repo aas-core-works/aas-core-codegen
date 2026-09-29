@@ -1145,6 +1145,14 @@ def generate_header(
         else ""
     )
 
+    unordered_set_include = (
+        "#include <unordered_set>\n"
+        if cpp_common.uses_sets(
+            [method for cls in symbol_table.classes for method in cls.methods]
+        )
+        else ""
+    )
+
     blocks = [
         Stripped(
             f"""\
@@ -1162,6 +1170,7 @@ def generate_header(
 #include <cstdint>
 #include <memory>
 #include <string>
+{unordered_set_include}\
 #include <vector>
 #pragma warning(pop)"""
         ),

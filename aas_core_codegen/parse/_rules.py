@@ -1141,6 +1141,7 @@ def _parse_block(
                 tree.Continue,
                 tree.Break,
                 tree.If,
+                tree.ExpressionStatement,
             ),
         ):
             return None, Error(

@@ -1276,7 +1276,7 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "Expected the argument of ``len`` to be a string, "
-                "a bytearray, a list, a tuple, a JSONArray or a JSONObject, "
+                "a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, "
                 "since we know how to compute the length only of these types "
                 "in all the target languages, but got: int"
             ),
@@ -3946,13 +3946,14 @@ def some_func(number: int) -> bool:
             body="""\
 @verification
 def some_func(texts: Sequence[str]) -> bool:
-    x: Set[str] = texts
+    x: Mapping[str, str] = texts
     return True
 """,
             expected_message=(
                 "We support only ``Optional[...]``, ``List[...]``, "
-                "``Sequence[...]`` and ``Tuple[...]`` as generic types in the type "
-                "annotations of the variables, but got: Set[...]"
+                "``Sequence[...]``, ``Set[...]`` and ``Tuple[...]`` as generic "
+                "types in the type annotations of the variables, but got: "
+                "Mapping[...]"
             ),
         )
 
@@ -4153,6 +4154,447 @@ def some_func(parent: Parent) -> bool:
                 "We inferred the target type of the assignment to be "
                 "Optional[Child_a], while the value type is inferred to be Parent. "
                 "We do not know how to model this assignment."
+            ),
+        )
+
+
+_SET_PRELUDE: Final[
+    str
+] = """\
+class Item(DBC):
+    name: str
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+
+Reserved_texts: AbstractSet[str] = constant_set(values=["reserved"])
+
+
+@verification
+def is_in(text: str, texts: AbstractSet[str]) -> bool:
+    return text in texts
+
+
+@verification
+def collect(text: str, texts: Set[str]) -> bool:
+    texts.add(text)
+    return True
+
+
+"""
+
+
+class Test_set(unittest.TestCase):
+    def expect_type_inference_to_fail(self, body: str, expected_message: str) -> None:
+        """Expect the type inference of the verification functions to fail."""
+        source = _SET_PRELUDE + body + _ANNOTATED_ASSIGNMENT_EPILOGUE
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        messages = []  # type: List[str]
+        for verification in symbol_table.verification_functions:
+            assert isinstance(verification, intermediate.TranspilableVerification)
+
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            if inference_error is not None:
+                messages.append(
+                    tests.common.most_underlying_messages([inference_error])
+                )
+
+        self.assertEqual(expected_message, "\n".join(messages), source)
+
+    def test_set_without_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    seen = set()
+    return True
+""",
+            expected_message=(
+                "We support ``set()`` only as the value assigned to a variable "
+                "declared as a set, *e.g.*, ``x: Set[str] = set()``, since the "
+                "targets need to know the type of the items of the new set."
+            ),
+        )
+
+    def test_set_with_arguments_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    seen: Set[str] = set(texts)
+    return True
+""",
+            expected_message=(
+                "We support only ``set()`` without arguments to create a new set, "
+                "but got 1 argument(s). Please add the items one by one with "
+                "``add``."
+            ),
+        )
+
+    def test_set_assigned_to_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    seen: List[str] = set()
+    return True
+""",
+            expected_message=(
+                "We support ``set()`` only as the value assigned to a variable "
+                "declared as a set, *e.g.*, ``x: Set[str] = set()``, since the "
+                "targets need to know the type of the items of the new set, but the "
+                "target is of type List[str]."
+            ),
+        )
+
+    def test_set_as_argument_of_call_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    return is_in(text, set())
+""",
+            expected_message=(
+                "We support ``set()`` only as the value assigned to a variable "
+                "declared as a set, *e.g.*, ``x: Set[str] = set()``, since the "
+                "targets need to know the type of the items of the new set."
+            ),
+        )
+
+    def test_set_of_floats_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: Sequence[float]) -> bool:
+    seen: Set[float] = set()
+    return True
+""",
+            expected_message=(
+                "We do not support the sets of floating-point numbers, but got the "
+                "items of type float. The targets disagree on the equality of "
+                "floating-point numbers in a set: Python finds a NaN only if it is "
+                "the very same object, C++ and Go never find a NaN, while C#, Java "
+                "and TypeScript always do. Moreover, Java tells 0.0 and -0.0 apart, "
+                "while the other targets do not."
+            ),
+        )
+
+    def test_set_of_byte_arrays_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(data: bytearray) -> bool:
+    seen: Set[bytearray] = set()
+    return True
+""",
+            expected_message=(
+                "We do not support the sets of byte arrays, but got the items of "
+                "type bytearray. A bytearray is mutable and hence unhashable in "
+                "Python, so ``set().add(bytearray(...))`` raises a ``TypeError``."
+            ),
+        )
+
+    def test_set_of_instances_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(item: Item) -> bool:
+    seen: Set[Item] = set()
+    return True
+""",
+            expected_message=(
+                "We support only the sets of primitive values and enumeration "
+                "literals, but got the items of type Item, which is a class. Please "
+                "contact the developers if you need the sets of instances."
+            ),
+        )
+
+    def test_set_of_optionals_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: Set[Optional[str]] = set()
+    return True
+""",
+            expected_message=(
+                "We do not support None as an item of a set, but got the items of "
+                "type Optional[str]. Some targets can not hold a null item in a "
+                "set, *e.g.*, a string key of a map in Go can not be nil. If the "
+                "whole set is optional, please declare it as ``Optional[Set[...]]``."
+            ),
+        )
+
+    def test_set_of_lists_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: Set[List[str]] = set()
+    return True
+""",
+            expected_message=(
+                "We do not support the sets of lists or sets, but got the items of "
+                "type List[str]. The lists and the sets are mutable and hence "
+                "unhashable in Python, so they can not be items of a set."
+            ),
+        )
+
+    def test_abstract_set_declared_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: AbstractSet[str] = Reserved_texts
+    return True
+""",
+            expected_message=(
+                "We do not support declaring a variable as an ``AbstractSet[...]``, "
+                "since it would share a set with another variable, and the targets "
+                "disagree on that: C++ copies the set, while the other targets "
+                "share it. Please declare a new set as ``Set[...]`` and initialize "
+                "it with ``set()``."
+            ),
+        )
+
+    def test_add_to_constant_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    Reserved_texts.add(text)
+    return True
+""",
+            expected_message=(
+                "The ``add`` mutates the set, but the constant set 'Reserved_texts' "
+                "is immutable."
+            ),
+        )
+
+    def test_add_to_read_only_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str, texts: AbstractSet[str]) -> bool:
+    texts.add(text)
+    return True
+""",
+            expected_message=(
+                "The ``add`` mutates the set, but the argument 'texts' is declared "
+                "as an AbstractSet, which is read-only. Please declare it as a Set "
+                "if the function mutates it."
+            ),
+        )
+
+    def test_add_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    seen: Set[str] = set()
+    seen.add(number)
+    return True
+""",
+            expected_message=(
+                "Expected the item added to Set[str] to be assignable to str, but "
+                "got: int"
+            ),
+        )
+
+    def test_add_as_expression_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: Set[str] = set()
+    result = seen.add(text)
+    return True
+""",
+            expected_message=(
+                "The ``add`` of a set returns nothing, so it can only be called as "
+                "a statement on its own.\n"
+                "We can not infer the type of the variable 'result' from ``None``. "
+                "Please declare the variable with a type annotation, *e.g.*, "
+                "``result: Optional[...] = None``."
+            ),
+        )
+
+    def test_unknown_method_on_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: Set[str] = set()
+    seen.discard(text)
+    return True
+""",
+            expected_message=(
+                "The member 'discard' is not supported on sets; we support only the "
+                "following methods: 'add', 'difference', 'intersection'"
+            ),
+        )
+
+    def test_is_in_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    return number in Reserved_texts
+""",
+            expected_message=(
+                "Expected the member to be of the type of the items of the set "
+                "Set[str], but got: int"
+            ),
+        )
+
+    def test_aliasing_of_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    seen: Set[str] = set()
+    other = seen
+    return True
+""",
+            expected_message=(
+                "We support a set only as the container of ``in``, the collection "
+                "of a for-loop, the receiver of its methods, an argument of a call, "
+                "the target of an assignment, the value of a nullness check, and a "
+                "new set as the assigned value. Elsewhere, the targets would need "
+                "to either copy or share the set, and they disagree on that: C++ "
+                "copies it, while the other targets share it."
+            ),
+        )
+
+    def test_constant_set_to_mutable_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    return collect(text, Reserved_texts)
+""",
+            expected_message=(
+                "The argument 'texts' of the verification function 'collect' is "
+                "mutable, but the constant set 'Reserved_texts' is immutable."
+            ),
+        )
+
+    def test_set_of_other_items_as_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    seen: Set[int] = set()
+    return is_in("x", seen)
+""",
+            expected_message=(
+                "The argument 'texts' of the verification function 'is_in' is of "
+                "type Set[str], but got: Set[int]"
+            ),
+        )
+
+    def test_list_as_set_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    return is_in("x", texts)
+""",
+            expected_message=(
+                "The argument 'texts' of the verification function 'is_in' is of "
+                "type Set[str], but got: List[str]"
+            ),
+        )
+
+    def test_add_in_loop_over_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Set[str]) -> bool:
+    for text in texts:
+        texts.add(text)
+    return True
+""",
+            expected_message=(
+                "The set texts can not be mutated in the for-loop over it, since "
+                "the targets disagree on that: Python and Java throw an exception, "
+                "the behavior is undefined in C++, while Go and TypeScript carry on."
+            ),
+        )
+
+    def test_mutable_argument_in_loop_over_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Set[str]) -> bool:
+    for text in texts:
+        collect(text, texts)
+    return True
+""",
+            expected_message=(
+                "The set texts can not be mutated in the for-loop over it, since "
+                "the targets disagree on that: Python and Java throw an exception, "
+                "the behavior is undefined in C++, while Go and TypeScript carry on."
+            ),
+        )
+
+    def test_intersection_with_other_items_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: AbstractSet[str], numbers: AbstractSet[int]) -> bool:
+    return len(texts.intersection(numbers)) > 0
+""",
+            expected_message=(
+                "Expected the argument of ``intersection`` to be a set of the same "
+                "items, Set[str], but got: Set[int]"
+            ),
+        )
+
+    def test_difference_with_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: AbstractSet[str], others: Sequence[str]) -> bool:
+    return len(texts.difference(others)) > 0
+""",
+            expected_message=(
+                "Expected the argument of ``difference`` to be a set of the same "
+                "items, Set[str], but got: List[str]"
+            ),
+        )
+
+    def test_intersection_assigned_to_other_items_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: AbstractSet[str]) -> bool:
+    numbers: Set[int] = texts.intersection(texts)
+    return True
+""",
+            expected_message=(
+                "We inferred the target type of the assignment to be Set[int], "
+                "while the value type is inferred to be Set[str]. We do not know "
+                "how to model this assignment."
             ),
         )
 

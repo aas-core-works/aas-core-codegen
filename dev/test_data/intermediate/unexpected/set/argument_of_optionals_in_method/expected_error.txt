@@ -1,0 +1,1 @@
+In the argument 'texts' of the method 'is_known' of the class 'Something': We do not support None as an item of a set, but got the items of type Optional[str]. Some targets can not hold a null item in a set, *e.g.*, a string key of a map in Go can not be nil. If the whole set is optional, please declare it as ``Optional[Set[...]]``.

@@ -236,15 +236,10 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer = io.StringIO()
 
-    # NOTE (mristin):
-    # We make the sets of enumeration literals work on nullables to avoid checking
-    # nullability all the time in the code. This gives a bit less performant code,
-    # but a much more readable one.
-
     writer.write(
         f"""\
-public static readonly HashSet<{enum_name}?> {constant_name} = (
-{I}new HashSet<{enum_name}?>()
+public static readonly HashSet<{enum_name}> {constant_name} = (
+{I}new HashSet<{enum_name}>()
 {I}{{
 """
     )

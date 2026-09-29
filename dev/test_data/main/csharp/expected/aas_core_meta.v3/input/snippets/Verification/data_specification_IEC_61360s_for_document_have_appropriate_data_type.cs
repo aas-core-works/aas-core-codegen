@@ -18,7 +18,7 @@ public static bool DataSpecificationIec61360sForDocumentHaveAppropriateDataType(
             if (
                 iec61360.DataType == null
                 || !Constants.DataTypeIec61360ForDocument.Contains(
-                    iec61360.DataType)
+                    iec61360.DataType.Value)
             )
             {
                 return false;

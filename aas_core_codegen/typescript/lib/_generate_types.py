@@ -738,6 +738,12 @@ for (const {loop_var} of this.{prop_name}) {{
             # own classes, so there is nothing to descend into.
             continue
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)

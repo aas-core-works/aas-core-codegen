@@ -2,7 +2,17 @@
 import enum
 import io
 import re
-from typing import List, cast, Tuple, Optional, Mapping, Type, Final
+from typing import (
+    List,
+    cast,
+    Tuple,
+    Optional,
+    Mapping,
+    Type,
+    Final,
+    Sequence,
+    Union,
+)
 
 from icontract import ensure, require
 
@@ -493,6 +503,13 @@ def generate_type(
 
         return Stripped(f"List[{item_type}]")
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, types_module=types_module
+        )
+
+        return Stripped(f"Set[{item_type}]")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, types_module=types_module)
@@ -569,6 +586,65 @@ Optional[
         assert_never(type_annotation)
 
     raise AssertionError("Should not have gotten here")
+
+
+def generate_argument_type(
+    argument: intermediate.Argument,
+    types_module: Optional[Identifier] = None,
+) -> Stripped:
+    """
+    Generate the type of the ``argument``.
+
+    We generate a read-only set as an ``AbstractSet``, so that the constant sets,
+    which are read-only, can be passed to it. Otherwise, the argument type is
+    generated as :py:func:`generate_type` does.
+    """
+    type_anno = intermediate.beneath_optional(argument.type_annotation)
+    if not isinstance(type_anno, intermediate.SetTypeAnnotation) or argument.mutable:
+        return generate_type(argument.type_annotation, types_module=types_module)
+
+    items_type = generate_type(type_anno.items, types_module=types_module)
+    if isinstance(argument.type_annotation, intermediate.OptionalTypeAnnotation):
+        return Stripped(f"Optional[AbstractSet[{items_type}]]")
+
+    return Stripped(f"AbstractSet[{items_type}]")
+
+
+def typing_imports_for_sets(
+    functions: Sequence[Union[intermediate.Verification, intermediate.Method]]
+) -> List[Identifier]:
+    """
+    List the generic types from ``typing`` needed by the sets in ``functions``.
+
+    We need ``AbstractSet`` for the read-only set arguments, and ``Set`` for
+    the mutable set arguments and for the declarations of the local sets. We list
+    them only if needed so that the imports are never unused.
+    """
+    uses_abstract_set = False
+    uses_set = False
+
+    for function in functions:
+        for argument in function.arguments:
+            if isinstance(
+                intermediate.beneath_optional(argument.type_annotation),
+                intermediate.SetTypeAnnotation,
+            ):
+                if argument.mutable:
+                    uses_set = True
+                else:
+                    uses_abstract_set = True
+
+        if intermediate.declares_local_set(function):
+            uses_set = True
+
+    result = []  # type: List[Identifier]
+    if uses_abstract_set:
+        result.append(Identifier("AbstractSet"))
+
+    if uses_set:
+        result.append(Identifier("Set"))
+
+    return result
 
 
 INDENT2 = INDENT * 2

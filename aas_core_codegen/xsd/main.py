@@ -979,6 +979,12 @@ def _value_to_type_element_or_type_identifier(
 
             return _TypeElementOrTypeIdentifier(element=xs_complex_type), None
 
+        elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_annotation}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation)

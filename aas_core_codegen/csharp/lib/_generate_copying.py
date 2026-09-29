@@ -559,6 +559,12 @@ if (that.{prop_name} != null)
                 else:
                     constructor_arg_exprs.append(deep_copy_expr)
 
+            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+                raise AssertionError(
+                    f"Unexpected set in a property, as the sets are allowed only "
+                    f"in the arguments: {type_anno}"
+                )
+
             else:
                 # noinspection PyTypeChecker
                 assert_never(type_anno)

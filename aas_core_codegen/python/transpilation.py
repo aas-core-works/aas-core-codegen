@@ -84,29 +84,30 @@ def generate_type(
         type_annotation,
         (
             intermediate_type_inference.ListTypeAnnotation,
+            intermediate_type_inference.SetTypeAnnotation,
             intermediate_type_inference.OptionalTypeAnnotation,
         ),
     ):
         nested, error_message = generate_type(
             type_annotation=(
-                type_annotation.items
+                type_annotation.value
                 if isinstance(
-                    type_annotation, intermediate_type_inference.ListTypeAnnotation
+                    type_annotation, intermediate_type_inference.OptionalTypeAnnotation
                 )
-                else type_annotation.value
+                else type_annotation.items
             ),
             types_module=types_module,
         )
         if error_message is not None:
             return None, error_message
 
-        generic = (
-            "List"
-            if isinstance(
-                type_annotation, intermediate_type_inference.ListTypeAnnotation
-            )
-            else "Optional"
-        )
+        generic: str
+        if isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
+            generic = "List"
+        elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+            generic = "Set"
+        else:
+            generic = "Optional"
 
         return Stripped(f"{generic}[{nested}]"), None
 
@@ -514,6 +515,20 @@ not (
             # specifications.
             return Stripped(f"{instance}.lstrip({args[0]})"), None
 
+        if method is intermediate_type_inference.SET_ADD:
+            return Stripped(f"{instance}.add({args[0]})"), None
+
+        if (
+            method is intermediate_type_inference.SET_INTERSECTION
+            or method is intermediate_type_inference.SET_DIFFERENCE
+        ):
+            if not isinstance(
+                node.member.instance, (parse_tree.Name, parse_tree.Member)
+            ):
+                instance = Stripped(f"({instance})")
+
+            return Stripped(f"{instance}.{method.name}({args[0]})"), None
+
         return None, Error(
             node.original_node,
             f"The handling of the built-in method {method.name!r} has not "
@@ -689,6 +704,14 @@ not (
                 # the other targets. See ``parse_safe_int`` in the generated
                 # common module.
                 return Stripped(f"aas_common.parse_safe_int({args[0]})"), None
+
+            elif func_type.func.name == "set":
+                assert len(args) == 0, (
+                    f"Expected no arguments, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                return Stripped("set()"), None
 
             else:
                 return None, Error(

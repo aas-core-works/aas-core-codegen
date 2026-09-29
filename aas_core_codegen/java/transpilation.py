@@ -96,6 +96,13 @@ def generate_type(
 
         return Stripped(f"List<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        item_type, error = generate_type(type_annotation=type_annotation.items)
+        if error is not None:
+            return None, error
+
+        return Stripped(f"Set<{item_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -535,12 +542,78 @@ class Transpiler(
         return Stripped(f"({left}) {comparator} ({right})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_long(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` such that an integer literal or a length is a ``long``.
+
+        We represent the integers as ``Long`` in Java, while we transpile the integer
+        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
+        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
+        literal or a length as an argument to a method expecting a ``Long``, so we
+        need to suffix the literal with ``L``, and cast the length to ``long``.
+        """
+        if Transpiler._is_int_literal(node):
+            assert isinstance(node, parse_tree.Constant)
+            return Stripped(f"{node.value}L"), None
+
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            if isinstance(
+                node,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                return Stripped(f"(long) {code}"), None
+
+            return Stripped(f"(long) ({code})"), None
+
+        return code, None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_set_member(
+        self, node: parse_tree.Expression, set_node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` to be looked up in or added to the set ``set_node``.
+
+        A set of integers holds ``Long``'s, while the integer literals and
+        the lengths are ``int``'s. Java boxes them to ``Integer``'s, which are never
+        equal to any ``Long``, so ``contains`` would silently give ``false``.
+        """
+        set_type = intermediate_type_inference.beneath_optional(self.type_map[set_node])
+        if (
+            isinstance(set_type, intermediate_type_inference.SetTypeAnnotation)
+            and intermediate_type_inference.try_primitive_type(set_type.items)
+            is intermediate_type_inference.PrimitiveType.INT
+        ):
+            return self._transform_as_long(node)
+
+        return self.transform(node)
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
         self, node: parse_tree.IsIn
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []
 
-        member, error = self.transform(node.member)
+        member, error = self._transform_as_set_member(
+            node=node.member, set_node=node.container
+        )
         if error is not None:
             errors.append(error)
 
@@ -713,49 +786,6 @@ class Transpiler(
 
         return Stripped(f"{not_antecedent}\n|| {consequent}"), None
 
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_as_long(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` such that an integer literal or a length is a ``long``.
-
-        We represent the integers as ``Long`` in Java, while we transpile the integer
-        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
-        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
-        literal or a length as an argument to a method expecting a ``Long``, so we
-        need to suffix the literal with ``L``, and cast the length to ``long``.
-        """
-        if Transpiler._is_int_literal(node):
-            assert isinstance(node, parse_tree.Constant)
-            return Stripped(f"{node.value}L"), None
-
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if (
-            intermediate_type_inference.try_primitive_type(self.type_map[node])
-            is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            if isinstance(
-                node,
-                (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Index,
-                ),
-            ):
-                return Stripped(f"(long) {code}"), None
-
-            return Stripped(f"(long) ({code})"), None
-
-        return code, None
-
     def _transform_as_optional(
         self, node: parse_tree.Expression
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -847,6 +877,29 @@ class Transpiler(
                 # ``StringHelpers.lstrip`` in the generated common package.
                 return (
                     Stripped(f"StringHelpers.lstrip({instance}, {args[0]})"),
+                    None,
+                )
+
+            if member_type.method is intermediate_type_inference.SET_ADD:
+                item, error = self._transform_as_set_member(
+                    node=node.args[0], set_node=node.member.instance
+                )
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                return Stripped(f"{instance}.add({item})"), None
+
+            if (
+                member_type.method is intermediate_type_inference.SET_INTERSECTION
+                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            ):
+                # NOTE (mristin):
+                # See ``SetHelpers`` in the generated common package.
+                return (
+                    Stripped(
+                        f"SetHelpers.{member_type.method.name}({instance}, {args[0]})"
+                    ),
                     None,
                 )
 
@@ -1011,6 +1064,7 @@ class Transpiler(
                     arg_type,
                     (
                         intermediate_type_inference.ListTypeAnnotation,
+                        intermediate_type_inference.SetTypeAnnotation,
                         intermediate_type_inference.TupleTypeAnnotation,
                     ),
                 ):
@@ -1073,6 +1127,21 @@ class Transpiler(
                 # the safe integers. See ``StringHelpers.parseSafeInt`` in
                 # the generated common package.
                 return Stripped(f"StringHelpers.parseSafeInt({args[0]})"), None
+
+            elif func_type.func.name == "set":
+                set_type = self.type_map[node]
+                assert isinstance(
+                    set_type, intermediate_type_inference.SetTypeAnnotation
+                )
+
+                # NOTE (mristin):
+                # We spell out the items, since Java can not infer them when
+                # the new set is wrapped, *e.g.*, in an ``Optional.of``.
+                item_type, error = generate_type(set_type.items)
+                if error is not None:
+                    return None, error
+
+                return Stripped(f"new HashSet<{item_type}>()"), None
 
             else:
                 return None, Error(

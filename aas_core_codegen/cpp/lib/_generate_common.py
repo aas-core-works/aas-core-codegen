@@ -3,7 +3,7 @@
 # pylint: disable=line-too-long
 
 import io
-from typing import Final, List
+from typing import Final, List, Sequence
 
 from icontract import ensure
 
@@ -692,6 +692,59 @@ int64_t ParseSafeInt(const std::wstring& text) {{
 )
 
 
+#: Define the operations on sets which give a new set, as in Python
+_SET_OPERATIONS_DEFINITIONS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+/**
+ * \\brief Give a new set of the items which are both in \\p that and
+ * in \\p other.
+ *
+ * \\param that set to be intersected
+ * \\param other set to intersect with
+ * \\return new set with the common items
+ */
+template<typename SetT>
+SetT Intersection(
+{I}const SetT& that,
+{I}const SetT& other
+) {{
+{I}SetT result;
+{I}for (const auto& item : that) {{
+{II}if (other.find(item) != other.end()) {{
+{III}result.insert(item);
+{II}}}
+{I}}}
+{I}return result;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * \\brief Give a new set of the items which are in \\p that, but not
+ * in \\p other.
+ *
+ * \\param that set to be subtracted from
+ * \\param other set of the items to be left out
+ * \\return new set with the remaining items
+ */
+template<typename SetT>
+SetT Difference(
+{I}const SetT& that,
+{I}const SetT& other
+) {{
+{I}SetT result;
+{I}for (const auto& item : that) {{
+{II}if (other.find(item) == other.end()) {{
+{III}result.insert(item);
+{II}}}
+{I}}}
+{I}return result;
+}}"""
+    ),
+]
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -1124,6 +1177,11 @@ size_t LenTuple(const std::tuple<T...>&) {
             *(
                 [PARSE_SAFE_INT_DECLARATION]
                 if intermediate.uses_int(symbol_table)
+                else []
+            ),
+            *(
+                _SET_OPERATIONS_DEFINITIONS
+                if intermediate.uses_set_operations(symbol_table)
                 else []
             ),
             Stripped(

@@ -164,6 +164,13 @@ def moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
     ):
         return _leaf_moniker(type_annotation)
 
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected iteration over a set, as the type inference refuses it "
+            f"since the order of the items differs among the targets: "
+            f"{type_annotation}"
+        )
+
     else:
         assert_never(type_annotation)
 

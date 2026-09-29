@@ -38,6 +38,7 @@ from aas_core_codegen.common import (
     XMLTagName,
 )
 from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
     _hierarchy,
     construction,
     doc,
@@ -62,6 +63,7 @@ from aas_core_codegen.intermediate._types import (
     OurType,
     ListTypeAnnotation,
     TupleTypeAnnotation,
+    SetTypeAnnotation,
     AtomicTypeAnnotationAsTuple,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
@@ -1154,6 +1156,21 @@ def _to_type_annotation(
                 parsed=parsed,
             )
 
+        elif parsed.identifier in ("Set", "AbstractSet"):
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the {parsed.identifier} type "
+                f"annotation, but got: {parsed}; this should have been caught before!"
+            )
+
+            # NOTE (mristin):
+            # An ``AbstractSet`` is a read-only set. We keep the read-only flag on
+            # the argument, see :py:attr:`Argument.mutable`, so that the generators
+            # need not distinguish the two.
+            return SetTypeAnnotation(
+                items=_to_type_annotation(parsed.subscripts[0]),
+                parsed=parsed,
+            )
+
         elif parsed.identifier == "Mutable":
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the Mutable type annotation, "
@@ -1238,7 +1255,8 @@ def _mutability_type_beneath_optional(
     parsed: parse.TypeAnnotation,
 ) -> Optional[parse.SubscriptedTypeAnnotation]:
     """
-    Find ``List``, ``Sequence`` or ``Mutable`` at the top of ``parsed``.
+    Find ``List``, ``Sequence``, ``Set``, ``AbstractSet`` or ``Mutable`` at the top
+    of ``parsed``.
 
     We look beneath ``Optional``, as ``Optional`` keeps the mutability.
     """
@@ -1251,6 +1269,8 @@ def _mutability_type_beneath_optional(
     if isinstance(parsed, parse.SubscriptedTypeAnnotation) and parsed.identifier in (
         "List",
         "Sequence",
+        "Set",
+        "AbstractSet",
         "Mutable",
     ):
         return parsed
@@ -1278,7 +1298,7 @@ def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
                 ),
                 mutable=(
                     mutability_type is not None
-                    and mutability_type.identifier in ("List", "Mutable")
+                    and mutability_type.identifier in ("List", "Set", "Mutable")
                 ),
                 parsed=parsed_arg,
             )
@@ -2487,7 +2507,7 @@ def _over_our_type_annotations(
     elif isinstance(something, OurTypeAnnotation):
         yield something
 
-    elif isinstance(something, ListTypeAnnotation):
+    elif isinstance(something, (ListTypeAnnotation, SetTypeAnnotation)):
         yield from _over_our_type_annotations(something.items)
 
     elif isinstance(something, TupleTypeAnnotation):
@@ -5726,6 +5746,40 @@ def _assert_all_type_annotations_are_unique_instances(
             observed_set_of_type_anno_ids.add(type_anno_id)
 
 
+def _verify_items_of_set_arguments(symbol_table: SymbolTable) -> List[Error]:
+    """Check that the sets in the arguments hold only the supported items."""
+    errors = []  # type: List[Error]
+
+    arguments_with_whats = [
+        (arg, f"the argument {arg.name!r} of the verification function {func.name!r}")
+        for func in symbol_table.verification_functions
+        for arg in func.arguments
+    ] + [
+        (
+            arg,
+            f"the argument {arg.name!r} of the method {method.name!r} "
+            f"of the class {cls.name!r}",
+        )
+        for cls in symbol_table.classes
+        for method in cls.methods
+        if method.specified_for is cls
+        for arg in method.arguments
+    ]
+
+    for arg, what in arguments_with_whats:
+        type_anno = beneath_optional(arg.type_annotation)
+        if not isinstance(type_anno, SetTypeAnnotation):
+            continue
+
+        refusal = intermediate_type_inference.refusal_of_set_items(
+            intermediate_type_inference.convert_type_annotation(type_anno.items)
+        )
+        if refusal is not None:
+            errors.append(Error(arg.parsed.node, f"In {what}: {refusal}"))
+
+    return errors
+
+
 def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error]:
     """Check that ``Mutable[...]`` wraps only the classes."""
     errors = []  # type: List[Error]
@@ -5758,9 +5812,9 @@ def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error
             continue
 
         # NOTE (mristin):
-        # The parser already refused ``Mutable`` around ``List`` and
-        # ``Sequence``, as it can tell them apart syntactically.
-        assert not isinstance(type_anno, ListTypeAnnotation)
+        # The parser already refused ``Mutable`` around ``List``, ``Sequence``,
+        # ``Set`` and ``AbstractSet``, as it can tell them apart syntactically.
+        assert not isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation))
 
         reason: str
         if isinstance(type_anno, PrimitiveTypeAnnotation) or (
@@ -5966,6 +6020,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_invariant_descriptions_unique(symbol_table=symbol_table))
 
     errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
+
+    errors.extend(_verify_items_of_set_arguments(symbol_table=symbol_table))
 
     errors.extend(
         _verify_methods_refer_neither_to_constants_nor_verification_functions(

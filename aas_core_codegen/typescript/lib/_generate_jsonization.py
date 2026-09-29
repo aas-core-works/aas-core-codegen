@@ -1049,6 +1049,12 @@ parseTuple{len(type_anno.items)}<{item_types_joined}>(
 )"""
         )
 
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     assert_never(type_anno)
 
 
@@ -2071,6 +2077,12 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         function_name = _composed_serialize_function_name(type_anno)
         value_expression = Stripped(f"{function_name}({access_expression})")
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
 
     else:
         assert_never(type_anno)

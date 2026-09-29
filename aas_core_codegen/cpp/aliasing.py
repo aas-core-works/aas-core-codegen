@@ -40,7 +40,7 @@ class _Category(enum.Enum):
     #: the instances are shared pointers
     VALUE = 1
 
-    #: Lists, tuples and JSON-able values, which C++ copies deeply
+    #: Lists, sets, tuples and JSON-able values, which C++ copies deeply
     CONTAINER = 2
 
 
@@ -54,6 +54,7 @@ def _categorize(
         type_anno,
         (
             intermediate_type_inference.ListTypeAnnotation,
+            intermediate_type_inference.SetTypeAnnotation,
             intermediate_type_inference.TupleTypeAnnotation,
             intermediate_type_inference.JsonValueTypeAnnotation,
             intermediate_type_inference.JsonArrayTypeAnnotation,
@@ -175,7 +176,8 @@ class _Collector(parse_tree.Visitor):
         self.reassigned = set()  # type: Set[_Binding]
 
         #: Expressions whose values are mutated in place: the collections of
-        #: the index targets, and the lists passed to the mutable arguments
+        #: the index targets, the sets which we add to, and the lists and the sets
+        #: passed to the mutable arguments
         self.mutated = []  # type: List[parse_tree.Expression]
 
         #: Names of the properties replaced by a setter
@@ -188,7 +190,7 @@ class _Collector(parse_tree.Visitor):
         #: values, including the instances of the non-``@non_mutating`` method calls
         self.passes_mutable_non_primitive = False
 
-        #: Set if the function mutates a list in place
+        #: Set if the function mutates a list or a set in place
         self.mutates_in_place = False
 
         #: Nodes whose values are copied in C++ from an access path, while Python
@@ -323,7 +325,13 @@ class _Collector(parse_tree.Visitor):
                 self.type_map[arg_node]
             )
 
-            if isinstance(type_anno, intermediate_type_inference.ListTypeAnnotation):
+            if isinstance(
+                type_anno,
+                (
+                    intermediate_type_inference.ListTypeAnnotation,
+                    intermediate_type_inference.SetTypeAnnotation,
+                ),
+            ):
                 self.mutated.append(arg_node)
 
                 if not _is_primitive_or_enumeration(type_anno.items):
@@ -349,6 +357,17 @@ class _Collector(parse_tree.Visitor):
             self.visit(arg)
 
         method_type = self.type_map.get(node.member, None)
+
+        if (
+            isinstance(
+                method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+            )
+            and method_type.method is intermediate_type_inference.SET_ADD
+        ):
+            self.mutated.append(node.member.instance)
+            self.mutates_in_place = True
+            return
+
         if not isinstance(
             method_type, intermediate_type_inference.MethodTypeAnnotation
         ):

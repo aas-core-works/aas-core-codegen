@@ -232,7 +232,7 @@ from aas_core_meta.marker import (
     constant_set
 )
 
-Some_constant_set: Set[str] = constant_set(
+Some_constant_set: AbstractSet[str] = constant_set(
     values=["value1", "value2"]
 )
 
@@ -811,6 +811,32 @@ __xml_namespace__ = "https://dummy.com"
 
         self.assertIsInstance(unpickled, intermediate_types.ListTypeAnnotation)
 
+    def test_set_type_annotation(self) -> None:
+        source = """\
+@verification
+def is_known(text: str, texts: AbstractSet[str]) -> bool:
+    return text in texts
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        if error is not None:
+            raise AssertionError(tests.common.most_underlying_messages(error))
+        assert symbol_table is not None
+
+        type_annotation = (
+            symbol_table.verification_functions[0].arguments[1].type_annotation
+        )
+
+        pickled_data = pickle.dumps(type_annotation)
+        unpickled = pickle.loads(pickled_data)
+
+        self.assertIsInstance(unpickled, intermediate_types.SetTypeAnnotation)
+
     def test_tuple_type_annotation(self) -> None:
         source = """\
 class Some_class:
@@ -1190,7 +1216,7 @@ from aas_core_meta.marker import (
     constant_set
 )
 
-Some_constant_set: Set[str] = constant_set(
+Some_constant_set: AbstractSet[str] = constant_set(
     values=["value1", "value2"]
 )
 
@@ -1690,7 +1716,7 @@ class Some_enum(Enum):
     Literal1 = "lit1"
     Literal2 = "lit2"
 
-Some_constant_set: Set[Some_enum] = constant_set(
+Some_constant_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.Literal1
     ]

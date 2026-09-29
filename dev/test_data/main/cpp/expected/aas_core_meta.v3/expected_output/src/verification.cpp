@@ -1612,10 +1612,9 @@ bool IsModelReferenceToReferable(
     (
       reference->type() == types::ReferenceTypes::kModelReference
       && reference->keys().size() != 0
-      && common::Contains(
-        constants::kAasReferables,
+      && constants::kAasReferables.find(
         reference->keys().back()->type()
-      )
+      ) != constants::kAasReferables.end()
     )
   );
 }
@@ -3786,10 +3785,9 @@ bool Property_11(
     static_cast<const types::IProperty*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool Property_12(
@@ -3930,10 +3928,9 @@ bool MultiLanguageProperty_11(
     static_cast<const types::IMultiLanguageProperty*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool MultiLanguageProperty_12(
@@ -4083,10 +4080,9 @@ bool Range_11(
     static_cast<const types::IRange*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool Range_12(
@@ -4240,10 +4236,9 @@ bool ReferenceElement_11(
     static_cast<const types::IReferenceElement*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool Blob_0(
@@ -4371,10 +4366,9 @@ bool Blob_11(
     static_cast<const types::IBlob*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool File_0(
@@ -4502,10 +4496,9 @@ bool File_11(
     static_cast<const types::IFile*>(value)
   );
   return !(that->category().has_value())
-  || common::Contains(
-    constants::kValidCategoriesForDataElement,
+  || constants::kValidCategoriesForDataElement.find(
     (*(that->category()))
-  );
+  ) != constants::kValidCategoriesForDataElement.end();
 }
 
 bool AnnotatedRelationshipElement_0(
@@ -5499,10 +5492,9 @@ bool Reference_1(
     static_cast<const types::IReference*>(value)
   );
   return !(that->keys().size() >= 1)
-  || common::Contains(
-    constants::kGloballyIdentifiables,
+  || constants::kGloballyIdentifiables.find(
     that->keys().at(0)->type()
-  );
+  ) != constants::kGloballyIdentifiables.end();
 }
 
 bool Reference_2(
@@ -5515,10 +5507,9 @@ bool Reference_2(
     that->type() == types::ReferenceTypes::kExternalReference
     && that->keys().size() >= 1
   ))
-  || common::Contains(
-    constants::kGenericGloballyIdentifiables,
+  || constants::kGenericGloballyIdentifiables.find(
     that->keys().at(0)->type()
-  );
+  ) != constants::kGenericGloballyIdentifiables.end();
 }
 
 bool Reference_3(
@@ -5531,10 +5522,9 @@ bool Reference_3(
     that->type() == types::ReferenceTypes::kModelReference
     && that->keys().size() >= 1
   ))
-  || common::Contains(
-    constants::kAasIdentifiables,
+  || constants::kAasIdentifiables.find(
     that->keys().at(0)->type()
-  );
+  ) != constants::kAasIdentifiables.end();
 }
 
 bool Reference_4(
@@ -5548,14 +5538,12 @@ bool Reference_4(
     && that->keys().size() >= 1
   ))
   || ((
-    common::Contains(
-      constants::kGenericGloballyIdentifiables,
+    constants::kGenericGloballyIdentifiables.find(
       that->keys().back()->type()
-    )
-    || common::Contains(
-      constants::kGenericFragmentKeys,
+    ) != constants::kGenericGloballyIdentifiables.end()
+    || constants::kGenericFragmentKeys.find(
       that->keys().back()->type()
-    )
+    ) != constants::kGenericFragmentKeys.end()
   ));
 }
 
@@ -5571,10 +5559,9 @@ bool Reference_5(
   ))
   || common::AllRange<size_t>(
     [&](size_t i) -> bool {
-      return common::Contains(
-        constants::kFragmentKeys,
+      return constants::kFragmentKeys.find(
         that->keys().at(i)->type()
-      );
+      ) != constants::kFragmentKeys.end();
     },
     1,
     that->keys().size()
@@ -5593,10 +5580,9 @@ bool Reference_6(
   ))
   || common::AllRange<size_t>(
     [&](size_t i) -> bool {
-      return !common::Contains(
-        constants::kGenericFragmentKeys,
+      return !(constants::kGenericFragmentKeys.find(
         that->keys().at(i)->type()
-      );
+      ) != constants::kGenericFragmentKeys.end());
     },
     0,
     that->keys().size() - (1)
@@ -5746,10 +5732,9 @@ bool DataSpecificationIec61360_1(
   );
   return !((
     (that->data_type().has_value())
-    && common::Contains(
-      constants::kIec61360DataTypesWithUnit,
+    && constants::kIec61360DataTypesWithUnit.find(
       (*(that->data_type()))
-    )
+    ) != constants::kIec61360DataTypesWithUnit.end()
   ))
   || ((
     (that->unit().has_value())

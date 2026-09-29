@@ -109,6 +109,13 @@ def generate_type(
 
         return Stripped(f"List<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        item_type, error_message = generate_type(type_annotation.items)
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"HashSet<{item_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -607,13 +614,37 @@ class Transpiler(
 
         return Stripped(f"({left}) {comparator} ({right})"), None
 
+    def _transform_and_unwrap_narrowed_nullable_value(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
+
+        A value type such as ``long?`` stays nullable in C# even if the type
+        inference narrowed it down to non-null, so we need to unwrap it with
+        ``.Value`` before we assign it to a non-nullable or return it.
+        """
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
+            return Stripped(f"{code}.Value"), None
+
+        return code, None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
         self, node: parse_tree.IsIn
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []
 
-        member, error = self.transform(node.member)
+        # NOTE (mristin):
+        # A set of value types, such as enumeration literals, does not hold
+        # nullables, so we unwrap a narrowed member.
+        member, error = self._transform_and_unwrap_narrowed_nullable_value(node.member)
         if error is not None:
             errors.append(error)
 
@@ -855,6 +886,41 @@ class Transpiler(
                     None,
                 )
 
+            if member_type.method is intermediate_type_inference.SET_ADD:
+                # NOTE (mristin):
+                # A set of value types does not hold nullables, so we unwrap
+                # a narrowed item.
+                item, error = self._transform_and_unwrap_narrowed_nullable_value(
+                    node.args[0]
+                )
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                return Stripped(f"{instance}.Add({item})"), None
+
+            if (
+                member_type.method is intermediate_type_inference.SET_INTERSECTION
+                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            ):
+                set_type, error_message = generate_type(self.type_map[node])
+                if error_message is not None:
+                    return None, Error(node.original_node, error_message)
+
+                # NOTE (mristin):
+                # We copy the result of LINQ into a new set, as Python gives
+                # a new set as well.
+                linq_method = (
+                    "Intersect"
+                    if member_type.method
+                    is intermediate_type_inference.SET_INTERSECTION
+                    else "Except"
+                )
+                return (
+                    Stripped(f"new {set_type}({instance}.{linq_method}({args[0]}))"),
+                    None,
+                )
+
             return None, Error(
                 node.original_node,
                 f"The handling of the built-in method {member_type.method.name!r} "
@@ -996,7 +1062,11 @@ class Transpiler(
                     return Stripped(f"{collection}.Length"), None
 
                 elif isinstance(
-                    arg_type, intermediate_type_inference.ListTypeAnnotation
+                    arg_type,
+                    (
+                        intermediate_type_inference.ListTypeAnnotation,
+                        intermediate_type_inference.SetTypeAnnotation,
+                    ),
                 ):
                     return Stripped(f"{collection}.Count"), None
 
@@ -1057,6 +1127,13 @@ class Transpiler(
                     Stripped(f"{csharp_common.COMMON_CLASS}.ParseSafeInt({args[0]})"),
                     None,
                 )
+
+            elif func_type.func.name == "set":
+                set_type, error_message = generate_type(self.type_map[node])
+                if error_message is not None:
+                    return None, Error(node.original_node, error_message)
+
+                return Stripped(f"new {set_type}()"), None
 
             else:
                 return None, Error(
@@ -1267,27 +1344,6 @@ class Transpiler(
                 writer.write(f"\n|| {value}")
 
         return Stripped(writer.getvalue()), None
-
-    def _transform_and_unwrap_narrowed_nullable_value(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
-
-        A value type such as ``long?`` stays nullable in C# even if the type
-        inference narrowed it down to non-null, so we need to unwrap it with
-        ``.Value`` before we assign it to a non-nullable or return it.
-        """
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
-            return Stripped(f"{code}.Value"), None
-
-        return code, None
 
     def _transform_as_method_argument(
         self, node: parse_tree.Expression
@@ -1613,6 +1669,7 @@ class Transpiler(
             else:
                 assert iteration is not None
                 source = iteration
+
         elif isinstance(node.generator, parse_tree.ForRange):
             assert start is not None
             assert end is not None

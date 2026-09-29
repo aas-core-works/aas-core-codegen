@@ -123,6 +123,12 @@ def _parser_name(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
             + "_from_jsonable"
         )
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 
@@ -184,7 +190,11 @@ class _ParserRegistry:
 
         assert not isinstance(
             items_type_anno,
-            (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+            (
+                intermediate.ListTypeAnnotation,
+                intermediate.TupleTypeAnnotation,
+                intermediate.SetTypeAnnotation,
+            ),
         ), (
             "We chose to implement only a very limited pattern matching; "
             "see intermediate._translate._verify_only_simple_type_patterns"
@@ -324,6 +334,12 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_parser(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             assert_never(type_anno)
@@ -1832,6 +1848,12 @@ def _generate_serialization(
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         serializer_name = _tuple_serializer_name(type_anno)
 
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1907,7 +1929,11 @@ class _SerializerRegistry:
 
         assert not isinstance(
             items_type_anno,
-            (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+            (
+                intermediate.ListTypeAnnotation,
+                intermediate.TupleTypeAnnotation,
+                intermediate.SetTypeAnnotation,
+            ),
         ), (
             "We chose to implement only a very limited pattern matching; "
             "see intermediate._translate._verify_only_simple_type_patterns"
@@ -2098,6 +2124,12 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_serializer(type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
 
         else:
             assert_never(type_anno)

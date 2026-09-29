@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Set
+from typing import AbstractSet
 
 
 class Some_enum(Enum):
@@ -18,17 +18,17 @@ SOME_STRING: str = constant_str(
     value="some string", description="A string constant."
 )
 
-SOME_SET_OF_INTS: Set[int] = constant_set(
+SOME_SET_OF_INTS: AbstractSet[int] = constant_set(
     values=[1, 2, 3],
     description="A set of integer constants.",
 )
 
-SOME_SET_OF_STRINGS: Set[str] = constant_set(
+SOME_SET_OF_STRINGS: AbstractSet[str] = constant_set(
     values=["first value", "second value"],
     description="A set of string constants.",
 )
 
-SOME_SET_OF_ENUM_LITERALS: Set[Some_enum] = constant_set(
+SOME_SET_OF_ENUM_LITERALS: AbstractSet[Some_enum] = constant_set(
     values=[Some_enum.First, Some_enum.Second],
     description="A set of enumeration literals.",
 )

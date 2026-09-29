@@ -153,6 +153,12 @@ def needed_combinators(
             json_shapes = True
             v_elements = v_elements or nested
 
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno}"
+            )
+
         else:
             assert_never(type_anno)
 

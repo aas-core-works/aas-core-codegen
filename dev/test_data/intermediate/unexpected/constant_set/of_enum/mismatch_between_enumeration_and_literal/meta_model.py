@@ -10,14 +10,14 @@ class Another_enum(Enum):
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.Some_literal,
         Some_enum.Another_literal,
     ]
 )
 
-Another_set: Set[Another_enum] = constant_set(
+Another_set: AbstractSet[Another_enum] = constant_set(
     values=[
         Another_enum.Some_literal,
         Another_enum.Another_literal,

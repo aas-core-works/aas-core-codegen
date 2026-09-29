@@ -26,6 +26,7 @@ from aas_core_codegen.intermediate._types import (
     JsonObjectTypeAnnotation,
     JsonValueTypeAnnotation,
     ListTypeAnnotation,
+    SetTypeAnnotation,
     MetaModel,
     NamedUnion,
     NumericPlace,
@@ -90,6 +91,20 @@ def _stringify_our_type_annotation(
 
 def _stringify_list_type_annotation(
     that: ListTypeAnnotation,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("items", stringify(that.items)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_set_type_annotation(
+    that: SetTypeAnnotation,
 ) -> stringify_mod.Entity:
     result = stringify_mod.Entity(
         name=that.__class__.__name__,
@@ -1026,6 +1041,7 @@ Dumpable = Union[
     JsonObjectTypeAnnotation,
     JsonValueTypeAnnotation,
     ListTypeAnnotation,
+    SetTypeAnnotation,
     MetaModel,
     NamedUnion,
     NumericPlace,
@@ -1080,6 +1096,7 @@ _DISPATCH = {
     JsonObjectTypeAnnotation: _stringify_json_object_type_annotation,
     JsonValueTypeAnnotation: _stringify_json_value_type_annotation,
     ListTypeAnnotation: _stringify_list_type_annotation,
+    SetTypeAnnotation: _stringify_set_type_annotation,
     MetaModel: _stringify_meta_model,
     OptionalTypeAnnotation: _stringify_optional_type_annotation,
     OurTypeAnnotation: _stringify_our_type_annotation,

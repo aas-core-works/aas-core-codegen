@@ -51,7 +51,7 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
@@ -111,13 +111,13 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
     ])
 
-Another_set: Set[Some_enum] = constant_set(
+Another_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.B,
         Some_enum.C
@@ -179,7 +179,7 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
@@ -241,13 +241,13 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
     ])
 
-Another_set: Set[Some_enum] = constant_set(
+Another_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.B,
         Some_enum.C
@@ -313,7 +313,7 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
@@ -379,13 +379,13 @@ class Some_enum(Enum):
     B = "B"
     C = "C"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B
     ])
 
-Another_set: Set[Some_enum] = constant_set(
+Another_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.B,
         Some_enum.C
@@ -456,21 +456,21 @@ class Some_enum(Enum):
     D = "D"
     E = "E"
 
-Some_set: Set[Some_enum] = constant_set(
+Some_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.A,
         Some_enum.B,
         Some_enum.C,
     ])
 
-Another_set: Set[Some_enum] = constant_set(
+Another_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.B,
         Some_enum.C,
         Some_enum.D
     ])
 
-Yet_another_set: Set[Some_enum] = constant_set(
+Yet_another_set: AbstractSet[Some_enum] = constant_set(
     values=[
         Some_enum.C,
         Some_enum.D,

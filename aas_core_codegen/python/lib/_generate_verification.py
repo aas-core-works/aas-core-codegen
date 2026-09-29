@@ -493,8 +493,8 @@ def _transpile_transpilable_verification(
 
     arg_defs = []  # type: List[Stripped]
     for arg in verification.arguments:
-        arg_type = python_common.generate_type(
-            arg.type_annotation, types_module=Identifier("aas_types")
+        arg_type = python_common.generate_argument_type(
+            arg, types_module=Identifier("aas_types")
         )
         arg_name = python_naming.argument_name(arg.name)
         arg_defs.append(Stripped(f"{arg_name}: {arg_type}"))
@@ -978,6 +978,12 @@ for error in {item_verify_function}(
 )"""
             )
 
+        elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected set in a property, as the sets are allowed only "
+                f"in the arguments: {type_anno.items}"
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno.items)
@@ -1225,6 +1231,12 @@ for key in that.{prop_name}:
 {II}yield error"""
                 )
             )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected set in a property, as the sets are allowed only "
+            f"in the arguments: {type_anno}"
+        )
 
     else:
         assert_never(type_anno)
@@ -1571,6 +1583,28 @@ def generate(
         f"{I}{imported_module}," for imported_module in imported_modules
     )
 
+    typing_imports = [
+        Identifier("Any"),
+        Identifier("Callable"),
+        Identifier("Iterable"),
+        Identifier("Iterator"),
+        Identifier("List"),
+        Identifier("Mapping"),
+        Identifier("Optional"),
+        Identifier("Pattern"),
+        Identifier("Sequence"),
+        Identifier("Set"),
+        Identifier("Tuple"),
+        Identifier("Union"),
+    ]
+
+    if Identifier("AbstractSet") in python_common.typing_imports_for_sets(
+        symbol_table.verification_functions
+    ):
+        typing_imports.insert(0, Identifier("AbstractSet"))
+
+    typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
+
     # region Module docstring
     blocks = [
         _generate_module_docstring(
@@ -1585,18 +1619,7 @@ import re
 import struct
 import sys
 from typing import (
-{I}Any,
-{I}Callable,
-{I}Iterable,
-{I}Iterator,
-{I}List,
-{I}Mapping,
-{I}Optional,
-{I}Pattern,
-{I}Sequence,
-{I}Set,
-{I}Tuple,
-{I}Union
+{typing_imports_joined}
 )
 
 if sys.version_info >= (3, 8):

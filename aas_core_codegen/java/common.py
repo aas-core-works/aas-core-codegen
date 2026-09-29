@@ -150,6 +150,42 @@ def json_imports_if_necessary(
     return []
 
 
+def set_imports_if_necessary(
+    methods: Iterable[intermediate.Method], with_bodies: bool
+) -> List[Stripped]:
+    """
+    Give the imports of the sets if any of ``methods`` uses them.
+
+    We need ``Set`` for the set arguments. If ``with_bodies`` is set, we also
+    consider the local sets declared in the bodies, which need ``HashSet`` as well.
+    """
+    uses_set = False
+    uses_hash_set = False
+
+    for method in methods:
+        if any(
+            isinstance(
+                intermediate.beneath_optional(argument.type_annotation),
+                intermediate.SetTypeAnnotation,
+            )
+            for argument in method.arguments
+        ):
+            uses_set = True
+
+        if with_bodies and intermediate.declares_local_set(method):
+            uses_set = True
+            uses_hash_set = True
+
+    result = []  # type: List[Stripped]
+    if uses_hash_set:
+        result.append(Stripped("java.util.HashSet"))
+
+    if uses_set:
+        result.append(Stripped("java.util.Set"))
+
+    return result
+
+
 @require(
     lambda our_type_qualifier:
     not (our_type_qualifier is not None)
@@ -207,6 +243,13 @@ def generate_type(
         )
 
         return Stripped(f"List<{item_type}>")
+
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
+        )
+
+        return Stripped(f"Set<{item_type}>")
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         # NOTE (mristin):

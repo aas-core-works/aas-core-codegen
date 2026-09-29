@@ -96,7 +96,7 @@ an environment.
 
 from enum import Enum
 from re import match
-from typing import List, Optional, Sequence, Set
+from typing import AbstractSet, List, Optional, Sequence
 
 from icontract import invariant, DBC, ensure
 
@@ -2908,7 +2908,7 @@ class Submodel_element_collection(Submodel_element):
         self.value = value
 
 
-Valid_categories_for_data_element: Set[str] = constant_set(
+Valid_categories_for_data_element: AbstractSet[str] = constant_set(
     values=[
         "CONSTANT",
         "PARAMETER",
@@ -4793,7 +4793,7 @@ class Key_types(Enum):
     """
 
 
-Generic_fragment_keys: Set[Key_types] = constant_set(
+Generic_fragment_keys: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Fragment_reference,
     ],
@@ -4807,14 +4807,14 @@ assert Key_types.Fragment_reference in Generic_fragment_keys, (
     "in the reference. This is necessary for our simpler formulation of AASd-127."
 )
 
-Generic_globally_identifiables: Set[Key_types] = constant_set(
+Generic_globally_identifiables: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Global_reference,
     ],
     description="Enumeration of different key value types within a key.",
 )
 
-AAS_identifiables: Set[Key_types] = constant_set(
+AAS_identifiables: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Asset_administration_shell,
         Key_types.Concept_description,
@@ -4824,7 +4824,7 @@ AAS_identifiables: Set[Key_types] = constant_set(
     description="Enumeration of different key value types within a key.",
 )
 
-AAS_submodel_elements_as_keys: Set[Key_types] = constant_set(
+AAS_submodel_elements_as_keys: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Annotated_relationship_element,
         Key_types.Basic_event_element,
@@ -4848,7 +4848,7 @@ AAS_submodel_elements_as_keys: Set[Key_types] = constant_set(
 Enumeration of all submodel elements within an asset administration shell.""",
 )
 
-AAS_referable_non_identifiables: Set[Key_types] = constant_set(
+AAS_referable_non_identifiables: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Annotated_relationship_element,
         Key_types.Basic_event_element,
@@ -4872,7 +4872,7 @@ AAS_referable_non_identifiables: Set[Key_types] = constant_set(
     superset_of=[AAS_submodel_elements_as_keys],
 )
 
-AAS_referables: Set[Key_types] = constant_set(
+AAS_referables: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Asset_administration_shell,
         Key_types.Concept_description,
@@ -4904,7 +4904,7 @@ AAS_referables: Set[Key_types] = constant_set(
     superset_of=[AAS_referable_non_identifiables, AAS_identifiables],
 )
 
-Globally_identifiables: Set[Key_types] = constant_set(
+Globally_identifiables: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Global_reference,
         Key_types.Asset_administration_shell,
@@ -4917,7 +4917,7 @@ Enumeration of all referable elements within an asset administration shell""",
     superset_of=[AAS_identifiables, Generic_globally_identifiables],
 )
 
-Fragment_keys: Set[Key_types] = constant_set(
+Fragment_keys: AbstractSet[Key_types] = constant_set(
     values=[
         Key_types.Annotated_relationship_element,
         Key_types.Basic_event_element,
@@ -5264,7 +5264,9 @@ class Data_type_IEC_61360(Enum):
     """
 
 
-Data_type_IEC_61360_for_property_or_value: Set[Data_type_IEC_61360] = constant_set(
+Data_type_IEC_61360_for_property_or_value: AbstractSet[
+    Data_type_IEC_61360
+] = constant_set(
     values=[
         Data_type_IEC_61360.Date,
         Data_type_IEC_61360.String,
@@ -5287,7 +5289,7 @@ Data_type_IEC_61360_for_property_or_value: Set[Data_type_IEC_61360] = constant_s
     ),
 )
 
-Data_type_IEC_61360_for_reference: Set[Data_type_IEC_61360] = constant_set(
+Data_type_IEC_61360_for_reference: AbstractSet[Data_type_IEC_61360] = constant_set(
     values=[
         Data_type_IEC_61360.String,
         Data_type_IEC_61360.IRI,
@@ -5298,7 +5300,7 @@ Data_type_IEC_61360_for_reference: Set[Data_type_IEC_61360] = constant_set(
     ),
 )
 
-Data_type_IEC_61360_for_document: Set[Data_type_IEC_61360] = constant_set(
+Data_type_IEC_61360_for_document: AbstractSet[Data_type_IEC_61360] = constant_set(
     values=[
         Data_type_IEC_61360.File,
         Data_type_IEC_61360.Blob,
@@ -5421,7 +5423,7 @@ class Value_list(DBC):
 
 
 # todo: Update Reference as it applies to Part 3b document
-IEC_61360_data_types_with_unit: Set[Data_type_IEC_61360] = constant_set(
+IEC_61360_data_types_with_unit: AbstractSet[Data_type_IEC_61360] = constant_set(
     values=[
         Data_type_IEC_61360.Integer_measure,
         Data_type_IEC_61360.Real_measure,
