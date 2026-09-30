@@ -41,6 +41,7 @@ from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -1884,7 +1885,7 @@ using System.Collections.Generic;  // can't alias{using_linq}"""
         )
     )
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         using_directives.append(Stripped("using Nodes = System.Text.Json.Nodes;"))
 
     code_blocks_joined = "\n\n".join(code_blocks)

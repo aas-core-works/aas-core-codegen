@@ -28,6 +28,7 @@ from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.typescript import (
     common as typescript_common,
@@ -2462,7 +2463,7 @@ def _generate_json_aliases(symbol_table: intermediate.SymbolTable) -> List[Strip
     Unlike Python, TypeScript resolves a recursive type alias, so the item and
     the value types can be spelled out instead of being widened to ``any``.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [

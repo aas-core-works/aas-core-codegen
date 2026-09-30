@@ -1,0 +1,340 @@
+"""
+Check which constructs the meta-model uses.
+
+The generators use these checks to generate the helpers, the includes and
+the tests only if the meta-model needs them.
+
+Import this module as ``intermediate_uses`` so that the checks read naturally,
+*e.g.*, ``intermediate_uses.modulo(symbol_table)``.
+"""
+
+from typing import Iterator, List, Sequence, Union
+
+from aas_core_codegen.intermediate import _types
+from aas_core_codegen.parse import tree as parse_tree
+
+
+def json_types(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any property in the model refers to a JSON-able type.
+
+    This works recursively: a JSON-able type is picked up regardless of how
+    deeply it is nested within a property's type annotation (*e.g.*, inside
+    a ``List[...]`` or an ``Optional[...]``), not just when the property
+    itself is directly annotated as one.
+    """
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            for type_anno in _types.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if isinstance(
+                    type_anno,
+                    (
+                        _types.JsonValueTypeAnnotation,
+                        _types.JsonArrayTypeAnnotation,
+                        _types.JsonObjectTypeAnnotation,
+                    ),
+                ):
+                    return True
+
+    return False
+
+
+def len_slicing_or_find(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any transpiled code might take ``len`` of, slice or search a string.
+
+    The targets use this check to generate the string helpers only if the meta-model
+    needs them. The helpers count the characters (code points) as Python does,
+    since Python is the language of the meta-model specifications.
+
+    We check the parse trees of the invariants and of the transpilable
+    verification functions. As we do not have the types at hand here, we
+    over-approximate and count every call to ``len``, even if it were on a list,
+    and every method call named ``find``, even if it were a method of our class.
+    In the worst case, we generate unused helpers.
+    """
+    roots = []  # type: List[parse_tree.Node]
+
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type,
+            (_types.ConstrainedPrimitive, _types.AbstractClass, _types.ConcreteClass),
+        ):
+            roots.extend(invariant.body for invariant in our_type.invariants)
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, _types.TranspilableVerification):
+            roots.extend(verification.parsed.body)
+
+    for root in roots:
+        for node in parse_tree.over_nodes(root):
+            if isinstance(node, parse_tree.Slice):
+                return True
+
+            if isinstance(node, parse_tree.MethodCall) and node.member.name == "find":
+                return True
+
+            if (
+                isinstance(node, parse_tree.FunctionCall)
+                and node.name.identifier == "len"
+            ):
+                return True
+
+    return False
+
+
+def _over_transpilable_nodes(
+    symbol_table: _types.SymbolTable,
+) -> Iterator[parse_tree.Node]:
+    """
+    Iterate recursively over all the nodes which the generators transpile.
+
+    These are the nodes of the invariants, of the transpilable verification
+    functions and of the understood methods.
+    """
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type,
+            (_types.ConstrainedPrimitive, _types.AbstractClass, _types.ConcreteClass),
+        ):
+            for an_invariant in our_type.invariants:
+                # NOTE (mristin):
+                # We skip the inherited invariants as they are also listed in
+                # the type which specified them.
+                if an_invariant.specified_for is not our_type:
+                    continue
+
+                yield from parse_tree.over_nodes(an_invariant.body)
+
+        if isinstance(our_type, (_types.AbstractClass, _types.ConcreteClass)):
+            for method in our_type.methods:
+                if isinstance(method, _types.UnderstoodMethod):
+                    for node in method.body:
+                        yield from parse_tree.over_nodes(node)
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, _types.TranspilableVerification):
+            for node in verification.parsed.body:
+                yield from parse_tree.over_nodes(node)
+
+
+def modulo(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model uses the modulo operator in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for the modulo.
+    """
+    return any(
+        isinstance(node, parse_tree.Mod)
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def abs_call(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls the built-in ``abs`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``abs``.
+    """
+    return any(
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "abs"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def lstrip_call(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls ``str.lstrip`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``lstrip``.
+
+    We do not distinguish between ``str.lstrip`` and a method of our class
+    named ``lstrip``. In the worst case, we generate unused helpers.
+    """
+    return any(
+        isinstance(node, parse_tree.MethodCall) and node.member.name == "lstrip"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def int_call(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model calls the built-in ``int`` in transpilable code.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for parsing the integers.
+    """
+    return any(
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "int"
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def sets_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> bool:
+    """
+    Check whether the ``functions`` take the sets as arguments or declare local sets.
+
+    The C++ generator uses this check to include ``<unordered_set>`` only where
+    it is needed.
+    """
+    return any(
+        any(
+            isinstance(
+                _types.beneath_optional(argument.type_annotation),
+                _types.SetTypeAnnotation,
+            )
+            for argument in function.arguments
+        )
+        or _types.declares_local_set(function)
+        for function in functions
+    )
+
+
+def sets(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model might use the sets in transpilable code.
+
+    The sets are the constant sets, the set arguments and the local sets.
+    The generators use this function to decide whether they need to generate
+    the helper functions for the sets.
+    """
+    if any(
+        isinstance(
+            constant,
+            (
+                _types.ConstantSetOfPrimitives,
+                _types.ConstantSetOfEnumerationLiterals,
+            ),
+        )
+        for constant in symbol_table.constants
+    ):
+        return True
+
+    functions = [
+        *symbol_table.verification_functions,
+        *(method for cls in symbol_table.classes for method in cls.methods),
+    ]  # type: List[Union[_types.Verification, _types.Method]]
+
+    return sets_in(functions)
+
+
+def set_operations(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model computes an intersection or a difference of sets.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions for the operations on sets.
+
+    We do not distinguish between the methods of the sets and the methods of our
+    classes of the same name. In the worst case, we generate unused helpers.
+    """
+    return any(
+        isinstance(node, parse_tree.MethodCall)
+        and node.member.name in ("intersection", "difference")
+        for node in _over_transpilable_nodes(symbol_table)
+    )
+
+
+def set_properties(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any class of the ``symbol_table`` has a set property.
+
+    The set properties are serialized as sorted arrays, so we need to generate
+    the helpers for sorting them only if there are any.
+    """
+    return any(
+        isinstance(
+            _types.beneath_optional(prop.type_annotation),
+            _types.SetTypeAnnotation,
+        )
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )
+
+
+def _is_set_of_enumeration_literals(
+    type_annotation: _types.TypeAnnotationUnion,
+) -> bool:
+    """Check whether the ``type_annotation`` is a set of enumeration literals."""
+    type_anno = _types.beneath_optional(type_annotation)
+    return (
+        isinstance(type_anno, _types.SetTypeAnnotation)
+        and isinstance(type_anno.items, _types.OurTypeAnnotation)
+        and isinstance(type_anno.items.our_type, _types.Enumeration)
+    )
+
+
+def sets_of_enumeration_literals(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model uses a set of enumeration literals.
+
+    The sets are the constant sets, the set properties, the set arguments,
+    the set return values and the local sets. We do not have the types of
+    the local sets at hand here, so we resolve the items of ``Set[...]`` and
+    ``AbstractSet[...]`` in the annotations of the local declarations.
+    """
+    if any(
+        isinstance(constant, _types.ConstantSetOfEnumerationLiterals)
+        for constant in symbol_table.constants
+    ):
+        return True
+
+    if any(
+        _is_set_of_enumeration_literals(prop.type_annotation)
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    ):
+        return True
+
+    functions = [
+        *symbol_table.verification_functions,
+        *(method for cls in symbol_table.classes for method in cls.methods),
+    ]  # type: List[Union[_types.Verification, _types.Method]]
+
+    for function in functions:
+        if any(
+            _is_set_of_enumeration_literals(argument.type_annotation)
+            for argument in function.arguments
+        ):
+            return True
+
+        if function.returns is not None and _is_set_of_enumeration_literals(
+            function.returns
+        ):
+            return True
+
+        for annotation in _types.local_declaration_annotations(function):
+            for node in parse_tree.over_nodes(annotation):
+                if (
+                    isinstance(node, parse_tree.Index)
+                    and isinstance(node.collection, parse_tree.Name)
+                    and node.collection.identifier in ("Set", "AbstractSet")
+                    and isinstance(node.index, parse_tree.Name)
+                    and isinstance(
+                        symbol_table.find_our_type(node.index.identifier),
+                        _types.Enumeration,
+                    )
+                ):
+                    return True
+
+    return False
+
+
+def sets_of_strings_in_properties(symbol_table: _types.SymbolTable) -> bool:
+    """Check whether any class of the ``symbol_table`` has a set property of strings."""
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = _types.beneath_optional(prop.type_annotation)
+            if (
+                isinstance(type_anno, _types.SetTypeAnnotation)
+                and _types.try_primitive_type(type_anno.items)
+                is _types.PrimitiveType.STR
+            ):
+                return True
+
+    return False

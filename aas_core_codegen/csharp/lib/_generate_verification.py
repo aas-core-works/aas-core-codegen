@@ -35,6 +35,7 @@ from aas_core_codegen.csharp.common import (
     INDENT4 as IIII,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 
 
@@ -1438,7 +1439,7 @@ def generate(
     # name one, so the alias is needed here just as it is in the types.
     json_using_directive = (
         "\nusing Nodes = System.Text.Json.Nodes;"
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 

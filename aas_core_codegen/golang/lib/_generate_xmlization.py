@@ -26,6 +26,7 @@ from aas_core_codegen.golang.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 # region Shared between the de-serialization and the serialization
 
@@ -834,7 +835,7 @@ def _generate_json_value_readers(
     These three give the readers of the ``xmlrpc`` package the names which
     this module's own registry of the readers expects.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -894,7 +895,7 @@ def _generate_json_value_writers(
     here, as it is a *property* of one of our classes which is optional, and
     not a JSON-able value of its own.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -2651,7 +2652,7 @@ type DeserializationError = xmlcommon.DeserializationError"""
         ]
     )
 
-    if golang_common.uses_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_read_set_of())
 
     requirements = _collect_requirements(symbol_table)

@@ -6,6 +6,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, tests_common
 from aas_core_codegen.common import Stripped, indent_but_first_line
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python import common as python_common
 from aas_core_codegen.python.common import (
     INDENT as I,
@@ -15,7 +16,7 @@ from aas_core_codegen.python.common import (
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -33,7 +34,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     """
     methods = []  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         for i, case in enumerate(tests_common.FLOOR_MOD_CASES):
             methods.append(
                 Stripped(
@@ -44,7 +45,7 @@ def test_modulo_{i}(self) -> None:
                 )
             )
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         for i, (int_argument, int_expected) in enumerate(tests_common.ABS_INT_CASES):
             methods.append(
                 Stripped(

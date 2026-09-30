@@ -12,12 +12,13 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_lstrip(symbol_table) or intermediate.uses_int(symbol_table)
+    intermediate_uses.lstrip_call(symbol_table) or intermediate_uses.int_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -40,7 +41,7 @@ def generate(
     """
     blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         for i, (text, chars, expected) in enumerate(tests_common.LSTRIP_CASES):
             blocks.append(
                 Stripped(
@@ -57,7 +58,7 @@ public void Test_LStrip_{i}()
                 )
             )
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         for i, (text, expected_int) in enumerate(tests_common.PARSE_INT_CASES):
             blocks.append(
                 Stripped(

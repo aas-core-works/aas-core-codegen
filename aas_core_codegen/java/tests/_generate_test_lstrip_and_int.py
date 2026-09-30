@@ -6,6 +6,7 @@ from icontract import require
 
 from aas_core_codegen import intermediate, tests_common
 from aas_core_codegen.common import Stripped, indent_but_first_line
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import common as java_common
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -17,7 +18,7 @@ from aas_core_codegen.java.common import (
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_lstrip(symbol_table) or intermediate.uses_int(symbol_table)
+    intermediate_uses.lstrip_call(symbol_table) or intermediate_uses.int_call(symbol_table)
 )
 # fmt: on
 def generate(
@@ -34,7 +35,7 @@ def generate(
     """
     blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         for i, (text, chars, expected) in enumerate(tests_common.LSTRIP_CASES):
             blocks.append(
                 Stripped(
@@ -50,7 +51,7 @@ public void testLstrip{i}() {{
                 )
             )
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         for i, (text, expected_int) in enumerate(tests_common.PARSE_INT_CASES):
             blocks.append(
                 Stripped(

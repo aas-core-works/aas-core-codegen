@@ -6,6 +6,7 @@ from icontract import require
 
 from aas_core_codegen import intermediate, tests_common
 from aas_core_codegen.common import Stripped, indent_but_first_line
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import common as java_common
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -35,7 +36,7 @@ def _double_literal(value: float) -> str:
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 # fmt: on
 def generate(
@@ -52,7 +53,7 @@ def generate(
     """
     blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         for i, case in enumerate(tests_common.FLOOR_MOD_CASES):
             blocks.append(
                 Stripped(
@@ -67,7 +68,7 @@ public void testFloorMod{i}() {{
                 )
             )
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         for i, (int_argument, int_expected) in enumerate(tests_common.ABS_INT_CASES):
             blocks.append(
                 Stripped(

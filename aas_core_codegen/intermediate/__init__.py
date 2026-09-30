@@ -82,14 +82,6 @@ over_type_annotation_and_nested_type_annotations = (
     _types.over_type_annotation_and_nested_type_annotations
 )
 tuple_arities = _types.tuple_arities
-uses_json_types = _types.uses_json_types
-uses_len_slicing_or_find = _types.uses_len_slicing_or_find
-uses_modulo = _types.uses_modulo
-uses_abs = _types.uses_abs
-uses_lstrip = _types.uses_lstrip
-uses_int = _types.uses_int
-uses_set_operations = _types.uses_set_operations
-uses_sets = _types.uses_sets
 declares_local_set = _types.declares_local_set
 local_declaration_annotations = _types.local_declaration_annotations
 

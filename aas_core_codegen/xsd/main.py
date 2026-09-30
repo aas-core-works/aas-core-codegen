@@ -19,6 +19,7 @@ from aas_core_codegen import (
     infer_for_schema,
 )
 from aas_core_codegen.common import Error, assert_never, Identifier
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import retree as parse_retree
 from aas_core_codegen.xsd import naming as xsd_naming
 
@@ -1578,7 +1579,7 @@ def _generate(
     if len(errors) > 0:
         return None, errors
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         root.extend(_generate_json_type_definitions())
 
     # Tag name 🠒 (name 🠒 element)

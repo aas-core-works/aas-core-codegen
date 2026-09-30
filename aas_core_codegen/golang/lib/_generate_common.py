@@ -21,6 +21,7 @@ from aas_core_codegen.golang.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_tuple_struct(arity: int) -> Stripped:
@@ -321,15 +322,15 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     # An unused import does not compile in Go, so we import only what the helpers
     # below need.
     import_lines = []  # type: List[str]
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         import_lines.append(f'{I}"fmt"')
 
-    if golang_common.uses_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         import_lines.append(f'{I}"sort"')
 
     import_lines.append(f'{I}"strings"')
 
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if intermediate_uses.len_slicing_or_find(symbol_table):
         import_lines.append(f'{I}"unicode/utf8"')
 
     import_lines_joined = "\n".join(import_lines)
@@ -456,7 +457,7 @@ func NewAndPointTo[T any](value T) *T {{
     # the strings to ``[]rune``, so that we neither copy the strings nor replace
     # the invalid UTF-8 bytes. Each invalid byte counts as a character of its own,
     # as in ``utf8.RuneCountInString`` and in the ``range`` loop over a string.
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if intermediate_uses.len_slicing_or_find(symbol_table):
         blocks.extend(
             [
                 Stripped(
@@ -580,22 +581,22 @@ func FindStr(text string, sub string, start int64) int64 {{
     # package so that both the verification and the methods in the types can use
     # them. They are exported so that the clients can rely on them, and so that we
     # can unit-test them.
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         blocks.append(FLOOR_MOD)
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         blocks.append(ABS_INT64)
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         blocks.append(PARSE_SAFE_INT)
 
-    if intermediate.uses_sets(symbol_table):
+    if intermediate_uses.sets(symbol_table):
         blocks.extend(SOME_AND_ALL_KEYS)
 
-    if intermediate.uses_set_operations(symbol_table):
+    if intermediate_uses.set_operations(symbol_table):
         blocks.extend(SET_OPERATIONS)
 
-    if golang_common.uses_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         blocks.extend(SORTED_KEYS)
 
     blocks.append(golang_common.WARNING)

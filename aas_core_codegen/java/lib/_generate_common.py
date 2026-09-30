@@ -4,6 +4,7 @@ from typing import List, Sequence
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, Stripped, indent_but_first_line
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import common as java_common, naming as java_naming
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -147,10 +148,10 @@ def _generate_string_helpers(
     uses them.
     """
     extra_methods = []  # type: List[Stripped]
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         extra_methods.append(_LSTRIP)
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         extra_methods.append(_PARSE_SAFE_INT)
 
     extra_methods_joined = "".join(
@@ -604,9 +605,9 @@ def generate(
     files = []  # type: List[java_common.JavaFile]
 
     if (
-        intermediate.uses_len_slicing_or_find(symbol_table)
-        or intermediate.uses_lstrip(symbol_table)
-        or intermediate.uses_int(symbol_table)
+        intermediate_uses.len_slicing_or_find(symbol_table)
+        or intermediate_uses.lstrip_call(symbol_table)
+        or intermediate_uses.int_call(symbol_table)
     ):
         files.append(
             java_common.JavaFile(
@@ -615,7 +616,7 @@ def generate(
             )
         )
 
-    with_operations = intermediate.uses_set_operations(symbol_table)
+    with_operations = intermediate_uses.set_operations(symbol_table)
     with_sorting = java_common.has_set_properties(symbol_table)
     if with_operations or with_sorting:
         set_helpers = _generate_set_helpers(

@@ -17,6 +17,7 @@ from aas_core_codegen.golang.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _int64_literal(value: int) -> str:
@@ -162,7 +163,7 @@ func TestAbsFloat64(t *testing.T) {{
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -180,10 +181,10 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     """
     test_blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         test_blocks.append(_generate_test_floor_mod())
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         test_blocks.append(_generate_test_abs_int64())
         test_blocks.append(_generate_test_abs_float64())
 

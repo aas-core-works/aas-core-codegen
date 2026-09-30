@@ -14,6 +14,7 @@ from aas_core_codegen.common import (
     assert_never,
     indent_but_first_line,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import (
     common as typescript_common,
     naming as typescript_naming,
@@ -1620,7 +1621,7 @@ def _generate_json_able_helpers(
     a non-finite number, and it needs to be copied, so that the instance and
     the document it came from do not share a mutable object.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [

@@ -14,6 +14,7 @@ from aas_core_codegen.common import (
     indent_but_first_line,
     assert_never,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
@@ -570,7 +571,7 @@ def generate(
     # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one
     # pay for the import.
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         imports.extend(
             Stripped(f"import {json_import};")
             for json_import in java_common.JSON_IMPORTS

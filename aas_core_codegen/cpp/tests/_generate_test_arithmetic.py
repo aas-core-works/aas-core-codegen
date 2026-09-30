@@ -11,6 +11,7 @@ from aas_core_codegen.cpp.common import (
     INDENT as I,
     INDENT2 as II,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 #: Smallest 32-bit signed integer, the smallest ``int`` literal on all our platforms
 _INT32_MIN = -(2**31)
@@ -49,7 +50,7 @@ def _double_literal(value: float) -> str:
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 @ensure(
     lambda result:
@@ -104,7 +105,7 @@ namespace aas = {library_namespace};"""
         ),
     ]  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         for case in tests_common.FLOOR_MOD_CASES:
             blocks.append(
                 Stripped(
@@ -123,7 +124,7 @@ TEST_CASE("Test FloorMod of {case.dividend} by {case.divisor}") {{
                 )
             )
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         for int_argument, int_expected in tests_common.ABS_INT_CASES:
             blocks.append(
                 Stripped(

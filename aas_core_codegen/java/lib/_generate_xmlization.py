@@ -15,6 +15,7 @@ from aas_core_codegen.common import (
     indent_but_first_line,
     Stripped,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
@@ -1986,7 +1987,7 @@ def _generate_json_value_readers(
     the readers of ``XmlRpc`` the name which this module's registry of
     the readers expects.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -2031,7 +2032,7 @@ def _generate_json_value_writers(
 
     These mirror :py:func:`_generate_json_value_readers`.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -3036,7 +3037,7 @@ def generate(
     # A JSON-able value is a Jackson node, and only the models which use one
     # pay for the import and for the XML-RPC de/serialization which goes
     # with it.
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         imports.extend(
             [
                 *(

@@ -7,6 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, tests_common
 from aas_core_codegen.common import Stripped
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import common as typescript_common
 from aas_core_codegen.typescript.common import INDENT as I
 
@@ -14,7 +15,7 @@ from aas_core_codegen.typescript.common import INDENT as I
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -57,7 +58,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
     ]  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         blocks.append(Stripped('import * as AasCommon from "../src/common";'))
 
         blocks.append(
@@ -94,7 +95,7 @@ test({title}, () => {{
                 )
             )
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         for int_argument, int_expected in tests_common.ABS_INT_CASES:
             # NOTE (mristin):
             # We skip the cases which can not be exactly represented as doubles,

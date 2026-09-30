@@ -22,6 +22,7 @@ from aas_core_codegen.common import (
     wrap_text_into_lines,
     assert_union_without_excluded,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python.common import (
     INDENT as I,
     INDENT2 as II,
@@ -1601,7 +1602,7 @@ def generate(
     json_value_verification_import = (
         f"\nimport {qualified_module_name}.jsonvalueverification"
         f" as aas_json_value_verification"
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 
@@ -1613,7 +1614,7 @@ def generate(
         "reporting as aas_reporting",
         "types as aas_types",
     ]
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         imported_modules.insert(0, "common as aas_common")
 
     imported_modules_joined = "\n".join(

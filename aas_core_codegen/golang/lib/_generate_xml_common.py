@@ -15,6 +15,7 @@ from aas_core_codegen.golang.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_deserialization_error_and_its_methods() -> List[Stripped]:
@@ -1370,7 +1371,7 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     # writes its elements in no namespace at all, as the XML-RPC specification
     # prescribes. The primitives which deal with such elements are therefore
     # only generated for a meta-model which actually has a JSON-able type.
-    uses_json_types = intermediate.uses_json_types(symbol_table)
+    uses_json_types = intermediate_uses.json_types(symbol_table)
 
     aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 

@@ -511,23 +511,6 @@ def names_package(blocks: Sequence[str], qualifier: str) -> bool:
     return any(pattern.search(block) is not None for block in blocks)
 
 
-def uses_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
-    """
-    Check whether any class of the ``symbol_table`` has a set property.
-
-    The set properties are serialized as sorted arrays, so we need to generate
-    the helpers for sorting them only if there are any.
-    """
-    return any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for cls in symbol_table.classes
-        for prop in cls.properties
-    )
-
-
 def enumerations_in_set_properties(
     symbol_table: intermediate.SymbolTable,
 ) -> List[intermediate.Enumeration]:

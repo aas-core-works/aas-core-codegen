@@ -7,6 +7,7 @@ from icontract import ensure
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import common as typescript_common
 from aas_core_codegen.typescript.common import (
     INDENT as I,
@@ -96,7 +97,7 @@ export function parseNamedElementInNoNamespace<T>(
 }}"""
             ),
         ]
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else []
     )  # type: List[Stripped]
 

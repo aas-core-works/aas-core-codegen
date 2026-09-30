@@ -22,6 +22,7 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_concatenate_definitions_for_2_parts_and_above() -> List[Stripped]:
@@ -255,7 +256,7 @@ int64_t FindStr(
         ),
     ]  # type: List[Stripped]
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         result.append(
             Stripped(
                 f"""\
@@ -474,7 +475,7 @@ int64_t FindStr(
         ),
     ]  # type: List[Stripped]
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         result.extend(
             [
                 Stripped(
@@ -848,20 +849,6 @@ struct EnumHash {{
 )
 
 
-def _uses_sets_of_enumeration_literals(symbol_table: intermediate.SymbolTable) -> bool:
-    """
-    Check whether the meta-model might use a set of enumeration literals.
-
-    We can not tell the items of the local sets without the type inference, so
-    we approximate: any set in a meta-model with an enumeration might hold
-    the enumeration literals. In the worst case, we generate an unused hasher.
-    """
-    return len(symbol_table.enumerations) > 0 and (
-        intermediate.uses_sets(symbol_table)
-        or len(cpp_common.set_types_of_properties(symbol_table)) > 0
-    )
-
-
 #: Define the sorting of the items of a set, which we need to serialize and
 #: verify the set properties in the same order in all the SDKs
 _SORTED_POINTERS_DEFINITION: Final[Stripped] = Stripped(
@@ -900,15 +887,6 @@ std::vector<const typename SetT::value_type*> SortedPointers(
 {I}return result;
 }}"""
 )
-
-
-def _uses_sets_of_strings_in_properties(symbol_table: intermediate.SymbolTable) -> bool:
-    """Check whether a set property holds strings, which we compare by code points."""
-    return any(
-        intermediate.try_primitive_type(set_type.items)
-        is intermediate.PrimitiveType.STR
-        for set_type in cpp_common.set_types_of_properties(symbol_table)
-    )
 
 
 # fmt: off
@@ -968,7 +946,7 @@ std::unique_ptr<T> make_unique(
 
     make_uniques_joined = "\n\n".join(make_uniques)
 
-    has_set_properties = len(cpp_common.set_types_of_properties(symbol_table)) > 0
+    has_set_properties = intermediate_uses.set_properties(symbol_table)
 
     vector_include = "#include <vector>\n" if has_set_properties else ""
 
@@ -1035,15 +1013,15 @@ std::unique_ptr<T> make_unique(
     # strings, slice them, or call ``find`` or ``lstrip`` on them.
     #
     # The helpers ``FloorMod`` and ``ParseSafeInt`` return ``int64_t``'s as well.
-    uses_string_helpers = intermediate.uses_len_slicing_or_find(
+    uses_string_helpers = intermediate_uses.len_slicing_or_find(
         symbol_table
-    ) or intermediate.uses_lstrip(symbol_table)
+    ) or intermediate_uses.lstrip_call(symbol_table)
 
     extra_std_includes = []  # type: List[str]
     if (
         uses_string_helpers
-        or intermediate.uses_modulo(symbol_table)
-        or intermediate.uses_int(symbol_table)
+        or intermediate_uses.modulo(symbol_table)
+        or intermediate_uses.int_call(symbol_table)
     ):
         extra_std_includes.append("#include <cstdint>")
 
@@ -1342,28 +1320,28 @@ size_t LenTuple(const std::tuple<T...>&) {
             ),
             *(
                 [FLOOR_MOD_DECLARATION]
-                if intermediate.uses_modulo(symbol_table)
+                if intermediate_uses.modulo(symbol_table)
                 else []
             ),
             *(
                 [PARSE_SAFE_INT_DECLARATION]
-                if intermediate.uses_int(symbol_table)
+                if intermediate_uses.int_call(symbol_table)
                 else []
             ),
             *(
                 _SET_OPERATIONS_DEFINITIONS
-                if intermediate.uses_set_operations(symbol_table)
+                if intermediate_uses.set_operations(symbol_table)
                 else []
             ),
             *(
                 [_LESS_BY_CODE_POINTS_DECLARATION]
-                if _uses_sets_of_strings_in_properties(symbol_table)
+                if intermediate_uses.sets_of_strings_in_properties(symbol_table)
                 else []
             ),
             *([_SORTED_POINTERS_DEFINITION] if has_set_properties else []),
             *(
                 [_ENUM_HASH_DEFINITION]
-                if _uses_sets_of_enumeration_literals(symbol_table)
+                if intermediate_uses.sets_of_enumeration_literals(symbol_table)
                 else []
             ),
             Stripped(
@@ -1407,12 +1385,12 @@ def generate_implementation(
     # NOTE (mristin):
     # ``ParseSafeInt`` throws ``std::invalid_argument``.
     std_includes = ["#include <algorithm>"]
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         std_includes.append("#include <stdexcept>")
 
     # NOTE (mristin):
     # ``LessByCodePoints`` needs ``std::uint32_t``.
-    if _uses_sets_of_strings_in_properties(symbol_table):
+    if intermediate_uses.sets_of_strings_in_properties(symbol_table):
         std_includes.append("#include <cstdint>")
 
     std_includes_joined = "\n".join(std_includes)
@@ -1630,16 +1608,20 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
         *(
             _generate_string_helper_definitions(symbol_table)
             if (
-                intermediate.uses_len_slicing_or_find(symbol_table)
-                or intermediate.uses_lstrip(symbol_table)
+                intermediate_uses.len_slicing_or_find(symbol_table)
+                or intermediate_uses.lstrip_call(symbol_table)
             )
             else []
         ),
-        *([FLOOR_MOD_DEFINITION] if intermediate.uses_modulo(symbol_table) else []),
-        *([PARSE_SAFE_INT_DEFINITION] if intermediate.uses_int(symbol_table) else []),
+        *([FLOOR_MOD_DEFINITION] if intermediate_uses.modulo(symbol_table) else []),
+        *(
+            [PARSE_SAFE_INT_DEFINITION]
+            if intermediate_uses.int_call(symbol_table)
+            else []
+        ),
         *(
             [_LESS_BY_CODE_POINTS_DEFINITION]
-            if _uses_sets_of_strings_in_properties(symbol_table)
+            if intermediate_uses.sets_of_strings_in_properties(symbol_table)
             else []
         ),
         cpp_common.generate_namespace_closing(namespace),

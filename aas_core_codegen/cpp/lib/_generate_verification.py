@@ -42,6 +42,7 @@ from aas_core_codegen.cpp.common import (
     INDENT5 as IIIII,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -196,7 +197,7 @@ def generate_header(
 
     unordered_set_include = (
         "#include <unordered_set>\n"
-        if cpp_common.uses_sets(symbol_table.verification_functions)
+        if intermediate_uses.sets_in(symbol_table.verification_functions)
         else ""
     )
 
@@ -3337,7 +3338,7 @@ def generate_implementation(
         symbol_table=symbol_table
     )
 
-    uses_json = intermediate.uses_json_types(symbol_table)
+    uses_json = intermediate_uses.json_types(symbol_table)
 
     json_value_verification_include = (
         '#include "json_value_verification.hpp"\n\n' if uses_json else ""
@@ -3348,7 +3349,7 @@ def generate_implementation(
     # ``<cstdlib>``, while its overloads for the floating-point numbers live in
     # ``<cmath>``.
     std_includes = ["<map>", "<set>", "<vector>"]
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         std_includes.extend(["<cmath>", "<cstdlib>"])
 
     std_includes_joined = "\n".join(

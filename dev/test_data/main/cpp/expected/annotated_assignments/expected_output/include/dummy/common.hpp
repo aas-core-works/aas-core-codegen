@@ -10256,20 +10256,6 @@ SetT Difference(
   return result;
 }
 
-/**
- * \brief Hash an enumeration literal by its underlying value.
- *
- * C++11 does not specialize std::hash for the enumerations, while C++14 does.
- * We use this hasher for all the sets of enumeration literals so that
- * the SDK stays C++11-compatible.
- */
-struct EnumHash {
-  template<typename T>
-  std::size_t operator()(T that) const {
-    return static_cast<std::size_t>(that);
-  }
-};
-
 }  // namespace common
 /**@}*/
 

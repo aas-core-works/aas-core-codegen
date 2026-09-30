@@ -28,6 +28,7 @@ from aas_core_codegen.csharp.common import (
     INDENT7 as IIIIIII,
     INDENT8 as IIIIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 # NOTE (mristin):
@@ -1492,7 +1493,7 @@ def _generate_deserialize_impl(
 
     # endregion
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.extend(_generate_deserialize_json_helpers())
 
     for our_type in symbol_table.our_types:
@@ -2836,7 +2837,7 @@ private static Nodes.JsonValue ToJsonValue(double that)
         for composed_type in composed_types:
             blocks.append(_generate_serializer_field(composed_type))
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.extend(_generate_serialize_json_helpers())
 
     # NOTE (mristin):

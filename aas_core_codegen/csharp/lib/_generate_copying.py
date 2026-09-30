@@ -23,6 +23,7 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_union_deep_copy_helper() -> Stripped:
@@ -676,7 +677,7 @@ using System.Collections.Generic;  // can't alias"""
         )
     )
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         using_directives.append(Stripped("using Nodes = System.Text.Json.Nodes;"))
 
     # NOTE (mristin):

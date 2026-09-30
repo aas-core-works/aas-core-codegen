@@ -11,6 +11,7 @@ from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _long_literal(value: int) -> str:
@@ -35,7 +36,7 @@ def _double_literal(value: float) -> str:
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_modulo(symbol_table) or intermediate.uses_abs(symbol_table)
+    intermediate_uses.modulo(symbol_table) or intermediate_uses.abs_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -58,7 +59,7 @@ def generate(
     """
     blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         for i, case in enumerate(tests_common.FLOOR_MOD_CASES):
             blocks.append(
                 Stripped(
@@ -74,7 +75,7 @@ public void Test_FloorMod_{i}()
                 )
             )
 
-    if intermediate.uses_abs(symbol_table):
+    if intermediate_uses.abs_call(symbol_table):
         for i, (int_argument, int_expected) in enumerate(tests_common.ABS_INT_CASES):
             blocks.append(
                 Stripped(

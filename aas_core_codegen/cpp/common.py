@@ -3,7 +3,7 @@
 import io
 import math
 import re
-from typing import List, Tuple, Optional, Sequence, Union
+from typing import List, Tuple, Optional, Set
 
 from icontract import ensure, require
 
@@ -756,59 +756,20 @@ def generate_argument_type(
     )
 
 
-def uses_sets(
-    functions: Sequence[Union[intermediate.Verification, intermediate.Method]]
-) -> bool:
-    """
-    Check whether the ``functions`` take the sets as arguments or declare local sets.
-
-    We use this check to include ``<unordered_set>`` only where it is needed.
-    """
-    return any(
-        any(
-            isinstance(
-                intermediate.beneath_optional(argument.type_annotation),
-                intermediate.SetTypeAnnotation,
-            )
-            for argument in function.arguments
-        )
-        or intermediate.declares_local_set(function)
-        for function in functions
-    )
-
-
-def set_types_of_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.SetTypeAnnotation]:
-    """
-    List the set types of the properties, beneath the optionals.
-
-    We use it to decide which helpers for the sets we need to generate, as we
-    sort the items of a set property when we serialize or verify it.
-    """
-    result = []  # type: List[intermediate.SetTypeAnnotation]
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            if prop.specified_for is not cls:
-                continue
-
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if isinstance(type_anno, intermediate.SetTypeAnnotation):
-                result.append(type_anno)
-
-    return result
-
-
 def enumerations_in_set_properties(
     symbol_table: intermediate.SymbolTable,
 ) -> List[intermediate.Enumeration]:
     """List the enumerations whose literals are held by a set property."""
-    enumeration_id_set = {
-        id(set_type.items.our_type)
-        for set_type in set_types_of_properties(symbol_table)
-        if isinstance(set_type.items, intermediate.OurTypeAnnotation)
-        and isinstance(set_type.items.our_type, intermediate.Enumeration)
-    }
+    enumeration_id_set = set()  # type: Set[int]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if (
+                isinstance(type_anno, intermediate.SetTypeAnnotation)
+                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+            ):
+                enumeration_id_set.add(id(type_anno.items.our_type))
 
     return [
         enumeration
