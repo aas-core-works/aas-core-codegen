@@ -10,42 +10,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected INode") {
   const std::shared_ptr<
-    aas::types::IBranch
+    our::types::IBranch
   > concrete_instance(
     test::common::examples::LoadMinBranch()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::INode
+      our::types::INode
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::NodeFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::NodeFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a INode "
         "from a minimal IBranch: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -57,7 +57,7 @@ TEST_CASE("Test the round-trip of an expected INode") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a INode "
         "over a minimal IBranch: ",
         *patch_message
@@ -69,38 +69,38 @@ TEST_CASE("Test the round-trip of an expected INode") {
 
 TEST_CASE("Test the round-trip of an expected IBranch") {
   const std::shared_ptr<
-    aas::types::ILeaf
+    our::types::ILeaf
   > concrete_instance(
     test::common::examples::LoadMinLeaf()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IBranch
+      our::types::IBranch
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::BranchFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::BranchFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IBranch "
         "from a minimal ILeaf: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -112,7 +112,7 @@ TEST_CASE("Test the round-trip of an expected IBranch") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IBranch "
         "over a minimal ILeaf: ",
         *patch_message
@@ -124,38 +124,38 @@ TEST_CASE("Test the round-trip of an expected IBranch") {
 
 TEST_CASE("Test the round-trip of an expected ILeaf") {
   const std::shared_ptr<
-    aas::types::IBlossom
+    our::types::IBlossom
   > concrete_instance(
     test::common::examples::LoadMinBlossom()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::ILeaf
+      our::types::ILeaf
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::LeafFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::LeafFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a ILeaf "
         "from a minimal IBlossom: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -167,7 +167,7 @@ TEST_CASE("Test the round-trip of an expected ILeaf") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a ILeaf "
         "over a minimal IBlossom: ",
         *patch_message

@@ -18,14 +18,14 @@ from typing import (
 import unittest
 
 
-import aas_core3.types as aas_types
+import aas_core3.types as our_types
 
 
 import tests.common
 import tests.common_xmlization
 
 
-class _TracingVisitor(aas_types.PassThroughVisitor):
+class _TracingVisitor(our_types.PassThroughVisitor):
     """Visit the instances and trace them."""
 
     def __init__(self) -> None:
@@ -37,18 +37,18 @@ class _TracingVisitor(aas_types.PassThroughVisitor):
         """Get the tracing log."""
         return self._log
 
-    def visit(self, that: aas_types.Class) -> None:
+    def visit(self, that: our_types.Class) -> None:
         self._log.append(tests.common.trace(that))
         super().visit(that)
 
 
 def assert_tracing_logs_from_descend_and_visitor_are_the_same(
-    that: aas_types.Class, test_case: unittest.TestCase
+    that: our_types.Class, test_case: unittest.TestCase
 ) -> None:
     """
     Check that the tracing logs are the same when :paramref:`that` instance
     is visited and when :paramref:`that` is ran through
-    :py:method:`aas_types.Class.descend`.
+    :py:method:`our_types.Class.descend`.
 
     :param that: instance to be iterated over
     :param test_case: in which this assertion runs

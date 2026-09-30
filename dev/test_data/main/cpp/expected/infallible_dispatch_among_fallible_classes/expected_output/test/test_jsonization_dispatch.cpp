@@ -10,42 +10,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
   const std::shared_ptr<
-    aas::types::IAbstractDescendantWithoutNumbers
+    our::types::IAbstractDescendantWithoutNumbers
   > concrete_instance(
     test::common::examples::LoadMinAbstractDescendantWithoutNumbers()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IAbstractWithoutNumbers
+      our::types::IAbstractWithoutNumbers
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::AbstractWithoutNumbersFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::AbstractWithoutNumbersFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IAbstractWithoutNumbers "
         "from a minimal IAbstractDescendantWithoutNumbers: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -57,7 +57,7 @@ TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IAbstractWithoutNumbers "
         "over a minimal IAbstractDescendantWithoutNumbers: ",
         *patch_message
@@ -69,38 +69,38 @@ TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
 
 TEST_CASE("Test the round-trip of an expected IParentWithoutNumbers") {
   const std::shared_ptr<
-    aas::types::IChildWithoutNumbers
+    our::types::IChildWithoutNumbers
   > concrete_instance(
     test::common::examples::LoadMinChildWithoutNumbers()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IParentWithoutNumbers
+      our::types::IParentWithoutNumbers
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::ParentWithoutNumbersFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::ParentWithoutNumbersFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IParentWithoutNumbers "
         "from a minimal IChildWithoutNumbers: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -112,7 +112,7 @@ TEST_CASE("Test the round-trip of an expected IParentWithoutNumbers") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IParentWithoutNumbers "
         "over a minimal IChildWithoutNumbers: ",
         *patch_message

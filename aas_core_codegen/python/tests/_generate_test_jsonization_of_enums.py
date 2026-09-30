@@ -37,7 +37,7 @@ def {test_method_name}(self) -> None:
 {I}for jsonable in [
 {II}{indent_but_first_line(literals_joined, II)}
 {I}]:
-{II}enum_literal = aas_jsonization.{from_jsonable}(jsonable)
+{II}enum_literal = our_jsonization.{from_jsonable}(jsonable)
 
 {II}self.assertEqual(enum_literal.value, jsonable)"""
             ),
@@ -81,7 +81,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.jsonization as aas_jsonization"""
+import {qualified_module_name}.jsonization as our_jsonization"""
         ),
         _generate_test_case(symbol_table=symbol_table),
         Stripped(

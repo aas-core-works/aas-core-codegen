@@ -205,11 +205,11 @@ def generate_sorted_set_items(
     if primitive_type is not None:
         comparator: str
         if primitive_type is intermediate.PrimitiveType.BOOL:
-            comparator = "AasCommon.compareBooleans"
+            comparator = "OurCommon.compareBooleans"
         elif primitive_type is intermediate.PrimitiveType.INT:
-            comparator = "AasCommon.compareNumbers"
+            comparator = "OurCommon.compareNumbers"
         elif primitive_type is intermediate.PrimitiveType.STR:
-            comparator = "AasCommon.compareByCodePoints"
+            comparator = "OurCommon.compareByCodePoints"
         elif primitive_type is intermediate.PrimitiveType.FLOAT:
             raise AssertionError(
                 f"Unexpected set of floats, which should have been refused in "
@@ -237,7 +237,7 @@ def generate_sorted_set_items(
         Identifier(f"compare_by_rank_of_{type_anno.items.our_type.name}")
     )
 
-    return Stripped(f"Array.from({set_expression}).sort(AasStringification.{compare})")
+    return Stripped(f"Array.from({set_expression}).sort(OurStringification.{compare})")
 
 
 # endregion

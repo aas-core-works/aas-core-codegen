@@ -1984,7 +1984,7 @@ import {package}.visitation.IVisitorWithContext;
 import java.lang.Iterable;
 
 /**
- * Represent a general class of an AAS model.
+ * Represent a general class of the meta-model.
  */
 public interface IClass {{
 {I}/**

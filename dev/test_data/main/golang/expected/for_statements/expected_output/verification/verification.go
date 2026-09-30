@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,7 +42,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check the for-each with an unconditional early return.
@@ -50,7 +50,7 @@ func FirstTextIsNotEmpty(
 	texts []string,
 ) bool {
 	for _, text := range texts {
-		return aascommon.LenStr(text) > 0
+		return ourcommon.LenStr(text) > 0
 	}
 	return true
 }
@@ -108,7 +108,7 @@ func SumIsSmall(
 
 // Check the nested for-each loops.
 func NoItemHasAnEmptyText(
-	items []aastypes.IItem,
+	items []ourtypes.IItem,
 ) bool {
 	for _, item := range items {
 		texts := item.Texts()
@@ -143,11 +143,11 @@ func IsNeitherThirteenNorUnlucky(
 
 // Check the for-each in a switch branch.
 func AlphaHasNoNegativeNumbers(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 	numbers []int64,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha:
+	case ourtypes.KindAlpha:
 		for _, number := range numbers {
 			switch number {
 			case -2:
@@ -164,7 +164,7 @@ func SumOfOddNumbersIsSmall(
 ) bool {
 	total := int64(0)
 	for _, number := range numbers {
-		switch aascommon.FloorMod(number, 2) {
+		switch ourcommon.FloorMod(number, 2) {
 		case 0:
 			continue
 		}
@@ -175,7 +175,7 @@ func SumOfOddNumbersIsSmall(
 
 // Check the continue in all the branches of a switch in a nested for-range.
 func ItemsAreFewAndTextsExpected(
-	items []aastypes.IItem,
+	items []ourtypes.IItem,
 ) bool {
 	count := int64(0)
 	for _, item := range items {
@@ -234,18 +234,18 @@ func WeightsBeforeEndAreSmall(
 
 // Check the break in the nested branches of a switch in a nested for-range.
 func TextsBeforeStopAreFew(
-	kind aastypes.Kind,
-	items []aastypes.IItem,
+	kind ourtypes.Kind,
+	items []ourtypes.IItem,
 ) bool {
 	count := int64(0)
 	for _, item := range items {
 		for i := 0; i < len(item.Texts()); i++ {
-			if kind == aastypes.KindAlpha {
+			if kind == ourtypes.KindAlpha {
 				if item.Texts()[i] == "stop" {
 					break
 				}
 			} else {
-				if aascommon.LenStr(item.Texts()[i]) > 10 {
+				if ourcommon.LenStr(item.Texts()[i]) > 10 {
 					break
 				}
 			}
@@ -255,14 +255,14 @@ func TextsBeforeStopAreFew(
 	return count < 3
 }
 
-// Verify `that` instance of [aastypes.IItem].
+// Verify `that` instance of [ourtypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyItem(
-	that aastypes.IItem,
+	that ourtypes.IItem,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -281,14 +281,14 @@ func VerifyItem(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -431,7 +431,7 @@ func VerifySomething(
 		that.Kind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Kind",
 				},
 			)
@@ -479,13 +479,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Items",
 						},
 					)
@@ -510,14 +510,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindBeta {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindBeta {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -538,19 +538,19 @@ func VerifyKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		abort = VerifyItem(
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

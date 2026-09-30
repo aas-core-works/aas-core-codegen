@@ -22,10 +22,10 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
-namespace common = aas::common;
-namespace xml_common = aas::xml_common;
-namespace xml_rpc = aas::xml_rpc;
+namespace our = dummy;
+namespace common = our::common;
+namespace xml_common = our::xml_common;
+namespace xml_rpc = our::xml_rpc;
 
 namespace {
 /**

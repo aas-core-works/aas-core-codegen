@@ -47,23 +47,23 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             f"""\
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test character in an empty range") {{
-{I}std::vector<aas::revm::Range> ranges;
+{I}std::vector<our::revm::Range> ranges;
 
 {I}REQUIRE(
-{II}!aas::revm::CharacterInRanges(ranges, L'M')
+{II}!our::revm::CharacterInRanges(ranges, L'M')
 {I});
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test character in a single range") {{
-{I}std::vector<aas::revm::Range> ranges = {{
-{II}aas::revm::Range(L'A', L'Z')
+{I}std::vector<our::revm::Range> ranges = {{
+{II}our::revm::Range(L'A', L'Z')
 {I}}};
 
 {I}REQUIRE(CharacterInRanges(ranges, L'M'));
@@ -73,17 +73,17 @@ TEST_CASE("Test character in a single range") {{
         Stripped(
             f"""\
 TEST_CASE("Test character in multiple ranges") {{
-{I}std::vector<aas::revm::Range> ranges = {{
-{II}aas::revm::Range(L'A', L'C'),
-{II}aas::revm::Range(L'D', L'F'),
-{II}aas::revm::Range(L'G', L'I'),
-{II}aas::revm::Range(L'J', L'L'),
-{II}aas::revm::Range(L'M', L'N')
+{I}std::vector<our::revm::Range> ranges = {{
+{II}our::revm::Range(L'A', L'C'),
+{II}our::revm::Range(L'D', L'F'),
+{II}our::revm::Range(L'G', L'I'),
+{II}our::revm::Range(L'J', L'L'),
+{II}our::revm::Range(L'M', L'N')
 {I}}};
 
 {I}for (wchar_t character = L'A'; character < L'Z'; ++character) {{
 {II}const std::string message(
-{III}aas::common::WstringToUtf8(
+{III}our::common::WstringToUtf8(
 {IIII}L"Testing for character: " + std::wstring(1, character)
 {III})
 {II});
@@ -105,226 +105,226 @@ TEST_CASE("Test character in multiple ranges") {{
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^a$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^a+b+$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSplit>(0, 2)
+{II}std::make_unique<our::revm::InstructionSplit>(0, 2)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'b')
+{II}std::make_unique<our::revm::InstructionChar>(L'b')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSplit>(2, 4)
+{II}std::make_unique<our::revm::InstructionSplit>(2, 4)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(!aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(aas::revm::Match(program, L"ab"));
-{I}REQUIRE(aas::revm::Match(program, L"aabb"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(!our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(our::revm::Match(program, L"ab"));
+{I}REQUIRE(our::revm::Match(program, L"aabb"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^a|b$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSplit>(1, 3)
+{II}std::make_unique<our::revm::InstructionSplit>(1, 3)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionJump>(4)
+{II}std::make_unique<our::revm::InstructionJump>(4)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'b')
+{II}std::make_unique<our::revm::InstructionChar>(L'b')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^a?$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSplit>(1, 2)
+{II}std::make_unique<our::revm::InstructionSplit>(1, 2)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^a*$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSplit>(1, 3)
+{II}std::make_unique<our::revm::InstructionSplit>(1, 3)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionJump>(0)
+{II}std::make_unique<our::revm::InstructionJump>(0)
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^[a-b]$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionSet>(
-{III}std::vector<aas::revm::Range>{{
-{IIII}aas::revm::Range(L'a', L'b')
+{II}std::make_unique<our::revm::InstructionSet>(
+{III}std::vector<our::revm::Range>{{
+{IIII}our::revm::Range(L'a', L'b')
 {III}}}
 {II})
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^[^a-b]$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionNotSet>(
-{III}std::vector<aas::revm::Range>{{
-{IIII}aas::revm::Range(L'a', L'b')
+{II}std::make_unique<our::revm::InstructionNotSet>(
+{III}std::vector<our::revm::Range>{{
+{IIII}our::revm::Range(L'a', L'b')
 {III}}}
 {II})
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionEnd>()
+{II}std::make_unique<our::revm::InstructionEnd>()
 {I});
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {I});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(!aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
-{I}REQUIRE(aas::revm::Match(program, L"c"));
-{I}REQUIRE(!aas::revm::Match(program, L"cc"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(!our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
+{I}REQUIRE(our::revm::Match(program, L"c"));
+{I}REQUIRE(!our::revm::Match(program, L"cc"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern ^.$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
-{I}program.emplace_back(std::make_unique<aas::revm::InstructionAny>());
-{I}program.emplace_back(std::make_unique<aas::revm::InstructionEnd>());
-{I}program.emplace_back(std::make_unique<aas::revm::InstructionMatch>());
+{I}program.emplace_back(std::make_unique<our::revm::InstructionAny>());
+{I}program.emplace_back(std::make_unique<our::revm::InstructionEnd>());
+{I}program.emplace_back(std::make_unique<our::revm::InstructionMatch>());
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(!aas::revm::Match(program, L"aa"));
-{I}REQUIRE(aas::revm::Match(program, L"b"));
-{I}REQUIRE(!aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(!our::revm::Match(program, L"aa"));
+{I}REQUIRE(our::revm::Match(program, L"b"));
+{I}REQUIRE(!our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         Stripped(
             f"""\
 TEST_CASE("Test pattern with arbitrary suffix ^a.*$") {{
-{I}std::vector<std::unique_ptr<aas::revm::Instruction> > program;
+{I}std::vector<std::unique_ptr<our::revm::Instruction> > program;
 
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionChar>(L'a')
+{II}std::make_unique<our::revm::InstructionChar>(L'a')
 {III});
 
 {I}// NOTE (mristin):
@@ -332,15 +332,15 @@ TEST_CASE("Test pattern with arbitrary suffix ^a.*$") {{
 {I}// However, we can optimize by having a single `match` without an `end` so that
 {I}// we return early.
 {I}program.emplace_back(
-{II}std::make_unique<aas::revm::InstructionMatch>()
+{II}std::make_unique<our::revm::InstructionMatch>()
 {III});
 
-{I}REQUIRE(!aas::revm::Match(program, L""));
-{I}REQUIRE(aas::revm::Match(program, L"a"));
-{I}REQUIRE(aas::revm::Match(program, L"aa"));
-{I}REQUIRE(!aas::revm::Match(program, L"b"));
-{I}REQUIRE(aas::revm::Match(program, L"ab"));
-{I}REQUIRE(!aas::revm::Match(program, L"ba"));
+{I}REQUIRE(!our::revm::Match(program, L""));
+{I}REQUIRE(our::revm::Match(program, L"a"));
+{I}REQUIRE(our::revm::Match(program, L"aa"));
+{I}REQUIRE(!our::revm::Match(program, L"b"));
+{I}REQUIRE(our::revm::Match(program, L"ab"));
+{I}REQUIRE(!our::revm::Match(program, L"ba"));
 }}"""
         ),
         cpp_common.WARNING,

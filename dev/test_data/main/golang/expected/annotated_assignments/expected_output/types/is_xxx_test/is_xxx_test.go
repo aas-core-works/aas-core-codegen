@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
-	instance := aastesting.MustLoadMinimalItem()
+	instance := ourtesting.MustLoadMinimalItem()
 
-	if !aastypes.IsItem(instance) {
+	if !ourtypes.IsItem(instance) {
 		t.Errorf(
 			"Expected IsItem to be true on an instance " +
 			"of IItem with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildA(instance) {
+	if ourtypes.IsChildA(instance) {
 		t.Errorf(
 			"Expected IsChildA to be false on an instance " +
 			"of IItem with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildB(instance) {
+	if ourtypes.IsChildB(instance) {
 		t.Errorf(
 			"Expected IsChildB to be false on an instance " +
 			"of IItem with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IItem with runtime type %T and with model type %v",
@@ -46,9 +46,9 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
-	instance := aastesting.MustLoadMinimalChildA()
+	instance := ourtesting.MustLoadMinimalChildA()
 
-	if aastypes.IsItem(instance) {
+	if ourtypes.IsItem(instance) {
 		t.Errorf(
 			"Expected IsItem to be false on an instance " +
 			"of IChildA with runtime type %T and with model type %v",
@@ -56,7 +56,7 @@ func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsChildA(instance) {
+	if !ourtypes.IsChildA(instance) {
 		t.Errorf(
 			"Expected IsChildA to be true on an instance " +
 			"of IChildA with runtime type %T and with model type %v",
@@ -64,7 +64,7 @@ func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildB(instance) {
+	if ourtypes.IsChildB(instance) {
 		t.Errorf(
 			"Expected IsChildB to be false on an instance " +
 			"of IChildA with runtime type %T and with model type %v",
@@ -72,7 +72,7 @@ func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IChildA with runtime type %T and with model type %v",
@@ -82,9 +82,9 @@ func TestIsXxxOnAnInstanceOfChildA(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
-	instance := aastesting.MustLoadMinimalChildB()
+	instance := ourtesting.MustLoadMinimalChildB()
 
-	if aastypes.IsItem(instance) {
+	if ourtypes.IsItem(instance) {
 		t.Errorf(
 			"Expected IsItem to be false on an instance " +
 			"of IChildB with runtime type %T and with model type %v",
@@ -92,7 +92,7 @@ func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildA(instance) {
+	if ourtypes.IsChildA(instance) {
 		t.Errorf(
 			"Expected IsChildA to be false on an instance " +
 			"of IChildB with runtime type %T and with model type %v",
@@ -100,7 +100,7 @@ func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsChildB(instance) {
+	if !ourtypes.IsChildB(instance) {
 		t.Errorf(
 			"Expected IsChildB to be true on an instance " +
 			"of IChildB with runtime type %T and with model type %v",
@@ -108,7 +108,7 @@ func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IChildB with runtime type %T and with model type %v",
@@ -118,9 +118,9 @@ func TestIsXxxOnAnInstanceOfChildB(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if aastypes.IsItem(instance) {
+	if ourtypes.IsItem(instance) {
 		t.Errorf(
 			"Expected IsItem to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -128,7 +128,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildA(instance) {
+	if ourtypes.IsChildA(instance) {
 		t.Errorf(
 			"Expected IsChildA to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -136,7 +136,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsChildB(instance) {
+	if ourtypes.IsChildB(instance) {
 		t.Errorf(
 			"Expected IsChildB to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -144,7 +144,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",

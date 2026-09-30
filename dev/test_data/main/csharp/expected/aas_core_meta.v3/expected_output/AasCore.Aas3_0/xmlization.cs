@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -510,309 +510,309 @@ namespace AasCore.Aas3_0
             /// <summary>
             /// Read an instance of class Extension from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Extension> ExtensionFromElement = (
-                AtElement<Aas.Extension>(
+            internal static readonly ElementReader<Our.Extension> ExtensionFromElement = (
+                AtElement<Our.Extension>(
                     ExtensionFromSequence, "extension"));
 
             /// <summary>
             /// Read an instance of class AdministrativeInformation from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.AdministrativeInformation
+                Our.AdministrativeInformation
             > AdministrativeInformationFromElement = (
-                AtElement<Aas.AdministrativeInformation>(
+                AtElement<Our.AdministrativeInformation>(
                     AdministrativeInformationFromSequence, "administrativeInformation"));
 
             /// <summary>
             /// Read an instance of class Qualifier from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Qualifier> QualifierFromElement = (
-                AtElement<Aas.Qualifier>(
+            internal static readonly ElementReader<Our.Qualifier> QualifierFromElement = (
+                AtElement<Our.Qualifier>(
                     QualifierFromSequence, "qualifier"));
 
             /// <summary>
             /// Read an instance of class AssetAdministrationShell from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.AssetAdministrationShell
+                Our.AssetAdministrationShell
             > AssetAdministrationShellFromElement = (
-                AtElement<Aas.AssetAdministrationShell>(
+                AtElement<Our.AssetAdministrationShell>(
                     AssetAdministrationShellFromSequence, "assetAdministrationShell"));
 
             /// <summary>
             /// Read an instance of class AssetInformation from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.AssetInformation
+                Our.AssetInformation
             > AssetInformationFromElement = (
-                AtElement<Aas.AssetInformation>(
+                AtElement<Our.AssetInformation>(
                     AssetInformationFromSequence, "assetInformation"));
 
             /// <summary>
             /// Read an instance of class Resource from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Resource> ResourceFromElement = (
-                AtElement<Aas.Resource>(
+            internal static readonly ElementReader<Our.Resource> ResourceFromElement = (
+                AtElement<Our.Resource>(
                     ResourceFromSequence, "resource"));
 
             /// <summary>
             /// Read an instance of class SpecificAssetId from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.SpecificAssetId
+                Our.SpecificAssetId
             > SpecificAssetIdFromElement = (
-                AtElement<Aas.SpecificAssetId>(
+                AtElement<Our.SpecificAssetId>(
                     SpecificAssetIdFromSequence, "specificAssetId"));
 
             /// <summary>
             /// Read an instance of class Submodel from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Submodel> SubmodelFromElement = (
-                AtElement<Aas.Submodel>(
+            internal static readonly ElementReader<Our.Submodel> SubmodelFromElement = (
+                AtElement<Our.Submodel>(
                     SubmodelFromSequence, "submodel"));
 
             /// <summary>
             /// Read an instance of class RelationshipElement from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.RelationshipElement
+                Our.RelationshipElement
             > RelationshipElementFromElement = (
-                AtElement<Aas.RelationshipElement>(
+                AtElement<Our.RelationshipElement>(
                     RelationshipElementFromSequence, "relationshipElement"));
 
             /// <summary>
             /// Read an instance of class SubmodelElementList from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.SubmodelElementList
+                Our.SubmodelElementList
             > SubmodelElementListFromElement = (
-                AtElement<Aas.SubmodelElementList>(
+                AtElement<Our.SubmodelElementList>(
                     SubmodelElementListFromSequence, "submodelElementList"));
 
             /// <summary>
             /// Read an instance of class SubmodelElementCollection from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.SubmodelElementCollection
+                Our.SubmodelElementCollection
             > SubmodelElementCollectionFromElement = (
-                AtElement<Aas.SubmodelElementCollection>(
+                AtElement<Our.SubmodelElementCollection>(
                     SubmodelElementCollectionFromSequence, "submodelElementCollection"));
 
             /// <summary>
             /// Read an instance of class Property from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Property> PropertyFromElement = (
-                AtElement<Aas.Property>(
+            internal static readonly ElementReader<Our.Property> PropertyFromElement = (
+                AtElement<Our.Property>(
                     PropertyFromSequence, "property"));
 
             /// <summary>
             /// Read an instance of class MultiLanguageProperty from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MultiLanguageProperty
+                Our.MultiLanguageProperty
             > MultiLanguagePropertyFromElement = (
-                AtElement<Aas.MultiLanguageProperty>(
+                AtElement<Our.MultiLanguageProperty>(
                     MultiLanguagePropertyFromSequence, "multiLanguageProperty"));
 
             /// <summary>
             /// Read an instance of class Range from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Range> RangeFromElement = (
-                AtElement<Aas.Range>(
+            internal static readonly ElementReader<Our.Range> RangeFromElement = (
+                AtElement<Our.Range>(
                     RangeFromSequence, "range"));
 
             /// <summary>
             /// Read an instance of class ReferenceElement from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.ReferenceElement
+                Our.ReferenceElement
             > ReferenceElementFromElement = (
-                AtElement<Aas.ReferenceElement>(
+                AtElement<Our.ReferenceElement>(
                     ReferenceElementFromSequence, "referenceElement"));
 
             /// <summary>
             /// Read an instance of class Blob from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Blob> BlobFromElement = (
-                AtElement<Aas.Blob>(
+            internal static readonly ElementReader<Our.Blob> BlobFromElement = (
+                AtElement<Our.Blob>(
                     BlobFromSequence, "blob"));
 
             /// <summary>
             /// Read an instance of class File from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.File> FileFromElement = (
-                AtElement<Aas.File>(
+            internal static readonly ElementReader<Our.File> FileFromElement = (
+                AtElement<Our.File>(
                     FileFromSequence, "file"));
 
             /// <summary>
             /// Read an instance of class AnnotatedRelationshipElement from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.AnnotatedRelationshipElement
+                Our.AnnotatedRelationshipElement
             > AnnotatedRelationshipElementFromElement = (
-                AtElement<Aas.AnnotatedRelationshipElement>(
+                AtElement<Our.AnnotatedRelationshipElement>(
                     AnnotatedRelationshipElementFromSequence, "annotatedRelationshipElement"));
 
             /// <summary>
             /// Read an instance of class Entity from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Entity> EntityFromElement = (
-                AtElement<Aas.Entity>(
+            internal static readonly ElementReader<Our.Entity> EntityFromElement = (
+                AtElement<Our.Entity>(
                     EntityFromSequence, "entity"));
 
             /// <summary>
             /// Read an instance of class EventPayload from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.EventPayload> EventPayloadFromElement = (
-                AtElement<Aas.EventPayload>(
+            internal static readonly ElementReader<Our.EventPayload> EventPayloadFromElement = (
+                AtElement<Our.EventPayload>(
                     EventPayloadFromSequence, "eventPayload"));
 
             /// <summary>
             /// Read an instance of class BasicEventElement from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.BasicEventElement
+                Our.BasicEventElement
             > BasicEventElementFromElement = (
-                AtElement<Aas.BasicEventElement>(
+                AtElement<Our.BasicEventElement>(
                     BasicEventElementFromSequence, "basicEventElement"));
 
             /// <summary>
             /// Read an instance of class Operation from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Operation> OperationFromElement = (
-                AtElement<Aas.Operation>(
+            internal static readonly ElementReader<Our.Operation> OperationFromElement = (
+                AtElement<Our.Operation>(
                     OperationFromSequence, "operation"));
 
             /// <summary>
             /// Read an instance of class OperationVariable from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.OperationVariable
+                Our.OperationVariable
             > OperationVariableFromElement = (
-                AtElement<Aas.OperationVariable>(
+                AtElement<Our.OperationVariable>(
                     OperationVariableFromSequence, "operationVariable"));
 
             /// <summary>
             /// Read an instance of class Capability from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Capability> CapabilityFromElement = (
-                AtElement<Aas.Capability>(
+            internal static readonly ElementReader<Our.Capability> CapabilityFromElement = (
+                AtElement<Our.Capability>(
                     CapabilityFromSequence, "capability"));
 
             /// <summary>
             /// Read an instance of class ConceptDescription from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.ConceptDescription
+                Our.ConceptDescription
             > ConceptDescriptionFromElement = (
-                AtElement<Aas.ConceptDescription>(
+                AtElement<Our.ConceptDescription>(
                     ConceptDescriptionFromSequence, "conceptDescription"));
 
             /// <summary>
             /// Read an instance of class Reference from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Reference> ReferenceFromElement = (
-                AtElement<Aas.Reference>(
+            internal static readonly ElementReader<Our.Reference> ReferenceFromElement = (
+                AtElement<Our.Reference>(
                     ReferenceFromSequence, "reference"));
 
             /// <summary>
             /// Read an instance of class Key from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Key> KeyFromElement = (
-                AtElement<Aas.Key>(
+            internal static readonly ElementReader<Our.Key> KeyFromElement = (
+                AtElement<Our.Key>(
                     KeyFromSequence, "key"));
 
             /// <summary>
             /// Read an instance of class LangStringNameType from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.LangStringNameType
+                Our.LangStringNameType
             > LangStringNameTypeFromElement = (
-                AtElement<Aas.LangStringNameType>(
+                AtElement<Our.LangStringNameType>(
                     LangStringNameTypeFromSequence, "langStringNameType"));
 
             /// <summary>
             /// Read an instance of class LangStringTextType from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.LangStringTextType
+                Our.LangStringTextType
             > LangStringTextTypeFromElement = (
-                AtElement<Aas.LangStringTextType>(
+                AtElement<Our.LangStringTextType>(
                     LangStringTextTypeFromSequence, "langStringTextType"));
 
             /// <summary>
             /// Read an instance of class Environment from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Environment> EnvironmentFromElement = (
-                AtElement<Aas.Environment>(
+            internal static readonly ElementReader<Our.Environment> EnvironmentFromElement = (
+                AtElement<Our.Environment>(
                     EnvironmentFromSequence, "environment"));
 
             /// <summary>
             /// Read an instance of class EmbeddedDataSpecification from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.EmbeddedDataSpecification
+                Our.EmbeddedDataSpecification
             > EmbeddedDataSpecificationFromElement = (
-                AtElement<Aas.EmbeddedDataSpecification>(
+                AtElement<Our.EmbeddedDataSpecification>(
                     EmbeddedDataSpecificationFromSequence, "embeddedDataSpecification"));
 
             /// <summary>
             /// Read an instance of class LevelType from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.LevelType> LevelTypeFromElement = (
-                AtElement<Aas.LevelType>(
+            internal static readonly ElementReader<Our.LevelType> LevelTypeFromElement = (
+                AtElement<Our.LevelType>(
                     LevelTypeFromSequence, "levelType"));
 
             /// <summary>
             /// Read an instance of class ValueReferencePair from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.ValueReferencePair
+                Our.ValueReferencePair
             > ValueReferencePairFromElement = (
-                AtElement<Aas.ValueReferencePair>(
+                AtElement<Our.ValueReferencePair>(
                     ValueReferencePairFromSequence, "valueReferencePair"));
 
             /// <summary>
             /// Read an instance of class ValueList from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.ValueList> ValueListFromElement = (
-                AtElement<Aas.ValueList>(
+            internal static readonly ElementReader<Our.ValueList> ValueListFromElement = (
+                AtElement<Our.ValueList>(
                     ValueListFromSequence, "valueList"));
 
             /// <summary>
             /// Read an instance of class LangStringPreferredNameTypeIec61360 from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.LangStringPreferredNameTypeIec61360
+                Our.LangStringPreferredNameTypeIec61360
             > LangStringPreferredNameTypeIec61360FromElement = (
-                AtElement<Aas.LangStringPreferredNameTypeIec61360>(
+                AtElement<Our.LangStringPreferredNameTypeIec61360>(
                     LangStringPreferredNameTypeIec61360FromSequence, "langStringPreferredNameTypeIec61360"));
 
             /// <summary>
             /// Read an instance of class LangStringShortNameTypeIec61360 from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.LangStringShortNameTypeIec61360
+                Our.LangStringShortNameTypeIec61360
             > LangStringShortNameTypeIec61360FromElement = (
-                AtElement<Aas.LangStringShortNameTypeIec61360>(
+                AtElement<Our.LangStringShortNameTypeIec61360>(
                     LangStringShortNameTypeIec61360FromSequence, "langStringShortNameTypeIec61360"));
 
             /// <summary>
             /// Read an instance of class LangStringDefinitionTypeIec61360 from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.LangStringDefinitionTypeIec61360
+                Our.LangStringDefinitionTypeIec61360
             > LangStringDefinitionTypeIec61360FromElement = (
-                AtElement<Aas.LangStringDefinitionTypeIec61360>(
+                AtElement<Our.LangStringDefinitionTypeIec61360>(
                     LangStringDefinitionTypeIec61360FromSequence, "langStringDefinitionTypeIec61360"));
 
             /// <summary>
             /// Read an instance of class DataSpecificationIec61360 from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.DataSpecificationIec61360
+                Our.DataSpecificationIec61360
             > DataSpecificationIec61360FromElement = (
-                AtElement<Aas.DataSpecificationIec61360>(
+                AtElement<Our.DataSpecificationIec61360>(
                     DataSpecificationIec61360FromSequence, "dataSpecificationIec61360"));
 
             private static readonly ContentReader<IReference> Read_IReference = (
@@ -826,7 +826,7 @@ namespace AasCore.Aas3_0
                 AsText<string>(ReadContentAsString, ""));
 
             private static readonly ContentReader<DataTypeDefXsd> Read_DataTypeDefXsd = (
-                AsEnum<Aas.DataTypeDefXsd>(
+                AsEnum<Our.DataTypeDefXsd>(
                     Stringification.DataTypeDefXsdFromString));
 
             private static readonly ContentReader<
@@ -836,7 +836,7 @@ namespace AasCore.Aas3_0
                     EmbeddedDataSpecificationFromElement));
 
             private static readonly ContentReader<QualifierKind> Read_QualifierKind = (
-                AsEnum<Aas.QualifierKind>(
+                AsEnum<Our.QualifierKind>(
                     Stringification.QualifierKindFromString));
 
             private static readonly ContentReader<List<IExtension>> Read_ListOf_IExtension = (
@@ -864,7 +864,7 @@ namespace AasCore.Aas3_0
                 AssetInformationFromSequence);
 
             private static readonly ContentReader<AssetKind> Read_AssetKind = (
-                AsEnum<Aas.AssetKind>(
+                AsEnum<Our.AssetKind>(
                     Stringification.AssetKindFromString));
 
             private static readonly ContentReader<
@@ -877,7 +877,7 @@ namespace AasCore.Aas3_0
                 ResourceFromSequence);
 
             private static readonly ContentReader<ModellingKind> Read_ModellingKind = (
-                AsEnum<Aas.ModellingKind>(
+                AsEnum<Our.ModellingKind>(
                     Stringification.ModellingKindFromString));
 
             private static readonly ContentReader<List<IQualifier>> Read_ListOf_IQualifier = (
@@ -894,7 +894,7 @@ namespace AasCore.Aas3_0
                 AsText<bool>(ReadContentAsBoolean));
 
             private static readonly ContentReader<AasSubmodelElements> Read_AasSubmodelElements = (
-                AsEnum<Aas.AasSubmodelElements>(
+                AsEnum<Our.AasSubmodelElements>(
                     Stringification.AasSubmodelElementsFromString));
 
             private static readonly ContentReader<byte[]> Read_bytes = (
@@ -905,15 +905,15 @@ namespace AasCore.Aas3_0
                     IDataElementFromElement));
 
             private static readonly ContentReader<EntityType> Read_EntityType = (
-                AsEnum<Aas.EntityType>(
+                AsEnum<Our.EntityType>(
                     Stringification.EntityTypeFromString));
 
             private static readonly ContentReader<Direction> Read_Direction = (
-                AsEnum<Aas.Direction>(
+                AsEnum<Our.Direction>(
                     Stringification.DirectionFromString));
 
             private static readonly ContentReader<StateOfEvent> Read_StateOfEvent = (
-                AsEnum<Aas.StateOfEvent>(
+                AsEnum<Our.StateOfEvent>(
                     Stringification.StateOfEventFromString));
 
             private static readonly ContentReader<
@@ -923,11 +923,11 @@ namespace AasCore.Aas3_0
                     OperationVariableFromElement));
 
             private static readonly ContentReader<ISubmodelElement> Read_ISubmodelElement = (
-                AsElement<Aas.ISubmodelElement>(
+                AsElement<Our.ISubmodelElement>(
                     ISubmodelElementFromElement));
 
             private static readonly ContentReader<ReferenceTypes> Read_ReferenceTypes = (
-                AsEnum<Aas.ReferenceTypes>(
+                AsEnum<Our.ReferenceTypes>(
                     Stringification.ReferenceTypesFromString));
 
             private static readonly ContentReader<List<IKey>> Read_ListOf_IKey = (
@@ -935,7 +935,7 @@ namespace AasCore.Aas3_0
                     KeyFromElement));
 
             private static readonly ContentReader<KeyTypes> Read_KeyTypes = (
-                AsEnum<Aas.KeyTypes>(
+                AsEnum<Our.KeyTypes>(
                     Stringification.KeyTypesFromString));
 
             private static readonly ContentReader<
@@ -957,7 +957,7 @@ namespace AasCore.Aas3_0
             private static readonly ContentReader<
                 IDataSpecificationContent
             > Read_IDataSpecificationContent = (
-                AsElement<Aas.IDataSpecificationContent>(
+                AsElement<Our.IDataSpecificationContent>(
                     IDataSpecificationContentFromElement));
 
             private static readonly ContentReader<
@@ -979,7 +979,7 @@ namespace AasCore.Aas3_0
                     LangStringShortNameTypeIec61360FromElement));
 
             private static readonly ContentReader<DataTypeIec61360> Read_DataTypeIec61360 = (
-                AsEnum<Aas.DataTypeIec61360>(
+                AsEnum<Our.DataTypeIec61360>(
                     Stringification.DataTypeIec61360FromString));
 
             private static readonly ContentReader<
@@ -998,7 +998,7 @@ namespace AasCore.Aas3_0
             /// Deserialize an instance of IHasSemantics from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IHasSemantics IHasSemanticsFromElement(
+            internal static Our.IHasSemantics IHasSemanticsFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1070,7 +1070,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IHasSemantics? IHasSemanticsFromElement
+            }  // internal static Our.IHasSemantics? IHasSemanticsFromElement
 
             /// <summary>
             /// Deserialize an instance of class Extension from a sequence of XML elements.
@@ -1080,7 +1080,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Extension ExtensionFromSequence(
+            internal static Our.Extension ExtensionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1212,7 +1212,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Extension(
+                return new Our.Extension(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1221,13 +1221,13 @@ namespace AasCore.Aas3_0
                     theValueType,
                     theValue,
                     theRefersTo);
-            }  // internal static Aas.Extension? ExtensionFromSequence
+            }  // internal static Our.Extension? ExtensionFromSequence
 
             /// <summary>
             /// Deserialize an instance of IHasExtensions from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IHasExtensions IHasExtensionsFromElement(
+            internal static Our.IHasExtensions IHasExtensionsFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1296,13 +1296,13 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IHasExtensions? IHasExtensionsFromElement
+            }  // internal static Our.IHasExtensions? IHasExtensionsFromElement
 
             /// <summary>
             /// Deserialize an instance of IReferable from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IReferable IReferableFromElement(
+            internal static Our.IReferable IReferableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1371,13 +1371,13 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IReferable? IReferableFromElement
+            }  // internal static Our.IReferable? IReferableFromElement
 
             /// <summary>
             /// Deserialize an instance of IIdentifiable from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IIdentifiable IIdentifiableFromElement(
+            internal static Our.IIdentifiable IIdentifiableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1404,13 +1404,13 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IIdentifiable? IIdentifiableFromElement
+            }  // internal static Our.IIdentifiable? IIdentifiableFromElement
 
             /// <summary>
             /// Deserialize an instance of IHasKind from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IHasKind IHasKindFromElement(
+            internal static Our.IHasKind IHasKindFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1431,13 +1431,13 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IHasKind? IHasKindFromElement
+            }  // internal static Our.IHasKind? IHasKindFromElement
 
             /// <summary>
             /// Deserialize an instance of IHasDataSpecification from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IHasDataSpecification IHasDataSpecificationFromElement(
+            internal static Our.IHasDataSpecification IHasDataSpecificationFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1509,7 +1509,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IHasDataSpecification? IHasDataSpecificationFromElement
+            }  // internal static Our.IHasDataSpecification? IHasDataSpecificationFromElement
 
             /// <summary>
             /// Deserialize an instance of class AdministrativeInformation from a sequence of XML elements.
@@ -1519,7 +1519,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.AdministrativeInformation AdministrativeInformationFromSequence(
+            internal static Our.AdministrativeInformation AdministrativeInformationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1633,19 +1633,19 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.AdministrativeInformation(
+                return new Our.AdministrativeInformation(
                     theEmbeddedDataSpecifications,
                     theVersion,
                     theRevision,
                     theCreator,
                     theTemplateId);
-            }  // internal static Aas.AdministrativeInformation? AdministrativeInformationFromSequence
+            }  // internal static Our.AdministrativeInformation? AdministrativeInformationFromSequence
 
             /// <summary>
             /// Deserialize an instance of IQualifiable from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IQualifiable IQualifiableFromElement(
+            internal static Our.IQualifiable IQualifiableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1708,7 +1708,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IQualifiable? IQualifiableFromElement
+            }  // internal static Our.IQualifiable? IQualifiableFromElement
 
             /// <summary>
             /// Deserialize an instance of class Qualifier from a sequence of XML elements.
@@ -1718,7 +1718,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Qualifier QualifierFromSequence(
+            internal static Our.Qualifier QualifierFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1868,7 +1868,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Qualifier(
+                return new Our.Qualifier(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1880,7 +1880,7 @@ namespace AasCore.Aas3_0
                     theKind,
                     theValue,
                     theValueId);
-            }  // internal static Aas.Qualifier? QualifierFromSequence
+            }  // internal static Our.Qualifier? QualifierFromSequence
 
             /// <summary>
             /// Deserialize an instance of class AssetAdministrationShell from a sequence of XML elements.
@@ -1890,7 +1890,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.AssetAdministrationShell AssetAdministrationShellFromSequence(
+            internal static Our.AssetAdministrationShell AssetAdministrationShellFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2080,7 +2080,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AssetAdministrationShell(
+                return new Our.AssetAdministrationShell(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2096,7 +2096,7 @@ namespace AasCore.Aas3_0
                     theEmbeddedDataSpecifications,
                     theDerivedFrom,
                     theSubmodels);
-            }  // internal static Aas.AssetAdministrationShell? AssetAdministrationShellFromSequence
+            }  // internal static Our.AssetAdministrationShell? AssetAdministrationShellFromSequence
 
             /// <summary>
             /// Deserialize an instance of class AssetInformation from a sequence of XML elements.
@@ -2106,7 +2106,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.AssetInformation AssetInformationFromSequence(
+            internal static Our.AssetInformation AssetInformationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2228,7 +2228,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AssetInformation(
+                return new Our.AssetInformation(
                     theAssetKind
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2236,7 +2236,7 @@ namespace AasCore.Aas3_0
                     theSpecificAssetIds,
                     theAssetType,
                     theDefaultThumbnail);
-            }  // internal static Aas.AssetInformation? AssetInformationFromSequence
+            }  // internal static Our.AssetInformation? AssetInformationFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Resource from a sequence of XML elements.
@@ -2246,7 +2246,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Resource ResourceFromSequence(
+            internal static Our.Resource ResourceFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2338,12 +2338,12 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Resource(
+                return new Our.Resource(
                     thePath
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theContentType);
-            }  // internal static Aas.Resource? ResourceFromSequence
+            }  // internal static Our.Resource? ResourceFromSequence
 
             /// <summary>
             /// Deserialize an instance of class SpecificAssetId from a sequence of XML elements.
@@ -2353,7 +2353,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.SpecificAssetId SpecificAssetIdFromSequence(
+            internal static Our.SpecificAssetId SpecificAssetIdFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2483,7 +2483,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.SpecificAssetId(
+                return new Our.SpecificAssetId(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2493,7 +2493,7 @@ namespace AasCore.Aas3_0
                     theSemanticId,
                     theSupplementalSemanticIds,
                     theExternalSubjectId);
-            }  // internal static Aas.SpecificAssetId? SpecificAssetIdFromSequence
+            }  // internal static Our.SpecificAssetId? SpecificAssetIdFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Submodel from a sequence of XML elements.
@@ -2503,7 +2503,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Submodel SubmodelFromSequence(
+            internal static Our.Submodel SubmodelFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2705,7 +2705,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Submodel(
+                return new Our.Submodel(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2721,13 +2721,13 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theSubmodelElements);
-            }  // internal static Aas.Submodel? SubmodelFromSequence
+            }  // internal static Our.Submodel? SubmodelFromSequence
 
             /// <summary>
             /// Deserialize an instance of ISubmodelElement from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.ISubmodelElement ISubmodelElementFromElement(
+            internal static Our.ISubmodelElement ISubmodelElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -2787,7 +2787,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.ISubmodelElement? ISubmodelElementFromElement
+            }  // internal static Our.ISubmodelElement? ISubmodelElementFromElement
 
             /// <summary>
             /// Deserialize an instance of class RelationshipElement from a sequence of XML elements.
@@ -2797,7 +2797,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.RelationshipElement RelationshipElementFromSequence(
+            internal static Our.RelationshipElement RelationshipElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -2987,7 +2987,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.RelationshipElement(
+                return new Our.RelationshipElement(
                     theFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3003,13 +3003,13 @@ namespace AasCore.Aas3_0
                     theSupplementalSemanticIds,
                     theQualifiers,
                     theEmbeddedDataSpecifications);
-            }  // internal static Aas.RelationshipElement? RelationshipElementFromSequence
+            }  // internal static Our.RelationshipElement? RelationshipElementFromSequence
 
             /// <summary>
             /// Deserialize an instance of IRelationshipElement from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IRelationshipElement IRelationshipElementFromElement(
+            internal static Our.IRelationshipElement IRelationshipElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -3033,7 +3033,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IRelationshipElement? IRelationshipElementFromElement
+            }  // internal static Our.IRelationshipElement? IRelationshipElementFromElement
 
             /// <summary>
             /// Deserialize an instance of class SubmodelElementList from a sequence of XML elements.
@@ -3043,7 +3043,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.SubmodelElementList SubmodelElementListFromSequence(
+            internal static Our.SubmodelElementList SubmodelElementListFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -3255,7 +3255,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.SubmodelElementList(
+                return new Our.SubmodelElementList(
                     theTypeValueListElement
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3272,7 +3272,7 @@ namespace AasCore.Aas3_0
                     theSemanticIdListElement,
                     theValueTypeListElement,
                     theValue);
-            }  // internal static Aas.SubmodelElementList? SubmodelElementListFromSequence
+            }  // internal static Our.SubmodelElementList? SubmodelElementListFromSequence
 
             /// <summary>
             /// Deserialize an instance of class SubmodelElementCollection from a sequence of XML elements.
@@ -3282,7 +3282,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.SubmodelElementCollection SubmodelElementCollectionFromSequence(
+            internal static Our.SubmodelElementCollection SubmodelElementCollectionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -3446,7 +3446,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.SubmodelElementCollection(
+                return new Our.SubmodelElementCollection(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -3457,13 +3457,13 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theValue);
-            }  // internal static Aas.SubmodelElementCollection? SubmodelElementCollectionFromSequence
+            }  // internal static Our.SubmodelElementCollection? SubmodelElementCollectionFromSequence
 
             /// <summary>
             /// Deserialize an instance of IDataElement from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IDataElement IDataElementFromElement(
+            internal static Our.IDataElement IDataElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -3499,7 +3499,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IDataElement? IDataElementFromElement
+            }  // internal static Our.IDataElement? IDataElementFromElement
 
             /// <summary>
             /// Deserialize an instance of class Property from a sequence of XML elements.
@@ -3509,7 +3509,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Property PropertyFromSequence(
+            internal static Our.Property PropertyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -3701,7 +3701,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Property(
+                return new Our.Property(
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3716,7 +3716,7 @@ namespace AasCore.Aas3_0
                     theEmbeddedDataSpecifications,
                     theValue,
                     theValueId);
-            }  // internal static Aas.Property? PropertyFromSequence
+            }  // internal static Our.Property? PropertyFromSequence
 
             /// <summary>
             /// Deserialize an instance of class MultiLanguageProperty from a sequence of XML elements.
@@ -3726,7 +3726,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MultiLanguageProperty MultiLanguagePropertyFromSequence(
+            internal static Our.MultiLanguageProperty MultiLanguagePropertyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -3900,7 +3900,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.MultiLanguageProperty(
+                return new Our.MultiLanguageProperty(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -3912,7 +3912,7 @@ namespace AasCore.Aas3_0
                     theEmbeddedDataSpecifications,
                     theValue,
                     theValueId);
-            }  // internal static Aas.MultiLanguageProperty? MultiLanguagePropertyFromSequence
+            }  // internal static Our.MultiLanguageProperty? MultiLanguagePropertyFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Range from a sequence of XML elements.
@@ -3922,7 +3922,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Range RangeFromSequence(
+            internal static Our.Range RangeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -4114,7 +4114,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Range(
+                return new Our.Range(
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4129,7 +4129,7 @@ namespace AasCore.Aas3_0
                     theEmbeddedDataSpecifications,
                     theMin,
                     theMax);
-            }  // internal static Aas.Range? RangeFromSequence
+            }  // internal static Our.Range? RangeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ReferenceElement from a sequence of XML elements.
@@ -4139,7 +4139,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ReferenceElement ReferenceElementFromSequence(
+            internal static Our.ReferenceElement ReferenceElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -4303,7 +4303,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.ReferenceElement(
+                return new Our.ReferenceElement(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -4314,7 +4314,7 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theValue);
-            }  // internal static Aas.ReferenceElement? ReferenceElementFromSequence
+            }  // internal static Our.ReferenceElement? ReferenceElementFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Blob from a sequence of XML elements.
@@ -4324,7 +4324,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Blob BlobFromSequence(
+            internal static Our.Blob BlobFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -4506,7 +4506,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Blob(
+                return new Our.Blob(
                     theContentType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4520,7 +4520,7 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theValue);
-            }  // internal static Aas.Blob? BlobFromSequence
+            }  // internal static Our.Blob? BlobFromSequence
 
             /// <summary>
             /// Deserialize an instance of class File from a sequence of XML elements.
@@ -4530,7 +4530,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.File FileFromSequence(
+            internal static Our.File FileFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -4712,7 +4712,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.File(
+                return new Our.File(
                     theContentType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4726,7 +4726,7 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theValue);
-            }  // internal static Aas.File? FileFromSequence
+            }  // internal static Our.File? FileFromSequence
 
             /// <summary>
             /// Deserialize an instance of class AnnotatedRelationshipElement from a sequence of XML elements.
@@ -4736,7 +4736,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFromSequence(
+            internal static Our.AnnotatedRelationshipElement AnnotatedRelationshipElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -4936,7 +4936,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AnnotatedRelationshipElement(
+                return new Our.AnnotatedRelationshipElement(
                     theFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4953,7 +4953,7 @@ namespace AasCore.Aas3_0
                     theQualifiers,
                     theEmbeddedDataSpecifications,
                     theAnnotations);
-            }  // internal static Aas.AnnotatedRelationshipElement? AnnotatedRelationshipElementFromSequence
+            }  // internal static Our.AnnotatedRelationshipElement? AnnotatedRelationshipElementFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Entity from a sequence of XML elements.
@@ -4963,7 +4963,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Entity EntityFromSequence(
+            internal static Our.Entity EntityFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -5165,7 +5165,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Entity(
+                return new Our.Entity(
                     theEntityType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5181,7 +5181,7 @@ namespace AasCore.Aas3_0
                     theStatements,
                     theGlobalAssetId,
                     theSpecificAssetIds);
-            }  // internal static Aas.Entity? EntityFromSequence
+            }  // internal static Our.Entity? EntityFromSequence
 
             /// <summary>
             /// Deserialize an instance of class EventPayload from a sequence of XML elements.
@@ -5191,7 +5191,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.EventPayload EventPayloadFromSequence(
+            internal static Our.EventPayload EventPayloadFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -5359,7 +5359,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.EventPayload(
+                return new Our.EventPayload(
                     theSource
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5374,13 +5374,13 @@ namespace AasCore.Aas3_0
                     theTopic,
                     theSubjectId,
                     thePayload);
-            }  // internal static Aas.EventPayload? EventPayloadFromSequence
+            }  // internal static Our.EventPayload? EventPayloadFromSequence
 
             /// <summary>
             /// Deserialize an instance of IEventElement from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IEventElement IEventElementFromElement(
+            internal static Our.IEventElement IEventElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -5401,7 +5401,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IEventElement? IEventElementFromElement
+            }  // internal static Our.IEventElement? IEventElementFromElement
 
             /// <summary>
             /// Deserialize an instance of class BasicEventElement from a sequence of XML elements.
@@ -5411,7 +5411,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.BasicEventElement BasicEventElementFromSequence(
+            internal static Our.BasicEventElement BasicEventElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -5669,7 +5669,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.BasicEventElement(
+                return new Our.BasicEventElement(
                     theObserved
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5693,7 +5693,7 @@ namespace AasCore.Aas3_0
                     theLastUpdate,
                     theMinInterval,
                     theMaxInterval);
-            }  // internal static Aas.BasicEventElement? BasicEventElementFromSequence
+            }  // internal static Our.BasicEventElement? BasicEventElementFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Operation from a sequence of XML elements.
@@ -5703,7 +5703,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Operation OperationFromSequence(
+            internal static Our.Operation OperationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -5887,7 +5887,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.Operation(
+                return new Our.Operation(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -5900,7 +5900,7 @@ namespace AasCore.Aas3_0
                     theInputVariables,
                     theOutputVariables,
                     theInoutputVariables);
-            }  // internal static Aas.Operation? OperationFromSequence
+            }  // internal static Our.Operation? OperationFromSequence
 
             /// <summary>
             /// Deserialize an instance of class OperationVariable from a sequence of XML elements.
@@ -5910,7 +5910,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.OperationVariable OperationVariableFromSequence(
+            internal static Our.OperationVariable OperationVariableFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -5992,11 +5992,11 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.OperationVariable(
+                return new Our.OperationVariable(
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.OperationVariable? OperationVariableFromSequence
+            }  // internal static Our.OperationVariable? OperationVariableFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Capability from a sequence of XML elements.
@@ -6006,7 +6006,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Capability CapabilityFromSequence(
+            internal static Our.Capability CapabilityFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6160,7 +6160,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.Capability(
+                return new Our.Capability(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -6170,7 +6170,7 @@ namespace AasCore.Aas3_0
                     theSupplementalSemanticIds,
                     theQualifiers,
                     theEmbeddedDataSpecifications);
-            }  // internal static Aas.Capability? CapabilityFromSequence
+            }  // internal static Our.Capability? CapabilityFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ConceptDescription from a sequence of XML elements.
@@ -6180,7 +6180,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ConceptDescription ConceptDescriptionFromSequence(
+            internal static Our.ConceptDescription ConceptDescriptionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6342,7 +6342,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ConceptDescription(
+                return new Our.ConceptDescription(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -6354,7 +6354,7 @@ namespace AasCore.Aas3_0
                     theAdministration,
                     theEmbeddedDataSpecifications,
                     theIsCaseOf);
-            }  // internal static Aas.ConceptDescription? ConceptDescriptionFromSequence
+            }  // internal static Our.ConceptDescription? ConceptDescriptionFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Reference from a sequence of XML elements.
@@ -6364,7 +6364,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Reference ReferenceFromSequence(
+            internal static Our.Reference ReferenceFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6474,7 +6474,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Reference(
+                return new Our.Reference(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -6482,7 +6482,7 @@ namespace AasCore.Aas3_0
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theReferredSemanticId);
-            }  // internal static Aas.Reference? ReferenceFromSequence
+            }  // internal static Our.Reference? ReferenceFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Key from a sequence of XML elements.
@@ -6492,7 +6492,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Key KeyFromSequence(
+            internal static Our.Key KeyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6592,20 +6592,20 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Key(
+                return new Our.Key(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Key? KeyFromSequence
+            }  // internal static Our.Key? KeyFromSequence
 
             /// <summary>
             /// Deserialize an instance of IAbstractLangString from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IAbstractLangString IAbstractLangStringFromElement(
+            internal static Our.IAbstractLangString IAbstractLangStringFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -6638,7 +6638,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IAbstractLangString? IAbstractLangStringFromElement
+            }  // internal static Our.IAbstractLangString? IAbstractLangStringFromElement
 
             /// <summary>
             /// Deserialize an instance of class LangStringNameType from a sequence of XML elements.
@@ -6648,7 +6648,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringNameType LangStringNameTypeFromSequence(
+            internal static Our.LangStringNameType LangStringNameTypeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6748,14 +6748,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringNameType(
+                return new Our.LangStringNameType(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringNameType? LangStringNameTypeFromSequence
+            }  // internal static Our.LangStringNameType? LangStringNameTypeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class LangStringTextType from a sequence of XML elements.
@@ -6765,7 +6765,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringTextType LangStringTextTypeFromSequence(
+            internal static Our.LangStringTextType LangStringTextTypeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6865,14 +6865,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringTextType(
+                return new Our.LangStringTextType(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringTextType? LangStringTextTypeFromSequence
+            }  // internal static Our.LangStringTextType? LangStringTextTypeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Environment from a sequence of XML elements.
@@ -6882,7 +6882,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Environment EnvironmentFromSequence(
+            internal static Our.Environment EnvironmentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -6976,17 +6976,17 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.Environment(
+                return new Our.Environment(
                     theAssetAdministrationShells,
                     theSubmodels,
                     theConceptDescriptions);
-            }  // internal static Aas.Environment? EnvironmentFromSequence
+            }  // internal static Our.Environment? EnvironmentFromSequence
 
             /// <summary>
             /// Deserialize an instance of IDataSpecificationContent from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IDataSpecificationContent IDataSpecificationContentFromElement(
+            internal static Our.IDataSpecificationContent IDataSpecificationContentFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -7007,7 +7007,7 @@ namespace AasCore.Aas3_0
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IDataSpecificationContent? IDataSpecificationContentFromElement
+            }  // internal static Our.IDataSpecificationContent? IDataSpecificationContentFromElement
 
             /// <summary>
             /// Deserialize an instance of class EmbeddedDataSpecification from a sequence of XML elements.
@@ -7017,7 +7017,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.EmbeddedDataSpecification EmbeddedDataSpecificationFromSequence(
+            internal static Our.EmbeddedDataSpecification EmbeddedDataSpecificationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7117,14 +7117,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.EmbeddedDataSpecification(
+                return new Our.EmbeddedDataSpecification(
                     theDataSpecification
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.EmbeddedDataSpecification? EmbeddedDataSpecificationFromSequence
+            }  // internal static Our.EmbeddedDataSpecification? EmbeddedDataSpecificationFromSequence
 
             /// <summary>
             /// Deserialize an instance of class LevelType from a sequence of XML elements.
@@ -7134,7 +7134,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LevelType LevelTypeFromSequence(
+            internal static Our.LevelType LevelTypeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7270,7 +7270,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LevelType(
+                return new Our.LevelType(
                     theMin
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -7283,7 +7283,7 @@ namespace AasCore.Aas3_0
                     theMax
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LevelType? LevelTypeFromSequence
+            }  // internal static Our.LevelType? LevelTypeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ValueReferencePair from a sequence of XML elements.
@@ -7293,7 +7293,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ValueReferencePair ValueReferencePairFromSequence(
+            internal static Our.ValueReferencePair ValueReferencePairFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7393,14 +7393,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ValueReferencePair(
+                return new Our.ValueReferencePair(
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theValueId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.ValueReferencePair? ValueReferencePairFromSequence
+            }  // internal static Our.ValueReferencePair? ValueReferencePairFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ValueList from a sequence of XML elements.
@@ -7410,7 +7410,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ValueList ValueListFromSequence(
+            internal static Our.ValueList ValueListFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7492,11 +7492,11 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ValueList(
+                return new Our.ValueList(
                     theValueReferencePairs
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.ValueList? ValueListFromSequence
+            }  // internal static Our.ValueList? ValueListFromSequence
 
             /// <summary>
             /// Deserialize an instance of class LangStringPreferredNameTypeIec61360 from a sequence of XML elements.
@@ -7506,7 +7506,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360FromSequence(
+            internal static Our.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360FromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7606,14 +7606,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringPreferredNameTypeIec61360(
+                return new Our.LangStringPreferredNameTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringPreferredNameTypeIec61360? LangStringPreferredNameTypeIec61360FromSequence
+            }  // internal static Our.LangStringPreferredNameTypeIec61360? LangStringPreferredNameTypeIec61360FromSequence
 
             /// <summary>
             /// Deserialize an instance of class LangStringShortNameTypeIec61360 from a sequence of XML elements.
@@ -7623,7 +7623,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360FromSequence(
+            internal static Our.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360FromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7723,14 +7723,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringShortNameTypeIec61360(
+                return new Our.LangStringShortNameTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringShortNameTypeIec61360? LangStringShortNameTypeIec61360FromSequence
+            }  // internal static Our.LangStringShortNameTypeIec61360? LangStringShortNameTypeIec61360FromSequence
 
             /// <summary>
             /// Deserialize an instance of class LangStringDefinitionTypeIec61360 from a sequence of XML elements.
@@ -7740,7 +7740,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360FromSequence(
+            internal static Our.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360FromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -7840,14 +7840,14 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringDefinitionTypeIec61360(
+                return new Our.LangStringDefinitionTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringDefinitionTypeIec61360? LangStringDefinitionTypeIec61360FromSequence
+            }  // internal static Our.LangStringDefinitionTypeIec61360? LangStringDefinitionTypeIec61360FromSequence
 
             /// <summary>
             /// Deserialize an instance of class DataSpecificationIec61360 from a sequence of XML elements.
@@ -7857,7 +7857,7 @@ namespace AasCore.Aas3_0
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.DataSpecificationIec61360 DataSpecificationIec61360FromSequence(
+            internal static Our.DataSpecificationIec61360 DataSpecificationIec61360FromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -8049,7 +8049,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.DataSpecificationIec61360(
+                return new Our.DataSpecificationIec61360(
                     thePreferredName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -8064,7 +8064,7 @@ namespace AasCore.Aas3_0
                     theValueList,
                     theValue,
                     theLevelType);
-            }  // internal static Aas.DataSpecificationIec61360? DataSpecificationIec61360FromSequence
+            }  // internal static Our.DataSpecificationIec61360? DataSpecificationIec61360FromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -8089,7 +8089,7 @@ namespace AasCore.Aas3_0
         /// Here is an example how to parse an instance of class IHasSemantics:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
+        /// Our.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -8108,7 +8108,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IHasSemantics.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasSemantics IHasSemanticsFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IHasSemantics IHasSemanticsFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8122,7 +8122,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IHasSemantics result = DeserializeImplementation.IHasSemanticsFromElement(
+                Our.IHasSemantics result = DeserializeImplementation.IHasSemanticsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8142,7 +8142,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Extension.
             /// </exception>
-            public static Aas.Extension ExtensionFrom(
+            public static Our.Extension ExtensionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8156,7 +8156,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Extension result = DeserializeImplementation.ExtensionFromElement(
+                Our.Extension result = DeserializeImplementation.ExtensionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8176,7 +8176,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IHasExtensions.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasExtensions IHasExtensionsFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IHasExtensions IHasExtensionsFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8190,7 +8190,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IHasExtensions result = DeserializeImplementation.IHasExtensionsFromElement(
+                Our.IHasExtensions result = DeserializeImplementation.IHasExtensionsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8210,7 +8210,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IReferable.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IReferable IReferableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IReferable IReferableFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8224,7 +8224,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IReferable result = DeserializeImplementation.IReferableFromElement(
+                Our.IReferable result = DeserializeImplementation.IReferableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8244,7 +8244,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IIdentifiable.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IIdentifiable IIdentifiableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IIdentifiable IIdentifiableFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8258,7 +8258,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IIdentifiable result = DeserializeImplementation.IIdentifiableFromElement(
+                Our.IIdentifiable result = DeserializeImplementation.IIdentifiableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8278,7 +8278,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IHasKind.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasKind IHasKindFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IHasKind IHasKindFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8292,7 +8292,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IHasKind result = DeserializeImplementation.IHasKindFromElement(
+                Our.IHasKind result = DeserializeImplementation.IHasKindFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8312,7 +8312,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IHasDataSpecification.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IHasDataSpecification IHasDataSpecificationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8326,7 +8326,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IHasDataSpecification result = DeserializeImplementation.IHasDataSpecificationFromElement(
+                Our.IHasDataSpecification result = DeserializeImplementation.IHasDataSpecificationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8346,7 +8346,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of AdministrativeInformation.
             /// </exception>
-            public static Aas.AdministrativeInformation AdministrativeInformationFrom(
+            public static Our.AdministrativeInformation AdministrativeInformationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8360,7 +8360,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AdministrativeInformation result = DeserializeImplementation.AdministrativeInformationFromElement(
+                Our.AdministrativeInformation result = DeserializeImplementation.AdministrativeInformationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8380,7 +8380,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IQualifiable.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IQualifiable IQualifiableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IQualifiable IQualifiableFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8394,7 +8394,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IQualifiable result = DeserializeImplementation.IQualifiableFromElement(
+                Our.IQualifiable result = DeserializeImplementation.IQualifiableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8414,7 +8414,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Qualifier.
             /// </exception>
-            public static Aas.Qualifier QualifierFrom(
+            public static Our.Qualifier QualifierFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8428,7 +8428,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Qualifier result = DeserializeImplementation.QualifierFromElement(
+                Our.Qualifier result = DeserializeImplementation.QualifierFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8448,7 +8448,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of AssetAdministrationShell.
             /// </exception>
-            public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
+            public static Our.AssetAdministrationShell AssetAdministrationShellFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8462,7 +8462,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AssetAdministrationShell result = DeserializeImplementation.AssetAdministrationShellFromElement(
+                Our.AssetAdministrationShell result = DeserializeImplementation.AssetAdministrationShellFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8482,7 +8482,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of AssetInformation.
             /// </exception>
-            public static Aas.AssetInformation AssetInformationFrom(
+            public static Our.AssetInformation AssetInformationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8496,7 +8496,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AssetInformation result = DeserializeImplementation.AssetInformationFromElement(
+                Our.AssetInformation result = DeserializeImplementation.AssetInformationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8516,7 +8516,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Resource.
             /// </exception>
-            public static Aas.Resource ResourceFrom(
+            public static Our.Resource ResourceFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8530,7 +8530,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Resource result = DeserializeImplementation.ResourceFromElement(
+                Our.Resource result = DeserializeImplementation.ResourceFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8550,7 +8550,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of SpecificAssetId.
             /// </exception>
-            public static Aas.SpecificAssetId SpecificAssetIdFrom(
+            public static Our.SpecificAssetId SpecificAssetIdFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8564,7 +8564,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.SpecificAssetId result = DeserializeImplementation.SpecificAssetIdFromElement(
+                Our.SpecificAssetId result = DeserializeImplementation.SpecificAssetIdFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8584,7 +8584,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Submodel.
             /// </exception>
-            public static Aas.Submodel SubmodelFrom(
+            public static Our.Submodel SubmodelFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8598,7 +8598,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Submodel result = DeserializeImplementation.SubmodelFromElement(
+                Our.Submodel result = DeserializeImplementation.SubmodelFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8618,7 +8618,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of ISubmodelElement.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.ISubmodelElement ISubmodelElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.ISubmodelElement ISubmodelElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8632,7 +8632,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ISubmodelElement result = DeserializeImplementation.ISubmodelElementFromElement(
+                Our.ISubmodelElement result = DeserializeImplementation.ISubmodelElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8652,7 +8652,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IRelationshipElement.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IRelationshipElement IRelationshipElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IRelationshipElement IRelationshipElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8666,7 +8666,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IRelationshipElement result = DeserializeImplementation.IRelationshipElementFromElement(
+                Our.IRelationshipElement result = DeserializeImplementation.IRelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8686,7 +8686,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of RelationshipElement.
             /// </exception>
-            public static Aas.RelationshipElement RelationshipElementFrom(
+            public static Our.RelationshipElement RelationshipElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8700,7 +8700,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.RelationshipElement result = DeserializeImplementation.RelationshipElementFromElement(
+                Our.RelationshipElement result = DeserializeImplementation.RelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8720,7 +8720,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementList.
             /// </exception>
-            public static Aas.SubmodelElementList SubmodelElementListFrom(
+            public static Our.SubmodelElementList SubmodelElementListFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8734,7 +8734,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.SubmodelElementList result = DeserializeImplementation.SubmodelElementListFromElement(
+                Our.SubmodelElementList result = DeserializeImplementation.SubmodelElementListFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8754,7 +8754,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementCollection.
             /// </exception>
-            public static Aas.SubmodelElementCollection SubmodelElementCollectionFrom(
+            public static Our.SubmodelElementCollection SubmodelElementCollectionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8768,7 +8768,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.SubmodelElementCollection result = DeserializeImplementation.SubmodelElementCollectionFromElement(
+                Our.SubmodelElementCollection result = DeserializeImplementation.SubmodelElementCollectionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8788,7 +8788,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IDataElement.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataElement IDataElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IDataElement IDataElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8802,7 +8802,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IDataElement result = DeserializeImplementation.IDataElementFromElement(
+                Our.IDataElement result = DeserializeImplementation.IDataElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8822,7 +8822,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Property.
             /// </exception>
-            public static Aas.Property PropertyFrom(
+            public static Our.Property PropertyFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8836,7 +8836,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Property result = DeserializeImplementation.PropertyFromElement(
+                Our.Property result = DeserializeImplementation.PropertyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8856,7 +8856,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of MultiLanguageProperty.
             /// </exception>
-            public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
+            public static Our.MultiLanguageProperty MultiLanguagePropertyFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8870,7 +8870,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MultiLanguageProperty result = DeserializeImplementation.MultiLanguagePropertyFromElement(
+                Our.MultiLanguageProperty result = DeserializeImplementation.MultiLanguagePropertyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8890,7 +8890,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Range.
             /// </exception>
-            public static Aas.Range RangeFrom(
+            public static Our.Range RangeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8904,7 +8904,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Range result = DeserializeImplementation.RangeFromElement(
+                Our.Range result = DeserializeImplementation.RangeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8924,7 +8924,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of ReferenceElement.
             /// </exception>
-            public static Aas.ReferenceElement ReferenceElementFrom(
+            public static Our.ReferenceElement ReferenceElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8938,7 +8938,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ReferenceElement result = DeserializeImplementation.ReferenceElementFromElement(
+                Our.ReferenceElement result = DeserializeImplementation.ReferenceElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8958,7 +8958,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Blob.
             /// </exception>
-            public static Aas.Blob BlobFrom(
+            public static Our.Blob BlobFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -8972,7 +8972,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Blob result = DeserializeImplementation.BlobFromElement(
+                Our.Blob result = DeserializeImplementation.BlobFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -8992,7 +8992,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of File.
             /// </exception>
-            public static Aas.File FileFrom(
+            public static Our.File FileFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9006,7 +9006,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.File result = DeserializeImplementation.FileFromElement(
+                Our.File result = DeserializeImplementation.FileFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9026,7 +9026,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of AnnotatedRelationshipElement.
             /// </exception>
-            public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
+            public static Our.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9040,7 +9040,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AnnotatedRelationshipElement result = DeserializeImplementation.AnnotatedRelationshipElementFromElement(
+                Our.AnnotatedRelationshipElement result = DeserializeImplementation.AnnotatedRelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9060,7 +9060,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Entity.
             /// </exception>
-            public static Aas.Entity EntityFrom(
+            public static Our.Entity EntityFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9074,7 +9074,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Entity result = DeserializeImplementation.EntityFromElement(
+                Our.Entity result = DeserializeImplementation.EntityFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9094,7 +9094,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of EventPayload.
             /// </exception>
-            public static Aas.EventPayload EventPayloadFrom(
+            public static Our.EventPayload EventPayloadFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9108,7 +9108,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.EventPayload result = DeserializeImplementation.EventPayloadFromElement(
+                Our.EventPayload result = DeserializeImplementation.EventPayloadFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9128,7 +9128,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IEventElement.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IEventElement IEventElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IEventElement IEventElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9142,7 +9142,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IEventElement result = DeserializeImplementation.IEventElementFromElement(
+                Our.IEventElement result = DeserializeImplementation.IEventElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9162,7 +9162,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of BasicEventElement.
             /// </exception>
-            public static Aas.BasicEventElement BasicEventElementFrom(
+            public static Our.BasicEventElement BasicEventElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9176,7 +9176,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.BasicEventElement result = DeserializeImplementation.BasicEventElementFromElement(
+                Our.BasicEventElement result = DeserializeImplementation.BasicEventElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9196,7 +9196,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Operation.
             /// </exception>
-            public static Aas.Operation OperationFrom(
+            public static Our.Operation OperationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9210,7 +9210,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Operation result = DeserializeImplementation.OperationFromElement(
+                Our.Operation result = DeserializeImplementation.OperationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9230,7 +9230,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of OperationVariable.
             /// </exception>
-            public static Aas.OperationVariable OperationVariableFrom(
+            public static Our.OperationVariable OperationVariableFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9244,7 +9244,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.OperationVariable result = DeserializeImplementation.OperationVariableFromElement(
+                Our.OperationVariable result = DeserializeImplementation.OperationVariableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9264,7 +9264,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Capability.
             /// </exception>
-            public static Aas.Capability CapabilityFrom(
+            public static Our.Capability CapabilityFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9278,7 +9278,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Capability result = DeserializeImplementation.CapabilityFromElement(
+                Our.Capability result = DeserializeImplementation.CapabilityFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9298,7 +9298,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of ConceptDescription.
             /// </exception>
-            public static Aas.ConceptDescription ConceptDescriptionFrom(
+            public static Our.ConceptDescription ConceptDescriptionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9312,7 +9312,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ConceptDescription result = DeserializeImplementation.ConceptDescriptionFromElement(
+                Our.ConceptDescription result = DeserializeImplementation.ConceptDescriptionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9332,7 +9332,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Reference.
             /// </exception>
-            public static Aas.Reference ReferenceFrom(
+            public static Our.Reference ReferenceFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9346,7 +9346,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Reference result = DeserializeImplementation.ReferenceFromElement(
+                Our.Reference result = DeserializeImplementation.ReferenceFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9366,7 +9366,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Key.
             /// </exception>
-            public static Aas.Key KeyFrom(
+            public static Our.Key KeyFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9380,7 +9380,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Key result = DeserializeImplementation.KeyFromElement(
+                Our.Key result = DeserializeImplementation.KeyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9400,7 +9400,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IAbstractLangString.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IAbstractLangString IAbstractLangStringFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IAbstractLangString IAbstractLangStringFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9414,7 +9414,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IAbstractLangString result = DeserializeImplementation.IAbstractLangStringFromElement(
+                Our.IAbstractLangString result = DeserializeImplementation.IAbstractLangStringFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9434,7 +9434,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LangStringNameType.
             /// </exception>
-            public static Aas.LangStringNameType LangStringNameTypeFrom(
+            public static Our.LangStringNameType LangStringNameTypeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9448,7 +9448,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringNameType result = DeserializeImplementation.LangStringNameTypeFromElement(
+                Our.LangStringNameType result = DeserializeImplementation.LangStringNameTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9468,7 +9468,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LangStringTextType.
             /// </exception>
-            public static Aas.LangStringTextType LangStringTextTypeFrom(
+            public static Our.LangStringTextType LangStringTextTypeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9482,7 +9482,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringTextType result = DeserializeImplementation.LangStringTextTypeFromElement(
+                Our.LangStringTextType result = DeserializeImplementation.LangStringTextTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9502,7 +9502,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of Environment.
             /// </exception>
-            public static Aas.Environment EnvironmentFrom(
+            public static Our.Environment EnvironmentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9516,7 +9516,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Environment result = DeserializeImplementation.EnvironmentFromElement(
+                Our.Environment result = DeserializeImplementation.EnvironmentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9536,7 +9536,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of IDataSpecificationContent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IDataSpecificationContent IDataSpecificationContentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9550,7 +9550,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IDataSpecificationContent result = DeserializeImplementation.IDataSpecificationContentFromElement(
+                Our.IDataSpecificationContent result = DeserializeImplementation.IDataSpecificationContentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9570,7 +9570,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of EmbeddedDataSpecification.
             /// </exception>
-            public static Aas.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
+            public static Our.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9584,7 +9584,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.EmbeddedDataSpecification result = DeserializeImplementation.EmbeddedDataSpecificationFromElement(
+                Our.EmbeddedDataSpecification result = DeserializeImplementation.EmbeddedDataSpecificationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9604,7 +9604,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LevelType.
             /// </exception>
-            public static Aas.LevelType LevelTypeFrom(
+            public static Our.LevelType LevelTypeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9618,7 +9618,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LevelType result = DeserializeImplementation.LevelTypeFromElement(
+                Our.LevelType result = DeserializeImplementation.LevelTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9638,7 +9638,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of ValueReferencePair.
             /// </exception>
-            public static Aas.ValueReferencePair ValueReferencePairFrom(
+            public static Our.ValueReferencePair ValueReferencePairFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9652,7 +9652,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ValueReferencePair result = DeserializeImplementation.ValueReferencePairFromElement(
+                Our.ValueReferencePair result = DeserializeImplementation.ValueReferencePairFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9672,7 +9672,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of ValueList.
             /// </exception>
-            public static Aas.ValueList ValueListFrom(
+            public static Our.ValueList ValueListFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9686,7 +9686,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ValueList result = DeserializeImplementation.ValueListFromElement(
+                Our.ValueList result = DeserializeImplementation.ValueListFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9706,7 +9706,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LangStringPreferredNameTypeIec61360.
             /// </exception>
-            public static Aas.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
+            public static Our.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9720,7 +9720,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringPreferredNameTypeIec61360 result = DeserializeImplementation.LangStringPreferredNameTypeIec61360FromElement(
+                Our.LangStringPreferredNameTypeIec61360 result = DeserializeImplementation.LangStringPreferredNameTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9740,7 +9740,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LangStringShortNameTypeIec61360.
             /// </exception>
-            public static Aas.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
+            public static Our.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9754,7 +9754,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringShortNameTypeIec61360 result = DeserializeImplementation.LangStringShortNameTypeIec61360FromElement(
+                Our.LangStringShortNameTypeIec61360 result = DeserializeImplementation.LangStringShortNameTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9774,7 +9774,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of LangStringDefinitionTypeIec61360.
             /// </exception>
-            public static Aas.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
+            public static Our.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9788,7 +9788,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringDefinitionTypeIec61360 result = DeserializeImplementation.LangStringDefinitionTypeIec61360FromElement(
+                Our.LangStringDefinitionTypeIec61360 result = DeserializeImplementation.LangStringDefinitionTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -9808,7 +9808,7 @@ namespace AasCore.Aas3_0
             /// Thrown when the element is not a valid XML
             /// representation of DataSpecificationIec61360.
             /// </exception>
-            public static Aas.DataSpecificationIec61360 DataSpecificationIec61360From(
+            public static Our.DataSpecificationIec61360 DataSpecificationIec61360From(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -9822,7 +9822,7 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.DataSpecificationIec61360 result = DeserializeImplementation.DataSpecificationIec61360FromElement(
+                Our.DataSpecificationIec61360 result = DeserializeImplementation.DataSpecificationIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -10006,7 +10006,7 @@ namespace AasCore.Aas3_0
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -10023,7 +10023,7 @@ namespace AasCore.Aas3_0
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<DataTypeDefXsd> Write_DataTypeDefXsd = (
-                WriteEnum<Aas.DataTypeDefXsd>(
+                WriteEnum<Our.DataTypeDefXsd>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<
@@ -10033,7 +10033,7 @@ namespace AasCore.Aas3_0
                     WriteIClass));
 
             private static readonly ContentWriter<QualifierKind> Write_QualifierKind = (
-                WriteEnum<Aas.QualifierKind>(
+                WriteEnum<Our.QualifierKind>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<List<IExtension>> Write_ListOf_IExtension = (
@@ -10061,7 +10061,7 @@ namespace AasCore.Aas3_0
                 AssetInformationToSequence);
 
             private static readonly ContentWriter<AssetKind> Write_AssetKind = (
-                WriteEnum<Aas.AssetKind>(
+                WriteEnum<Our.AssetKind>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<
@@ -10074,7 +10074,7 @@ namespace AasCore.Aas3_0
                 ResourceToSequence);
 
             private static readonly ContentWriter<ModellingKind> Write_ModellingKind = (
-                WriteEnum<Aas.ModellingKind>(
+                WriteEnum<Our.ModellingKind>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<List<IQualifier>> Write_ListOf_IQualifier = (
@@ -10091,7 +10091,7 @@ namespace AasCore.Aas3_0
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<AasSubmodelElements> Write_AasSubmodelElements = (
-                WriteEnum<Aas.AasSubmodelElements>(
+                WriteEnum<Our.AasSubmodelElements>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<byte[]> Write_bytes = (
@@ -10102,15 +10102,15 @@ namespace AasCore.Aas3_0
                     WriteIClass));
 
             private static readonly ContentWriter<EntityType> Write_EntityType = (
-                WriteEnum<Aas.EntityType>(
+                WriteEnum<Our.EntityType>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<Direction> Write_Direction = (
-                WriteEnum<Aas.Direction>(
+                WriteEnum<Our.Direction>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<StateOfEvent> Write_StateOfEvent = (
-                WriteEnum<Aas.StateOfEvent>(
+                WriteEnum<Our.StateOfEvent>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<
@@ -10123,7 +10123,7 @@ namespace AasCore.Aas3_0
                 WriteIClass);
 
             private static readonly ContentWriter<ReferenceTypes> Write_ReferenceTypes = (
-                WriteEnum<Aas.ReferenceTypes>(
+                WriteEnum<Our.ReferenceTypes>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<List<IKey>> Write_ListOf_IKey = (
@@ -10131,7 +10131,7 @@ namespace AasCore.Aas3_0
                     WriteIClass));
 
             private static readonly ContentWriter<KeyTypes> Write_KeyTypes = (
-                WriteEnum<Aas.KeyTypes>(
+                WriteEnum<Our.KeyTypes>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<
@@ -10174,7 +10174,7 @@ namespace AasCore.Aas3_0
                     WriteIClass));
 
             private static readonly ContentWriter<DataTypeIec61360> Write_DataTypeIec61360 = (
-                WriteEnum<Aas.DataTypeIec61360>(
+                WriteEnum<Our.DataTypeIec61360>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<
@@ -10190,7 +10190,7 @@ namespace AasCore.Aas3_0
                 LevelTypeToSequence);
 
             private static void ExtensionToSequence(
-                Aas.IExtension that,
+                Our.IExtension that,
                 Xml.XmlWriter writer)
             {
                 if (that.SemanticId != null)
@@ -10236,7 +10236,7 @@ namespace AasCore.Aas3_0
             }  // private static void ExtensionToSequence
 
             public override void VisitExtension(
-                Aas.IExtension that,
+                Our.IExtension that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10249,7 +10249,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void AdministrativeInformationToSequence(
-                Aas.IAdministrativeInformation that,
+                Our.IAdministrativeInformation that,
                 Xml.XmlWriter writer)
             {
                 if (that.EmbeddedDataSpecifications != null)
@@ -10288,7 +10288,7 @@ namespace AasCore.Aas3_0
             }  // private static void AdministrativeInformationToSequence
 
             public override void VisitAdministrativeInformation(
-                Aas.IAdministrativeInformation that,
+                Our.IAdministrativeInformation that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10301,7 +10301,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void QualifierToSequence(
-                Aas.IQualifier that,
+                Our.IQualifier that,
                 Xml.XmlWriter writer)
             {
                 if (that.SemanticId != null)
@@ -10346,7 +10346,7 @@ namespace AasCore.Aas3_0
             }  // private static void QualifierToSequence
 
             public override void VisitQualifier(
-                Aas.IQualifier that,
+                Our.IQualifier that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10359,7 +10359,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void AssetAdministrationShellToSequence(
-                Aas.IAssetAdministrationShell that,
+                Our.IAssetAdministrationShell that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -10448,7 +10448,7 @@ namespace AasCore.Aas3_0
             }  // private static void AssetAdministrationShellToSequence
 
             public override void VisitAssetAdministrationShell(
-                Aas.IAssetAdministrationShell that,
+                Our.IAssetAdministrationShell that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10461,7 +10461,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void AssetInformationToSequence(
-                Aas.IAssetInformation that,
+                Our.IAssetInformation that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -10501,7 +10501,7 @@ namespace AasCore.Aas3_0
             }  // private static void AssetInformationToSequence
 
             public override void VisitAssetInformation(
-                Aas.IAssetInformation that,
+                Our.IAssetInformation that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10514,7 +10514,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ResourceToSequence(
-                Aas.IResource that,
+                Our.IResource that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -10528,7 +10528,7 @@ namespace AasCore.Aas3_0
             }  // private static void ResourceToSequence
 
             public override void VisitResource(
-                Aas.IResource that,
+                Our.IResource that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10541,7 +10541,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void SpecificAssetIdToSequence(
-                Aas.ISpecificAssetId that,
+                Our.ISpecificAssetId that,
                 Xml.XmlWriter writer)
             {
                 if (that.SemanticId != null)
@@ -10578,7 +10578,7 @@ namespace AasCore.Aas3_0
             }  // private static void SpecificAssetIdToSequence
 
             public override void VisitSpecificAssetId(
-                Aas.ISpecificAssetId that,
+                Our.ISpecificAssetId that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10591,7 +10591,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void SubmodelToSequence(
-                Aas.ISubmodel that,
+                Our.ISubmodel that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -10703,7 +10703,7 @@ namespace AasCore.Aas3_0
             }  // private static void SubmodelToSequence
 
             public override void VisitSubmodel(
-                Aas.ISubmodel that,
+                Our.ISubmodel that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10716,7 +10716,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void RelationshipElementToSequence(
-                Aas.IRelationshipElement that,
+                Our.IRelationshipElement that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -10805,7 +10805,7 @@ namespace AasCore.Aas3_0
             }  // private static void RelationshipElementToSequence
 
             public override void VisitRelationshipElement(
-                Aas.IRelationshipElement that,
+                Our.IRelationshipElement that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10818,7 +10818,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void SubmodelElementListToSequence(
-                Aas.ISubmodelElementList that,
+                Our.ISubmodelElementList that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -10944,7 +10944,7 @@ namespace AasCore.Aas3_0
             }  // private static void SubmodelElementListToSequence
 
             public override void VisitSubmodelElementList(
-                Aas.ISubmodelElementList that,
+                Our.ISubmodelElementList that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -10957,7 +10957,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void SubmodelElementCollectionToSequence(
-                Aas.ISubmodelElementCollection that,
+                Our.ISubmodelElementCollection that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11046,7 +11046,7 @@ namespace AasCore.Aas3_0
             }  // private static void SubmodelElementCollectionToSequence
 
             public override void VisitSubmodelElementCollection(
-                Aas.ISubmodelElementCollection that,
+                Our.ISubmodelElementCollection that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11059,7 +11059,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void PropertyToSequence(
-                Aas.IProperty that,
+                Our.IProperty that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11157,7 +11157,7 @@ namespace AasCore.Aas3_0
             }  // private static void PropertyToSequence
 
             public override void VisitProperty(
-                Aas.IProperty that,
+                Our.IProperty that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11170,7 +11170,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void MultiLanguagePropertyToSequence(
-                Aas.IMultiLanguageProperty that,
+                Our.IMultiLanguageProperty that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11265,7 +11265,7 @@ namespace AasCore.Aas3_0
             }  // private static void MultiLanguagePropertyToSequence
 
             public override void VisitMultiLanguageProperty(
-                Aas.IMultiLanguageProperty that,
+                Our.IMultiLanguageProperty that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11278,7 +11278,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void RangeToSequence(
-                Aas.IRange that,
+                Our.IRange that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11376,7 +11376,7 @@ namespace AasCore.Aas3_0
             }  // private static void RangeToSequence
 
             public override void VisitRange(
-                Aas.IRange that,
+                Our.IRange that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11389,7 +11389,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ReferenceElementToSequence(
-                Aas.IReferenceElement that,
+                Our.IReferenceElement that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11478,7 +11478,7 @@ namespace AasCore.Aas3_0
             }  // private static void ReferenceElementToSequence
 
             public override void VisitReferenceElement(
-                Aas.IReferenceElement that,
+                Our.IReferenceElement that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11491,7 +11491,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void BlobToSequence(
-                Aas.IBlob that,
+                Our.IBlob that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11583,7 +11583,7 @@ namespace AasCore.Aas3_0
             }  // private static void BlobToSequence
 
             public override void VisitBlob(
-                Aas.IBlob that,
+                Our.IBlob that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11596,7 +11596,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void FileToSequence(
-                Aas.IFile that,
+                Our.IFile that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11688,7 +11688,7 @@ namespace AasCore.Aas3_0
             }  // private static void FileToSequence
 
             public override void VisitFile(
-                Aas.IFile that,
+                Our.IFile that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11701,7 +11701,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void AnnotatedRelationshipElementToSequence(
-                Aas.IAnnotatedRelationshipElement that,
+                Our.IAnnotatedRelationshipElement that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11800,7 +11800,7 @@ namespace AasCore.Aas3_0
             }  // private static void AnnotatedRelationshipElementToSequence
 
             public override void VisitAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement that,
+                Our.IAnnotatedRelationshipElement that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11813,7 +11813,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void EntityToSequence(
-                Aas.IEntity that,
+                Our.IEntity that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -11925,7 +11925,7 @@ namespace AasCore.Aas3_0
             }  // private static void EntityToSequence
 
             public override void VisitEntity(
-                Aas.IEntity that,
+                Our.IEntity that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -11938,7 +11938,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void EventPayloadToSequence(
-                Aas.IEventPayload that,
+                Our.IEventPayload that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -11994,7 +11994,7 @@ namespace AasCore.Aas3_0
             }  // private static void EventPayloadToSequence
 
             public override void VisitEventPayload(
-                Aas.IEventPayload that,
+                Our.IEventPayload that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12007,7 +12007,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void BasicEventElementToSequence(
-                Aas.IBasicEventElement that,
+                Our.IBasicEventElement that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -12133,7 +12133,7 @@ namespace AasCore.Aas3_0
             }  // private static void BasicEventElementToSequence
 
             public override void VisitBasicEventElement(
-                Aas.IBasicEventElement that,
+                Our.IBasicEventElement that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12146,7 +12146,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void OperationToSequence(
-                Aas.IOperation that,
+                Our.IOperation that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -12259,7 +12259,7 @@ namespace AasCore.Aas3_0
             }  // private static void OperationToSequence
 
             public override void VisitOperation(
-                Aas.IOperation that,
+                Our.IOperation that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12272,7 +12272,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void OperationVariableToSequence(
-                Aas.IOperationVariable that,
+                Our.IOperationVariable that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12280,7 +12280,7 @@ namespace AasCore.Aas3_0
             }  // private static void OperationVariableToSequence
 
             public override void VisitOperationVariable(
-                Aas.IOperationVariable that,
+                Our.IOperationVariable that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12293,7 +12293,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void CapabilityToSequence(
-                Aas.ICapability that,
+                Our.ICapability that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -12376,7 +12376,7 @@ namespace AasCore.Aas3_0
             }  // private static void CapabilityToSequence
 
             public override void VisitCapability(
-                Aas.ICapability that,
+                Our.ICapability that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12389,7 +12389,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ConceptDescriptionToSequence(
-                Aas.IConceptDescription that,
+                Our.IConceptDescription that,
                 Xml.XmlWriter writer)
             {
                 if (that.Extensions != null)
@@ -12465,7 +12465,7 @@ namespace AasCore.Aas3_0
             }  // private static void ConceptDescriptionToSequence
 
             public override void VisitConceptDescription(
-                Aas.IConceptDescription that,
+                Our.IConceptDescription that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12478,7 +12478,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ReferenceToSequence(
-                Aas.IReference that,
+                Our.IReference that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12499,7 +12499,7 @@ namespace AasCore.Aas3_0
             }  // private static void ReferenceToSequence
 
             public override void VisitReference(
-                Aas.IReference that,
+                Our.IReference that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12512,7 +12512,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void KeyToSequence(
-                Aas.IKey that,
+                Our.IKey that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12523,7 +12523,7 @@ namespace AasCore.Aas3_0
             }  // private static void KeyToSequence
 
             public override void VisitKey(
-                Aas.IKey that,
+                Our.IKey that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12536,7 +12536,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LangStringNameTypeToSequence(
-                Aas.ILangStringNameType that,
+                Our.ILangStringNameType that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12547,7 +12547,7 @@ namespace AasCore.Aas3_0
             }  // private static void LangStringNameTypeToSequence
 
             public override void VisitLangStringNameType(
-                Aas.ILangStringNameType that,
+                Our.ILangStringNameType that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12560,7 +12560,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LangStringTextTypeToSequence(
-                Aas.ILangStringTextType that,
+                Our.ILangStringTextType that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12571,7 +12571,7 @@ namespace AasCore.Aas3_0
             }  // private static void LangStringTextTypeToSequence
 
             public override void VisitLangStringTextType(
-                Aas.ILangStringTextType that,
+                Our.ILangStringTextType that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12584,7 +12584,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void EnvironmentToSequence(
-                Aas.IEnvironment that,
+                Our.IEnvironment that,
                 Xml.XmlWriter writer)
             {
                 if (that.AssetAdministrationShells != null)
@@ -12615,7 +12615,7 @@ namespace AasCore.Aas3_0
             }  // private static void EnvironmentToSequence
 
             public override void VisitEnvironment(
-                Aas.IEnvironment that,
+                Our.IEnvironment that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12628,7 +12628,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void EmbeddedDataSpecificationToSequence(
-                Aas.IEmbeddedDataSpecification that,
+                Our.IEmbeddedDataSpecification that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12647,7 +12647,7 @@ namespace AasCore.Aas3_0
             }  // private static void EmbeddedDataSpecificationToSequence
 
             public override void VisitEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification that,
+                Our.IEmbeddedDataSpecification that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12660,7 +12660,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LevelTypeToSequence(
-                Aas.ILevelType that,
+                Our.ILevelType that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12677,7 +12677,7 @@ namespace AasCore.Aas3_0
             }  // private static void LevelTypeToSequence
 
             public override void VisitLevelType(
-                Aas.ILevelType that,
+                Our.ILevelType that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12690,7 +12690,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ValueReferencePairToSequence(
-                Aas.IValueReferencePair that,
+                Our.IValueReferencePair that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12701,7 +12701,7 @@ namespace AasCore.Aas3_0
             }  // private static void ValueReferencePairToSequence
 
             public override void VisitValueReferencePair(
-                Aas.IValueReferencePair that,
+                Our.IValueReferencePair that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12714,7 +12714,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void ValueListToSequence(
-                Aas.IValueList that,
+                Our.IValueList that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12726,7 +12726,7 @@ namespace AasCore.Aas3_0
             }  // private static void ValueListToSequence
 
             public override void VisitValueList(
-                Aas.IValueList that,
+                Our.IValueList that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12739,7 +12739,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LangStringPreferredNameTypeIec61360ToSequence(
-                Aas.ILangStringPreferredNameTypeIec61360 that,
+                Our.ILangStringPreferredNameTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12750,7 +12750,7 @@ namespace AasCore.Aas3_0
             }  // private static void LangStringPreferredNameTypeIec61360ToSequence
 
             public override void VisitLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 that,
+                Our.ILangStringPreferredNameTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12763,7 +12763,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LangStringShortNameTypeIec61360ToSequence(
-                Aas.ILangStringShortNameTypeIec61360 that,
+                Our.ILangStringShortNameTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12774,7 +12774,7 @@ namespace AasCore.Aas3_0
             }  // private static void LangStringShortNameTypeIec61360ToSequence
 
             public override void VisitLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 that,
+                Our.ILangStringShortNameTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12787,7 +12787,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void LangStringDefinitionTypeIec61360ToSequence(
-                Aas.ILangStringDefinitionTypeIec61360 that,
+                Our.ILangStringDefinitionTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12798,7 +12798,7 @@ namespace AasCore.Aas3_0
             }  // private static void LangStringDefinitionTypeIec61360ToSequence
 
             public override void VisitLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 that,
+                Our.ILangStringDefinitionTypeIec61360 that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12811,7 +12811,7 @@ namespace AasCore.Aas3_0
             }
 
             private static void DataSpecificationIec61360ToSequence(
-                Aas.IDataSpecificationIec61360 that,
+                Our.IDataSpecificationIec61360 that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -12905,7 +12905,7 @@ namespace AasCore.Aas3_0
             }  // private static void DataSpecificationIec61360ToSequence
 
             public override void VisitDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 that,
+                Our.IDataSpecificationIec61360 that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -12924,7 +12924,7 @@ namespace AasCore.Aas3_0
         /// <example>
         /// Here is an example how to serialize an instance of IHasSemantics:
         /// <code>
-        /// var anInstance = new Aas.IHasSemantics(
+        /// var anInstance = new Our.IHasSemantics(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -12943,7 +12943,7 @@ namespace AasCore.Aas3_0
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

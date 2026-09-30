@@ -42,11 +42,11 @@ def {test_method_name}(self) -> None:
 {II}with path.open("rt") as fid:
 {III}original_jsonable = json.load(fid)
 
-{II}instance = aas_jsonization.{from_jsonable}(
+{II}instance = our_jsonization.{from_jsonable}(
 {III}original_jsonable
 {II})
 
-{II}another_jsonable = aas_jsonization.to_jsonable(instance)
+{II}another_jsonable = our_jsonization.to_jsonable(instance)
 
 {II}mismatches = tests.common_jsonization.check_equal(
 {III}original_jsonable,
@@ -138,16 +138,16 @@ def _generate_serialization_failure_test_case(
                 f"""\
 def {test_method_name}(self) -> None:
 {I}for value in {values_literal}:
-{II}instance = aas_jsonization.{from_jsonable}(
+{II}instance = our_jsonization.{from_jsonable}(
 {III}_load_the_first_expected({model_type!r})
 {II})
 
 {II}{indent_but_first_line(mutation, II)}
 
 {II}with self.assertRaises(
-{III}aas_jsonization.SerializationException
+{III}our_jsonization.SerializationException
 {II}) as context_manager:
-{III}aas_jsonization.to_jsonable(instance)
+{III}our_jsonization.to_jsonable(instance)
 
 {II}self.assertEqual(
 {III}{expected_path!r},
@@ -228,7 +228,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.jsonization as aas_jsonization"""
+import {qualified_module_name}.jsonization as our_jsonization"""
         ),
         Stripped(
             """\

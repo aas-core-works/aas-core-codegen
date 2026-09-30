@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using System.Linq;  // can't alias
 using NUnit.Framework;  // can't alias

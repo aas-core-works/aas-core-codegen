@@ -32,23 +32,23 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";"""
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";"""
         ),
         Stripped(
             f"""\
 test("verification path and segments format", () => {{
-{I}const path = new AasVerification.Path();
+{I}const path = new OurVerification.Path();
 
 {I}path.prepend(
-{I}{I}new AasVerification.IndexSegment(
-{I}{I}{I}<Array<AasTypes.Class>>[],
+{I}{I}new OurVerification.IndexSegment(
+{I}{I}{I}<Array<OurTypes.Class>>[],
 {I}{I}{I}2
 {I}{I})
 {I});
 {I}path.prepend(
-{I}{I}new AasVerification.PropertySegment(
-{I}{I}{I}<AasTypes.Class>{{}},
+{I}{I}new OurVerification.PropertySegment(
+{I}{I}{I}<OurTypes.Class>{{}},
 {I}{I}{I}"something"
 {I}{I})
 {I});
@@ -59,15 +59,15 @@ test("verification path and segments format", () => {{
         Stripped(
             f"""\
 test("verification error stores provided path", () => {{
-{I}const path = new AasVerification.Path();
+{I}const path = new OurVerification.Path();
 {I}path.prepend(
-{I}{I}new AasVerification.PropertySegment(
-{I}{I}{I}<AasTypes.Class>{{}},
+{I}{I}new OurVerification.PropertySegment(
+{I}{I}{I}<OurTypes.Class>{{}},
 {I}{I}{I}"idShort"
 {I}{I})
 {I});
 
-{I}const error = new AasVerification.VerificationError(
+{I}const error = new OurVerification.VerificationError(
 {I}{I}"Some verification error",
 {I}{I}path
 {I});
@@ -108,10 +108,10 @@ test("verification error stores provided path", () => {{
             Stripped(
                 f"""\
 test("{verification_name} returns boolean", () => {{
-{I}const resultOnEmpty = AasVerification.{verification_name}("");
+{I}const resultOnEmpty = OurVerification.{verification_name}("");
 {I}expect(typeof resultOnEmpty).toStrictEqual("boolean");
 
-{I}const resultOnSample = AasVerification.{verification_name}("sample-value");
+{I}const resultOnSample = OurVerification.{verification_name}("sample-value");
 {I}expect(typeof resultOnSample).toStrictEqual("boolean");
 }});"""
             )

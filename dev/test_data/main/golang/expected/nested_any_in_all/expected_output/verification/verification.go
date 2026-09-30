@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,7 +42,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check that language denotes English.
@@ -57,12 +57,12 @@ func IsEnglish(
 //
 // This function tests a plain `any` nested in `all`.
 func LangStringSetsHaveEnglish(
-	langStringSets []aastypes.ILangStringSet,
+	langStringSets []ourtypes.ILangStringSet,
 ) bool {
-	return aascommon.All(
-			func(langStringSet aastypes.ILangStringSet) bool {
-				return aascommon.Some(
-						func(langString aastypes.ILangString) bool {
+	return ourcommon.All(
+			func(langStringSet ourtypes.ILangStringSet) bool {
+				return ourcommon.Some(
+						func(langString ourtypes.ILangString) bool {
 							return IsEnglish(langString.Language())
 						},
 						langStringSet.LangStrings(),
@@ -72,37 +72,37 @@ func LangStringSetsHaveEnglish(
 		)
 }
 
-// Check that the [aastypes.IIecContent.Definition] is defined at least in English
-// for all the specifications whose content is an [aastypes.IIecContent].
+// Check that the [ourtypes.IIecContent.Definition] is defined at least in English
+// for all the specifications whose content is an [ourtypes.IIecContent].
 //
 // This function tests an `any` nested in `all`, where the nested `any`
 // iterates over an optional property of a value narrowed by `isinstance`.
 func IecContentsHaveDefinitionInEnglish(
-	specifications []aastypes.ISpecification,
+	specifications []ourtypes.ISpecification,
 ) bool {
-	return aascommon.All(
-			func(specification aastypes.ISpecification) bool {
-				return !aastypes.IsIecContent(specification.Content()) ||
-					((specification.Content().(aastypes.IIecContent).Definition() != nil) &&
-					aascommon.Some(
-						func(langString aastypes.ILangString) bool {
+	return ourcommon.All(
+			func(specification ourtypes.ISpecification) bool {
+				return !ourtypes.IsIecContent(specification.Content()) ||
+					((specification.Content().(ourtypes.IIecContent).Definition() != nil) &&
+					ourcommon.Some(
+						func(langString ourtypes.ILangString) bool {
 							return IsEnglish(langString.Language())
 						},
-						specification.Content().(aastypes.IIecContent).Definition(),
+						specification.Content().(ourtypes.IIecContent).Definition(),
 					))
 			},
 			specifications,
 		)
 }
 
-// Verify `that` instance of [aastypes.ILangString].
+// Verify `that` instance of [ourtypes.ILangString].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangString(
-	that aastypes.ILangString,
+	that ourtypes.ILangString,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -112,14 +112,14 @@ func VerifyLangString(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringSet].
+// Verify `that` instance of [ourtypes.ILangStringSet].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringSet(
-	that aastypes.ILangStringSet,
+	that ourtypes.ILangStringSet,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -139,13 +139,13 @@ func VerifyLangStringSet(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "LangStrings",
 						},
 					)
@@ -162,14 +162,14 @@ func VerifyLangStringSet(
 	return
 }
 
-// Verify `that` instance of [aastypes.IIecContent].
+// Verify `that` instance of [ourtypes.IIecContent].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyIecContent(
-	that aastypes.IIecContent,
+	that ourtypes.IIecContent,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -180,13 +180,13 @@ func VerifyIecContent(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Definition",
 						},
 					)
@@ -203,14 +203,14 @@ func VerifyIecContent(
 	return
 }
 
-// Verify `that` instance of [aastypes.IOtherContent].
+// Verify `that` instance of [ourtypes.IOtherContent].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyOtherContent(
-	that aastypes.IOtherContent,
+	that ourtypes.IOtherContent,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -220,14 +220,14 @@ func VerifyOtherContent(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISpecification].
+// Verify `that` instance of [ourtypes.ISpecification].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySpecification(
-	that aastypes.ISpecification,
+	that ourtypes.ISpecification,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -246,7 +246,7 @@ func VerifySpecification(
 			that.Content(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Content",
 					},
 				)
@@ -261,14 +261,14 @@ func VerifySpecification(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -288,10 +288,10 @@ func VerifySomething(
 	}
 
 	if !(
-		aascommon.All(
-			func(langStringSet aastypes.ILangStringSet) bool {
-				return aascommon.Some(
-						func(langString aastypes.ILangString) bool {
+		ourcommon.All(
+			func(langStringSet ourtypes.ILangStringSet) bool {
+				return ourcommon.Some(
+						func(langString ourtypes.ILangString) bool {
 							return langString.Language() == that.DefaultLanguage()
 						},
 						langStringSet.LangStrings(),
@@ -337,13 +337,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "LangStringSets",
 						},
 					)
@@ -363,13 +363,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Specifications",
 						},
 					)
@@ -393,39 +393,39 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeLangString:
+	case ourtypes.ModelTypeLangString:
 		abort = VerifyLangString(
-			that.(aastypes.ILangString),
+			that.(ourtypes.ILangString),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringSet:
+	case ourtypes.ModelTypeLangStringSet:
 		abort = VerifyLangStringSet(
-			that.(aastypes.ILangStringSet),
+			that.(ourtypes.ILangStringSet),
 			onError,
 		)
-	case aastypes.ModelTypeIecContent:
+	case ourtypes.ModelTypeIecContent:
 		abort = VerifyIecContent(
-			that.(aastypes.IIecContent),
+			that.(ourtypes.IIecContent),
 			onError,
 		)
-	case aastypes.ModelTypeOtherContent:
+	case ourtypes.ModelTypeOtherContent:
 		abort = VerifyOtherContent(
-			that.(aastypes.IOtherContent),
+			that.(ourtypes.IOtherContent),
 			onError,
 		)
-	case aastypes.ModelTypeSpecification:
+	case ourtypes.ModelTypeSpecification:
 		abort = VerifySpecification(
-			that.(aastypes.ISpecification),
+			that.(ourtypes.ISpecification),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

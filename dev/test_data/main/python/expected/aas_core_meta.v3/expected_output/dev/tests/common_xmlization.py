@@ -18,8 +18,8 @@ else:
     from typing_extensions import Final
 
 
-import aas_core3.types as aas_types
-import aas_core3.xmlization as aas_xmlization
+import aas_core3.types as our_types
+import aas_core3.xmlization as our_xmlization
 
 
 class Difference:
@@ -30,12 +30,12 @@ class Difference:
 
     #: Path to the expected XML element which is different from
     #: the obtained XML element
-    path: Final[aas_xmlization.Path]
+    path: Final[our_xmlization.Path]
 
     def __init__(self, message: str) -> None:
         """Initialize with the given message and empty path."""
         self.message = message
-        self.path = aas_xmlization.Path()
+        self.path = our_xmlization.Path()
 
     def __str__(self) -> str:
         return f"#{self.path}: {self.message}"
@@ -130,9 +130,9 @@ def check_equal(
     ):
         for difference in check_equal(expected_child, got_child):
             if children_tag_unique:
-                difference.path._prepend(aas_xmlization.ElementSegment(expected_child))
+                difference.path._prepend(our_xmlization.ElementSegment(expected_child))
             else:
-                difference.path._prepend(aas_xmlization.IndexSegment(expected_child, i))
+                difference.path._prepend(our_xmlization.IndexSegment(expected_child, i))
 
             yield difference
 
@@ -172,10 +172,10 @@ def assert_elements_equal(
 
 def must_load(
     path: pathlib.Path,
-) -> aas_types.Class:
+) -> our_types.Class:
     """Load an instance from ``path``."""
     try:
-        instance = aas_xmlization.from_file(path)
+        instance = our_xmlization.from_file(path)
     except Exception as exception:
         raise RuntimeError(f"Failed to read from {path}") from exception
 

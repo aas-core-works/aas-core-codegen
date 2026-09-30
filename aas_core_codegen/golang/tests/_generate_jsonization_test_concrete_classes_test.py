@@ -40,9 +40,9 @@ def _generate_for_class(cls: intermediate.ConcreteClass) -> List[Stripped]:
         Stripped(
             f"""\
 func {test_name}(t *testing.T) {{
-{I}pths := aastesting.FindFilesBySuffixRecursively(
+{I}pths := ourtesting.FindFilesBySuffixRecursively(
 {II}filepath.Join(
-{III}aastesting.TestDataDir,
+{III}ourtesting.TestDataDir,
 {III}"Json",
 {III}"Expected",
 {III}{model_type_literal},
@@ -52,11 +52,11 @@ func {test_name}(t *testing.T) {{
 {I}sort.Strings(pths)
 
 {I}for _, pth := range pths {{
-{II}jsonable := aastesting.MustReadJsonable(
+{II}jsonable := ourtesting.MustReadJsonable(
 {III}pth,
 {II})
 
-{II}deserialized, deseriaErr := aasjsonization.{deserialization_function}(
+{II}deserialized, deseriaErr := ourjsonization.{deserialization_function}(
 {III}jsonable,
 {II})
 {II}ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -64,7 +64,7 @@ func {test_name}(t *testing.T) {{
 {III}return
 {II}}}
 
-{II}anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+{II}anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 {II}ok = assertNoSerializationError(t, seriaErr, pth)
 {II}if !ok {{
 {III}return
@@ -93,7 +93,7 @@ func {test_name}(t *testing.T) {{
             f"""\
 func {test_name}(t *testing.T) {{
 {I}pattern := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"Json",
 {II}"Unexpected",
 {II}"Unserializable",
@@ -112,35 +112,35 @@ func {test_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, causeDir := range causeDirs {{
-{II}pths := aastesting.FindFilesBySuffixRecursively(
+{II}pths := ourtesting.FindFilesBySuffixRecursively(
 {III}causeDir,
 {III}".json",
 {II})
 {II}sort.Strings(pths)
 
 {II}for _, pth := range pths {{
-{III}jsonable := aastesting.MustReadJsonable(
+{III}jsonable := ourtesting.MustReadJsonable(
 {IIII}pth,
 {III})
 
-{III}relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+{III}relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 {III}if err != nil {{
 {IIII}panic(
 {IIIII}fmt.Sprintf(
 {IIIIII}"Failed to compute the relative path of %s to %s: %s",
-{IIIIII}aastesting.TestDataDir, pth, err.Error(),
+{IIIIII}ourtesting.TestDataDir, pth, err.Error(),
 {IIIII}),
 {IIII})
 {III}}}
 
 {III}expectedPth := filepath.Join(
-{IIII}aastesting.TestDataDir,
+{IIII}ourtesting.TestDataDir,
 {IIII}"DeserializationError",
 {IIII}filepath.Dir(relPth),
 {IIII}filepath.Base(relPth)+".error",
 {III})
 
-{III}_, deseriaErr := aasjsonization.{deserialization_function}(
+{III}_, deseriaErr := ourjsonization.{deserialization_function}(
 {IIII}jsonable,
 {III})
 {III}ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -165,9 +165,9 @@ def _generate_serialization_failure_infrastructure() -> List[Stripped]:
             f"""\
 // Determine the path to the first recorded example of `modelType`.
 func mustFirstExpectedPath(t *testing.T, modelType string) string {{
-{I}pths := aastesting.FindFilesBySuffixRecursively(
+{I}pths := ourtesting.FindFilesBySuffixRecursively(
 {II}filepath.Join(
-{III}aastesting.TestDataDir,
+{III}ourtesting.TestDataDir,
 {III}"Json",
 {III}"Expected",
 {III}modelType,
@@ -192,10 +192,10 @@ func mustFirstExpectedPath(t *testing.T, modelType string) string {{
 // is reported at `expectedPath`.
 func assertSerializationFailsAt(
 {I}t *testing.T,
-{I}that aastypes.IClass,
+{I}that ourtypes.IClass,
 {I}expectedPath string,
 ) {{
-{I}_, err := aasjsonization.ToJsonable(that)
+{I}_, err := ourjsonization.ToJsonable(that)
 
 {I}if err == nil {{
 {II}t.Fatalf(
@@ -205,7 +205,7 @@ func assertSerializationFailsAt(
 {II}return
 {I}}}
 
-{I}seriaErr, ok := err.(*aasjsonization.SerializationError)
+{I}seriaErr, ok := err.(*ourjsonization.SerializationError)
 {I}if !ok {{
 {II}t.Fatalf(
 {III}"Expected a *SerializationError, but got %T: %v",
@@ -293,9 +293,9 @@ func {test_name}(t *testing.T) {{
 {I}for _, value := range []{value_type}{{
 {II}{indent_but_first_line(values_joined, II)},
 {I}}} {{
-{II}jsonable := aastesting.MustReadJsonable(pth)
+{II}jsonable := ourtesting.MustReadJsonable(pth)
 
-{II}instance, deseriaErr := aasjsonization.{deserialization_function}(
+{II}instance, deseriaErr := ourjsonization.{deserialization_function}(
 {III}jsonable,
 {II})
 {II}if !assertNoDeserializationError(t, deseriaErr, pth) {{
@@ -356,9 +356,9 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
         ("math", f'{I}"math"'),
         ("sort", f'{I}"sort"'),
         ("testing", f'{I}"testing"'),
-        ("aasjsonization", f'{I}aasjsonization "{repo_url}/jsonization"'),
-        ("aastesting", f'{I}aastesting "{repo_url}/aastesting"'),
-        ("aastypes", f'{I}aastypes "{repo_url}/types"'),
+        ("ourjsonization", f'{I}ourjsonization "{repo_url}/jsonization"'),
+        ("ourtesting", f'{I}ourtesting "{repo_url}/ourtesting"'),
+        ("ourtypes", f'{I}ourtypes "{repo_url}/types"'),
     ):
         if golang_common.names_package(blocks, module):
             import_lines.append(literal)

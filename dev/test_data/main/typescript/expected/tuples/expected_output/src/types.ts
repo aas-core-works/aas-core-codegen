@@ -30,7 +30,7 @@ export function *overModelType (
 }
 
 /**
- * Represent the most general class of an AAS model.
+ * Represent the most general class of the meta-model.
  */
 export abstract class Class {
   /**

@@ -1,5 +1,5 @@
 """
-Read and write AAS models as XML.
+Read and write model instances as XML.
 
 For reading, we provide different reading functions, each handling a different kind
 of input. All the reading functions operate in one pass, *i.e.*, the source is read
@@ -42,10 +42,10 @@ Here is an example usage how to de-serialize from a file:
     import pathlib
     import xml.etree.ElementTree as ET
 
-    import dummy.xmlization as aas_xmlization
+    import dummy.xmlization as our_xmlization
 
     path = pathlib.Path(...)
-    instance = aas_xmlization.read_structural_first_from_file(
+    instance = our_xmlization.read_structural_first_from_file(
         path
     )
 
@@ -57,8 +57,8 @@ Here is another code example where we serialize the instance:
 
     import pathlib
 
-    import dummy.types as aas_types
-    import dummy.xmlization as aas_xmlization
+    import dummy.types as our_types
+    import dummy.xmlization as our_xmlization
 
     instance = StructuralFirst(
        ... # some constructor arguments
@@ -66,7 +66,7 @@ Here is another code example where we serialize the instance:
 
     pth = pathlib.Path(...)
     with pth.open("wt") as fid:
-        aas_xmlization.write(instance, fid)
+        our_xmlization.write(instance, fid)
 """
 
 
@@ -103,9 +103,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
-import dummy.xmlcommon as aas_xmlcommon
+import dummy.stringification as our_stringification
+import dummy.types as our_types
+import dummy.xmlcommon as our_xmlcommon
 from dummy.xmlcommon import (
     XS_WHITESPACE_RE,
     collapse_whitespace,
@@ -125,23 +125,23 @@ else:
 
 
 #: XML namespace in which all the elements are expected to reside
-NAMESPACE = aas_xmlcommon.NAMESPACE
+NAMESPACE = our_xmlcommon.NAMESPACE
 
 
 # region De-serialization
 
 
-Element = aas_xmlcommon.Element
-HasIterparse = aas_xmlcommon.HasIterparse
+Element = our_xmlcommon.Element
+HasIterparse = our_xmlcommon.HasIterparse
 
-ElementSegment = aas_xmlcommon.ElementSegment
-IndexSegment = aas_xmlcommon.IndexSegment
-KeySegment = aas_xmlcommon.KeySegment
-Segment = aas_xmlcommon.Segment
-Path = aas_xmlcommon.Path
+ElementSegment = our_xmlcommon.ElementSegment
+IndexSegment = our_xmlcommon.IndexSegment
+KeySegment = our_xmlcommon.KeySegment
+Segment = our_xmlcommon.Segment
+Path = our_xmlcommon.Path
 
-DeserializationException = aas_xmlcommon.DeserializationException
-SerializationException = aas_xmlcommon.SerializationException
+DeserializationException = our_xmlcommon.DeserializationException
+SerializationException = our_xmlcommon.SerializationException
 
 
 def _with_elements_cleared_after_yield(
@@ -161,7 +161,7 @@ def _with_elements_cleared_after_yield(
 
 def structural_first_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst` from
     the :paramref:`iterator`.
@@ -173,7 +173,7 @@ def structural_first_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -181,7 +181,7 @@ def structural_first_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.structural_first_from_iterparse(
+            instance = our_xmlization.structural_first_from_iterparse(
                 iterator
             )
 
@@ -206,7 +206,7 @@ def structural_first_from_iterparse(
 def structural_first_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst` from
     the :paramref:`stream`.
@@ -215,10 +215,10 @@ def structural_first_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.structural_first_from_stream(
+            instance = our_xmlization.structural_first_from_stream(
                 stream
             )
 
@@ -250,7 +250,7 @@ def structural_first_from_stream(
 def structural_first_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst` from
     the :paramref:`path`.
@@ -260,10 +260,10 @@ def structural_first_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.structural_first_from_file(
+        instance = our_xmlization.structural_first_from_file(
             path
         )
 
@@ -296,7 +296,7 @@ def structural_first_from_file(
 def structural_first_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst` from
     the :paramref:`text`.
@@ -306,10 +306,10 @@ def structural_first_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.structural_first_from_str(
+        instance = our_xmlization.structural_first_from_str(
             text
         )
 
@@ -340,7 +340,7 @@ def structural_first_from_str(
 
 def structural_second_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond` from
     the :paramref:`iterator`.
@@ -352,7 +352,7 @@ def structural_second_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -360,7 +360,7 @@ def structural_second_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.structural_second_from_iterparse(
+            instance = our_xmlization.structural_second_from_iterparse(
                 iterator
             )
 
@@ -385,7 +385,7 @@ def structural_second_from_iterparse(
 def structural_second_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond` from
     the :paramref:`stream`.
@@ -394,10 +394,10 @@ def structural_second_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.structural_second_from_stream(
+            instance = our_xmlization.structural_second_from_stream(
                 stream
             )
 
@@ -429,7 +429,7 @@ def structural_second_from_stream(
 def structural_second_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond` from
     the :paramref:`path`.
@@ -439,10 +439,10 @@ def structural_second_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.structural_second_from_file(
+        instance = our_xmlization.structural_second_from_file(
             path
         )
 
@@ -475,7 +475,7 @@ def structural_second_from_file(
 def structural_second_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond` from
     the :paramref:`text`.
@@ -485,10 +485,10 @@ def structural_second_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.structural_second_from_str(
+        instance = our_xmlization.structural_second_from_str(
             text
         )
 
@@ -519,7 +519,7 @@ def structural_second_from_str(
 
 def mixed_abstract_member_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Read an instance of :py:class:`.types.MixedAbstractMember` from
     the :paramref:`iterator`.
@@ -531,7 +531,7 @@ def mixed_abstract_member_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -539,7 +539,7 @@ def mixed_abstract_member_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_abstract_member_from_iterparse(
+            instance = our_xmlization.mixed_abstract_member_from_iterparse(
                 iterator
             )
 
@@ -564,7 +564,7 @@ def mixed_abstract_member_from_iterparse(
 def mixed_abstract_member_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Read an instance of :py:class:`.types.MixedAbstractMember` from
     the :paramref:`stream`.
@@ -573,10 +573,10 @@ def mixed_abstract_member_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_abstract_member_from_stream(
+            instance = our_xmlization.mixed_abstract_member_from_stream(
                 stream
             )
 
@@ -608,7 +608,7 @@ def mixed_abstract_member_from_stream(
 def mixed_abstract_member_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Read an instance of :py:class:`.types.MixedAbstractMember` from
     the :paramref:`path`.
@@ -618,10 +618,10 @@ def mixed_abstract_member_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_abstract_member_from_file(
+        instance = our_xmlization.mixed_abstract_member_from_file(
             path
         )
 
@@ -654,7 +654,7 @@ def mixed_abstract_member_from_file(
 def mixed_abstract_member_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Read an instance of :py:class:`.types.MixedAbstractMember` from
     the :paramref:`text`.
@@ -664,10 +664,10 @@ def mixed_abstract_member_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_abstract_member_from_str(
+        instance = our_xmlization.mixed_abstract_member_from_str(
             text
         )
 
@@ -698,7 +698,7 @@ def mixed_abstract_member_from_str(
 
 def mixed_abstract_descendant_one_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne` from
     the :paramref:`iterator`.
@@ -710,7 +710,7 @@ def mixed_abstract_descendant_one_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -718,7 +718,7 @@ def mixed_abstract_descendant_one_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_abstract_descendant_one_from_iterparse(
+            instance = our_xmlization.mixed_abstract_descendant_one_from_iterparse(
                 iterator
             )
 
@@ -743,7 +743,7 @@ def mixed_abstract_descendant_one_from_iterparse(
 def mixed_abstract_descendant_one_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne` from
     the :paramref:`stream`.
@@ -752,10 +752,10 @@ def mixed_abstract_descendant_one_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_abstract_descendant_one_from_stream(
+            instance = our_xmlization.mixed_abstract_descendant_one_from_stream(
                 stream
             )
 
@@ -787,7 +787,7 @@ def mixed_abstract_descendant_one_from_stream(
 def mixed_abstract_descendant_one_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne` from
     the :paramref:`path`.
@@ -797,10 +797,10 @@ def mixed_abstract_descendant_one_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_abstract_descendant_one_from_file(
+        instance = our_xmlization.mixed_abstract_descendant_one_from_file(
             path
         )
 
@@ -833,7 +833,7 @@ def mixed_abstract_descendant_one_from_file(
 def mixed_abstract_descendant_one_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne` from
     the :paramref:`text`.
@@ -843,10 +843,10 @@ def mixed_abstract_descendant_one_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_abstract_descendant_one_from_str(
+        instance = our_xmlization.mixed_abstract_descendant_one_from_str(
             text
         )
 
@@ -877,7 +877,7 @@ def mixed_abstract_descendant_one_from_str(
 
 def mixed_abstract_descendant_two_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo` from
     the :paramref:`iterator`.
@@ -889,7 +889,7 @@ def mixed_abstract_descendant_two_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -897,7 +897,7 @@ def mixed_abstract_descendant_two_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_abstract_descendant_two_from_iterparse(
+            instance = our_xmlization.mixed_abstract_descendant_two_from_iterparse(
                 iterator
             )
 
@@ -922,7 +922,7 @@ def mixed_abstract_descendant_two_from_iterparse(
 def mixed_abstract_descendant_two_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo` from
     the :paramref:`stream`.
@@ -931,10 +931,10 @@ def mixed_abstract_descendant_two_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_abstract_descendant_two_from_stream(
+            instance = our_xmlization.mixed_abstract_descendant_two_from_stream(
                 stream
             )
 
@@ -966,7 +966,7 @@ def mixed_abstract_descendant_two_from_stream(
 def mixed_abstract_descendant_two_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo` from
     the :paramref:`path`.
@@ -976,10 +976,10 @@ def mixed_abstract_descendant_two_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_abstract_descendant_two_from_file(
+        instance = our_xmlization.mixed_abstract_descendant_two_from_file(
             path
         )
 
@@ -1012,7 +1012,7 @@ def mixed_abstract_descendant_two_from_file(
 def mixed_abstract_descendant_two_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo` from
     the :paramref:`text`.
@@ -1022,10 +1022,10 @@ def mixed_abstract_descendant_two_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_abstract_descendant_two_from_str(
+        instance = our_xmlization.mixed_abstract_descendant_two_from_str(
             text
         )
 
@@ -1056,7 +1056,7 @@ def mixed_abstract_descendant_two_from_str(
 
 def mixed_concrete_with_descendants_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants` from
     the :paramref:`iterator`.
@@ -1068,7 +1068,7 @@ def mixed_concrete_with_descendants_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1076,7 +1076,7 @@ def mixed_concrete_with_descendants_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_concrete_with_descendants_from_iterparse(
+            instance = our_xmlization.mixed_concrete_with_descendants_from_iterparse(
                 iterator
             )
 
@@ -1101,7 +1101,7 @@ def mixed_concrete_with_descendants_from_iterparse(
 def mixed_concrete_with_descendants_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants` from
     the :paramref:`stream`.
@@ -1110,10 +1110,10 @@ def mixed_concrete_with_descendants_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_concrete_with_descendants_from_stream(
+            instance = our_xmlization.mixed_concrete_with_descendants_from_stream(
                 stream
             )
 
@@ -1145,7 +1145,7 @@ def mixed_concrete_with_descendants_from_stream(
 def mixed_concrete_with_descendants_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants` from
     the :paramref:`path`.
@@ -1155,10 +1155,10 @@ def mixed_concrete_with_descendants_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_concrete_with_descendants_from_file(
+        instance = our_xmlization.mixed_concrete_with_descendants_from_file(
             path
         )
 
@@ -1191,7 +1191,7 @@ def mixed_concrete_with_descendants_from_file(
 def mixed_concrete_with_descendants_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants` from
     the :paramref:`text`.
@@ -1201,10 +1201,10 @@ def mixed_concrete_with_descendants_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_concrete_with_descendants_from_str(
+        instance = our_xmlization.mixed_concrete_with_descendants_from_str(
             text
         )
 
@@ -1235,7 +1235,7 @@ def mixed_concrete_with_descendants_from_str(
 
 def mixed_concrete_with_descendants_child_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from
     the :paramref:`iterator`.
@@ -1247,7 +1247,7 @@ def mixed_concrete_with_descendants_child_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1255,7 +1255,7 @@ def mixed_concrete_with_descendants_child_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_concrete_with_descendants_child_from_iterparse(
+            instance = our_xmlization.mixed_concrete_with_descendants_child_from_iterparse(
                 iterator
             )
 
@@ -1280,7 +1280,7 @@ def mixed_concrete_with_descendants_child_from_iterparse(
 def mixed_concrete_with_descendants_child_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from
     the :paramref:`stream`.
@@ -1289,10 +1289,10 @@ def mixed_concrete_with_descendants_child_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_concrete_with_descendants_child_from_stream(
+            instance = our_xmlization.mixed_concrete_with_descendants_child_from_stream(
                 stream
             )
 
@@ -1324,7 +1324,7 @@ def mixed_concrete_with_descendants_child_from_stream(
 def mixed_concrete_with_descendants_child_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from
     the :paramref:`path`.
@@ -1334,10 +1334,10 @@ def mixed_concrete_with_descendants_child_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_concrete_with_descendants_child_from_file(
+        instance = our_xmlization.mixed_concrete_with_descendants_child_from_file(
             path
         )
 
@@ -1370,7 +1370,7 @@ def mixed_concrete_with_descendants_child_from_file(
 def mixed_concrete_with_descendants_child_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from
     the :paramref:`text`.
@@ -1380,10 +1380,10 @@ def mixed_concrete_with_descendants_child_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_concrete_with_descendants_child_from_str(
+        instance = our_xmlization.mixed_concrete_with_descendants_child_from_str(
             text
         )
 
@@ -1414,7 +1414,7 @@ def mixed_concrete_with_descendants_child_from_str(
 
 def mixed_concrete_leaf_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf` from
     the :paramref:`iterator`.
@@ -1426,7 +1426,7 @@ def mixed_concrete_leaf_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1434,7 +1434,7 @@ def mixed_concrete_leaf_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.mixed_concrete_leaf_from_iterparse(
+            instance = our_xmlization.mixed_concrete_leaf_from_iterparse(
                 iterator
             )
 
@@ -1459,7 +1459,7 @@ def mixed_concrete_leaf_from_iterparse(
 def mixed_concrete_leaf_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf` from
     the :paramref:`stream`.
@@ -1468,10 +1468,10 @@ def mixed_concrete_leaf_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.mixed_concrete_leaf_from_stream(
+            instance = our_xmlization.mixed_concrete_leaf_from_stream(
                 stream
             )
 
@@ -1503,7 +1503,7 @@ def mixed_concrete_leaf_from_stream(
 def mixed_concrete_leaf_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf` from
     the :paramref:`path`.
@@ -1513,10 +1513,10 @@ def mixed_concrete_leaf_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.mixed_concrete_leaf_from_file(
+        instance = our_xmlization.mixed_concrete_leaf_from_file(
             path
         )
 
@@ -1549,7 +1549,7 @@ def mixed_concrete_leaf_from_file(
 def mixed_concrete_leaf_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf` from
     the :paramref:`text`.
@@ -1559,10 +1559,10 @@ def mixed_concrete_leaf_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.mixed_concrete_leaf_from_str(
+        instance = our_xmlization.mixed_concrete_leaf_from_str(
             text
         )
 
@@ -1593,7 +1593,7 @@ def mixed_concrete_leaf_from_str(
 
 def model_typed_first_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst` from
     the :paramref:`iterator`.
@@ -1605,7 +1605,7 @@ def model_typed_first_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1613,7 +1613,7 @@ def model_typed_first_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.model_typed_first_from_iterparse(
+            instance = our_xmlization.model_typed_first_from_iterparse(
                 iterator
             )
 
@@ -1638,7 +1638,7 @@ def model_typed_first_from_iterparse(
 def model_typed_first_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst` from
     the :paramref:`stream`.
@@ -1647,10 +1647,10 @@ def model_typed_first_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.model_typed_first_from_stream(
+            instance = our_xmlization.model_typed_first_from_stream(
                 stream
             )
 
@@ -1682,7 +1682,7 @@ def model_typed_first_from_stream(
 def model_typed_first_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst` from
     the :paramref:`path`.
@@ -1692,10 +1692,10 @@ def model_typed_first_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.model_typed_first_from_file(
+        instance = our_xmlization.model_typed_first_from_file(
             path
         )
 
@@ -1728,7 +1728,7 @@ def model_typed_first_from_file(
 def model_typed_first_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst` from
     the :paramref:`text`.
@@ -1738,10 +1738,10 @@ def model_typed_first_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.model_typed_first_from_str(
+        instance = our_xmlization.model_typed_first_from_str(
             text
         )
 
@@ -1772,7 +1772,7 @@ def model_typed_first_from_str(
 
 def model_typed_second_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond` from
     the :paramref:`iterator`.
@@ -1784,7 +1784,7 @@ def model_typed_second_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1792,7 +1792,7 @@ def model_typed_second_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.model_typed_second_from_iterparse(
+            instance = our_xmlization.model_typed_second_from_iterparse(
                 iterator
             )
 
@@ -1817,7 +1817,7 @@ def model_typed_second_from_iterparse(
 def model_typed_second_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond` from
     the :paramref:`stream`.
@@ -1826,10 +1826,10 @@ def model_typed_second_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.model_typed_second_from_stream(
+            instance = our_xmlization.model_typed_second_from_stream(
                 stream
             )
 
@@ -1861,7 +1861,7 @@ def model_typed_second_from_stream(
 def model_typed_second_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond` from
     the :paramref:`path`.
@@ -1871,10 +1871,10 @@ def model_typed_second_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.model_typed_second_from_file(
+        instance = our_xmlization.model_typed_second_from_file(
             path
         )
 
@@ -1907,7 +1907,7 @@ def model_typed_second_from_file(
 def model_typed_second_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond` from
     the :paramref:`text`.
@@ -1917,10 +1917,10 @@ def model_typed_second_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.model_typed_second_from_str(
+        instance = our_xmlization.model_typed_second_from_str(
             text
         )
 
@@ -1951,7 +1951,7 @@ def model_typed_second_from_str(
 
 def something_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`iterator`.
@@ -1963,7 +1963,7 @@ def something_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1971,7 +1971,7 @@ def something_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.something_from_iterparse(
+            instance = our_xmlization.something_from_iterparse(
                 iterator
             )
 
@@ -1996,7 +1996,7 @@ def something_from_iterparse(
 def something_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`stream`.
@@ -2005,10 +2005,10 @@ def something_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.something_from_stream(
+            instance = our_xmlization.something_from_stream(
                 stream
             )
 
@@ -2040,7 +2040,7 @@ def something_from_stream(
 def something_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`path`.
@@ -2050,10 +2050,10 @@ def something_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.something_from_file(
+        instance = our_xmlization.something_from_file(
             path
         )
 
@@ -2086,7 +2086,7 @@ def something_from_file(
 def something_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`text`.
@@ -2096,10 +2096,10 @@ def something_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.something_from_str(
+        instance = our_xmlization.something_from_str(
             text
         )
 
@@ -2130,7 +2130,7 @@ def something_from_str(
 
 def from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`iterator`.
 
@@ -2143,7 +2143,7 @@ def from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -2151,7 +2151,7 @@ def from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.from_iterparse(
+            instance = our_xmlization.from_iterparse(
                 iterator
             )
 
@@ -2175,7 +2175,7 @@ def from_iterparse(
 def from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`stream`.
 
@@ -2185,10 +2185,10 @@ def from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.from_stream(
+            instance = our_xmlization.from_stream(
                 stream
             )
 
@@ -2218,7 +2218,7 @@ def from_stream(
 def from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the file at the :paramref:`path`.
 
@@ -2227,10 +2227,10 @@ def from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.from_file(
+        instance = our_xmlization.from_file(
             path
         )
 
@@ -2261,7 +2261,7 @@ def from_file(
 def from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`text`.
 
@@ -2270,10 +2270,10 @@ def from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.from_str(
+        instance = our_xmlization.from_str(
             text
         )
 
@@ -2753,7 +2753,7 @@ def _tuple3_from_element(
 def _read_list_of__mixed_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.MixedUnion]:
+) -> List[our_types.MixedUnion]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.MixedUnion`.
@@ -2768,7 +2768,7 @@ def _read_list_of__mixed_union(
 def _read_list_of__model_typed_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.ModelTypedUnion]:
+) -> List[our_types.ModelTypedUnion]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.ModelTypedUnion`.
@@ -2783,7 +2783,7 @@ def _read_list_of__model_typed_union(
 def _read_list_of__overlapping_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.OverlappingUnion]:
+) -> List[our_types.OverlappingUnion]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.OverlappingUnion`.
@@ -2798,7 +2798,7 @@ def _read_list_of__overlapping_union(
 def _read_list_of__structural_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.StructuralUnion]:
+) -> List[our_types.StructuralUnion]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.StructuralUnion`.
@@ -2813,7 +2813,7 @@ def _read_list_of__structural_union(
 def _read_nested__mixed_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedUnion:
+) -> our_types.MixedUnion:
     """
     Read an instance of :py:class:`.types.MixedUnion` nested in
     :paramref:`element` as a discriminator element.
@@ -2829,7 +2829,7 @@ def _read_nested__mixed_union(
 def _read_nested__model_typed_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedUnion:
+) -> our_types.ModelTypedUnion:
     """
     Read an instance of :py:class:`.types.ModelTypedUnion` nested in
     :paramref:`element` as a discriminator element.
@@ -2845,7 +2845,7 @@ def _read_nested__model_typed_union(
 def _read_nested__structural_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralUnion:
+) -> our_types.StructuralUnion:
     """
     Read an instance of :py:class:`.types.StructuralUnion` nested in
     :paramref:`element` as a discriminator element.
@@ -2861,7 +2861,7 @@ def _read_nested__structural_union(
 def _read_tuple3_of__structural_union__mixed_union__model_typed_union(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> Tuple[aas_types.StructuralUnion, aas_types.MixedUnion, aas_types.ModelTypedUnion]:
+) -> Tuple[our_types.StructuralUnion, our_types.MixedUnion, our_types.ModelTypedUnion]:
     """
     Read the items of :paramref:`element` as a tuple of 3 item(s).
     """
@@ -2877,7 +2877,7 @@ def _read_tuple3_of__structural_union__mixed_union__model_typed_union(
 def _read_structural_first_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst`
     as a sequence of XML-encoded properties.
@@ -2906,7 +2906,7 @@ def _read_structural_first_as_sequence(
             "The required property 'uniqueToFirst' is missing"
         )
 
-    return aas_types.StructuralFirst(
+    return our_types.StructuralFirst(
         the_unique_to_first
     )
 
@@ -2914,7 +2914,7 @@ def _read_structural_first_as_sequence(
 def _read_structural_first_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Read an instance of :py:class:`.types.StructuralFirst` from
     :paramref:`iterator`, including the end element.
@@ -2938,7 +2938,7 @@ def _read_structural_first_as_element(
 def _read_structural_second_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond`
     as a sequence of XML-encoded properties.
@@ -2967,7 +2967,7 @@ def _read_structural_second_as_sequence(
             "The required property 'uniqueToSecond' is missing"
         )
 
-    return aas_types.StructuralSecond(
+    return our_types.StructuralSecond(
         the_unique_to_second
     )
 
@@ -2975,7 +2975,7 @@ def _read_structural_second_as_sequence(
 def _read_structural_second_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Read an instance of :py:class:`.types.StructuralSecond` from
     :paramref:`iterator`, including the end element.
@@ -2999,7 +2999,7 @@ def _read_structural_second_as_element(
 def _read_structural_union_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.StructuralUnion:
+) -> our_types.StructuralUnion:
     """
     Read an instance of :py:class:`.types.StructuralUnion` from
     :paramref:`iterator`, including the end element.
@@ -3023,7 +3023,7 @@ def _read_structural_union_as_element(
 def _read_mixed_abstract_member_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Read an instance of :py:class:`.types.MixedAbstractMember` from
     :paramref:`iterator`, including the end element.
@@ -3047,7 +3047,7 @@ def _read_mixed_abstract_member_as_element(
 def _read_mixed_abstract_descendant_one_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne`
     as a sequence of XML-encoded properties.
@@ -3078,7 +3078,7 @@ def _read_mixed_abstract_descendant_one_as_sequence(
             "The required property 'uniqueToAbstractDescendantOne' is missing"
         )
 
-    return aas_types.MixedAbstractDescendantOne(
+    return our_types.MixedAbstractDescendantOne(
         the_unique_to_abstract_descendant_one
     )
 
@@ -3086,7 +3086,7 @@ def _read_mixed_abstract_descendant_one_as_sequence(
 def _read_mixed_abstract_descendant_one_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantOne` from
     :paramref:`iterator`, including the end element.
@@ -3110,7 +3110,7 @@ def _read_mixed_abstract_descendant_one_as_element(
 def _read_mixed_abstract_descendant_two_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo`
     as a sequence of XML-encoded properties.
@@ -3141,7 +3141,7 @@ def _read_mixed_abstract_descendant_two_as_sequence(
             "The required property 'uniqueToAbstractDescendantTwo' is missing"
         )
 
-    return aas_types.MixedAbstractDescendantTwo(
+    return our_types.MixedAbstractDescendantTwo(
         the_unique_to_abstract_descendant_two
     )
 
@@ -3149,7 +3149,7 @@ def _read_mixed_abstract_descendant_two_as_sequence(
 def _read_mixed_abstract_descendant_two_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Read an instance of :py:class:`.types.MixedAbstractDescendantTwo` from
     :paramref:`iterator`, including the end element.
@@ -3173,7 +3173,7 @@ def _read_mixed_abstract_descendant_two_as_element(
 def _read_mixed_concrete_with_descendants_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants`
     as a sequence of XML-encoded properties.
@@ -3202,7 +3202,7 @@ def _read_mixed_concrete_with_descendants_as_sequence(
             "The required property 'someBaseProperty' is missing"
         )
 
-    return aas_types.MixedConcreteWithDescendants(
+    return our_types.MixedConcreteWithDescendants(
         the_some_base_property
     )
 
@@ -3210,7 +3210,7 @@ def _read_mixed_concrete_with_descendants_as_sequence(
 def _read_mixed_concrete_with_descendants_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendants` from
     :paramref:`iterator`, including the end element.
@@ -3234,7 +3234,7 @@ def _read_mixed_concrete_with_descendants_as_element(
 def _read_mixed_concrete_with_descendants_child_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild`
     as a sequence of XML-encoded properties.
@@ -3269,7 +3269,7 @@ def _read_mixed_concrete_with_descendants_child_as_sequence(
             "The required property 'someChildProperty' is missing"
         )
 
-    return aas_types.MixedConcreteWithDescendantsChild(
+    return our_types.MixedConcreteWithDescendantsChild(
         the_some_base_property,
         the_some_child_property
     )
@@ -3278,7 +3278,7 @@ def _read_mixed_concrete_with_descendants_child_as_sequence(
 def _read_mixed_concrete_with_descendants_child_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Read an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from
     :paramref:`iterator`, including the end element.
@@ -3302,7 +3302,7 @@ def _read_mixed_concrete_with_descendants_child_as_element(
 def _read_mixed_concrete_leaf_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf`
     as a sequence of XML-encoded properties.
@@ -3331,7 +3331,7 @@ def _read_mixed_concrete_leaf_as_sequence(
             "The required property 'uniqueToConcreteLeaf' is missing"
         )
 
-    return aas_types.MixedConcreteLeaf(
+    return our_types.MixedConcreteLeaf(
         the_unique_to_concrete_leaf
     )
 
@@ -3339,7 +3339,7 @@ def _read_mixed_concrete_leaf_as_sequence(
 def _read_mixed_concrete_leaf_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Read an instance of :py:class:`.types.MixedConcreteLeaf` from
     :paramref:`iterator`, including the end element.
@@ -3363,7 +3363,7 @@ def _read_mixed_concrete_leaf_as_element(
 def _read_mixed_union_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.MixedUnion:
+) -> our_types.MixedUnion:
     """
     Read an instance of :py:class:`.types.MixedUnion` from
     :paramref:`iterator`, including the end element.
@@ -3387,7 +3387,7 @@ def _read_mixed_union_as_element(
 def _read_model_typed_first_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst`
     as a sequence of XML-encoded properties.
@@ -3416,7 +3416,7 @@ def _read_model_typed_first_as_sequence(
             "The required property 'someProperty' is missing"
         )
 
-    return aas_types.ModelTypedFirst(
+    return our_types.ModelTypedFirst(
         the_some_property
     )
 
@@ -3424,7 +3424,7 @@ def _read_model_typed_first_as_sequence(
 def _read_model_typed_first_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Read an instance of :py:class:`.types.ModelTypedFirst` from
     :paramref:`iterator`, including the end element.
@@ -3448,7 +3448,7 @@ def _read_model_typed_first_as_element(
 def _read_model_typed_second_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond`
     as a sequence of XML-encoded properties.
@@ -3477,7 +3477,7 @@ def _read_model_typed_second_as_sequence(
             "The required property 'someProperty' is missing"
         )
 
-    return aas_types.ModelTypedSecond(
+    return our_types.ModelTypedSecond(
         the_some_property
     )
 
@@ -3485,7 +3485,7 @@ def _read_model_typed_second_as_sequence(
 def _read_model_typed_second_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Read an instance of :py:class:`.types.ModelTypedSecond` from
     :paramref:`iterator`, including the end element.
@@ -3509,7 +3509,7 @@ def _read_model_typed_second_as_element(
 def _read_model_typed_union_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.ModelTypedUnion:
+) -> our_types.ModelTypedUnion:
     """
     Read an instance of :py:class:`.types.ModelTypedUnion` from
     :paramref:`iterator`, including the end element.
@@ -3533,7 +3533,7 @@ def _read_model_typed_union_as_element(
 def _read_overlapping_union_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.OverlappingUnion:
+) -> our_types.OverlappingUnion:
     """
     Read an instance of :py:class:`.types.OverlappingUnion` from
     :paramref:`iterator`, including the end element.
@@ -3557,7 +3557,7 @@ def _read_overlapping_union_as_element(
 def _read_something_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something`
     as a sequence of XML-encoded properties.
@@ -3579,41 +3579,41 @@ def _read_something_as_sequence(
         _READERS_FOR_SOMETHING
     )
 
-    the_structural_property: Optional[aas_types.StructuralUnion] = values.get(
+    the_structural_property: Optional[our_types.StructuralUnion] = values.get(
         'structuralProperty'
     )
-    the_mixed_property: Optional[aas_types.MixedUnion] = values.get('mixedProperty')
-    the_model_typed_property: Optional[aas_types.ModelTypedUnion] = values.get(
+    the_mixed_property: Optional[our_types.MixedUnion] = values.get('mixedProperty')
+    the_model_typed_property: Optional[our_types.ModelTypedUnion] = values.get(
         'modelTypedProperty'
     )
-    the_list_structural_property: Optional[List[aas_types.StructuralUnion]] = values.get(
+    the_list_structural_property: Optional[List[our_types.StructuralUnion]] = values.get(
         'listStructuralProperty'
     )
-    the_list_mixed_property: Optional[List[aas_types.MixedUnion]] = values.get(
+    the_list_mixed_property: Optional[List[our_types.MixedUnion]] = values.get(
         'listMixedProperty'
     )
-    the_list_model_typed_property: Optional[List[aas_types.ModelTypedUnion]] = values.get(
+    the_list_model_typed_property: Optional[List[our_types.ModelTypedUnion]] = values.get(
         'listModelTypedProperty'
     )
     the_tuple_property: Optional[
         Tuple[
-            aas_types.StructuralUnion,
-            aas_types.MixedUnion,
-            aas_types.ModelTypedUnion,
+            our_types.StructuralUnion,
+            our_types.MixedUnion,
+            our_types.ModelTypedUnion,
         ]
     ] = values.get(
         'tupleProperty'
     )
-    the_optional_structural_property: Optional[aas_types.StructuralUnion] = values.get(
+    the_optional_structural_property: Optional[our_types.StructuralUnion] = values.get(
         'optionalStructuralProperty'
     )
-    the_optional_mixed_property: Optional[aas_types.MixedUnion] = values.get(
+    the_optional_mixed_property: Optional[our_types.MixedUnion] = values.get(
         'optionalMixedProperty'
     )
-    the_optional_model_typed_property: Optional[aas_types.ModelTypedUnion] = values.get(
+    the_optional_model_typed_property: Optional[our_types.ModelTypedUnion] = values.get(
         'optionalModelTypedProperty'
     )
-    the_optional_list_overlapping_property: Optional[List[aas_types.OverlappingUnion]] = values.get(
+    the_optional_list_overlapping_property: Optional[List[our_types.OverlappingUnion]] = values.get(
         'optionalListOverlappingProperty'
     )
 
@@ -3652,7 +3652,7 @@ def _read_something_as_sequence(
             "The required property 'tupleProperty' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_structural_property,
         the_mixed_property,
         the_model_typed_property,
@@ -3670,7 +3670,7 @@ def _read_something_as_sequence(
 def _read_something_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     :paramref:`iterator`, including the end element.
@@ -3694,7 +3694,7 @@ def _read_something_as_element(
 def _read_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from :paramref:`iterator`, including the end element.
 
@@ -3723,7 +3723,7 @@ _DISPATCH_FOR_MIXED_ABSTRACT_MEMBER: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.MixedAbstractMember
+        our_types.MixedAbstractMember
     ]
 ] = {
     'mixedAbstractDescendantOne': _read_mixed_abstract_descendant_one_as_sequence,
@@ -3740,7 +3740,7 @@ _DISPATCH_FOR_MIXED_CONCRETE_WITH_DESCENDANTS: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.MixedConcreteWithDescendants
+        our_types.MixedConcreteWithDescendants
     ]
 ] = {
     'mixedConcreteWithDescendants': _read_mixed_concrete_with_descendants_as_sequence,
@@ -3757,7 +3757,7 @@ _DISPATCH_FOR_STRUCTURAL_UNION: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.StructuralUnion
+        our_types.StructuralUnion
     ]
 ] = {
     'structuralFirst': _read_structural_first_as_sequence,
@@ -3774,7 +3774,7 @@ _DISPATCH_FOR_MIXED_UNION: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.MixedUnion
+        our_types.MixedUnion
     ]
 ] = {
     'mixedAbstractDescendantOne': _read_mixed_abstract_descendant_one_as_sequence,
@@ -3794,7 +3794,7 @@ _DISPATCH_FOR_MODEL_TYPED_UNION: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.ModelTypedUnion
+        our_types.ModelTypedUnion
     ]
 ] = {
     'modelTypedFirst': _read_model_typed_first_as_sequence,
@@ -3811,7 +3811,7 @@ _DISPATCH_FOR_OVERLAPPING_UNION: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.OverlappingUnion
+        our_types.OverlappingUnion
     ]
 ] = {
     'modelTypedFirst': _read_model_typed_first_as_sequence,
@@ -3830,7 +3830,7 @@ _GENERAL_DISPATCH: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.Class
+        our_types.Class
     ]
 ] = {
     'structuralFirst': _read_structural_first_as_sequence,
@@ -4087,7 +4087,7 @@ def _write_str_as_element(
 def _write_nested_element(
     name: str,
     prop_name: Optional[str],
-    value: aas_types.Class,
+    value: our_types.Class,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4123,7 +4123,7 @@ def _write_nested_element(
 def _write_list_of_instances(
     name: str,
     prop_name: Optional[str],
-    items: Sequence[aas_types.Class],
+    items: Sequence[our_types.Class],
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4162,9 +4162,9 @@ def _write_tuple3_of__structural_union__mixed_union__model_typed_union(
     name: str,
     prop_name: Optional[str],
     value: Tuple[
-        aas_types.StructuralUnion,
-        aas_types.MixedUnion,
-        aas_types.ModelTypedUnion,
+        our_types.StructuralUnion,
+        our_types.MixedUnion,
+        our_types.ModelTypedUnion,
     ],
     serializer: '_Serializer'
 ) -> None:
@@ -4206,7 +4206,7 @@ def _write_tuple3_of__structural_union__mixed_union__model_typed_union(
 def _write_structural_first_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.StructuralFirst,
+    that: our_types.StructuralFirst,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4233,7 +4233,7 @@ def _write_structural_first_as_element(
 def _write_structural_second_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.StructuralSecond,
+    that: our_types.StructuralSecond,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4260,7 +4260,7 @@ def _write_structural_second_as_element(
 def _write_mixed_abstract_descendant_one_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.MixedAbstractDescendantOne,
+    that: our_types.MixedAbstractDescendantOne,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4290,7 +4290,7 @@ def _write_mixed_abstract_descendant_one_as_element(
 def _write_mixed_abstract_descendant_two_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.MixedAbstractDescendantTwo,
+    that: our_types.MixedAbstractDescendantTwo,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4320,7 +4320,7 @@ def _write_mixed_abstract_descendant_two_as_element(
 def _write_mixed_concrete_with_descendants_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.MixedConcreteWithDescendants,
+    that: our_types.MixedConcreteWithDescendants,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4350,7 +4350,7 @@ def _write_mixed_concrete_with_descendants_as_element(
 def _write_mixed_concrete_with_descendants_child_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.MixedConcreteWithDescendantsChild,
+    that: our_types.MixedConcreteWithDescendantsChild,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4386,7 +4386,7 @@ def _write_mixed_concrete_with_descendants_child_as_element(
 def _write_mixed_concrete_leaf_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.MixedConcreteLeaf,
+    that: our_types.MixedConcreteLeaf,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4416,7 +4416,7 @@ def _write_mixed_concrete_leaf_as_element(
 def _write_model_typed_first_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.ModelTypedFirst,
+    that: our_types.ModelTypedFirst,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4443,7 +4443,7 @@ def _write_model_typed_first_as_element(
 def _write_model_typed_second_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.ModelTypedSecond,
+    that: our_types.ModelTypedSecond,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4470,7 +4470,7 @@ def _write_model_typed_second_as_element(
 def _write_something_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.Something,
+    that: our_types.Something,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -4555,11 +4555,11 @@ def _write_something_as_element(
         _attribute_to_property(exception, prop_name)
 
 
-class _Serializer(aas_types.AbstractVisitor):
+class _Serializer(our_types.AbstractVisitor):
     """Encode instances as XML and write them to :py:attr:`~writer`."""
 
     #: Frame the XML elements of the document which we are writing
-    writer: Final[aas_xmlcommon.Writer]
+    writer: Final[our_xmlcommon.Writer]
 
     def __init__(
         self,
@@ -4573,11 +4573,11 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param stream: where to write to
         """
-        self.writer = aas_xmlcommon.Writer(stream)
+        self.writer = our_xmlcommon.Writer(stream)
 
     def visit_structural_first(
         self,
-        that: aas_types.StructuralFirst
+        that: our_types.StructuralFirst
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4591,7 +4591,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_structural_second(
         self,
-        that: aas_types.StructuralSecond
+        that: our_types.StructuralSecond
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4605,7 +4605,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_mixed_abstract_descendant_one(
         self,
-        that: aas_types.MixedAbstractDescendantOne
+        that: our_types.MixedAbstractDescendantOne
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4621,7 +4621,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_mixed_abstract_descendant_two(
         self,
-        that: aas_types.MixedAbstractDescendantTwo
+        that: our_types.MixedAbstractDescendantTwo
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4637,7 +4637,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_mixed_concrete_with_descendants(
         self,
-        that: aas_types.MixedConcreteWithDescendants
+        that: our_types.MixedConcreteWithDescendants
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4653,7 +4653,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_mixed_concrete_with_descendants_child(
         self,
-        that: aas_types.MixedConcreteWithDescendantsChild
+        that: our_types.MixedConcreteWithDescendantsChild
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4669,7 +4669,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_mixed_concrete_leaf(
         self,
-        that: aas_types.MixedConcreteLeaf
+        that: our_types.MixedConcreteLeaf
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4683,7 +4683,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_model_typed_first(
         self,
-        that: aas_types.ModelTypedFirst
+        that: our_types.ModelTypedFirst
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4697,7 +4697,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_model_typed_second(
         self,
-        that: aas_types.ModelTypedSecond
+        that: our_types.ModelTypedSecond
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4711,7 +4711,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_something(
         self,
-        that: aas_types.Something
+        that: our_types.Something
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -4724,7 +4724,7 @@ class _Serializer(aas_types.AbstractVisitor):
         _write_something_as_element('something', None, that, self)
 
 
-def write(instance: aas_types.Class, stream: TextIO) -> None:
+def write(instance: our_types.Class, stream: TextIO) -> None:
     """
     Write the XML representation of :paramref:`instance` to :paramref:`stream`.
 
@@ -4734,8 +4734,8 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
 
         import pathlib
 
-        import dummy.types as aas_types
-        import dummy.xmlization as aas_xmlization
+        import dummy.types as our_types
+        import dummy.xmlization as our_xmlization
 
         instance = StructuralFirst(
            ... # some constructor arguments
@@ -4743,7 +4743,7 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
 
         pth = pathlib.Path(...)
         with pth.open("wt") as fid:
-            aas_xmlization.write(instance, fid)
+            our_xmlization.write(instance, fid)
 
     :param instance: to be serialized
     :param stream: to write to
@@ -4759,7 +4759,7 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
         _attribute_to_property(exception, None)
 
 
-def to_str(that: aas_types.Class) -> str:
+def to_str(that: our_types.Class) -> str:
     """
     Serialize :paramref:`that` to an XML-encoded text.
 

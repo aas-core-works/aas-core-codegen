@@ -69,7 +69,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
     ]  # type: List[Stripped]
 
@@ -84,7 +84,7 @@ namespace aas = {library_namespace};"""
                     f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE(
-{II}aas::common::LStrip(
+{II}our::common::LStrip(
 {III}{cpp_common.wstring_literal(text)},
 {III}{cpp_common.wstring_literal(chars)}
 {II})
@@ -105,7 +105,7 @@ TEST_CASE({name}) {{
                     f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE(
-{II}aas::common::ParseSafeInt({cpp_common.wstring_literal(text)})
+{II}our::common::ParseSafeInt({cpp_common.wstring_literal(text)})
 {II}== INT64_C({expected_int})
 {I});
 }}"""
@@ -122,7 +122,7 @@ TEST_CASE({name}) {{
                     f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE_THROWS_AS(
-{II}aas::common::ParseSafeInt({cpp_common.wstring_literal(text)}),
+{II}our::common::ParseSafeInt({cpp_common.wstring_literal(text)}),
 {II}std::invalid_argument
 {I});
 }}"""

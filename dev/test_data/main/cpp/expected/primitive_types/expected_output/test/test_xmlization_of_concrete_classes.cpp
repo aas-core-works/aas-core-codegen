@@ -9,23 +9,23 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 void AssertRoundTrip(
   const std::filesystem::path& path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > deserialized(
     test::common::xmlization::MustDeserializeFile(path)
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(*deserialized, {}, ss);
+  our::xmlization::Serialize(*deserialized, {}, ss);
 
   std::string expected_xml = test::common::MustReadString(path);
 
-  INFO(aas::common::Concat("XML round-trip on ", path.string()))
+  INFO(our::common::Concat("XML round-trip on ", path.string()))
   REQUIRE(
     test::common::xmlization::CanonicalizeXml(expected_xml)
       == test::common::xmlization::CanonicalizeXml(ss.str())
@@ -38,16 +38,16 @@ void AssertDeserializationFailure(
 ) {
   std::ifstream ifs(path, std::ios::binary);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ifs
   );
 
   if (deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected the de-serialization to fail on ",
         path.string(),
         ", but the de-serialization succeeded"
@@ -57,12 +57,12 @@ void AssertDeserializationFailure(
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::Concat(
-      aas::common::WstringToUtf8(
+    our::common::Concat(
+      our::common::WstringToUtf8(
         deserialized.error().path.ToWstring()
       ),
       ": ",
-      aas::common::WstringToUtf8(
+      our::common::WstringToUtf8(
         deserialized.error().cause
       )
     ),
@@ -71,7 +71,7 @@ void AssertDeserializationFailure(
 }
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -80,7 +80,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineErrorDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "XmlizationError";
   }
@@ -171,7 +171,7 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {
     original.rfind("</something>")
   );
 
-  INFO(aas::common::Concat("Looking for </something> in ", path.string()))
+  INFO(our::common::Concat("Looking for </something> in ", path.string()))
   REQUIRE(insertion_index != std::string::npos);
 
   const std::string broken(
@@ -182,12 +182,12 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {
 
   std::istringstream iss(broken);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(iss);
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(iss);
 
-  INFO(aas::common::Concat("De-serializing: ", broken))
+  INFO(our::common::Concat("De-serializing: ", broken))
   REQUIRE(!deserialized.has_value());
 }
 
@@ -195,7 +195,7 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {
  * \brief Read the first recorded example of ISomething with the content
  * of the element \p xml_name replaced by \p text.
  */
-std::shared_ptr<aas::types::ISomething> ReadWith(
+std::shared_ptr<our::types::ISomething> ReadWith(
   const std::string& xml_name,
   const std::string& text
 ) {
@@ -216,11 +216,11 @@ std::shared_ptr<aas::types::ISomething> ReadWith(
   const std::string original(test::common::MustReadString(paths.front()));
 
   const std::size_t start(
-    original.find(aas::common::Concat("<", xml_name, ">"))
+    original.find(our::common::Concat("<", xml_name, ">"))
       + xml_name.size() + 2
   );
   const std::size_t end(
-    original.find(aas::common::Concat("</", xml_name, ">"))
+    original.find(our::common::Concat("</", xml_name, ">"))
   );
 
   const std::string patched(
@@ -229,16 +229,16 @@ std::shared_ptr<aas::types::ISomething> ReadWith(
 
   std::istringstream iss(patched);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(iss);
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(iss);
 
-  INFO(aas::common::Concat("De-serializing: ", patched))
+  INFO(our::common::Concat("De-serializing: ", patched))
   REQUIRE(deserialized.has_value());
 
-  std::shared_ptr<aas::types::ISomething> casted(
-    std::dynamic_pointer_cast<aas::types::ISomething>(*deserialized)
+  std::shared_ptr<our::types::ISomething> casted(
+    std::dynamic_pointer_cast<our::types::ISomething>(*deserialized)
   );
   REQUIRE(casted != nullptr);
 
@@ -246,7 +246,7 @@ std::shared_ptr<aas::types::ISomething> ReadWith(
 }
 
 TEST_CASE("Read someFloat from 1e400") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "1e400"
@@ -257,7 +257,7 @@ TEST_CASE("Read someFloat from 1e400") {
 }
 
 TEST_CASE("Read someFloat from -1e400") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "-1e400"
@@ -268,7 +268,7 @@ TEST_CASE("Read someFloat from -1e400") {
 }
 
 TEST_CASE("Read someFloat from 1e-400") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "1e-400"
@@ -279,7 +279,7 @@ TEST_CASE("Read someFloat from 1e-400") {
 }
 
 TEST_CASE("Read someFloat from INF") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "INF"
@@ -290,7 +290,7 @@ TEST_CASE("Read someFloat from INF") {
 }
 
 TEST_CASE("Read someFloat from +INF") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "+INF"
@@ -301,7 +301,7 @@ TEST_CASE("Read someFloat from +INF") {
 }
 
 TEST_CASE("Read someFloat from -INF") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someFloat",
       "-INF"
@@ -312,7 +312,7 @@ TEST_CASE("Read someFloat from -INF") {
 }
 
 TEST_CASE("Read someBool from 1") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBool",
       "1"
@@ -323,7 +323,7 @@ TEST_CASE("Read someBool from 1") {
 }
 
 TEST_CASE("Read someBool from 0") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBool",
       "0"
@@ -334,7 +334,7 @@ TEST_CASE("Read someBool from 0") {
 }
 
 TEST_CASE("Read someBool from true") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBool",
       "true"
@@ -345,7 +345,7 @@ TEST_CASE("Read someBool from true") {
 }
 
 TEST_CASE("Read someBool from false") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBool",
       "false"
@@ -356,7 +356,7 @@ TEST_CASE("Read someBool from false") {
 }
 
 TEST_CASE("Read someBytes from SGk=") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBytes",
       "SGk="
@@ -367,7 +367,7 @@ TEST_CASE("Read someBytes from SGk=") {
 }
 
 TEST_CASE("Read someBytes from SG k=") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBytes",
       "SG k="
@@ -378,7 +378,7 @@ TEST_CASE("Read someBytes from SG k=") {
 }
 
 TEST_CASE("Read someBytes from S G k =") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBytes",
       "S G k ="
@@ -389,7 +389,7 @@ TEST_CASE("Read someBytes from S G k =") {
 }
 
 TEST_CASE("Read someBytes from ") {
-  std::shared_ptr<aas::types::ISomething> instance(
+  std::shared_ptr<our::types::ISomething> instance(
     ReadWith(
       "someBytes",
       ""

@@ -581,8 +581,7 @@ class SelfClosingWriter {
    * floats, as the value can be de-serialized correctly from XML. However, this
    * means that XML and JSON serializations are not interoperable. If you need
    * interoperability, you have to ensure that range yourself (<i>e.g.</i>, through
-   * \ref validation, see also
-   * https://github.com/aas-core-works/aas-core-meta/issues/298).
+   * \ref validation).
    */
   void SerializeInt64(
     int64_t value

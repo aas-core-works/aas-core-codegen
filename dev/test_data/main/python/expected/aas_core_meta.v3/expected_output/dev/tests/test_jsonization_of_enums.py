@@ -11,7 +11,7 @@
 import unittest
 
 
-import aas_core3.jsonization as aas_jsonization
+import aas_core3.jsonization as our_jsonization
 
 
 class TestRoundTrips(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestRoundTrips(unittest.TestCase):
             'Template',
             'Instance'
         ]:
-            enum_literal = aas_jsonization.modelling_kind_from_jsonable(jsonable)
+            enum_literal = our_jsonization.modelling_kind_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -30,7 +30,7 @@ class TestRoundTrips(unittest.TestCase):
             'ConceptQualifier',
             'TemplateQualifier'
         ]:
-            enum_literal = aas_jsonization.qualifier_kind_from_jsonable(jsonable)
+            enum_literal = our_jsonization.qualifier_kind_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -40,7 +40,7 @@ class TestRoundTrips(unittest.TestCase):
             'Instance',
             'NotApplicable'
         ]:
-            enum_literal = aas_jsonization.asset_kind_from_jsonable(jsonable)
+            enum_literal = our_jsonization.asset_kind_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -64,7 +64,7 @@ class TestRoundTrips(unittest.TestCase):
             'SubmodelElementList',
             'SubmodelElementCollection'
         ]:
-            enum_literal = aas_jsonization.aas_submodel_elements_from_jsonable(jsonable)
+            enum_literal = our_jsonization.aas_submodel_elements_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -73,7 +73,7 @@ class TestRoundTrips(unittest.TestCase):
             'CoManagedEntity',
             'SelfManagedEntity'
         ]:
-            enum_literal = aas_jsonization.entity_type_from_jsonable(jsonable)
+            enum_literal = our_jsonization.entity_type_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -82,7 +82,7 @@ class TestRoundTrips(unittest.TestCase):
             'input',
             'output'
         ]:
-            enum_literal = aas_jsonization.direction_from_jsonable(jsonable)
+            enum_literal = our_jsonization.direction_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -91,7 +91,7 @@ class TestRoundTrips(unittest.TestCase):
             'on',
             'off'
         ]:
-            enum_literal = aas_jsonization.state_of_event_from_jsonable(jsonable)
+            enum_literal = our_jsonization.state_of_event_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -100,7 +100,7 @@ class TestRoundTrips(unittest.TestCase):
             'ExternalReference',
             'ModelReference'
         ]:
-            enum_literal = aas_jsonization.reference_types_from_jsonable(jsonable)
+            enum_literal = our_jsonization.reference_types_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -131,7 +131,7 @@ class TestRoundTrips(unittest.TestCase):
             'SubmodelElementCollection',
             'SubmodelElementList'
         ]:
-            enum_literal = aas_jsonization.key_types_from_jsonable(jsonable)
+            enum_literal = our_jsonization.key_types_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -168,7 +168,7 @@ class TestRoundTrips(unittest.TestCase):
             'xs:unsignedLong',
             'xs:unsignedShort'
         ]:
-            enum_literal = aas_jsonization.data_type_def_xsd_from_jsonable(jsonable)
+            enum_literal = our_jsonization.data_type_def_xsd_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -194,7 +194,7 @@ class TestRoundTrips(unittest.TestCase):
             'HTML',
             'BLOB'
         ]:
-            enum_literal = aas_jsonization.data_type_iec_61360_from_jsonable(jsonable)
+            enum_literal = our_jsonization.data_type_iec_61360_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 

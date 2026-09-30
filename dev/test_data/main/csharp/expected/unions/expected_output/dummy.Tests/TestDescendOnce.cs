@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;
@@ -21,12 +21,12 @@ namespace dummy.Tests
             var writer = new System.IO.StringWriter();
             foreach (var descendant in instance.DescendOnce())
             {
-                writer.WriteLine(Aas.Tests.Common.Trace(descendant));
+                writer.WriteLine(Our.Tests.Common.Trace(descendant));
             }
 
             string got = writer.ToString();
 
-            if (Aas.Tests.Common.RecordMode)
+            if (Our.Tests.Common.RecordMode)
             {
                 string? parent = Path.GetDirectoryName(expectedPath);
                 if (parent != null)
@@ -46,7 +46,7 @@ namespace dummy.Tests
                     throw new System.IO.FileNotFoundException(
                         $"The file with the recorded trace does not exist: {expectedPath}; " +
                         "maybe you want to set the environment " +
-                        $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                        $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                 }
 
                 string expected = System.IO.File.ReadAllText(expectedPath);
@@ -60,13 +60,13 @@ namespace dummy.Tests
         [Test]
         public void Test_StructuralFirst()
         {
-            Aas.StructuralFirst instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalStructuralFirst());
+            Our.StructuralFirst instance = (
+                Our.Tests.CommonJsonization.LoadMaximalStructuralFirst());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "StructuralFirst",
                     "maximal.json.trace"));
@@ -75,13 +75,13 @@ namespace dummy.Tests
         [Test]
         public void Test_StructuralSecond()
         {
-            Aas.StructuralSecond instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalStructuralSecond());
+            Our.StructuralSecond instance = (
+                Our.Tests.CommonJsonization.LoadMaximalStructuralSecond());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "StructuralSecond",
                     "maximal.json.trace"));
@@ -90,13 +90,13 @@ namespace dummy.Tests
         [Test]
         public void Test_MixedAbstractDescendantOne()
         {
-            Aas.MixedAbstractDescendantOne instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantOne());
+            Our.MixedAbstractDescendantOne instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantOne());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "MixedAbstractDescendantOne",
                     "maximal.json.trace"));
@@ -105,13 +105,13 @@ namespace dummy.Tests
         [Test]
         public void Test_MixedAbstractDescendantTwo()
         {
-            Aas.MixedAbstractDescendantTwo instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantTwo());
+            Our.MixedAbstractDescendantTwo instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantTwo());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "MixedAbstractDescendantTwo",
                     "maximal.json.trace"));
@@ -120,13 +120,13 @@ namespace dummy.Tests
         [Test]
         public void Test_MixedConcreteWithDescendants()
         {
-            Aas.MixedConcreteWithDescendants instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants());
+            Our.MixedConcreteWithDescendants instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "MixedConcreteWithDescendants",
                     "maximal.json.trace"));
@@ -135,13 +135,13 @@ namespace dummy.Tests
         [Test]
         public void Test_MixedConcreteWithDescendantsChild()
         {
-            Aas.MixedConcreteWithDescendantsChild instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild());
+            Our.MixedConcreteWithDescendantsChild instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "MixedConcreteWithDescendantsChild",
                     "maximal.json.trace"));
@@ -150,13 +150,13 @@ namespace dummy.Tests
         [Test]
         public void Test_MixedConcreteLeaf()
         {
-            Aas.MixedConcreteLeaf instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteLeaf());
+            Our.MixedConcreteLeaf instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteLeaf());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "MixedConcreteLeaf",
                     "maximal.json.trace"));
@@ -165,13 +165,13 @@ namespace dummy.Tests
         [Test]
         public void Test_ModelTypedFirst()
         {
-            Aas.ModelTypedFirst instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalModelTypedFirst());
+            Our.ModelTypedFirst instance = (
+                Our.Tests.CommonJsonization.LoadMaximalModelTypedFirst());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "ModelTypedFirst",
                     "maximal.json.trace"));
@@ -180,13 +180,13 @@ namespace dummy.Tests
         [Test]
         public void Test_ModelTypedSecond()
         {
-            Aas.ModelTypedSecond instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalModelTypedSecond());
+            Our.ModelTypedSecond instance = (
+                Our.Tests.CommonJsonization.LoadMaximalModelTypedSecond());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "ModelTypedSecond",
                     "maximal.json.trace"));
@@ -195,13 +195,13 @@ namespace dummy.Tests
         [Test]
         public void Test_Something()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "DescendOnce",
                     "Something",
                     "maximal.json.trace"));

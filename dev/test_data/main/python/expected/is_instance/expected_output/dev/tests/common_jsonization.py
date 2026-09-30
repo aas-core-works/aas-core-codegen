@@ -21,9 +21,9 @@ else:
     from typing_extensions import Final
 
 
-import dummy.common as aas_common
-import dummy.jsonization as aas_jsonization
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.jsonization as our_jsonization
+import dummy.types as our_types
 
 
 class Difference:
@@ -34,20 +34,20 @@ class Difference:
 
     #: Path in the expected JSON-able value which is different from
     #: the obtained JSON-able value
-    path: Final[aas_jsonization.Path]
+    path: Final[our_jsonization.Path]
 
     def __init__(self, message: str) -> None:
         """Initialize with the given message and empty path."""
         self.message = message
-        self.path = aas_jsonization.Path()
+        self.path = our_jsonization.Path()
 
     def __str__(self) -> str:
         return f"#{self.path}: {self.message}"
 
 
 def check_equal(
-    expected: aas_jsonization.Jsonable,
-    got: aas_jsonization.Jsonable,
+    expected: our_jsonization.Jsonable,
+    got: our_jsonization.Jsonable,
 ) -> Iterator[Difference]:
     """
     Compare recursively two JSON-able values for equality.
@@ -74,7 +74,7 @@ def check_equal(
 
             for i, (expected_item, got_item) in enumerate(zip(expected, got)):
                 for difference in check_equal(expected_item, got_item):
-                    difference.path._prepend(aas_jsonization.IndexSegment(expected, i))
+                    difference.path._prepend(our_jsonization.IndexSegment(expected, i))
                     yield difference
 
     elif isinstance(expected, collections.abc.Mapping):
@@ -109,67 +109,67 @@ def check_equal(
 
                 for difference in check_equal(expected_value, got_value):
                     difference.path._prepend(
-                        aas_jsonization.PropertySegment(expected, key)
+                        our_jsonization.PropertySegment(expected, key)
                     )
                     yield difference
     else:
-        aas_common.assert_never(expected)
+        our_common.assert_never(expected)
 
 
 _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
     str,
-    Callable[[aas_jsonization.Jsonable], aas_types.Class]
+    Callable[[our_jsonization.Jsonable], our_types.Class]
 ] = {
     'AttributeOperand':
-        aas_jsonization.attribute_operand_from_jsonable,
+        our_jsonization.attribute_operand_from_jsonable,
     'GlobalAttribute':
-        aas_jsonization.global_attribute_from_jsonable,
+        our_jsonization.global_attribute_from_jsonable,
     'Leaf':
-        aas_jsonization.leaf_from_jsonable,
+        our_jsonization.leaf_from_jsonable,
     'LocalAttribute':
-        aas_jsonization.local_attribute_from_jsonable,
+        our_jsonization.local_attribute_from_jsonable,
     'NumberLiteral':
-        aas_jsonization.number_literal_from_jsonable,
+        our_jsonization.number_literal_from_jsonable,
     'OrderedContainer':
-        aas_jsonization.ordered_container_from_jsonable,
+        our_jsonization.ordered_container_from_jsonable,
     'Something':
-        aas_jsonization.something_from_jsonable,
+        our_jsonization.something_from_jsonable,
     'StringLiteral':
-        aas_jsonization.string_literal_from_jsonable,
+        our_jsonization.string_literal_from_jsonable,
     'UnorderedContainer':
-        aas_jsonization.unordered_container_from_jsonable
+        our_jsonization.unordered_container_from_jsonable
 }
 
 
 _MODEL_TYPE_TO_CLASS: Mapping[
     str,
-    Type[aas_types.Class]
+    Type[our_types.Class]
 ] = {
     'AttributeOperand':
-        aas_types.AttributeOperand,
+        our_types.AttributeOperand,
     'GlobalAttribute':
-        aas_types.GlobalAttribute,
+        our_types.GlobalAttribute,
     'Leaf':
-        aas_types.Leaf,
+        our_types.Leaf,
     'LocalAttribute':
-        aas_types.LocalAttribute,
+        our_types.LocalAttribute,
     'NumberLiteral':
-        aas_types.NumberLiteral,
+        our_types.NumberLiteral,
     'OrderedContainer':
-        aas_types.OrderedContainer,
+        our_types.OrderedContainer,
     'Something':
-        aas_types.Something,
+        our_types.Something,
     'StringLiteral':
-        aas_types.StringLiteral,
+        our_types.StringLiteral,
     'UnorderedContainer':
-        aas_types.UnorderedContainer
+        our_types.UnorderedContainer
 }
 
 
 def must_load(
     path: pathlib.Path,
     model_type: str
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Load an instance from ``path``.
 

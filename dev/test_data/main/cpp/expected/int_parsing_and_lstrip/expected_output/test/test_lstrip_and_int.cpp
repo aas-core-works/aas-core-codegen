@@ -27,11 +27,11 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test LStrip 0: '000123'.lstrip('0') gives '123'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"000123",
       L"0"
     )
@@ -41,7 +41,7 @@ TEST_CASE("Test LStrip 0: '000123'.lstrip('0') gives '123'") {
 
 TEST_CASE("Test LStrip 1: '+-+12'.lstrip('+-') gives '12'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"+-+12",
       L"+-"
     )
@@ -51,7 +51,7 @@ TEST_CASE("Test LStrip 1: '+-+12'.lstrip('+-') gives '12'") {
 
 TEST_CASE("Test LStrip 2: '0102'.lstrip('0') gives '102'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"0102",
       L"0"
     )
@@ -61,7 +61,7 @@ TEST_CASE("Test LStrip 2: '0102'.lstrip('0') gives '102'") {
 
 TEST_CASE("Test LStrip 3: ''.lstrip('0') gives ''") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"",
       L"0"
     )
@@ -71,7 +71,7 @@ TEST_CASE("Test LStrip 3: ''.lstrip('0') gives ''") {
 
 TEST_CASE("Test LStrip 4: '000'.lstrip('0') gives ''") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"000",
       L"0"
     )
@@ -81,7 +81,7 @@ TEST_CASE("Test LStrip 4: '000'.lstrip('0') gives ''") {
 
 TEST_CASE("Test LStrip 5: 'abc'.lstrip('') gives 'abc'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"abc",
       L""
     )
@@ -91,7 +91,7 @@ TEST_CASE("Test LStrip 5: 'abc'.lstrip('') gives 'abc'") {
 
 TEST_CASE("Test LStrip 6: 'abc'.lstrip('xyz') gives 'abc'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"abc",
       L"xyz"
     )
@@ -101,7 +101,7 @@ TEST_CASE("Test LStrip 6: 'abc'.lstrip('xyz') gives 'abc'") {
 
 TEST_CASE("Test LStrip 7: 'abc'.lstrip('cba') gives ''") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"abc",
       L"cba"
     )
@@ -111,7 +111,7 @@ TEST_CASE("Test LStrip 7: 'abc'.lstrip('cba') gives ''") {
 
 TEST_CASE("Test LStrip 8: '\303\251\303\251-x'.lstrip('-\303\251') gives 'x'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"\u00e9\u00e9-x",
       L"-\u00e9"
     )
@@ -121,7 +121,7 @@ TEST_CASE("Test LStrip 8: '\303\251\303\251-x'.lstrip('-\303\251') gives 'x'") {
 
 TEST_CASE("Test LStrip 9: '\360\237\230\200\360\237\230\200a\360\237\230\200'.lstrip('\360\237\230\200') gives 'a\360\237\230\200'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"\U0001f600\U0001f600a\U0001f600",
       L"\U0001f600"
     )
@@ -131,7 +131,7 @@ TEST_CASE("Test LStrip 9: '\360\237\230\200\360\237\230\200a\360\237\230\200'.ls
 
 TEST_CASE("Test LStrip 10: '\360\237\230\201x'.lstrip('\360\237\230\200') gives '\360\237\230\201x'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"\U0001f601x",
       L"\U0001f600"
     )
@@ -141,7 +141,7 @@ TEST_CASE("Test LStrip 10: '\360\237\230\201x'.lstrip('\360\237\230\200') gives 
 
 TEST_CASE("Test LStrip 11: 'a\360\237\230\200'.lstrip('a') gives '\360\237\230\200'") {
   REQUIRE(
-    aas::common::LStrip(
+    our::common::LStrip(
       L"a\U0001f600",
       L"a"
     )
@@ -151,189 +151,189 @@ TEST_CASE("Test LStrip 11: 'a\360\237\230\200'.lstrip('a') gives '\360\237\230\2
 
 TEST_CASE("Test ParseSafeInt 0: '0' gives 0") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"0")
+    our::common::ParseSafeInt(L"0")
     == INT64_C(0)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 1: '-0' gives 0") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"-0")
+    our::common::ParseSafeInt(L"-0")
     == INT64_C(0)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 2: '+7' gives 7") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"+7")
+    our::common::ParseSafeInt(L"+7")
     == INT64_C(7)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 3: '42' gives 42") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"42")
+    our::common::ParseSafeInt(L"42")
     == INT64_C(42)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 4: '-42' gives -42") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"-42")
+    our::common::ParseSafeInt(L"-42")
     == INT64_C(-42)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 5: '0007' gives 7") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"0007")
+    our::common::ParseSafeInt(L"0007")
     == INT64_C(7)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 6: '-0042' gives -42") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"-0042")
+    our::common::ParseSafeInt(L"-0042")
     == INT64_C(-42)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 7: '0000000000000000000000000000001' gives 1") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"0000000000000000000000000000001")
+    our::common::ParseSafeInt(L"0000000000000000000000000000001")
     == INT64_C(1)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 8: '9007199254740991' gives 9007199254740991") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"9007199254740991")
+    our::common::ParseSafeInt(L"9007199254740991")
     == INT64_C(9007199254740991)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 9: '-9007199254740991' gives -9007199254740991") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"-9007199254740991")
+    our::common::ParseSafeInt(L"-9007199254740991")
     == INT64_C(-9007199254740991)
   );
 }
 
 TEST_CASE("Test ParseSafeInt 10: '+0009007199254740991' gives 9007199254740991") {
   REQUIRE(
-    aas::common::ParseSafeInt(L"+0009007199254740991")
+    our::common::ParseSafeInt(L"+0009007199254740991")
     == INT64_C(9007199254740991)
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 0: ''") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L""),
+    our::common::ParseSafeInt(L""),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 1: '+'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"+"),
+    our::common::ParseSafeInt(L"+"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 2: '-'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"-"),
+    our::common::ParseSafeInt(L"-"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 3: '+-1'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"+-1"),
+    our::common::ParseSafeInt(L"+-1"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 4: ' 1'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L" 1"),
+    our::common::ParseSafeInt(L" 1"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 5: '1 '") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"1 "),
+    our::common::ParseSafeInt(L"1 "),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 6: '1_0'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"1_0"),
+    our::common::ParseSafeInt(L"1_0"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 7: '1.0'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"1.0"),
+    our::common::ParseSafeInt(L"1.0"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 8: '1e3'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"1e3"),
+    our::common::ParseSafeInt(L"1e3"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 9: '0x10'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"0x10"),
+    our::common::ParseSafeInt(L"0x10"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 10: '\331\245'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"\u0665"),
+    our::common::ParseSafeInt(L"\u0665"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 11: '\357\274\221'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"\uff11"),
+    our::common::ParseSafeInt(L"\uff11"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 12: '9007199254740992'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"9007199254740992"),
+    our::common::ParseSafeInt(L"9007199254740992"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 13: '-9007199254740992'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"-9007199254740992"),
+    our::common::ParseSafeInt(L"-9007199254740992"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 14: '9223372036854775807'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"9223372036854775807"),
+    our::common::ParseSafeInt(L"9223372036854775807"),
     std::invalid_argument
   );
 }
 
 TEST_CASE("Test ParseSafeInt on invalid 15: '999999999999999999999999999999'") {
   REQUIRE_THROWS_AS(
-    aas::common::ParseSafeInt(L"999999999999999999999999999999"),
+    our::common::ParseSafeInt(L"999999999999999999999999999999"),
     std::invalid_argument
   );
 }

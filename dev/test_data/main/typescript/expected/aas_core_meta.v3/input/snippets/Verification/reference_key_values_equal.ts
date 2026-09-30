@@ -8,8 +8,8 @@
  * @returns `true` if the key values are are equal
  */
 export function referenceKeyValuesEqual(
-  that: AasTypes.Reference,
-  other: AasTypes.Reference
+  that: OurTypes.Reference,
+  other: OurTypes.Reference
 ): boolean {
   if (that.keys.length != other.keys.length) {
     return false;

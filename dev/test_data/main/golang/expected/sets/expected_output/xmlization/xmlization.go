@@ -11,10 +11,10 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aasstringification "github.com/dummy-works/dummy/stringification"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourstringification "github.com/dummy-works/dummy/stringification"
+	ourtypes "github.com/dummy-works/dummy/types"
 	xmlcommon "github.com/dummy-works/dummy/internal/xmlcommon"
 )
 
@@ -96,10 +96,10 @@ func unexpectedItemElement(local string, expectedLocal string) error {
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -128,7 +128,7 @@ func readListOf[T any](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -241,7 +241,7 @@ func concludeProperty(
 	if valueErr != nil {
 		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: local},
+				&ourreporting.NameSegment{Name: local},
 			)
 		}
 		err = valueErr
@@ -299,7 +299,7 @@ func readSetOf[T comparable](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -311,7 +311,7 @@ func readSetOf[T comparable](
 				"Expected unique items in the set, but the item is a duplicate",
 			)
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: i},
+				&ourreporting.IndexSegment{Index: i},
 			)
 			err = deseriaErr
 			return
@@ -374,7 +374,7 @@ func readAtV_Kind(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (value aastypes.Kind,
+) (value ourtypes.Kind,
 	next xml.Token,
 	err error,
 ) {
@@ -414,7 +414,7 @@ func readAtV_Direction(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (value aastypes.Direction,
+) (value ourtypes.Direction,
 	next xml.Token,
 	err error,
 ) {
@@ -427,7 +427,7 @@ func readAtV_Direction(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.Kind].
+// [ourtypes.Kind].
 //
 // Any comment tokens are skipped.
 //
@@ -438,7 +438,7 @@ func readAtV_Direction(
 func readTextAs_Kind(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.Kind,
+) (value ourtypes.Kind,
 	next xml.Token,
 	err error,
 ) {
@@ -449,7 +449,7 @@ func readTextAs_Kind(
 	}
 
 	var ok bool
-	value, ok = aasstringification.KindFromString(text)
+	value, ok = ourstringification.KindFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -464,7 +464,7 @@ func readTextAs_Kind(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.Direction].
+// [ourtypes.Direction].
 //
 // Any comment tokens are skipped.
 //
@@ -475,7 +475,7 @@ func readTextAs_Kind(
 func readTextAs_Direction(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.Direction,
+) (value ourtypes.Direction,
 	next xml.Token,
 	err error,
 ) {
@@ -486,7 +486,7 @@ func readTextAs_Direction(
 	}
 
 	var ok bool
-	value, ok = aasstringification.DirectionFromString(text)
+	value, ok = ourstringification.DirectionFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -500,29 +500,29 @@ func readTextAs_Direction(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISomething]
+// De-serialize the instance of [ourtypes.ISomething]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISomething].
+// of [ourtypes.ISomething].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSomethingAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISomething,
+) (instance ourtypes.ISomething,
 	next xml.Token,
 	err error,
 ) {
 	var theText string
 	var theNumber int64
-	var theKind aastypes.Kind
+	var theKind ourtypes.Kind
 	var theTexts []string
 	var theNumbers []int64
-	var theKinds []aastypes.Kind
+	var theKinds []ourtypes.Kind
 	var theCodes []string
 	var theFlags []bool
 	var theOptionalTexts []string
-	var theOptionalKind *aastypes.Kind
+	var theOptionalKind *ourtypes.Kind
 
 	foundText := false
 	foundNumber := false
@@ -692,7 +692,7 @@ func readSomethingAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSomething(
+	instance = ourtypes.NewSomething(
 		theText,
 		theNumber,
 		theKind,
@@ -707,26 +707,26 @@ func readSomethingAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.ICollection]
+// De-serialize the instance of [ourtypes.ICollection]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ICollection].
+// of [ourtypes.ICollection].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readCollectionAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ICollection,
+) (instance ourtypes.ICollection,
 	next xml.Token,
 	err error,
 ) {
 	var theTexts map[string]struct{}
 	var theNumbers map[int64]struct{}
 	var theFlags map[bool]struct{}
-	var theDirections map[aastypes.Direction]struct{}
+	var theDirections map[ourtypes.Direction]struct{}
 	var theCodes map[string]struct{}
 	var theOptionalTexts map[string]struct{}
-	var theOptionalDirections map[aastypes.Direction]struct{}
+	var theOptionalDirections map[ourtypes.Direction]struct{}
 
 	foundTexts := false
 	foundNumbers := false
@@ -851,7 +851,7 @@ func readCollectionAsSequence(
 		return
 	}
 
-	instance = aastypes.NewCollection(
+	instance = ourtypes.NewCollection(
 		theTexts,
 		theNumbers,
 		theFlags,
@@ -863,7 +863,7 @@ func readCollectionAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -872,7 +872,7 @@ func readClassDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 	next xml.Token,
 	err error,
 ) {
@@ -892,12 +892,12 @@ func readClassDispatched(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 	decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {
+) (instance ourtypes.IClass, err error) {
 	var current xml.Token
 	current, err = xmlcommon.ReadNext(decoder, nil)
 	if err != nil {
@@ -1012,7 +1012,7 @@ func writeList[T any](
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
 				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			return
@@ -1030,7 +1030,7 @@ func writeList[T any](
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -1045,7 +1045,7 @@ func finishProperty(
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: getter},
+				&ourreporting.NameSegment{Name: getter},
 			)
 		}
 		return err
@@ -1063,13 +1063,13 @@ func finishProperty(
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 	encoder *xml.Encoder,
 	that T,
 ) error {
@@ -1135,7 +1135,7 @@ func writeAtV_long(
 // Do not flush.
 func writeAtV_Kind(
 	encoder *xml.Encoder,
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) error {
 	return xmlcommon.WriteElement(
 		encoder, "v", value, writeAsText_Kind,
@@ -1159,7 +1159,7 @@ func writeAtV_bool(
 // Do not flush.
 func writeAtV_Direction(
 	encoder *xml.Encoder,
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) error {
 	return xmlcommon.WriteElement(
 		encoder, "v", value, writeAsText_Direction,
@@ -1195,7 +1195,7 @@ func writeListOf_long(
 // Do not flush.
 func writeListOf_Kind(
 	encoder *xml.Encoder,
-	list []aastypes.Kind,
+	list []ourtypes.Kind,
 ) error {
 	return writeList(
 		encoder, list, writeAtV_Kind,
@@ -1219,7 +1219,7 @@ func writeListOf_bool(
 // Do not flush.
 func writeListOf_Direction(
 	encoder *xml.Encoder,
-	list []aastypes.Direction,
+	list []ourtypes.Direction,
 ) error {
 	return writeList(
 		encoder, list, writeAtV_Direction,
@@ -1227,15 +1227,15 @@ func writeListOf_Direction(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.Kind]
+// of [ourtypes.Kind]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_Kind(
 	encoder *xml.Encoder,
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) (err error) {
-	text, ok := aasstringification.KindToString(
+	text, ok := ourstringification.KindToString(
 		value,
 	)
 	if !ok {
@@ -1253,15 +1253,15 @@ func writeAsText_Kind(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.Direction]
+// of [ourtypes.Direction]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_Direction(
 	encoder *xml.Encoder,
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) (err error) {
-	text, ok := aasstringification.DirectionToString(
+	text, ok := ourstringification.DirectionToString(
 		value,
 	)
 	if !ok {
@@ -1279,7 +1279,7 @@ func writeAsText_Direction(
 }
 
 // Serialize the instance
-// of [aastypes.ISomething]
+// of [ourtypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1288,7 +1288,7 @@ func writeAsText_Direction(
 // Do not flush.
 func writeSomethingAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (err error) {
 	err = finishProperty(
 		"Text()",
@@ -1394,7 +1394,7 @@ func writeSomethingAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ICollection]
+// of [ourtypes.ICollection]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1403,14 +1403,14 @@ func writeSomethingAsSequence(
 // Do not flush.
 func writeCollectionAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ICollection,
+	that ourtypes.ICollection,
 ) (err error) {
 	err = finishProperty(
 		"Texts()",
 		xmlcommon.WriteElement(
 			encoder,
 			"texts",
-			aascommon.SortedKeys(that.Texts(), aascommon.LessOrdered[string]),
+			ourcommon.SortedKeys(that.Texts(), ourcommon.LessOrdered[string]),
 			writeListOf_string,
 		),
 	)
@@ -1423,7 +1423,7 @@ func writeCollectionAsSequence(
 		xmlcommon.WriteElement(
 			encoder,
 			"numbers",
-			aascommon.SortedKeys(that.Numbers(), aascommon.LessOrdered[int64]),
+			ourcommon.SortedKeys(that.Numbers(), ourcommon.LessOrdered[int64]),
 			writeListOf_long,
 		),
 	)
@@ -1436,7 +1436,7 @@ func writeCollectionAsSequence(
 		xmlcommon.WriteElement(
 			encoder,
 			"flags",
-			aascommon.SortedKeys(that.Flags(), aascommon.LessBool),
+			ourcommon.SortedKeys(that.Flags(), ourcommon.LessBool),
 			writeListOf_bool,
 		),
 	)
@@ -1449,9 +1449,9 @@ func writeCollectionAsSequence(
 		xmlcommon.WriteElement(
 			encoder,
 			"directions",
-			aascommon.SortedKeys(
+			ourcommon.SortedKeys(
 				that.Directions(),
-				aasstringification.LessByRankOfDirection,
+				ourstringification.LessByRankOfDirection,
 			),
 			writeListOf_Direction,
 		),
@@ -1465,7 +1465,7 @@ func writeCollectionAsSequence(
 		xmlcommon.WriteElement(
 			encoder,
 			"codes",
-			aascommon.SortedKeys(that.Codes(), aascommon.LessOrdered[string]),
+			ourcommon.SortedKeys(that.Codes(), ourcommon.LessOrdered[string]),
 			writeListOf_string,
 		),
 	)
@@ -1478,9 +1478,9 @@ func writeCollectionAsSequence(
 		writeOptionalSlice(
 			encoder,
 			"optionalTexts",
-			aascommon.SortedKeys(
+			ourcommon.SortedKeys(
 				that.OptionalTexts(),
-				aascommon.LessOrdered[string],
+				ourcommon.LessOrdered[string],
 			),
 			writeListOf_string,
 		),
@@ -1494,9 +1494,9 @@ func writeCollectionAsSequence(
 		writeOptionalSlice(
 			encoder,
 			"optionalDirections",
-			aascommon.SortedKeys(
+			ourcommon.SortedKeys(
 				that.OptionalDirections(),
-				aasstringification.LessByRankOfDirection,
+				ourstringification.LessByRankOfDirection,
 			),
 			writeListOf_Direction,
 		),
@@ -1516,24 +1516,24 @@ func writeCollectionAsSequence(
 // to [Namespace].
 func writeClass(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		err = writeClassElement(
 			encoder,
 			"something",
 			withNamespace,
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			writeSomethingAsSequence,
 		)
-	case aastypes.ModelTypeCollection:
+	case ourtypes.ModelTypeCollection:
 		err = writeClassElement(
 			encoder,
 			"collection",
 			withNamespace,
-			that.(aastypes.ICollection),
+			that.(ourtypes.ICollection),
 			writeCollectionAsSequence,
 		)
 	default:
@@ -1553,7 +1553,7 @@ func writeClass(
 // to [Namespace].
 func Marshal(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	err = writeClass(encoder, that, withNamespace)

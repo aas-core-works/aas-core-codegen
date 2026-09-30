@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestParentRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalChildA()
+	instance := ourtesting.MustLoadMinimalChildA()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal ChildA: %v",
@@ -23,7 +23,7 @@ func TestParentRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal ChildA>"
 
-	deserialized, deseriaErr := aasjsonization.ParentFromJsonable(
+	deserialized, deseriaErr := ourjsonization.ParentFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestParentRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -51,7 +51,7 @@ func TestParentRoundTripOKOverDescendant(t *testing.T) {
 func TestParentDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.ParentFromJsonable(
+	_, err := ourjsonization.ParentFromJsonable(
 		jsonable,
 	)
 
@@ -60,7 +60,7 @@ func TestParentDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

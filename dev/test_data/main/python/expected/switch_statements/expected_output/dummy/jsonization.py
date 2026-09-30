@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -33,9 +33,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -169,7 +169,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -179,7 +179,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -308,7 +308,7 @@ def _str_from_jsonable(
 
 def kind_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.Kind:
+) -> our_types.Kind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.Kind`.
@@ -322,7 +322,7 @@ def kind_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.kind_from_str(jsonable)
+    literal = our_stringification.kind_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -334,7 +334,7 @@ def kind_from_jsonable(
 
 def something_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Parse an instance of :py:class:`.types.Something` from the JSON-able
     structure :paramref:`jsonable`.
@@ -345,7 +345,7 @@ def something_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_kind: Optional[aas_types.Kind] = None
+    the_kind: Optional[our_types.Kind] = None
     the_text: Optional[str] = None
     the_name: Optional[str] = None
     the_number: Optional[int] = None
@@ -393,7 +393,7 @@ def something_from_jsonable(
             "The required property 'number' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_kind,
         the_text,
         the_name,
@@ -482,7 +482,7 @@ def _int_to_jsonable(
 
 
 def _something_to_jsonable(
-    that: aas_types.Something
+    that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -512,7 +512,7 @@ def _something_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -531,12 +531,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

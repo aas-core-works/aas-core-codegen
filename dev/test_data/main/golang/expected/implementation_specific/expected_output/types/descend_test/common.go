@@ -8,33 +8,33 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Trace the `instance` and compare the trace against the golden one from
-// the test data, or re-record the trace if [aastesting.RecordMode] is set.
+// the test data, or re-record the trace if [ourtesting.RecordMode] is set.
 //
-// If `onlyOnce`, trace the `instance` with [aastypes.DescendOnce]. Otherwise,
-// trace with [aastypes.Descend].
+// If `onlyOnce`, trace the `instance` with [ourtypes.DescendOnce]. Otherwise,
+// trace with [ourtypes.Descend].
 //
 // If we are comparing, and not recording, return the error message if
 // the expected and the obtained trace differ.
 func compareOrRerecordTrace(
-	instance aastypes.IClass,
+	instance ourtypes.IClass,
 	expectedPath string,
 	onlyOnce bool,
 ) (message *string) {
-	lines := []string{aastesting.TraceMark(instance)}
+	lines := []string{ourtesting.TraceMark(instance)}
 
 	if onlyOnce {
-		instance.DescendOnce(func(descendant aastypes.IClass) (abort bool) {
-			lines = append(lines, aastesting.TraceMark(descendant))
+		instance.DescendOnce(func(descendant ourtypes.IClass) (abort bool) {
+			lines = append(lines, ourtesting.TraceMark(descendant))
 			return
 		})
 	} else {
-		instance.Descend(func(descendant aastypes.IClass) (abort bool) {
-			lines = append(lines, aastesting.TraceMark(descendant))
+		instance.Descend(func(descendant ourtypes.IClass) (abort bool) {
+			lines = append(lines, ourtesting.TraceMark(descendant))
 			return
 		})
 	}
@@ -44,7 +44,7 @@ func compareOrRerecordTrace(
 	// Add a new line for POSIX systems.
 	got += "\n"
 
-	if aastesting.RecordMode {
+	if ourtesting.RecordMode {
 		parent := filepath.Dir(expectedPath)
 		err := os.MkdirAll(parent, os.ModePerm)
 		if err != nil {

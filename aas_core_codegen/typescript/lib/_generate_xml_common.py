@@ -49,7 +49,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
  */
 export function readNextOpenTagInNoNamespace(
 {I}cursor: XmlCursor
-): AasCommon.Either<OpenTagToken, DeserializationError> {{
+): OurCommon.Either<OpenTagToken, DeserializationError> {{
 {I}return readNextOpenTagInNamespace(cursor, "");
 }}"""
             ),
@@ -69,7 +69,7 @@ export function parseElementContentInNoNamespace<T>(
 {I}cursor: XmlCursor,
 {I}localName: string,
 {I}parseContent: ContentParser<T>
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}return parseElementContentInNamespace(cursor, localName, parseContent, "");
 }}"""
             ),
@@ -90,7 +90,7 @@ export function parseNamedElementInNoNamespace<T>(
 {I}cursor: XmlCursor,
 {I}expectedLocalName: string,
 {I}parseContent: ContentParser<T>
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}return parseNamedElementInNamespace(
 {II}cursor, expectedLocalName, parseContent, ""
 {I});
@@ -123,7 +123,7 @@ export function parseNamedElementInNoNamespace<T>(
 export function parseSet<T>(
 {I}cursor: XmlCursor,
 {I}parseItem: ContentParser<T>
-): AasCommon.Either<Set<T>, DeserializationError> {{
+): OurCommon.Either<Set<T>, DeserializationError> {{
 {I}const items = new Set<T>();
 {I}let itemIndex = 0;
 
@@ -145,7 +145,7 @@ export function parseSet<T>(
 {II}const itemOrError = parseItem(cursor);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(itemIndex));
-{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{III}return new OurCommon.Either<Set<T>, DeserializationError>(
 {IIII}null,
 {IIII}itemOrError.error
 {III});
@@ -157,7 +157,7 @@ export function parseSet<T>(
 {IIII}"Expected unique items in the set, but the item is a duplicate"
 {III});
 {III}error.path.prepend(new IndexSegment(itemIndex));
-{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{III}return new OurCommon.Either<Set<T>, DeserializationError>(
 {IIII}null,
 {IIII}error
 {III});
@@ -168,7 +168,7 @@ export function parseSet<T>(
 {II}cursor.skipIgnorable();
 {I}}}
 
-{I}return new AasCommon.Either<Set<T>, DeserializationError>(items, null);
+{I}return new OurCommon.Either<Set<T>, DeserializationError>(items, null);
 }}"""
             )
         ]
@@ -204,7 +204,7 @@ export function parseSet<T>(
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasCommon from "./common";
+import * as OurCommon from "./common";
 
 import {
   CdataToken,
@@ -447,8 +447,8 @@ export class SerializationError extends Error {{
             f"""\
 export function newDeserializationError<T>(
 {I}message: string
-): AasCommon.Either<T, DeserializationError> {{
-{I}return new AasCommon.Either<T, DeserializationError>(
+): OurCommon.Either<T, DeserializationError> {{
+{I}return new OurCommon.Either<T, DeserializationError>(
 {II}null,
 {II}new DeserializationError(message)
 {I});
@@ -469,7 +469,7 @@ export function newDeserializationError<T>(
  */
 export type ContentParser<T> = (
 {I}cursor: XmlCursor
-) => AasCommon.Either<T, DeserializationError>;
+) => OurCommon.Either<T, DeserializationError>;
 
 export function currentTokenKind(cursor: XmlCursor): string {{
 {I}const token = cursor.current();
@@ -646,14 +646,14 @@ function consumeCloseTagInNamespace(
  */
 export function readNextOpenTag(
 {I}cursor: XmlCursor
-): AasCommon.Either<OpenTagToken, DeserializationError> {{
+): OurCommon.Either<OpenTagToken, DeserializationError> {{
 {I}return readNextOpenTagInNamespace(cursor, NAMESPACE);
 }}
 
 function readNextOpenTagInNamespace(
 {I}cursor: XmlCursor,
 {I}expectedNamespace: string
-): AasCommon.Either<OpenTagToken, DeserializationError> {{
+): OurCommon.Either<OpenTagToken, DeserializationError> {{
 {I}cursor.skipIgnorable();
 {I}const token = cursor.current();
 {I}if (token === null) {{
@@ -671,13 +671,13 @@ function readNextOpenTagInNamespace(
 {II}token, expectedNamespace
 {I});
 {I}if (namespaceError !== null) {{
-{II}return new AasCommon.Either<OpenTagToken, DeserializationError>(
+{II}return new OurCommon.Either<OpenTagToken, DeserializationError>(
 {III}null,
 {III}namespaceError
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<OpenTagToken, DeserializationError>(token, null);
+{I}return new OurCommon.Either<OpenTagToken, DeserializationError>(token, null);
 }}
 
 /**
@@ -704,7 +704,7 @@ export function parseElementContent<T>(
 {I}cursor: XmlCursor,
 {I}localName: string,
 {I}parseContent: ContentParser<T>
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}return parseElementContentInNamespace(
 {II}cursor, localName, parseContent, NAMESPACE
 {I});
@@ -715,7 +715,7 @@ function parseElementContentInNamespace<T>(
 {I}localName: string,
 {I}parseContent: ContentParser<T>,
 {I}expectedNamespace: string
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}const parsedOrError = parseContent(cursor);
 {I}if (parsedOrError.error !== null) {{
 {II}return parsedOrError;
@@ -725,7 +725,7 @@ function parseElementContentInNamespace<T>(
 {II}cursor, localName, expectedNamespace
 {I});
 {I}if (closeError !== null) {{
-{II}return new AasCommon.Either<T, DeserializationError>(null, closeError);
+{II}return new OurCommon.Either<T, DeserializationError>(null, closeError);
 {I}}}
 
 {I}return parsedOrError;
@@ -752,7 +752,7 @@ export function parseNamedElement<T>(
 {I}cursor: XmlCursor,
 {I}expectedLocalName: string,
 {I}parseContent: ContentParser<T>
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}return parseNamedElementInNamespace(
 {II}cursor, expectedLocalName, parseContent, NAMESPACE
 {I});
@@ -763,12 +763,12 @@ function parseNamedElementInNamespace<T>(
 {I}expectedLocalName: string,
 {I}parseContent: ContentParser<T>,
 {I}expectedNamespace: string
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}const startTagOrError = readNextOpenTagInNamespace(
 {II}cursor, expectedNamespace
 {I});
 {I}if (startTagOrError.error !== null) {{
-{II}return new AasCommon.Either<T, DeserializationError>(
+{II}return new OurCommon.Either<T, DeserializationError>(
 {III}null,
 {III}startTagOrError.error
 {II});
@@ -805,7 +805,7 @@ function parseNamedElementInNamespace<T>(
 export function parseList<T>(
 {I}cursor: XmlCursor,
 {I}parseItem: ContentParser<T>
-): AasCommon.Either<Array<T>, DeserializationError> {{
+): OurCommon.Either<Array<T>, DeserializationError> {{
 {I}const items = new Array<T>();
 {I}let itemIndex = 0;
 
@@ -827,7 +827,7 @@ export function parseList<T>(
 {II}const itemOrError = parseItem(cursor);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(itemIndex));
-{III}return new AasCommon.Either<Array<T>, DeserializationError>(
+{III}return new OurCommon.Either<Array<T>, DeserializationError>(
 {IIII}null,
 {IIII}itemOrError.error
 {III});
@@ -838,7 +838,7 @@ export function parseList<T>(
 {II}cursor.skipIgnorable();
 {I}}}
 
-{I}return new AasCommon.Either<Array<T>, DeserializationError>(items, null);
+{I}return new OurCommon.Either<Array<T>, DeserializationError>(items, null);
 }}
 
 /**
@@ -892,7 +892,7 @@ export class XmlCursor {{
 
 export function tokenizeXml(
 {I}xml: string
-): AasCommon.Either<Array<XmlAnyToken>, DeserializationError> {{
+): OurCommon.Either<Array<XmlAnyToken>, DeserializationError> {{
 {I}const parser = new XmlSaxParser({{ allowDoctype: false, xmlns: true }});
 {I}const tokens = new Array<XmlAnyToken>();
 
@@ -911,7 +911,7 @@ export function tokenizeXml(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<Array<XmlAnyToken>, DeserializationError>(
+{I}return new OurCommon.Either<Array<XmlAnyToken>, DeserializationError>(
 {II}tokens,
 {II}null
 {I});
@@ -919,7 +919,7 @@ export function tokenizeXml(
 
 export function readRequiredRootOpenTag(
 {I}cursor: XmlCursor
-): AasCommon.Either<OpenTagToken, DeserializationError> {{
+): OurCommon.Either<OpenTagToken, DeserializationError> {{
 {I}cursor.skipIgnorable();
 
 {I}const token = cursor.current();
@@ -937,7 +937,7 @@ export function readRequiredRootOpenTag(
 
 {I}const namespaceError = checkExpectedOpenTagNamespace(token, NAMESPACE);
 {I}if (namespaceError !== null) {{
-{II}return new AasCommon.Either<OpenTagToken, DeserializationError>(
+{II}return new OurCommon.Either<OpenTagToken, DeserializationError>(
 {III}null,
 {III}namespaceError
 {II});
@@ -945,7 +945,7 @@ export function readRequiredRootOpenTag(
 
 {I}cursor.advance();
 
-{I}return new AasCommon.Either<OpenTagToken, DeserializationError>(
+{I}return new OurCommon.Either<OpenTagToken, DeserializationError>(
 {II}token,
 {II}null
 {I});

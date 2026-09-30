@@ -141,12 +141,12 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         """\
 import * as path from "path";
 
-import * as AasJsonization from "../src/jsonization";
+import * as OurJsonization from "../src/jsonization";
 
 import * as TestCommon from "./common";"""
         if helpers_needed
         else """\
-import * as AasJsonization from "../src/jsonization";"""
+import * as OurJsonization from "../src/jsonization";"""
     )
 
     blocks = [
@@ -167,12 +167,12 @@ import * as AasJsonization from "../src/jsonization";"""
 function readExpectedJson(
     classJsonName: string,
     fileName: "minimal.json" | "maximal.json"
-): AasJsonization.JsonValue {
+): OurJsonization.JsonValue {
   const pth = path.join(TestCommon.TEST_DATA_DIR, "Json", "Expected", classJsonName, fileName);
   return TestCommon.readJsonFromFileSync(pth);
 }
 
-function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.JsonObject {
+function mustBeJsonObject(jsonable: OurJsonization.JsonValue): OurJsonization.JsonObject {
   if (
     typeof jsonable !== "object" ||
     jsonable === null ||
@@ -181,7 +181,7 @@ function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.Js
     throw new Error(`Expected a JSON object, but got: ${JSON.stringify(jsonable)}`);
   }
 
-  return <AasJsonization.JsonObject>jsonable;
+  return <OurJsonization.JsonObject>jsonable;
 }"""
             )
         )
@@ -198,7 +198,7 @@ function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.Js
 test("{typescript_naming.class_name(first_cls.name)} deserialization fails on non-object", () => {{
 {I}const jsonable = "This is not a JSON object.";
 
-{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{I}const instanceOrError = OurJsonization.{deserialization_function}(
 {I}{I}jsonable
 {I});
 
@@ -231,7 +231,7 @@ test("{typescript_naming.class_name(required_cls.name)} deserialization fails wi
 {I}const jsonObject = {{ ...mustBeJsonObject(jsonable) }};
 {I}delete jsonObject[{required_property_name_literal}];
 
-{I}const instanceOrError = AasJsonization.{required_deserialization_function}(
+{I}const instanceOrError = OurJsonization.{required_deserialization_function}(
 {I}{I}jsonObject
 {I});
 
@@ -264,7 +264,7 @@ test("{typescript_naming.class_name(mismatch_cls.name)} deserialization fails wi
 {I}const jsonObject = {{ ...mustBeJsonObject(jsonable) }};
 {I}jsonObject[{mismatch_property_name_literal}] = {{ definitely: "unexpected-object" }};
 
-{I}const instanceOrError = AasJsonization.{mismatch_deserialization_function}(
+{I}const instanceOrError = OurJsonization.{mismatch_deserialization_function}(
 {I}{I}jsonObject
 {I});
 
@@ -308,11 +308,11 @@ test("{typescript_naming.class_name(nested_cls.name)} deserialization fails with
 {I}{I}throw new Error("Expected nested class JSON object to be present in maximal example.");
 {I}}}
 
-{I}const nestedObject = {{ ...<AasJsonization.JsonObject>nestedValue }};
+{I}const nestedObject = {{ ...<OurJsonization.JsonObject>nestedValue }};
 {I}nestedObject[{model_type_property_name_literal}] = "DefinitelyNotAModelType";
 {I}jsonObject[{nested_property_name_literal}] = nestedObject;
 
-{I}const instanceOrError = AasJsonization.{nested_deserialization_function}(
+{I}const instanceOrError = OurJsonization.{nested_deserialization_function}(
 {I}{I}jsonObject
 {I});
 

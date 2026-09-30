@@ -47,7 +47,7 @@ def _generate_model_type_from_string(
                 f"""\
 [
 {I}{json_model_type_literal},
-{I}AasTypes.{model_type_enum}.{model_type_literal}
+{I}OurTypes.{model_type_enum}.{model_type_literal}
 ]"""
             )
         )
@@ -60,7 +60,7 @@ def _generate_model_type_from_string(
     return [
         Stripped(
             f"""\
-const {map_name} = new Map<string, AasTypes.{model_type_enum}>([
+const {map_name} = new Map<string, OurTypes.{model_type_enum}>([
 {I}{indent_but_first_line(keys_values_joined, I)}
 ]);"""
         ),
@@ -74,7 +74,7 @@ const {map_name} = new Map<string, AasTypes.{model_type_enum}>([
  */
 export function {from_string}(
 {I}text: string
-): AasTypes.{model_type_enum} | null {{
+): OurTypes.{model_type_enum} | null {{
 {I}const result = {map_name}.get(text);
 {I}return result !== undefined ? result : null;
 }}"""
@@ -137,7 +137,7 @@ const {array_name}: readonly string[] = [
  * if `value` valid, and `null` otherwise
  */
 export function {to_string}(
-{I}value: AasTypes.{model_type_enum}
+{I}value: OurTypes.{model_type_enum}
 ): string | null {{
 {I}const result = {array_name}[value];
 {I}return result !== undefined ? result : null;
@@ -155,7 +155,7 @@ export function {to_string}(
  * if the `value` is invalid
  */
 export function {must_to_string}(
-{I}value: AasTypes.{model_type_enum}
+{I}value: OurTypes.{model_type_enum}
 ): string {{
 {I}const result = {array_name}[value];
 {I}if (result === undefined) {{
@@ -182,7 +182,7 @@ def _generate_enum_from_string(enumeration: intermediate.Enumeration) -> Strippe
         literal_name = typescript_naming.enum_literal_name(literal.name)
         literal_value = typescript_common.string_literal(literal.value)
 
-        items.append(f"[{literal_value}, AasTypes.{name}.{literal_name}]")
+        items.append(f"[{literal_value}, OurTypes.{name}.{literal_name}]")
 
     from_str_map_name = typescript_naming.constant_name(
         Identifier(f"{enumeration.name}_from_string")
@@ -193,7 +193,7 @@ def _generate_enum_from_string(enumeration: intermediate.Enumeration) -> Strippe
     blocks.append(
         Stripped(
             f"""\
-const {from_str_map_name} = new Map<string, AasTypes.{name}>([
+const {from_str_map_name} = new Map<string, OurTypes.{name}>([
 {I}{indent_but_first_line(items_joined, I)}
 ]);"""
         )
@@ -218,7 +218,7 @@ const {from_str_map_name} = new Map<string, AasTypes.{name}>([
  */
 export function {from_str_name}(
 {I}text: string
-): AasTypes.{name} | null {{
+): OurTypes.{name} | null {{
 {I}const result = {from_str_map_name}.get(text);
 {I}return result !== undefined ? result : null;
 }}"""
@@ -292,7 +292,7 @@ const {to_str_array_name}: readonly string[] = [
  * @returns string representation of {{@link types!{name}}}, if `value` valid, and `null` otherwise
  */
 export function {to_str_name}(
-{I}value: AasTypes.{name}
+{I}value: OurTypes.{name}
 ): string | null {{
 {I}const result = {to_str_array_name}[value];
 {I}return result !== undefined ? result : null;
@@ -317,7 +317,7 @@ export function {to_str_name}(
  * if the `value` is invalid
  */
 export function {must_to_str_name}(
-{I}value: AasTypes.{name}
+{I}value: OurTypes.{name}
 ): string {{
 {I}const result = {to_str_array_name}[value];
 {I}if (result === undefined) {{
@@ -357,7 +357,7 @@ def _generate_rank_and_compare(enumeration: intermediate.Enumeration) -> Strippe
     ):
         literal_name = typescript_naming.enum_literal_name(literal.name)
         cases.append(
-            f"case AasTypes.{name}.{literal_name}:\n"
+            f"case OurTypes.{name}.{literal_name}:\n"
             f"{I}return {rank};  // {typescript_common.string_literal(literal.value)}"
         )
 
@@ -372,7 +372,7 @@ def _generate_rank_and_compare(enumeration: intermediate.Enumeration) -> Strippe
  * @returns rank of `that`, or the number of the literals if `that` is invalid
  */
 export function {rank_name}(
-{I}that: AasTypes.{name}
+{I}that: OurTypes.{name}
 ): number {{
 {I}switch (that) {{
 {II}{indent_but_first_line(cases_joined, II)}
@@ -390,8 +390,8 @@ export function {rank_name}(
  * after `other`
  */
 export function {compare_name}(
-{I}that: AasTypes.{name},
-{I}other: AasTypes.{name}
+{I}that: OurTypes.{name},
+{I}other: OurTypes.{name}
 ): number {{
 {I}return {rank_name}(that) - {rank_name}(other);
 }}"""
@@ -418,7 +418,7 @@ def generate(
  */"""
         ),
         typescript_common.WARNING,
-        Stripped('import * as AasTypes from "./types";'),
+        Stripped('import * as OurTypes from "./types";'),
         *_generate_model_type_from_string(symbol_table=symbol_table),
         *_generate_model_type_to_string(symbol_table=symbol_table),
     ]

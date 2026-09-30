@@ -47,20 +47,20 @@ def generate(
 [Test]
 public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_csharp}()
 {{
-{I}var instance = Aas.Tests.CommonJsonization.LoadMaximal{implementer_cls_name_csharp}();
+{I}var instance = Our.Tests.CommonJsonization.LoadMaximal{implementer_cls_name_csharp}();
 
-{I}var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+{I}var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-{I}var anotherInstance = Aas.Jsonization.Deserialize.{interface_name_csharp}From(
+{I}var anotherInstance = Our.Jsonization.Deserialize.{interface_name_csharp}From(
 {II}jsonObject);
 
-{I}var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+{I}var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
 {II}anotherInstance);
 
-{I}Aas.Tests.CommonJson.CheckJsonNodesEqual(
+{I}Our.Tests.CommonJson.CheckJsonNodesEqual(
 {II}jsonObject,
 {II}anotherJsonObject,
-{II}out Aas.Reporting.Error? error);
+{II}out Our.Reporting.Error? error);
 
 {I}if (error != null)
 {I}{{
@@ -80,7 +80,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

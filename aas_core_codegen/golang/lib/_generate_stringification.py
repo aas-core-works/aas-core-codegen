@@ -45,7 +45,7 @@ def _generate_model_type_from_string(
             aas_core_codegen.naming.json_model_type(cls.name)
         )
 
-        items.append(f"{literal_value}: aastypes.{literal_name}")
+        items.append(f"{literal_value}: ourtypes.{literal_name}")
 
     from_str_map_name = golang_naming.private_constant_name(
         Identifier("model_type_from_string_map")
@@ -58,7 +58,7 @@ def _generate_model_type_from_string(
     blocks.append(
         Stripped(
             f"""\
-var {from_str_map_name} = map[string]aastypes.{name} {{
+var {from_str_map_name} = map[string]ourtypes.{name} {{
 {I}{indent_but_first_line(items_joined, I)}
 }}"""
         )
@@ -72,12 +72,12 @@ var {from_str_map_name} = map[string]aastypes.{name} {{
     blocks.append(
         Stripped(
             f"""\
-// Parse `text` as a string representation of [aastypes.{name}].
+// Parse `text` as a string representation of [ourtypes.{name}].
 //
 // If not ok, the literal result is undefined.
 func {from_str_name}(
 {I}text string,
-) (literal aastypes.{name}, ok bool) {{
+) (literal ourtypes.{name}, ok bool) {{
 {I}literal, ok = {from_str_map_name}[text]
 {I}return
 }}"""
@@ -139,12 +139,12 @@ var {to_str_array_name} = [...]string {{
     blocks.append(
         Stripped(
             f"""\
-// Translate `value` from [aastypes.{name}] to a string.
+// Translate `value` from [ourtypes.{name}] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func {to_str_name}(
-{I}value aastypes.{name},
+{I}value ourtypes.{name},
 ) (result string, ok bool) {{
 {I}i := int(value)
 {I}ok =
@@ -167,11 +167,11 @@ func {to_str_name}(
     blocks.append(
         Stripped(
             f"""\
-// Translate the `value` from [aastypes.{name}] to a string.
+// Translate the `value` from [ourtypes.{name}] to a string.
 //
 // Panic if the given value is invalid.
 func {must_to_str_name}(
-{I}value aastypes.{name},
+{I}value ourtypes.{name},
 ) string {{
 {I}result, ok := {to_str_name}(value)
 {I}if !ok {{
@@ -205,7 +205,7 @@ def _generate_enum_from_string(enumeration: intermediate.Enumeration) -> Strippe
         literal_name = golang_naming.enum_literal_name(enumeration.name, literal.name)
         literal_value = golang_common.string_literal(literal.value)
 
-        items.append(f"{literal_value}: aastypes.{literal_name}")
+        items.append(f"{literal_value}: ourtypes.{literal_name}")
 
     from_str_map_name = golang_naming.private_constant_name(
         Identifier(f"{enumeration.name}_from_string_map")
@@ -216,7 +216,7 @@ def _generate_enum_from_string(enumeration: intermediate.Enumeration) -> Strippe
     blocks.append(
         Stripped(
             f"""\
-var {from_str_map_name} = map[string]aastypes.{name} {{
+var {from_str_map_name} = map[string]ourtypes.{name} {{
 {I}{indent_but_first_line(items_joined, I)}
 }}"""
         )
@@ -232,12 +232,12 @@ var {from_str_map_name} = map[string]aastypes.{name} {{
     blocks.append(
         Stripped(
             f"""\
-// Parse `text` as a string representation of [aastypes.{name}].
+// Parse `text` as a string representation of [ourtypes.{name}].
 //
 // If not ok, the literal result is undefined.
 func {from_str_name}(
 {I}text string,
-) (literal aastypes.{name}, ok bool) {{
+) (literal ourtypes.{name}, ok bool) {{
 {I}literal, ok = {from_str_map_name}[text]
 {I}return
 }}"""
@@ -291,12 +291,12 @@ var {to_str_array_name} = [...]string {{
     blocks.append(
         Stripped(
             f"""\
-// Translate `value` from [aastypes.{name}] to a string.
+// Translate `value` from [ourtypes.{name}] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func {to_str_name}(
-{I}value aastypes.{name},
+{I}value ourtypes.{name},
 ) (result string, ok bool) {{
 {I}i := int(value)
 {I}ok =
@@ -319,11 +319,11 @@ func {to_str_name}(
     blocks.append(
         Stripped(
             f"""\
-// Translate the `value` from [aastypes.{name}] to a string.
+// Translate the `value` from [ourtypes.{name}] to a string.
 //
 // Panic if the given value is invalid.
 func {must_to_str_name}(
-{I}value aastypes.{name},
+{I}value ourtypes.{name},
 ) string {{
 {I}result, ok := {to_str_name}(value)
 {I}if !ok {{
@@ -356,7 +356,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, repo_url: Stripped
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code for string de/serialization of enumerations."""
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
         Stripped(
@@ -369,7 +369,7 @@ package stringification"""
             f"""\
 import (
 {I}"fmt"
-{I}aastypes {aastypes_url_literal}
+{I}ourtypes {ourtypes_url_literal}
 )"""
         ),
         _generate_model_type_from_string(symbol_table=symbol_table),
@@ -409,7 +409,7 @@ import (
                 case_blocks.append(
                     Stripped(
                         f"""\
-case aastypes.{literal_name}:
+case ourtypes.{literal_name}:
 {I}return {rank} // {comment}"""
                     )
                 )
@@ -421,9 +421,9 @@ case aastypes.{literal_name}:
                     f"""\
 // Rank `that` by the code points of its string representation.
 //
-// We serialize the sets of [aastypes.{name}] in this order, which is the same
+// We serialize the sets of [ourtypes.{name}] in this order, which is the same
 // in all the SDKs. An invalid literal is ranked last.
-func {rank_name}(that aastypes.{name}) int {{
+func {rank_name}(that ourtypes.{name}) int {{
 {I}switch that {{
 {I}{indent_but_first_line(case_blocks_joined, I)}
 {I}}}
@@ -438,8 +438,8 @@ func {rank_name}(that aastypes.{name}) int {{
 // Check whether `that` comes before `other` in the order of their string
 // representations, see [{rank_name}].
 func {less_name}(
-{I}that aastypes.{name},
-{I}other aastypes.{name},
+{I}that ourtypes.{name},
+{I}other ourtypes.{name},
 ) bool {{
 {I}return {rank_name}(that) < {rank_name}(other)
 }}"""

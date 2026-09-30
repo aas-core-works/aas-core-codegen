@@ -35,8 +35,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasXmlization from "../src/xmlization";
-import * as AasTypes from "../src/types";
+import * as OurXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
 
 import * as TestCommonXmlization from "./commonXmlization";"""
         ),
@@ -84,11 +84,11 @@ import * as TestCommonXmlization from "./commonXmlization";"""
 test("{enum_name_typescript} XML round-trip OK", () => {{
 {I}const instance = TestCommonXmlization.{load_maximal_name}();
 
-{I}const xmlText = AasXmlization.toXmlString(instance);
-{I}const anotherOrError = AasXmlization.fromXmlString(xmlText);
+{I}const xmlText = OurXmlization.toXmlString(instance);
+{I}const anotherOrError = OurXmlization.fromXmlString(xmlText);
 {I}expect(anotherOrError.error).toBeNull();
 
-{I}const casted = AasTypes.{as_function}(anotherOrError.mustValue());
+{I}const casted = OurTypes.{as_function}(anotherOrError.mustValue());
 {I}expect(casted).not.toBeNull();
 {I}expect(casted.{prop_name_typescript}).toStrictEqual(
 {II}instance.{prop_name_typescript}
@@ -106,7 +106,7 @@ test("{enum_name_typescript} XML round-trip OK", () => {{
                     f"""\
 test("{enum_name_typescript} XML deserializes {literal_name_typescript} OK", () => {{
 {I}const instance = TestCommonXmlization.{load_maximal_name}();
-{I}const xmlText = AasXmlization.toXmlString(instance);
+{I}const xmlText = OurXmlization.toXmlString(instance);
 
 {I}const regex = new RegExp(
 {II}`(<${{{prop_xml_name_literal}}}>)([^<]*)(</${{{prop_xml_name_literal}}}>)`
@@ -116,13 +116,13 @@ test("{enum_name_typescript} XML deserializes {literal_name_typescript} OK", () 
 {II}`$1${{{literal_value_literal}}}$3`
 {I});
 
-{I}const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+{I}const anotherOrError = OurXmlization.fromXmlString(adaptedXmlText);
 {I}expect(anotherOrError.error).toBeNull();
 
-{I}const casted = AasTypes.{as_function}(anotherOrError.mustValue());
+{I}const casted = OurTypes.{as_function}(anotherOrError.mustValue());
 {I}expect(casted).not.toBeNull();
 {I}expect(casted.{prop_name_typescript}).toStrictEqual(
-{II}AasTypes.{enum_name_typescript}.{literal_name_typescript}
+{II}OurTypes.{enum_name_typescript}.{literal_name_typescript}
 {I});
 }});"""
                 )
@@ -142,7 +142,7 @@ test("{enum_name_typescript} XML deserializes {literal_name_typescript} OK", () 
                 f"""\
 test("{enum_name_typescript} XML deserialization fail", () => {{
 {I}const instance = TestCommonXmlization.{load_maximal_name}();
-{I}const xmlText = AasXmlization.toXmlString(instance);
+{I}const xmlText = OurXmlization.toXmlString(instance);
 
 {I}const regex = new RegExp(
 {II}`(<${{{prop_xml_name_literal}}}>)([^<]*)(</${{{prop_xml_name_literal}}}>)`
@@ -154,7 +154,7 @@ test("{enum_name_typescript} XML deserialization fail", () => {{
 
 {I}expect(brokenXmlText).not.toStrictEqual(xmlText);
 
-{I}const anotherOrError = AasXmlization.fromXmlString(brokenXmlText);
+{I}const anotherOrError = OurXmlization.fromXmlString(brokenXmlText);
 {I}expect(anotherOrError.error).not.toBeNull();
 }});"""
             )

@@ -9,16 +9,16 @@ import (
 	"math"
 	"sort"
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Determine the path to the first recorded example of `modelType`.
 func mustFirstExpectedPath(t *testing.T, modelType string) string {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			modelType,
@@ -41,10 +41,10 @@ func mustFirstExpectedPath(t *testing.T, modelType string) string {
 // is reported at `expectedPath`.
 func assertSerializationFailsAt(
 	t *testing.T,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	expectedPath string,
 ) {
-	_, err := aasjsonization.ToJsonable(that)
+	_, err := ourjsonization.ToJsonable(that)
 
 	if err == nil {
 		t.Fatalf(
@@ -54,7 +54,7 @@ func assertSerializationFailsAt(
 		return
 	}
 
-	seriaErr, ok := err.(*aasjsonization.SerializationError)
+	seriaErr, ok := err.(*ourjsonization.SerializationError)
 	if !ok {
 		t.Fatalf(
 			"Expected a *SerializationError, but got %T: %v",
@@ -73,9 +73,9 @@ func assertSerializationFailsAt(
 }
 
 func TestLeafRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Leaf",
@@ -85,11 +85,11 @@ func TestLeafRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.LeafFromJsonable(
+		deserialized, deseriaErr := ourjsonization.LeafFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -97,7 +97,7 @@ func TestLeafRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -117,7 +117,7 @@ func TestLeafRoundTripOK(t *testing.T) {
 
 func TestLeafDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -136,35 +136,35 @@ func TestLeafDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.LeafFromJsonable(
+			_, deseriaErr := ourjsonization.LeafFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -178,9 +178,9 @@ func TestLeafDeserializationFail(t *testing.T) {
 }
 
 func TestOrderedContainerRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"OrderedContainer",
@@ -190,11 +190,11 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.OrderedContainerFromJsonable(
+		deserialized, deseriaErr := ourjsonization.OrderedContainerFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -202,7 +202,7 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -222,7 +222,7 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 
 func TestOrderedContainerDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -241,35 +241,35 @@ func TestOrderedContainerDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.OrderedContainerFromJsonable(
+			_, deseriaErr := ourjsonization.OrderedContainerFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -283,9 +283,9 @@ func TestOrderedContainerDeserializationFail(t *testing.T) {
 }
 
 func TestUnorderedContainerRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"UnorderedContainer",
@@ -295,11 +295,11 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.UnorderedContainerFromJsonable(
+		deserialized, deseriaErr := ourjsonization.UnorderedContainerFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -307,7 +307,7 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -327,7 +327,7 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 
 func TestUnorderedContainerDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -346,35 +346,35 @@ func TestUnorderedContainerDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.UnorderedContainerFromJsonable(
+			_, deseriaErr := ourjsonization.UnorderedContainerFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -388,9 +388,9 @@ func TestUnorderedContainerDeserializationFail(t *testing.T) {
 }
 
 func TestGlobalAttributeRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"GlobalAttribute",
@@ -400,11 +400,11 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.GlobalAttributeFromJsonable(
+		deserialized, deseriaErr := ourjsonization.GlobalAttributeFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -412,7 +412,7 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -432,7 +432,7 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 
 func TestGlobalAttributeDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -451,35 +451,35 @@ func TestGlobalAttributeDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.GlobalAttributeFromJsonable(
+			_, deseriaErr := ourjsonization.GlobalAttributeFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -493,9 +493,9 @@ func TestGlobalAttributeDeserializationFail(t *testing.T) {
 }
 
 func TestLocalAttributeRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"LocalAttribute",
@@ -505,11 +505,11 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.LocalAttributeFromJsonable(
+		deserialized, deseriaErr := ourjsonization.LocalAttributeFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -517,7 +517,7 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -537,7 +537,7 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 
 func TestLocalAttributeDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -556,35 +556,35 @@ func TestLocalAttributeDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.LocalAttributeFromJsonable(
+			_, deseriaErr := ourjsonization.LocalAttributeFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -598,9 +598,9 @@ func TestLocalAttributeDeserializationFail(t *testing.T) {
 }
 
 func TestAttributeOperandRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"AttributeOperand",
@@ -610,11 +610,11 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.AttributeOperandFromJsonable(
+		deserialized, deseriaErr := ourjsonization.AttributeOperandFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -622,7 +622,7 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -642,7 +642,7 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 
 func TestAttributeOperandDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -661,35 +661,35 @@ func TestAttributeOperandDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.AttributeOperandFromJsonable(
+			_, deseriaErr := ourjsonization.AttributeOperandFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -703,9 +703,9 @@ func TestAttributeOperandDeserializationFail(t *testing.T) {
 }
 
 func TestStringLiteralRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"StringLiteral",
@@ -715,11 +715,11 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.StringLiteralFromJsonable(
+		deserialized, deseriaErr := ourjsonization.StringLiteralFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -727,7 +727,7 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -747,7 +747,7 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 
 func TestStringLiteralDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -766,35 +766,35 @@ func TestStringLiteralDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.StringLiteralFromJsonable(
+			_, deseriaErr := ourjsonization.StringLiteralFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -808,9 +808,9 @@ func TestStringLiteralDeserializationFail(t *testing.T) {
 }
 
 func TestNumberLiteralRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"NumberLiteral",
@@ -820,11 +820,11 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.NumberLiteralFromJsonable(
+		deserialized, deseriaErr := ourjsonization.NumberLiteralFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -832,7 +832,7 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -852,7 +852,7 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 
 func TestNumberLiteralDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -871,35 +871,35 @@ func TestNumberLiteralDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.NumberLiteralFromJsonable(
+			_, deseriaErr := ourjsonization.NumberLiteralFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -913,9 +913,9 @@ func TestNumberLiteralDeserializationFail(t *testing.T) {
 }
 
 func TestSomethingRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Something",
@@ -925,11 +925,11 @@ func TestSomethingRoundTripOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.SomethingFromJsonable(
+		deserialized, deseriaErr := ourjsonization.SomethingFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
@@ -937,7 +937,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 			return
 		}
 
-		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -957,7 +957,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 
 func TestSomethingDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Unserializable",
@@ -976,35 +976,35 @@ func TestSomethingDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
 			)
 
-			_, deseriaErr := aasjsonization.SomethingFromJsonable(
+			_, deseriaErr := ourjsonization.SomethingFromJsonable(
 				jsonable,
 			)
 			ok := assertDeserializationErrorEqualsExpectedOrRecord(
@@ -1025,9 +1025,9 @@ func TestNumberLiteralSerializationFailOnNonFiniteNumber(t *testing.T) {
 		math.Inf(-1),
 		math.NaN(),
 	} {
-		jsonable := aastesting.MustReadJsonable(pth)
+		jsonable := ourtesting.MustReadJsonable(pth)
 
-		instance, deseriaErr := aasjsonization.NumberLiteralFromJsonable(
+		instance, deseriaErr := ourjsonization.NumberLiteralFromJsonable(
 			jsonable,
 		)
 		if !assertNoDeserializationError(t, deseriaErr, pth) {

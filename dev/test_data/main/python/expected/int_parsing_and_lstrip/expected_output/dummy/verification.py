@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Something
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Something(
+    an_instance = our_types.Something(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,20 +47,20 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    common as aas_common,
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    common as our_common,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 # noinspection SpellCheckingInspection
@@ -102,11 +102,11 @@ def is_safe_integer(
                             len(digits) == 16
                             and (
                                 (
-                                    aas_common.parse_safe_int(digits[:15]) < 900719925474099
+                                    our_common.parse_safe_int(digits[:15]) < 900719925474099
                                     or (
                                         (
-                                            aas_common.parse_safe_int(digits[:15]) == 900719925474099
-                                            and aas_common.parse_safe_int(digits[15:]) <= 1
+                                            our_common.parse_safe_int(digits[:15]) == 900719925474099
+                                            and our_common.parse_safe_int(digits[15:]) <= 1
                                         )
                                     )
                                 )
@@ -136,8 +136,8 @@ def is_xs_long(
         return True
     if len(digits) > 19:
         return False
-    head = aas_common.parse_safe_int(digits[:10])
-    tail = aas_common.parse_safe_int(digits[10:])
+    head = our_common.parse_safe_int(digits[:10])
+    tail = our_common.parse_safe_int(digits[10:])
     if text[:1] == '-':
         return (
             (
@@ -170,18 +170,18 @@ def parse_number(
     The caller has to check that :paramref:`text` is a safe integer.
     """
     # pylint: disable=all
-    return aas_common.parse_safe_int(text)
+    return our_common.parse_safe_int(text)
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not is_safe_integer(that.number):
             yield Error(
@@ -190,7 +190,7 @@ class _Transformer(
 
         if not (
             not is_safe_integer(that.number)
-            or (aas_common.parse_safe_int(that.number) >= -1000)
+            or (our_common.parse_safe_int(that.number) >= -1000)
         ):
             yield Error(
                 'Number must be at least -1000'
@@ -221,7 +221,7 @@ class _Transformer(
 
         if not (
             not is_safe_integer(that.decimal)
-            or (aas_common.parse_safe_int(that.decimal) != 13)
+            or (our_common.parse_safe_int(that.decimal) != 13)
         ):
             yield Error(
                 'Decimal must not be 13'
@@ -254,7 +254,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

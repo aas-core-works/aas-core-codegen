@@ -25,7 +25,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -63,7 +63,7 @@ type IElement interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IElement]
+// Check whether the instance corresponds to [ourtypes.IElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -92,7 +92,7 @@ type ILeaf interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILeaf]
+// Check whether the instance corresponds to [ourtypes.ILeaf]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -189,7 +189,7 @@ type IContainer interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IContainer]
+// Check whether the instance corresponds to [ourtypes.IContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -216,7 +216,7 @@ type IOrderedContainer interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IOrderedContainer]
+// Check whether the instance corresponds to [ourtypes.IOrderedContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -338,7 +338,7 @@ type IUnorderedContainer interface {
 	IContainer
 }
 
-// Check whether the instance corresponds to [aastypes.IUnorderedContainer]
+// Check whether the instance corresponds to [ourtypes.IUnorderedContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -452,7 +452,7 @@ type IGlobalAttribute interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IGlobalAttribute]
+// Check whether the instance corresponds to [ourtypes.IGlobalAttribute]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -535,7 +535,7 @@ type ILocalAttribute interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILocalAttribute]
+// Check whether the instance corresponds to [ourtypes.ILocalAttribute]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -696,7 +696,7 @@ type IAttributeOperand interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAttributeOperand]
+// Check whether the instance corresponds to [ourtypes.IAttributeOperand]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -795,7 +795,7 @@ type IStringLiteral interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IStringLiteral]
+// Check whether the instance corresponds to [ourtypes.IStringLiteral]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -878,7 +878,7 @@ type INumberLiteral interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.INumberLiteral]
+// Check whether the instance corresponds to [ourtypes.INumberLiteral]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1151,7 +1151,7 @@ type ISomething interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

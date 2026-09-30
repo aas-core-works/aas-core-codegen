@@ -101,7 +101,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
     ]  # type: List[Stripped]
 
@@ -117,7 +117,7 @@ TEST_CASE("Test FloorMod of {case.dividend} by {case.divisor}") {{
 {I}const int64_t expected = {_int64_literal(case.expected)};
 
 {I}REQUIRE(
-{II}aas::common::FloorMod(dividend, divisor)
+{II}our::common::FloorMod(dividend, divisor)
 {II}== expected
 {I});
 }}"""

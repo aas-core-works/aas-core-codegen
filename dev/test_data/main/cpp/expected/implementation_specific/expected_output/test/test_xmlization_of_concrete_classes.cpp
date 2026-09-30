@@ -9,23 +9,23 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 void AssertRoundTrip(
   const std::filesystem::path& path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > deserialized(
     test::common::xmlization::MustDeserializeFile(path)
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(*deserialized, {}, ss);
+  our::xmlization::Serialize(*deserialized, {}, ss);
 
   std::string expected_xml = test::common::MustReadString(path);
 
-  INFO(aas::common::Concat("XML round-trip on ", path.string()))
+  INFO(our::common::Concat("XML round-trip on ", path.string()))
   REQUIRE(
     test::common::xmlization::CanonicalizeXml(expected_xml)
       == test::common::xmlization::CanonicalizeXml(ss.str())
@@ -38,16 +38,16 @@ void AssertDeserializationFailure(
 ) {
   std::ifstream ifs(path, std::ios::binary);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ifs
   );
 
   if (deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected the de-serialization to fail on ",
         path.string(),
         ", but the de-serialization succeeded"
@@ -57,12 +57,12 @@ void AssertDeserializationFailure(
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::Concat(
-      aas::common::WstringToUtf8(
+    our::common::Concat(
+      our::common::WstringToUtf8(
         deserialized.error().path.ToWstring()
       ),
       ": ",
-      aas::common::WstringToUtf8(
+      our::common::WstringToUtf8(
         deserialized.error().cause
       )
     ),
@@ -71,7 +71,7 @@ void AssertDeserializationFailure(
 }
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -80,7 +80,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineErrorDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "XmlizationError";
   }
@@ -273,7 +273,7 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {
     original.rfind("</box>")
   );
 
-  INFO(aas::common::Concat("Looking for </box> in ", path.string()))
+  INFO(our::common::Concat("Looking for </box> in ", path.string()))
   REQUIRE(insertion_index != std::string::npos);
 
   const std::string broken(
@@ -284,12 +284,12 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {
 
   std::istringstream iss(broken);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(iss);
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(iss);
 
-  INFO(aas::common::Concat("De-serializing: ", broken))
+  INFO(our::common::Concat("De-serializing: ", broken))
   REQUIRE(!deserialized.has_value());
 }
 

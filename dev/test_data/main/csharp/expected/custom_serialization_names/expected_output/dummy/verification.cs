@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of QueryCondition:
     /// <code>
-    /// var anInstance = new Aas.QueryCondition(
+    /// var anInstance = new Our.QueryCondition(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -48,7 +48,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformQueryCondition(
-                Aas.IQueryCondition that
+                Our.IQueryCondition that
             )
             {
                 // No verification has been defined for QueryCondition.
@@ -62,7 +62,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {

@@ -12,7 +12,7 @@ import pathlib
 import unittest
 
 
-import aas_core3.types as aas_types
+import aas_core3.types as our_types
 
 
 import tests.common
@@ -34,7 +34,7 @@ class TestExtension(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Extension
+                our_types.Extension
             )
 
             log = [tests.common.trace(instance.value_type_or_default())]
@@ -67,7 +67,7 @@ class TestQualifier(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Qualifier
+                our_types.Qualifier
             )
 
             log = [tests.common.trace(instance.kind_or_default())]
@@ -100,7 +100,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [tests.common.trace(instance.kind_or_default())]
@@ -133,7 +133,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [tests.common.trace(instance.order_relevant_or_default())]
@@ -166,7 +166,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [tests.common.trace(instance.category_or_default())]
@@ -199,7 +199,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [tests.common.trace(instance.category_or_default())]
@@ -232,7 +232,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [tests.common.trace(instance.category_or_default())]
@@ -265,7 +265,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [tests.common.trace(instance.category_or_default())]
@@ -298,7 +298,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [tests.common.trace(instance.category_or_default())]
@@ -331,7 +331,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [tests.common.trace(instance.category_or_default())]

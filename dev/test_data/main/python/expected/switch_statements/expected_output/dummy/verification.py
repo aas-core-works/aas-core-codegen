@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Something
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Something(
+    an_instance = our_types.Something(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,66 +47,66 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def switch_on_enum_with_a_single_case(
-    kind: aas_types.Kind
+    kind: our_types.Kind
 ) -> bool:
     """Check the switch with a single case and no default."""
     # pylint: disable=all
-    if kind == aas_types.Kind.DELTA:
+    if kind == our_types.Kind.DELTA:
         return False
     return True
 
 
 def switch_on_enum_with_default(
-    kind: aas_types.Kind
+    kind: our_types.Kind
 ) -> bool:
     """Check the switch with a case per form of labels and a default."""
     # pylint: disable=all
-    if kind == aas_types.Kind.ALPHA:
+    if kind == our_types.Kind.ALPHA:
         return True
-    elif kind in (aas_types.Kind.BETA, aas_types.Kind.GAMMA):
+    elif kind in (our_types.Kind.BETA, our_types.Kind.GAMMA):
         return False
     else:
         return True
 
 
 def switch_on_enum_with_labels_in_tuple(
-    kind: aas_types.Kind
+    kind: our_types.Kind
 ) -> bool:
     """Check the switch with the labels given as a tuple."""
     # pylint: disable=all
-    if kind in (aas_types.Kind.ALPHA, aas_types.Kind.BETA, aas_types.Kind.GAMMA):
+    if kind in (our_types.Kind.ALPHA, our_types.Kind.BETA, our_types.Kind.GAMMA):
         return True
     else:
         return False
 
 
 def switch_on_enum_with_pass(
-    kind: aas_types.Kind
+    kind: our_types.Kind
 ) -> bool:
     """
     Check the switch with the branches which pass and complete normally.
     """
     # pylint: disable=all
     result = True
-    if kind in (aas_types.Kind.ALPHA, aas_types.Kind.BETA):
+    if kind in (our_types.Kind.ALPHA, our_types.Kind.BETA):
         pass
-    elif kind == aas_types.Kind.GAMMA:
+    elif kind == our_types.Kind.GAMMA:
         result = False
     else:
         pass
@@ -114,15 +114,15 @@ def switch_on_enum_with_pass(
 
 
 def switch_on_enum_with_variables_in_cases(
-    kind: aas_types.Kind,
+    kind: our_types.Kind,
     text: str
 ) -> bool:
     """Check the variables defined in the cases of the switch."""
     # pylint: disable=all
-    if kind == aas_types.Kind.ALPHA:
+    if kind == our_types.Kind.ALPHA:
         length = len(text)
         return length > 1
-    elif kind == aas_types.Kind.BETA:
+    elif kind == our_types.Kind.BETA:
         length = len(text)
         return length > 2
     else:
@@ -171,19 +171,19 @@ def switch_on_int(
 
 
 def nested_switches(
-    kind: aas_types.Kind,
+    kind: our_types.Kind,
     number: int
 ) -> bool:
     """
     Check the nested switches, including an ``elif`` on another subject.
     """
     # pylint: disable=all
-    if kind == aas_types.Kind.ALPHA:
+    if kind == our_types.Kind.ALPHA:
         if number == 0:
             return True
         else:
             return number > 10
-    elif kind == aas_types.Kind.BETA:
+    elif kind == our_types.Kind.BETA:
         if number == 1:
             return False
     else:
@@ -193,7 +193,7 @@ def nested_switches(
 
 
 def switch_with_reassigned_int(
-    kind: aas_types.Kind,
+    kind: our_types.Kind,
     number: int
 ) -> bool:
     """
@@ -202,20 +202,20 @@ def switch_with_reassigned_int(
     """
     # pylint: disable=all
     result = 0
-    if kind == aas_types.Kind.BETA:
+    if kind == our_types.Kind.BETA:
         result = number
     return result < 1000
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not switch_with_reassigned_int(that.kind, that.number):
             yield Error(
@@ -286,7 +286,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

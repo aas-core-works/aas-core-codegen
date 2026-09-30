@@ -408,27 +408,27 @@ WARNING: Final[Stripped] = Stripped(
 # fmt: off
 @ensure(
     lambda namespace, result:
-    not (namespace != "Aas") or len(result) == 1,
+    not (namespace != "Our") or len(result) == 1,
     "Exactly one block of stripped text to be appended to the list of using directives "
     "if this using directive is necessary"
 )
 @ensure(
     lambda namespace, result:
-    not (namespace == "Aas") or len(result) == 0,
+    not (namespace == "Our") or len(result) == 0,
     "Empty list if no directive is necessary"
 )
 # fmt: on
-def generate_using_aas_directive_if_necessary(
+def generate_using_our_directive_if_necessary(
     namespace: NamespaceIdentifier,
 ) -> List[Stripped]:
-    """Generate the using directive if the namespace does not equal ``Aas``."""
-    if namespace == "Aas":
+    """Generate the using directive if the namespace does not equal ``Our``."""
+    if namespace == "Our":
         return []
 
-    if namespace.endswith(".Aas"):
-        return [Stripped(f"using Aas = {namespace};")]
+    if namespace.endswith(".Our"):
+        return [Stripped(f"using Our = {namespace};")]
 
-    return [Stripped(f"using Aas = {namespace};  // renamed")]
+    return [Stripped(f"using Our = {namespace};  // renamed")]
 
 
 # NOTE (mristin):

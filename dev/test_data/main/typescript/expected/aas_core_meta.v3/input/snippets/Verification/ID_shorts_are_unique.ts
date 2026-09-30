@@ -6,7 +6,7 @@
  * @returns `true` if the check passes
  */
 export function idShortsAreUnique(
-  referables: Iterable<AasTypes.IReferable>
+  referables: Iterable<OurTypes.IReferable>
 ): boolean {
   const idShortSet = new Set<string>();
   for (const referable of referables) {

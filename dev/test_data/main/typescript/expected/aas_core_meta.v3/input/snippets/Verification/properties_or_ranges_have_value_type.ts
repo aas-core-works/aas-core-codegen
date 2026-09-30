@@ -6,11 +6,11 @@
  * @returns `true` if the check passes
  */
 export function propertiesOrRangesHaveValueType(
-  elements: Iterable<AasTypes.ISubmodelElement>,
-  valueType: AasTypes.DataTypeDefXsd
+  elements: Iterable<OurTypes.ISubmodelElement>,
+  valueType: OurTypes.DataTypeDefXsd
 ): boolean {
   for (const element of elements) {
-    if (AasTypes.isProperty(element) || AasTypes.isRange(element)) {
+    if (OurTypes.isProperty(element) || OurTypes.isRange(element)) {
       if (element.valueType !== valueType) {
         return false;
       }

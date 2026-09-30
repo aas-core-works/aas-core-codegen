@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -16,7 +16,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -31,7 +31,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -45,7 +45,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -60,7 +60,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -74,7 +74,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -89,7 +89,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -103,7 +103,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -118,7 +118,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -132,7 +132,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -147,7 +147,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -161,7 +161,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -176,7 +176,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -190,7 +190,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -205,7 +205,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -219,7 +219,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -234,7 +234,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -248,7 +248,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -263,7 +263,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -277,7 +277,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -292,7 +292,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -306,7 +306,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -321,7 +321,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -335,7 +335,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -350,7 +350,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -364,7 +364,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -379,7 +379,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -393,7 +393,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -408,7 +408,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -422,7 +422,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -437,7 +437,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -451,7 +451,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -466,7 +466,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -480,7 +480,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -495,7 +495,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -509,7 +509,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -524,7 +524,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -538,7 +538,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -553,7 +553,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -567,7 +567,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -582,7 +582,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -596,7 +596,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -611,7 +611,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -625,7 +625,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -640,7 +640,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -654,7 +654,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -669,7 +669,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -683,7 +683,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -698,7 +698,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -712,7 +712,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -727,7 +727,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -741,7 +741,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -756,7 +756,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -770,7 +770,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -785,7 +785,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -799,7 +799,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -814,7 +814,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -828,7 +828,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -843,7 +843,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -857,7 +857,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasSemanticsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasSemanticsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -872,7 +872,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -886,7 +886,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -901,7 +901,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -915,7 +915,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -930,7 +930,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -944,7 +944,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -959,7 +959,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -973,7 +973,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -988,7 +988,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1002,7 +1002,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1017,7 +1017,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1031,7 +1031,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1046,7 +1046,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1060,7 +1060,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1075,7 +1075,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1089,7 +1089,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1104,7 +1104,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1118,7 +1118,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1133,7 +1133,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1147,7 +1147,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1162,7 +1162,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1176,7 +1176,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1191,7 +1191,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1205,7 +1205,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1220,7 +1220,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1234,7 +1234,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalConceptDescription();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalConceptDescription();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1249,7 +1249,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1263,7 +1263,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1278,7 +1278,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1292,7 +1292,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1307,7 +1307,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1321,7 +1321,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1336,7 +1336,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1350,7 +1350,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1365,7 +1365,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1379,7 +1379,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1394,7 +1394,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1408,7 +1408,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1423,7 +1423,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1437,7 +1437,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1452,7 +1452,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1466,7 +1466,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1481,7 +1481,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1495,7 +1495,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1510,7 +1510,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1524,7 +1524,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1539,7 +1539,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1553,7 +1553,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1568,7 +1568,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1582,7 +1582,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1597,7 +1597,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1611,7 +1611,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1626,7 +1626,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1640,7 +1640,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1655,7 +1655,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1669,7 +1669,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1684,7 +1684,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1698,7 +1698,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1713,7 +1713,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1727,7 +1727,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1742,7 +1742,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1756,7 +1756,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1771,7 +1771,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1785,7 +1785,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1800,7 +1800,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1814,7 +1814,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1829,7 +1829,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1843,7 +1843,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasExtensionsFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasExtensionsFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1858,7 +1858,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1872,7 +1872,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1887,7 +1887,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1901,7 +1901,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1916,7 +1916,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1930,7 +1930,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -1945,7 +1945,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -1959,7 +1959,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -1974,7 +1974,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -1988,7 +1988,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2003,7 +2003,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2017,7 +2017,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2032,7 +2032,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2046,7 +2046,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2061,7 +2061,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2075,7 +2075,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2090,7 +2090,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2104,7 +2104,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2119,7 +2119,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2133,7 +2133,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2148,7 +2148,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2162,7 +2162,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2177,7 +2177,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2191,7 +2191,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2206,7 +2206,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2220,7 +2220,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalConceptDescription();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalConceptDescription();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2235,7 +2235,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2249,7 +2249,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2264,7 +2264,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2278,7 +2278,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2293,7 +2293,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2307,7 +2307,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2322,7 +2322,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2336,7 +2336,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2351,7 +2351,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2365,7 +2365,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2380,7 +2380,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2394,7 +2394,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2409,7 +2409,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2423,7 +2423,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2438,7 +2438,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2452,7 +2452,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2467,7 +2467,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2481,7 +2481,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2496,7 +2496,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2510,7 +2510,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2525,7 +2525,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2539,7 +2539,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2554,7 +2554,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2568,7 +2568,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2583,7 +2583,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2597,7 +2597,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2612,7 +2612,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2626,7 +2626,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2641,7 +2641,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2655,7 +2655,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2670,7 +2670,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2684,7 +2684,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2699,7 +2699,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2713,7 +2713,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2728,7 +2728,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2742,7 +2742,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2757,7 +2757,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2771,7 +2771,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2786,7 +2786,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2800,7 +2800,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2815,7 +2815,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2829,7 +2829,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IReferableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IReferableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2844,7 +2844,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2858,7 +2858,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2873,7 +2873,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2887,7 +2887,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IIdentifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IIdentifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2902,7 +2902,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2916,7 +2916,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalConceptDescription();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalConceptDescription();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2931,7 +2931,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -2945,7 +2945,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IIdentifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IIdentifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -2960,7 +2960,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -2974,7 +2974,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -2989,7 +2989,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3003,7 +3003,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IIdentifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IIdentifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3018,7 +3018,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3032,7 +3032,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3047,7 +3047,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3061,7 +3061,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasKindFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasKindFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3076,7 +3076,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3090,7 +3090,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3105,7 +3105,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3119,7 +3119,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3134,7 +3134,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3148,7 +3148,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3163,7 +3163,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3177,7 +3177,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3192,7 +3192,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3206,7 +3206,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3221,7 +3221,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3235,7 +3235,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3250,7 +3250,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3264,7 +3264,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3279,7 +3279,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3293,7 +3293,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3308,7 +3308,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3322,7 +3322,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3337,7 +3337,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3351,7 +3351,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3366,7 +3366,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3380,7 +3380,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3395,7 +3395,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3409,7 +3409,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3424,7 +3424,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3438,7 +3438,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalConceptDescription();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalConceptDescription();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3453,7 +3453,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3467,7 +3467,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3482,7 +3482,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3496,7 +3496,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3511,7 +3511,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3525,7 +3525,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3540,7 +3540,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3554,7 +3554,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3569,7 +3569,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3583,7 +3583,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3598,7 +3598,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3612,7 +3612,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3627,7 +3627,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3641,7 +3641,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3656,7 +3656,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3670,7 +3670,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3685,7 +3685,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3699,7 +3699,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3714,7 +3714,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3728,7 +3728,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3743,7 +3743,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3757,7 +3757,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3772,7 +3772,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3786,7 +3786,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3801,7 +3801,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3815,7 +3815,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3830,7 +3830,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3844,7 +3844,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3859,7 +3859,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3873,7 +3873,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3888,7 +3888,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3902,7 +3902,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3917,7 +3917,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3931,7 +3931,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -3946,7 +3946,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -3960,7 +3960,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -3975,7 +3975,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -3989,7 +3989,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4004,7 +4004,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4018,7 +4018,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4033,7 +4033,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4047,7 +4047,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IHasDataSpecificationFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IHasDataSpecificationFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4062,7 +4062,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4076,7 +4076,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4091,7 +4091,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4105,7 +4105,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4120,7 +4120,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4134,7 +4134,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4149,7 +4149,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4163,7 +4163,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4178,7 +4178,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4192,7 +4192,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4207,7 +4207,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4221,7 +4221,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4236,7 +4236,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4250,7 +4250,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4265,7 +4265,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4279,7 +4279,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4294,7 +4294,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4308,7 +4308,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4323,7 +4323,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4337,7 +4337,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4352,7 +4352,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4366,7 +4366,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4381,7 +4381,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4395,7 +4395,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4410,7 +4410,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4424,7 +4424,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4439,7 +4439,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4453,7 +4453,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4468,7 +4468,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4482,7 +4482,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4497,7 +4497,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4511,7 +4511,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4526,7 +4526,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4540,7 +4540,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4555,7 +4555,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4569,7 +4569,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4584,7 +4584,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4598,7 +4598,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4613,7 +4613,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4627,7 +4627,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4642,7 +4642,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4656,7 +4656,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4671,7 +4671,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4685,7 +4685,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4700,7 +4700,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4714,7 +4714,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4729,7 +4729,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4743,7 +4743,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4758,7 +4758,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4772,7 +4772,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodel();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodel();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4787,7 +4787,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4801,7 +4801,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4816,7 +4816,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4830,7 +4830,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4845,7 +4845,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4859,7 +4859,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4874,7 +4874,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4888,7 +4888,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4903,7 +4903,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4917,7 +4917,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IQualifiableFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IQualifiableFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4932,7 +4932,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -4946,7 +4946,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -4961,7 +4961,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -4975,7 +4975,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -4990,7 +4990,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5004,7 +5004,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5019,7 +5019,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5033,7 +5033,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5048,7 +5048,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5062,7 +5062,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5077,7 +5077,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5091,7 +5091,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5106,7 +5106,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5120,7 +5120,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5135,7 +5135,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5149,7 +5149,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5164,7 +5164,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5178,7 +5178,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalCapability();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalCapability();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5193,7 +5193,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5207,7 +5207,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5222,7 +5222,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5236,7 +5236,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalEntity();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalEntity();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5251,7 +5251,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5265,7 +5265,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5280,7 +5280,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5294,7 +5294,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5309,7 +5309,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5323,7 +5323,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5338,7 +5338,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5352,7 +5352,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5367,7 +5367,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5381,7 +5381,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5396,7 +5396,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5410,7 +5410,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalOperation();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalOperation();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5425,7 +5425,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5439,7 +5439,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5454,7 +5454,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5468,7 +5468,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5483,7 +5483,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5497,7 +5497,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5512,7 +5512,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5526,7 +5526,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5541,7 +5541,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5555,7 +5555,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5570,7 +5570,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5584,7 +5584,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5599,7 +5599,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5613,7 +5613,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5628,7 +5628,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5642,7 +5642,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5657,7 +5657,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5671,7 +5671,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5686,7 +5686,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5700,7 +5700,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5715,7 +5715,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5729,7 +5729,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.ISubmodelElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.ISubmodelElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5744,7 +5744,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5758,7 +5758,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5773,7 +5773,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5787,7 +5787,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IRelationshipElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IRelationshipElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5802,7 +5802,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5816,7 +5816,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRelationshipElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5831,7 +5831,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5845,7 +5845,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IRelationshipElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IRelationshipElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5860,7 +5860,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5874,7 +5874,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBlob();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBlob();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5889,7 +5889,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5903,7 +5903,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5918,7 +5918,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5932,7 +5932,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFile();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFile();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -5947,7 +5947,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -5961,7 +5961,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -5976,7 +5976,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -5990,7 +5990,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6005,7 +6005,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6019,7 +6019,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6034,7 +6034,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -6048,7 +6048,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalProperty();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalProperty();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6063,7 +6063,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6077,7 +6077,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6092,7 +6092,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -6106,7 +6106,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalRange();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalRange();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6121,7 +6121,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6135,7 +6135,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6150,7 +6150,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -6164,7 +6164,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalReferenceElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalReferenceElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6179,7 +6179,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6193,7 +6193,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6208,7 +6208,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -6222,7 +6222,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalBasicEventElement();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6237,7 +6237,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6251,7 +6251,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IEventElementFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IEventElementFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6266,7 +6266,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -6280,7 +6280,7 @@ namespace AasCore.Aas3_0.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -6295,7 +6295,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -6309,7 +6309,7 @@ namespace AasCore.Aas3_0.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IDataSpecificationContentFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IDataSpecificationContentFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -6324,7 +6324,7 @@ namespace AasCore.Aas3_0.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }

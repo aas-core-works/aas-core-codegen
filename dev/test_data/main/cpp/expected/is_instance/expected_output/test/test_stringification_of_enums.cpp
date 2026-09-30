@@ -6,131 +6,131 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kLeaf
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLeaf
+    == our::stringification::MustModelTypeFromString(
       "Leaf"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLeaf
+    our::stringification::to_string(
+      our::types::ModelType::kLeaf
     )
     == "Leaf"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOrderedContainer
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kOrderedContainer
+    == our::stringification::MustModelTypeFromString(
       "OrderedContainer"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kOrderedContainer
+    our::stringification::to_string(
+      our::types::ModelType::kOrderedContainer
     )
     == "OrderedContainer"
   );
 
   REQUIRE(
-    aas::types::ModelType::kUnorderedContainer
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kUnorderedContainer
+    == our::stringification::MustModelTypeFromString(
       "UnorderedContainer"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kUnorderedContainer
+    our::stringification::to_string(
+      our::types::ModelType::kUnorderedContainer
     )
     == "UnorderedContainer"
   );
 
   REQUIRE(
-    aas::types::ModelType::kGlobalAttribute
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kGlobalAttribute
+    == our::stringification::MustModelTypeFromString(
       "GlobalAttribute"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kGlobalAttribute
+    our::stringification::to_string(
+      our::types::ModelType::kGlobalAttribute
     )
     == "GlobalAttribute"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLocalAttribute
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLocalAttribute
+    == our::stringification::MustModelTypeFromString(
       "LocalAttribute"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLocalAttribute
+    our::stringification::to_string(
+      our::types::ModelType::kLocalAttribute
     )
     == "LocalAttribute"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAttributeOperand
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kAttributeOperand
+    == our::stringification::MustModelTypeFromString(
       "AttributeOperand"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kAttributeOperand
+    our::stringification::to_string(
+      our::types::ModelType::kAttributeOperand
     )
     == "AttributeOperand"
   );
 
   REQUIRE(
-    aas::types::ModelType::kStringLiteral
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kStringLiteral
+    == our::stringification::MustModelTypeFromString(
       "StringLiteral"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kStringLiteral
+    our::stringification::to_string(
+      our::types::ModelType::kStringLiteral
     )
     == "StringLiteral"
   );
 
   REQUIRE(
-    aas::types::ModelType::kNumberLiteral
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kNumberLiteral
+    == our::stringification::MustModelTypeFromString(
       "NumberLiteral"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kNumberLiteral
+    our::stringification::to_string(
+      our::types::ModelType::kNumberLiteral
     )
     == "NumberLiteral"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSomething
+    == our::stringification::MustModelTypeFromString(
       "Something"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSomething
+    our::stringification::to_string(
+      our::types::ModelType::kSomething
     )
     == "Something"
   );
@@ -138,13 +138,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::stringification::ModelTypeFromString(
+    !our::stringification::ModelTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModelTypeFromString(
+    our::stringification::MustModelTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

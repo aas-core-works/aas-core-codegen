@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestMixedConcreteWithDescendantsRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedConcreteWithDescendantsChild()
+	instance := ourtesting.MustLoadMinimalMixedConcreteWithDescendantsChild()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal MixedConcreteWithDescendantsChild: %v",
@@ -23,7 +23,7 @@ func TestMixedConcreteWithDescendantsRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal MixedConcreteWithDescendantsChild>"
 
-	deserialized, deseriaErr := aasjsonization.MixedConcreteWithDescendantsFromJsonable(
+	deserialized, deseriaErr := ourjsonization.MixedConcreteWithDescendantsFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestMixedConcreteWithDescendantsRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return

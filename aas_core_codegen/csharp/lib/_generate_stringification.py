@@ -32,8 +32,8 @@ def _generate_enum_to_and_from_string(
     to_str_map_writer = io.StringIO()
     to_str_map_writer.write(
         f"""\
-private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (
-{I}new Dictionary<Aas.{name}, string>()
+private static readonly Dictionary<Our.{name}, string> {to_str_map_name} = (
+{I}new Dictionary<Our.{name}, string>()
 {I}{{
 """
     )
@@ -41,7 +41,7 @@ private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (
     for i, literal in enumerate(enumeration.literals):
         literal_name = csharp_naming.enum_literal_name(literal.name)
         to_str_map_writer.write(
-            f"{II}{{ Aas.{name}.{literal_name}, "
+            f"{II}{{ Our.{name}.{literal_name}, "
             f"{csharp_common.string_literal(literal.value)} }}"
         )
 
@@ -69,7 +69,7 @@ private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (
 /// <remarks>
 /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
 /// </remarks>
-public static string? {to_str_name}(Aas.{name}? that)
+public static string? {to_str_name}(Our.{name}? that)
 {{
 {I}if (!that.HasValue)
 {I}{{
@@ -103,8 +103,8 @@ public static string? {to_str_name}(Aas.{name}? that)
     from_str_map_writer.write(
         f"""\
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (
-{I}new Dictionary<string, Aas.{name}>()
+private static readonly Dictionary<string, Our.{name}> {from_str_map_name} = (
+{I}new Dictionary<string, Our.{name}>()
 {I}{{
 """
     )
@@ -113,7 +113,7 @@ private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (
         literal_name = csharp_naming.enum_literal_name(literal.name)
         from_str_map_writer.write(
             f"{II}{{ {csharp_common.string_literal(literal.value)}, "
-            f"Aas.{name}.{literal_name} }}"
+            f"Our.{name}.{literal_name} }}"
         )
 
         if i < len(enumeration.literals) - 1:
@@ -144,7 +144,7 @@ private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (
 /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />,
 /// return <c>null</c>.
 /// </remarks>
-public static Aas.{name}? {from_str_name}(string text)
+public static Our.{name}? {from_str_name}(string text)
 {{
 {I}if ({from_str_map_name}.TryGetValue(text, out {name} value))
 {I}{{
@@ -182,7 +182,7 @@ def generate(
     """
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     using_directives.append(

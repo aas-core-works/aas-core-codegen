@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,20 +14,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IMixedConcreteWithDescendants_from_MixedConcreteWithDescendantsChild()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IMixedConcreteWithDescendantsFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IMixedConcreteWithDescendantsFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {
@@ -43,20 +43,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IMixedConcreteWithDescendants_from_MixedConcreteWithDescendants()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IMixedConcreteWithDescendantsFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IMixedConcreteWithDescendantsFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {

@@ -6,56 +6,56 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"Extension": aastypes.ModelTypeExtension,
-	"AdministrativeInformation": aastypes.ModelTypeAdministrativeInformation,
-	"Qualifier": aastypes.ModelTypeQualifier,
-	"AssetAdministrationShell": aastypes.ModelTypeAssetAdministrationShell,
-	"AssetInformation": aastypes.ModelTypeAssetInformation,
-	"Resource": aastypes.ModelTypeResource,
-	"SpecificAssetId": aastypes.ModelTypeSpecificAssetID,
-	"Submodel": aastypes.ModelTypeSubmodel,
-	"RelationshipElement": aastypes.ModelTypeRelationshipElement,
-	"SubmodelElementList": aastypes.ModelTypeSubmodelElementList,
-	"SubmodelElementCollection": aastypes.ModelTypeSubmodelElementCollection,
-	"Property": aastypes.ModelTypeProperty,
-	"MultiLanguageProperty": aastypes.ModelTypeMultiLanguageProperty,
-	"Range": aastypes.ModelTypeRange,
-	"ReferenceElement": aastypes.ModelTypeReferenceElement,
-	"Blob": aastypes.ModelTypeBlob,
-	"File": aastypes.ModelTypeFile,
-	"AnnotatedRelationshipElement": aastypes.ModelTypeAnnotatedRelationshipElement,
-	"Entity": aastypes.ModelTypeEntity,
-	"EventPayload": aastypes.ModelTypeEventPayload,
-	"BasicEventElement": aastypes.ModelTypeBasicEventElement,
-	"Operation": aastypes.ModelTypeOperation,
-	"OperationVariable": aastypes.ModelTypeOperationVariable,
-	"Capability": aastypes.ModelTypeCapability,
-	"ConceptDescription": aastypes.ModelTypeConceptDescription,
-	"Reference": aastypes.ModelTypeReference,
-	"Key": aastypes.ModelTypeKey,
-	"LangStringNameType": aastypes.ModelTypeLangStringNameType,
-	"LangStringTextType": aastypes.ModelTypeLangStringTextType,
-	"Environment": aastypes.ModelTypeEnvironment,
-	"EmbeddedDataSpecification": aastypes.ModelTypeEmbeddedDataSpecification,
-	"LevelType": aastypes.ModelTypeLevelType,
-	"ValueReferencePair": aastypes.ModelTypeValueReferencePair,
-	"ValueList": aastypes.ModelTypeValueList,
-	"LangStringPreferredNameTypeIec61360": aastypes.ModelTypeLangStringPreferredNameTypeIEC61360,
-	"LangStringShortNameTypeIec61360": aastypes.ModelTypeLangStringShortNameTypeIEC61360,
-	"LangStringDefinitionTypeIec61360": aastypes.ModelTypeLangStringDefinitionTypeIEC61360,
-	"DataSpecificationIec61360": aastypes.ModelTypeDataSpecificationIEC61360,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"Extension": ourtypes.ModelTypeExtension,
+	"AdministrativeInformation": ourtypes.ModelTypeAdministrativeInformation,
+	"Qualifier": ourtypes.ModelTypeQualifier,
+	"AssetAdministrationShell": ourtypes.ModelTypeAssetAdministrationShell,
+	"AssetInformation": ourtypes.ModelTypeAssetInformation,
+	"Resource": ourtypes.ModelTypeResource,
+	"SpecificAssetId": ourtypes.ModelTypeSpecificAssetID,
+	"Submodel": ourtypes.ModelTypeSubmodel,
+	"RelationshipElement": ourtypes.ModelTypeRelationshipElement,
+	"SubmodelElementList": ourtypes.ModelTypeSubmodelElementList,
+	"SubmodelElementCollection": ourtypes.ModelTypeSubmodelElementCollection,
+	"Property": ourtypes.ModelTypeProperty,
+	"MultiLanguageProperty": ourtypes.ModelTypeMultiLanguageProperty,
+	"Range": ourtypes.ModelTypeRange,
+	"ReferenceElement": ourtypes.ModelTypeReferenceElement,
+	"Blob": ourtypes.ModelTypeBlob,
+	"File": ourtypes.ModelTypeFile,
+	"AnnotatedRelationshipElement": ourtypes.ModelTypeAnnotatedRelationshipElement,
+	"Entity": ourtypes.ModelTypeEntity,
+	"EventPayload": ourtypes.ModelTypeEventPayload,
+	"BasicEventElement": ourtypes.ModelTypeBasicEventElement,
+	"Operation": ourtypes.ModelTypeOperation,
+	"OperationVariable": ourtypes.ModelTypeOperationVariable,
+	"Capability": ourtypes.ModelTypeCapability,
+	"ConceptDescription": ourtypes.ModelTypeConceptDescription,
+	"Reference": ourtypes.ModelTypeReference,
+	"Key": ourtypes.ModelTypeKey,
+	"LangStringNameType": ourtypes.ModelTypeLangStringNameType,
+	"LangStringTextType": ourtypes.ModelTypeLangStringTextType,
+	"Environment": ourtypes.ModelTypeEnvironment,
+	"EmbeddedDataSpecification": ourtypes.ModelTypeEmbeddedDataSpecification,
+	"LevelType": ourtypes.ModelTypeLevelType,
+	"ValueReferencePair": ourtypes.ModelTypeValueReferencePair,
+	"ValueList": ourtypes.ModelTypeValueList,
+	"LangStringPreferredNameTypeIec61360": ourtypes.ModelTypeLangStringPreferredNameTypeIEC61360,
+	"LangStringShortNameTypeIec61360": ourtypes.ModelTypeLangStringShortNameTypeIEC61360,
+	"LangStringDefinitionTypeIec61360": ourtypes.ModelTypeLangStringDefinitionTypeIEC61360,
+	"DataSpecificationIec61360": ourtypes.ModelTypeDataSpecificationIEC61360,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -101,12 +101,12 @@ var modelTypeToStringArray = [...]string {
 	"DataSpecificationIec61360",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -120,11 +120,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {
@@ -138,17 +138,17 @@ func MustModelTypeToString(
 	return result
 }
 
-var modellingKindFromStringMap = map[string]aastypes.ModellingKind {
-	"Template": aastypes.ModellingKindTemplate,
-	"Instance": aastypes.ModellingKindInstance,
+var modellingKindFromStringMap = map[string]ourtypes.ModellingKind {
+	"Template": ourtypes.ModellingKindTemplate,
+	"Instance": ourtypes.ModellingKindInstance,
 }
 
-// Parse `text` as a string representation of [aastypes.ModellingKind].
+// Parse `text` as a string representation of [ourtypes.ModellingKind].
 //
 // If not ok, the literal result is undefined.
 func ModellingKindFromString(
 	text string,
-) (literal aastypes.ModellingKind, ok bool) {
+) (literal ourtypes.ModellingKind, ok bool) {
 	literal, ok = modellingKindFromStringMap[text]
 	return
 }
@@ -158,12 +158,12 @@ var modellingKindToStringArray = [...]string {
 	"Instance",
 }
 
-// Translate `value` from [aastypes.ModellingKind] to a string.
+// Translate `value` from [ourtypes.ModellingKind] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModellingKindToString(
-	value aastypes.ModellingKind,
+	value ourtypes.ModellingKind,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -177,11 +177,11 @@ func ModellingKindToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModellingKind] to a string.
+// Translate the `value` from [ourtypes.ModellingKind] to a string.
 //
 // Panic if the given value is invalid.
 func MustModellingKindToString(
-	value aastypes.ModellingKind,
+	value ourtypes.ModellingKind,
 ) string {
 	result, ok := ModellingKindToString(value)
 	if !ok {
@@ -195,18 +195,18 @@ func MustModellingKindToString(
 	return result
 }
 
-var qualifierKindFromStringMap = map[string]aastypes.QualifierKind {
-	"ValueQualifier": aastypes.QualifierKindValueQualifier,
-	"ConceptQualifier": aastypes.QualifierKindConceptQualifier,
-	"TemplateQualifier": aastypes.QualifierKindTemplateQualifier,
+var qualifierKindFromStringMap = map[string]ourtypes.QualifierKind {
+	"ValueQualifier": ourtypes.QualifierKindValueQualifier,
+	"ConceptQualifier": ourtypes.QualifierKindConceptQualifier,
+	"TemplateQualifier": ourtypes.QualifierKindTemplateQualifier,
 }
 
-// Parse `text` as a string representation of [aastypes.QualifierKind].
+// Parse `text` as a string representation of [ourtypes.QualifierKind].
 //
 // If not ok, the literal result is undefined.
 func QualifierKindFromString(
 	text string,
-) (literal aastypes.QualifierKind, ok bool) {
+) (literal ourtypes.QualifierKind, ok bool) {
 	literal, ok = qualifierKindFromStringMap[text]
 	return
 }
@@ -217,12 +217,12 @@ var qualifierKindToStringArray = [...]string {
 	"TemplateQualifier",
 }
 
-// Translate `value` from [aastypes.QualifierKind] to a string.
+// Translate `value` from [ourtypes.QualifierKind] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func QualifierKindToString(
-	value aastypes.QualifierKind,
+	value ourtypes.QualifierKind,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -236,11 +236,11 @@ func QualifierKindToString(
 	return
 }
 
-// Translate the `value` from [aastypes.QualifierKind] to a string.
+// Translate the `value` from [ourtypes.QualifierKind] to a string.
 //
 // Panic if the given value is invalid.
 func MustQualifierKindToString(
-	value aastypes.QualifierKind,
+	value ourtypes.QualifierKind,
 ) string {
 	result, ok := QualifierKindToString(value)
 	if !ok {
@@ -254,18 +254,18 @@ func MustQualifierKindToString(
 	return result
 }
 
-var assetKindFromStringMap = map[string]aastypes.AssetKind {
-	"Type": aastypes.AssetKindType,
-	"Instance": aastypes.AssetKindInstance,
-	"NotApplicable": aastypes.AssetKindNotApplicable,
+var assetKindFromStringMap = map[string]ourtypes.AssetKind {
+	"Type": ourtypes.AssetKindType,
+	"Instance": ourtypes.AssetKindInstance,
+	"NotApplicable": ourtypes.AssetKindNotApplicable,
 }
 
-// Parse `text` as a string representation of [aastypes.AssetKind].
+// Parse `text` as a string representation of [ourtypes.AssetKind].
 //
 // If not ok, the literal result is undefined.
 func AssetKindFromString(
 	text string,
-) (literal aastypes.AssetKind, ok bool) {
+) (literal ourtypes.AssetKind, ok bool) {
 	literal, ok = assetKindFromStringMap[text]
 	return
 }
@@ -276,12 +276,12 @@ var assetKindToStringArray = [...]string {
 	"NotApplicable",
 }
 
-// Translate `value` from [aastypes.AssetKind] to a string.
+// Translate `value` from [ourtypes.AssetKind] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func AssetKindToString(
-	value aastypes.AssetKind,
+	value ourtypes.AssetKind,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -295,11 +295,11 @@ func AssetKindToString(
 	return
 }
 
-// Translate the `value` from [aastypes.AssetKind] to a string.
+// Translate the `value` from [ourtypes.AssetKind] to a string.
 //
 // Panic if the given value is invalid.
 func MustAssetKindToString(
-	value aastypes.AssetKind,
+	value ourtypes.AssetKind,
 ) string {
 	result, ok := AssetKindToString(value)
 	if !ok {
@@ -313,32 +313,32 @@ func MustAssetKindToString(
 	return result
 }
 
-var aasSubmodelElementsFromStringMap = map[string]aastypes.AASSubmodelElements {
-	"AnnotatedRelationshipElement": aastypes.AASSubmodelElementsAnnotatedRelationshipElement,
-	"BasicEventElement": aastypes.AASSubmodelElementsBasicEventElement,
-	"Blob": aastypes.AASSubmodelElementsBlob,
-	"Capability": aastypes.AASSubmodelElementsCapability,
-	"DataElement": aastypes.AASSubmodelElementsDataElement,
-	"Entity": aastypes.AASSubmodelElementsEntity,
-	"EventElement": aastypes.AASSubmodelElementsEventElement,
-	"File": aastypes.AASSubmodelElementsFile,
-	"MultiLanguageProperty": aastypes.AASSubmodelElementsMultiLanguageProperty,
-	"Operation": aastypes.AASSubmodelElementsOperation,
-	"Property": aastypes.AASSubmodelElementsProperty,
-	"Range": aastypes.AASSubmodelElementsRange,
-	"ReferenceElement": aastypes.AASSubmodelElementsReferenceElement,
-	"RelationshipElement": aastypes.AASSubmodelElementsRelationshipElement,
-	"SubmodelElement": aastypes.AASSubmodelElementsSubmodelElement,
-	"SubmodelElementList": aastypes.AASSubmodelElementsSubmodelElementList,
-	"SubmodelElementCollection": aastypes.AASSubmodelElementsSubmodelElementCollection,
+var aasSubmodelElementsFromStringMap = map[string]ourtypes.AASSubmodelElements {
+	"AnnotatedRelationshipElement": ourtypes.AASSubmodelElementsAnnotatedRelationshipElement,
+	"BasicEventElement": ourtypes.AASSubmodelElementsBasicEventElement,
+	"Blob": ourtypes.AASSubmodelElementsBlob,
+	"Capability": ourtypes.AASSubmodelElementsCapability,
+	"DataElement": ourtypes.AASSubmodelElementsDataElement,
+	"Entity": ourtypes.AASSubmodelElementsEntity,
+	"EventElement": ourtypes.AASSubmodelElementsEventElement,
+	"File": ourtypes.AASSubmodelElementsFile,
+	"MultiLanguageProperty": ourtypes.AASSubmodelElementsMultiLanguageProperty,
+	"Operation": ourtypes.AASSubmodelElementsOperation,
+	"Property": ourtypes.AASSubmodelElementsProperty,
+	"Range": ourtypes.AASSubmodelElementsRange,
+	"ReferenceElement": ourtypes.AASSubmodelElementsReferenceElement,
+	"RelationshipElement": ourtypes.AASSubmodelElementsRelationshipElement,
+	"SubmodelElement": ourtypes.AASSubmodelElementsSubmodelElement,
+	"SubmodelElementList": ourtypes.AASSubmodelElementsSubmodelElementList,
+	"SubmodelElementCollection": ourtypes.AASSubmodelElementsSubmodelElementCollection,
 }
 
-// Parse `text` as a string representation of [aastypes.AASSubmodelElements].
+// Parse `text` as a string representation of [ourtypes.AASSubmodelElements].
 //
 // If not ok, the literal result is undefined.
 func AASSubmodelElementsFromString(
 	text string,
-) (literal aastypes.AASSubmodelElements, ok bool) {
+) (literal ourtypes.AASSubmodelElements, ok bool) {
 	literal, ok = aasSubmodelElementsFromStringMap[text]
 	return
 }
@@ -363,12 +363,12 @@ var aasSubmodelElementsToStringArray = [...]string {
 	"SubmodelElementCollection",
 }
 
-// Translate `value` from [aastypes.AASSubmodelElements] to a string.
+// Translate `value` from [ourtypes.AASSubmodelElements] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func AASSubmodelElementsToString(
-	value aastypes.AASSubmodelElements,
+	value ourtypes.AASSubmodelElements,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -382,11 +382,11 @@ func AASSubmodelElementsToString(
 	return
 }
 
-// Translate the `value` from [aastypes.AASSubmodelElements] to a string.
+// Translate the `value` from [ourtypes.AASSubmodelElements] to a string.
 //
 // Panic if the given value is invalid.
 func MustAASSubmodelElementsToString(
-	value aastypes.AASSubmodelElements,
+	value ourtypes.AASSubmodelElements,
 ) string {
 	result, ok := AASSubmodelElementsToString(value)
 	if !ok {
@@ -400,17 +400,17 @@ func MustAASSubmodelElementsToString(
 	return result
 }
 
-var entityTypeFromStringMap = map[string]aastypes.EntityType {
-	"CoManagedEntity": aastypes.EntityTypeCoManagedEntity,
-	"SelfManagedEntity": aastypes.EntityTypeSelfManagedEntity,
+var entityTypeFromStringMap = map[string]ourtypes.EntityType {
+	"CoManagedEntity": ourtypes.EntityTypeCoManagedEntity,
+	"SelfManagedEntity": ourtypes.EntityTypeSelfManagedEntity,
 }
 
-// Parse `text` as a string representation of [aastypes.EntityType].
+// Parse `text` as a string representation of [ourtypes.EntityType].
 //
 // If not ok, the literal result is undefined.
 func EntityTypeFromString(
 	text string,
-) (literal aastypes.EntityType, ok bool) {
+) (literal ourtypes.EntityType, ok bool) {
 	literal, ok = entityTypeFromStringMap[text]
 	return
 }
@@ -420,12 +420,12 @@ var entityTypeToStringArray = [...]string {
 	"SelfManagedEntity",
 }
 
-// Translate `value` from [aastypes.EntityType] to a string.
+// Translate `value` from [ourtypes.EntityType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func EntityTypeToString(
-	value aastypes.EntityType,
+	value ourtypes.EntityType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -439,11 +439,11 @@ func EntityTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.EntityType] to a string.
+// Translate the `value` from [ourtypes.EntityType] to a string.
 //
 // Panic if the given value is invalid.
 func MustEntityTypeToString(
-	value aastypes.EntityType,
+	value ourtypes.EntityType,
 ) string {
 	result, ok := EntityTypeToString(value)
 	if !ok {
@@ -457,17 +457,17 @@ func MustEntityTypeToString(
 	return result
 }
 
-var directionFromStringMap = map[string]aastypes.Direction {
-	"input": aastypes.DirectionInput,
-	"output": aastypes.DirectionOutput,
+var directionFromStringMap = map[string]ourtypes.Direction {
+	"input": ourtypes.DirectionInput,
+	"output": ourtypes.DirectionOutput,
 }
 
-// Parse `text` as a string representation of [aastypes.Direction].
+// Parse `text` as a string representation of [ourtypes.Direction].
 //
 // If not ok, the literal result is undefined.
 func DirectionFromString(
 	text string,
-) (literal aastypes.Direction, ok bool) {
+) (literal ourtypes.Direction, ok bool) {
 	literal, ok = directionFromStringMap[text]
 	return
 }
@@ -477,12 +477,12 @@ var directionToStringArray = [...]string {
 	"output",
 }
 
-// Translate `value` from [aastypes.Direction] to a string.
+// Translate `value` from [ourtypes.Direction] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func DirectionToString(
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -496,11 +496,11 @@ func DirectionToString(
 	return
 }
 
-// Translate the `value` from [aastypes.Direction] to a string.
+// Translate the `value` from [ourtypes.Direction] to a string.
 //
 // Panic if the given value is invalid.
 func MustDirectionToString(
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) string {
 	result, ok := DirectionToString(value)
 	if !ok {
@@ -514,17 +514,17 @@ func MustDirectionToString(
 	return result
 }
 
-var stateOfEventFromStringMap = map[string]aastypes.StateOfEvent {
-	"on": aastypes.StateOfEventOn,
-	"off": aastypes.StateOfEventOff,
+var stateOfEventFromStringMap = map[string]ourtypes.StateOfEvent {
+	"on": ourtypes.StateOfEventOn,
+	"off": ourtypes.StateOfEventOff,
 }
 
-// Parse `text` as a string representation of [aastypes.StateOfEvent].
+// Parse `text` as a string representation of [ourtypes.StateOfEvent].
 //
 // If not ok, the literal result is undefined.
 func StateOfEventFromString(
 	text string,
-) (literal aastypes.StateOfEvent, ok bool) {
+) (literal ourtypes.StateOfEvent, ok bool) {
 	literal, ok = stateOfEventFromStringMap[text]
 	return
 }
@@ -534,12 +534,12 @@ var stateOfEventToStringArray = [...]string {
 	"off",
 }
 
-// Translate `value` from [aastypes.StateOfEvent] to a string.
+// Translate `value` from [ourtypes.StateOfEvent] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func StateOfEventToString(
-	value aastypes.StateOfEvent,
+	value ourtypes.StateOfEvent,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -553,11 +553,11 @@ func StateOfEventToString(
 	return
 }
 
-// Translate the `value` from [aastypes.StateOfEvent] to a string.
+// Translate the `value` from [ourtypes.StateOfEvent] to a string.
 //
 // Panic if the given value is invalid.
 func MustStateOfEventToString(
-	value aastypes.StateOfEvent,
+	value ourtypes.StateOfEvent,
 ) string {
 	result, ok := StateOfEventToString(value)
 	if !ok {
@@ -571,17 +571,17 @@ func MustStateOfEventToString(
 	return result
 }
 
-var referenceTypesFromStringMap = map[string]aastypes.ReferenceTypes {
-	"ExternalReference": aastypes.ReferenceTypesExternalReference,
-	"ModelReference": aastypes.ReferenceTypesModelReference,
+var referenceTypesFromStringMap = map[string]ourtypes.ReferenceTypes {
+	"ExternalReference": ourtypes.ReferenceTypesExternalReference,
+	"ModelReference": ourtypes.ReferenceTypesModelReference,
 }
 
-// Parse `text` as a string representation of [aastypes.ReferenceTypes].
+// Parse `text` as a string representation of [ourtypes.ReferenceTypes].
 //
 // If not ok, the literal result is undefined.
 func ReferenceTypesFromString(
 	text string,
-) (literal aastypes.ReferenceTypes, ok bool) {
+) (literal ourtypes.ReferenceTypes, ok bool) {
 	literal, ok = referenceTypesFromStringMap[text]
 	return
 }
@@ -591,12 +591,12 @@ var referenceTypesToStringArray = [...]string {
 	"ModelReference",
 }
 
-// Translate `value` from [aastypes.ReferenceTypes] to a string.
+// Translate `value` from [ourtypes.ReferenceTypes] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ReferenceTypesToString(
-	value aastypes.ReferenceTypes,
+	value ourtypes.ReferenceTypes,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -610,11 +610,11 @@ func ReferenceTypesToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ReferenceTypes] to a string.
+// Translate the `value` from [ourtypes.ReferenceTypes] to a string.
 //
 // Panic if the given value is invalid.
 func MustReferenceTypesToString(
-	value aastypes.ReferenceTypes,
+	value ourtypes.ReferenceTypes,
 ) string {
 	result, ok := ReferenceTypesToString(value)
 	if !ok {
@@ -628,39 +628,39 @@ func MustReferenceTypesToString(
 	return result
 }
 
-var keyTypesFromStringMap = map[string]aastypes.KeyTypes {
-	"AnnotatedRelationshipElement": aastypes.KeyTypesAnnotatedRelationshipElement,
-	"AssetAdministrationShell": aastypes.KeyTypesAssetAdministrationShell,
-	"BasicEventElement": aastypes.KeyTypesBasicEventElement,
-	"Blob": aastypes.KeyTypesBlob,
-	"Capability": aastypes.KeyTypesCapability,
-	"ConceptDescription": aastypes.KeyTypesConceptDescription,
-	"DataElement": aastypes.KeyTypesDataElement,
-	"Entity": aastypes.KeyTypesEntity,
-	"EventElement": aastypes.KeyTypesEventElement,
-	"File": aastypes.KeyTypesFile,
-	"FragmentReference": aastypes.KeyTypesFragmentReference,
-	"GlobalReference": aastypes.KeyTypesGlobalReference,
-	"Identifiable": aastypes.KeyTypesIdentifiable,
-	"MultiLanguageProperty": aastypes.KeyTypesMultiLanguageProperty,
-	"Operation": aastypes.KeyTypesOperation,
-	"Property": aastypes.KeyTypesProperty,
-	"Range": aastypes.KeyTypesRange,
-	"Referable": aastypes.KeyTypesReferable,
-	"ReferenceElement": aastypes.KeyTypesReferenceElement,
-	"RelationshipElement": aastypes.KeyTypesRelationshipElement,
-	"Submodel": aastypes.KeyTypesSubmodel,
-	"SubmodelElement": aastypes.KeyTypesSubmodelElement,
-	"SubmodelElementCollection": aastypes.KeyTypesSubmodelElementCollection,
-	"SubmodelElementList": aastypes.KeyTypesSubmodelElementList,
+var keyTypesFromStringMap = map[string]ourtypes.KeyTypes {
+	"AnnotatedRelationshipElement": ourtypes.KeyTypesAnnotatedRelationshipElement,
+	"AssetAdministrationShell": ourtypes.KeyTypesAssetAdministrationShell,
+	"BasicEventElement": ourtypes.KeyTypesBasicEventElement,
+	"Blob": ourtypes.KeyTypesBlob,
+	"Capability": ourtypes.KeyTypesCapability,
+	"ConceptDescription": ourtypes.KeyTypesConceptDescription,
+	"DataElement": ourtypes.KeyTypesDataElement,
+	"Entity": ourtypes.KeyTypesEntity,
+	"EventElement": ourtypes.KeyTypesEventElement,
+	"File": ourtypes.KeyTypesFile,
+	"FragmentReference": ourtypes.KeyTypesFragmentReference,
+	"GlobalReference": ourtypes.KeyTypesGlobalReference,
+	"Identifiable": ourtypes.KeyTypesIdentifiable,
+	"MultiLanguageProperty": ourtypes.KeyTypesMultiLanguageProperty,
+	"Operation": ourtypes.KeyTypesOperation,
+	"Property": ourtypes.KeyTypesProperty,
+	"Range": ourtypes.KeyTypesRange,
+	"Referable": ourtypes.KeyTypesReferable,
+	"ReferenceElement": ourtypes.KeyTypesReferenceElement,
+	"RelationshipElement": ourtypes.KeyTypesRelationshipElement,
+	"Submodel": ourtypes.KeyTypesSubmodel,
+	"SubmodelElement": ourtypes.KeyTypesSubmodelElement,
+	"SubmodelElementCollection": ourtypes.KeyTypesSubmodelElementCollection,
+	"SubmodelElementList": ourtypes.KeyTypesSubmodelElementList,
 }
 
-// Parse `text` as a string representation of [aastypes.KeyTypes].
+// Parse `text` as a string representation of [ourtypes.KeyTypes].
 //
 // If not ok, the literal result is undefined.
 func KeyTypesFromString(
 	text string,
-) (literal aastypes.KeyTypes, ok bool) {
+) (literal ourtypes.KeyTypes, ok bool) {
 	literal, ok = keyTypesFromStringMap[text]
 	return
 }
@@ -692,12 +692,12 @@ var keyTypesToStringArray = [...]string {
 	"SubmodelElementList",
 }
 
-// Translate `value` from [aastypes.KeyTypes] to a string.
+// Translate `value` from [ourtypes.KeyTypes] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func KeyTypesToString(
-	value aastypes.KeyTypes,
+	value ourtypes.KeyTypes,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -711,11 +711,11 @@ func KeyTypesToString(
 	return
 }
 
-// Translate the `value` from [aastypes.KeyTypes] to a string.
+// Translate the `value` from [ourtypes.KeyTypes] to a string.
 //
 // Panic if the given value is invalid.
 func MustKeyTypesToString(
-	value aastypes.KeyTypes,
+	value ourtypes.KeyTypes,
 ) string {
 	result, ok := KeyTypesToString(value)
 	if !ok {
@@ -729,45 +729,45 @@ func MustKeyTypesToString(
 	return result
 }
 
-var dataTypeDefXSDFromStringMap = map[string]aastypes.DataTypeDefXSD {
-	"xs:anyURI": aastypes.DataTypeDefXSDAnyURI,
-	"xs:base64Binary": aastypes.DataTypeDefXSDBase64Binary,
-	"xs:boolean": aastypes.DataTypeDefXSDBoolean,
-	"xs:byte": aastypes.DataTypeDefXSDByte,
-	"xs:date": aastypes.DataTypeDefXSDDate,
-	"xs:dateTime": aastypes.DataTypeDefXSDDateTime,
-	"xs:decimal": aastypes.DataTypeDefXSDDecimal,
-	"xs:double": aastypes.DataTypeDefXSDDouble,
-	"xs:duration": aastypes.DataTypeDefXSDDuration,
-	"xs:float": aastypes.DataTypeDefXSDFloat,
-	"xs:gDay": aastypes.DataTypeDefXSDGDay,
-	"xs:gMonth": aastypes.DataTypeDefXSDGMonth,
-	"xs:gMonthDay": aastypes.DataTypeDefXSDGMonthDay,
-	"xs:gYear": aastypes.DataTypeDefXSDGYear,
-	"xs:gYearMonth": aastypes.DataTypeDefXSDGYearMonth,
-	"xs:hexBinary": aastypes.DataTypeDefXSDHexBinary,
-	"xs:int": aastypes.DataTypeDefXSDInt,
-	"xs:integer": aastypes.DataTypeDefXSDInteger,
-	"xs:long": aastypes.DataTypeDefXSDLong,
-	"xs:negativeInteger": aastypes.DataTypeDefXSDNegativeInteger,
-	"xs:nonNegativeInteger": aastypes.DataTypeDefXSDNonNegativeInteger,
-	"xs:nonPositiveInteger": aastypes.DataTypeDefXSDNonPositiveInteger,
-	"xs:positiveInteger": aastypes.DataTypeDefXSDPositiveInteger,
-	"xs:short": aastypes.DataTypeDefXSDShort,
-	"xs:string": aastypes.DataTypeDefXSDString,
-	"xs:time": aastypes.DataTypeDefXSDTime,
-	"xs:unsignedByte": aastypes.DataTypeDefXSDUnsignedByte,
-	"xs:unsignedInt": aastypes.DataTypeDefXSDUnsignedInt,
-	"xs:unsignedLong": aastypes.DataTypeDefXSDUnsignedLong,
-	"xs:unsignedShort": aastypes.DataTypeDefXSDUnsignedShort,
+var dataTypeDefXSDFromStringMap = map[string]ourtypes.DataTypeDefXSD {
+	"xs:anyURI": ourtypes.DataTypeDefXSDAnyURI,
+	"xs:base64Binary": ourtypes.DataTypeDefXSDBase64Binary,
+	"xs:boolean": ourtypes.DataTypeDefXSDBoolean,
+	"xs:byte": ourtypes.DataTypeDefXSDByte,
+	"xs:date": ourtypes.DataTypeDefXSDDate,
+	"xs:dateTime": ourtypes.DataTypeDefXSDDateTime,
+	"xs:decimal": ourtypes.DataTypeDefXSDDecimal,
+	"xs:double": ourtypes.DataTypeDefXSDDouble,
+	"xs:duration": ourtypes.DataTypeDefXSDDuration,
+	"xs:float": ourtypes.DataTypeDefXSDFloat,
+	"xs:gDay": ourtypes.DataTypeDefXSDGDay,
+	"xs:gMonth": ourtypes.DataTypeDefXSDGMonth,
+	"xs:gMonthDay": ourtypes.DataTypeDefXSDGMonthDay,
+	"xs:gYear": ourtypes.DataTypeDefXSDGYear,
+	"xs:gYearMonth": ourtypes.DataTypeDefXSDGYearMonth,
+	"xs:hexBinary": ourtypes.DataTypeDefXSDHexBinary,
+	"xs:int": ourtypes.DataTypeDefXSDInt,
+	"xs:integer": ourtypes.DataTypeDefXSDInteger,
+	"xs:long": ourtypes.DataTypeDefXSDLong,
+	"xs:negativeInteger": ourtypes.DataTypeDefXSDNegativeInteger,
+	"xs:nonNegativeInteger": ourtypes.DataTypeDefXSDNonNegativeInteger,
+	"xs:nonPositiveInteger": ourtypes.DataTypeDefXSDNonPositiveInteger,
+	"xs:positiveInteger": ourtypes.DataTypeDefXSDPositiveInteger,
+	"xs:short": ourtypes.DataTypeDefXSDShort,
+	"xs:string": ourtypes.DataTypeDefXSDString,
+	"xs:time": ourtypes.DataTypeDefXSDTime,
+	"xs:unsignedByte": ourtypes.DataTypeDefXSDUnsignedByte,
+	"xs:unsignedInt": ourtypes.DataTypeDefXSDUnsignedInt,
+	"xs:unsignedLong": ourtypes.DataTypeDefXSDUnsignedLong,
+	"xs:unsignedShort": ourtypes.DataTypeDefXSDUnsignedShort,
 }
 
-// Parse `text` as a string representation of [aastypes.DataTypeDefXSD].
+// Parse `text` as a string representation of [ourtypes.DataTypeDefXSD].
 //
 // If not ok, the literal result is undefined.
 func DataTypeDefXSDFromString(
 	text string,
-) (literal aastypes.DataTypeDefXSD, ok bool) {
+) (literal ourtypes.DataTypeDefXSD, ok bool) {
 	literal, ok = dataTypeDefXSDFromStringMap[text]
 	return
 }
@@ -805,12 +805,12 @@ var dataTypeDefXSDToStringArray = [...]string {
 	"xs:unsignedShort",
 }
 
-// Translate `value` from [aastypes.DataTypeDefXSD] to a string.
+// Translate `value` from [ourtypes.DataTypeDefXSD] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func DataTypeDefXSDToString(
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -824,11 +824,11 @@ func DataTypeDefXSDToString(
 	return
 }
 
-// Translate the `value` from [aastypes.DataTypeDefXSD] to a string.
+// Translate the `value` from [ourtypes.DataTypeDefXSD] to a string.
 //
 // Panic if the given value is invalid.
 func MustDataTypeDefXSDToString(
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) string {
 	result, ok := DataTypeDefXSDToString(value)
 	if !ok {
@@ -842,34 +842,34 @@ func MustDataTypeDefXSDToString(
 	return result
 }
 
-var dataTypeIEC61360FromStringMap = map[string]aastypes.DataTypeIEC61360 {
-	"DATE": aastypes.DataTypeIEC61360Date,
-	"STRING": aastypes.DataTypeIEC61360String,
-	"STRING_TRANSLATABLE": aastypes.DataTypeIEC61360StringTranslatable,
-	"INTEGER_MEASURE": aastypes.DataTypeIEC61360IntegerMeasure,
-	"INTEGER_COUNT": aastypes.DataTypeIEC61360IntegerCount,
-	"INTEGER_CURRENCY": aastypes.DataTypeIEC61360IntegerCurrency,
-	"REAL_MEASURE": aastypes.DataTypeIEC61360RealMeasure,
-	"REAL_COUNT": aastypes.DataTypeIEC61360RealCount,
-	"REAL_CURRENCY": aastypes.DataTypeIEC61360RealCurrency,
-	"BOOLEAN": aastypes.DataTypeIEC61360Boolean,
-	"IRI": aastypes.DataTypeIEC61360IRI,
-	"IRDI": aastypes.DataTypeIEC61360IRDI,
-	"RATIONAL": aastypes.DataTypeIEC61360Rational,
-	"RATIONAL_MEASURE": aastypes.DataTypeIEC61360RationalMeasure,
-	"TIME": aastypes.DataTypeIEC61360Time,
-	"TIMESTAMP": aastypes.DataTypeIEC61360Timestamp,
-	"FILE": aastypes.DataTypeIEC61360File,
-	"HTML": aastypes.DataTypeIEC61360HTML,
-	"BLOB": aastypes.DataTypeIEC61360Blob,
+var dataTypeIEC61360FromStringMap = map[string]ourtypes.DataTypeIEC61360 {
+	"DATE": ourtypes.DataTypeIEC61360Date,
+	"STRING": ourtypes.DataTypeIEC61360String,
+	"STRING_TRANSLATABLE": ourtypes.DataTypeIEC61360StringTranslatable,
+	"INTEGER_MEASURE": ourtypes.DataTypeIEC61360IntegerMeasure,
+	"INTEGER_COUNT": ourtypes.DataTypeIEC61360IntegerCount,
+	"INTEGER_CURRENCY": ourtypes.DataTypeIEC61360IntegerCurrency,
+	"REAL_MEASURE": ourtypes.DataTypeIEC61360RealMeasure,
+	"REAL_COUNT": ourtypes.DataTypeIEC61360RealCount,
+	"REAL_CURRENCY": ourtypes.DataTypeIEC61360RealCurrency,
+	"BOOLEAN": ourtypes.DataTypeIEC61360Boolean,
+	"IRI": ourtypes.DataTypeIEC61360IRI,
+	"IRDI": ourtypes.DataTypeIEC61360IRDI,
+	"RATIONAL": ourtypes.DataTypeIEC61360Rational,
+	"RATIONAL_MEASURE": ourtypes.DataTypeIEC61360RationalMeasure,
+	"TIME": ourtypes.DataTypeIEC61360Time,
+	"TIMESTAMP": ourtypes.DataTypeIEC61360Timestamp,
+	"FILE": ourtypes.DataTypeIEC61360File,
+	"HTML": ourtypes.DataTypeIEC61360HTML,
+	"BLOB": ourtypes.DataTypeIEC61360Blob,
 }
 
-// Parse `text` as a string representation of [aastypes.DataTypeIEC61360].
+// Parse `text` as a string representation of [ourtypes.DataTypeIEC61360].
 //
 // If not ok, the literal result is undefined.
 func DataTypeIEC61360FromString(
 	text string,
-) (literal aastypes.DataTypeIEC61360, ok bool) {
+) (literal ourtypes.DataTypeIEC61360, ok bool) {
 	literal, ok = dataTypeIEC61360FromStringMap[text]
 	return
 }
@@ -896,12 +896,12 @@ var dataTypeIEC61360ToStringArray = [...]string {
 	"BLOB",
 }
 
-// Translate `value` from [aastypes.DataTypeIEC61360] to a string.
+// Translate `value` from [ourtypes.DataTypeIEC61360] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func DataTypeIEC61360ToString(
-	value aastypes.DataTypeIEC61360,
+	value ourtypes.DataTypeIEC61360,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -915,11 +915,11 @@ func DataTypeIEC61360ToString(
 	return
 }
 
-// Translate the `value` from [aastypes.DataTypeIEC61360] to a string.
+// Translate the `value` from [ourtypes.DataTypeIEC61360] to a string.
 //
 // Panic if the given value is invalid.
 func MustDataTypeIEC61360ToString(
-	value aastypes.DataTypeIEC61360,
+	value ourtypes.DataTypeIEC61360,
 ) string {
 	result, ok := DataTypeIEC61360ToString(value)
 	if !ok {

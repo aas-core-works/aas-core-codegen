@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,345 +14,345 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.StructuralFirst LoadMaximalStructuralFirst()
+        public static Our.StructuralFirst LoadMaximalStructuralFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StructuralFirst",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StructuralFirstFrom(
+            var instance = Our.Jsonization.Deserialize.StructuralFirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StructuralFirst LoadMaximalStructuralFirst
+        }  // public static Our.StructuralFirst LoadMaximalStructuralFirst
 
-        public static Aas.StructuralFirst LoadMinimalStructuralFirst()
+        public static Our.StructuralFirst LoadMinimalStructuralFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StructuralFirst",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StructuralFirstFrom(
+            var instance = Our.Jsonization.Deserialize.StructuralFirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StructuralFirst LoadMinimalStructuralFirst
+        }  // public static Our.StructuralFirst LoadMinimalStructuralFirst
 
-        public static Aas.StructuralSecond LoadMaximalStructuralSecond()
+        public static Our.StructuralSecond LoadMaximalStructuralSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StructuralSecond",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StructuralSecondFrom(
+            var instance = Our.Jsonization.Deserialize.StructuralSecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StructuralSecond LoadMaximalStructuralSecond
+        }  // public static Our.StructuralSecond LoadMaximalStructuralSecond
 
-        public static Aas.StructuralSecond LoadMinimalStructuralSecond()
+        public static Our.StructuralSecond LoadMinimalStructuralSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StructuralSecond",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StructuralSecondFrom(
+            var instance = Our.Jsonization.Deserialize.StructuralSecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StructuralSecond LoadMinimalStructuralSecond
+        }  // public static Our.StructuralSecond LoadMinimalStructuralSecond
 
-        public static Aas.MixedAbstractDescendantOne LoadMaximalMixedAbstractDescendantOne()
+        public static Our.MixedAbstractDescendantOne LoadMaximalMixedAbstractDescendantOne()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedAbstractDescendantOne",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedAbstractDescendantOneFrom(
+            var instance = Our.Jsonization.Deserialize.MixedAbstractDescendantOneFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedAbstractDescendantOne LoadMaximalMixedAbstractDescendantOne
+        }  // public static Our.MixedAbstractDescendantOne LoadMaximalMixedAbstractDescendantOne
 
-        public static Aas.MixedAbstractDescendantOne LoadMinimalMixedAbstractDescendantOne()
+        public static Our.MixedAbstractDescendantOne LoadMinimalMixedAbstractDescendantOne()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedAbstractDescendantOne",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedAbstractDescendantOneFrom(
+            var instance = Our.Jsonization.Deserialize.MixedAbstractDescendantOneFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedAbstractDescendantOne LoadMinimalMixedAbstractDescendantOne
+        }  // public static Our.MixedAbstractDescendantOne LoadMinimalMixedAbstractDescendantOne
 
-        public static Aas.MixedAbstractDescendantTwo LoadMaximalMixedAbstractDescendantTwo()
+        public static Our.MixedAbstractDescendantTwo LoadMaximalMixedAbstractDescendantTwo()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedAbstractDescendantTwo",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedAbstractDescendantTwoFrom(
+            var instance = Our.Jsonization.Deserialize.MixedAbstractDescendantTwoFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedAbstractDescendantTwo LoadMaximalMixedAbstractDescendantTwo
+        }  // public static Our.MixedAbstractDescendantTwo LoadMaximalMixedAbstractDescendantTwo
 
-        public static Aas.MixedAbstractDescendantTwo LoadMinimalMixedAbstractDescendantTwo()
+        public static Our.MixedAbstractDescendantTwo LoadMinimalMixedAbstractDescendantTwo()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedAbstractDescendantTwo",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedAbstractDescendantTwoFrom(
+            var instance = Our.Jsonization.Deserialize.MixedAbstractDescendantTwoFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedAbstractDescendantTwo LoadMinimalMixedAbstractDescendantTwo
+        }  // public static Our.MixedAbstractDescendantTwo LoadMinimalMixedAbstractDescendantTwo
 
-        public static Aas.MixedConcreteWithDescendants LoadMaximalMixedConcreteWithDescendants()
+        public static Our.MixedConcreteWithDescendants LoadMaximalMixedConcreteWithDescendants()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteWithDescendants",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteWithDescendantsFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteWithDescendantsFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteWithDescendants LoadMaximalMixedConcreteWithDescendants
+        }  // public static Our.MixedConcreteWithDescendants LoadMaximalMixedConcreteWithDescendants
 
-        public static Aas.MixedConcreteWithDescendants LoadMinimalMixedConcreteWithDescendants()
+        public static Our.MixedConcreteWithDescendants LoadMinimalMixedConcreteWithDescendants()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteWithDescendants",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteWithDescendantsFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteWithDescendantsFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteWithDescendants LoadMinimalMixedConcreteWithDescendants
+        }  // public static Our.MixedConcreteWithDescendants LoadMinimalMixedConcreteWithDescendants
 
-        public static Aas.MixedConcreteWithDescendantsChild LoadMaximalMixedConcreteWithDescendantsChild()
+        public static Our.MixedConcreteWithDescendantsChild LoadMaximalMixedConcreteWithDescendantsChild()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteWithDescendantsChild",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteWithDescendantsChildFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteWithDescendantsChildFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteWithDescendantsChild LoadMaximalMixedConcreteWithDescendantsChild
+        }  // public static Our.MixedConcreteWithDescendantsChild LoadMaximalMixedConcreteWithDescendantsChild
 
-        public static Aas.MixedConcreteWithDescendantsChild LoadMinimalMixedConcreteWithDescendantsChild()
+        public static Our.MixedConcreteWithDescendantsChild LoadMinimalMixedConcreteWithDescendantsChild()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteWithDescendantsChild",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteWithDescendantsChildFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteWithDescendantsChildFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteWithDescendantsChild LoadMinimalMixedConcreteWithDescendantsChild
+        }  // public static Our.MixedConcreteWithDescendantsChild LoadMinimalMixedConcreteWithDescendantsChild
 
-        public static Aas.MixedConcreteLeaf LoadMaximalMixedConcreteLeaf()
+        public static Our.MixedConcreteLeaf LoadMaximalMixedConcreteLeaf()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteLeaf",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteLeafFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteLeafFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteLeaf LoadMaximalMixedConcreteLeaf
+        }  // public static Our.MixedConcreteLeaf LoadMaximalMixedConcreteLeaf
 
-        public static Aas.MixedConcreteLeaf LoadMinimalMixedConcreteLeaf()
+        public static Our.MixedConcreteLeaf LoadMinimalMixedConcreteLeaf()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "MixedConcreteLeaf",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.MixedConcreteLeafFrom(
+            var instance = Our.Jsonization.Deserialize.MixedConcreteLeafFrom(
                 node);
 
             return instance;
-        }  // public static Aas.MixedConcreteLeaf LoadMinimalMixedConcreteLeaf
+        }  // public static Our.MixedConcreteLeaf LoadMinimalMixedConcreteLeaf
 
-        public static Aas.ModelTypedFirst LoadMaximalModelTypedFirst()
+        public static Our.ModelTypedFirst LoadMaximalModelTypedFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ModelTypedFirst",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ModelTypedFirstFrom(
+            var instance = Our.Jsonization.Deserialize.ModelTypedFirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ModelTypedFirst LoadMaximalModelTypedFirst
+        }  // public static Our.ModelTypedFirst LoadMaximalModelTypedFirst
 
-        public static Aas.ModelTypedFirst LoadMinimalModelTypedFirst()
+        public static Our.ModelTypedFirst LoadMinimalModelTypedFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ModelTypedFirst",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ModelTypedFirstFrom(
+            var instance = Our.Jsonization.Deserialize.ModelTypedFirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ModelTypedFirst LoadMinimalModelTypedFirst
+        }  // public static Our.ModelTypedFirst LoadMinimalModelTypedFirst
 
-        public static Aas.ModelTypedSecond LoadMaximalModelTypedSecond()
+        public static Our.ModelTypedSecond LoadMaximalModelTypedSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ModelTypedSecond",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ModelTypedSecondFrom(
+            var instance = Our.Jsonization.Deserialize.ModelTypedSecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ModelTypedSecond LoadMaximalModelTypedSecond
+        }  // public static Our.ModelTypedSecond LoadMaximalModelTypedSecond
 
-        public static Aas.ModelTypedSecond LoadMinimalModelTypedSecond()
+        public static Our.ModelTypedSecond LoadMinimalModelTypedSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ModelTypedSecond",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ModelTypedSecondFrom(
+            var instance = Our.Jsonization.Deserialize.ModelTypedSecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ModelTypedSecond LoadMinimalModelTypedSecond
+        }  // public static Our.ModelTypedSecond LoadMinimalModelTypedSecond
 
-        public static Aas.Something LoadMaximalSomething()
+        public static Our.Something LoadMaximalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMaximalSomething
+        }  // public static Our.Something LoadMaximalSomething
 
-        public static Aas.Something LoadMinimalSomething()
+        public static Our.Something LoadMinimalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMinimalSomething
+        }  // public static Our.Something LoadMinimalSomething
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

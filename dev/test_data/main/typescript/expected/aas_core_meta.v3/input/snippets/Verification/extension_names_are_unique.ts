@@ -6,7 +6,7 @@
  * @returns `true` if the check passes
  */
 export function extensionNamesAreUnique(
-  extensions: Iterable<AasTypes.Extension>
+  extensions: Iterable<OurTypes.Extension>
 ): boolean {
   const nameSet = new Set<string>();
   for (const extension of extensions) {

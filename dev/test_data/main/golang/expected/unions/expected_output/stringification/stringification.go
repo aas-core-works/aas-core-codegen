@@ -6,28 +6,28 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"StructuralFirst": aastypes.ModelTypeStructuralFirst,
-	"StructuralSecond": aastypes.ModelTypeStructuralSecond,
-	"MixedAbstractDescendantOne": aastypes.ModelTypeMixedAbstractDescendantOne,
-	"MixedAbstractDescendantTwo": aastypes.ModelTypeMixedAbstractDescendantTwo,
-	"MixedConcreteWithDescendants": aastypes.ModelTypeMixedConcreteWithDescendants,
-	"MixedConcreteWithDescendantsChild": aastypes.ModelTypeMixedConcreteWithDescendantsChild,
-	"MixedConcreteLeaf": aastypes.ModelTypeMixedConcreteLeaf,
-	"ModelTypedFirst": aastypes.ModelTypeModelTypedFirst,
-	"ModelTypedSecond": aastypes.ModelTypeModelTypedSecond,
-	"Something": aastypes.ModelTypeSomething,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"StructuralFirst": ourtypes.ModelTypeStructuralFirst,
+	"StructuralSecond": ourtypes.ModelTypeStructuralSecond,
+	"MixedAbstractDescendantOne": ourtypes.ModelTypeMixedAbstractDescendantOne,
+	"MixedAbstractDescendantTwo": ourtypes.ModelTypeMixedAbstractDescendantTwo,
+	"MixedConcreteWithDescendants": ourtypes.ModelTypeMixedConcreteWithDescendants,
+	"MixedConcreteWithDescendantsChild": ourtypes.ModelTypeMixedConcreteWithDescendantsChild,
+	"MixedConcreteLeaf": ourtypes.ModelTypeMixedConcreteLeaf,
+	"ModelTypedFirst": ourtypes.ModelTypeModelTypedFirst,
+	"ModelTypedSecond": ourtypes.ModelTypeModelTypedSecond,
+	"Something": ourtypes.ModelTypeSomething,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -45,12 +45,12 @@ var modelTypeToStringArray = [...]string {
 	"Something",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -64,11 +64,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {

@@ -1,11 +1,11 @@
 def submodel_elements_have_identical_semantic_ids(
-    elements: Iterable[aas_types.SubmodelElement],
+    elements: Iterable[our_types.SubmodelElement],
 ) -> bool:
     """
     Check that all :paramref:`elements` have the identical
     :py:attr:`.types.HasSemantics.semantic_id`.
     """
-    that_semantic_id = None  # type: Optional[aas_types.Reference]
+    that_semantic_id = None  # type: Optional[our_types.Reference]
 
     for element in elements:
         if element.semantic_id is None:

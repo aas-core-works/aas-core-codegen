@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of IItem:
     /// <code>
-    /// var anInstance = new Aas.IItem(
+    /// var anInstance = new Our.IItem(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -35,7 +35,7 @@ namespace dummy
         /// Check that <paramref name="text" /> is not empty.
         /// </summary>
         /// <remarks>
-        /// This is meant to check the result of <see cref="Aas.IItem.Describe" />.
+        /// This is meant to check the result of <see cref="Our.IItem.Describe" />.
         /// </remarks>
         public static bool IsDescribed(
             string text
@@ -61,7 +61,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBox(
-                Aas.IBox that
+                Our.IBox that
             )
             {
                 if (!(that.Size > 0))
@@ -79,7 +79,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {

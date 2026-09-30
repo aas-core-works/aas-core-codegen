@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnceOnAnInstanceOfBranch(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalBranch()
+	instance := ourtesting.MustLoadMaximalBranch()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Branch",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnceOnAnInstanceOfBranch(
 func TestDescendOnceOnAnInstanceOfLeaf(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLeaf()
+	instance := ourtesting.MustLoadMaximalLeaf()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Leaf",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnceOnAnInstanceOfLeaf(
 func TestDescendOnceOnAnInstanceOfBlossom(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalBlossom()
+	instance := ourtesting.MustLoadMaximalBlossom()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Blossom",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnceOnAnInstanceOfBlossom(
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Something",
 		"maximal.json.trace",
@@ -108,10 +108,10 @@ func TestDescendOnceOnAnInstanceOfSomething(
 func TestDescendOnceOnAnInstanceOfContainer(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalContainer()
+	instance := ourtesting.MustLoadMaximalContainer()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Container",
 		"maximal.json.trace",

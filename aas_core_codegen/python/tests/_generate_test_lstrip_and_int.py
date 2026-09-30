@@ -66,7 +66,7 @@ def test_lstrip_{i}(self) -> None:
 def test_int_{i}(self) -> None:
 {I}self.assertEqual(
 {II}{expected_int},
-{II}aas_common.parse_safe_int({python_common.string_literal(text)})
+{II}our_common.parse_safe_int({python_common.string_literal(text)})
 {I})"""
                 )
             )
@@ -77,7 +77,7 @@ def test_int_{i}(self) -> None:
                     f"""\
 def test_int_invalid_{i}(self) -> None:
 {I}with self.assertRaises(ValueError):
-{II}aas_common.parse_safe_int({python_common.string_literal(text)})"""
+{II}our_common.parse_safe_int({python_common.string_literal(text)})"""
                 )
             )
 
@@ -88,7 +88,7 @@ def test_int_invalid_{i}(self) -> None:
             f"""\
 import unittest
 
-import {qualified_module_name}.common as aas_common"""
+import {qualified_module_name}.common as our_common"""
         )
     else:
         imports = Stripped("import unittest")

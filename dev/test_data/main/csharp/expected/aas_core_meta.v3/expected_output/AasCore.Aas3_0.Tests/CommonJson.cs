@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
     
-using Aas = AasCore.Aas3_0; // renamed
+using Our = AasCore.Aas3_0; // renamed
 
 using FileMode = System.IO.FileMode;
 using FileStream = System.IO.FileStream;
@@ -67,8 +67,8 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         $"Could not convert {something} to " + "a base64-encoded JSON string"
                     );
-            case Aas.IClass instance:
-                return Aas.Jsonization.Serialize.ToJsonObject(instance);
+            case Our.IClass instance:
+                return Our.Jsonization.Serialize.ToJsonObject(instance);
             default:
                 throw new System.ArgumentException(
                     $"The conversion of type {something.GetType()} "

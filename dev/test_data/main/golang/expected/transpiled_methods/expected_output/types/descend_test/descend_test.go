@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnAnInstanceOfFirst(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalFirst()
+	instance := ourtesting.MustLoadMaximalFirst()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"First",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnAnInstanceOfFirst(
 func TestDescendOnAnInstanceOfSecond(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSecond()
+	instance := ourtesting.MustLoadMaximalSecond()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Second",
 		"maximal.json.trace",

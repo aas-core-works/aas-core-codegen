@@ -84,8 +84,8 @@ public static Nodes.JsonNode ToJson(object something)
 {IIII}?? throw new System.InvalidOperationException(
 {IIIII}$"Could not convert {{something}} to " + "a base64-encoded JSON string"
 {IIII});
-{II}case Aas.IClass instance:
-{III}return Aas.Jsonization.Serialize.ToJsonObject(instance);
+{II}case Our.IClass instance:
+{III}return Our.Jsonization.Serialize.ToJsonObject(instance);
 {II}default:
 {III}throw new System.ArgumentException(
 {IIII}$"The conversion of type {{something.GetType()}} "
@@ -242,7 +242,7 @@ public static void CheckJsonNodesEqual(
     return f"""\
 {csharp_common.WARNING}
     
-using Aas = {namespace}; // renamed
+using Our = {namespace}; // renamed
 
 using FileMode = System.IO.FileMode;
 using FileStream = System.IO.FileStream;

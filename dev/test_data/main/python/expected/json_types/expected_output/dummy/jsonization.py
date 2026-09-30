@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -34,9 +34,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -170,7 +170,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -180,7 +180,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -272,7 +272,7 @@ def _as_mapping(
 
 def _json_value_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.JsonValue:
+) -> our_types.JsonValue:
     """
     Parse :paramref:`jsonable` as a JSON-able value.
 
@@ -301,7 +301,7 @@ def _json_value_from_jsonable(
         # JSON knows a single numeric type, so :py:mod:`json` giving us
         # an ``int`` says nothing about the document: "1" and "1.0" are
         # the same number, and a JSON-able value holds it as a ``float``.
-        number = aas_common.try_to_convert_int_to_float(jsonable)
+        number = our_common.try_to_convert_int_to_float(jsonable)
         if number is None:
             raise DeserializationException(
                 f"Expected a JSON-able value, but got the integer {jsonable}, "
@@ -344,7 +344,7 @@ def _json_value_from_jsonable(
 
         return mapping
 
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is not None:
         items = []  # type: List[Any]
         for i, jsonable_item in enumerate(array_like):
@@ -364,7 +364,7 @@ def _json_value_from_jsonable(
 
 def _json_array_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.JsonArray:
+) -> our_types.JsonArray:
     """
     Parse :paramref:`jsonable` as a JSON-able array.
 
@@ -372,7 +372,7 @@ def _json_array_from_jsonable(
     :return: parsed JSON-able array
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    if aas_common.try_to_cast_to_array_like(jsonable) is None:
+    if our_common.try_to_cast_to_array_like(jsonable) is None:
         raise DeserializationException(
             f"Expected a JSON-able array, but got: {type(jsonable)}"
         )
@@ -384,7 +384,7 @@ def _json_array_from_jsonable(
 
 def _json_object_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.JsonObject:
+) -> our_types.JsonObject:
     """
     Parse :paramref:`jsonable` as a JSON-able object.
 
@@ -404,7 +404,7 @@ def _json_object_from_jsonable(
 
 def something_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Parse an instance of :py:class:`.types.Something` from the JSON-able
     structure :paramref:`jsonable`.
@@ -415,13 +415,13 @@ def something_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_value: Optional[aas_types.JsonValue] = None
-    the_values: Optional[aas_types.JsonArray] = None
-    the_mapping: Optional[aas_types.JsonObject] = None
-    the_mapping_with_constrained_key: Optional[aas_types.JsonObject] = None
-    the_optional_value: Optional[aas_types.JsonValue] = None
-    the_optional_values: Optional[aas_types.JsonArray] = None
-    the_optional_mapping: Optional[aas_types.JsonObject] = None
+    the_value: Optional[our_types.JsonValue] = None
+    the_values: Optional[our_types.JsonArray] = None
+    the_mapping: Optional[our_types.JsonObject] = None
+    the_mapping_with_constrained_key: Optional[our_types.JsonObject] = None
+    the_optional_value: Optional[our_types.JsonValue] = None
+    the_optional_values: Optional[our_types.JsonArray] = None
+    the_optional_mapping: Optional[our_types.JsonObject] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -474,7 +474,7 @@ def something_from_jsonable(
             "The required property 'mappingWithConstrainedKey' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_value,
         the_values,
         the_mapping,
@@ -543,7 +543,7 @@ class SerializationException(Exception):
 
 
 def _json_value_to_jsonable(
-    value: aas_types.JsonValue
+    value: our_types.JsonValue
 ) -> MutableJsonable:
     """
     Serialize :paramref:`value` as a JSON-able structure.
@@ -573,7 +573,7 @@ def _json_value_to_jsonable(
         # numeric type, though, so it has to be one which a ``float`` can
         # hold exactly -- otherwise a reader, which reads every number as
         # a ``float``, would get a different number back.
-        if aas_common.try_to_convert_int_to_float(value) is None:
+        if our_common.try_to_convert_int_to_float(value) is None:
             raise SerializationException(
                 f"Expected a JSON-able value, but got the integer {value}, "
                 f"which is not exactly representable as a JSON number"
@@ -611,7 +611,7 @@ def _json_value_to_jsonable(
 
         return mapping
 
-    array_like = aas_common.try_to_cast_to_array_like(value)
+    array_like = our_common.try_to_cast_to_array_like(value)
     if array_like is not None:
         items = []  # type: List[Any]
         for i, item_value in enumerate(array_like):
@@ -630,7 +630,7 @@ def _json_value_to_jsonable(
 
 
 def _something_to_jsonable(
-    that: aas_types.Something
+    that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -690,7 +690,7 @@ def _something_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -709,12 +709,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

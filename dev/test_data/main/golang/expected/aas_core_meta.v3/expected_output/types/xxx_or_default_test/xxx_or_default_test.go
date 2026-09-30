@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	aasstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
-	aastesting "github.com/aas-core-works/aas-core3.0-golang/aastesting"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
+	ourtesting "github.com/aas-core-works/aas-core3.0-golang/ourtesting"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
 // Represent explicitly a literal of an enumeration.
@@ -69,8 +69,8 @@ func stringify(value interface{}) (got string) {
 				got = fmt.Sprintf("%d byte(s)", len(casted))
 			case *enumerationLiteral:
 				got = casted.String()
-			case aastypes.IClass:
-				got = aastesting.TraceMark(casted)
+			case ourtypes.IClass:
+				got = ourtesting.TraceMark(casted)
 			default:
 				panic(
 					fmt.Sprintf(
@@ -88,10 +88,10 @@ func stringify(value interface{}) (got string) {
 // Represent `value` such that we can immediately check whether it is the default value
 // or the set one.
 //
-// We compare it against the recorded golden file, if not [aastesting.RecordMode].
+// We compare it against the recorded golden file, if not [ourtesting.RecordMode].
 // If there are differences, a `message` is set.
 //
-// Otherwise, when [aastesting.RecordMode] is set, we re-record the golden file.
+// Otherwise, when [ourtesting.RecordMode] is set, we re-record the golden file.
 func compareOrRerecordValue(
 	value interface{},
 	expectedPath string,
@@ -102,7 +102,7 @@ func compareOrRerecordValue(
 	// Add a new line for POSIX systems.
 	got += "\n"
 
-	if aastesting.RecordMode {
+	if ourtesting.RecordMode {
 		parent := filepath.Dir(expectedPath)
 		err := os.MkdirAll(parent, os.ModePerm)
 		if err != nil {
@@ -152,17 +152,17 @@ func compareOrRerecordValue(
 }
 
 func TestExtensionValueTypeOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalExtension()
+	instance := ourtesting.MustLoadMinimalExtension()
 
 	value := &enumerationLiteral{
 		enumerationName: "DataTypeDefXSD",
-		literalName: aasstringification.MustDataTypeDefXSDToString(
+		literalName: ourstringification.MustDataTypeDefXSDToString(
 			instance.ValueTypeOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Extension",
 		"ValueTypeOrDefault.on_minimal.txt",
@@ -179,17 +179,17 @@ func TestExtensionValueTypeOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestExtensionValueTypeOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalExtension()
+	instance := ourtesting.MustLoadMaximalExtension()
 
 	value := &enumerationLiteral{
 		enumerationName: "DataTypeDefXSD",
-		literalName: aasstringification.MustDataTypeDefXSDToString(
+		literalName: ourstringification.MustDataTypeDefXSDToString(
 			instance.ValueTypeOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Extension",
 		"ValueTypeOrDefault.on_maximal.txt",
@@ -206,17 +206,17 @@ func TestExtensionValueTypeOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestQualifierKindOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalQualifier()
+	instance := ourtesting.MustLoadMinimalQualifier()
 
 	value := &enumerationLiteral{
 		enumerationName: "QualifierKind",
-		literalName: aasstringification.MustQualifierKindToString(
+		literalName: ourstringification.MustQualifierKindToString(
 			instance.KindOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Qualifier",
 		"KindOrDefault.on_minimal.txt",
@@ -233,17 +233,17 @@ func TestQualifierKindOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestQualifierKindOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalQualifier()
+	instance := ourtesting.MustLoadMaximalQualifier()
 
 	value := &enumerationLiteral{
 		enumerationName: "QualifierKind",
-		literalName: aasstringification.MustQualifierKindToString(
+		literalName: ourstringification.MustQualifierKindToString(
 			instance.KindOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Qualifier",
 		"KindOrDefault.on_maximal.txt",
@@ -260,17 +260,17 @@ func TestQualifierKindOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestSubmodelKindOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodel()
+	instance := ourtesting.MustLoadMinimalSubmodel()
 
 	value := &enumerationLiteral{
 		enumerationName: "ModellingKind",
-		literalName: aasstringification.MustModellingKindToString(
+		literalName: ourstringification.MustModellingKindToString(
 			instance.KindOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Submodel",
 		"KindOrDefault.on_minimal.txt",
@@ -287,17 +287,17 @@ func TestSubmodelKindOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestSubmodelKindOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalSubmodel()
+	instance := ourtesting.MustLoadMaximalSubmodel()
 
 	value := &enumerationLiteral{
 		enumerationName: "ModellingKind",
-		literalName: aasstringification.MustModellingKindToString(
+		literalName: ourstringification.MustModellingKindToString(
 			instance.KindOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Submodel",
 		"KindOrDefault.on_maximal.txt",
@@ -314,12 +314,12 @@ func TestSubmodelKindOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestSubmodelElementListOrderRelevantOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodelElementList()
+	instance := ourtesting.MustLoadMinimalSubmodelElementList()
 
 	value := instance.OrderRelevantOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"SubmodelElementList",
 		"OrderRelevantOrDefault.on_minimal.txt",
@@ -336,12 +336,12 @@ func TestSubmodelElementListOrderRelevantOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestSubmodelElementListOrderRelevantOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalSubmodelElementList()
+	instance := ourtesting.MustLoadMaximalSubmodelElementList()
 
 	value := instance.OrderRelevantOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"SubmodelElementList",
 		"OrderRelevantOrDefault.on_maximal.txt",
@@ -358,12 +358,12 @@ func TestSubmodelElementListOrderRelevantOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestPropertyCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalProperty()
+	instance := ourtesting.MustLoadMinimalProperty()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Property",
 		"CategoryOrDefault.on_minimal.txt",
@@ -380,12 +380,12 @@ func TestPropertyCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestPropertyCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalProperty()
+	instance := ourtesting.MustLoadMaximalProperty()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Property",
 		"CategoryOrDefault.on_maximal.txt",
@@ -402,12 +402,12 @@ func TestPropertyCategoryOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestMultiLanguagePropertyCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMultiLanguageProperty()
+	instance := ourtesting.MustLoadMinimalMultiLanguageProperty()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"MultiLanguageProperty",
 		"CategoryOrDefault.on_minimal.txt",
@@ -424,12 +424,12 @@ func TestMultiLanguagePropertyCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestMultiLanguagePropertyCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMultiLanguageProperty()
+	instance := ourtesting.MustLoadMaximalMultiLanguageProperty()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"MultiLanguageProperty",
 		"CategoryOrDefault.on_maximal.txt",
@@ -446,12 +446,12 @@ func TestMultiLanguagePropertyCategoryOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestRangeCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRange()
+	instance := ourtesting.MustLoadMinimalRange()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Range",
 		"CategoryOrDefault.on_minimal.txt",
@@ -468,12 +468,12 @@ func TestRangeCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestRangeCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalRange()
+	instance := ourtesting.MustLoadMaximalRange()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Range",
 		"CategoryOrDefault.on_maximal.txt",
@@ -490,12 +490,12 @@ func TestRangeCategoryOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestReferenceElementCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalReferenceElement()
+	instance := ourtesting.MustLoadMinimalReferenceElement()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"ReferenceElement",
 		"CategoryOrDefault.on_minimal.txt",
@@ -512,12 +512,12 @@ func TestReferenceElementCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestReferenceElementCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalReferenceElement()
+	instance := ourtesting.MustLoadMaximalReferenceElement()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"ReferenceElement",
 		"CategoryOrDefault.on_maximal.txt",
@@ -534,12 +534,12 @@ func TestReferenceElementCategoryOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestBlobCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBlob()
+	instance := ourtesting.MustLoadMinimalBlob()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Blob",
 		"CategoryOrDefault.on_minimal.txt",
@@ -556,12 +556,12 @@ func TestBlobCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestBlobCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalBlob()
+	instance := ourtesting.MustLoadMaximalBlob()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Blob",
 		"CategoryOrDefault.on_maximal.txt",
@@ -578,12 +578,12 @@ func TestBlobCategoryOrDefaultOnMaximal(t *testing.T) {
 }
 
 func TestFileCategoryOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalFile()
+	instance := ourtesting.MustLoadMinimalFile()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"File",
 		"CategoryOrDefault.on_minimal.txt",
@@ -600,12 +600,12 @@ func TestFileCategoryOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestFileCategoryOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalFile()
+	instance := ourtesting.MustLoadMaximalFile()
 
 	value := instance.CategoryOrDefault()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"File",
 		"CategoryOrDefault.on_maximal.txt",

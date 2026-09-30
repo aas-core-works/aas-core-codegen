@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -478,15 +478,15 @@ namespace dummy
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             /// <summary>
             /// Read an instance of class Collection from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Collection> CollectionFromElement = (
-                AtElement<Aas.Collection>(
+            internal static readonly ElementReader<Our.Collection> CollectionFromElement = (
+                AtElement<Our.Collection>(
                     CollectionFromSequence, "collection"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -496,7 +496,7 @@ namespace dummy
                 AsText<long>(ReadContentAsLong));
 
             private static readonly ContentReader<Kind> Read_Kind = (
-                AsEnum<Aas.Kind>(
+                AsEnum<Our.Kind>(
                     Stringification.KindFromString));
 
             private static readonly ContentReader<List<string>> Read_ListOf_string = (
@@ -538,7 +538,7 @@ namespace dummy
                         Read_bool, "v")));
 
             private static readonly ContentReader<Direction> Read_Direction = (
-                AsEnum<Aas.Direction>(
+                AsEnum<Our.Direction>(
                     Stringification.DirectionFromString));
 
             private static readonly ContentReader<HashSet<Direction>> Read_SetOf_Direction = (
@@ -554,7 +554,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -782,7 +782,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -809,7 +809,7 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theOptionalTexts,
                     theOptionalKind);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Collection from a sequence of XML elements.
@@ -819,7 +819,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Collection CollectionFromSequence(
+            internal static Our.Collection CollectionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -993,7 +993,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Collection(
+                return new Our.Collection(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1011,7 +1011,7 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theOptionalTexts,
                     theOptionalDirections);
-            }  // internal static Aas.Collection? CollectionFromSequence
+            }  // internal static Our.Collection? CollectionFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -1036,7 +1036,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class Something:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.Something anInstance = Deserialize.SomethingFrom(
+        /// Our.Something anInstance = Deserialize.SomethingFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -1055,7 +1055,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1069,7 +1069,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1089,7 +1089,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Collection.
             /// </exception>
-            public static Aas.Collection CollectionFrom(
+            public static Our.Collection CollectionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1103,7 +1103,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Collection result = DeserializeImplementation.CollectionFromElement(
+                Our.Collection result = DeserializeImplementation.CollectionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1353,7 +1353,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -1366,7 +1366,7 @@ namespace dummy
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<Kind> Write_Kind = (
-                WriteEnum<Aas.Kind>(
+                WriteEnum<Our.Kind>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<List<string>> Write_ListOf_string = (
@@ -1411,7 +1411,7 @@ namespace dummy
                     System.Collections.Generic.Comparer<bool>.Default.Compare));
 
             private static readonly ContentWriter<Direction> Write_Direction = (
-                WriteEnum<Aas.Direction>(
+                WriteEnum<Our.Direction>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<HashSet<Direction>> Write_SetOf_Direction = (
@@ -1421,7 +1421,7 @@ namespace dummy
                     Common.SetHelpers.CompareByRankOfDirection));
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1470,7 +1470,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1483,7 +1483,7 @@ namespace dummy
             }
 
             private static void CollectionToSequence(
-                Aas.ICollection that,
+                Our.ICollection that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1523,7 +1523,7 @@ namespace dummy
             }  // private static void CollectionToSequence
 
             public override void VisitCollection(
-                Aas.ICollection that,
+                Our.ICollection that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1542,7 +1542,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of Something:
         /// <code>
-        /// var anInstance = new Aas.Something(
+        /// var anInstance = new Our.Something(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -1561,7 +1561,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

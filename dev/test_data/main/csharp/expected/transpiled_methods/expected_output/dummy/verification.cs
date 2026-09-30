@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of IItem:
     /// <code>
-    /// var anInstance = new Aas.IItem(
+    /// var anInstance = new Our.IItem(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -55,8 +55,8 @@ namespace dummy
             internal static readonly HashSet<int> ForKind = new HashSet<int>
             {
 
-                (int)Aas.Kind.Alpha,
-                (int)Aas.Kind.Beta
+                (int)Our.Kind.Alpha,
+                (int)Our.Kind.Beta
             };
         }  // internal static class EnumValueSet
 
@@ -69,7 +69,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformFirst(
-                Aas.IFirst that
+                Our.IFirst that
             )
             {
                 if (!that.IsCountWithin(that.Texts.Count))
@@ -103,7 +103,7 @@ namespace dummy
                 if (that.Kind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.Kind value = that.Kind
+                    Our.Kind value = that.Kind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyKind(value))
                     {
@@ -117,7 +117,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSecond(
-                Aas.ISecond that
+                Our.ISecond that
             )
             {
                 if (!that.IsCountWithin(that.Texts.Count))
@@ -158,7 +158,7 @@ namespace dummy
                 if (that.Kind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.Kind value = that.Kind
+                    Our.Kind value = that.Kind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyKind(value))
                     {
@@ -177,7 +177,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -189,7 +189,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKind(
-            Aas.Kind that)
+            Our.Kind that)
         {
             if (!EnumValueSet.ForKind.Contains(
                 (int)that))

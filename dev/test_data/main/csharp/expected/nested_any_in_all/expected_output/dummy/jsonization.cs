@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -365,7 +365,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangString LangStringFrom(
+            internal static Our.LangString LangStringFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -423,7 +423,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LangString(
+                return new Our.LangString(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -437,7 +437,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringSet LangStringSetFrom(
+            internal static Our.LangStringSet LangStringSetFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -483,7 +483,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LangStringSet(
+                return new Our.LangStringSet(
                     theLangStrings
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -496,7 +496,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IContent IContentFrom(
+            public static Our.IContent IContentFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -527,14 +527,14 @@ namespace dummy
                         $"Unexpected model type for IContent: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IContent IContentFrom
+            }  // public static Our.IContent IContentFrom
 
             /// <summary>
             /// Deserialize an instance of IecContent from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.IecContent IecContentFrom(
+            internal static Our.IecContent IecContentFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -592,7 +592,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.IecContent(
+                return new Our.IecContent(
                     theDefinition);
             }  // internal static IecContentFrom
 
@@ -601,7 +601,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.OtherContent OtherContentFrom(
+            internal static Our.OtherContent OtherContentFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -653,7 +653,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.OtherContent();
+                return new Our.OtherContent();
             }  // internal static OtherContentFrom
 
             /// <summary>
@@ -661,7 +661,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Specification SpecificationFrom(
+            internal static Our.Specification SpecificationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -707,7 +707,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Specification(
+                return new Our.Specification(
                     theContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -718,7 +718,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -781,7 +781,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theDefaultLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -851,7 +851,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.LangString anInstance = Deserialize.LangStringFrom(
+        /// Our.LangString anInstance = Deserialize.LangStringFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -865,10 +865,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangString.
             /// </exception>
-            public static Aas.LangString LangStringFrom(
+            public static Our.LangString LangStringFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LangString result = DeserializeImplementation.LangStringFrom(
+                Our.LangString result = DeserializeImplementation.LangStringFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -888,10 +888,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringSet.
             /// </exception>
-            public static Aas.LangStringSet LangStringSetFrom(
+            public static Our.LangStringSet LangStringSetFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringSet result = DeserializeImplementation.LangStringSetFrom(
+                Our.LangStringSet result = DeserializeImplementation.LangStringSetFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -912,10 +912,10 @@ namespace dummy
             /// representation of IContent.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IContent IContentFrom(
+            public static Our.IContent IContentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IContent result = DeserializeImplementation.IContentFrom(
+                Our.IContent result = DeserializeImplementation.IContentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -936,10 +936,10 @@ namespace dummy
             /// representation of IecContent.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IecContent IecContentFrom(
+            public static Our.IecContent IecContentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IecContent result = DeserializeImplementation.IecContentFrom(
+                Our.IecContent result = DeserializeImplementation.IecContentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -959,10 +959,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of OtherContent.
             /// </exception>
-            public static Aas.OtherContent OtherContentFrom(
+            public static Our.OtherContent OtherContentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.OtherContent result = DeserializeImplementation.OtherContentFrom(
+                Our.OtherContent result = DeserializeImplementation.OtherContentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -982,10 +982,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Specification.
             /// </exception>
-            public static Aas.Specification SpecificationFrom(
+            public static Our.Specification SpecificationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Specification result = DeserializeImplementation.SpecificationFrom(
+                Our.Specification result = DeserializeImplementation.SpecificationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1005,10 +1005,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1045,7 +1045,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -1176,7 +1176,7 @@ namespace dummy
 
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
-            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+            private static readonly Serializer<Our.IClass> Serialize_IClass = TransformIClass;
 
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
@@ -1210,7 +1210,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformLangString(
-                Aas.ILangString that
+                Our.ILangString that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1223,7 +1223,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformLangStringSet(
-                Aas.ILangStringSet that
+                Our.ILangStringSet that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1239,7 +1239,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformIecContent(
-                Aas.IIecContent that
+                Our.IIecContent that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1260,7 +1260,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformOtherContent(
-                Aas.IOtherContent that
+                Our.IOtherContent that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1271,7 +1271,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSpecification(
-                Aas.ISpecification that
+                Our.ISpecification that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1282,7 +1282,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1321,7 +1321,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of LangString:
         /// <code>
-        /// var anInstance = new Aas.LangString(
+        /// var anInstance = new Our.LangString(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -1338,7 +1338,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

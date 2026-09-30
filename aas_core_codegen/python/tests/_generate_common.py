@@ -50,8 +50,8 @@ from typing import Union, Sequence"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.common as aas_common
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.common as our_common
+import {qualified_module_name}.types as our_types"""
         ),
         Stripped(
             """\
@@ -122,9 +122,9 @@ def trace(
 {II}str,
 {II}bytes,
 {II}enum.Enum,
-{II}aas_types.Class,
+{II}our_types.Class,
 {II}Sequence[
-{III}Union[bool, int, float, str, bytes, enum.Enum, aas_types.Class]
+{III}Union[bool, int, float, str, bytes, enum.Enum, our_types.Class]
 {II}],
 {I}],
 ) -> str:
@@ -134,7 +134,7 @@ def trace(
 {I}:param that: to be traced
 {I}:return: segment in the descent trace
 {I}"""
-{I}if isinstance(that, aas_types.Class):
+{I}if isinstance(that, our_types.Class):
 {II}return that.__class__.__name__
 {I}elif isinstance(that, (bool, int, float, str, enum.Enum)):
 {II}return str(that)
@@ -156,7 +156,7 @@ def trace(
 {II}writer.write("]")
 {II}return writer.getvalue()
 {I}else:
-{II}aas_common.assert_never(that)'''
+{II}our_common.assert_never(that)'''
         ),
         Stripped(
             f'''\

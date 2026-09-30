@@ -1,8 +1,8 @@
 /// <summary>
-/// Check that <see cref="Aas.IItem.Label" />'s of the <paramref name="items" />
+/// Check that <see cref="Our.IItem.Label" />'s of the <paramref name="items" />
 /// do not repeat.
 /// </summary>
-public static bool ItemsHaveUniqueLabels(IEnumerable<Aas.IItem> items)
+public static bool ItemsHaveUniqueLabels(IEnumerable<Our.IItem> items)
 {
     var labelSet = new HashSet<string>();
     foreach (var item in items)

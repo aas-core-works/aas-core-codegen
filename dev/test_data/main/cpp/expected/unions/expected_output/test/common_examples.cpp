@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,122 +21,122 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::IStructuralFirst
+  our::types::IStructuralFirst
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IStructuralFirst
+  our::types::IStructuralFirst
 >::name = "IStructuralFirst";
 
 template<>
 struct StaticTypeName<
-  aas::types::IStructuralSecond
+  our::types::IStructuralSecond
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IStructuralSecond
+  our::types::IStructuralSecond
 >::name = "IStructuralSecond";
 
 template<>
 struct StaticTypeName<
-  aas::types::IMixedAbstractDescendantOne
+  our::types::IMixedAbstractDescendantOne
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IMixedAbstractDescendantOne
+  our::types::IMixedAbstractDescendantOne
 >::name = "IMixedAbstractDescendantOne";
 
 template<>
 struct StaticTypeName<
-  aas::types::IMixedAbstractDescendantTwo
+  our::types::IMixedAbstractDescendantTwo
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IMixedAbstractDescendantTwo
+  our::types::IMixedAbstractDescendantTwo
 >::name = "IMixedAbstractDescendantTwo";
 
 template<>
 struct StaticTypeName<
-  aas::types::IMixedConcreteWithDescendants
+  our::types::IMixedConcreteWithDescendants
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IMixedConcreteWithDescendants
+  our::types::IMixedConcreteWithDescendants
 >::name = "IMixedConcreteWithDescendants";
 
 template<>
 struct StaticTypeName<
-  aas::types::IMixedConcreteWithDescendantsChild
+  our::types::IMixedConcreteWithDescendantsChild
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IMixedConcreteWithDescendantsChild
+  our::types::IMixedConcreteWithDescendantsChild
 >::name = "IMixedConcreteWithDescendantsChild";
 
 template<>
 struct StaticTypeName<
-  aas::types::IMixedConcreteLeaf
+  our::types::IMixedConcreteLeaf
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IMixedConcreteLeaf
+  our::types::IMixedConcreteLeaf
 >::name = "IMixedConcreteLeaf";
 
 template<>
 struct StaticTypeName<
-  aas::types::IModelTypedFirst
+  our::types::IModelTypedFirst
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IModelTypedFirst
+  our::types::IModelTypedFirst
 >::name = "IModelTypedFirst";
 
 template<>
 struct StaticTypeName<
-  aas::types::IModelTypedSecond
+  our::types::IModelTypedSecond
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IModelTypedSecond
+  our::types::IModelTypedSecond
 >::name = "IModelTypedSecond";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 >::name = "ISomething";
 
 std::shared_ptr<
-  aas::types::IStructuralFirst
+  our::types::IStructuralFirst
 > LoadStructuralFirst(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IStructuralFirst
+    our::types::IStructuralFirst
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IStructuralFirst
+      our::types::IStructuralFirst
     >(
       abstract
     )
@@ -144,7 +144,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IStructuralFirst from ",
         path.string()
       )
@@ -155,7 +155,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IStructuralFirst
+  our::types::IStructuralFirst
 > LoadMinStructuralFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -171,7 +171,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IStructuralFirst
+  our::types::IStructuralFirst
 > LoadMaxStructuralFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -187,23 +187,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IStructuralSecond
+  our::types::IStructuralSecond
 > LoadStructuralSecond(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IStructuralSecond
+    our::types::IStructuralSecond
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IStructuralSecond
+      our::types::IStructuralSecond
     >(
       abstract
     )
@@ -211,7 +211,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IStructuralSecond from ",
         path.string()
       )
@@ -222,7 +222,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IStructuralSecond
+  our::types::IStructuralSecond
 > LoadMinStructuralSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -238,7 +238,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IStructuralSecond
+  our::types::IStructuralSecond
 > LoadMaxStructuralSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -254,23 +254,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantOne
+  our::types::IMixedAbstractDescendantOne
 > LoadMixedAbstractDescendantOne(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IMixedAbstractDescendantOne
+    our::types::IMixedAbstractDescendantOne
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IMixedAbstractDescendantOne
+      our::types::IMixedAbstractDescendantOne
     >(
       abstract
     )
@@ -278,7 +278,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IMixedAbstractDescendantOne from ",
         path.string()
       )
@@ -289,7 +289,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantOne
+  our::types::IMixedAbstractDescendantOne
 > LoadMinMixedAbstractDescendantOne() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -305,7 +305,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantOne
+  our::types::IMixedAbstractDescendantOne
 > LoadMaxMixedAbstractDescendantOne() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -321,23 +321,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantTwo
+  our::types::IMixedAbstractDescendantTwo
 > LoadMixedAbstractDescendantTwo(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IMixedAbstractDescendantTwo
+    our::types::IMixedAbstractDescendantTwo
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IMixedAbstractDescendantTwo
+      our::types::IMixedAbstractDescendantTwo
     >(
       abstract
     )
@@ -345,7 +345,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IMixedAbstractDescendantTwo from ",
         path.string()
       )
@@ -356,7 +356,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantTwo
+  our::types::IMixedAbstractDescendantTwo
 > LoadMinMixedAbstractDescendantTwo() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -372,7 +372,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedAbstractDescendantTwo
+  our::types::IMixedAbstractDescendantTwo
 > LoadMaxMixedAbstractDescendantTwo() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -388,23 +388,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendants
+  our::types::IMixedConcreteWithDescendants
 > LoadMixedConcreteWithDescendants(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendants
+    our::types::IMixedConcreteWithDescendants
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IMixedConcreteWithDescendants
+      our::types::IMixedConcreteWithDescendants
     >(
       abstract
     )
@@ -412,7 +412,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IMixedConcreteWithDescendants from ",
         path.string()
       )
@@ -423,7 +423,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendants
+  our::types::IMixedConcreteWithDescendants
 > LoadMinMixedConcreteWithDescendants() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -439,7 +439,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendants
+  our::types::IMixedConcreteWithDescendants
 > LoadMaxMixedConcreteWithDescendants() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -455,23 +455,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendantsChild
+  our::types::IMixedConcreteWithDescendantsChild
 > LoadMixedConcreteWithDescendantsChild(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendantsChild
+    our::types::IMixedConcreteWithDescendantsChild
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IMixedConcreteWithDescendantsChild
+      our::types::IMixedConcreteWithDescendantsChild
     >(
       abstract
     )
@@ -479,7 +479,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IMixedConcreteWithDescendantsChild from ",
         path.string()
       )
@@ -490,7 +490,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendantsChild
+  our::types::IMixedConcreteWithDescendantsChild
 > LoadMinMixedConcreteWithDescendantsChild() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -506,7 +506,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteWithDescendantsChild
+  our::types::IMixedConcreteWithDescendantsChild
 > LoadMaxMixedConcreteWithDescendantsChild() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -522,23 +522,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteLeaf
+  our::types::IMixedConcreteLeaf
 > LoadMixedConcreteLeaf(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IMixedConcreteLeaf
+    our::types::IMixedConcreteLeaf
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IMixedConcreteLeaf
+      our::types::IMixedConcreteLeaf
     >(
       abstract
     )
@@ -546,7 +546,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IMixedConcreteLeaf from ",
         path.string()
       )
@@ -557,7 +557,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteLeaf
+  our::types::IMixedConcreteLeaf
 > LoadMinMixedConcreteLeaf() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -573,7 +573,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IMixedConcreteLeaf
+  our::types::IMixedConcreteLeaf
 > LoadMaxMixedConcreteLeaf() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -589,23 +589,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedFirst
+  our::types::IModelTypedFirst
 > LoadModelTypedFirst(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IModelTypedFirst
+    our::types::IModelTypedFirst
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IModelTypedFirst
+      our::types::IModelTypedFirst
     >(
       abstract
     )
@@ -613,7 +613,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IModelTypedFirst from ",
         path.string()
       )
@@ -624,7 +624,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedFirst
+  our::types::IModelTypedFirst
 > LoadMinModelTypedFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -640,7 +640,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedFirst
+  our::types::IModelTypedFirst
 > LoadMaxModelTypedFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -656,23 +656,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedSecond
+  our::types::IModelTypedSecond
 > LoadModelTypedSecond(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IModelTypedSecond
+    our::types::IModelTypedSecond
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IModelTypedSecond
+      our::types::IModelTypedSecond
     >(
       abstract
     )
@@ -680,7 +680,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IModelTypedSecond from ",
         path.string()
       )
@@ -691,7 +691,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedSecond
+  our::types::IModelTypedSecond
 > LoadMinModelTypedSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -707,7 +707,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IModelTypedSecond
+  our::types::IModelTypedSecond
 > LoadMaxModelTypedSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -723,23 +723,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadSomething(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISomething
+      our::types::ISomething
     >(
       abstract
     )
@@ -747,7 +747,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISomething from ",
         path.string()
       )
@@ -758,7 +758,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMinSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -774,7 +774,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMaxSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

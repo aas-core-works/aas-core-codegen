@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.First`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.First(
+    an_instance = our_types.First(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,24 +47,24 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def reset_and_check(
-    item: aas_types.Item,
-    other: aas_types.Item,
+    item: our_types.Item,
+    other: our_types.Item,
     numbers: List[int]
 ) -> bool:
     """
@@ -82,14 +82,14 @@ def reset_and_check(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_first(
             self,
-            that: aas_types.First
+            that: our_types.First
     ) -> Iterator[Error]:
         if not that.is_count_within(len(that.texts)):
             yield Error(
@@ -114,7 +114,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_second(
             self,
-            that: aas_types.Second
+            that: our_types.Second
     ) -> Iterator[Error]:
         if not that.is_count_within(len(that.texts)):
             yield Error(
@@ -146,7 +146,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

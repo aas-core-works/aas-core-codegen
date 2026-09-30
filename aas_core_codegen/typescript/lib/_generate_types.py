@@ -2544,7 +2544,7 @@ def generate(
             Stripped(
                 f"""\
 /**
- * Represent the most general class of an AAS model.
+ * Represent the most general class of the meta-model.
  */
 export abstract class Class {{
 {I}/**
@@ -2675,10 +2675,10 @@ export abstract class Class {{
     # to slice the strings by code points. The common module does not depend on
     # the types module, so the import is not cyclic. We import it only if it is
     # used, as TypeScript complains about the unused imports.
-    if any("AasCommon." in block for block in blocks):
+    if any("OurCommon." in block for block in blocks):
         warning_index = blocks.index(typescript_common.WARNING)
         blocks.insert(
-            warning_index + 1, Stripped('import * as AasCommon from "./common";')
+            warning_index + 1, Stripped('import * as OurCommon from "./common";')
         )
 
     blocks.extend(

@@ -16,8 +16,8 @@ import unittest
 import xml.etree.ElementTree as ET
 
 
-import dummy.types as aas_types
-import dummy.xmlization as aas_xmlization
+import dummy.types as our_types
+import dummy.xmlization as our_xmlization
 
 
 import tests.common
@@ -41,22 +41,22 @@ class TestRoundTrips(unittest.TestCase):
             # region From iterparse
             iterator = ET.iterparse(source=io.StringIO(text), events=["start", "end"])
             got_from_iterparse = (
-                aas_xmlization.query_condition_from_iterparse(iterator)
+                our_xmlization.query_condition_from_iterparse(iterator)
             )
 
-            et_from_iterparse = ET.fromstring(aas_xmlization.to_str(got_from_iterparse))
+            et_from_iterparse = ET.fromstring(our_xmlization.to_str(got_from_iterparse))
             tests.common_xmlization.remove_redundant_whitespace(et_from_iterparse)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_iterparse)
             # endregion
 
             # region From stream
             got_from_stream = (
-                aas_xmlization
+                our_xmlization
                 .query_condition_from_stream(
                     io.StringIO(text)
                 )
             )
-            et_from_stream = ET.fromstring(aas_xmlization.to_str(got_from_stream))
+            et_from_stream = ET.fromstring(our_xmlization.to_str(got_from_stream))
             tests.common_xmlization.remove_redundant_whitespace(et_from_stream)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_stream)
             # endregion
@@ -67,20 +67,20 @@ class TestRoundTrips(unittest.TestCase):
                 path.write_text(text, encoding="utf-8")
 
                 got_from_file = (
-                    aas_xmlization
+                    our_xmlization
                     .query_condition_from_file(path)
                 )
-            et_from_file = ET.fromstring(aas_xmlization.to_str(got_from_file))
+            et_from_file = ET.fromstring(our_xmlization.to_str(got_from_file))
             tests.common_xmlization.remove_redundant_whitespace(et_from_file)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_file)
             # endregion
 
             # region From string
             got_from_str = (
-                aas_xmlization
+                our_xmlization
                 .query_condition_from_str(text)
             )
-            et_from_str = ET.fromstring(aas_xmlization.to_str(got_from_str))
+            et_from_str = ET.fromstring(our_xmlization.to_str(got_from_str))
             tests.common_xmlization.remove_redundant_whitespace(et_from_str)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_str)
             # endregion

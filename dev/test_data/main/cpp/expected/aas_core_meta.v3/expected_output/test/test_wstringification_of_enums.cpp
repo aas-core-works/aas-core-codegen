@@ -6,537 +6,537 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kExtension
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kExtension
+    == our::wstringification::MustModelTypeFromWstring(
       L"Extension"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kExtension
+    our::wstringification::to_wstring(
+      our::types::ModelType::kExtension
     )
     == L"Extension"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAdministrativeInformation
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAdministrativeInformation
+    == our::wstringification::MustModelTypeFromWstring(
       L"AdministrativeInformation"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAdministrativeInformation
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAdministrativeInformation
     )
     == L"AdministrativeInformation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kQualifier
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kQualifier
+    == our::wstringification::MustModelTypeFromWstring(
       L"Qualifier"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kQualifier
+    our::wstringification::to_wstring(
+      our::types::ModelType::kQualifier
     )
     == L"Qualifier"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAssetAdministrationShell
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAssetAdministrationShell
+    == our::wstringification::MustModelTypeFromWstring(
       L"AssetAdministrationShell"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAssetAdministrationShell
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAssetAdministrationShell
     )
     == L"AssetAdministrationShell"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAssetInformation
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAssetInformation
+    == our::wstringification::MustModelTypeFromWstring(
       L"AssetInformation"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAssetInformation
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAssetInformation
     )
     == L"AssetInformation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kResource
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kResource
+    == our::wstringification::MustModelTypeFromWstring(
       L"Resource"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kResource
+    our::wstringification::to_wstring(
+      our::types::ModelType::kResource
     )
     == L"Resource"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSpecificAssetId
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSpecificAssetId
+    == our::wstringification::MustModelTypeFromWstring(
       L"SpecificAssetId"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSpecificAssetId
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSpecificAssetId
     )
     == L"SpecificAssetId"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodel
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSubmodel
+    == our::wstringification::MustModelTypeFromWstring(
       L"Submodel"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSubmodel
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSubmodel
     )
     == L"Submodel"
   );
 
   REQUIRE(
-    aas::types::ModelType::kRelationshipElement
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kRelationshipElement
+    == our::wstringification::MustModelTypeFromWstring(
       L"RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::ModelType::kRelationshipElement
     )
     == L"RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodelElementList
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSubmodelElementList
+    == our::wstringification::MustModelTypeFromWstring(
       L"SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSubmodelElementList
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSubmodelElementList
     )
     == L"SubmodelElementList"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodelElementCollection
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSubmodelElementCollection
+    == our::wstringification::MustModelTypeFromWstring(
       L"SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSubmodelElementCollection
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSubmodelElementCollection
     )
     == L"SubmodelElementCollection"
   );
 
   REQUIRE(
-    aas::types::ModelType::kProperty
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kProperty
+    == our::wstringification::MustModelTypeFromWstring(
       L"Property"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kProperty
+    our::wstringification::to_wstring(
+      our::types::ModelType::kProperty
     )
     == L"Property"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMultiLanguageProperty
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMultiLanguageProperty
+    == our::wstringification::MustModelTypeFromWstring(
       L"MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMultiLanguageProperty
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMultiLanguageProperty
     )
     == L"MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::ModelType::kRange
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kRange
+    == our::wstringification::MustModelTypeFromWstring(
       L"Range"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kRange
+    our::wstringification::to_wstring(
+      our::types::ModelType::kRange
     )
     == L"Range"
   );
 
   REQUIRE(
-    aas::types::ModelType::kReferenceElement
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kReferenceElement
+    == our::wstringification::MustModelTypeFromWstring(
       L"ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kReferenceElement
+    our::wstringification::to_wstring(
+      our::types::ModelType::kReferenceElement
     )
     == L"ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBlob
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBlob
+    == our::wstringification::MustModelTypeFromWstring(
       L"Blob"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBlob
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBlob
     )
     == L"Blob"
   );
 
   REQUIRE(
-    aas::types::ModelType::kFile
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kFile
+    == our::wstringification::MustModelTypeFromWstring(
       L"File"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kFile
+    our::wstringification::to_wstring(
+      our::types::ModelType::kFile
     )
     == L"File"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAnnotatedRelationshipElement
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAnnotatedRelationshipElement
+    == our::wstringification::MustModelTypeFromWstring(
       L"AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAnnotatedRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAnnotatedRelationshipElement
     )
     == L"AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEntity
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kEntity
+    == our::wstringification::MustModelTypeFromWstring(
       L"Entity"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kEntity
+    our::wstringification::to_wstring(
+      our::types::ModelType::kEntity
     )
     == L"Entity"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEventPayload
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kEventPayload
+    == our::wstringification::MustModelTypeFromWstring(
       L"EventPayload"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kEventPayload
+    our::wstringification::to_wstring(
+      our::types::ModelType::kEventPayload
     )
     == L"EventPayload"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBasicEventElement
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBasicEventElement
+    == our::wstringification::MustModelTypeFromWstring(
       L"BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBasicEventElement
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBasicEventElement
     )
     == L"BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOperation
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kOperation
+    == our::wstringification::MustModelTypeFromWstring(
       L"Operation"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kOperation
+    our::wstringification::to_wstring(
+      our::types::ModelType::kOperation
     )
     == L"Operation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOperationVariable
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kOperationVariable
+    == our::wstringification::MustModelTypeFromWstring(
       L"OperationVariable"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kOperationVariable
+    our::wstringification::to_wstring(
+      our::types::ModelType::kOperationVariable
     )
     == L"OperationVariable"
   );
 
   REQUIRE(
-    aas::types::ModelType::kCapability
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kCapability
+    == our::wstringification::MustModelTypeFromWstring(
       L"Capability"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kCapability
+    our::wstringification::to_wstring(
+      our::types::ModelType::kCapability
     )
     == L"Capability"
   );
 
   REQUIRE(
-    aas::types::ModelType::kConceptDescription
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kConceptDescription
+    == our::wstringification::MustModelTypeFromWstring(
       L"ConceptDescription"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kConceptDescription
+    our::wstringification::to_wstring(
+      our::types::ModelType::kConceptDescription
     )
     == L"ConceptDescription"
   );
 
   REQUIRE(
-    aas::types::ModelType::kReference
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kReference
+    == our::wstringification::MustModelTypeFromWstring(
       L"Reference"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kReference
+    our::wstringification::to_wstring(
+      our::types::ModelType::kReference
     )
     == L"Reference"
   );
 
   REQUIRE(
-    aas::types::ModelType::kKey
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kKey
+    == our::wstringification::MustModelTypeFromWstring(
       L"Key"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kKey
+    our::wstringification::to_wstring(
+      our::types::ModelType::kKey
     )
     == L"Key"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringNameType
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLangStringNameType
+    == our::wstringification::MustModelTypeFromWstring(
       L"LangStringNameType"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLangStringNameType
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLangStringNameType
     )
     == L"LangStringNameType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringTextType
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLangStringTextType
+    == our::wstringification::MustModelTypeFromWstring(
       L"LangStringTextType"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLangStringTextType
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLangStringTextType
     )
     == L"LangStringTextType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEnvironment
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kEnvironment
+    == our::wstringification::MustModelTypeFromWstring(
       L"Environment"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kEnvironment
+    our::wstringification::to_wstring(
+      our::types::ModelType::kEnvironment
     )
     == L"Environment"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEmbeddedDataSpecification
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kEmbeddedDataSpecification
+    == our::wstringification::MustModelTypeFromWstring(
       L"EmbeddedDataSpecification"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kEmbeddedDataSpecification
+    our::wstringification::to_wstring(
+      our::types::ModelType::kEmbeddedDataSpecification
     )
     == L"EmbeddedDataSpecification"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLevelType
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLevelType
+    == our::wstringification::MustModelTypeFromWstring(
       L"LevelType"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLevelType
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLevelType
     )
     == L"LevelType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kValueReferencePair
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kValueReferencePair
+    == our::wstringification::MustModelTypeFromWstring(
       L"ValueReferencePair"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kValueReferencePair
+    our::wstringification::to_wstring(
+      our::types::ModelType::kValueReferencePair
     )
     == L"ValueReferencePair"
   );
 
   REQUIRE(
-    aas::types::ModelType::kValueList
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kValueList
+    == our::wstringification::MustModelTypeFromWstring(
       L"ValueList"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kValueList
+    our::wstringification::to_wstring(
+      our::types::ModelType::kValueList
     )
     == L"ValueList"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringPreferredNameTypeIec61360
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLangStringPreferredNameTypeIec61360
+    == our::wstringification::MustModelTypeFromWstring(
       L"LangStringPreferredNameTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLangStringPreferredNameTypeIec61360
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLangStringPreferredNameTypeIec61360
     )
     == L"LangStringPreferredNameTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringShortNameTypeIec61360
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLangStringShortNameTypeIec61360
+    == our::wstringification::MustModelTypeFromWstring(
       L"LangStringShortNameTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLangStringShortNameTypeIec61360
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLangStringShortNameTypeIec61360
     )
     == L"LangStringShortNameTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringDefinitionTypeIec61360
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLangStringDefinitionTypeIec61360
+    == our::wstringification::MustModelTypeFromWstring(
       L"LangStringDefinitionTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLangStringDefinitionTypeIec61360
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLangStringDefinitionTypeIec61360
     )
     == L"LangStringDefinitionTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kDataSpecificationIec61360
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kDataSpecificationIec61360
+    == our::wstringification::MustModelTypeFromWstring(
       L"DataSpecificationIec61360"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kDataSpecificationIec61360
+    our::wstringification::to_wstring(
+      our::types::ModelType::kDataSpecificationIec61360
     )
     == L"DataSpecificationIec61360"
   );
@@ -544,13 +544,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -559,29 +559,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test ModellingKind round-trip") {
   REQUIRE(
-    aas::types::ModellingKind::kTemplate
-    == aas::wstringification::MustModellingKindFromWstring(
+    our::types::ModellingKind::kTemplate
+    == our::wstringification::MustModellingKindFromWstring(
       L"Template"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModellingKind::kTemplate
+    our::wstringification::to_wstring(
+      our::types::ModellingKind::kTemplate
     )
     == L"Template"
   );
 
   REQUIRE(
-    aas::types::ModellingKind::kInstance
-    == aas::wstringification::MustModellingKindFromWstring(
+    our::types::ModellingKind::kInstance
+    == our::wstringification::MustModellingKindFromWstring(
       L"Instance"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModellingKind::kInstance
+    our::wstringification::to_wstring(
+      our::types::ModellingKind::kInstance
     )
     == L"Instance"
   );
@@ -589,13 +589,13 @@ TEST_CASE("Test ModellingKind round-trip") {
 
 TEST_CASE("Test failure on ModellingKind") {
   CHECK(
-    !aas::wstringification::ModellingKindFromWstring(
+    !our::wstringification::ModellingKindFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModellingKindFromWstring(
+    our::wstringification::MustModellingKindFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModellingKind literal: Totally utterly invalid"
@@ -604,43 +604,43 @@ TEST_CASE("Test failure on ModellingKind") {
 
 TEST_CASE("Test QualifierKind round-trip") {
   REQUIRE(
-    aas::types::QualifierKind::kValueQualifier
-    == aas::wstringification::MustQualifierKindFromWstring(
+    our::types::QualifierKind::kValueQualifier
+    == our::wstringification::MustQualifierKindFromWstring(
       L"ValueQualifier"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::QualifierKind::kValueQualifier
+    our::wstringification::to_wstring(
+      our::types::QualifierKind::kValueQualifier
     )
     == L"ValueQualifier"
   );
 
   REQUIRE(
-    aas::types::QualifierKind::kConceptQualifier
-    == aas::wstringification::MustQualifierKindFromWstring(
+    our::types::QualifierKind::kConceptQualifier
+    == our::wstringification::MustQualifierKindFromWstring(
       L"ConceptQualifier"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::QualifierKind::kConceptQualifier
+    our::wstringification::to_wstring(
+      our::types::QualifierKind::kConceptQualifier
     )
     == L"ConceptQualifier"
   );
 
   REQUIRE(
-    aas::types::QualifierKind::kTemplateQualifier
-    == aas::wstringification::MustQualifierKindFromWstring(
+    our::types::QualifierKind::kTemplateQualifier
+    == our::wstringification::MustQualifierKindFromWstring(
       L"TemplateQualifier"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::QualifierKind::kTemplateQualifier
+    our::wstringification::to_wstring(
+      our::types::QualifierKind::kTemplateQualifier
     )
     == L"TemplateQualifier"
   );
@@ -648,13 +648,13 @@ TEST_CASE("Test QualifierKind round-trip") {
 
 TEST_CASE("Test failure on QualifierKind") {
   CHECK(
-    !aas::wstringification::QualifierKindFromWstring(
+    !our::wstringification::QualifierKindFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustQualifierKindFromWstring(
+    our::wstringification::MustQualifierKindFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected QualifierKind literal: Totally utterly invalid"
@@ -663,43 +663,43 @@ TEST_CASE("Test failure on QualifierKind") {
 
 TEST_CASE("Test AssetKind round-trip") {
   REQUIRE(
-    aas::types::AssetKind::kType
-    == aas::wstringification::MustAssetKindFromWstring(
+    our::types::AssetKind::kType
+    == our::wstringification::MustAssetKindFromWstring(
       L"Type"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AssetKind::kType
+    our::wstringification::to_wstring(
+      our::types::AssetKind::kType
     )
     == L"Type"
   );
 
   REQUIRE(
-    aas::types::AssetKind::kInstance
-    == aas::wstringification::MustAssetKindFromWstring(
+    our::types::AssetKind::kInstance
+    == our::wstringification::MustAssetKindFromWstring(
       L"Instance"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AssetKind::kInstance
+    our::wstringification::to_wstring(
+      our::types::AssetKind::kInstance
     )
     == L"Instance"
   );
 
   REQUIRE(
-    aas::types::AssetKind::kNotApplicable
-    == aas::wstringification::MustAssetKindFromWstring(
+    our::types::AssetKind::kNotApplicable
+    == our::wstringification::MustAssetKindFromWstring(
       L"NotApplicable"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AssetKind::kNotApplicable
+    our::wstringification::to_wstring(
+      our::types::AssetKind::kNotApplicable
     )
     == L"NotApplicable"
   );
@@ -707,13 +707,13 @@ TEST_CASE("Test AssetKind round-trip") {
 
 TEST_CASE("Test failure on AssetKind") {
   CHECK(
-    !aas::wstringification::AssetKindFromWstring(
+    !our::wstringification::AssetKindFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustAssetKindFromWstring(
+    our::wstringification::MustAssetKindFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected AssetKind literal: Totally utterly invalid"
@@ -722,239 +722,239 @@ TEST_CASE("Test failure on AssetKind") {
 
 TEST_CASE("Test AasSubmodelElements round-trip") {
   REQUIRE(
-    aas::types::AasSubmodelElements::kAnnotatedRelationshipElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kAnnotatedRelationshipElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kAnnotatedRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kAnnotatedRelationshipElement
     )
     == L"AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kBasicEventElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kBasicEventElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kBasicEventElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kBasicEventElement
     )
     == L"BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kBlob
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kBlob
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Blob"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kBlob
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kBlob
     )
     == L"Blob"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kCapability
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kCapability
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Capability"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kCapability
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kCapability
     )
     == L"Capability"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kDataElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kDataElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"DataElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kDataElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kDataElement
     )
     == L"DataElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kEntity
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kEntity
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Entity"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kEntity
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kEntity
     )
     == L"Entity"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kEventElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kEventElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"EventElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kEventElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kEventElement
     )
     == L"EventElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kFile
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kFile
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"File"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kFile
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kFile
     )
     == L"File"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kMultiLanguageProperty
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kMultiLanguageProperty
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kMultiLanguageProperty
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kMultiLanguageProperty
     )
     == L"MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kOperation
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kOperation
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Operation"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kOperation
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kOperation
     )
     == L"Operation"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kProperty
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kProperty
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Property"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kProperty
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kProperty
     )
     == L"Property"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kRange
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kRange
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Range"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kRange
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kRange
     )
     == L"Range"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kReferenceElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kReferenceElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kReferenceElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kReferenceElement
     )
     == L"ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kRelationshipElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kRelationshipElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kRelationshipElement
     )
     == L"RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElement
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kSubmodelElement
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"SubmodelElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kSubmodelElement
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kSubmodelElement
     )
     == L"SubmodelElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElementList
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kSubmodelElementList
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kSubmodelElementList
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kSubmodelElementList
     )
     == L"SubmodelElementList"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElementCollection
-    == aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::types::AasSubmodelElements::kSubmodelElementCollection
+    == our::wstringification::MustAasSubmodelElementsFromWstring(
       L"SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::AasSubmodelElements::kSubmodelElementCollection
+    our::wstringification::to_wstring(
+      our::types::AasSubmodelElements::kSubmodelElementCollection
     )
     == L"SubmodelElementCollection"
   );
@@ -962,13 +962,13 @@ TEST_CASE("Test AasSubmodelElements round-trip") {
 
 TEST_CASE("Test failure on AasSubmodelElements") {
   CHECK(
-    !aas::wstringification::AasSubmodelElementsFromWstring(
+    !our::wstringification::AasSubmodelElementsFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustAasSubmodelElementsFromWstring(
+    our::wstringification::MustAasSubmodelElementsFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected AasSubmodelElements literal: Totally utterly invalid"
@@ -977,29 +977,29 @@ TEST_CASE("Test failure on AasSubmodelElements") {
 
 TEST_CASE("Test EntityType round-trip") {
   REQUIRE(
-    aas::types::EntityType::kCoManagedEntity
-    == aas::wstringification::MustEntityTypeFromWstring(
+    our::types::EntityType::kCoManagedEntity
+    == our::wstringification::MustEntityTypeFromWstring(
       L"CoManagedEntity"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::EntityType::kCoManagedEntity
+    our::wstringification::to_wstring(
+      our::types::EntityType::kCoManagedEntity
     )
     == L"CoManagedEntity"
   );
 
   REQUIRE(
-    aas::types::EntityType::kSelfManagedEntity
-    == aas::wstringification::MustEntityTypeFromWstring(
+    our::types::EntityType::kSelfManagedEntity
+    == our::wstringification::MustEntityTypeFromWstring(
       L"SelfManagedEntity"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::EntityType::kSelfManagedEntity
+    our::wstringification::to_wstring(
+      our::types::EntityType::kSelfManagedEntity
     )
     == L"SelfManagedEntity"
   );
@@ -1007,13 +1007,13 @@ TEST_CASE("Test EntityType round-trip") {
 
 TEST_CASE("Test failure on EntityType") {
   CHECK(
-    !aas::wstringification::EntityTypeFromWstring(
+    !our::wstringification::EntityTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustEntityTypeFromWstring(
+    our::wstringification::MustEntityTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected EntityType literal: Totally utterly invalid"
@@ -1022,29 +1022,29 @@ TEST_CASE("Test failure on EntityType") {
 
 TEST_CASE("Test Direction round-trip") {
   REQUIRE(
-    aas::types::Direction::kInput
-    == aas::wstringification::MustDirectionFromWstring(
+    our::types::Direction::kInput
+    == our::wstringification::MustDirectionFromWstring(
       L"input"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Direction::kInput
+    our::wstringification::to_wstring(
+      our::types::Direction::kInput
     )
     == L"input"
   );
 
   REQUIRE(
-    aas::types::Direction::kOutput
-    == aas::wstringification::MustDirectionFromWstring(
+    our::types::Direction::kOutput
+    == our::wstringification::MustDirectionFromWstring(
       L"output"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Direction::kOutput
+    our::wstringification::to_wstring(
+      our::types::Direction::kOutput
     )
     == L"output"
   );
@@ -1052,13 +1052,13 @@ TEST_CASE("Test Direction round-trip") {
 
 TEST_CASE("Test failure on Direction") {
   CHECK(
-    !aas::wstringification::DirectionFromWstring(
+    !our::wstringification::DirectionFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustDirectionFromWstring(
+    our::wstringification::MustDirectionFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected Direction literal: Totally utterly invalid"
@@ -1067,29 +1067,29 @@ TEST_CASE("Test failure on Direction") {
 
 TEST_CASE("Test StateOfEvent round-trip") {
   REQUIRE(
-    aas::types::StateOfEvent::kOn
-    == aas::wstringification::MustStateOfEventFromWstring(
+    our::types::StateOfEvent::kOn
+    == our::wstringification::MustStateOfEventFromWstring(
       L"on"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::StateOfEvent::kOn
+    our::wstringification::to_wstring(
+      our::types::StateOfEvent::kOn
     )
     == L"on"
   );
 
   REQUIRE(
-    aas::types::StateOfEvent::kOff
-    == aas::wstringification::MustStateOfEventFromWstring(
+    our::types::StateOfEvent::kOff
+    == our::wstringification::MustStateOfEventFromWstring(
       L"off"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::StateOfEvent::kOff
+    our::wstringification::to_wstring(
+      our::types::StateOfEvent::kOff
     )
     == L"off"
   );
@@ -1097,13 +1097,13 @@ TEST_CASE("Test StateOfEvent round-trip") {
 
 TEST_CASE("Test failure on StateOfEvent") {
   CHECK(
-    !aas::wstringification::StateOfEventFromWstring(
+    !our::wstringification::StateOfEventFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustStateOfEventFromWstring(
+    our::wstringification::MustStateOfEventFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected StateOfEvent literal: Totally utterly invalid"
@@ -1112,29 +1112,29 @@ TEST_CASE("Test failure on StateOfEvent") {
 
 TEST_CASE("Test ReferenceTypes round-trip") {
   REQUIRE(
-    aas::types::ReferenceTypes::kExternalReference
-    == aas::wstringification::MustReferenceTypesFromWstring(
+    our::types::ReferenceTypes::kExternalReference
+    == our::wstringification::MustReferenceTypesFromWstring(
       L"ExternalReference"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ReferenceTypes::kExternalReference
+    our::wstringification::to_wstring(
+      our::types::ReferenceTypes::kExternalReference
     )
     == L"ExternalReference"
   );
 
   REQUIRE(
-    aas::types::ReferenceTypes::kModelReference
-    == aas::wstringification::MustReferenceTypesFromWstring(
+    our::types::ReferenceTypes::kModelReference
+    == our::wstringification::MustReferenceTypesFromWstring(
       L"ModelReference"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ReferenceTypes::kModelReference
+    our::wstringification::to_wstring(
+      our::types::ReferenceTypes::kModelReference
     )
     == L"ModelReference"
   );
@@ -1142,13 +1142,13 @@ TEST_CASE("Test ReferenceTypes round-trip") {
 
 TEST_CASE("Test failure on ReferenceTypes") {
   CHECK(
-    !aas::wstringification::ReferenceTypesFromWstring(
+    !our::wstringification::ReferenceTypesFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustReferenceTypesFromWstring(
+    our::wstringification::MustReferenceTypesFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ReferenceTypes literal: Totally utterly invalid"
@@ -1157,337 +1157,337 @@ TEST_CASE("Test failure on ReferenceTypes") {
 
 TEST_CASE("Test KeyTypes round-trip") {
   REQUIRE(
-    aas::types::KeyTypes::kAnnotatedRelationshipElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kAnnotatedRelationshipElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kAnnotatedRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kAnnotatedRelationshipElement
     )
     == L"AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kAssetAdministrationShell
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kAssetAdministrationShell
+    == our::wstringification::MustKeyTypesFromWstring(
       L"AssetAdministrationShell"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kAssetAdministrationShell
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kAssetAdministrationShell
     )
     == L"AssetAdministrationShell"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kBasicEventElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kBasicEventElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kBasicEventElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kBasicEventElement
     )
     == L"BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kBlob
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kBlob
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Blob"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kBlob
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kBlob
     )
     == L"Blob"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kCapability
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kCapability
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Capability"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kCapability
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kCapability
     )
     == L"Capability"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kConceptDescription
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kConceptDescription
+    == our::wstringification::MustKeyTypesFromWstring(
       L"ConceptDescription"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kConceptDescription
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kConceptDescription
     )
     == L"ConceptDescription"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kDataElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kDataElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"DataElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kDataElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kDataElement
     )
     == L"DataElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kEntity
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kEntity
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Entity"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kEntity
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kEntity
     )
     == L"Entity"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kEventElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kEventElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"EventElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kEventElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kEventElement
     )
     == L"EventElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kFile
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kFile
+    == our::wstringification::MustKeyTypesFromWstring(
       L"File"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kFile
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kFile
     )
     == L"File"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kFragmentReference
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kFragmentReference
+    == our::wstringification::MustKeyTypesFromWstring(
       L"FragmentReference"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kFragmentReference
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kFragmentReference
     )
     == L"FragmentReference"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kGlobalReference
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kGlobalReference
+    == our::wstringification::MustKeyTypesFromWstring(
       L"GlobalReference"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kGlobalReference
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kGlobalReference
     )
     == L"GlobalReference"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kIdentifiable
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kIdentifiable
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Identifiable"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kIdentifiable
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kIdentifiable
     )
     == L"Identifiable"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kMultiLanguageProperty
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kMultiLanguageProperty
+    == our::wstringification::MustKeyTypesFromWstring(
       L"MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kMultiLanguageProperty
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kMultiLanguageProperty
     )
     == L"MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kOperation
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kOperation
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Operation"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kOperation
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kOperation
     )
     == L"Operation"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kProperty
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kProperty
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Property"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kProperty
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kProperty
     )
     == L"Property"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kRange
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kRange
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Range"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kRange
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kRange
     )
     == L"Range"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kReferable
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kReferable
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Referable"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kReferable
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kReferable
     )
     == L"Referable"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kReferenceElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kReferenceElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kReferenceElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kReferenceElement
     )
     == L"ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kRelationshipElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kRelationshipElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kRelationshipElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kRelationshipElement
     )
     == L"RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodel
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kSubmodel
+    == our::wstringification::MustKeyTypesFromWstring(
       L"Submodel"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kSubmodel
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kSubmodel
     )
     == L"Submodel"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElement
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kSubmodelElement
+    == our::wstringification::MustKeyTypesFromWstring(
       L"SubmodelElement"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kSubmodelElement
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kSubmodelElement
     )
     == L"SubmodelElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElementCollection
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kSubmodelElementCollection
+    == our::wstringification::MustKeyTypesFromWstring(
       L"SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kSubmodelElementCollection
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kSubmodelElementCollection
     )
     == L"SubmodelElementCollection"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElementList
-    == aas::wstringification::MustKeyTypesFromWstring(
+    our::types::KeyTypes::kSubmodelElementList
+    == our::wstringification::MustKeyTypesFromWstring(
       L"SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::KeyTypes::kSubmodelElementList
+    our::wstringification::to_wstring(
+      our::types::KeyTypes::kSubmodelElementList
     )
     == L"SubmodelElementList"
   );
@@ -1495,13 +1495,13 @@ TEST_CASE("Test KeyTypes round-trip") {
 
 TEST_CASE("Test failure on KeyTypes") {
   CHECK(
-    !aas::wstringification::KeyTypesFromWstring(
+    !our::wstringification::KeyTypesFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustKeyTypesFromWstring(
+    our::wstringification::MustKeyTypesFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected KeyTypes literal: Totally utterly invalid"
@@ -1510,421 +1510,421 @@ TEST_CASE("Test failure on KeyTypes") {
 
 TEST_CASE("Test DataTypeDefXsd round-trip") {
   REQUIRE(
-    aas::types::DataTypeDefXsd::kAnyUri
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kAnyUri
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:anyURI"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kAnyUri
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kAnyUri
     )
     == L"xs:anyURI"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kBase64Binary
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kBase64Binary
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:base64Binary"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kBase64Binary
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kBase64Binary
     )
     == L"xs:base64Binary"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kBoolean
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kBoolean
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:boolean"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kBoolean
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kBoolean
     )
     == L"xs:boolean"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kByte
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kByte
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:byte"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kByte
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kByte
     )
     == L"xs:byte"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDate
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kDate
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:date"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kDate
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kDate
     )
     == L"xs:date"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDateTime
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kDateTime
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:dateTime"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kDateTime
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kDateTime
     )
     == L"xs:dateTime"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDecimal
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kDecimal
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:decimal"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kDecimal
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kDecimal
     )
     == L"xs:decimal"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDouble
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kDouble
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:double"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kDouble
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kDouble
     )
     == L"xs:double"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDuration
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kDuration
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:duration"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kDuration
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kDuration
     )
     == L"xs:duration"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kFloat
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kFloat
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:float"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kFloat
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kFloat
     )
     == L"xs:float"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGDay
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kGDay
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:gDay"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kGDay
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kGDay
     )
     == L"xs:gDay"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGMonth
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kGMonth
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:gMonth"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kGMonth
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kGMonth
     )
     == L"xs:gMonth"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGMonthDay
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kGMonthDay
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:gMonthDay"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kGMonthDay
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kGMonthDay
     )
     == L"xs:gMonthDay"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGYear
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kGYear
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:gYear"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kGYear
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kGYear
     )
     == L"xs:gYear"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGYearMonth
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kGYearMonth
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:gYearMonth"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kGYearMonth
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kGYearMonth
     )
     == L"xs:gYearMonth"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kHexBinary
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kHexBinary
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:hexBinary"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kHexBinary
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kHexBinary
     )
     == L"xs:hexBinary"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kInt
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kInt
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:int"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kInt
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kInt
     )
     == L"xs:int"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kInteger
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kInteger
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:integer"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kInteger
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kInteger
     )
     == L"xs:integer"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kLong
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kLong
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:long"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kLong
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kLong
     )
     == L"xs:long"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNegativeInteger
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kNegativeInteger
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:negativeInteger"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kNegativeInteger
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kNegativeInteger
     )
     == L"xs:negativeInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNonNegativeInteger
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kNonNegativeInteger
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:nonNegativeInteger"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kNonNegativeInteger
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kNonNegativeInteger
     )
     == L"xs:nonNegativeInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNonPositiveInteger
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kNonPositiveInteger
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:nonPositiveInteger"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kNonPositiveInteger
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kNonPositiveInteger
     )
     == L"xs:nonPositiveInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kPositiveInteger
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kPositiveInteger
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:positiveInteger"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kPositiveInteger
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kPositiveInteger
     )
     == L"xs:positiveInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kShort
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kShort
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:short"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kShort
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kShort
     )
     == L"xs:short"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kString
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kString
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:string"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kString
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kString
     )
     == L"xs:string"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kTime
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kTime
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:time"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kTime
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kTime
     )
     == L"xs:time"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedByte
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kUnsignedByte
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:unsignedByte"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kUnsignedByte
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kUnsignedByte
     )
     == L"xs:unsignedByte"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedInt
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kUnsignedInt
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:unsignedInt"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kUnsignedInt
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kUnsignedInt
     )
     == L"xs:unsignedInt"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedLong
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kUnsignedLong
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:unsignedLong"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kUnsignedLong
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kUnsignedLong
     )
     == L"xs:unsignedLong"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedShort
-    == aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::types::DataTypeDefXsd::kUnsignedShort
+    == our::wstringification::MustDataTypeDefXsdFromWstring(
       L"xs:unsignedShort"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeDefXsd::kUnsignedShort
+    our::wstringification::to_wstring(
+      our::types::DataTypeDefXsd::kUnsignedShort
     )
     == L"xs:unsignedShort"
   );
@@ -1932,13 +1932,13 @@ TEST_CASE("Test DataTypeDefXsd round-trip") {
 
 TEST_CASE("Test failure on DataTypeDefXsd") {
   CHECK(
-    !aas::wstringification::DataTypeDefXsdFromWstring(
+    !our::wstringification::DataTypeDefXsdFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustDataTypeDefXsdFromWstring(
+    our::wstringification::MustDataTypeDefXsdFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected DataTypeDefXsd literal: Totally utterly invalid"
@@ -1947,267 +1947,267 @@ TEST_CASE("Test failure on DataTypeDefXsd") {
 
 TEST_CASE("Test DataTypeIec61360 round-trip") {
   REQUIRE(
-    aas::types::DataTypeIec61360::kDate
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kDate
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"DATE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kDate
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kDate
     )
     == L"DATE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kString
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kString
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"STRING"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kString
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kString
     )
     == L"STRING"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kStringTranslatable
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kStringTranslatable
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"STRING_TRANSLATABLE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kStringTranslatable
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kStringTranslatable
     )
     == L"STRING_TRANSLATABLE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerMeasure
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kIntegerMeasure
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"INTEGER_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kIntegerMeasure
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kIntegerMeasure
     )
     == L"INTEGER_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerCount
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kIntegerCount
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"INTEGER_COUNT"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kIntegerCount
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kIntegerCount
     )
     == L"INTEGER_COUNT"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerCurrency
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kIntegerCurrency
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"INTEGER_CURRENCY"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kIntegerCurrency
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kIntegerCurrency
     )
     == L"INTEGER_CURRENCY"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealMeasure
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kRealMeasure
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"REAL_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kRealMeasure
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kRealMeasure
     )
     == L"REAL_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealCount
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kRealCount
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"REAL_COUNT"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kRealCount
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kRealCount
     )
     == L"REAL_COUNT"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealCurrency
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kRealCurrency
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"REAL_CURRENCY"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kRealCurrency
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kRealCurrency
     )
     == L"REAL_CURRENCY"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kBoolean
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kBoolean
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"BOOLEAN"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kBoolean
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kBoolean
     )
     == L"BOOLEAN"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIri
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kIri
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"IRI"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kIri
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kIri
     )
     == L"IRI"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIrdi
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kIrdi
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"IRDI"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kIrdi
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kIrdi
     )
     == L"IRDI"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRational
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kRational
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"RATIONAL"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kRational
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kRational
     )
     == L"RATIONAL"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRationalMeasure
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kRationalMeasure
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"RATIONAL_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kRationalMeasure
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kRationalMeasure
     )
     == L"RATIONAL_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kTime
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kTime
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"TIME"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kTime
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kTime
     )
     == L"TIME"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kTimestamp
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kTimestamp
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"TIMESTAMP"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kTimestamp
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kTimestamp
     )
     == L"TIMESTAMP"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kFile
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kFile
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"FILE"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kFile
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kFile
     )
     == L"FILE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kHtml
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kHtml
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"HTML"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kHtml
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kHtml
     )
     == L"HTML"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kBlob
-    == aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::types::DataTypeIec61360::kBlob
+    == our::wstringification::MustDataTypeIec61360FromWstring(
       L"BLOB"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::DataTypeIec61360::kBlob
+    our::wstringification::to_wstring(
+      our::types::DataTypeIec61360::kBlob
     )
     == L"BLOB"
   );
@@ -2215,13 +2215,13 @@ TEST_CASE("Test DataTypeIec61360 round-trip") {
 
 TEST_CASE("Test failure on DataTypeIec61360") {
   CHECK(
-    !aas::wstringification::DataTypeIec61360FromWstring(
+    !our::wstringification::DataTypeIec61360FromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustDataTypeIec61360FromWstring(
+    our::wstringification::MustDataTypeIec61360FromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected DataTypeIec61360 literal: Totally utterly invalid"

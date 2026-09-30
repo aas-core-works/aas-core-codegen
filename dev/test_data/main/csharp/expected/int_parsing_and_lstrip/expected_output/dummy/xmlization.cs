@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -286,8 +286,8 @@ namespace dummy
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -301,7 +301,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -447,7 +447,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theNumber
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -461,7 +461,7 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theMaybeNumber);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class Something:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.Something anInstance = Deserialize.SomethingFrom(
+        /// Our.Something anInstance = Deserialize.SomethingFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -505,7 +505,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -519,7 +519,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -637,7 +637,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -647,7 +647,7 @@ namespace dummy
                 (that, writer) => writer.WriteValue(that));
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -670,7 +670,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -689,7 +689,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of Something:
         /// <code>
-        /// var anInstance = new Aas.Something(
+        /// var anInstance = new Our.Something(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -708,7 +708,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Leaf`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Leaf(
+    an_instance = our_types.Leaf(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,23 +47,23 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def has_leaf_in_tree(
-    element: aas_types.Element
+    element: our_types.Element
 ) -> bool:
     """
     Check recursively whether there is a leaf in the tree of :paramref:`element`.
@@ -74,10 +74,10 @@ def has_leaf_in_tree(
     # pylint: disable=all
     return (
         (
-            isinstance(element, aas_types.Leaf)
+            isinstance(element, our_types.Leaf)
             or (
                 (
-                    isinstance(element, aas_types.Container)
+                    isinstance(element, our_types.Container)
                     and (
                         any(
                             has_leaf_in_tree(child)
@@ -90,7 +90,7 @@ def has_leaf_in_tree(
 
 
 def leaves_in_tree_are_not_empty(
-    element: aas_types.Element
+    element: our_types.Element
 ) -> bool:
     """
     Check recursively that all the leaves in the tree of :paramref:`element`
@@ -103,11 +103,11 @@ def leaves_in_tree_are_not_empty(
     return (
         (
             (
-            not isinstance(element, aas_types.Leaf)
+            not isinstance(element, our_types.Leaf)
             or (len(element.text) > 0)
         )
             and (
-                not isinstance(element, aas_types.Container)
+                not isinstance(element, our_types.Container)
                 or (
                     all(
                         leaves_in_tree_are_not_empty(child)
@@ -119,7 +119,7 @@ def leaves_in_tree_are_not_empty(
 
 
 def is_short_leaf_or_no_leaf(
-    element: aas_types.Element
+    element: our_types.Element
 ) -> bool:
     """
     Check that :paramref:`element` is either not a leaf or has a short text.
@@ -130,14 +130,14 @@ def is_short_leaf_or_no_leaf(
     # pylint: disable=all
     return (
         (
-            (not isinstance(element, aas_types.Leaf))
+            (not isinstance(element, our_types.Leaf))
             or len(element.text) == 0
             or len(element.text) < 16
         ))
 
 
 def is_container(
-    element: aas_types.Element
+    element: our_types.Element
 ) -> bool:
     """
     Check that :paramref:`element` is a container.
@@ -146,11 +146,11 @@ def is_container(
     """
     # pylint: disable=all
     return (
-        isinstance(element, (aas_types.OrderedContainer, aas_types.UnorderedContainer)))
+        isinstance(element, (our_types.OrderedContainer, our_types.UnorderedContainer)))
 
 
 def is_sorted_ordered_container(
-    element: aas_types.Element
+    element: our_types.Element
 ) -> bool:
     """
     Check that :paramref:`element` is an ordered container which is sorted.
@@ -160,14 +160,14 @@ def is_sorted_ordered_container(
     # pylint: disable=all
     return (
         (
-            isinstance(element, aas_types.Container)
-            and isinstance(element, aas_types.OrderedContainer)
+            isinstance(element, our_types.Container)
+            and isinstance(element, our_types.OrderedContainer)
             and element.is_sorted
         ))
 
 
 def container_has_children(
-    container: aas_types.Container
+    container: our_types.Container
 ) -> bool:
     """Check that :paramref:`container` has at least one child."""
     # pylint: disable=all
@@ -175,7 +175,7 @@ def container_has_children(
 
 
 def is_global_attribute_of_kind_name(
-    value: aas_types.Value
+    value: our_types.Value
 ) -> bool:
     """
     Check that :paramref:`value` refers to a global attribute of kind name.
@@ -186,14 +186,14 @@ def is_global_attribute_of_kind_name(
     # pylint: disable=all
     return (
         (
-            isinstance(value, aas_types.AttributeOperand)
-            and isinstance(value.attribute, aas_types.GlobalAttribute)
+            isinstance(value, our_types.AttributeOperand)
+            and isinstance(value.attribute, our_types.GlobalAttribute)
             and value.attribute.kind == 'name'
         ))
 
 
 def is_string_value(
-    value: aas_types.Value
+    value: our_types.Value
 ) -> bool:
     """
     Check that :paramref:`value` is a string value.
@@ -202,18 +202,18 @@ def is_string_value(
     """
     # pylint: disable=all
     return (
-        isinstance(value, (aas_types.StringLiteral, aas_types.AttributeOperand)))
+        isinstance(value, (our_types.StringLiteral, our_types.AttributeOperand)))
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_leaf(
             self,
-            that: aas_types.Leaf
+            that: our_types.Leaf
     ) -> Iterator[Error]:
         # No verification has been defined for Leaf.
         return
@@ -225,7 +225,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_ordered_container(
             self,
-            that: aas_types.OrderedContainer
+            that: our_types.OrderedContainer
     ) -> Iterator[Error]:
         for i, an_item in enumerate(that.children):
             for error in self.transform(an_item):
@@ -246,7 +246,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_unordered_container(
             self,
-            that: aas_types.UnorderedContainer
+            that: our_types.UnorderedContainer
     ) -> Iterator[Error]:
         for i, an_item in enumerate(that.children):
             for error in self.transform(an_item):
@@ -267,7 +267,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_global_attribute(
             self,
-            that: aas_types.GlobalAttribute
+            that: our_types.GlobalAttribute
     ) -> Iterator[Error]:
         # No verification has been defined for GlobalAttribute.
         return
@@ -279,7 +279,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_local_attribute(
             self,
-            that: aas_types.LocalAttribute
+            that: our_types.LocalAttribute
     ) -> Iterator[Error]:
         # No verification has been defined for LocalAttribute.
         return
@@ -291,7 +291,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_attribute_operand(
             self,
-            that: aas_types.AttributeOperand
+            that: our_types.AttributeOperand
     ) -> Iterator[Error]:
         for error in self.transform(that.attribute):
             error.path._prepend(
@@ -305,7 +305,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_string_literal(
             self,
-            that: aas_types.StringLiteral
+            that: our_types.StringLiteral
     ) -> Iterator[Error]:
         # No verification has been defined for StringLiteral.
         return
@@ -317,7 +317,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_number_literal(
             self,
-            that: aas_types.NumberLiteral
+            that: our_types.NumberLiteral
     ) -> Iterator[Error]:
         # No verification has been defined for NumberLiteral.
         return
@@ -329,7 +329,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not has_leaf_in_tree(that.root):
             yield Error(
@@ -343,7 +343,7 @@ class _Transformer(
 
         if not (
             all(
-                not isinstance(value, aas_types.NumberLiteral)
+                not isinstance(value, our_types.NumberLiteral)
                 or (value.number >= 0.0)
                 for value in that.values
             )
@@ -355,7 +355,7 @@ class _Transformer(
         if not (
             any(
                 (
-                    isinstance(value, aas_types.StringLiteral)
+                    isinstance(value, our_types.StringLiteral)
                     and value.text == 'root'
                 )
                 for value in that.values
@@ -367,7 +367,7 @@ class _Transformer(
             )
 
         if not (
-            not isinstance(that.root, aas_types.Container)
+            not isinstance(that.root, our_types.Container)
             or container_has_children(that.root)
         ):
             yield Error(
@@ -378,7 +378,7 @@ class _Transformer(
             not (
                 (
                     (that.optional_element is not None)
-                    and isinstance(that.optional_element, aas_types.Leaf)
+                    and isinstance(that.optional_element, our_types.Leaf)
                 )
             )
             or (len(that.optional_element.text) > 0)
@@ -436,7 +436,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

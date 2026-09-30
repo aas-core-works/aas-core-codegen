@@ -46,7 +46,7 @@ class Enhancement
         ),
         Stripped(
             f"""\
-private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
+private static OurEnhancing.Enhancer<Enhancement> CreateEnhancer()
 {{
 {I}long lastCustomId = 0;
 
@@ -58,7 +58,7 @@ private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
 {II}}}
 {I});
 
-{I}return new AasEnhancing.Enhancer<Enhancement>(enhancementFactory);
+{I}return new OurEnhancing.Enhancer<Enhancement>(enhancementFactory);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -73,7 +73,7 @@ private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
 public void Test_{cls_name}()
 {{
 {I}var instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name}()
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name}()
 {I});
 
 {I}var enhancer = CreateEnhancer();
@@ -106,8 +106,8 @@ public void Test_{cls_name}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace}; // renamed
-using AasEnhancing = {namespace}.Enhancing; // renamed
+using Our = {namespace}; // renamed
+using OurEnhancing = {namespace}.Enhancing; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias

@@ -1,6 +1,6 @@
-// Check that all [aastypes.IReferable.IDShort] are unique among
+// Check that all [ourtypes.IReferable.IDShort] are unique among
 // `referables`.
-func IDShortsAreUnique[R aastypes.IReferable](
+func IDShortsAreUnique[R ourtypes.IReferable](
 	referables []R) bool {
 	idShortSet := make(map[string]struct{})
 

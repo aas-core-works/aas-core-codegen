@@ -1126,7 +1126,7 @@ class _MethodTranspiler(csharp_transpilation.Transpiler):
             # NOTE (mristin):
             # We qualify the enumeration, since a property of the class might
             # carry the same name, *e.g.*, ``Kind`` of type ``Kind?``.
-            return Stripped(f"Aas.{csharp_naming.enum_name(node.identifier)}"), None
+            return Stripped(f"Our.{csharp_naming.enum_name(node.identifier)}"), None
 
         # NOTE (mristin):
         # The intermediate stage refuses the references to the constants and
@@ -1709,7 +1709,7 @@ def generate(
         Stripped(
             f"""\
 /// <summary>
-/// Represent a general class of an AAS model.
+/// Represent a general class of the meta-model.
 /// </summary>
 public interface IClass
 {{
@@ -1867,7 +1867,7 @@ public interface IUnion<T> : IUnion where T : IUnion<T>
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     # NOTE (mristin):

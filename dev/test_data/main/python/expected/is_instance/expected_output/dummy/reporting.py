@@ -35,7 +35,7 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -75,14 +75,14 @@ class PropertySegment:
     """Represent a property access on a path to an erroneous value."""
 
     #: Instance containing the property
-    instance: Final[aas_types.Class]
+    instance: Final[our_types.Class]
 
     #: Name of the property
     name: Final[str]
 
     def __init__(
             self,
-            instance: aas_types.Class,
+            instance: our_types.Class,
             name: str
     ) -> None:
         """Initialize with the given values."""

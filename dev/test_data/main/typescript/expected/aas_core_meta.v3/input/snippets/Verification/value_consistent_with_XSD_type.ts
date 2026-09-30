@@ -393,7 +393,7 @@ export function isXsUnsignedByte(value: string): boolean {
 
 
 // NOTE (mristin):
-// The literals of AasTypes.DataTypeDefXsd are consecutive integers starting
+// The literals of OurTypes.DataTypeDefXsd are consecutive integers starting
 // at 0, so we index into an array instead of looking the check up in a map.
 const DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY: ReadonlyArray<
   (value: string) => boolean
@@ -431,10 +431,10 @@ const DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY: ReadonlyArray<
 ];
 
 function assertAllDataTypeDefXsdCovered() {
-  for (const literal of AasTypes.overDataTypeDefXsd()) {
+  for (const literal of OurTypes.overDataTypeDefXsd()) {
     if (DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY[literal] === undefined) {
       throw new Error(
-        `The enumeration key ${literal} of AasTypes.DataTypeDefXsd ` +
+        `The enumeration key ${literal} of OurTypes.DataTypeDefXsd ` +
           "is not covered in DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY"
       );
     }
@@ -451,7 +451,7 @@ assertAllDataTypeDefXsdCovered();
  */
 export function valueConsistentWithXsdType(
   value: string,
-  valueType: AasTypes.DataTypeDefXsd
+  valueType: OurTypes.DataTypeDefXsd
 ): boolean {
   const verifier = DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY[valueType];
   if (verifier === undefined) {

@@ -14,10 +14,10 @@
 
 #include <deque>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -26,7 +26,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineDescentDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Descent";
   }
@@ -35,7 +35,7 @@ const std::filesystem::path& DetermineDescentDir() {
 }
 
 const std::filesystem::path& DetermineDescentOnceDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "DescentOnce";
   }
@@ -48,7 +48,7 @@ void AssertOrRerecordDescent(
   const std::filesystem::path& trace_path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > instance(
     test::common::xmlization::MustDeserializeFile(xml_path)
   );
@@ -56,15 +56,15 @@ void AssertOrRerecordDescent(
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::Descent(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::Descent(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -72,21 +72,21 @@ void AssertOrRerecordDescent(
 }
 
 void AssertOrRerecordDescentOnce(
-  const std::shared_ptr<aas::types::IClass>& instance,
+  const std::shared_ptr<our::types::IClass>& instance,
   const std::filesystem::path& trace_path
 ) {
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::DescentOnce(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::DescentOnce(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -122,7 +122,7 @@ TEST_CASE("Test Descent over an Leaf") {
 
 TEST_CASE("Test DescentOnce over an Leaf") {
   const std::shared_ptr<
-    aas::types::ILeaf
+    our::types::ILeaf
   > instance(
     test::common::examples::LoadMaxLeaf()
   );
@@ -164,7 +164,7 @@ TEST_CASE("Test Descent over an OrderedContainer") {
 
 TEST_CASE("Test DescentOnce over an OrderedContainer") {
   const std::shared_ptr<
-    aas::types::IOrderedContainer
+    our::types::IOrderedContainer
   > instance(
     test::common::examples::LoadMaxOrderedContainer()
   );
@@ -206,7 +206,7 @@ TEST_CASE("Test Descent over an UnorderedContainer") {
 
 TEST_CASE("Test DescentOnce over an UnorderedContainer") {
   const std::shared_ptr<
-    aas::types::IUnorderedContainer
+    our::types::IUnorderedContainer
   > instance(
     test::common::examples::LoadMaxUnorderedContainer()
   );
@@ -248,7 +248,7 @@ TEST_CASE("Test Descent over an GlobalAttribute") {
 
 TEST_CASE("Test DescentOnce over an GlobalAttribute") {
   const std::shared_ptr<
-    aas::types::IGlobalAttribute
+    our::types::IGlobalAttribute
   > instance(
     test::common::examples::LoadMaxGlobalAttribute()
   );
@@ -290,7 +290,7 @@ TEST_CASE("Test Descent over an LocalAttribute") {
 
 TEST_CASE("Test DescentOnce over an LocalAttribute") {
   const std::shared_ptr<
-    aas::types::ILocalAttribute
+    our::types::ILocalAttribute
   > instance(
     test::common::examples::LoadMaxLocalAttribute()
   );
@@ -332,7 +332,7 @@ TEST_CASE("Test Descent over an AttributeOperand") {
 
 TEST_CASE("Test DescentOnce over an AttributeOperand") {
   const std::shared_ptr<
-    aas::types::IAttributeOperand
+    our::types::IAttributeOperand
   > instance(
     test::common::examples::LoadMaxAttributeOperand()
   );
@@ -374,7 +374,7 @@ TEST_CASE("Test Descent over an StringLiteral") {
 
 TEST_CASE("Test DescentOnce over an StringLiteral") {
   const std::shared_ptr<
-    aas::types::IStringLiteral
+    our::types::IStringLiteral
   > instance(
     test::common::examples::LoadMaxStringLiteral()
   );
@@ -416,7 +416,7 @@ TEST_CASE("Test Descent over an NumberLiteral") {
 
 TEST_CASE("Test DescentOnce over an NumberLiteral") {
   const std::shared_ptr<
-    aas::types::INumberLiteral
+    our::types::INumberLiteral
   > instance(
     test::common::examples::LoadMaxNumberLiteral()
   );
@@ -458,7 +458,7 @@ TEST_CASE("Test Descent over an Something") {
 
 TEST_CASE("Test DescentOnce over an Something") {
   const std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     test::common::examples::LoadMaxSomething()
   );

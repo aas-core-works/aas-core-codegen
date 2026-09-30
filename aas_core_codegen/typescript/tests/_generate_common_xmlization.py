@@ -30,7 +30,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         Stripped(
             """\
 /**
- * Provide functions for loading generated XML examples of AAS instances.
+ * Provide functions for loading generated XML examples of model instances.
  */"""
         ),
         typescript_common.WARNING,
@@ -39,8 +39,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasTypes from "../src/types";
-import * as AasXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
+import * as OurXmlization from "../src/xmlization";
 
 import * as TestCommon from "./common";"""
         ),
@@ -70,7 +70,7 @@ import * as TestCommon from "./common";"""
  * from the test data directory.
  */
 export function {load_maximal_name}(
-): AasTypes.{cls_name_typescript} {{
+): OurTypes.{cls_name_typescript} {{
 {I}const aPath = path.join(
 {II}TestCommon.TEST_DATA_DIR,
 {II}"Xml",
@@ -81,13 +81,13 @@ export function {load_maximal_name}(
 
 {I}const text = fs.readFileSync(aPath, "utf-8");
 
-{I}const instanceOrError = AasXmlization.fromXmlString(
+{I}const instanceOrError = OurXmlization.fromXmlString(
 {II}text
 {I});
 {I}expect(instanceOrError.error).toBeNull();
 {I}const instance = instanceOrError.mustValue();
 
-{I}const casted = AasTypes.{as_function}(instance);
+{I}const casted = OurTypes.{as_function}(instance);
 {I}if (casted === null) {{
 {II}throw new Error(
 {III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +
@@ -107,7 +107,7 @@ export function {load_maximal_name}(
  * from the test data directory.
  */
 export function {load_minimal_name}(
-): AasTypes.{cls_name_typescript} {{
+): OurTypes.{cls_name_typescript} {{
 {I}const aPath = path.join(
 {II}TestCommon.TEST_DATA_DIR,
 {II}"Xml",
@@ -118,13 +118,13 @@ export function {load_minimal_name}(
 
 {I}const text = fs.readFileSync(aPath, "utf-8");
 
-{I}const instanceOrError = AasXmlization.fromXmlString(
+{I}const instanceOrError = OurXmlization.fromXmlString(
 {II}text
 {I});
 {I}expect(instanceOrError.error).toBeNull();
 {I}const instance = instanceOrError.mustValue();
 
-{I}const casted = AasTypes.{as_function}(instance);
+{I}const casted = OurTypes.{as_function}(instance);
 {I}if (casted === null) {{
 {II}throw new Error(
 {III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +

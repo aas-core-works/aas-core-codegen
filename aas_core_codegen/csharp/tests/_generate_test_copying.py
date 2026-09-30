@@ -46,8 +46,8 @@ return (
     return Stripped(
         f"""\
 private static bool {cls_name_csharp}ShallowEquals(
-{I}Aas.{cls_name_csharp} that,
-{I}Aas.{cls_name_csharp} other)
+{I}Our.{cls_name_csharp} that,
+{I}Our.{cls_name_csharp} other)
 {{
 {I}{indent_but_first_line(statement, I)}
 }}"""
@@ -433,10 +433,10 @@ that.{prop_name}.ToJsonString() == casted.{prop_name}.ToJsonString()"""
     return Stripped(
         f"""\
 public override bool {transform_name}(
-{I}Aas.{interface_name} that,
-{I}Aas.IClass other)
+{I}Our.{interface_name} that,
+{I}Our.IClass other)
 {{
-{I}if (!(other is Aas.{cls_name} casted))
+{I}if (!(other is Our.{cls_name} casted))
 {I}{{
 {II}return false;
 {I}}}
@@ -450,14 +450,14 @@ def _generate_union_transform_helper() -> Stripped:
     """
     Generate a single ``Transform`` overload shared by every named union.
 
-    A named union is not itself an ``Aas.IClass``, so it can not be dispatched
-    by the inherited, ``Aas.IClass``-typed ``Transform`` overload. We add
+    A named union is not itself an ``Our.IClass``, so it can not be dispatched
+    by the inherited, ``Our.IClass``-typed ``Transform`` overload. We add
     this overload, single-purpose and non-virtual, so that call sites can
     keep passing ``Transform`` around as a plain method group or calling it
     directly, regardless of whether the value at hand is a class instance or
     a named union.
 
-    Dispatching over the common, non-generic ``Aas.IUnion`` (see ``generate()``
+    Dispatching over the common, non-generic ``Our.IUnion`` (see ``generate()``
     in ``_generate_types.py``) instead of the union's own type means we need
     only this one overload for *all* named unions, not one per union -- the
     result is a plain ``bool``, so there is no return type to preserve.
@@ -468,7 +468,7 @@ def _generate_union_transform_helper() -> Stripped:
     """
     return Stripped(
         f"""\
-private bool Transform(Aas.IUnion that, Aas.IUnion other)
+private bool Transform(Our.IUnion that, Our.IUnion other)
 {{
 {I}return Transform(that.Underlying, other.Underlying);
 }}"""
@@ -506,7 +506,7 @@ private static bool ByteSpansEqual(
     writer.write(
         f"""\
 internal class DeepEqualiser
-{I}: Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+{I}: Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
 {{
 """
     )
@@ -529,8 +529,8 @@ def _generate_deep_equals(cls: intermediate.ConcreteClass) -> Stripped:
     return Stripped(
         f"""\
 private static bool {cls_name}DeepEquals(
-{I}Aas.{cls_name} that,
-{I}Aas.{cls_name} other)
+{I}Our.{cls_name} that,
+{I}Our.{cls_name} other)
 {{
 {I}return DeepEqualiserInstance.Transform(that, other);
 }}"""
@@ -575,10 +575,10 @@ private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser(
 [Test]
 public void Test_{cls_name}_shallow_copy()
 {{
-{I}Aas.{cls_name} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name}());
+{I}Our.{cls_name} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name}());
 
-{I}var instanceCopy = Aas.Copying.Shallow(instance);
+{I}var instanceCopy = Our.Copying.Shallow(instance);
 
 {I}Assert.IsTrue(
 {II}{cls_name}ShallowEquals(
@@ -594,10 +594,10 @@ public void Test_{cls_name}_shallow_copy()
 [Test]
 public void Test_{cls_name}_deep_copy()
 {{
-{I}Aas.{cls_name} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name}());
+{I}Our.{cls_name} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name}());
 
-{I}var instanceCopy = Aas.Copying.Deep(instance);
+{I}var instanceCopy = Our.Copying.Deep(instance);
 
 {I}Assert.IsTrue(
 {II}{cls_name}DeepEquals(
@@ -612,7 +612,7 @@ public void Test_{cls_name}_deep_copy()
         f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias

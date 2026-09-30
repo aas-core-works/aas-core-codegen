@@ -41,8 +41,8 @@ import (
 {I}"path/filepath"
 {I}"strings"
 {I}"testing"
-{I}aasjsonization "{repo_url}/jsonization"
-{I}aastesting "{repo_url}/aastesting"
+{I}ourjsonization "{repo_url}/jsonization"
+{I}ourtesting "{repo_url}/ourtesting"
 )"""
         ),
         Stripped(
@@ -135,7 +135,7 @@ func assertSerializationEqualsDeserialization(
             f"""\
 // Assert that there is a de-serialization error.
 //
-// If [aastesting.RecordMode] is set, the de-serialization error is re-recorded
+// If [ourtesting.RecordMode] is set, the de-serialization error is re-recorded
 // to `expectedPth`. Otherwise, the error is compared against the golden file
 // `expectedPth`.
 func assertDeserializationErrorEqualsExpectedOrRecord(
@@ -152,8 +152,8 @@ func assertDeserializationErrorEqualsExpectedOrRecord(
 {II}return
 {I}}}
 
-{I}var deseriaErr *aasjsonization.DeserializationError
-{I}deseriaErr, ok = err.(*aasjsonization.DeserializationError)
+{I}var deseriaErr *ourjsonization.DeserializationError
+{I}deseriaErr, ok = err.(*ourjsonization.DeserializationError)
 {I}if !ok {{
 {II}t.Fatalf("Expected a de-serialization error, but got: %v from %s", err, source)
 {II}return
@@ -162,7 +162,7 @@ func assertDeserializationErrorEqualsExpectedOrRecord(
 {I}// Add a new line for POSIX systems.
 {I}got := deseriaErr.Error() + "\\n"
 
-{I}if aastesting.RecordMode {{
+{I}if ourtesting.RecordMode {{
 {II}parent := filepath.Dir(expectedPth)
 {II}err := os.MkdirAll(parent, os.ModePerm)
 {II}if err != nil {{
@@ -189,7 +189,7 @@ func assertDeserializationErrorEqualsExpectedOrRecord(
 {IIII}"Failed to stat the file %s: %s; if the file does not exist, "+
 {IIIII}"you probably want to record the test data by "+
 {IIIII}"setting the environment variable %s",
-{IIII}expectedPth, err.Error(), aastesting.RecordModeEnvironmentVariableName,
+{IIII}expectedPth, err.Error(), ourtesting.RecordModeEnvironmentVariableName,
 {III})
 {III}return
 {II}}}

@@ -12,7 +12,7 @@ import json
 import unittest
 
 
-import aas_core3.jsonization as aas_jsonization
+import aas_core3.jsonization as our_jsonization
 
 
 import tests.common
@@ -51,11 +51,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.referable_from_jsonable(
+                instance = our_jsonization.referable_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -81,11 +81,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.identifiable_from_jsonable(
+                instance = our_jsonization.identifiable_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -123,11 +123,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.qualifiable_from_jsonable(
+                instance = our_jsonization.qualifiable_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -164,11 +164,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.submodel_element_from_jsonable(
+                instance = our_jsonization.submodel_element_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -192,11 +192,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.relationship_element_from_jsonable(
+                instance = our_jsonization.relationship_element_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -225,11 +225,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.data_element_from_jsonable(
+                instance = our_jsonization.data_element_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -253,11 +253,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.event_element_from_jsonable(
+                instance = our_jsonization.event_element_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -281,11 +281,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.data_specification_content_from_jsonable(
+                instance = our_jsonization.data_specification_content_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,

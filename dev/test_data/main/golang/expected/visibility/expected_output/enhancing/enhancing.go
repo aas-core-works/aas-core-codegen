@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedBox[E any] struct {
-	instance aastypes.IBox
+	instance ourtypes.IBox
 	enhancement E
 }
 
 func (eb *enhancedBox[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eb.instance.ModelType()
 }
 
 func (eb *enhancedBox[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eb.instance.DescendOnce(action)
 }
 
 func (eb *enhancedBox[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eb.instance.Descend(action)
 }
@@ -81,9 +81,9 @@ func (eb *enhancedBox[E]) setEnhancement(
 }
 
 func wrapBox[E any](
-	that aastypes.IBox,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IBox) {
+	that ourtypes.IBox,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IBox) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -109,9 +109,9 @@ func wrapBox[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -123,9 +123,9 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeBox:
+	case ourtypes.ModelTypeBox:
 		result = wrapBox[E](
-			that.(aastypes.IBox),
+			that.(ourtypes.IBox),
 			factory,
 		)
 	default:
@@ -144,7 +144,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -157,7 +157,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

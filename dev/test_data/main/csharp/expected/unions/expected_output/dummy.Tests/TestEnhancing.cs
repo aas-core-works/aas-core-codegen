@@ -3,8 +3,8 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy; // renamed
-using AasEnhancing = dummy.Enhancing; // renamed
+using Our = dummy; // renamed
+using OurEnhancing = dummy.Enhancing; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias
@@ -25,7 +25,7 @@ namespace dummy.Tests
             }
         }
 
-        private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
+        private static OurEnhancing.Enhancer<Enhancement> CreateEnhancer()
         {
             long lastCustomId = 0;
 
@@ -37,14 +37,14 @@ namespace dummy.Tests
                 }
             );
 
-            return new AasEnhancing.Enhancer<Enhancement>(enhancementFactory);
+            return new OurEnhancing.Enhancer<Enhancement>(enhancementFactory);
         }
 
         [Test]
         public void Test_StructuralFirst()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalStructuralFirst()
+                Our.Tests.CommonJsonization.LoadMaximalStructuralFirst()
             );
 
             var enhancer = CreateEnhancer();
@@ -74,7 +74,7 @@ namespace dummy.Tests
         public void Test_StructuralSecond()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalStructuralSecond()
+                Our.Tests.CommonJsonization.LoadMaximalStructuralSecond()
             );
 
             var enhancer = CreateEnhancer();
@@ -104,7 +104,7 @@ namespace dummy.Tests
         public void Test_MixedAbstractDescendantOne()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantOne()
+                Our.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantOne()
             );
 
             var enhancer = CreateEnhancer();
@@ -134,7 +134,7 @@ namespace dummy.Tests
         public void Test_MixedAbstractDescendantTwo()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantTwo()
+                Our.Tests.CommonJsonization.LoadMaximalMixedAbstractDescendantTwo()
             );
 
             var enhancer = CreateEnhancer();
@@ -164,7 +164,7 @@ namespace dummy.Tests
         public void Test_MixedConcreteWithDescendants()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants()
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendants()
             );
 
             var enhancer = CreateEnhancer();
@@ -194,7 +194,7 @@ namespace dummy.Tests
         public void Test_MixedConcreteWithDescendantsChild()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild()
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteWithDescendantsChild()
             );
 
             var enhancer = CreateEnhancer();
@@ -224,7 +224,7 @@ namespace dummy.Tests
         public void Test_MixedConcreteLeaf()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMixedConcreteLeaf()
+                Our.Tests.CommonJsonization.LoadMaximalMixedConcreteLeaf()
             );
 
             var enhancer = CreateEnhancer();
@@ -254,7 +254,7 @@ namespace dummy.Tests
         public void Test_ModelTypedFirst()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalModelTypedFirst()
+                Our.Tests.CommonJsonization.LoadMaximalModelTypedFirst()
             );
 
             var enhancer = CreateEnhancer();
@@ -284,7 +284,7 @@ namespace dummy.Tests
         public void Test_ModelTypedSecond()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalModelTypedSecond()
+                Our.Tests.CommonJsonization.LoadMaximalModelTypedSecond()
             );
 
             var enhancer = CreateEnhancer();
@@ -314,7 +314,7 @@ namespace dummy.Tests
         public void Test_Something()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+                Our.Tests.CommonJsonization.LoadMaximalSomething()
             );
 
             var enhancer = CreateEnhancer();

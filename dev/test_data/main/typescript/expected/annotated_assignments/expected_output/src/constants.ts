@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import * as AasTypes from "./types";
+import * as OurTypes from "./types";
 
 /**
  * List the texts which must not be used.

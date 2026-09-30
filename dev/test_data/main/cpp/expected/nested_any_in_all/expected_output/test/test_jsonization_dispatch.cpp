@@ -10,42 +10,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IContent") {
   const std::shared_ptr<
-    aas::types::IIecContent
+    our::types::IIecContent
   > concrete_instance(
     test::common::examples::LoadMinIecContent()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IContent
+      our::types::IContent
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::ContentFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::ContentFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IContent "
         "from a minimal IIecContent: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -57,7 +57,7 @@ TEST_CASE("Test the round-trip of an expected IContent") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IContent "
         "over a minimal IIecContent: ",
         *patch_message

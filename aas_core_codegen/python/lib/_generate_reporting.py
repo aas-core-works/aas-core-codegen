@@ -72,7 +72,7 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         ),
         python_common.generate_note_on_the_three_error_paths(
             qualified_module_name=qualified_module_name
@@ -83,14 +83,14 @@ class PropertySegment:
 {I}\"\"\"Represent a property access on a path to an erroneous value.\"\"\"
 
 {I}#: Instance containing the property
-{I}instance: Final[aas_types.Class]
+{I}instance: Final[our_types.Class]
 
 {I}#: Name of the property
 {I}name: Final[str]
 
 {I}def __init__(
 {III}self,
-{III}instance: aas_types.Class,
+{III}instance: our_types.Class,
 {III}name: str
 {I}) -> None:
 {II}\"\"\"Initialize with the given values.\"\"\"

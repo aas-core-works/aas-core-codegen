@@ -5,7 +5,7 @@ package types
 // Do NOT edit or append.
 
 import (
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Represent a value which JSON can carry.
@@ -34,7 +34,7 @@ const (
 	ModelTypeSomething ModelType = iota
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -71,14 +71,14 @@ type ISomething interface {
 		value []JsonValue,
 	);
 
-	TupleWithJson() aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject];
+	TupleWithJson() ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject];
 
 	SetTupleWithJson(
-		value aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
+		value ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -93,7 +93,7 @@ func IsSomething(
 // Implements ISomething.
 type Something struct {
 	values []JsonValue
-	tupleWithJson aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject]
+	tupleWithJson ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject]
 }
 
 func (s *Something) Values(
@@ -108,12 +108,12 @@ func (s *Something) SetValues(
 }
 
 func (s *Something) TupleWithJson(
-) aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject] {
+) ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject] {
 	return s.tupleWithJson
 }
 
 func (s *Something) SetTupleWithJson(
-	value aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
+	value ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
 ) {
 	s.tupleWithJson = value
 }
@@ -157,7 +157,7 @@ func (s *Something) Descend(
 // the given properties.
 func NewSomething(
 	values []JsonValue,
-	tupleWithJson aascommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
+	tupleWithJson ourcommon.Tuple4[string, JsonValue, JsonArray, JsonObject],
 ) *Something {
 	return &Something{
 		values: values,

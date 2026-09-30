@@ -1,17 +1,17 @@
 /// <summary>
-/// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
+/// Check that the <see cref="Our.IDataSpecificationIec61360.DataType" /> is defined
 /// appropriately for all data specifications whose content is given as IEC 61360.
 /// </summary>
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 public static bool DataSpecificationIec61360sForReferenceHaveAppropriateDataType(
-    IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+    IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
 )
 {
     foreach (var embeddedDataSpecification in embeddedDataSpecifications)
     {
         var iec61360 = (
             embeddedDataSpecification.DataSpecificationContent
-                as Aas.IDataSpecificationIec61360
+                as Our.IDataSpecificationIec61360
         );
         if (iec61360 != null)
         {

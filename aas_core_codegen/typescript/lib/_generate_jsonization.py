@@ -54,11 +54,11 @@ function parseArray<T>(
 {I}jsonable: JsonValue,
 {I}parseItem: (
 {II}jsonableItem: JsonValue
-{I}) => AasCommon.Either<T, DeserializationError>
-): AasCommon.Either<Array<T>, DeserializationError> {{
+{I}) => OurCommon.Either<T, DeserializationError>
+): OurCommon.Either<Array<T>, DeserializationError> {{
 {I}const iterableError = checkIsIterable(jsonable);
 {I}if (iterableError !== null) {{
-{II}return new AasCommon.Either<Array<T>, DeserializationError>(
+{II}return new OurCommon.Either<Array<T>, DeserializationError>(
 {III}null,
 {III}iterableError
 {II});
@@ -72,7 +72,7 @@ function parseArray<T>(
 {II}const itemOrError = parseItem(jsonableItem);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(iterable, i));
-{III}return new AasCommon.Either<Array<T>, DeserializationError>(
+{III}return new OurCommon.Either<Array<T>, DeserializationError>(
 {IIII}null,
 {IIII}itemOrError.error
 {III});
@@ -80,7 +80,7 @@ function parseArray<T>(
 {II}items.push(itemOrError.mustValue());
 {II}i++;
 {I}}}
-{I}return new AasCommon.Either<Array<T>, DeserializationError>(items, null);
+{I}return new OurCommon.Either<Array<T>, DeserializationError>(items, null);
 }}"""
     )
 
@@ -106,11 +106,11 @@ function parseSet<T>(
 {I}jsonable: JsonValue,
 {I}parseItem: (
 {II}jsonableItem: JsonValue
-{I}) => AasCommon.Either<T, DeserializationError>
-): AasCommon.Either<Set<T>, DeserializationError> {{
+{I}) => OurCommon.Either<T, DeserializationError>
+): OurCommon.Either<Set<T>, DeserializationError> {{
 {I}const iterableError = checkIsIterable(jsonable);
 {I}if (iterableError !== null) {{
-{II}return new AasCommon.Either<Set<T>, DeserializationError>(
+{II}return new OurCommon.Either<Set<T>, DeserializationError>(
 {III}null,
 {III}iterableError
 {II});
@@ -124,7 +124,7 @@ function parseSet<T>(
 {II}const itemOrError = parseItem(jsonableItem);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(iterable, i));
-{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{III}return new OurCommon.Either<Set<T>, DeserializationError>(
 {IIII}null,
 {IIII}itemOrError.error
 {III});
@@ -136,7 +136,7 @@ function parseSet<T>(
 {IIII}"Expected unique items in the set, but the item is a duplicate"
 {III});
 {III}error.path.prepend(new IndexSegment(iterable, i));
-{III}return new AasCommon.Either<Set<T>, DeserializationError>(
+{III}return new OurCommon.Either<Set<T>, DeserializationError>(
 {IIII}null,
 {IIII}error
 {III});
@@ -145,7 +145,7 @@ function parseSet<T>(
 {II}items.add(item);
 {II}i++;
 {I}}}
-{I}return new AasCommon.Either<Set<T>, DeserializationError>(items, null);
+{I}return new OurCommon.Either<Set<T>, DeserializationError>(items, null);
 }}"""
     )
 
@@ -167,7 +167,7 @@ def _generate_extract_model_type() -> Stripped:
  */
 function extractModelType(
 {I}jsonObject: JsonObject
-): AasCommon.Either<string, DeserializationError> {{
+): OurCommon.Either<string, DeserializationError> {{
 {I}const modelType = jsonObject["modelType"];
 {I}if (modelType === undefined) {{
 {II}return newDeserializationError<string>(
@@ -181,7 +181,7 @@ function extractModelType(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<string, DeserializationError>(modelType, null);
+{I}return new OurCommon.Either<string, DeserializationError>(modelType, null);
 }}"""
     )
 
@@ -298,7 +298,7 @@ def _generate_parse_tuple_helper(arity: int) -> Stripped:
 
     Every atomic value parser (see :py:func:`_parse_function_for_atomic_value`)
     already has the uniform signature ``(jsonable: JsonValue) =>
-    AasCommon.Either<T, DeserializationError>`` -- the very same shape
+    OurCommon.Either<T, DeserializationError>`` -- the very same shape
     :py:func:`_generate_parse_array` expects for a list item -- so a tuple
     item's parser can be passed on to the generated function as a bare
     reference, with no adapter or closure needed.
@@ -331,7 +331,7 @@ def _generate_parse_tuple_helper(arity: int) -> Stripped:
         f"""\
 parseItem{i}: (
 {I}jsonableItem: JsonValue
-) => AasCommon.Either<{type_params[i]}, DeserializationError>"""
+) => OurCommon.Either<{type_params[i]}, DeserializationError>"""
         for i in range(arity)
     )
 
@@ -350,7 +350,7 @@ if (next{i}.done) {{
 const item{i}OrError = parseItem{i}(next{i}.value);
 if (item{i}OrError.error !== null) {{
 {I}item{i}OrError.error.path.prepend(new IndexSegment(iterable, {i}));
-{I}return new AasCommon.Either<{tuple_type}, DeserializationError>(
+{I}return new OurCommon.Either<{tuple_type}, DeserializationError>(
 {II}null,
 {II}item{i}OrError.error
 {I});
@@ -377,10 +377,10 @@ if (item{i}OrError.error !== null) {{
 function {function_name}<{type_params_joined}>(
 {I}jsonable: JsonValue,
 {I}{indent_but_first_line(params_joined, I)}
-): AasCommon.Either<{tuple_type}, DeserializationError> {{
+): OurCommon.Either<{tuple_type}, DeserializationError> {{
 {I}const iterableError = checkIsIterable(jsonable);
 {I}if (iterableError !== null) {{
-{II}return new AasCommon.Either<{tuple_type}, DeserializationError>(
+{II}return new OurCommon.Either<{tuple_type}, DeserializationError>(
 {III}null,
 {III}iterableError
 {II});
@@ -406,7 +406,7 @@ function {function_name}<{type_params_joined}>(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<{tuple_type}, DeserializationError>(
+{I}return new OurCommon.Either<{tuple_type}, DeserializationError>(
 {II}[
 {III}{indent_but_first_line(values_joined, III)}
 {II}],
@@ -428,7 +428,7 @@ def _generate_bool_from_jsonable() -> Stripped:
  */
 function booleanFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<boolean, DeserializationError> {{
+): OurCommon.Either<boolean, DeserializationError> {{
 {I}// `typeof` seems to be optimized these days, so we use it instead of
 {I}// literal comparison, see:
 {I}// https://stackoverflow.com/questions/61786250/is-typeof-faster-than-literal-comparison
@@ -444,7 +444,7 @@ function booleanFromJsonable(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<boolean, DeserializationError>(jsonable, null);
+{I}return new OurCommon.Either<boolean, DeserializationError>(jsonable, null);
 }}"""
     )
 
@@ -462,7 +462,7 @@ def _generate_int_from_jsonable() -> Stripped:
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function integerFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<number, DeserializationError> {{
+): OurCommon.Either<number, DeserializationError> {{
 {I}if (jsonable === null) {{
 {II}return newDeserializationError<number>(
 {III}"Expected an integer number, but got null"
@@ -480,7 +480,7 @@ function integerFromJsonable(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<number, DeserializationError>(jsonable, null);
+{I}return new OurCommon.Either<number, DeserializationError>(jsonable, null);
 }}"""
     )
 
@@ -498,7 +498,7 @@ def _generate_float_from_jsonable() -> Stripped:
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function numberFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<number, DeserializationError> {{
+): OurCommon.Either<number, DeserializationError> {{
 {I}if (jsonable === null) {{
 {II}return newDeserializationError<number>(
 {III}"Expected a number, but got null"
@@ -520,7 +520,7 @@ function numberFromJsonable(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<number, DeserializationError>(jsonable, null);
+{I}return new OurCommon.Either<number, DeserializationError>(jsonable, null);
 }}"""
     )
 
@@ -537,7 +537,7 @@ def _generate_str_from_jsonable() -> Stripped:
  */
 function stringFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<string, DeserializationError> {{
+): OurCommon.Either<string, DeserializationError> {{
 {I}if (jsonable === null) {{
 {II}return newDeserializationError<string>(
 {III}"Expected a string, but got null"
@@ -549,7 +549,7 @@ function stringFromJsonable(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<string, DeserializationError>(jsonable, null);
+{I}return new OurCommon.Either<string, DeserializationError>(jsonable, null);
 }}"""
     )
 
@@ -566,7 +566,7 @@ def _generate_bytes_from_jsonable() -> Stripped:
  */
 function bytesFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<Uint8Array, DeserializationError> {{
+): OurCommon.Either<Uint8Array, DeserializationError> {{
 {I}if (jsonable === null) {{
 {II}return newDeserializationError<Uint8Array>(
 {III}"Expected a base64-encoded string, but got null"
@@ -578,11 +578,11 @@ function bytesFromJsonable(
 {II});
 {I}}}
 
-{I}const either = AasCommon.base64Decode(jsonable);
+{I}const either = OurCommon.base64Decode(jsonable);
 {I}if (either.error !== null) {{
 {II}return newDeserializationError<Uint8Array>(either.error);
 {I}}}
-{I}return new AasCommon.Either<Uint8Array, DeserializationError>(
+{I}return new OurCommon.Either<Uint8Array, DeserializationError>(
 {II}either.mustValue(), null
 {I});
 }}"""
@@ -614,23 +614,23 @@ def _generate_enumeration_from_jsonable(
  */
 export function {function_name}(
 {I}jsonable: JsonValue
-): AasCommon.Either<AasTypes.{enum_name}, DeserializationError> {{
+): OurCommon.Either<OurTypes.{enum_name}, DeserializationError> {{
 {I}if (typeof jsonable !== "string") {{
-{II}return newDeserializationError<AasTypes.{enum_name}>(
+{II}return newDeserializationError<OurTypes.{enum_name}>(
 {III}`Expected a string, but got: ${{typeof jsonable}}`
 {II});
 {I}}}
 
-{I}const literal = AasStringification.{enum_from_str}(jsonable);
+{I}const literal = OurStringification.{enum_from_str}(jsonable);
 {I}if (literal === null) {{
-{II}return newDeserializationError<AasTypes.{enum_name}>(
+{II}return newDeserializationError<OurTypes.{enum_name}>(
 {III}"Not a valid string representation of " +
 {IIII}`a literal of {enum_name}: ${{jsonable}}`
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<
-{II}AasTypes.{enum_name},
+{I}return new OurCommon.Either<
+{II}OurTypes.{enum_name},
 {II}DeserializationError
 {I}>(literal, null);
 }}"""
@@ -690,7 +690,7 @@ def _generate_dispatch_on_model_type(
         Stripped(
             f"""\
 default:
-{I}return newDeserializationError<AasTypes.{type_name}>(
+{I}return newDeserializationError<OurTypes.{type_name}>(
 {II}`Unexpected model type for {type_name}: ${{modelType}}`
 {I});"""
         )
@@ -702,8 +702,8 @@ default:
         f"""\
 const modelTypeOrError = extractModelType(jsonObject);
 if (modelTypeOrError.error !== null) {{
-{I}return new AasCommon.Either<
-{II}AasTypes.{type_name},
+{I}return new OurCommon.Either<
+{II}OurTypes.{type_name},
 {II}DeserializationError
 {I}>(
 {II}null,
@@ -742,14 +742,14 @@ def _generate_dispatch_from_jsonable(interface: intermediate.Interface) -> Strip
  */
 export function {function_name}(
 {I}jsonable: JsonValue
-): AasCommon.Either<
-{I}AasTypes.{interface_name},
+): OurCommon.Either<
+{I}OurTypes.{interface_name},
 {I}DeserializationError
 > {{
 {I}const objectError = checkIsJsonObject(jsonable);
 {I}if (objectError !== null) {{
-{II}return new AasCommon.Either<
-{III}AasTypes.{interface_name},
+{II}return new OurCommon.Either<
+{III}OurTypes.{interface_name},
 {III}DeserializationError
 {II}>(
 {III}null,
@@ -798,8 +798,8 @@ def _generate_named_union_from_jsonable(
             f"""\
 const objectError = checkIsJsonObject(jsonable);
 if (objectError !== null) {{
-{I}return new AasCommon.Either<
-{II}AasTypes.{union_name},
+{I}return new OurCommon.Either<
+{II}OurTypes.{union_name},
 {II}DeserializationError
 {I}>(
 {II}null,
@@ -837,7 +837,7 @@ if (jsonObject["modelType"] !== undefined) {{
                 f"""\
 const modelType = jsonObject["modelType"];
 if (modelType !== undefined) {{
-{I}return newDeserializationError<AasTypes.{union_name}>(
+{I}return newDeserializationError<OurTypes.{union_name}>(
 {II}`Unexpected model type for {union_name}: ${{modelType}}`
 {I});
 }}"""
@@ -896,7 +896,7 @@ if (
     blocks.append(
         Stripped(
             f"""\
-return newDeserializationError<AasTypes.{union_name}>(
+return newDeserializationError<OurTypes.{union_name}>(
 {I}"Could not determine the concrete type of {union_name} for the " +
 {II}"given JSON object"
 );"""
@@ -916,8 +916,8 @@ return newDeserializationError<AasTypes.{union_name}>(
  */
 function {function_name}(
 {I}jsonable: JsonValue
-): AasCommon.Either<
-{I}AasTypes.{union_name},
+): OurCommon.Either<
+{I}OurTypes.{union_name},
 {I}DeserializationError
 > {{
 {I}{indent_but_first_line(body, I)}
@@ -1004,7 +1004,7 @@ def _generate_parse_call_for_property(prop: intermediate.Property) -> Stripped:
     Generate the call which de-serializes the value of ``prop``.
 
     Every de-serialization has one and the same shape, ``(jsonable: JsonValue) =>
-    AasCommon.Either<T, DeserializationError>``, and ``jsonableValue`` already is
+    OurCommon.Either<T, DeserializationError>``, and ``jsonableValue`` already is
     the whole value of the property -- unlike in XML, a JSON value is not framed by
     anything -- so there is nothing to compose at the point of the call. A list and
     a tuple are the only two which take more than the value, and they take the
@@ -1031,7 +1031,7 @@ def _generate_parse_call_for_property(prop: intermediate.Property) -> Stripped:
 
         function parse_ListOf_Reference(
           jsonable: JsonValue
-        ): AasCommon.Either<Array<AasTypes.Reference>, DeserializationError> {
+        ): OurCommon.Either<Array<OurTypes.Reference>, DeserializationError> {
           // ... the very body of ``parseArray``, except that the item is parsed
           // by ``referenceFromJsonable`` instead of by ``parseItem``
         }
@@ -1095,7 +1095,7 @@ parseArray(
 
             item_types.append(
                 typescript_common.generate_type(
-                    item_type_anno, types_module=Identifier("AasTypes")
+                    item_type_anno, types_module=Identifier("OurTypes")
                 )
             )
             item_parse_functions.append(
@@ -1206,7 +1206,7 @@ def _generate_parse_properties_of_class(cls: intermediate.ConcreteClass) -> Stri
         var_name_by_property[prop.name] = var_name
 
         var_type = typescript_common.generate_type(
-            prop.type_annotation, types_module=Identifier("AasTypes")
+            prop.type_annotation, types_module=Identifier("OurTypes")
         )
 
         # NOTE (mristin):
@@ -1223,7 +1223,7 @@ def _generate_parse_properties_of_class(cls: intermediate.ConcreteClass) -> Stri
                     f"""\
 if ({var_name} === null) {{
 {I}return newDeserializationError<
-{II}AasTypes.{cls_name}
+{II}OurTypes.{cls_name}
 {I}>(
 {II}{message_literal}
 {I});
@@ -1299,8 +1299,8 @@ for (const key in jsonObject) {{
 {II}propertyError.path.prepend(
 {III}new PropertySegment(jsonObject, key)
 {II});
-{II}return new AasCommon.Either<
-{III}AasTypes.{cls_name},
+{II}return new OurCommon.Either<
+{III}OurTypes.{cls_name},
 {III}DeserializationError
 {II}>(
 {III}null,
@@ -1318,11 +1318,11 @@ for (const key in jsonObject) {{
         blocks.append(
             Stripped(
                 f"""\
-return new AasCommon.Either<
-{I}AasTypes.{cls_name},
+return new OurCommon.Either<
+{I}OurTypes.{cls_name},
 {I}DeserializationError
 >(
-{I}new AasTypes.{cls_name}(),
+{I}new OurTypes.{cls_name}(),
 {I}null
 );"""
             )
@@ -1331,11 +1331,11 @@ return new AasCommon.Either<
         init_writer = io.StringIO()
         init_writer.write(
             f"""\
-return new AasCommon.Either<
-{I}AasTypes.{cls_name},
+return new OurCommon.Either<
+{I}OurTypes.{cls_name},
 {I}DeserializationError
 >(
-{I}new AasTypes.{cls_name}(
+{I}new OurTypes.{cls_name}(
 """
         )
 
@@ -1394,8 +1394,8 @@ or an error if any"""
 {description_comment}
 function {function_name}(
 {I}jsonObject: JsonObject
-): AasCommon.Either<
-{I}AasTypes.{cls_name},
+): OurCommon.Either<
+{I}OurTypes.{cls_name},
 {I}DeserializationError
 > {{
 """
@@ -1433,8 +1433,8 @@ def _generate_concrete_class_from_jsonable(
             f"""\
 const objectError = checkIsJsonObject(jsonable);
 if (objectError !== null) {{
-{I}return new AasCommon.Either<
-{II}AasTypes.{cls_name},
+{I}return new OurCommon.Either<
+{II}OurTypes.{cls_name},
 {II}DeserializationError
 {I}>(
 {II}null,
@@ -1460,8 +1460,8 @@ const jsonObject = <JsonObject>jsonable;"""
                 f"""\
 const modelTypeError = checkModelType(jsonObject, "{model_type}");
 if (modelTypeError !== null) {{
-{I}return new AasCommon.Either<
-{II}AasTypes.{cls_name},
+{I}return new OurCommon.Either<
+{II}OurTypes.{cls_name},
 {II}DeserializationError
 {I}>(
 {II}null,
@@ -1493,8 +1493,8 @@ or an error if any"""
 {description_comment}
 export function {function_name}(
 {I}jsonable: JsonValue
-): AasCommon.Either<
-{I}AasTypes.{cls_name},
+): OurCommon.Either<
+{I}OurTypes.{cls_name},
 {I}DeserializationError
 > {{
 """
@@ -1586,7 +1586,7 @@ def _jsonable_type_of_atomic(type_anno: intermediate.AtomicTypeAnnotation) -> St
     # NOTE (mristin):
     # A JSON-able value goes on the wire as itself, whatever shape it happens
     # to have. ``JsonValue`` here is the jsonization module's own alias for
-    # a value of a JSON document, and not ``AasTypes.JsonValue``, but the two
+    # a value of a JSON document, and not ``OurTypes.JsonValue``, but the two
     # describe the very same thing.
     if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         return Stripped("JsonValue")
@@ -1643,9 +1643,9 @@ def _generate_json_able_helpers(
  */
 function jsonValueFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<AasTypes.JsonValue, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonValue, DeserializationError> {{
 {I}if (jsonable === null || jsonable === undefined) {{
-{II}return newDeserializationError<AasTypes.JsonValue>(
+{II}return newDeserializationError<OurTypes.JsonValue>(
 {III}`Expected a JSON-able value, but got: ${{jsonable}}`
 {II});
 {I}}}
@@ -1653,7 +1653,7 @@ function jsonValueFromJsonable(
 {I}switch (typeof jsonable) {{
 {II}case "boolean":
 {II}case "string":
-{III}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {IIII}jsonable, null
 {III});
 
@@ -1663,12 +1663,12 @@ function jsonValueFromJsonable(
 {III}// never gives us one, but the caller may well have put the value
 {III}// together programmatically.
 {III}if (!Number.isFinite(jsonable)) {{
-{IIII}return newDeserializationError<AasTypes.JsonValue>(
+{IIII}return newDeserializationError<OurTypes.JsonValue>(
 {IIIII}`Expected a JSON-able value, but got the number ${{jsonable}}, ` +
 {IIIII}`which is neither finite nor representable in JSON`
 {IIII});
 {III}}}
-{III}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {IIII}jsonable, null
 {III});
 
@@ -1676,14 +1676,14 @@ function jsonValueFromJsonable(
 {III}break;
 
 {II}default:
-{III}return newDeserializationError<AasTypes.JsonValue>(
+{III}return newDeserializationError<OurTypes.JsonValue>(
 {IIII}`Expected a JSON-able value (a boolean, a number, a string, ` +
 {IIIII}`an array or an object), but got: ${{typeof jsonable}}`
 {III});
 {I}}}
 
 {I}if (Array.isArray(jsonable)) {{
-{II}const items = new Array<AasTypes.JsonValue>(jsonable.length);
+{II}const items = new Array<OurTypes.JsonValue>(jsonable.length);
 {II}for (let i = 0; i < jsonable.length; i++) {{
 {III}const parsed = jsonValueFromJsonable(jsonable[i]);
 {III}if (parsed.error !== null) {{
@@ -1692,12 +1692,12 @@ function jsonValueFromJsonable(
 {III}}}
 {III}items[i] = parsed.mustValue();
 {II}}}
-{II}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {III}items, null
 {II});
 {I}}}
 
-{I}const members: AasTypes.JsonObject = {{}};
+{I}const members: OurTypes.JsonObject = {{}};
 {I}for (const key of Object.keys(jsonable)) {{
 {II}const parsed = jsonValueFromJsonable((jsonable as JsonObject)[key]);
 {II}if (parsed.error !== null) {{
@@ -1709,7 +1709,7 @@ function jsonValueFromJsonable(
 {II}members[key] = parsed.mustValue();
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{I}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {II}members, null
 {I});
 }}"""
@@ -1724,22 +1724,22 @@ function jsonValueFromJsonable(
  */
 function jsonArrayFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<AasTypes.JsonArray, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonArray, DeserializationError> {{
 {I}if (!Array.isArray(jsonable)) {{
-{II}return newDeserializationError<AasTypes.JsonArray>(
+{II}return newDeserializationError<OurTypes.JsonArray>(
 {III}`Expected a JSON-able array, but got: ${{typeof jsonable}}`
 {II});
 {I}}}
 
 {I}const parsed = jsonValueFromJsonable(jsonable);
 {I}if (parsed.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.JsonArray, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonArray, DeserializationError>(
 {III}null, parsed.error
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonArray, DeserializationError>(
-{II}parsed.mustValue() as AasTypes.JsonArray, null
+{I}return new OurCommon.Either<OurTypes.JsonArray, DeserializationError>(
+{II}parsed.mustValue() as OurTypes.JsonArray, null
 {I});
 }}"""
         ),
@@ -1753,27 +1753,27 @@ function jsonArrayFromJsonable(
  */
 function jsonObjectFromJsonable(
 {I}jsonable: JsonValue
-): AasCommon.Either<AasTypes.JsonObject, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonObject, DeserializationError> {{
 {I}if (
 {II}jsonable === null
 {II}|| jsonable === undefined
 {II}|| typeof jsonable !== "object"
 {II}|| Array.isArray(jsonable)
 {I}) {{
-{II}return newDeserializationError<AasTypes.JsonObject>(
+{II}return newDeserializationError<OurTypes.JsonObject>(
 {III}`Expected a JSON-able object, but got: ${{typeof jsonable}}`
 {II});
 {I}}}
 
 {I}const parsed = jsonValueFromJsonable(jsonable);
 {I}if (parsed.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.JsonObject, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonObject, DeserializationError>(
 {III}null, parsed.error
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonObject, DeserializationError>(
-{II}parsed.mustValue() as AasTypes.JsonObject, null
+{I}return new OurCommon.Either<OurTypes.JsonObject, DeserializationError>(
+{II}parsed.mustValue() as OurTypes.JsonObject, null
 {I});
 }}"""
         ),
@@ -1790,7 +1790,7 @@ function jsonObjectFromJsonable(
  * @returns `that`, as a value of a JSON document
  * @throws {{@link SerializationError}} if `that` is not JSON-able
  */
-function jsonValueToJsonable(that: AasTypes.JsonValue): JsonValue {{
+function jsonValueToJsonable(that: OurTypes.JsonValue): JsonValue {{
 {I}if (that === null || that === undefined) {{
 {II}throw new SerializationError(
 {III}`Expected a JSON-able value, but got: ${{that}}`
@@ -1842,7 +1842,7 @@ function jsonValueToJsonable(that: AasTypes.JsonValue): JsonValue {{
 {I}const members: JsonObject = {{}};
 {I}for (const key of Object.keys(that)) {{
 {II}try {{
-{III}members[key] = jsonValueToJsonable((that as AasTypes.JsonObject)[key]);
+{III}members[key] = jsonValueToJsonable((that as OurTypes.JsonObject)[key]);
 {II}}} catch (error) {{
 {III}if (error instanceof SerializationError) {{
 {IIII}error.prependKey(key);
@@ -1885,7 +1885,7 @@ def _generate_serialize_call(
             return Stripped(f"numberToJsonable({access_expression})")
 
         elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-            return Stripped(f"AasCommon.base64Encode({access_expression})")
+            return Stripped(f"OurCommon.base64Encode({access_expression})")
 
         else:
             assert_never(primitive_type)
@@ -1970,9 +1970,9 @@ def _generate_serialize_enumeration(
  * {{@link types!{enum_name}}}
  */
 function {function_name}(
-{I}that: AasTypes.{enum_name}
+{I}that: OurTypes.{enum_name}
 ): string {{
-{I}const text = AasStringification.{to_string_name}(that);
+{I}const text = OurStringification.{to_string_name}(that);
 {I}if (text === null) {{
 {II}throw new SerializationError(
 {III}`Invalid literal of {enum_name}: ${{that}}`
@@ -2007,7 +2007,7 @@ def _generate_serialize_list(type_anno: intermediate.ListTypeAnnotation) -> Stri
     function_name = _composed_serialize_function_name(type_anno)
 
     item_type = typescript_common.generate_type(
-        items_type_anno, types_module=Identifier("AasTypes")
+        items_type_anno, types_module=Identifier("OurTypes")
     )
     jsonable_item_type = _jsonable_type_of_atomic(items_type_anno)
 
@@ -2064,7 +2064,7 @@ def _generate_serialize_set(type_anno: intermediate.SetTypeAnnotation) -> Stripp
     function_name = _composed_serialize_function_name(type_anno)
 
     item_type = typescript_common.generate_type(
-        items_type_anno, types_module=Identifier("AasTypes")
+        items_type_anno, types_module=Identifier("OurTypes")
     )
     jsonable_item_type = _jsonable_type_of_atomic(items_type_anno)
 
@@ -2131,7 +2131,7 @@ def _generate_serialize_tuple(type_anno: intermediate.TupleTypeAnnotation) -> St
 
     item_types = ", ".join(
         typescript_common.generate_type(
-            item_type_anno, types_module=Identifier("AasTypes")
+            item_type_anno, types_module=Identifier("OurTypes")
         )
         for item_type_anno in item_type_annos
     )
@@ -2315,7 +2315,7 @@ try {{
  * @returns JSON-able representation
  */
 function {function_name}(
-{I}that: AasTypes.{cls_name}
+{I}that: OurTypes.{cls_name}
 ): JsonObject {{
 """
     )
@@ -2349,7 +2349,7 @@ def _generate_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
             Stripped(
                 f"""\
 {method_name}(
-{I}that: AasTypes.{cls_name}
+{I}that: OurTypes.{cls_name}
 ): JsonObject {{
 {I}return {function_name}(that);
 }}"""
@@ -2362,7 +2362,7 @@ def _generate_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
 /**
  * Dispatch the serialization on the run-time type of an instance.
  */
-class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
+class Serializer extends OurTypes.AbstractTransformer<JsonObject> {
 """
     )
 
@@ -2392,7 +2392,7 @@ def _generate_serialize_instance() -> Stripped:
  * @param that - instance to be serialized
  * @returns JSON-able representation
  */
-function serializeClass(that: AasTypes.Class): JsonObject {{
+function serializeClass(that: OurTypes.Class): JsonObject {{
 {I}return that.transform(SERIALIZER);
 }}"""
     )
@@ -2657,7 +2657,7 @@ def generate(
         typescript_description.documentation_comment(
             Stripped(
                 """\
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -2667,9 +2667,9 @@ properties do not have fixed order, and hence we can not read
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasCommon from "./common";
-import * as AasTypes from "./types";
-import * as AasStringification from "./stringification";"""
+import * as OurCommon from "./common";
+import * as OurTypes from "./types";
+import * as OurStringification from "./stringification";"""
         ),
         Stripped(
             """\
@@ -2855,8 +2855,8 @@ export class DeserializationError {{
  */
 function newDeserializationError<T>(
 {I}message: string
-): AasCommon.Either<T, DeserializationError> {{
-{I}return new AasCommon.Either<T, DeserializationError>(
+): OurCommon.Either<T, DeserializationError> {{
+{I}return new OurCommon.Either<T, DeserializationError>(
 {II}null,
 {II}new DeserializationError(message)
 {I});
@@ -2954,12 +2954,12 @@ function newDeserializationError<T>(
 /**
  * Convert `that` to a JSON-able structure.
  *
- * @param that - AAS data to be recursively converted to a JSON-able structure
+ * @param that - Model instance to be recursively converted to a JSON-able structure
  * @returns
  * JSON-able structure which can be further processed with, say,
  * {{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify|JSON.stringify}})
  */
-export function toJsonable(that: AasTypes.Class): JsonObject {{
+export function toJsonable(that: OurTypes.Class): JsonObject {{
 {I}return serializeClass(that);
 }}"""
         )

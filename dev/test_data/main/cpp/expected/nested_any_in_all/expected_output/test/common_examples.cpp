@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,82 +21,82 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::ILangString
+  our::types::ILangString
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ILangString
+  our::types::ILangString
 >::name = "ILangString";
 
 template<>
 struct StaticTypeName<
-  aas::types::ILangStringSet
+  our::types::ILangStringSet
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ILangStringSet
+  our::types::ILangStringSet
 >::name = "ILangStringSet";
 
 template<>
 struct StaticTypeName<
-  aas::types::IIecContent
+  our::types::IIecContent
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IIecContent
+  our::types::IIecContent
 >::name = "IIecContent";
 
 template<>
 struct StaticTypeName<
-  aas::types::IOtherContent
+  our::types::IOtherContent
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IOtherContent
+  our::types::IOtherContent
 >::name = "IOtherContent";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISpecification
+  our::types::ISpecification
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISpecification
+  our::types::ISpecification
 >::name = "ISpecification";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 >::name = "ISomething";
 
 std::shared_ptr<
-  aas::types::ILangString
+  our::types::ILangString
 > LoadLangString(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ILangString
+    our::types::ILangString
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ILangString
+      our::types::ILangString
     >(
       abstract
     )
@@ -104,7 +104,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ILangString from ",
         path.string()
       )
@@ -115,7 +115,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILangString
+  our::types::ILangString
 > LoadMinLangString() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -131,7 +131,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILangString
+  our::types::ILangString
 > LoadMaxLangString() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -147,23 +147,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILangStringSet
+  our::types::ILangStringSet
 > LoadLangStringSet(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ILangStringSet
+    our::types::ILangStringSet
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ILangStringSet
+      our::types::ILangStringSet
     >(
       abstract
     )
@@ -171,7 +171,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ILangStringSet from ",
         path.string()
       )
@@ -182,7 +182,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILangStringSet
+  our::types::ILangStringSet
 > LoadMinLangStringSet() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -198,7 +198,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILangStringSet
+  our::types::ILangStringSet
 > LoadMaxLangStringSet() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -214,23 +214,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IIecContent
+  our::types::IIecContent
 > LoadIecContent(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IIecContent
+    our::types::IIecContent
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IIecContent
+      our::types::IIecContent
     >(
       abstract
     )
@@ -238,7 +238,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IIecContent from ",
         path.string()
       )
@@ -249,7 +249,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IIecContent
+  our::types::IIecContent
 > LoadMinIecContent() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -265,7 +265,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IIecContent
+  our::types::IIecContent
 > LoadMaxIecContent() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -281,23 +281,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IOtherContent
+  our::types::IOtherContent
 > LoadOtherContent(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IOtherContent
+    our::types::IOtherContent
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IOtherContent
+      our::types::IOtherContent
     >(
       abstract
     )
@@ -305,7 +305,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IOtherContent from ",
         path.string()
       )
@@ -316,7 +316,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IOtherContent
+  our::types::IOtherContent
 > LoadMinOtherContent() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -332,7 +332,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IOtherContent
+  our::types::IOtherContent
 > LoadMaxOtherContent() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -348,23 +348,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISpecification
+  our::types::ISpecification
 > LoadSpecification(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISpecification
+    our::types::ISpecification
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISpecification
+      our::types::ISpecification
     >(
       abstract
     )
@@ -372,7 +372,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISpecification from ",
         path.string()
       )
@@ -383,7 +383,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISpecification
+  our::types::ISpecification
 > LoadMinSpecification() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -399,7 +399,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISpecification
+  our::types::ISpecification
 > LoadMaxSpecification() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -415,23 +415,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadSomething(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISomething
+      our::types::ISomething
     >(
       abstract
     )
@@ -439,7 +439,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISomething from ",
         path.string()
       )
@@ -450,7 +450,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMinSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -466,7 +466,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMaxSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

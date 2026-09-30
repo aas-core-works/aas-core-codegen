@@ -8,9 +8,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasJsonization from "../src/jsonization";
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
+import * as OurJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
 
 import * as TestCommon from "./common";
 
@@ -19,13 +19,13 @@ import * as TestCommon from "./common";
  * gives the input.
  */
 function assertSerializeDeserializeEqualsOriginal(
-  originalJsonable: AasJsonization.JsonValue,
-  instance: AasTypes.Class,
+  originalJsonable: OurJsonization.JsonValue,
+  instance: OurTypes.Class,
   aPath: string
 ): void {
-  let jsonable: AasJsonization.JsonValue | null = null;
+  let jsonable: OurJsonization.JsonValue | null = null;
   try {
-    jsonable = AasJsonization.toJsonable(instance);
+    jsonable = OurJsonization.toJsonable(instance);
   } catch (error) {
     throw new Error(
       "Expected no exception during JSON serialization " +
@@ -55,7 +55,7 @@ function assertSerializeDeserializeEqualsOriginal(
  * @throws an {@link Error} if assertion fails
  */
 function assertDeserializationErrorEqualsExpectedOrRecord(
-  error: AasJsonization.DeserializationError,
+  error: OurJsonization.DeserializationError,
   aPath: string
 ): void {
   const errorPath = aPath + ".error";
@@ -94,7 +94,7 @@ function assertDeserializationErrorEqualsExpectedOrRecord(
  * @throws an {@link Error} if assertion fails
  */
 function assertVerificationErrorsEqualExpectedOrRecord(
-  errors: Array<AasVerification.VerificationError>,
+  errors: Array<OurVerification.VerificationError>,
   aPath: string
 ): void {
   const errorsPath = aPath + ".errors";
@@ -150,13 +150,13 @@ test("Branch round-trip OK", () => {
   for (const pth of pths) {
     const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-    const instanceOrError = AasJsonization.branchFromJsonable(
+    const instanceOrError = OurJsonization.branchFromJsonable(
       jsonable
     );
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
     assertSerializeDeserializeEqualsOriginal(
       jsonable,
@@ -207,7 +207,7 @@ test("Branch deserialization fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.branchFromJsonable(
+      const instanceOrError = OurJsonization.branchFromJsonable(
         jsonable
       );
       if (instanceOrError.error === null) {
@@ -255,7 +255,7 @@ test("Branch verification fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.branchFromJsonable(
+      const instanceOrError = OurJsonization.branchFromJsonable(
         jsonable
       );
       if (instanceOrError.error !== null) {
@@ -267,7 +267,7 @@ test("Branch verification fail", () => {
 
       const instance = instanceOrError.mustValue();
 
-      const verificationErrors = Array.from(AasVerification.verify(instance));
+      const verificationErrors = Array.from(OurVerification.verify(instance));
       assertVerificationErrorsEqualExpectedOrRecord(
         verificationErrors,
         pth
@@ -293,13 +293,13 @@ test("Leaf round-trip OK", () => {
   for (const pth of pths) {
     const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-    const instanceOrError = AasJsonization.leafFromJsonable(
+    const instanceOrError = OurJsonization.leafFromJsonable(
       jsonable
     );
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
     assertSerializeDeserializeEqualsOriginal(
       jsonable,
@@ -350,7 +350,7 @@ test("Leaf deserialization fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.leafFromJsonable(
+      const instanceOrError = OurJsonization.leafFromJsonable(
         jsonable
       );
       if (instanceOrError.error === null) {
@@ -398,7 +398,7 @@ test("Leaf verification fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.leafFromJsonable(
+      const instanceOrError = OurJsonization.leafFromJsonable(
         jsonable
       );
       if (instanceOrError.error !== null) {
@@ -410,7 +410,7 @@ test("Leaf verification fail", () => {
 
       const instance = instanceOrError.mustValue();
 
-      const verificationErrors = Array.from(AasVerification.verify(instance));
+      const verificationErrors = Array.from(OurVerification.verify(instance));
       assertVerificationErrorsEqualExpectedOrRecord(
         verificationErrors,
         pth
@@ -436,13 +436,13 @@ test("Blossom round-trip OK", () => {
   for (const pth of pths) {
     const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-    const instanceOrError = AasJsonization.blossomFromJsonable(
+    const instanceOrError = OurJsonization.blossomFromJsonable(
       jsonable
     );
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
     assertSerializeDeserializeEqualsOriginal(
       jsonable,
@@ -493,7 +493,7 @@ test("Blossom deserialization fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.blossomFromJsonable(
+      const instanceOrError = OurJsonization.blossomFromJsonable(
         jsonable
       );
       if (instanceOrError.error === null) {
@@ -541,7 +541,7 @@ test("Blossom verification fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.blossomFromJsonable(
+      const instanceOrError = OurJsonization.blossomFromJsonable(
         jsonable
       );
       if (instanceOrError.error !== null) {
@@ -553,7 +553,7 @@ test("Blossom verification fail", () => {
 
       const instance = instanceOrError.mustValue();
 
-      const verificationErrors = Array.from(AasVerification.verify(instance));
+      const verificationErrors = Array.from(OurVerification.verify(instance));
       assertVerificationErrorsEqualExpectedOrRecord(
         verificationErrors,
         pth
@@ -579,13 +579,13 @@ test("Something round-trip OK", () => {
   for (const pth of pths) {
     const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-    const instanceOrError = AasJsonization.somethingFromJsonable(
+    const instanceOrError = OurJsonization.somethingFromJsonable(
       jsonable
     );
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
     assertSerializeDeserializeEqualsOriginal(
       jsonable,
@@ -636,7 +636,7 @@ test("Something deserialization fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.somethingFromJsonable(
+      const instanceOrError = OurJsonization.somethingFromJsonable(
         jsonable
       );
       if (instanceOrError.error === null) {
@@ -684,7 +684,7 @@ test("Something verification fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.somethingFromJsonable(
+      const instanceOrError = OurJsonization.somethingFromJsonable(
         jsonable
       );
       if (instanceOrError.error !== null) {
@@ -696,7 +696,7 @@ test("Something verification fail", () => {
 
       const instance = instanceOrError.mustValue();
 
-      const verificationErrors = Array.from(AasVerification.verify(instance));
+      const verificationErrors = Array.from(OurVerification.verify(instance));
       assertVerificationErrorsEqualExpectedOrRecord(
         verificationErrors,
         pth
@@ -722,13 +722,13 @@ test("Container round-trip OK", () => {
   for (const pth of pths) {
     const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-    const instanceOrError = AasJsonization.containerFromJsonable(
+    const instanceOrError = OurJsonization.containerFromJsonable(
       jsonable
     );
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
     assertSerializeDeserializeEqualsOriginal(
       jsonable,
@@ -779,7 +779,7 @@ test("Container deserialization fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.containerFromJsonable(
+      const instanceOrError = OurJsonization.containerFromJsonable(
         jsonable
       );
       if (instanceOrError.error === null) {
@@ -827,7 +827,7 @@ test("Container verification fail", () => {
     for (const pth of pths) {
       const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-      const instanceOrError = AasJsonization.containerFromJsonable(
+      const instanceOrError = OurJsonization.containerFromJsonable(
         jsonable
       );
       if (instanceOrError.error !== null) {
@@ -839,7 +839,7 @@ test("Container verification fail", () => {
 
       const instance = instanceOrError.mustValue();
 
-      const verificationErrors = Array.from(AasVerification.verify(instance));
+      const verificationErrors = Array.from(OurVerification.verify(instance));
       assertVerificationErrorsEqualExpectedOrRecord(
         verificationErrors,
         pth
@@ -851,7 +851,7 @@ test("Container verification fail", () => {
 /**
  * Load the first recorded example of the `modelType`.
  */
-function loadTheFirstExpected(modelType: string): AasJsonization.JsonValue {
+function loadTheFirstExpected(modelType: string): OurJsonization.JsonValue {
   const pths = Array.from(
     TestCommon.findFilesBySuffixRecursively(
       path.join(
@@ -879,7 +879,7 @@ test(
   + "at .value",
   () => {
     for (const value of [9007199254740992, -9007199254740992]) {
-      const instance = AasJsonization.leafFromJsonable(
+      const instance = OurJsonization.leafFromJsonable(
         loadTheFirstExpected("Leaf")
       ).mustValue();
 
@@ -887,12 +887,12 @@ test(
 
       let caught: unknown = null;
       try {
-        AasJsonization.toJsonable(instance);
+        OurJsonization.toJsonable(instance);
       } catch (error) {
         caught = error;
       }
 
-      if (!(caught instanceof AasJsonization.SerializationError)) {
+      if (!(caught instanceof OurJsonization.SerializationError)) {
         throw new Error(
           `Expected a SerializationError, but got: ${caught}`
         );
@@ -908,7 +908,7 @@ test(
   + "at .value",
   () => {
     for (const value of [9007199254740992, -9007199254740992]) {
-      const instance = AasJsonization.blossomFromJsonable(
+      const instance = OurJsonization.blossomFromJsonable(
         loadTheFirstExpected("Blossom")
       ).mustValue();
 
@@ -916,12 +916,12 @@ test(
 
       let caught: unknown = null;
       try {
-        AasJsonization.toJsonable(instance);
+        OurJsonization.toJsonable(instance);
       } catch (error) {
         caught = error;
       }
 
-      if (!(caught instanceof AasJsonization.SerializationError)) {
+      if (!(caught instanceof OurJsonization.SerializationError)) {
         throw new Error(
           `Expected a SerializationError, but got: ${caught}`
         );

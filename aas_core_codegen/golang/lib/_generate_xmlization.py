@@ -423,10 +423,10 @@ def _generate_read_list_of() -> Stripped:
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
@@ -455,7 +455,7 @@ func readListOf[T any](
 {II}if valueErr != nil {{
 {III}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
 {IIII}deseriaErr.Path.PrependIndex(
-{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIIII}&ourreporting.IndexSegment{{Index: i}},
 {IIII})
 {III}}}
 {III}err = valueErr
@@ -514,7 +514,7 @@ func readSetOf[T comparable](
 {II}if valueErr != nil {{
 {III}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
 {IIII}deseriaErr.Path.PrependIndex(
-{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIIII}&ourreporting.IndexSegment{{Index: i}},
 {IIII})
 {III}}}
 {III}err = valueErr
@@ -526,7 +526,7 @@ func readSetOf[T comparable](
 {IIII}"Expected unique items in the set, but the item is a duplicate",
 {III})
 {III}deseriaErr.Path.PrependIndex(
-{IIII}&aasreporting.IndexSegment{{Index: i}},
+{IIII}&ourreporting.IndexSegment{{Index: i}},
 {III})
 {III}err = deseriaErr
 {III}return
@@ -656,7 +656,7 @@ func concludeProperty(
 {I}if valueErr != nil {{
 {II}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
 {III}deseriaErr.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{Name: local}},
+{IIII}&ourreporting.NameSegment{{Name: local}},
 {III})
 {II}}}
 {II}err = valueErr
@@ -685,7 +685,7 @@ def _generate_read_tuple_helper(arity: int) -> Stripped:
     type_params = [f"T{i + 1}" for i in range(arity)]
     type_params_joined = ", ".join(f"{t} any" for t in type_params)
 
-    tuple_type = f"aascommon.Tuple{arity}[{', '.join(type_params)}]"
+    tuple_type = f"ourcommon.Tuple{arity}[{', '.join(type_params)}]"
 
     params_joined = ",\n".join(
         f"readItem{i + 1} func(\n"
@@ -708,7 +708,7 @@ item{i + 1}, current, err = xmlcommon.ReadElementDispatched(
 if err != nil {{
 {I}if deseriaErr, ok := err.(*DeserializationError); ok {{
 {II}deseriaErr.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{Index: {i}}},
+{III}&ourreporting.IndexSegment{{Index: {i}}},
 {II})
 {I}}}
 {I}return
@@ -759,7 +759,7 @@ def _generate_read_text_as_enumeration(
     return Stripped(
         f"""\
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.{enum_name}].
+// [ourtypes.{enum_name}].
 //
 // Any comment tokens are skipped.
 //
@@ -770,7 +770,7 @@ def _generate_read_text_as_enumeration(
 func {function_name}(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.{enum_name},
+) (value ourtypes.{enum_name},
 {I}next xml.Token,
 {I}err error,
 ) {{
@@ -781,7 +781,7 @@ func {function_name}(
 {I}}}
 
 {I}var ok bool
-{I}value, ok = aasstringification.{from_string_name}(text)
+{I}value, ok = ourstringification.{from_string_name}(text)
 {I}if !ok {{
 {II}err = xmlcommon.NewDeserializationError(
 {III}fmt.Sprintf(
@@ -851,7 +851,7 @@ def _generate_json_value_readers(
 func readJsonValue(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}return xmlrpc.ReadValueContent(decoder, current)
 }}"""
         ),
@@ -863,7 +863,7 @@ func readJsonValue(
 func readJsonArray(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonArray, next xml.Token, err error) {{
+) (value ourtypes.JsonArray, next xml.Token, err error) {{
 {I}return xmlrpc.ReadArrayContent(decoder, current)
 }}"""
         ),
@@ -876,7 +876,7 @@ func readJsonArray(
 func readJsonObject(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonObject, next xml.Token, err error) {{
+) (value ourtypes.JsonObject, next xml.Token, err error) {{
 {I}return xmlrpc.ReadObjectContent(decoder, current)
 }}"""
         ),
@@ -915,8 +915,8 @@ def _generate_json_value_writers(
 func writeOptionalJsonValue(
 {I}encoder *xml.Encoder,
 {I}local string,
-{I}that aastypes.JsonValue,
-{I}writeContent func(anEncoder *xml.Encoder, aValue aastypes.JsonValue) (anErr error),
+{I}that ourtypes.JsonValue,
+{I}writeContent func(anEncoder *xml.Encoder, aValue ourtypes.JsonValue) (anErr error),
 ) (err error) {{
 {I}if that == nil {{
 {II}return
@@ -936,8 +936,8 @@ func writeOptionalJsonValue(
 func writeOptionalJsonObject(
 {I}encoder *xml.Encoder,
 {I}local string,
-{I}that aastypes.JsonObject,
-{I}writeContent func(anEncoder *xml.Encoder, aValue aastypes.JsonObject) (anErr error),
+{I}that ourtypes.JsonObject,
+{I}writeContent func(anEncoder *xml.Encoder, aValue ourtypes.JsonObject) (anErr error),
 ) (err error) {{
 {I}if that == nil {{
 {II}return
@@ -1002,7 +1002,7 @@ def _generate_read_scalar_item(scalar_item: _ScalarItem) -> Stripped:
     )
 
     value_type = golang_common.generate_type(
-        type_annotation=scalar_item.type_anno, types_package=Identifier("aastypes")
+        type_annotation=scalar_item.type_anno, types_package=Identifier("ourtypes")
     )
 
     element_name_literal = golang_common.string_literal(scalar_item.element_name)
@@ -1296,7 +1296,7 @@ def _generate_read_as_sequence(cls: intermediate.ConcreteClass) -> Stripped:
         prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
 
         prop_var_type = golang_common.generate_type(
-            type_annotation=prop.type_annotation, types_package=Identifier("aastypes")
+            type_annotation=prop.type_annotation, types_package=Identifier("ourtypes")
         )
 
         prop_var_initializations.append(Stripped(f"var {prop_var} {prop_var_type}"))
@@ -1368,14 +1368,14 @@ if !{found_var} {{
         constructing_statements.append(
             Stripped(
                 f"""\
-instance = aastypes.{new_function}(
+instance = ourtypes.{new_function}(
 {I}{indent_but_first_line(constructor_arguments_joined, I)}
 )"""
             )
         )
     else:
         constructing_statements.append(
-            Stripped(f"instance = aastypes.{new_function}()")
+            Stripped(f"instance = ourtypes.{new_function}()")
         )
 
     for arg in cls.constructor.arguments:
@@ -1399,16 +1399,16 @@ instance = aastypes.{new_function}(
 
     return Stripped(
         f"""\
-// De-serialize the instance of [aastypes.{interface_name}]
+// De-serialize the instance of [ourtypes.{interface_name}]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.{interface_name}].
+// of [ourtypes.{interface_name}].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func {function_name}(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (instance aastypes.{interface_name},
+) (instance ourtypes.{interface_name},
 {I}next xml.Token,
 {I}err error,
 ) {{
@@ -1464,8 +1464,8 @@ def _generate_read_dispatched(
             our_type.implementers
         )  # type: List[intermediate.ConcreteClass]
         union_name = golang_naming.union_name(our_type.name)
-        value_type = Stripped(f"*aastypes.{union_name}")
-        doc_reference = Stripped(f"aastypes.{union_name}")
+        value_type = Stripped(f"*ourtypes.{union_name}")
+        doc_reference = Stripped(f"ourtypes.{union_name}")
         default_error = Stripped(
             f"unexpectedDiscriminator(local, "
             f"{golang_common.string_literal(f'the union {union_name}')})"
@@ -1476,8 +1476,8 @@ def _generate_read_dispatched(
             alternatives.append(our_type)
 
         interface_name = golang_naming.interface_name(our_type.name)
-        value_type = Stripped(f"aastypes.{interface_name}")
-        doc_reference = Stripped(f"aastypes.{interface_name}")
+        value_type = Stripped(f"ourtypes.{interface_name}")
+        doc_reference = Stripped(f"ourtypes.{interface_name}")
 
         if isinstance(our_type, intermediate.ConcreteClass) and (
             len(our_type.concrete_descendants) == 0
@@ -1521,10 +1521,10 @@ def _generate_read_dispatched(
                 Stripped(
                     f"""\
 case {xml_class_name_literal}:
-{I}var casted aastypes.{alternative_interface_name}
+{I}var casted ourtypes.{alternative_interface_name}
 {I}casted, next, err = {read_as_sequence}(decoder, current)
 {I}if err == nil {{
-{II}instance = aastypes.{from_function_name}(casted)
+{II}instance = ourtypes.{from_function_name}(casted)
 {I}}}"""
                 )
             )
@@ -1611,7 +1611,7 @@ default:
 
     return Stripped(
         f"""\
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1620,7 +1620,7 @@ func readClassDispatched(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 {I}next xml.Token,
 {I}err error,
 ) {{
@@ -1635,12 +1635,12 @@ func readClassDispatched(
 def _generate_unmarshal() -> Stripped:
     return Stripped(
         f"""\
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 {I}decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {{
+) (instance ourtypes.IClass, err error) {{
 {I}var current xml.Token
 {I}current, err = xmlcommon.ReadNext(decoder, nil)
 {I}if err != nil {{
@@ -1798,7 +1798,7 @@ func writeList[T any](
 {II}if err != nil {{
 {III}if seriaErr, ok := err.(*SerializationError); ok {{
 {IIII}seriaErr.Path.PrependIndex(
-{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIIII}&ourreporting.IndexSegment{{Index: i}},
 {IIII})
 {III}}}
 {III}return
@@ -1822,7 +1822,7 @@ def _generate_finish_property() -> Stripped:
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -1837,7 +1837,7 @@ func finishProperty(
 {I}if err != nil {{
 {II}if seriaErr, ok := err.(*SerializationError); ok {{
 {III}seriaErr.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{Name: getter}},
+{IIII}&ourreporting.NameSegment{{Name: getter}},
 {III})
 {II}}}
 {II}return err
@@ -1861,13 +1861,13 @@ def _generate_write_instance() -> Stripped:
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 {I}encoder *xml.Encoder,
 {I}that T,
 ) error {{
@@ -1880,7 +1880,7 @@ def _generate_named_union_constraint() -> Stripped:
     """
     Generate the constraint interface shared by the named-union writers.
 
-    A named union is deliberately not an ``aastypes.IClass``, but every
+    A named union is deliberately not an ``ourtypes.IClass``, but every
     named union exposes its underlying instance through ``Underlying`` --
     constraining a generic type parameter to that single method lets one
     writer serve every named union, instead of generating one dedicated,
@@ -1891,7 +1891,7 @@ def _generate_named_union_constraint() -> Stripped:
 // Constrain a generic type to a named union, giving access to its
 // underlying instance for serialization.
 type namedUnion interface {{
-{I}Underlying() aastypes.IClass
+{I}Underlying() ourtypes.IClass
 }}"""
     )
 
@@ -1904,7 +1904,7 @@ def _generate_write_union() -> Stripped:
 //
 // Do not flush.
 //
-// A named union is deliberately not an [aastypes.IClass], so [writeInstance] can not
+// A named union is deliberately not an [ourtypes.IClass], so [writeInstance] can not
 // serve it; this writer narrows through the [namedUnion] constraint instead, and one
 // generic writer thus covers every named union.
 //
@@ -1924,7 +1924,7 @@ def _generate_write_tuple_helper(arity: int) -> Stripped:
     type_params = [f"T{i + 1}" for i in range(arity)]
     type_params_joined = ", ".join(f"{t} any" for t in type_params)
 
-    tuple_type = f"aascommon.Tuple{arity}[{', '.join(type_params)}]"
+    tuple_type = f"ourcommon.Tuple{arity}[{', '.join(type_params)}]"
 
     params_joined = ",\n".join(
         f"writeItem{i + 1} func(encoder *xml.Encoder, value {type_params[i]}) error"
@@ -1940,7 +1940,7 @@ err = writeItem{i + 1}(encoder, that.Item{i + 1})
 if err != nil {{
 {I}if seriaErr, ok := err.(*SerializationError); ok {{
 {II}seriaErr.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{Index: {i}}},
+{III}&ourreporting.IndexSegment{{Index: {i}}},
 {II})
 {I}}}
 {I}return
@@ -2021,15 +2021,15 @@ def _generate_write_enumeration_as_text(
     return Stripped(
         f"""\
 // Write the `value` of a property as string representation
-// of [aastypes.{enum_name}]
+// of [ourtypes.{enum_name}]
 // in a text element.
 //
 // Do not flush.
 func {function_name}(
 {I}encoder *xml.Encoder,
-{I}value aastypes.{enum_name},
+{I}value ourtypes.{enum_name},
 ) (err error) {{
-{I}text, ok := aasstringification.{to_string_name}(
+{I}text, ok := ourstringification.{to_string_name}(
 {II}value,
 {I})
 {I}if !ok {{
@@ -2122,7 +2122,7 @@ def _content_writer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Strippe
         return _write_text_function(type_anno)
 
     golang_type = golang_common.generate_type(
-        type_annotation=type_anno, types_package=Identifier("aastypes")
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
     )
 
     if isinstance(our_type, intermediate.NamedUnion):
@@ -2152,7 +2152,7 @@ def _generate_write_scalar_item(scalar_item: _ScalarItem) -> Stripped:
     )
 
     value_type = golang_common.generate_type(
-        type_annotation=scalar_item.type_anno, types_package=Identifier("aastypes")
+        type_annotation=scalar_item.type_anno, types_package=Identifier("ourtypes")
     )
 
     element_name_literal = golang_common.string_literal(scalar_item.element_name)
@@ -2196,7 +2196,7 @@ def _item_writer_expr(
         our_type = type_anno.our_type
 
         item_type = golang_common.generate_type(
-            type_annotation=type_anno, types_package=Identifier("aastypes")
+            type_annotation=type_anno, types_package=Identifier("ourtypes")
         )
 
         if isinstance(
@@ -2223,7 +2223,7 @@ def _generate_write_list_content_writer(
     the same call as any other value, be it optional or not.
     """
     items_type = golang_common.generate_type(
-        type_annotation=items_type_anno, types_package=Identifier("aastypes")
+        type_annotation=items_type_anno, types_package=Identifier("ourtypes")
     )
 
     arguments_joined = golang_common.join_arguments(
@@ -2259,7 +2259,7 @@ def _generate_write_tuple_content_writer(
     the same call as any other value, be it optional or not.
     """
     tuple_type = golang_common.generate_type(
-        type_annotation=type_anno, types_package=Identifier("aastypes")
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
     )
 
     item_writer_exprs = []  # type: List[Stripped]
@@ -2349,7 +2349,7 @@ def _generate_snippet_to_serialize_property(
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
         # NOTE (mristin):
         # We write the sorted items of a set as a slice. An absent set gives
-        # a nil slice, see ``aascommon.SortedKeys``.
+        # a nil slice, see ``ourcommon.SortedKeys``.
         function_name = "writeOptionalSlice"
     elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         function_name = "writeOptionalJsonValue"
@@ -2447,7 +2447,7 @@ def _generate_write_as_sequence(
         Stripped(
             f"""\
 // Serialize the instance
-// of [aastypes.{interface_name}]
+// of [ourtypes.{interface_name}]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -2456,7 +2456,7 @@ def _generate_write_as_sequence(
 // Do not flush.
 func {function_name}(
 {I}encoder *xml.Encoder,
-{I}that aastypes.{interface_name},
+{I}that ourtypes.{interface_name},
 ) (err error) {{
 {I}{indent_but_first_line(prop_blocks_joined, I)}
 
@@ -2495,7 +2495,7 @@ def _generate_write_class(symbol_table: intermediate.SymbolTable) -> Stripped:
                 "encoder",
                 xml_class_name_literal,
                 "withNamespace",
-                f"that.(aastypes.{interface_name})",
+                f"that.(ourtypes.{interface_name})",
                 write_as_sequence_name,
             ],
             indention=3,
@@ -2504,7 +2504,7 @@ def _generate_write_class(symbol_table: intermediate.SymbolTable) -> Stripped:
         case_blocks.append(
             Stripped(
                 f"""\
-case aastypes.{model_type_literal}:
+case ourtypes.{model_type_literal}:
 {I}err = writeClassElement(
 {II}{indent_but_first_line(arguments_joined, II)}
 {I})"""
@@ -2537,7 +2537,7 @@ default:
 // to [Namespace].
 func writeClass(
 {I}encoder *xml.Encoder,
-{I}that aastypes.IClass,
+{I}that ourtypes.IClass,
 {I}withNamespace bool,
 ) (err error) {{
 {I}switch that.{model_type_getter}() {{
@@ -2565,7 +2565,7 @@ def _generate_marshal() -> Stripped:
 // to [Namespace].
 func Marshal(
 {I}encoder *xml.Encoder,
-{I}that aastypes.IClass,
+{I}that ourtypes.IClass,
 {I}withNamespace bool,
 ) (err error) {{
 {I}err = writeClass(encoder, that, withNamespace)
@@ -2599,15 +2599,15 @@ def generate(
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code for XML de/serialization."""
-    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+    ourcommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
-    aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
+    ourreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
-    aasstringification_url_literal = golang_common.string_literal(
+    ourstringification_url_literal = golang_common.string_literal(
         f"{repo_url}/stringification"
     )
 
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     xmlcommon_url_literal = golang_common.string_literal(
         f"{repo_url}/internal/xmlcommon"
@@ -2788,13 +2788,13 @@ type SerializationError = xmlcommon.SerializationError"""
     for module, literal in (
         ("xml", f'{I}"encoding/xml"'),
         ("fmt", f'{I}"fmt"'),
-        ("aascommon", f"{I}aascommon {aascommon_url_literal}"),
-        ("aasreporting", f"{I}aasreporting {aasreporting_url_literal}"),
+        ("ourcommon", f"{I}ourcommon {ourcommon_url_literal}"),
+        ("ourreporting", f"{I}ourreporting {ourreporting_url_literal}"),
         (
-            "aasstringification",
-            f"{I}aasstringification {aasstringification_url_literal}",
+            "ourstringification",
+            f"{I}ourstringification {ourstringification_url_literal}",
         ),
-        ("aastypes", f"{I}aastypes {aastypes_url_literal}"),
+        ("ourtypes", f"{I}ourtypes {ourtypes_url_literal}"),
         ("xmlcommon", f"{I}xmlcommon {xmlcommon_url_literal}"),
         ("xmlrpc", f"{I}xmlrpc {xmlrpc_url_literal}"),
     ):

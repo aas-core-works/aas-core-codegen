@@ -1,4 +1,4 @@
-def items_have_unique_labels(items: Iterable[aas_types.Item]) -> bool:
+def items_have_unique_labels(items: Iterable[our_types.Item]) -> bool:
     """
     Check that :py:attr:`.types.Item.label`'s of the :paramref:`items`
     do not repeat.

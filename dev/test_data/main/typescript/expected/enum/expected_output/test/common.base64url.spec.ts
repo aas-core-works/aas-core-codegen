@@ -2,16 +2,16 @@
  * Test base64url encoding and decoding.
  */
 
-import * as AasCommon from "../src/common";
+import * as OurCommon from "../src/common";
 
 function testBase64UrlEncodeDecode(text: string, expectedEncoded: string): void {
   const bytes = Uint8Array.from(text.split("").map((c) => c.charCodeAt(0)));
 
-  const encoded = AasCommon.base64UrlEncode(bytes);
+  const encoded = OurCommon.base64UrlEncode(bytes);
   expect(encoded).toEqual(expectedEncoded);
 
-  const decodedOrError: AasCommon.Either<Uint8Array, string> =
-    AasCommon.base64UrlDecode(encoded);
+  const decodedOrError: OurCommon.Either<Uint8Array, string> =
+    OurCommon.base64UrlDecode(encoded);
 
   expect(decodedOrError.error).toBeNull();
   expect(decodedOrError.mustValue()).toEqual(bytes);
@@ -64,8 +64,8 @@ test("RFC 4648 test vectors", () => {
 test("characters that differ from base64", () => {
   const bytes = new Uint8Array([0x3e, 0x3f, 0xfc, 0xff]);
 
-  const base64 = AasCommon.base64Encode(bytes);
-  const base64url = AasCommon.base64UrlEncode(bytes);
+  const base64 = OurCommon.base64Encode(bytes);
+  const base64url = OurCommon.base64UrlEncode(bytes);
 
   expect(base64).toEqual("Pj/8/w==");
   expect(base64url).toEqual("Pj_8_w");
@@ -78,14 +78,14 @@ test("decode with missing padding", () => {
   const testCases = ["Zg", "Zm8", "Zm9vYg", "Zm9vYmE"];
 
   for (const encoded of testCases) {
-    const decodedOrError = AasCommon.base64UrlDecode(encoded);
+    const decodedOrError = OurCommon.base64UrlDecode(encoded);
     expect(decodedOrError.error).toBeNull();
   }
 });
 
 test("decode URL-safe characters", () => {
   const encoded = "Pj_8_w";
-  const decodedOrError = AasCommon.base64UrlDecode(encoded);
+  const decodedOrError = OurCommon.base64UrlDecode(encoded);
 
   expect(decodedOrError.error).toBeNull();
   expect(decodedOrError.mustValue()).toEqual(new Uint8Array([0x3e, 0x3f, 0xfc, 0xff]));
@@ -97,8 +97,8 @@ test("round-trip with binary data", () => {
     bytes[i] = i;
   }
 
-  const encoded = AasCommon.base64UrlEncode(bytes);
-  const decodedOrError = AasCommon.base64UrlDecode(encoded);
+  const encoded = OurCommon.base64UrlEncode(bytes);
+  const decodedOrError = OurCommon.base64UrlDecode(encoded);
 
   expect(decodedOrError.error).toBeNull();
   expect(decodedOrError.mustValue()).toEqual(bytes);
@@ -124,11 +124,11 @@ test("specific byte sequences that produce URL-unsafe characters", () => {
 
   for (const [numberArray, expectedEncoded] of testCases) {
     const bytes = new Uint8Array(numberArray);
-    const encoded = AasCommon.base64UrlEncode(bytes);
+    const encoded = OurCommon.base64UrlEncode(bytes);
 
     expect(encoded).toEqual(expectedEncoded);
 
-    const decodedOrError = AasCommon.base64UrlDecode(encoded);
+    const decodedOrError = OurCommon.base64UrlDecode(encoded);
     expect(decodedOrError.error).toBeNull();
     expect(decodedOrError.mustValue()).toEqual(bytes);
   }
@@ -138,7 +138,7 @@ test("invalid characters in input", () => {
   const invalidInputs = ["Zm9v+", "Zm9v/", "Zm9v=", "Zm9v YmFy", "Zm9v\n", "Zm9v\t"];
 
   for (const invalid of invalidInputs) {
-    const decodedOrError = AasCommon.base64UrlDecode(invalid);
+    const decodedOrError = OurCommon.base64UrlDecode(invalid);
     expect(decodedOrError.error).not.toBeNull();
     expect(decodedOrError.value).toBeNull();
   }

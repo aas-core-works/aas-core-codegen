@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of IItem:
     /// <code>
-    /// var anInstance = new Aas.IItem(
+    /// var anInstance = new Our.IItem(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -73,10 +73,10 @@ namespace dummy
         }
 
         /// <summary>
-        /// Check that <see cref="Aas.IItem.Label" />'s of the <paramref name="items" />
+        /// Check that <see cref="Our.IItem.Label" />'s of the <paramref name="items" />
         /// do not repeat.
         /// </summary>
-        public static bool ItemsHaveUniqueLabels(IEnumerable<Aas.IItem> items)
+        public static bool ItemsHaveUniqueLabels(IEnumerable<Our.IItem> items)
         {
             var labelSet = new HashSet<string>();
             foreach (var item in items)
@@ -98,8 +98,8 @@ namespace dummy
             internal static readonly HashSet<int> ForColor = new HashSet<int>
             {
 
-                (int)Aas.Color.Red,
-                (int)Aas.Color.Green
+                (int)Our.Color.Red,
+                (int)Our.Color.Green
             };
         }  // internal static class EnumValueSet
 
@@ -112,7 +112,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBox(
-                Aas.IBox that
+                Our.IBox that
             )
             {
                 if (!Verification.HasBalancedBrackets(that.Label))
@@ -125,7 +125,7 @@ namespace dummy
                 if (that.Color != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.Color value = that.Color
+                    Our.Color value = that.Color
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyColor(value))
                     {
@@ -139,7 +139,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBag(
-                Aas.IBag that
+                Our.IBag that
             )
             {
                 if (!Verification.HasBalancedBrackets(that.Label))
@@ -152,7 +152,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformContainer(
-                Aas.IContainer that
+                Our.IContainer that
             )
             {
                 if (!Verification.ItemsHaveUniqueLabels(that.Items))
@@ -193,7 +193,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -205,7 +205,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyColor(
-            Aas.Color that)
+            Our.Color that)
         {
             if (!EnumValueSet.ForColor.Contains(
                 (int)that))

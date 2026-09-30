@@ -36,7 +36,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasJsonization from "../src/jsonization";
+import * as OurJsonization from "../src/jsonization";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
@@ -74,15 +74,15 @@ test(
 {I}() => {{
 {I}const instance = TestCommonJsonization.{load_minimal_name}();
 
-{I}const jsonable = AasJsonization.toJsonable(instance);
+{I}const jsonable = OurJsonization.toJsonable(instance);
 
-{I}const anotherInstanceOrError = AasJsonization.{deserialization_function}(
+{I}const anotherInstanceOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 {I}expect(anotherInstanceOrError.error).toBeNull();
 {I}const anotherInstance = anotherInstanceOrError.mustValue();
 
-{I}const anotherJsonable = AasJsonization.toJsonable(anotherInstance);
+{I}const anotherJsonable = OurJsonization.toJsonable(anotherInstance);
 
 {I}const inequalityError = TestCommon.checkJsonablesEqual(
 {II}jsonable,
@@ -106,7 +106,7 @@ test(
 test("{interface_name_typescript} deserialization fail", () => {{
 {I}const jsonable = "This is not a {interface_name_typescript}.";
 
-{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{I}const instanceOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 {I}expect(instanceOrError.error.message).toStrictEqual(

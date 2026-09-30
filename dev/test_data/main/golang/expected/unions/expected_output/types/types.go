@@ -6,7 +6,7 @@ package types
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -27,7 +27,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -65,7 +65,7 @@ type IStructuralFirst interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IStructuralFirst]
+// Check whether the instance corresponds to [ourtypes.IStructuralFirst]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -148,7 +148,7 @@ type IStructuralSecond interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IStructuralSecond]
+// Check whether the instance corresponds to [ourtypes.IStructuralSecond]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -303,7 +303,7 @@ type IMixedAbstractMember interface {
 	IClass
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedAbstractMember]
+// Check whether the instance corresponds to [ourtypes.IMixedAbstractMember]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -330,7 +330,7 @@ type IMixedAbstractDescendantOne interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedAbstractDescendantOne]
+// Check whether the instance corresponds to [ourtypes.IMixedAbstractDescendantOne]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -413,7 +413,7 @@ type IMixedAbstractDescendantTwo interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedAbstractDescendantTwo]
+// Check whether the instance corresponds to [ourtypes.IMixedAbstractDescendantTwo]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -496,7 +496,7 @@ type IMixedConcreteWithDescendants interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedConcreteWithDescendants]
+// Check whether the instance corresponds to [ourtypes.IMixedConcreteWithDescendants]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -584,7 +584,7 @@ type IMixedConcreteWithDescendantsChild interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedConcreteWithDescendantsChild]
+// Check whether the instance corresponds to [ourtypes.IMixedConcreteWithDescendantsChild]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -681,7 +681,7 @@ type IMixedConcreteLeaf interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IMixedConcreteLeaf]
+// Check whether the instance corresponds to [ourtypes.IMixedConcreteLeaf]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -866,7 +866,7 @@ type IModelTypedFirst interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IModelTypedFirst]
+// Check whether the instance corresponds to [ourtypes.IModelTypedFirst]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -949,7 +949,7 @@ type IModelTypedSecond interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IModelTypedSecond]
+// Check whether the instance corresponds to [ourtypes.IModelTypedSecond]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1249,10 +1249,10 @@ type ISomething interface {
 		value []*ModelTypedUnion,
 	);
 
-	TupleProperty() aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion];
+	TupleProperty() ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion];
 
 	SetTupleProperty(
-		value aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
+		value ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
 	);
 
 	OptionalStructuralProperty() *StructuralUnion;
@@ -1280,7 +1280,7 @@ type ISomething interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1300,7 +1300,7 @@ type Something struct {
 	listStructuralProperty []*StructuralUnion
 	listMixedProperty []*MixedUnion
 	listModelTypedProperty []*ModelTypedUnion
-	tupleProperty aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion]
+	tupleProperty ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion]
 	optionalStructuralProperty *StructuralUnion
 	optionalMixedProperty *MixedUnion
 	optionalModelTypedProperty *ModelTypedUnion
@@ -1374,12 +1374,12 @@ func (s *Something) SetListModelTypedProperty(
 }
 
 func (s *Something) TupleProperty(
-) aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion] {
+) ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion] {
 	return s.tupleProperty
 }
 
 func (s *Something) SetTupleProperty(
-	value aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
+	value ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
 ) {
 	s.tupleProperty = value
 }
@@ -1744,7 +1744,7 @@ func NewSomething(
 	listStructuralProperty []*StructuralUnion,
 	listMixedProperty []*MixedUnion,
 	listModelTypedProperty []*ModelTypedUnion,
-	tupleProperty aascommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
+	tupleProperty ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
 ) *Something {
 	return &Something{
 		structuralProperty: structuralProperty,

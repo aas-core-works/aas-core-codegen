@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using System.Linq;  // can't alias
 using NUnit.Framework;  // can't alias
@@ -15,8 +15,8 @@ namespace dummy.Tests
         [Test]
         public void Test_Kind_valid()
         {
-            var errors = Aas.Verification.VerifyKind(
-                Aas.Kind.Alpha).ToList();
+            var errors = Our.Verification.VerifyKind(
+                Our.Kind.Alpha).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_Kind_valid
@@ -25,9 +25,9 @@ namespace dummy.Tests
         public void Test_Kind_invalid()
         {
             int valueAsInt = -1;
-            Aas.Kind value = (Aas.Kind)valueAsInt;
+            Our.Kind value = (Our.Kind)valueAsInt;
 
-            var errors = Aas.Verification.VerifyKind(
+            var errors = Our.Verification.VerifyKind(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -37,8 +37,8 @@ namespace dummy.Tests
         [Test]
         public void Test_Direction_valid()
         {
-            var errors = Aas.Verification.VerifyDirection(
-                Aas.Direction.North).ToList();
+            var errors = Our.Verification.VerifyDirection(
+                Our.Direction.North).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_Direction_valid
@@ -47,9 +47,9 @@ namespace dummy.Tests
         public void Test_Direction_invalid()
         {
             int valueAsInt = -1;
-            Aas.Direction value = (Aas.Direction)valueAsInt;
+            Our.Direction value = (Our.Direction)valueAsInt;
 
-            var errors = Aas.Verification.VerifyDirection(
+            var errors = Our.Verification.VerifyDirection(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);

@@ -6,7 +6,7 @@ package jsonization_test
 import (
 	"fmt"
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
 )
 
 func TestKindRoundTripOK(t *testing.T) {
@@ -20,7 +20,7 @@ func TestKindRoundTripOK(t *testing.T) {
 		source := fmt.Sprintf("<string literal %s>", literal)
 		jsonable := any(literal)
 
-		deserialized, deseriaErr := aasjsonization.KindFromJsonable(
+		deserialized, deseriaErr := ourjsonization.KindFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -29,7 +29,7 @@ func TestKindRoundTripOK(t *testing.T) {
 		}
 
 		anotherJsonable, seriaErr :=
-			aasjsonization.KindToJsonable(deserialized)
+			ourjsonization.KindToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, source)
 		if !ok {
 			return
@@ -50,7 +50,7 @@ func TestKindRoundTripOK(t *testing.T) {
 func TestKindDeserializationFail(t *testing.T) {
 	jsonable := any("THIS-CANNOT-POSSIBLY-BE-VALID")
 
-	_, err := aasjsonization.KindFromJsonable(
+	_, err := ourjsonization.KindFromJsonable(
 		jsonable,
 	)
 
@@ -59,7 +59,7 @@ func TestKindDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -98,7 +98,7 @@ func TestDirectionRoundTripOK(t *testing.T) {
 		source := fmt.Sprintf("<string literal %s>", literal)
 		jsonable := any(literal)
 
-		deserialized, deseriaErr := aasjsonization.DirectionFromJsonable(
+		deserialized, deseriaErr := ourjsonization.DirectionFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -107,7 +107,7 @@ func TestDirectionRoundTripOK(t *testing.T) {
 		}
 
 		anotherJsonable, seriaErr :=
-			aasjsonization.DirectionToJsonable(deserialized)
+			ourjsonization.DirectionToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, source)
 		if !ok {
 			return
@@ -128,7 +128,7 @@ func TestDirectionRoundTripOK(t *testing.T) {
 func TestDirectionDeserializationFail(t *testing.T) {
 	jsonable := any("THIS-CANNOT-POSSIBLY-BE-VALID")
 
-	_, err := aasjsonization.DirectionFromJsonable(
+	_, err := ourjsonization.DirectionFromJsonable(
 		jsonable,
 	)
 
@@ -137,7 +137,7 @@ func TestDirectionDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

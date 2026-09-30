@@ -7,14 +7,14 @@
  * @returns `true` if the check passes
  */
 export function dataSpecificationIec61360sForReferenceHaveAppropriateDataType(
-  embeddedDataSpecifications: Iterable<AasTypes.EmbeddedDataSpecification>
+  embeddedDataSpecifications: Iterable<OurTypes.EmbeddedDataSpecification>
 ): boolean {
   for (const embeddedDataSpecification of embeddedDataSpecifications) {
     const content = embeddedDataSpecification.dataSpecificationContent;
-    if (AasTypes.isDataSpecificationIec61360(content)) {
+    if (OurTypes.isDataSpecificationIec61360(content)) {
       if (
         content.dataType === null
-        || !AasConstants.DATA_TYPE_IEC_61360_FOR_REFERENCE.has(content.dataType)
+        || !OurConstants.DATA_TYPE_IEC_61360_FOR_REFERENCE.has(content.dataType)
       ) {
         return false;
       }

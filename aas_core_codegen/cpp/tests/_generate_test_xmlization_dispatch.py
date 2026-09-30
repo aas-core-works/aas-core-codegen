@@ -44,7 +44,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
     ]  # type: List[Stripped]
 
@@ -66,13 +66,13 @@ namespace aas = {library_namespace};"""
                 f"""\
 TEST_CASE("Test the round-trip of an expected {interface_name}") {{
 {I}const std::shared_ptr<
-{II}aas::types::{concrete_interface_name}
+{II}our::types::{concrete_interface_name}
 {I}> original_instance(
 {II}test::common::examples::{load_min_concrete}()
 {I});
 
 {I}std::stringstream ss;
-{I}aas::xmlization::Serialize(
+{I}our::xmlization::Serialize(
 {II}*original_instance,
 {II}{{}},
 {II}ss
@@ -82,23 +82,23 @@ TEST_CASE("Test the round-trip of an expected {interface_name}") {{
 
 {I}ss.seekp(0);
 
-{I}aas::common::expected<
-{II}std::shared_ptr<aas::types::IClass>,
-{II}aas::xmlization::DeserializationError
-{I}> deserialized = aas::xmlization::From(
+{I}our::common::expected<
+{II}std::shared_ptr<our::types::IClass>,
+{II}our::xmlization::DeserializationError
+{I}> deserialized = our::xmlization::From(
 {II}ss
 {I});
 
 {I}if (!deserialized.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to make the round-trip Serialize-Deserialize "
 {IIII}"a minimal instance of {concrete_interface_name}: ",
-{IIII}aas::common::WstringToUtf8(
+{IIII}our::common::WstringToUtf8(
 {IIIII}deserialized.error().path.ToWstring()
 {IIII}),
 {IIII}": ",
-{IIII}aas::common::WstringToUtf8(
+{IIII}our::common::WstringToUtf8(
 {IIIII}deserialized.error().cause
 {IIII})
 {III})
@@ -107,13 +107,13 @@ TEST_CASE("Test the round-trip of an expected {interface_name}") {{
 {I}}}
 
 {I}std::shared_ptr<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}> abstract = std::dynamic_pointer_cast<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}>(deserialized.value());
 
 {I}std::stringstream another_ss;
-{I}aas::xmlization::Serialize(
+{I}our::xmlization::Serialize(
 {II}*abstract,
 {II}{{}},
 {II}another_ss

@@ -6,75 +6,75 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kBranch
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBranch
+    == our::wstringification::MustModelTypeFromWstring(
       L"Branch"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBranch
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBranch
     )
     == L"Branch"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLeaf
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLeaf
+    == our::wstringification::MustModelTypeFromWstring(
       L"Leaf"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLeaf
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLeaf
     )
     == L"Leaf"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBlossom
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBlossom
+    == our::wstringification::MustModelTypeFromWstring(
       L"Blossom"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBlossom
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBlossom
     )
     == L"Blossom"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
 
   REQUIRE(
-    aas::types::ModelType::kContainer
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kContainer
+    == our::wstringification::MustModelTypeFromWstring(
       L"Container"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kContainer
+    our::wstringification::to_wstring(
+      our::types::ModelType::kContainer
     )
     == L"Container"
   );
@@ -82,13 +82,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

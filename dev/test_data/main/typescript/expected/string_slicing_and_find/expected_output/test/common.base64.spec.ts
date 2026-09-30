@@ -2,16 +2,16 @@
  * Test base64 encoding and decoding.
  */
 
-import * as AasCommon from "../src/common";
+import * as OurCommon from "../src/common";
 
 function testEncodeDecode(text: string, expectedEncoded: string): void {
   const bytes = Uint8Array.from(text.split("").map((c) => c.charCodeAt(0)));
 
-  const encoded = AasCommon.base64Encode(bytes);
+  const encoded = OurCommon.base64Encode(bytes);
   expect(encoded).toEqual(expectedEncoded);
 
-  const decodedOrError: AasCommon.Either<Uint8Array, string> =
-    AasCommon.base64Decode(encoded);
+  const decodedOrError: OurCommon.Either<Uint8Array, string> =
+    OurCommon.base64Decode(encoded);
 
   expect(decodedOrError.error).toBeNull();
   expect(decodedOrError.mustValue()).toEqual(bytes);
@@ -59,7 +59,7 @@ test("unexpected padding in the middle", () => {
     // Test the test
     expect(badEncoded.length).toEqual(encoded.length);
 
-    const decodedOrError = AasCommon.base64Decode(badEncoded);
+    const decodedOrError = OurCommon.base64Decode(badEncoded);
     expect(decodedOrError.error).toEqual(
       "Expected a valid character from " +
         "base64-encoded string, but got at " +
@@ -82,11 +82,11 @@ test("Bytes representing an invalid UTF-8 sequence encode OK", () => {
   // This encoding was obtained by Python `base64` module.
   const expectedEncoded = "wyg=";
 
-  const encoded = AasCommon.base64Encode(bytes);
+  const encoded = OurCommon.base64Encode(bytes);
   expect(encoded).toEqual(expectedEncoded);
 
-  const decodedOrError: AasCommon.Either<Uint8Array, string> =
-    AasCommon.base64Decode(encoded);
+  const decodedOrError: OurCommon.Either<Uint8Array, string> =
+    OurCommon.base64Decode(encoded);
 
   expect(decodedOrError.error).toBeNull();
   expect(decodedOrError.mustValue()).toEqual(bytes);
@@ -106,7 +106,7 @@ test("our implementation suffers from padding inconsistency of 'Hello' as 'SGVsb
 
   const badEncoded = "SGVsbG9=";
 
-  const decodedOrError = AasCommon.base64Decode(badEncoded);
+  const decodedOrError = OurCommon.base64Decode(badEncoded);
   expect(decodedOrError.mustValue()).toEqual(
     new Uint8Array(
       // "Hello"
@@ -200,11 +200,11 @@ test("table from rickkas7/Base64RK", () => {
   for (const [array, expectedEncoded] of arraysExpectedEncodeds) {
     const bytes = new Uint8Array(array);
 
-    const encoded = AasCommon.base64Encode(bytes);
+    const encoded = OurCommon.base64Encode(bytes);
     expect(encoded).toEqual(expectedEncoded);
 
-    const decodedOrError: AasCommon.Either<Uint8Array, string> =
-      AasCommon.base64Decode(encoded);
+    const decodedOrError: OurCommon.Either<Uint8Array, string> =
+      OurCommon.base64Decode(encoded);
 
     expect(decodedOrError.error).toBeNull();
     expect(decodedOrError.mustValue()).toEqual(bytes);

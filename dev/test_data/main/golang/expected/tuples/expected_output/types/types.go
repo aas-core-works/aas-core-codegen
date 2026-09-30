@@ -5,7 +5,7 @@ package types
 // Do NOT edit or append.
 
 import (
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -19,7 +19,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -67,7 +67,7 @@ type IAbstractItem interface {
 	IClass
 }
 
-// Check whether the instance corresponds to [aastypes.IAbstractItem]
+// Check whether the instance corresponds to [ourtypes.IAbstractItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -94,7 +94,7 @@ type ISomeItem interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomeItem]
+// Check whether the instance corresponds to [ourtypes.ISomeItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -177,7 +177,7 @@ type IAnotherItem interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAnotherItem]
+// Check whether the instance corresponds to [ourtypes.IAnotherItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -253,32 +253,32 @@ func NewAnotherItem(
 type ISomething interface {
 	IClass
 
-	Pair() aascommon.Tuple2[string, int64];
+	Pair() ourcommon.Tuple2[string, int64];
 
 	SetPair(
-		value aascommon.Tuple2[string, int64],
+		value ourcommon.Tuple2[string, int64],
 	);
 
-	Items() aascommon.Tuple2[IAbstractItem, IAbstractItem];
+	Items() ourcommon.Tuple2[IAbstractItem, IAbstractItem];
 
 	SetItems(
-		value aascommon.Tuple2[IAbstractItem, IAbstractItem],
+		value ourcommon.Tuple2[IAbstractItem, IAbstractItem],
 	);
 
-	Tricky() aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result];
+	Tricky() ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result];
 
 	SetTricky(
-		value aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
+		value ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
 	);
 
-	OptionalPair() *aascommon.Tuple2[string, IAbstractItem];
+	OptionalPair() *ourcommon.Tuple2[string, IAbstractItem];
 
 	SetOptionalPair(
-		value *aascommon.Tuple2[string, IAbstractItem],
+		value *ourcommon.Tuple2[string, IAbstractItem],
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -292,52 +292,52 @@ func IsSomething(
 
 // Implements ISomething.
 type Something struct {
-	pair aascommon.Tuple2[string, int64]
-	items aascommon.Tuple2[IAbstractItem, IAbstractItem]
-	tricky aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result]
-	optionalPair *aascommon.Tuple2[string, IAbstractItem]
+	pair ourcommon.Tuple2[string, int64]
+	items ourcommon.Tuple2[IAbstractItem, IAbstractItem]
+	tricky ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result]
+	optionalPair *ourcommon.Tuple2[string, IAbstractItem]
 }
 
 func (s *Something) Pair(
-) aascommon.Tuple2[string, int64] {
+) ourcommon.Tuple2[string, int64] {
 	return s.pair
 }
 
 func (s *Something) SetPair(
-	value aascommon.Tuple2[string, int64],
+	value ourcommon.Tuple2[string, int64],
 ) {
 	s.pair = value
 }
 
 func (s *Something) Items(
-) aascommon.Tuple2[IAbstractItem, IAbstractItem] {
+) ourcommon.Tuple2[IAbstractItem, IAbstractItem] {
 	return s.items
 }
 
 func (s *Something) SetItems(
-	value aascommon.Tuple2[IAbstractItem, IAbstractItem],
+	value ourcommon.Tuple2[IAbstractItem, IAbstractItem],
 ) {
 	s.items = value
 }
 
 func (s *Something) Tricky(
-) aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result] {
+) ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result] {
 	return s.tricky
 }
 
 func (s *Something) SetTricky(
-	value aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
+	value ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
 ) {
 	s.tricky = value
 }
 
 func (s *Something) OptionalPair(
-) *aascommon.Tuple2[string, IAbstractItem] {
+) *ourcommon.Tuple2[string, IAbstractItem] {
 	return s.optionalPair
 }
 
 func (s *Something) SetOptionalPair(
-	value *aascommon.Tuple2[string, IAbstractItem],
+	value *ourcommon.Tuple2[string, IAbstractItem],
 ) {
 	s.optionalPair = value
 }
@@ -494,9 +494,9 @@ func (s *Something) Descend(
 // Create a new instance of Something with
 // the given properties.
 func NewSomething(
-	pair aascommon.Tuple2[string, int64],
-	items aascommon.Tuple2[IAbstractItem, IAbstractItem],
-	tricky aascommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
+	pair ourcommon.Tuple2[string, int64],
+	items ourcommon.Tuple2[IAbstractItem, IAbstractItem],
+	tricky ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
 ) *Something {
 	return &Something{
 		pair: pair,

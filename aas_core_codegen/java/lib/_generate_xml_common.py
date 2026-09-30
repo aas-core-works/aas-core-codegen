@@ -783,7 +783,7 @@ def generate(
     of it lives here and is defined exactly once.
 
     The namespace is a constant here, ``NAMESPACE``, and no argument of
-    the primitives: ``Xmlization`` re-exports it as ``AAS_NAME_SPACE``, and
+    the primitives: ``Xmlization`` re-exports it as ``NAMESPACE``, and
     ``XmlRpc`` needs none at all, as the XML-RPC elements reside in no
     namespace. Where a primitive is called for both, it comes in two flavors,
     one of them named ``...InNoNamespace``.

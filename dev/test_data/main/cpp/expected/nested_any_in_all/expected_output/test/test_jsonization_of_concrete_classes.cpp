@@ -9,36 +9,36 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 template<class ClassT>
 void AssertRoundTrip(
   const std::filesystem::path& path,
   std::function<
-    aas::common::expected<
+    our::common::expected<
       std::shared_ptr<ClassT>,
-      aas::jsonization::DeserializationError
+      our::jsonization::DeserializationError
     >(const nlohmann::json&, bool)
   > deserialization_function
 ) {
   const nlohmann::json json = test::common::jsonization::MustReadJson(path);
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<ClassT>,
-    aas::jsonization::DeserializationError
+    our::jsonization::DeserializationError
   > deserialized = deserialization_function(json, false);
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to de-serialize from ",
         path.string(),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -46,7 +46,7 @@ void AssertRoundTrip(
     REQUIRE(deserialized.has_value());
   }
 
-  nlohmann::json another_json = aas::jsonization::Serialize(
+  nlohmann::json another_json = our::jsonization::Serialize(
     *(deserialized.value())
   );
 
@@ -56,7 +56,7 @@ void AssertRoundTrip(
   );
   if (diff_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "The JSON round-trip from ",
         path.string(),
         " failed. There is a diff between the original JSON "
@@ -72,23 +72,23 @@ template<typename ClassT>
 void AssertDeserializationFailure(
   const std::filesystem::path& path,
   std::function<
-    aas::common::expected<
+    our::common::expected<
       std::shared_ptr<ClassT>,
-      aas::jsonization::DeserializationError
+      our::jsonization::DeserializationError
     >(const nlohmann::json&, bool)
   > deserialization_function,
   const std::filesystem::path& error_path
 ) {
   const nlohmann::json json = test::common::jsonization::MustReadJson(path);
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<ClassT>,
-    aas::jsonization::DeserializationError
+    our::jsonization::DeserializationError
   > deserialized = deserialization_function(json, false);
 
   if (deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected the de-serialization to fail on ",
         path.string(),
         ", but the de-serialization succeeded"
@@ -98,12 +98,12 @@ void AssertDeserializationFailure(
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::Concat(
-      aas::common::WstringToUtf8(
+    our::common::Concat(
+      our::common::WstringToUtf8(
         deserialized.error().path.ToWstring()
       ),
       ": ",
-      aas::common::WstringToUtf8(
+      our::common::WstringToUtf8(
         deserialized.error().cause
       )
     ),
@@ -112,7 +112,7 @@ void AssertDeserializationFailure(
 }
 
 const std::filesystem::path& DetermineJsonDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Json";
   }
@@ -121,7 +121,7 @@ const std::filesystem::path& DetermineJsonDir() {
 }
 
 const std::filesystem::path& DetermineErrorDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "JsonizationError";
   }
@@ -141,8 +141,8 @@ TEST_CASE("Test the round-trip of an expected LangString") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::ILangString
-    >(path, aas::jsonization::LangStringFrom);
+      our::types::ILangString
+    >(path, our::jsonization::LangStringFrom);
   }
 }
 
@@ -175,10 +175,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected LangString") {
       );
 
       AssertDeserializationFailure<
-        aas::types::ILangString
+        our::types::ILangString
       >(
         path,
-        aas::jsonization::LangStringFrom,
+        our::jsonization::LangStringFrom,
         error_path
       );
     }
@@ -197,8 +197,8 @@ TEST_CASE("Test the round-trip of an expected LangStringSet") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::ILangStringSet
-    >(path, aas::jsonization::LangStringSetFrom);
+      our::types::ILangStringSet
+    >(path, our::jsonization::LangStringSetFrom);
   }
 }
 
@@ -231,10 +231,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected LangStringSet") {
       );
 
       AssertDeserializationFailure<
-        aas::types::ILangStringSet
+        our::types::ILangStringSet
       >(
         path,
-        aas::jsonization::LangStringSetFrom,
+        our::jsonization::LangStringSetFrom,
         error_path
       );
     }
@@ -253,8 +253,8 @@ TEST_CASE("Test the round-trip of an expected IecContent") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::IIecContent
-    >(path, aas::jsonization::IecContentFrom);
+      our::types::IIecContent
+    >(path, our::jsonization::IecContentFrom);
   }
 }
 
@@ -287,10 +287,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected IecContent") {
       );
 
       AssertDeserializationFailure<
-        aas::types::IIecContent
+        our::types::IIecContent
       >(
         path,
-        aas::jsonization::IecContentFrom,
+        our::jsonization::IecContentFrom,
         error_path
       );
     }
@@ -309,8 +309,8 @@ TEST_CASE("Test the round-trip of an expected OtherContent") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::IOtherContent
-    >(path, aas::jsonization::OtherContentFrom);
+      our::types::IOtherContent
+    >(path, our::jsonization::OtherContentFrom);
   }
 }
 
@@ -343,10 +343,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected OtherContent") {
       );
 
       AssertDeserializationFailure<
-        aas::types::IOtherContent
+        our::types::IOtherContent
       >(
         path,
-        aas::jsonization::OtherContentFrom,
+        our::jsonization::OtherContentFrom,
         error_path
       );
     }
@@ -365,8 +365,8 @@ TEST_CASE("Test the round-trip of an expected Specification") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::ISpecification
-    >(path, aas::jsonization::SpecificationFrom);
+      our::types::ISpecification
+    >(path, our::jsonization::SpecificationFrom);
   }
 }
 
@@ -399,10 +399,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected Specification") {
       );
 
       AssertDeserializationFailure<
-        aas::types::ISpecification
+        our::types::ISpecification
       >(
         path,
-        aas::jsonization::SpecificationFrom,
+        our::jsonization::SpecificationFrom,
         error_path
       );
     }
@@ -421,8 +421,8 @@ TEST_CASE("Test the round-trip of an expected Something") {
 
   for (const std::filesystem::path& path : paths) {
     AssertRoundTrip<
-      aas::types::ISomething
-    >(path, aas::jsonization::SomethingFrom);
+      our::types::ISomething
+    >(path, our::jsonization::SomethingFrom);
   }
 }
 
@@ -455,10 +455,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected Something") {
       );
 
       AssertDeserializationFailure<
-        aas::types::ISomething
+        our::types::ISomething
       >(
         path,
-        aas::jsonization::SomethingFrom,
+        our::jsonization::SomethingFrom,
         error_path
       );
     }

@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,311 +14,311 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.Leaf LoadMaximalLeaf()
+        public static Our.Leaf LoadMaximalLeaf()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Leaf",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.LeafFrom(
+            var instance = Our.Jsonization.Deserialize.LeafFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Leaf LoadMaximalLeaf
+        }  // public static Our.Leaf LoadMaximalLeaf
 
-        public static Aas.Leaf LoadMinimalLeaf()
+        public static Our.Leaf LoadMinimalLeaf()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Leaf",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.LeafFrom(
+            var instance = Our.Jsonization.Deserialize.LeafFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Leaf LoadMinimalLeaf
+        }  // public static Our.Leaf LoadMinimalLeaf
 
-        public static Aas.OrderedContainer LoadMaximalOrderedContainer()
+        public static Our.OrderedContainer LoadMaximalOrderedContainer()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "OrderedContainer",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+            var instance = Our.Jsonization.Deserialize.OrderedContainerFrom(
                 node);
 
             return instance;
-        }  // public static Aas.OrderedContainer LoadMaximalOrderedContainer
+        }  // public static Our.OrderedContainer LoadMaximalOrderedContainer
 
-        public static Aas.OrderedContainer LoadMinimalOrderedContainer()
+        public static Our.OrderedContainer LoadMinimalOrderedContainer()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "OrderedContainer",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+            var instance = Our.Jsonization.Deserialize.OrderedContainerFrom(
                 node);
 
             return instance;
-        }  // public static Aas.OrderedContainer LoadMinimalOrderedContainer
+        }  // public static Our.OrderedContainer LoadMinimalOrderedContainer
 
-        public static Aas.UnorderedContainer LoadMaximalUnorderedContainer()
+        public static Our.UnorderedContainer LoadMaximalUnorderedContainer()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "UnorderedContainer",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+            var instance = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                 node);
 
             return instance;
-        }  // public static Aas.UnorderedContainer LoadMaximalUnorderedContainer
+        }  // public static Our.UnorderedContainer LoadMaximalUnorderedContainer
 
-        public static Aas.UnorderedContainer LoadMinimalUnorderedContainer()
+        public static Our.UnorderedContainer LoadMinimalUnorderedContainer()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "UnorderedContainer",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+            var instance = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                 node);
 
             return instance;
-        }  // public static Aas.UnorderedContainer LoadMinimalUnorderedContainer
+        }  // public static Our.UnorderedContainer LoadMinimalUnorderedContainer
 
-        public static Aas.GlobalAttribute LoadMaximalGlobalAttribute()
+        public static Our.GlobalAttribute LoadMaximalGlobalAttribute()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "GlobalAttribute",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+            var instance = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                 node);
 
             return instance;
-        }  // public static Aas.GlobalAttribute LoadMaximalGlobalAttribute
+        }  // public static Our.GlobalAttribute LoadMaximalGlobalAttribute
 
-        public static Aas.GlobalAttribute LoadMinimalGlobalAttribute()
+        public static Our.GlobalAttribute LoadMinimalGlobalAttribute()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "GlobalAttribute",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+            var instance = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                 node);
 
             return instance;
-        }  // public static Aas.GlobalAttribute LoadMinimalGlobalAttribute
+        }  // public static Our.GlobalAttribute LoadMinimalGlobalAttribute
 
-        public static Aas.LocalAttribute LoadMaximalLocalAttribute()
+        public static Our.LocalAttribute LoadMaximalLocalAttribute()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "LocalAttribute",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+            var instance = Our.Jsonization.Deserialize.LocalAttributeFrom(
                 node);
 
             return instance;
-        }  // public static Aas.LocalAttribute LoadMaximalLocalAttribute
+        }  // public static Our.LocalAttribute LoadMaximalLocalAttribute
 
-        public static Aas.LocalAttribute LoadMinimalLocalAttribute()
+        public static Our.LocalAttribute LoadMinimalLocalAttribute()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "LocalAttribute",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+            var instance = Our.Jsonization.Deserialize.LocalAttributeFrom(
                 node);
 
             return instance;
-        }  // public static Aas.LocalAttribute LoadMinimalLocalAttribute
+        }  // public static Our.LocalAttribute LoadMinimalLocalAttribute
 
-        public static Aas.AttributeOperand LoadMaximalAttributeOperand()
+        public static Our.AttributeOperand LoadMaximalAttributeOperand()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "AttributeOperand",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+            var instance = Our.Jsonization.Deserialize.AttributeOperandFrom(
                 node);
 
             return instance;
-        }  // public static Aas.AttributeOperand LoadMaximalAttributeOperand
+        }  // public static Our.AttributeOperand LoadMaximalAttributeOperand
 
-        public static Aas.AttributeOperand LoadMinimalAttributeOperand()
+        public static Our.AttributeOperand LoadMinimalAttributeOperand()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "AttributeOperand",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+            var instance = Our.Jsonization.Deserialize.AttributeOperandFrom(
                 node);
 
             return instance;
-        }  // public static Aas.AttributeOperand LoadMinimalAttributeOperand
+        }  // public static Our.AttributeOperand LoadMinimalAttributeOperand
 
-        public static Aas.StringLiteral LoadMaximalStringLiteral()
+        public static Our.StringLiteral LoadMaximalStringLiteral()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StringLiteral",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StringLiteralFrom(
+            var instance = Our.Jsonization.Deserialize.StringLiteralFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StringLiteral LoadMaximalStringLiteral
+        }  // public static Our.StringLiteral LoadMaximalStringLiteral
 
-        public static Aas.StringLiteral LoadMinimalStringLiteral()
+        public static Our.StringLiteral LoadMinimalStringLiteral()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "StringLiteral",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.StringLiteralFrom(
+            var instance = Our.Jsonization.Deserialize.StringLiteralFrom(
                 node);
 
             return instance;
-        }  // public static Aas.StringLiteral LoadMinimalStringLiteral
+        }  // public static Our.StringLiteral LoadMinimalStringLiteral
 
-        public static Aas.NumberLiteral LoadMaximalNumberLiteral()
+        public static Our.NumberLiteral LoadMaximalNumberLiteral()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "NumberLiteral",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+            var instance = Our.Jsonization.Deserialize.NumberLiteralFrom(
                 node);
 
             return instance;
-        }  // public static Aas.NumberLiteral LoadMaximalNumberLiteral
+        }  // public static Our.NumberLiteral LoadMaximalNumberLiteral
 
-        public static Aas.NumberLiteral LoadMinimalNumberLiteral()
+        public static Our.NumberLiteral LoadMinimalNumberLiteral()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "NumberLiteral",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+            var instance = Our.Jsonization.Deserialize.NumberLiteralFrom(
                 node);
 
             return instance;
-        }  // public static Aas.NumberLiteral LoadMinimalNumberLiteral
+        }  // public static Our.NumberLiteral LoadMinimalNumberLiteral
 
-        public static Aas.Something LoadMaximalSomething()
+        public static Our.Something LoadMaximalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMaximalSomething
+        }  // public static Our.Something LoadMaximalSomething
 
-        public static Aas.Something LoadMinimalSomething()
+        public static Our.Something LoadMinimalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMinimalSomething
+        }  // public static Our.Something LoadMinimalSomething
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

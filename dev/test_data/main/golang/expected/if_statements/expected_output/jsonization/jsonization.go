@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aasstringification "github.com/dummy-works/dummy/stringification"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourstringification "github.com/dummy-works/dummy/stringification"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -27,13 +27,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -48,7 +48,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -57,7 +57,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -68,7 +68,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -79,7 +79,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -430,30 +430,30 @@ func unexpectedEnumLiteralError(
 	)
 }
 
-// Parse `jsonable` as a literal of [aastypes.Kind],
+// Parse `jsonable` as a literal of [ourtypes.Kind],
 // or return an error.
 func KindFromJsonable(
 	jsonable interface{},
-) (result aastypes.Kind, err error) {
+) (result ourtypes.Kind, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "Kind")
 		return
 	}
 
-	result, ok = aasstringification.KindFromString(text)
+	result, ok = ourstringification.KindFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "Kind")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IItem],
+// Parse `jsonable` as an instance of [ourtypes.IItem],
 // or return an error.
 func ItemFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IItem,
+	result ourtypes.IItem,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -465,12 +465,12 @@ func ItemFromJsonable(
 	return itemFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IItem] from a map,
+// Parse [ourtypes.IItem] from a map,
 // or return an error, if any.
 func itemFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IItem,
+	result ourtypes.IItem,
 	err error,
 ) {
 	var theName string
@@ -510,7 +510,7 @@ func itemFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewItem(
+	result = ourtypes.NewItem(
 		theName,
 	)
 	result.SetOptionalText(
@@ -520,12 +520,12 @@ func itemFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IParent],
+// Parse `jsonable` as an instance of [ourtypes.IParent],
 // or return an error.
 func ParentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IParent,
+	result ourtypes.IParent,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -537,12 +537,12 @@ func ParentFromJsonable(
 	return parentFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IChildA],
+// Parse `jsonable` as an instance of [ourtypes.IChildA],
 // or return an error.
 func ChildAFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IChildA,
+	result ourtypes.IChildA,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -559,12 +559,12 @@ func ChildAFromJsonable(
 	return childAFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IChildA] from a map,
+// Parse [ourtypes.IChildA] from a map,
 // or return an error, if any.
 func childAFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IChildA,
+	result ourtypes.IChildA,
 	err error,
 ) {
 	var theOptionalText *string
@@ -607,7 +607,7 @@ func childAFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewChildA(
+	result = ourtypes.NewChildA(
 		theAOnly,
 	)
 	result.SetOptionalText(
@@ -617,12 +617,12 @@ func childAFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IChildB],
+// Parse `jsonable` as an instance of [ourtypes.IChildB],
 // or return an error.
 func ChildBFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IChildB,
+	result ourtypes.IChildB,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -639,12 +639,12 @@ func ChildBFromJsonable(
 	return childBFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IChildB] from a map,
+// Parse [ourtypes.IChildB] from a map,
 // or return an error, if any.
 func childBFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IChildB,
+	result ourtypes.IChildB,
 	err error,
 ) {
 	var theOptionalText *string
@@ -687,7 +687,7 @@ func childBFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewChildB(
+	result = ourtypes.NewChildB(
 		theBOnly,
 	)
 	result.SetOptionalText(
@@ -697,12 +697,12 @@ func childBFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IContainer],
+// Parse `jsonable` as an instance of [ourtypes.IContainer],
 // or return an error.
 func ContainerFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IContainer,
+	result ourtypes.IContainer,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -719,16 +719,16 @@ func ContainerFromJsonable(
 	return containerFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IContainer] from a map,
+// Parse [ourtypes.IContainer] from a map,
 // or return an error, if any.
 func containerFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IContainer,
+	result ourtypes.IContainer,
 	err error,
 ) {
 	var theOptionalText *string
-	var theChildren []aastypes.IParent
+	var theChildren []ourtypes.IParent
 
 	for k, v := range m {
 		switch k {
@@ -757,7 +757,7 @@ func containerFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewContainer()
+	result = ourtypes.NewContainer()
 	result.SetOptionalText(
 		theOptionalText,
 	)
@@ -768,12 +768,12 @@ func containerFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISomething],
+// Parse `jsonable` as an instance of [ourtypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -785,21 +785,21 @@ func SomethingFromJsonable(
 	return somethingFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISomething] from a map,
+// Parse [ourtypes.ISomething] from a map,
 // or return an error, if any.
 func somethingFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
-	var theKind aastypes.Kind
+	var theKind ourtypes.Kind
 	var theText string
 	var theNumber int64
 	var theFlag bool
-	var theItem aastypes.IItem
-	var theOptionalParent aastypes.IParent
-	var theParents []aastypes.IParent
+	var theItem ourtypes.IItem
+	var theOptionalParent ourtypes.IParent
+	var theParents []ourtypes.IParent
 
 	foundKind := false
 	foundText := false
@@ -886,7 +886,7 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSomething(
+	result = ourtypes.NewSomething(
 		theKind,
 		theText,
 		theNumber,
@@ -903,12 +903,12 @@ func somethingFromMapWithoutDispatch(
 	return
 }
 
-// De-serialize an instance of [aastypes.IParent]
+// De-serialize an instance of [ourtypes.IParent]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func parentFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IParent,
+	result ourtypes.IParent,
 	err error,
 ) {
 	var modelType string
@@ -945,13 +945,13 @@ func parentFromMap(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -966,7 +966,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -975,7 +975,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -986,7 +986,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -997,7 +997,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -1121,27 +1121,27 @@ func serializeArray[T any](
 
 // Serialize `that` to a JSON-able value, or return an error.
 //
-// `ToJsonable` takes an `aastypes.IClass`, but a list or a tuple item's own
-// (more specific) interface type, e.g., `aastypes.ISomeItem`, can not be
+// `ToJsonable` takes an `ourtypes.IClass`, but a list or a tuple item's own
+// (more specific) interface type, e.g., `ourtypes.ISomeItem`, can not be
 // unified with that when passing `ToJsonable` itself as a
 // `func(item T) (interface{}, error)` value -- Go function values are
 // invariant in their parameter type (no contravariance, unlike, say, a C#
 // delegate). Making this wrapper itself generic (instead of fixing its
-// parameter to `aastypes.IClass`) lets the very same one be passed on bare,
+// parameter to `ourtypes.IClass`) lets the very same one be passed on bare,
 // uninstantiated, for every class-typed item regardless of its
 // concrete interface: Go infers both the item's type and this
 // wrapper's own type parameter together from the context of the
 // `serializeArray`/`serializeTupleN` call.
-func classAsJsonableInterface[T aastypes.IClass](that T) (interface{}, error) {
+func classAsJsonableInterface[T ourtypes.IClass](that T) (interface{}, error) {
 	return ToJsonable(that)
 }
 
 // Serialize `that` to a string, or return an error.
 func KindToJsonable(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.KindToString(
+	result, ok = ourstringification.KindToString(
 		that,
 	)
 	if !ok {
@@ -1157,14 +1157,14 @@ func KindToJsonable(
 	return
 }
 
-// Serialize [aastypes.IItem] as a JSON-able map.
+// Serialize [ourtypes.IItem] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IItem] with proper dispatch, call
+// [ourtypes.IItem] with proper dispatch, call
 // [ToJsonable].
 func itemToMap(
-	that aastypes.IItem,
+	that ourtypes.IItem,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1177,14 +1177,14 @@ func itemToMap(
 	return
 }
 
-// Serialize [aastypes.IChildA] as a JSON-able map.
+// Serialize [ourtypes.IChildA] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IChildA] with proper dispatch, call
+// [ourtypes.IChildA] with proper dispatch, call
 // [ToJsonable].
 func childAToMap(
-	that aastypes.IChildA,
+	that ourtypes.IChildA,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1203,14 +1203,14 @@ func childAToMap(
 	return
 }
 
-// Serialize [aastypes.IChildB] as a JSON-able map.
+// Serialize [ourtypes.IChildB] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IChildB] with proper dispatch, call
+// [ourtypes.IChildB] with proper dispatch, call
 // [ToJsonable].
 func childBToMap(
-	that aastypes.IChildB,
+	that ourtypes.IChildB,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1229,14 +1229,14 @@ func childBToMap(
 	return
 }
 
-// Serialize [aastypes.IContainer] as a JSON-able map.
+// Serialize [ourtypes.IContainer] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IContainer] with proper dispatch, call
+// [ourtypes.IContainer] with proper dispatch, call
 // [ToJsonable].
 func containerToMap(
-	that aastypes.IContainer,
+	that ourtypes.IContainer,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1246,7 +1246,7 @@ func containerToMap(
 
 	if that.Children() != nil {
 		result["children"], err = serializeArray(
-			that.Children(), classAsJsonableInterface[aastypes.IParent],
+			that.Children(), classAsJsonableInterface[ourtypes.IParent],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Children()")
@@ -1259,14 +1259,14 @@ func containerToMap(
 	return
 }
 
-// Serialize [aastypes.ISomething] as a JSON-able map.
+// Serialize [ourtypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISomething] with proper dispatch, call
+// [ourtypes.ISomething] with proper dispatch, call
 // [ToJsonable].
 func somethingToMap(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1302,7 +1302,7 @@ func somethingToMap(
 
 	if that.Parents() != nil {
 		result["parents"], err = serializeArray(
-			that.Parents(), classAsJsonableInterface[aastypes.IParent],
+			that.Parents(), classAsJsonableInterface[ourtypes.IParent],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Parents()")
@@ -1318,28 +1318,28 @@ func somethingToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		result, err = itemToMap(
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 		)
-	case aastypes.ModelTypeChildA:
+	case ourtypes.ModelTypeChildA:
 		result, err = childAToMap(
-			that.(aastypes.IChildA),
+			that.(ourtypes.IChildA),
 		)
-	case aastypes.ModelTypeChildB:
+	case ourtypes.ModelTypeChildB:
 		result, err = childBToMap(
-			that.(aastypes.IChildB),
+			that.(ourtypes.IChildB),
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		result, err = containerToMap(
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 		)
 	default:
 		err = newSerializationError(

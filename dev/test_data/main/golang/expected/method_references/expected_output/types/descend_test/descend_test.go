@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnAnInstanceOfBox(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalBox()
+	instance := ourtesting.MustLoadMaximalBox()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Box",
 		"maximal.json.trace",

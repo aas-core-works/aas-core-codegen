@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy; // renamed
+using Our = dummy; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias
@@ -57,8 +57,8 @@ namespace dummy.Tests
         /// in the <paramref name="container" />,
         /// including the <paramref name="container" /> itself.
         /// </summary>
-        public static T MustFind<T>(Aas.IClass container)
-            where T : Aas.IClass
+        public static T MustFind<T>(Our.IClass container)
+            where T : Our.IClass
         {
             var instance = (
                 (container is T)
@@ -73,7 +73,7 @@ namespace dummy.Tests
         }
 
         public static void AssertNoVerificationErrors(
-            List<Aas.Reporting.Error> errors,
+            List<Our.Reporting.Error> errors,
             string path
         )
         {
@@ -98,7 +98,7 @@ namespace dummy.Tests
         }
 
         public static void AssertEqualsExpectedOrRerecordVerificationErrors(
-            List<Aas.Reporting.Error> errors,
+            List<Our.Reporting.Error> errors,
             string path
         )
         {
@@ -130,7 +130,7 @@ namespace dummy.Tests
                         "The file with the recorded errors does not "
                             + $"exist: {errorsPath}; maybe you want to set "
                             + "the environment variable "
-                            + $"{Aas.Tests.Common.RecordModeEnvironmentVariableName}?"
+                            + $"{Our.Tests.Common.RecordModeEnvironmentVariableName}?"
                     );
                 }
 
@@ -143,7 +143,7 @@ namespace dummy.Tests
             }
         }
 
-        public static string Trace(Aas.IClass instance)
+        public static string Trace(Our.IClass instance)
         {
             return instance.GetType().Name;
         }

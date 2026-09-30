@@ -16,8 +16,8 @@ import textwrap
 from typing import Union, Sequence
 
 
-import dummy.common as aas_common
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.types as our_types
 
 
 _REPO_ROOT = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
@@ -83,9 +83,9 @@ def trace(
         str,
         bytes,
         enum.Enum,
-        aas_types.Class,
+        our_types.Class,
         Sequence[
-            Union[bool, int, float, str, bytes, enum.Enum, aas_types.Class]
+            Union[bool, int, float, str, bytes, enum.Enum, our_types.Class]
         ],
     ],
 ) -> str:
@@ -95,7 +95,7 @@ def trace(
     :param that: to be traced
     :return: segment in the descent trace
     """
-    if isinstance(that, aas_types.Class):
+    if isinstance(that, our_types.Class):
         return that.__class__.__name__
     elif isinstance(that, (bool, int, float, str, enum.Enum)):
         return str(that)
@@ -117,7 +117,7 @@ def trace(
         writer.write("]")
         return writer.getvalue()
     else:
-        aas_common.assert_never(that)
+        our_common.assert_never(that)
 
 
 def trace_log_as_text_file_content(log: Sequence[str]) -> str:

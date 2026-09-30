@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -353,7 +353,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Kind KindFrom(
+            internal static Our.Kind KindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -363,7 +363,7 @@ namespace dummy
                     return default!;
                 }
 
-                Aas.Kind? result = Stringification.KindFromString(text);
+                Our.Kind? result = Stringification.KindFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -381,7 +381,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IItem IItemFrom(
+            public static Our.IItem IItemFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -412,14 +412,14 @@ namespace dummy
                         $"Unexpected model type for IItem: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IItem IItemFrom
+            }  // public static Our.IItem IItemFrom
 
             /// <summary>
             /// Deserialize an instance of First from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.First FirstFrom(
+            internal static Our.First FirstFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -501,7 +501,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.First(
+                return new Our.First(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -516,7 +516,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Second SecondFrom(
+            internal static Our.Second SecondFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -610,7 +610,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Second(
+                return new Our.Second(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -683,7 +683,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.IItem anInstance = Deserialize.IItemFrom(
+        /// Our.IItem anInstance = Deserialize.IItemFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -697,10 +697,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Kind.
             /// </exception>
-            public static Aas.Kind KindFrom(
+            public static Our.Kind KindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Kind result = DeserializeImplementation.KindFrom(
+                Our.Kind result = DeserializeImplementation.KindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -721,10 +721,10 @@ namespace dummy
             /// representation of IItem.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IItem IItemFrom(
+            public static Our.IItem IItemFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IItem result = DeserializeImplementation.IItemFrom(
+                Our.IItem result = DeserializeImplementation.IItemFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -744,10 +744,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of First.
             /// </exception>
-            public static Aas.First FirstFrom(
+            public static Our.First FirstFrom(
                 Nodes.JsonNode node)
             {
-                Aas.First result = DeserializeImplementation.FirstFrom(
+                Our.First result = DeserializeImplementation.FirstFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -767,10 +767,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Second.
             /// </exception>
-            public static Aas.Second SecondFrom(
+            public static Our.Second SecondFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Second result = DeserializeImplementation.SecondFrom(
+                Our.Second result = DeserializeImplementation.SecondFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -807,7 +807,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -962,7 +962,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformFirst(
-                Aas.IFirst that
+                Our.IFirst that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -982,7 +982,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSecond(
-                Aas.ISecond that
+                Our.ISecond that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1010,7 +1010,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of IItem:
         /// <code>
-        /// var anInstance = new Aas.IItem(
+        /// var anInstance = new Our.IItem(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -1027,7 +1027,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {
@@ -1049,7 +1049,7 @@ namespace dummy
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue KindToJsonValue(Aas.Kind that)
+            public static Nodes.JsonValue KindToJsonValue(Our.Kind that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)

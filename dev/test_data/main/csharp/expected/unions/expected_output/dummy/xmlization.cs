@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -489,103 +489,103 @@ namespace dummy
             /// Read an instance of class StructuralFirst from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.StructuralFirst
+                Our.StructuralFirst
             > StructuralFirstFromElement = (
-                AtElement<Aas.StructuralFirst>(
+                AtElement<Our.StructuralFirst>(
                     StructuralFirstFromSequence, "structuralFirst"));
 
             /// <summary>
             /// Read an instance of class StructuralSecond from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.StructuralSecond
+                Our.StructuralSecond
             > StructuralSecondFromElement = (
-                AtElement<Aas.StructuralSecond>(
+                AtElement<Our.StructuralSecond>(
                     StructuralSecondFromSequence, "structuralSecond"));
 
             /// <summary>
             /// Read an instance of class MixedAbstractDescendantOne from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MixedAbstractDescendantOne
+                Our.MixedAbstractDescendantOne
             > MixedAbstractDescendantOneFromElement = (
-                AtElement<Aas.MixedAbstractDescendantOne>(
+                AtElement<Our.MixedAbstractDescendantOne>(
                     MixedAbstractDescendantOneFromSequence, "mixedAbstractDescendantOne"));
 
             /// <summary>
             /// Read an instance of class MixedAbstractDescendantTwo from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MixedAbstractDescendantTwo
+                Our.MixedAbstractDescendantTwo
             > MixedAbstractDescendantTwoFromElement = (
-                AtElement<Aas.MixedAbstractDescendantTwo>(
+                AtElement<Our.MixedAbstractDescendantTwo>(
                     MixedAbstractDescendantTwoFromSequence, "mixedAbstractDescendantTwo"));
 
             /// <summary>
             /// Read an instance of class MixedConcreteWithDescendants from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MixedConcreteWithDescendants
+                Our.MixedConcreteWithDescendants
             > MixedConcreteWithDescendantsFromElement = (
-                AtElement<Aas.MixedConcreteWithDescendants>(
+                AtElement<Our.MixedConcreteWithDescendants>(
                     MixedConcreteWithDescendantsFromSequence, "mixedConcreteWithDescendants"));
 
             /// <summary>
             /// Read an instance of class MixedConcreteWithDescendantsChild from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MixedConcreteWithDescendantsChild
+                Our.MixedConcreteWithDescendantsChild
             > MixedConcreteWithDescendantsChildFromElement = (
-                AtElement<Aas.MixedConcreteWithDescendantsChild>(
+                AtElement<Our.MixedConcreteWithDescendantsChild>(
                     MixedConcreteWithDescendantsChildFromSequence, "mixedConcreteWithDescendantsChild"));
 
             /// <summary>
             /// Read an instance of class MixedConcreteLeaf from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.MixedConcreteLeaf
+                Our.MixedConcreteLeaf
             > MixedConcreteLeafFromElement = (
-                AtElement<Aas.MixedConcreteLeaf>(
+                AtElement<Our.MixedConcreteLeaf>(
                     MixedConcreteLeafFromSequence, "mixedConcreteLeaf"));
 
             /// <summary>
             /// Read an instance of class ModelTypedFirst from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.ModelTypedFirst
+                Our.ModelTypedFirst
             > ModelTypedFirstFromElement = (
-                AtElement<Aas.ModelTypedFirst>(
+                AtElement<Our.ModelTypedFirst>(
                     ModelTypedFirstFromSequence, "modelTypedFirst"));
 
             /// <summary>
             /// Read an instance of class ModelTypedSecond from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.ModelTypedSecond
+                Our.ModelTypedSecond
             > ModelTypedSecondFromElement = (
-                AtElement<Aas.ModelTypedSecond>(
+                AtElement<Our.ModelTypedSecond>(
                     ModelTypedSecondFromSequence, "modelTypedSecond"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             private static readonly ContentReader<string> Read_string = (
                 AsText<string>(ReadContentAsString, ""));
 
             private static readonly ContentReader<StructuralUnion> Read_StructuralUnion = (
-                AsElement<Aas.StructuralUnion>(
+                AsElement<Our.StructuralUnion>(
                     StructuralUnionFromElement));
 
             private static readonly ContentReader<MixedUnion> Read_MixedUnion = (
-                AsElement<Aas.MixedUnion>(
+                AsElement<Our.MixedUnion>(
                     MixedUnionFromElement));
 
             private static readonly ContentReader<ModelTypedUnion> Read_ModelTypedUnion = (
-                AsElement<Aas.ModelTypedUnion>(
+                AsElement<Our.ModelTypedUnion>(
                     ModelTypedUnionFromElement));
 
             private static readonly ContentReader<
@@ -626,7 +626,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.StructuralFirst StructuralFirstFromSequence(
+            internal static Our.StructuralFirst StructuralFirstFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -708,11 +708,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StructuralFirst(
+                return new Our.StructuralFirst(
                     theUniqueToFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.StructuralFirst? StructuralFirstFromSequence
+            }  // internal static Our.StructuralFirst? StructuralFirstFromSequence
 
             /// <summary>
             /// Deserialize an instance of class StructuralSecond from a sequence of XML elements.
@@ -722,7 +722,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.StructuralSecond StructuralSecondFromSequence(
+            internal static Our.StructuralSecond StructuralSecondFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -804,17 +804,17 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StructuralSecond(
+                return new Our.StructuralSecond(
                     theUniqueToSecond
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.StructuralSecond? StructuralSecondFromSequence
+            }  // internal static Our.StructuralSecond? StructuralSecondFromSequence
 
             /// <summary>
             /// Deserialize an instance of IMixedAbstractMember from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IMixedAbstractMember IMixedAbstractMemberFromElement(
+            internal static Our.IMixedAbstractMember IMixedAbstractMemberFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -838,7 +838,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IMixedAbstractMember? IMixedAbstractMemberFromElement
+            }  // internal static Our.IMixedAbstractMember? IMixedAbstractMemberFromElement
 
             /// <summary>
             /// Deserialize an instance of class MixedAbstractDescendantOne from a sequence of XML elements.
@@ -848,7 +848,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MixedAbstractDescendantOne MixedAbstractDescendantOneFromSequence(
+            internal static Our.MixedAbstractDescendantOne MixedAbstractDescendantOneFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -930,11 +930,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedAbstractDescendantOne(
+                return new Our.MixedAbstractDescendantOne(
                     theUniqueToAbstractDescendantOne
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.MixedAbstractDescendantOne? MixedAbstractDescendantOneFromSequence
+            }  // internal static Our.MixedAbstractDescendantOne? MixedAbstractDescendantOneFromSequence
 
             /// <summary>
             /// Deserialize an instance of class MixedAbstractDescendantTwo from a sequence of XML elements.
@@ -944,7 +944,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFromSequence(
+            internal static Our.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1026,11 +1026,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedAbstractDescendantTwo(
+                return new Our.MixedAbstractDescendantTwo(
                     theUniqueToAbstractDescendantTwo
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.MixedAbstractDescendantTwo? MixedAbstractDescendantTwoFromSequence
+            }  // internal static Our.MixedAbstractDescendantTwo? MixedAbstractDescendantTwoFromSequence
 
             /// <summary>
             /// Deserialize an instance of class MixedConcreteWithDescendants from a sequence of XML elements.
@@ -1040,7 +1040,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MixedConcreteWithDescendants MixedConcreteWithDescendantsFromSequence(
+            internal static Our.MixedConcreteWithDescendants MixedConcreteWithDescendantsFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1122,17 +1122,17 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteWithDescendants(
+                return new Our.MixedConcreteWithDescendants(
                     theSomeBaseProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.MixedConcreteWithDescendants? MixedConcreteWithDescendantsFromSequence
+            }  // internal static Our.MixedConcreteWithDescendants? MixedConcreteWithDescendantsFromSequence
 
             /// <summary>
             /// Deserialize an instance of IMixedConcreteWithDescendants from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFromElement(
+            internal static Our.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1156,7 +1156,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IMixedConcreteWithDescendants? IMixedConcreteWithDescendantsFromElement
+            }  // internal static Our.IMixedConcreteWithDescendants? IMixedConcreteWithDescendantsFromElement
 
             /// <summary>
             /// Deserialize an instance of class MixedConcreteWithDescendantsChild from a sequence of XML elements.
@@ -1166,7 +1166,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFromSequence(
+            internal static Our.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1266,14 +1266,14 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteWithDescendantsChild(
+                return new Our.MixedConcreteWithDescendantsChild(
                     theSomeBaseProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theSomeChildProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.MixedConcreteWithDescendantsChild? MixedConcreteWithDescendantsChildFromSequence
+            }  // internal static Our.MixedConcreteWithDescendantsChild? MixedConcreteWithDescendantsChildFromSequence
 
             /// <summary>
             /// Deserialize an instance of class MixedConcreteLeaf from a sequence of XML elements.
@@ -1283,7 +1283,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.MixedConcreteLeaf MixedConcreteLeafFromSequence(
+            internal static Our.MixedConcreteLeaf MixedConcreteLeafFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1365,11 +1365,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteLeaf(
+                return new Our.MixedConcreteLeaf(
                     theUniqueToConcreteLeaf
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.MixedConcreteLeaf? MixedConcreteLeafFromSequence
+            }  // internal static Our.MixedConcreteLeaf? MixedConcreteLeafFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ModelTypedFirst from a sequence of XML elements.
@@ -1379,7 +1379,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ModelTypedFirst ModelTypedFirstFromSequence(
+            internal static Our.ModelTypedFirst ModelTypedFirstFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1461,11 +1461,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ModelTypedFirst(
+                return new Our.ModelTypedFirst(
                     theSomeProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.ModelTypedFirst? ModelTypedFirstFromSequence
+            }  // internal static Our.ModelTypedFirst? ModelTypedFirstFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ModelTypedSecond from a sequence of XML elements.
@@ -1475,7 +1475,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ModelTypedSecond ModelTypedSecondFromSequence(
+            internal static Our.ModelTypedSecond ModelTypedSecondFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1557,11 +1557,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ModelTypedSecond(
+                return new Our.ModelTypedSecond(
                     theSomeProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.ModelTypedSecond? ModelTypedSecondFromSequence
+            }  // internal static Our.ModelTypedSecond? ModelTypedSecondFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -1571,7 +1571,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1801,7 +1801,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theStructuralProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1827,12 +1827,12 @@ namespace dummy
                     theOptionalMixedProperty,
                     theOptionalModelTypedProperty,
                     theOptionalListOverlappingProperty);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
 
             /// <summary>
             /// Deserialize an instance of StructuralUnion from an XML element.
             /// </summary>
-            internal static Aas.StructuralUnion StructuralUnionFromElement(
+            internal static Our.StructuralUnion StructuralUnionFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1847,35 +1847,35 @@ namespace dummy
                 {
                     case "structuralFirst":
                     {
-                        Aas.StructuralFirst instance = StructuralFirstFromElement(
+                        Our.StructuralFirst instance = StructuralFirstFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.StructuralUnion.FromStructuralFirst(instance);
+                        return Our.StructuralUnion.FromStructuralFirst(instance);
                     }
                     case "structuralSecond":
                     {
-                        Aas.StructuralSecond instance = StructuralSecondFromElement(
+                        Our.StructuralSecond instance = StructuralSecondFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.StructuralUnion.FromStructuralSecond(instance);
+                        return Our.StructuralUnion.FromStructuralSecond(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.StructuralUnion? StructuralUnionFromElement
+            }  // internal static Our.StructuralUnion? StructuralUnionFromElement
 
             /// <summary>
             /// Deserialize an instance of MixedUnion from an XML element.
             /// </summary>
-            internal static Aas.MixedUnion MixedUnionFromElement(
+            internal static Our.MixedUnion MixedUnionFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1890,65 +1890,65 @@ namespace dummy
                 {
                     case "mixedAbstractDescendantOne":
                     {
-                        Aas.MixedAbstractDescendantOne instance = MixedAbstractDescendantOneFromElement(
+                        Our.MixedAbstractDescendantOne instance = MixedAbstractDescendantOneFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.MixedUnion.FromMixedAbstractMember(instance);
+                        return Our.MixedUnion.FromMixedAbstractMember(instance);
                     }
                     case "mixedAbstractDescendantTwo":
                     {
-                        Aas.MixedAbstractDescendantTwo instance = MixedAbstractDescendantTwoFromElement(
+                        Our.MixedAbstractDescendantTwo instance = MixedAbstractDescendantTwoFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.MixedUnion.FromMixedAbstractMember(instance);
+                        return Our.MixedUnion.FromMixedAbstractMember(instance);
                     }
                     case "mixedConcreteWithDescendantsChild":
                     {
-                        Aas.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFromElement(
+                        Our.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.MixedUnion.FromMixedConcreteWithDescendants(instance);
+                        return Our.MixedUnion.FromMixedConcreteWithDescendants(instance);
                     }
                     case "mixedConcreteWithDescendants":
                     {
-                        Aas.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFromElement(
+                        Our.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.MixedUnion.FromMixedConcreteWithDescendants(instance);
+                        return Our.MixedUnion.FromMixedConcreteWithDescendants(instance);
                     }
                     case "mixedConcreteLeaf":
                     {
-                        Aas.MixedConcreteLeaf instance = MixedConcreteLeafFromElement(
+                        Our.MixedConcreteLeaf instance = MixedConcreteLeafFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.MixedUnion.FromMixedConcreteLeaf(instance);
+                        return Our.MixedUnion.FromMixedConcreteLeaf(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.MixedUnion? MixedUnionFromElement
+            }  // internal static Our.MixedUnion? MixedUnionFromElement
 
             /// <summary>
             /// Deserialize an instance of ModelTypedUnion from an XML element.
             /// </summary>
-            internal static Aas.ModelTypedUnion ModelTypedUnionFromElement(
+            internal static Our.ModelTypedUnion ModelTypedUnionFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1963,35 +1963,35 @@ namespace dummy
                 {
                     case "modelTypedFirst":
                     {
-                        Aas.ModelTypedFirst instance = ModelTypedFirstFromElement(
+                        Our.ModelTypedFirst instance = ModelTypedFirstFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.ModelTypedUnion.FromModelTypedFirst(instance);
+                        return Our.ModelTypedUnion.FromModelTypedFirst(instance);
                     }
                     case "modelTypedSecond":
                     {
-                        Aas.ModelTypedSecond instance = ModelTypedSecondFromElement(
+                        Our.ModelTypedSecond instance = ModelTypedSecondFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.ModelTypedUnion.FromModelTypedSecond(instance);
+                        return Our.ModelTypedUnion.FromModelTypedSecond(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.ModelTypedUnion? ModelTypedUnionFromElement
+            }  // internal static Our.ModelTypedUnion? ModelTypedUnionFromElement
 
             /// <summary>
             /// Deserialize an instance of OverlappingUnion from an XML element.
             /// </summary>
-            internal static Aas.OverlappingUnion OverlappingUnionFromElement(
+            internal static Our.OverlappingUnion OverlappingUnionFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -2006,50 +2006,50 @@ namespace dummy
                 {
                     case "modelTypedFirst":
                     {
-                        Aas.ModelTypedFirst instance = ModelTypedFirstFromElement(
+                        Our.ModelTypedFirst instance = ModelTypedFirstFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.OverlappingUnion.FromModelTypedFirst(instance);
+                        return Our.OverlappingUnion.FromModelTypedFirst(instance);
                     }
                     case "modelTypedSecond":
                     {
-                        Aas.ModelTypedSecond instance = ModelTypedSecondFromElement(
+                        Our.ModelTypedSecond instance = ModelTypedSecondFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.OverlappingUnion.FromModelTypedSecond(instance);
+                        return Our.OverlappingUnion.FromModelTypedSecond(instance);
                     }
                     case "mixedConcreteWithDescendantsChild":
                     {
-                        Aas.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFromElement(
+                        Our.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.OverlappingUnion.FromMixedConcreteWithDescendantsChild(instance);
+                        return Our.OverlappingUnion.FromMixedConcreteWithDescendantsChild(instance);
                     }
                     case "mixedConcreteWithDescendants":
                     {
-                        Aas.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFromElement(
+                        Our.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.OverlappingUnion.FromMixedConcreteWithDescendants(instance);
+                        return Our.OverlappingUnion.FromMixedConcreteWithDescendants(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.OverlappingUnion? OverlappingUnionFromElement
+            }  // internal static Our.OverlappingUnion? OverlappingUnionFromElement
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -2074,7 +2074,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class StructuralFirst:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.StructuralFirst anInstance = Deserialize.StructuralFirstFrom(
+        /// Our.StructuralFirst anInstance = Deserialize.StructuralFirstFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -2093,7 +2093,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of StructuralFirst.
             /// </exception>
-            public static Aas.StructuralFirst StructuralFirstFrom(
+            public static Our.StructuralFirst StructuralFirstFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2107,7 +2107,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.StructuralFirst result = DeserializeImplementation.StructuralFirstFromElement(
+                Our.StructuralFirst result = DeserializeImplementation.StructuralFirstFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2127,7 +2127,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of StructuralSecond.
             /// </exception>
-            public static Aas.StructuralSecond StructuralSecondFrom(
+            public static Our.StructuralSecond StructuralSecondFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2141,7 +2141,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.StructuralSecond result = DeserializeImplementation.StructuralSecondFromElement(
+                Our.StructuralSecond result = DeserializeImplementation.StructuralSecondFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2161,7 +2161,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IMixedAbstractMember.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IMixedAbstractMember IMixedAbstractMemberFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IMixedAbstractMember IMixedAbstractMemberFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2175,7 +2175,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IMixedAbstractMember result = DeserializeImplementation.IMixedAbstractMemberFromElement(
+                Our.IMixedAbstractMember result = DeserializeImplementation.IMixedAbstractMemberFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2195,7 +2195,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedAbstractDescendantOne.
             /// </exception>
-            public static Aas.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
+            public static Our.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2209,7 +2209,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedAbstractDescendantOne result = DeserializeImplementation.MixedAbstractDescendantOneFromElement(
+                Our.MixedAbstractDescendantOne result = DeserializeImplementation.MixedAbstractDescendantOneFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2229,7 +2229,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedAbstractDescendantTwo.
             /// </exception>
-            public static Aas.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
+            public static Our.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2243,7 +2243,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedAbstractDescendantTwo result = DeserializeImplementation.MixedAbstractDescendantTwoFromElement(
+                Our.MixedAbstractDescendantTwo result = DeserializeImplementation.MixedAbstractDescendantTwoFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2263,7 +2263,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IMixedConcreteWithDescendants.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2277,7 +2277,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IMixedConcreteWithDescendants result = DeserializeImplementation.IMixedConcreteWithDescendantsFromElement(
+                Our.IMixedConcreteWithDescendants result = DeserializeImplementation.IMixedConcreteWithDescendantsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2297,7 +2297,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedConcreteWithDescendants.
             /// </exception>
-            public static Aas.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
+            public static Our.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2311,7 +2311,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedConcreteWithDescendants result = DeserializeImplementation.MixedConcreteWithDescendantsFromElement(
+                Our.MixedConcreteWithDescendants result = DeserializeImplementation.MixedConcreteWithDescendantsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2331,7 +2331,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedConcreteWithDescendantsChild.
             /// </exception>
-            public static Aas.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
+            public static Our.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2345,7 +2345,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedConcreteWithDescendantsChild result = DeserializeImplementation.MixedConcreteWithDescendantsChildFromElement(
+                Our.MixedConcreteWithDescendantsChild result = DeserializeImplementation.MixedConcreteWithDescendantsChildFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2365,7 +2365,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedConcreteLeaf.
             /// </exception>
-            public static Aas.MixedConcreteLeaf MixedConcreteLeafFrom(
+            public static Our.MixedConcreteLeaf MixedConcreteLeafFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2379,7 +2379,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedConcreteLeaf result = DeserializeImplementation.MixedConcreteLeafFromElement(
+                Our.MixedConcreteLeaf result = DeserializeImplementation.MixedConcreteLeafFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2399,7 +2399,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ModelTypedFirst.
             /// </exception>
-            public static Aas.ModelTypedFirst ModelTypedFirstFrom(
+            public static Our.ModelTypedFirst ModelTypedFirstFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2413,7 +2413,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ModelTypedFirst result = DeserializeImplementation.ModelTypedFirstFromElement(
+                Our.ModelTypedFirst result = DeserializeImplementation.ModelTypedFirstFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2433,7 +2433,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ModelTypedSecond.
             /// </exception>
-            public static Aas.ModelTypedSecond ModelTypedSecondFrom(
+            public static Our.ModelTypedSecond ModelTypedSecondFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2447,7 +2447,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ModelTypedSecond result = DeserializeImplementation.ModelTypedSecondFromElement(
+                Our.ModelTypedSecond result = DeserializeImplementation.ModelTypedSecondFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2467,7 +2467,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2481,7 +2481,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2501,7 +2501,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of StructuralUnion.
             /// </exception>
-            public static Aas.StructuralUnion StructuralUnionFrom(
+            public static Our.StructuralUnion StructuralUnionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2515,7 +2515,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.StructuralUnion result = DeserializeImplementation.StructuralUnionFromElement(
+                Our.StructuralUnion result = DeserializeImplementation.StructuralUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2535,7 +2535,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of MixedUnion.
             /// </exception>
-            public static Aas.MixedUnion MixedUnionFrom(
+            public static Our.MixedUnion MixedUnionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2549,7 +2549,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.MixedUnion result = DeserializeImplementation.MixedUnionFromElement(
+                Our.MixedUnion result = DeserializeImplementation.MixedUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2569,7 +2569,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ModelTypedUnion.
             /// </exception>
-            public static Aas.ModelTypedUnion ModelTypedUnionFrom(
+            public static Our.ModelTypedUnion ModelTypedUnionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2583,7 +2583,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ModelTypedUnion result = DeserializeImplementation.ModelTypedUnionFromElement(
+                Our.ModelTypedUnion result = DeserializeImplementation.ModelTypedUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2603,7 +2603,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of OverlappingUnion.
             /// </exception>
-            public static Aas.OverlappingUnion OverlappingUnionFrom(
+            public static Our.OverlappingUnion OverlappingUnionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2617,7 +2617,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.OverlappingUnion result = DeserializeImplementation.OverlappingUnionFromElement(
+                Our.OverlappingUnion result = DeserializeImplementation.OverlappingUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2815,7 +2815,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -2826,16 +2826,16 @@ namespace dummy
             /// element.
             /// </summary>
             /// <remarks>
-            /// A named union is not itself an <c>Aas.IClass</c>, so it can not be
+            /// A named union is not itself an <c>Our.IClass</c>, so it can not be
             /// dispatched by <see cref="WriteIClass" /> directly. Going through
-            /// the common, non-generic <c>Aas.IUnion</c> instead of the union's own
+            /// the common, non-generic <c>Our.IUnion</c> instead of the union's own
             /// type means one writer for *all* the named unions, not one per union.
             ///
             /// Should a named union ever be allowed to flatten a primitive or
             /// an enumeration alternative, only this body has to change.
             /// </remarks>
             private static void WriteIUnion(
-                Aas.IUnion that,
+                Our.IUnion that,
                 Xml.XmlWriter writer)
             {
                 WriteIClass(that.Underlying, writer);
@@ -2884,7 +2884,7 @@ namespace dummy
                     WriteIUnion));
 
             private static void StructuralFirstToSequence(
-                Aas.IStructuralFirst that,
+                Our.IStructuralFirst that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2892,7 +2892,7 @@ namespace dummy
             }  // private static void StructuralFirstToSequence
 
             public override void VisitStructuralFirst(
-                Aas.IStructuralFirst that,
+                Our.IStructuralFirst that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2905,7 +2905,7 @@ namespace dummy
             }
 
             private static void StructuralSecondToSequence(
-                Aas.IStructuralSecond that,
+                Our.IStructuralSecond that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2913,7 +2913,7 @@ namespace dummy
             }  // private static void StructuralSecondToSequence
 
             public override void VisitStructuralSecond(
-                Aas.IStructuralSecond that,
+                Our.IStructuralSecond that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2926,7 +2926,7 @@ namespace dummy
             }
 
             private static void MixedAbstractDescendantOneToSequence(
-                Aas.IMixedAbstractDescendantOne that,
+                Our.IMixedAbstractDescendantOne that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2938,7 +2938,7 @@ namespace dummy
             }  // private static void MixedAbstractDescendantOneToSequence
 
             public override void VisitMixedAbstractDescendantOne(
-                Aas.IMixedAbstractDescendantOne that,
+                Our.IMixedAbstractDescendantOne that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2951,7 +2951,7 @@ namespace dummy
             }
 
             private static void MixedAbstractDescendantTwoToSequence(
-                Aas.IMixedAbstractDescendantTwo that,
+                Our.IMixedAbstractDescendantTwo that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2963,7 +2963,7 @@ namespace dummy
             }  // private static void MixedAbstractDescendantTwoToSequence
 
             public override void VisitMixedAbstractDescendantTwo(
-                Aas.IMixedAbstractDescendantTwo that,
+                Our.IMixedAbstractDescendantTwo that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2976,7 +2976,7 @@ namespace dummy
             }
 
             private static void MixedConcreteWithDescendantsToSequence(
-                Aas.IMixedConcreteWithDescendants that,
+                Our.IMixedConcreteWithDescendants that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2988,7 +2988,7 @@ namespace dummy
             }  // private static void MixedConcreteWithDescendantsToSequence
 
             public override void VisitMixedConcreteWithDescendants(
-                Aas.IMixedConcreteWithDescendants that,
+                Our.IMixedConcreteWithDescendants that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3001,7 +3001,7 @@ namespace dummy
             }
 
             private static void MixedConcreteWithDescendantsChildToSequence(
-                Aas.IMixedConcreteWithDescendantsChild that,
+                Our.IMixedConcreteWithDescendantsChild that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -3020,7 +3020,7 @@ namespace dummy
             }  // private static void MixedConcreteWithDescendantsChildToSequence
 
             public override void VisitMixedConcreteWithDescendantsChild(
-                Aas.IMixedConcreteWithDescendantsChild that,
+                Our.IMixedConcreteWithDescendantsChild that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3033,7 +3033,7 @@ namespace dummy
             }
 
             private static void MixedConcreteLeafToSequence(
-                Aas.IMixedConcreteLeaf that,
+                Our.IMixedConcreteLeaf that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -3045,7 +3045,7 @@ namespace dummy
             }  // private static void MixedConcreteLeafToSequence
 
             public override void VisitMixedConcreteLeaf(
-                Aas.IMixedConcreteLeaf that,
+                Our.IMixedConcreteLeaf that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3058,7 +3058,7 @@ namespace dummy
             }
 
             private static void ModelTypedFirstToSequence(
-                Aas.IModelTypedFirst that,
+                Our.IModelTypedFirst that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -3066,7 +3066,7 @@ namespace dummy
             }  // private static void ModelTypedFirstToSequence
 
             public override void VisitModelTypedFirst(
-                Aas.IModelTypedFirst that,
+                Our.IModelTypedFirst that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3079,7 +3079,7 @@ namespace dummy
             }
 
             private static void ModelTypedSecondToSequence(
-                Aas.IModelTypedSecond that,
+                Our.IModelTypedSecond that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -3087,7 +3087,7 @@ namespace dummy
             }  // private static void ModelTypedSecondToSequence
 
             public override void VisitModelTypedSecond(
-                Aas.IModelTypedSecond that,
+                Our.IModelTypedSecond that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3100,7 +3100,7 @@ namespace dummy
             }
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -3190,7 +3190,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -3209,7 +3209,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of StructuralFirst:
         /// <code>
-        /// var anInstance = new Aas.StructuralFirst(
+        /// var anInstance = new Our.StructuralFirst(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -3228,7 +3228,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

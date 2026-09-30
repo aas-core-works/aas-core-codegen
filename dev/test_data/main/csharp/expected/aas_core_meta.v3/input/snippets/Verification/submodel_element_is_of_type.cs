@@ -1,62 +1,62 @@
 public static bool SubmodelElementIsOfType(
-    Aas.ISubmodelElement element,
-    Aas.AasSubmodelElements expectedType
+    Our.ISubmodelElement element,
+    Our.AasSubmodelElements expectedType
 )
 {
     switch (expectedType)
     {
-        case Aas.AasSubmodelElements.AnnotatedRelationshipElement:
-            return element is Aas.IAnnotatedRelationshipElement;
+        case Our.AasSubmodelElements.AnnotatedRelationshipElement:
+            return element is Our.IAnnotatedRelationshipElement;
 
-        case Aas.AasSubmodelElements.BasicEventElement:
-            return element is Aas.IBasicEventElement;
+        case Our.AasSubmodelElements.BasicEventElement:
+            return element is Our.IBasicEventElement;
 
-        case Aas.AasSubmodelElements.Blob:
-            return element is Aas.IBlob;
+        case Our.AasSubmodelElements.Blob:
+            return element is Our.IBlob;
 
-        case Aas.AasSubmodelElements.Capability:
-            return element is Aas.ICapability;
+        case Our.AasSubmodelElements.Capability:
+            return element is Our.ICapability;
 
-        case Aas.AasSubmodelElements.DataElement:
-            return element is Aas.IDataElement;
+        case Our.AasSubmodelElements.DataElement:
+            return element is Our.IDataElement;
 
-        case Aas.AasSubmodelElements.Entity:
-            return element is Aas.IEntity;
+        case Our.AasSubmodelElements.Entity:
+            return element is Our.IEntity;
 
-        case Aas.AasSubmodelElements.EventElement:
-            return element is Aas.IEventElement;
+        case Our.AasSubmodelElements.EventElement:
+            return element is Our.IEventElement;
 
-        case Aas.AasSubmodelElements.File:
-            return element is Aas.IFile;
+        case Our.AasSubmodelElements.File:
+            return element is Our.IFile;
 
-        case Aas.AasSubmodelElements.MultiLanguageProperty:
-            return element is Aas.IMultiLanguageProperty;
+        case Our.AasSubmodelElements.MultiLanguageProperty:
+            return element is Our.IMultiLanguageProperty;
 
-        case Aas.AasSubmodelElements.Operation:
-            return element is Aas.IOperation;
+        case Our.AasSubmodelElements.Operation:
+            return element is Our.IOperation;
 
-        case Aas.AasSubmodelElements.Property:
-            return element is Aas.IProperty;
+        case Our.AasSubmodelElements.Property:
+            return element is Our.IProperty;
 
-        case Aas.AasSubmodelElements.Range:
-            return element is Aas.IRange;
+        case Our.AasSubmodelElements.Range:
+            return element is Our.IRange;
 
-        case Aas.AasSubmodelElements.ReferenceElement:
-            return element is Aas.IReferenceElement;
+        case Our.AasSubmodelElements.ReferenceElement:
+            return element is Our.IReferenceElement;
 
-        case Aas.AasSubmodelElements.RelationshipElement:
-            return element is Aas.IRelationshipElement;
+        case Our.AasSubmodelElements.RelationshipElement:
+            return element is Our.IRelationshipElement;
 
-        case Aas.AasSubmodelElements.SubmodelElement:
+        case Our.AasSubmodelElements.SubmodelElement:
             // ReSharper disable once IsExpressionAlwaysTrue
             // ReSharper disable once ConvertTypeCheckToNullCheck
-            return element is Aas.ISubmodelElement;
+            return element is Our.ISubmodelElement;
 
-        case Aas.AasSubmodelElements.SubmodelElementList:
-            return element is Aas.ISubmodelElementList;
+        case Our.AasSubmodelElements.SubmodelElementList:
+            return element is Our.ISubmodelElementList;
 
-        case Aas.AasSubmodelElements.SubmodelElementCollection:
-            return element is Aas.ISubmodelElementCollection;
+        case Our.AasSubmodelElements.SubmodelElementCollection:
+            return element is Our.ISubmodelElementCollection;
 
         default:
             throw new System.ArgumentException(

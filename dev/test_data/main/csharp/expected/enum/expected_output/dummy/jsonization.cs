@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -245,7 +245,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Result ResultFrom(
+            internal static Our.Result ResultFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -255,7 +255,7 @@ namespace dummy
                     return default!;
                 }
 
-                Aas.Result? result = Stringification.ResultFromString(text);
+                Our.Result? result = Stringification.ResultFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -271,7 +271,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -317,7 +317,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theSomeResult
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -383,7 +383,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.Something anInstance = Deserialize.SomethingFrom(
+        /// Our.Something anInstance = Deserialize.SomethingFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -397,10 +397,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Result.
             /// </exception>
-            public static Aas.Result ResultFrom(
+            public static Our.Result ResultFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Result result = DeserializeImplementation.ResultFrom(
+                Our.Result result = DeserializeImplementation.ResultFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -420,10 +420,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -460,7 +460,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -559,7 +559,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -576,7 +576,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of Something:
         /// <code>
-        /// var anInstance = new Aas.Something(
+        /// var anInstance = new Our.Something(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -593,7 +593,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {
@@ -615,7 +615,7 @@ namespace dummy
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue ResultToJsonValue(Aas.Result that)
+            public static Nodes.JsonValue ResultToJsonValue(Our.Result that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)

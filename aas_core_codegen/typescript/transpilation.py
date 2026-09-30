@@ -223,7 +223,7 @@ class Transpiler(
         environment: intermediate_type_inference.Environment,
         downcast_map: Mapping[parse_tree.Node, intermediate_type_inference.Downcast],
         reassigned_definitions: AbstractSet[parse_tree.Assignment] = frozenset(),
-        types_module: Optional[Identifier] = Identifier("AasTypes"),
+        types_module: Optional[Identifier] = Identifier("OurTypes"),
     ) -> None:
         """
         Initialize with the given values.
@@ -393,7 +393,7 @@ class Transpiler(
             #
             # We represent tuples as native TypeScript tuple types (arrays under
             # the hood), so we index them directly instead of going through
-            # ``AasCommon.at`` -- that helper collapses the item type to a single
+            # ``OurCommon.at`` -- that helper collapses the item type to a single
             # generic ``T``, which would lose the precise positional item type
             # that a native tuple index access retains.
             assert isinstance(node.index, parse_tree.Constant) and isinstance(
@@ -462,20 +462,20 @@ class Transpiler(
         ):
             # NOTE (mristin):
             # A JSON-able object is a plain object, indexed by its keys, while
-            # ``AasCommon.at`` indexes an array by a position, and resolves
+            # ``OurCommon.at`` indexes an array by a position, and resolves
             # a negative index from its back.
             return Stripped(f"{collection}[{index}]"), None
 
         # NOTE (mristin):
         # Poor man's re-flow
-        result = Stripped(f"AasCommon.at({collection}, {index})")
+        result = Stripped(f"OurCommon.at({collection}, {index})")
         if len(collection) + len(index) < 20:
             return result, None
 
         return (
             Stripped(
                 f"""\
-AasCommon.at(
+OurCommon.at(
 {I}{collection},
 {I}{index}
 )"""
@@ -565,7 +565,7 @@ AasCommon.at(
         if end is not None:
             args.append(end)
 
-        return Stripped(f"AasCommon.sliceStr({', '.join(args)})"), None
+        return Stripped(f"OurCommon.sliceStr({', '.join(args)})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
@@ -835,7 +835,7 @@ AasCommon.at(
                 # start from the end, unlike Python. See ``findStr`` in
                 # the generated common module.
                 return (
-                    Stripped(f"AasCommon.findStr({instance}, {', '.join(args)})"),
+                    Stripped(f"OurCommon.findStr({instance}, {', '.join(args)})"),
                     None,
                 )
 
@@ -846,7 +846,7 @@ AasCommon.at(
                 # common module, which strips the characters (code points) instead
                 # of the UTF-16 code units.
                 return (
-                    Stripped(f"AasCommon.lstrip({instance}, {args[0]})"),
+                    Stripped(f"OurCommon.lstrip({instance}, {args[0]})"),
                     None,
                 )
 
@@ -874,7 +874,7 @@ AasCommon.at(
                     assert_never(kind)
 
                 return (
-                    Stripped(f"AasCommon.{function_name}({instance}, {args[0]})"),
+                    Stripped(f"OurCommon.{function_name}({instance}, {args[0]})"),
                     None,
                 )
 
@@ -938,7 +938,7 @@ AasCommon.at(
             # We do not use the native ``length`` as it counts the UTF-16 code units
             # instead of the characters, unlike Python. See ``lenStr`` in
             # the generated common module.
-            return Stripped(f"AasCommon.lenStr({collection})"), None
+            return Stripped(f"OurCommon.lenStr({collection})"), None
 
         elif primitive_type is intermediate_type_inference.PrimitiveType.BYTEARRAY:
             return Stripped(f"{collection}.length"), None
@@ -1129,7 +1129,7 @@ AasCommon.at(
                 # much more than the other targets, *e.g.*, the white space, ``1e3``
                 # or ``0x10``, and silently lose the precision beyond the safe
                 # integers. See ``parseSafeInt`` in the generated common module.
-                return Stripped(f"AasCommon.parseSafeInt({arg})"), None
+                return Stripped(f"OurCommon.parseSafeInt({arg})"), None
 
             else:
                 assert_never(func_type.func.kind)
@@ -1426,12 +1426,12 @@ AasCommon.at(
         # :py:data:`aas_core_codegen.typescript.lib._generate_common.FLOOR_MOD`.
         joined_args = f"{left}, {right}"
         if "\n" not in joined_args and len(joined_args) <= 50:
-            return Stripped(f"AasCommon.floorMod({joined_args})"), None
+            return Stripped(f"OurCommon.floorMod({joined_args})"), None
 
         return (
             Stripped(
                 f"""\
-AasCommon.floorMod(
+OurCommon.floorMod(
 {I}{indent_but_first_line(left, I)},
 {I}{indent_but_first_line(right, I)}
 )"""
@@ -1586,9 +1586,9 @@ AasCommon.floorMod(
 
         qualifier_function: str
         if isinstance(node, parse_tree.Any):
-            qualifier_function = "AasCommon.some"
+            qualifier_function = "OurCommon.some"
         elif isinstance(node, parse_tree.All):
-            qualifier_function = "AasCommon.every"
+            qualifier_function = "OurCommon.every"
         else:
             assert_never(node)
 
@@ -1618,7 +1618,7 @@ AasCommon.floorMod(
 
             source = Stripped(
                 f"""\
-AasCommon.range(
+OurCommon.range(
 {I}{indent_but_first_line(start, I)},
 {I}{indent_but_first_line(end, I)}
 )"""
@@ -1631,7 +1631,7 @@ AasCommon.range(
             Stripped(
                 f"""\
 {qualifier_function}(
-{I}AasCommon.map(
+{I}OurCommon.map(
 {II}{indent_but_first_line(source, II)},
 {II}{variable} =>
 {III}{indent_but_first_line(condition, III)}
@@ -1680,7 +1680,7 @@ AasCommon.range(
         if isinstance(node.target, parse_tree.Index):
             # NOTE (mristin):
             # The type inference allows only the items of a list as index targets.
-            # We can not assign to ``AasCommon.at``, while the plain assignment
+            # We can not assign to ``OurCommon.at``, while the plain assignment
             # would not resolve the negative indices, and would silently grow
             # the array on an out-of-bound index.
             collection, error = self.transform(node.target.collection)
@@ -1704,14 +1704,14 @@ AasCommon.range(
             # Poor man's re-flow
             if "\n" not in value and len(collection) + len(index) + len(value) < 50:
                 return (
-                    Stripped(f"AasCommon.setAt({collection}, {index}, {value});"),
+                    Stripped(f"OurCommon.setAt({collection}, {index}, {value});"),
                     None,
                 )
 
             return (
                 Stripped(
                     f"""\
-AasCommon.setAt(
+OurCommon.setAt(
 {I}{indent_but_first_line(collection, I)},
 {I}{indent_but_first_line(index, I)},
 {I}{indent_but_first_line(value, I)}

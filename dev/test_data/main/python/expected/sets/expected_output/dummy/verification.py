@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Something
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Something(
+    an_instance = our_types.Something(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -48,19 +48,19 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def texts_are_unique(
@@ -93,11 +93,11 @@ def numbers_are_unique_between_zeros(
 
 
 def kinds_are_unique(
-    kinds: List[aas_types.Kind]
+    kinds: List[our_types.Kind]
 ) -> bool:
     """Check a local set of enumeration literals."""
     # pylint: disable=all
-    seen: Set[aas_types.Kind] = set()
+    seen: Set[our_types.Kind] = set()
     for kind in kinds:
         if kind in seen:
             return False
@@ -186,8 +186,8 @@ def is_in_optional_texts(
 
 
 def is_in_kinds(
-    kind: aas_types.Kind,
-    kinds: AbstractSet[aas_types.Kind]
+    kind: our_types.Kind,
+    kinds: AbstractSet[our_types.Kind]
 ) -> bool:
     """
     Check whether :paramref:`kind` is in :paramref:`kinds`, a read-only set.
@@ -232,11 +232,11 @@ def text_is_not_reserved(
     # pylint: disable=all
     return (
         (
-            (not is_in_texts(text, aas_constants.RESERVED_TEXTS))
+            (not is_in_texts(text, our_constants.RESERVED_TEXTS))
             and (
                 not is_in_optional_texts(
                     text,
-                    aas_constants.RESERVED_TEXTS
+                    our_constants.RESERVED_TEXTS
                 )
             )
         ))
@@ -285,13 +285,13 @@ def at_most_one_text_is_reserved(
     # pylint: disable=all
     seen: Set[str] = set()
     add_texts(texts, seen)
-    reserved = set(aas_constants.RESERVED_TEXTS & seen)
+    reserved = set(our_constants.RESERVED_TEXTS & seen)
     return len(reserved) <= 1
 
 
 def some_kind_is_not_special(
-    kinds: List[aas_types.Kind],
-    optional_kind: Optional[aas_types.Kind]
+    kinds: List[our_types.Kind],
+    optional_kind: Optional[our_types.Kind]
 ) -> bool:
     """
     Check the difference of a local set and a constant set.
@@ -300,7 +300,7 @@ def some_kind_is_not_special(
     a narrowed optional to a set.
     """
     # pylint: disable=all
-    seen: Set[aas_types.Kind] = set()
+    seen: Set[our_types.Kind] = set()
     for kind in kinds:
         seen.add(kind)
     if optional_kind is not None:
@@ -308,22 +308,22 @@ def some_kind_is_not_special(
     return (
         (
             len(seen) == 0
-            or len(seen - aas_constants.SPECIAL_KINDS) > 0
+            or len(seen - our_constants.SPECIAL_KINDS) > 0
         ))
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not (
-            that.optional_texts_are_unique_ignoring(aas_constants.RESERVED_TEXTS)
+            that.optional_texts_are_unique_ignoring(our_constants.RESERVED_TEXTS)
         ):
             yield Error(
                 'Optional texts must be unique, apart from the reserved ones.'
@@ -337,20 +337,20 @@ class _Transformer(
             )
 
         if not (
-            not is_in_kinds(that.kind, aas_constants.SPECIAL_KINDS)
+            not is_in_kinds(that.kind, our_constants.SPECIAL_KINDS)
         ):
             yield Error(
                 'Kind must not be special.'
             )
 
         if not (
-            not (len(that.numbers) in aas_constants.LUCKY_NUMBERS)
+            not (len(that.numbers) in our_constants.LUCKY_NUMBERS)
         ):
             yield Error(
                 'Number of numbers must not be lucky.'
             )
 
-        if not (not (that.number in aas_constants.LUCKY_NUMBERS)):
+        if not (not (that.number in our_constants.LUCKY_NUMBERS)):
             yield Error(
                 'Number must not be lucky.'
             )
@@ -387,7 +387,7 @@ class _Transformer(
 
         if not (
             not (that.optional_kind is not None)
-            or (not (that.optional_kind in aas_constants.SPECIAL_KINDS))
+            or (not (that.optional_kind in our_constants.SPECIAL_KINDS))
         ):
             yield Error(
                 'Optional kind must not be special.'
@@ -443,10 +443,10 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_collection(
             self,
-            that: aas_types.Collection
+            that: our_types.Collection
     ) -> Iterator[Error]:
         if not (
-            that.texts_are_not_all_in(aas_constants.RESERVED_TEXTS)
+            that.texts_are_not_all_in(our_constants.RESERVED_TEXTS)
         ):
             yield Error(
                 'Texts must contain a text which is not reserved, if any.'
@@ -461,8 +461,8 @@ class _Transformer(
             )
 
         if not (
-            not (aas_types.Direction.NORTH in that.directions)
-            or (aas_types.Direction.SOUTH in that.directions)
+            not (our_types.Direction.NORTH in that.directions)
+            or (our_types.Direction.SOUTH in that.directions)
         ):
             yield Error(
                 'Directions must contain south if they contain north.'
@@ -510,7 +510,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

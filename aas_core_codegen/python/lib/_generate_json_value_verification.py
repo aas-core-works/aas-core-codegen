@@ -62,8 +62,8 @@ import collections.abc
 import math
 from typing import Iterator
 
-import {qualified_module_name}.common as aas_common
-import {qualified_module_name}.types as aas_types
+import {qualified_module_name}.common as our_common
+import {qualified_module_name}.types as our_types
 from {qualified_module_name}.reporting import (
 {I}Error,
 {I}IndexSegment,
@@ -73,7 +73,7 @@ from {qualified_module_name}.reporting import (
         Stripped(
             f'''\
 def verify_json_value(
-{I}value: aas_types.JsonValue
+{I}value: our_types.JsonValue
 ) -> Iterator[Error]:
 {I}"""
 {I}Verify that :paramref:`value` is a JSON-able value, at any depth.
@@ -101,7 +101,7 @@ def verify_json_value(
 {II}# on the way out. Only an ``int`` which that conversion can not carry
 {II}# exactly is an error here -- see
 {II}# :py:func:`.common.try_to_convert_int_to_float`.
-{II}if aas_common.try_to_convert_int_to_float(value) is None:
+{II}if our_common.try_to_convert_int_to_float(value) is None:
 {III}yield Error(
 {IIII}f"Expected a JSON-able value, but got the integer {{value}}, "
 {IIII}f"which is not exactly representable as a JSON number"
@@ -144,7 +144,7 @@ def verify_json_value(
 
 {II}return
 
-{I}array_like = aas_common.try_to_cast_to_array_like(value)
+{I}array_like = our_common.try_to_cast_to_array_like(value)
 {I}if array_like is not None:
 {II}for i, item_value in enumerate(array_like):
 {III}for error in verify_json_value(item_value):
@@ -161,7 +161,7 @@ def verify_json_value(
         Stripped(
             f'''\
 def verify_json_array(
-{I}value: aas_types.JsonArray
+{I}value: our_types.JsonArray
 ) -> Iterator[Error]:
 {I}"""
 {I}Verify that :paramref:`value` is a JSON-able array.
@@ -169,7 +169,7 @@ def verify_json_array(
 {I}:param value: to be verified
 {I}:yield: errors, if any
 {I}"""
-{I}if aas_common.try_to_cast_to_array_like(value) is None:
+{I}if our_common.try_to_cast_to_array_like(value) is None:
 {II}yield Error(
 {III}f"Expected a JSON-able array, but got: {{type(value)}}"
 {II})
@@ -180,7 +180,7 @@ def verify_json_array(
         Stripped(
             f'''\
 def verify_json_object(
-{I}value: aas_types.JsonObject
+{I}value: our_types.JsonObject
 ) -> Iterator[Error]:
 {I}"""
 {I}Verify that :paramref:`value` is a JSON-able object.

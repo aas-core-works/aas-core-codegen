@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;
@@ -19,10 +19,10 @@ namespace dummy.Tests
             object value,
             string expectedPath)
         {
-            Nodes.JsonNode got = Aas.Tests.CommonJson.ToJson(
+            Nodes.JsonNode got = Our.Tests.CommonJson.ToJson(
                 value);
 
-            if (Aas.Tests.Common.RecordMode)
+            if (Our.Tests.Common.RecordMode)
             {
                 string? parent = Path.GetDirectoryName(expectedPath);
                 if (parent != null)
@@ -43,14 +43,14 @@ namespace dummy.Tests
                     throw new System.IO.FileNotFoundException(
                         $"The file with the recorded value does not exist: {expectedPath}; " +
                         "maybe you want to set the environment " +
-                        $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                        $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                 }
 
-                Nodes.JsonNode expected = Aas.Tests.CommonJson.ReadFromFile(
+                Nodes.JsonNode expected = Our.Tests.CommonJson.ReadFromFile(
                     expectedPath);
 
-                Aas.Tests.CommonJson.CheckJsonNodesEqual(
-                    expected, got, out Aas.Reporting.Error? error);
+                Our.Tests.CommonJson.CheckJsonNodesEqual(
+                    expected, got, out Our.Reporting.Error? error);
 
                 if (error != null)
                 {
@@ -67,10 +67,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Box_ColorOrDefault_non_default()
         {
-            Aas.Box instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBox());
+            Our.Box instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBox());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.ColorOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -78,7 +78,7 @@ namespace dummy.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Box",
                     "ColorOrDefault.non-default.json"));
@@ -87,10 +87,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Box_ColorOrDefault_default()
         {
-            Aas.Box instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalBox());
+            Our.Box instance = (
+                Our.Tests.CommonJsonization.LoadMinimalBox());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.ColorOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -98,7 +98,7 @@ namespace dummy.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Box",
                     "ColorOrDefault.default.json"));

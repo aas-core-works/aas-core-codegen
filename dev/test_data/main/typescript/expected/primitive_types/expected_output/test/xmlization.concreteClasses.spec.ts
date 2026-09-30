@@ -8,9 +8,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasXmlization from "../src/xmlization";
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
+import * as OurXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
 
 import * as TestCommon from "./common";
 
@@ -31,11 +31,11 @@ test("Something XML round-trip OK", () => {
   for (const pth of pths) {
     const text = fs.readFileSync(pth, "utf-8");
 
-    const instanceOrError = AasXmlization.fromXmlString(text);
+    const instanceOrError = OurXmlization.fromXmlString(text);
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    const casted = AasTypes.asSomething(instance);
+    const casted = OurTypes.asSomething(instance);
     if (casted === null) {
       throw new Error(
         `Expected instance of Something in ${pth}, ` +
@@ -43,9 +43,9 @@ test("Something XML round-trip OK", () => {
       );
     }
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-    const roundTripText = AasXmlization.toXmlString(casted);
+    const roundTripText = OurXmlization.toXmlString(casted);
     expect(roundTripText.length).toBeGreaterThan(0);
   }
 });
@@ -80,7 +80,7 @@ test("Something XML deserialization fail", () => {
 
     for (const pth of pths) {
       const text = fs.readFileSync(pth, "utf-8");
-      const instanceOrError = AasXmlization.fromXmlString(text);
+      const instanceOrError = OurXmlization.fromXmlString(text);
       expect(instanceOrError.error).not.toBeNull();
     }
   }
@@ -90,7 +90,7 @@ test("Something XML deserialization fail", () => {
  * Read the first recorded example of Something with the content
  * of the element `xmlName` replaced by `text`.
  */
-function readWith(xmlName: string, text: string): AasTypes.Something {
+function readWith(xmlName: string, text: string): OurTypes.Something {
   const pths = Array.from(
     TestCommon.findFilesBySuffixRecursively(
       path.join(
@@ -113,10 +113,10 @@ function readWith(xmlName: string, text: string): AasTypes.Something {
 
   const patched = original.slice(0, start) + text + original.slice(end);
 
-  const instanceOrError = AasXmlization.fromXmlString(patched);
+  const instanceOrError = OurXmlization.fromXmlString(patched);
   expect(instanceOrError.error).toBeNull();
 
-  const casted = AasTypes.asSomething(instanceOrError.mustValue());
+  const casted = OurTypes.asSomething(instanceOrError.mustValue());
   if (casted === null) {
     throw new Error(`Expected an instance of Something`);
   }

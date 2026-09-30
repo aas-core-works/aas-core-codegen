@@ -38,10 +38,10 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasCommon from "../src/common";
-import * as AasTypes from "../src/types";
-import * as AasXmlCommon from "../src/xmlcommon";
-import * as AasXmlRpc from "../src/xmlrpc";"""
+import * as OurCommon from "../src/common";
+import * as OurTypes from "../src/types";
+import * as OurXmlCommon from "../src/xmlcommon";
+import * as OurXmlRpc from "../src/xmlrpc";"""
         ),
         Stripped(f"""const NAMESPACE = {namespace_literal};"""),
         Stripped(
@@ -55,17 +55,17 @@ import * as AasXmlRpc from "../src/xmlrpc";"""
  * element whose content it is to read, exactly as the de/serialization of
  * the model hands it over.
  */
-function enter(text: string): AasXmlCommon.XmlCursor {{
-{I}const tokensOrError = AasXmlCommon.tokenizeXml(text);
+function enter(text: string): OurXmlCommon.XmlCursor {{
+{I}const tokensOrError = OurXmlCommon.tokenizeXml(text);
 {I}if (tokensOrError.error !== null) {{
 {II}throw new Error(
 {III}`Expected a well-formed XML, but got: ${{tokensOrError.error.message}}`
 {II});
 {I}}}
 
-{I}const cursor = new AasXmlCommon.XmlCursor(tokensOrError.mustValue());
+{I}const cursor = new OurXmlCommon.XmlCursor(tokensOrError.mustValue());
 
-{I}const rootOrError = AasXmlCommon.readRequiredRootOpenTag(cursor);
+{I}const rootOrError = OurXmlCommon.readRequiredRootOpenTag(cursor);
 {I}if (rootOrError.error !== null) {{
 {II}throw new Error(
 {III}`Expected a root element, but got: ${{rootOrError.error.message}}`
@@ -79,8 +79,8 @@ function enter(text: string): AasXmlCommon.XmlCursor {{
  * Assert that `parsed` failed and give out its error.
  */
 function mustError(
-{I}parsed: AasCommon.Either<unknown, AasXmlCommon.DeserializationError>
-): AasXmlCommon.DeserializationError {{
+{I}parsed: OurCommon.Either<unknown, OurXmlCommon.DeserializationError>
+): OurXmlCommon.DeserializationError {{
 {I}const error = parsed.error;
 {I}if (error === null) {{
 {II}throw new Error("Expected an error, but the parsing succeeded");
@@ -102,7 +102,7 @@ test("a value round-trips through every discriminator", () => {{
 {III}"</struct></v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseValueContent(cursor);
+{I}const parsed = OurXmlRpc.parseValueContent(cursor);
 
 {I}expect(parsed.error).toBeNull();
 {I}expect(parsed.mustValue()).toStrictEqual({{
@@ -120,7 +120,7 @@ test("the discriminator is a step of the path", () => {{
 {II}`<v xmlns="${{NAMESPACE}}"><boolean xmlns="">yes</boolean></v>`
 {I});
 
-{I}const parsed = AasXmlRpc.parseValueContent(cursor);
+{I}const parsed = OurXmlRpc.parseValueContent(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual("boolean");
@@ -134,7 +134,7 @@ test("an element which is no discriminator gets no step", () => {{
 {I}// the path as well as in the message would say nothing more.
 {I}const cursor = enter(`<v xmlns="${{NAMESPACE}}"><oops xmlns=""/></v>`);
 
-{I}const parsed = AasXmlRpc.parseValueContent(cursor);
+{I}const parsed = OurXmlRpc.parseValueContent(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual("");
@@ -153,7 +153,7 @@ test("the path into a nested value", () => {{
 {III}"</struct></v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseValueContent(cursor);
+{I}const parsed = OurXmlRpc.parseValueContent(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual(
@@ -173,7 +173,7 @@ test("the array body is entered without its wrapper", () => {{
 {III}"</data></v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseArrayBody(cursor);
+{I}const parsed = OurXmlRpc.parseArrayBody(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual("data/*[0]/boolean");
@@ -191,7 +191,7 @@ test("the struct body is entered without its wrapper", () => {{
 {III}"</v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseStructBody(cursor);
+{I}const parsed = OurXmlRpc.parseStructBody(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual(
@@ -209,7 +209,7 @@ test("the key of a member is escaped in the path", () => {{
 {III}"</v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseStructBody(cursor);
+{I}const parsed = OurXmlRpc.parseStructBody(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual(
@@ -227,7 +227,7 @@ test("a repeated member is refused", () => {{
 {III}"</v>"
 {I});
 
-{I}const parsed = AasXmlRpc.parseStructBody(cursor);
+{I}const parsed = OurXmlRpc.parseStructBody(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual('member[name="k"]');
@@ -244,7 +244,7 @@ test("neither an infinity nor a not-a-number is read", () => {{
 {III}`<v xmlns="${{NAMESPACE}}"><double xmlns="">${{text}}</double></v>`
 {II});
 
-{II}const parsed = AasXmlRpc.parseValueContent(cursor);
+{II}const parsed = OurXmlRpc.parseValueContent(cursor);
 
 {II}expect(parsed.error).not.toBeNull();
 {II}expect(mustError(parsed).path.toString()).toStrictEqual("double");
@@ -254,7 +254,7 @@ test("neither an infinity nor a not-a-number is read", () => {{
         Stripped(
             f"""\
 test("a value is written with its discriminator", () => {{
-{I}const cases: Array<[AasTypes.JsonValue, string]> = [
+{I}const cases: Array<[OurTypes.JsonValue, string]> = [
 {II}[true, '<boolean xmlns="">1</boolean>'],
 {II}[false, '<boolean xmlns="">0</boolean>'],
 {II}[1, '<double xmlns="">1</double>'],
@@ -273,7 +273,7 @@ test("a value is written with its discriminator", () => {{
 
 {I}for (const [value, expected] of cases) {{
 {II}const parts = new Array<string>();
-{II}AasXmlRpc.writeValueContent(parts, value);
+{II}OurXmlRpc.writeValueContent(parts, value);
 {II}expect(parts.join("")).toStrictEqual(expected);
 {I}}}
 }});"""
@@ -284,18 +284,18 @@ test("the path of a failed write points into the value", () => {{
 {I}const parts = new Array<string>();
 
 {I}expect(() =>
-{II}AasXmlRpc.writeStructBody(parts, {{
+{II}OurXmlRpc.writeStructBody(parts, {{
 {III}"a b": [0, Number.POSITIVE_INFINITY]
 {II}}})
-{I}).toThrow(AasXmlCommon.SerializationError);
+{I}).toThrow(OurXmlCommon.SerializationError);
 
 {I}try {{
-{II}AasXmlRpc.writeStructBody(new Array<string>(), {{
+{II}OurXmlRpc.writeStructBody(new Array<string>(), {{
 {III}"a b": [0, Number.POSITIVE_INFINITY]
 {II}}});
 {I}}} catch (error) {{
-{II}expect(error).toBeInstanceOf(AasXmlCommon.SerializationError);
-{II}expect((error as AasXmlCommon.SerializationError).path).toStrictEqual(
+{II}expect(error).toBeInstanceOf(OurXmlCommon.SerializationError);
+{II}expect((error as OurXmlCommon.SerializationError).path).toStrictEqual(
 {III}'["a b"][1]'
 {II});
 {I}}}

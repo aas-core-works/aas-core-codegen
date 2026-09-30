@@ -37,10 +37,10 @@ private static void CompareOrRerecordValue(
 {I}object value,
 {I}string expectedPath)
 {{
-{I}Nodes.JsonNode got = Aas.Tests.CommonJson.ToJson(
+{I}Nodes.JsonNode got = Our.Tests.CommonJson.ToJson(
 {II}value);
 
-{I}if (Aas.Tests.Common.RecordMode)
+{I}if (Our.Tests.Common.RecordMode)
 {I}{{
 {II}string? parent = Path.GetDirectoryName(expectedPath);
 {II}if (parent != null)
@@ -61,14 +61,14 @@ private static void CompareOrRerecordValue(
 {III}throw new System.IO.FileNotFoundException(
 {IIII}$"The file with the recorded value does not exist: {{expectedPath}}; " +
 {IIII}"maybe you want to set the environment " +
-{IIII}$"variable {{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?");
+{IIII}$"variable {{Our.Tests.Common.RecordModeEnvironmentVariableName}}?");
 {II}}}
 
-{II}Nodes.JsonNode expected = Aas.Tests.CommonJson.ReadFromFile(
+{II}Nodes.JsonNode expected = Our.Tests.CommonJson.ReadFromFile(
 {III}expectedPath);
 
-{II}Aas.Tests.CommonJson.CheckJsonNodesEqual(
-{III}expected, got, out Aas.Reporting.Error? error);
+{II}Our.Tests.CommonJson.CheckJsonNodesEqual(
+{III}expected, got, out Our.Reporting.Error? error);
 
 {II}if (error != null)
 {II}{{
@@ -117,7 +117,7 @@ private static void CompareOrRerecordValue(
             else:
                 value_assignment_snippet = Stripped(
                     f"""\
-string value = Aas.Stringification.ToString(
+string value = Our.Stringification.ToString(
 {I}instance.{method_name_csharp}())
 {II}?? throw new System.InvalidOperationException(
 {III}"Failed to stringify the enum");"""
@@ -130,15 +130,15 @@ string value = Aas.Stringification.ToString(
 [Test]
 public void Test_{cls_name_csharp}_{method_name_csharp}_non_default()
 {{
-{I}Aas.{cls_name_csharp} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
+{I}Our.{cls_name_csharp} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
 
 {I}{indent_but_first_line(value_assignment_snippet, I)}
 
 {I}CompareOrRerecordValue(
 {II}value,
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"XOrDefault",
 {III}{csharp_common.string_literal(cls_name_json)},
 {III}"{method_name_csharp}.non-default.json"));
@@ -147,15 +147,15 @@ public void Test_{cls_name_csharp}_{method_name_csharp}_non_default()
 [Test]
 public void Test_{cls_name_csharp}_{method_name_csharp}_default()
 {{
-{I}Aas.{cls_name_csharp} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMinimal{cls_name_csharp}());
+{I}Our.{cls_name_csharp} instance = (
+{II}Our.Tests.CommonJsonization.LoadMinimal{cls_name_csharp}());
 
 {I}{indent_but_first_line(value_assignment_snippet, I)}
 
 {I}CompareOrRerecordValue(
 {II}value,
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"XOrDefault",
 {III}{csharp_common.string_literal(cls_name_json)},
 {III}"{method_name_csharp}.default.json"));
@@ -168,7 +168,7 @@ public void Test_{cls_name_csharp}_{method_name_csharp}_default()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;

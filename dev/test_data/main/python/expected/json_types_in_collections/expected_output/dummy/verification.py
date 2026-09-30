@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Something
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Something(
+    an_instance = our_types.Something(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,34 +47,34 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
-import dummy.jsonvalueverification as aas_json_value_verification
+import dummy.jsonvalueverification as our_json_value_verification
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         for i, an_item in enumerate(that.values):
-            for error in aas_json_value_verification.verify_json_value(
+            for error in our_json_value_verification.verify_json_value(
                     an_item
             ):
                 error.path._prepend(
@@ -91,7 +91,7 @@ class _Transformer(
                 )
                 yield error
 
-        for error in aas_json_value_verification.verify_json_value(
+        for error in our_json_value_verification.verify_json_value(
                 that.tuple_with_json[1]
         ):
             error.path._prepend(
@@ -107,7 +107,7 @@ class _Transformer(
                 )
             )
             yield error
-        for error in aas_json_value_verification.verify_json_array(
+        for error in our_json_value_verification.verify_json_array(
                 that.tuple_with_json[2]
         ):
             error.path._prepend(
@@ -123,7 +123,7 @@ class _Transformer(
                 )
             )
             yield error
-        for error in aas_json_value_verification.verify_json_object(
+        for error in our_json_value_verification.verify_json_object(
                 that.tuple_with_json[3]
         ):
             error.path._prepend(
@@ -145,7 +145,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

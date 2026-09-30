@@ -36,39 +36,39 @@ def generate(
         blocks.append(
             Stripped(
                 f"""\
-public static Aas.{cls_name_csharp} LoadMaximal{cls_name_csharp}()
+public static Our.{cls_name_csharp} LoadMaximal{cls_name_csharp}()
 {{
 {I}string path = Path.Combine(
-{II}Aas.Tests.Common.TestDataDir,
+{II}Our.Tests.Common.TestDataDir,
 {II}"Json",
 {II}"Expected",
 {II}{csharp_common.string_literal(cls_name_json)},
 {II}"maximal.json");
 
-{I}var node = Aas.Tests.CommonJson.ReadFromFile(path);
+{I}var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-{I}var instance = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{I}var instance = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {II}node);
 
 {I}return instance;
-}}  // public static Aas.{cls_name_csharp} LoadMaximal{cls_name_csharp}
+}}  // public static Our.{cls_name_csharp} LoadMaximal{cls_name_csharp}
 
-public static Aas.{cls_name_csharp} LoadMinimal{cls_name_csharp}()
+public static Our.{cls_name_csharp} LoadMinimal{cls_name_csharp}()
 {{
 {I}string path = Path.Combine(
-{II}Aas.Tests.Common.TestDataDir,
+{II}Our.Tests.Common.TestDataDir,
 {II}"Json",
 {II}"Expected",
 {II}{csharp_common.string_literal(cls_name_json)},
 {II}"minimal.json");
 
-{I}var node = Aas.Tests.CommonJson.ReadFromFile(path);
+{I}var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-{I}var instance = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{I}var instance = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {II}node);
 
 {I}return instance;
-}}  // public static Aas.{cls_name_csharp} LoadMinimal{cls_name_csharp}"""
+}}  // public static Our.{cls_name_csharp} LoadMinimal{cls_name_csharp}"""
             )
         )
 
@@ -77,7 +77,7 @@ public static Aas.{cls_name_csharp} LoadMinimal{cls_name_csharp}()
         f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Path = System.IO.Path;
 

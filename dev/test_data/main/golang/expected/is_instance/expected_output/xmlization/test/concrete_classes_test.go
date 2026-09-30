@@ -12,15 +12,15 @@ import (
 	"strings"
 	"testing"
 	"encoding/xml"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
-	aasxmlization "github.com/dummy-works/dummy/xmlization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
+	ourxmlization "github.com/dummy-works/dummy/xmlization"
 )
 
 func TestLeafRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"leaf",
@@ -39,13 +39,13 @@ func TestLeafRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.ILeaf); !ok {
+		if _, ok := deserialized.(ourtypes.ILeaf); !ok {
 			t.Fatalf(
 				"Expected an instance of ILeaf, "+
 					"but got %T: %v",
@@ -58,7 +58,7 @@ func TestLeafRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -80,7 +80,7 @@ func TestLeafRoundTripOK(t *testing.T) {
 
 func TestLeafDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -99,25 +99,25 @@ func TestLeafDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -132,7 +132,7 @@ func TestLeafDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -144,9 +144,9 @@ func TestLeafDeserializationFail(t *testing.T) {
 }
 
 func TestOrderedContainerRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"orderedContainer",
@@ -165,13 +165,13 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IOrderedContainer); !ok {
+		if _, ok := deserialized.(ourtypes.IOrderedContainer); !ok {
 			t.Fatalf(
 				"Expected an instance of IOrderedContainer, "+
 					"but got %T: %v",
@@ -184,7 +184,7 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -206,7 +206,7 @@ func TestOrderedContainerRoundTripOK(t *testing.T) {
 
 func TestOrderedContainerDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -225,25 +225,25 @@ func TestOrderedContainerDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -258,7 +258,7 @@ func TestOrderedContainerDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -270,9 +270,9 @@ func TestOrderedContainerDeserializationFail(t *testing.T) {
 }
 
 func TestUnorderedContainerRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"unorderedContainer",
@@ -291,13 +291,13 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IUnorderedContainer); !ok {
+		if _, ok := deserialized.(ourtypes.IUnorderedContainer); !ok {
 			t.Fatalf(
 				"Expected an instance of IUnorderedContainer, "+
 					"but got %T: %v",
@@ -310,7 +310,7 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -332,7 +332,7 @@ func TestUnorderedContainerRoundTripOK(t *testing.T) {
 
 func TestUnorderedContainerDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -351,25 +351,25 @@ func TestUnorderedContainerDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -384,7 +384,7 @@ func TestUnorderedContainerDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -396,9 +396,9 @@ func TestUnorderedContainerDeserializationFail(t *testing.T) {
 }
 
 func TestGlobalAttributeRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"globalAttribute",
@@ -417,13 +417,13 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IGlobalAttribute); !ok {
+		if _, ok := deserialized.(ourtypes.IGlobalAttribute); !ok {
 			t.Fatalf(
 				"Expected an instance of IGlobalAttribute, "+
 					"but got %T: %v",
@@ -436,7 +436,7 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -458,7 +458,7 @@ func TestGlobalAttributeRoundTripOK(t *testing.T) {
 
 func TestGlobalAttributeDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -477,25 +477,25 @@ func TestGlobalAttributeDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -510,7 +510,7 @@ func TestGlobalAttributeDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -522,9 +522,9 @@ func TestGlobalAttributeDeserializationFail(t *testing.T) {
 }
 
 func TestLocalAttributeRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"localAttribute",
@@ -543,13 +543,13 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.ILocalAttribute); !ok {
+		if _, ok := deserialized.(ourtypes.ILocalAttribute); !ok {
 			t.Fatalf(
 				"Expected an instance of ILocalAttribute, "+
 					"but got %T: %v",
@@ -562,7 +562,7 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -584,7 +584,7 @@ func TestLocalAttributeRoundTripOK(t *testing.T) {
 
 func TestLocalAttributeDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -603,25 +603,25 @@ func TestLocalAttributeDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -636,7 +636,7 @@ func TestLocalAttributeDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -648,9 +648,9 @@ func TestLocalAttributeDeserializationFail(t *testing.T) {
 }
 
 func TestAttributeOperandRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"attributeOperand",
@@ -669,13 +669,13 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IAttributeOperand); !ok {
+		if _, ok := deserialized.(ourtypes.IAttributeOperand); !ok {
 			t.Fatalf(
 				"Expected an instance of IAttributeOperand, "+
 					"but got %T: %v",
@@ -688,7 +688,7 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -710,7 +710,7 @@ func TestAttributeOperandRoundTripOK(t *testing.T) {
 
 func TestAttributeOperandDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -729,25 +729,25 @@ func TestAttributeOperandDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -762,7 +762,7 @@ func TestAttributeOperandDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -774,9 +774,9 @@ func TestAttributeOperandDeserializationFail(t *testing.T) {
 }
 
 func TestStringLiteralRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"stringLiteral",
@@ -795,13 +795,13 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IStringLiteral); !ok {
+		if _, ok := deserialized.(ourtypes.IStringLiteral); !ok {
 			t.Fatalf(
 				"Expected an instance of IStringLiteral, "+
 					"but got %T: %v",
@@ -814,7 +814,7 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -836,7 +836,7 @@ func TestStringLiteralRoundTripOK(t *testing.T) {
 
 func TestStringLiteralDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -855,25 +855,25 @@ func TestStringLiteralDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -888,7 +888,7 @@ func TestStringLiteralDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -900,9 +900,9 @@ func TestStringLiteralDeserializationFail(t *testing.T) {
 }
 
 func TestNumberLiteralRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"numberLiteral",
@@ -921,13 +921,13 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.INumberLiteral); !ok {
+		if _, ok := deserialized.(ourtypes.INumberLiteral); !ok {
 			t.Fatalf(
 				"Expected an instance of INumberLiteral, "+
 					"but got %T: %v",
@@ -940,7 +940,7 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -962,7 +962,7 @@ func TestNumberLiteralRoundTripOK(t *testing.T) {
 
 func TestNumberLiteralDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -981,25 +981,25 @@ func TestNumberLiteralDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -1014,7 +1014,7 @@ func TestNumberLiteralDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -1026,9 +1026,9 @@ func TestNumberLiteralDeserializationFail(t *testing.T) {
 }
 
 func TestSomethingRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"something",
@@ -1047,13 +1047,13 @@ func TestSomethingRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.ISomething); !ok {
+		if _, ok := deserialized.(ourtypes.ISomething); !ok {
 			t.Fatalf(
 				"Expected an instance of ISomething, "+
 					"but got %T: %v",
@@ -1066,7 +1066,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -1088,7 +1088,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 
 func TestSomethingDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -1107,25 +1107,25 @@ func TestSomethingDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -1140,7 +1140,7 @@ func TestSomethingDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)
@@ -1153,7 +1153,7 @@ func TestSomethingDeserializationFail(t *testing.T) {
 
 func TestDuplicatePropertyFails(t *testing.T) {
 	pth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Expected",
 		"leaf",
@@ -1198,7 +1198,7 @@ func TestDuplicatePropertyFails(t *testing.T) {
 
 	decoder := xml.NewDecoder(strings.NewReader(brokenText))
 
-	_, deseriaErr := aasxmlization.Unmarshal(decoder)
+	_, deseriaErr := ourxmlization.Unmarshal(decoder)
 	if deseriaErr == nil {
 		t.Fatalf(
 			"Expected a de-serialization error when the property %s is given twice, "+

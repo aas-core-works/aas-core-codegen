@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,73 +14,73 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.First LoadMaximalFirst()
+        public static Our.First LoadMaximalFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "First",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.FirstFrom(
+            var instance = Our.Jsonization.Deserialize.FirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.First LoadMaximalFirst
+        }  // public static Our.First LoadMaximalFirst
 
-        public static Aas.First LoadMinimalFirst()
+        public static Our.First LoadMinimalFirst()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "First",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.FirstFrom(
+            var instance = Our.Jsonization.Deserialize.FirstFrom(
                 node);
 
             return instance;
-        }  // public static Aas.First LoadMinimalFirst
+        }  // public static Our.First LoadMinimalFirst
 
-        public static Aas.Second LoadMaximalSecond()
+        public static Our.Second LoadMaximalSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Second",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SecondFrom(
+            var instance = Our.Jsonization.Deserialize.SecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Second LoadMaximalSecond
+        }  // public static Our.Second LoadMaximalSecond
 
-        public static Aas.Second LoadMinimalSecond()
+        public static Our.Second LoadMinimalSecond()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Second",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SecondFrom(
+            var instance = Our.Jsonization.Deserialize.SecondFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Second LoadMinimalSecond
+        }  // public static Our.Second LoadMinimalSecond
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

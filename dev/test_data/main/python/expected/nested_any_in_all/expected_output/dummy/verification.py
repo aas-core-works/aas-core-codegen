@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.LangStrin
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.LangString(
+    an_instance = our_types.LangString(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,19 +47,19 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def is_english(
@@ -71,7 +71,7 @@ def is_english(
 
 
 def lang_string_sets_have_english(
-    lang_string_sets: List[aas_types.LangStringSet]
+    lang_string_sets: List[our_types.LangStringSet]
 ) -> bool:
     """
     Check that every set in :paramref:`lang_string_sets` has at least one
@@ -91,7 +91,7 @@ def lang_string_sets_have_english(
 
 
 def iec_contents_have_definition_in_english(
-    specifications: List[aas_types.Specification]
+    specifications: List[our_types.Specification]
 ) -> bool:
     """
     Check that the :py:attr:`.types.IecContent.definition` is defined at least in English
@@ -103,7 +103,7 @@ def iec_contents_have_definition_in_english(
     # pylint: disable=all
     return (
         all(
-            not isinstance(specification.content, aas_types.IecContent)
+            not isinstance(specification.content, our_types.IecContent)
             or (
                 (
                     (specification.content.definition is not None)
@@ -120,14 +120,14 @@ def iec_contents_have_definition_in_english(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_lang_string(
             self,
-            that: aas_types.LangString
+            that: our_types.LangString
     ) -> Iterator[Error]:
         # No verification has been defined for LangString.
         return
@@ -139,7 +139,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_set(
             self,
-            that: aas_types.LangStringSet
+            that: our_types.LangStringSet
     ) -> Iterator[Error]:
         for i, an_item in enumerate(that.lang_strings):
             for error in self.transform(an_item):
@@ -160,7 +160,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_iec_content(
             self,
-            that: aas_types.IecContent
+            that: our_types.IecContent
     ) -> Iterator[Error]:
         if that.definition is not None:
             for i, an_item in enumerate(that.definition):
@@ -182,7 +182,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_other_content(
             self,
-            that: aas_types.OtherContent
+            that: our_types.OtherContent
     ) -> Iterator[Error]:
         # No verification has been defined for OtherContent.
         return
@@ -194,7 +194,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_specification(
             self,
-            that: aas_types.Specification
+            that: our_types.Specification
     ) -> Iterator[Error]:
         for error in self.transform(that.content):
             error.path._prepend(
@@ -208,7 +208,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not (
             not (that.specifications is not None)
@@ -280,7 +280,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

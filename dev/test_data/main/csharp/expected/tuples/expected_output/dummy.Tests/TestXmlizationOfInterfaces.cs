@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -16,7 +16,7 @@ namespace dummy.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalAnotherItem();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalAnotherItem();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -31,7 +31,7 @@ namespace dummy.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -45,7 +45,7 @@ namespace dummy.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IAbstractItemFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IAbstractItemFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -60,7 +60,7 @@ namespace dummy.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }
@@ -74,7 +74,7 @@ namespace dummy.Tests
         {
             // We load from JSON here just to jump-start the round trip.
             // The round-trip goes then over XML.
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSomeItem();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSomeItem();
 
             // The round-trip starts here.
             var outputBuilder = new System.Text.StringBuilder();
@@ -89,7 +89,7 @@ namespace dummy.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     xmlWriter);
             }
@@ -103,7 +103,7 @@ namespace dummy.Tests
                 outputReader,
                 new System.Xml.XmlReaderSettings());
 
-            var anotherInstance = Aas.Xmlization.Deserialize.IAbstractItemFrom(
+            var anotherInstance = Our.Xmlization.Deserialize.IAbstractItemFrom(
                 xmlReader);
 
             // Serialize back to XML
@@ -118,7 +118,7 @@ namespace dummy.Tests
                         OmitXmlDeclaration = true
                     });
 
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     anotherInstance,
                     anotherXmlWriter);
             }

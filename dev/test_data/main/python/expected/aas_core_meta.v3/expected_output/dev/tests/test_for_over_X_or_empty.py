@@ -12,7 +12,7 @@ import pathlib
 import unittest
 
 
-import aas_core3.types as aas_types
+import aas_core3.types as our_types
 
 
 import tests.common
@@ -34,7 +34,7 @@ class TestExtension(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Extension
+                our_types.Extension
             )
 
             log = [
@@ -69,7 +69,7 @@ class TestExtension(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Extension
+                our_types.Extension
             )
 
             log = [
@@ -106,7 +106,7 @@ class TestAdministrativeInformation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AdministrativeInformation
+                our_types.AdministrativeInformation
             )
 
             log = [
@@ -143,7 +143,7 @@ class TestQualifier(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Qualifier
+                our_types.Qualifier
             )
 
             log = [
@@ -180,7 +180,7 @@ class TestAssetAdministrationShell(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetAdministrationShell
+                our_types.AssetAdministrationShell
             )
 
             log = [
@@ -215,7 +215,7 @@ class TestAssetAdministrationShell(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetAdministrationShell
+                our_types.AssetAdministrationShell
             )
 
             log = [
@@ -250,7 +250,7 @@ class TestAssetAdministrationShell(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetAdministrationShell
+                our_types.AssetAdministrationShell
             )
 
             log = [
@@ -285,7 +285,7 @@ class TestAssetAdministrationShell(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetAdministrationShell
+                our_types.AssetAdministrationShell
             )
 
             log = [
@@ -320,7 +320,7 @@ class TestAssetAdministrationShell(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetAdministrationShell
+                our_types.AssetAdministrationShell
             )
 
             log = [
@@ -357,7 +357,7 @@ class TestAssetInformation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AssetInformation
+                our_types.AssetInformation
             )
 
             log = [
@@ -394,7 +394,7 @@ class TestSpecificAssetID(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SpecificAssetID
+                our_types.SpecificAssetID
             )
 
             log = [
@@ -431,7 +431,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -466,7 +466,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -501,7 +501,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -536,7 +536,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -571,7 +571,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -606,7 +606,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -641,7 +641,7 @@ class TestSubmodel(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Submodel
+                our_types.Submodel
             )
 
             log = [
@@ -678,7 +678,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -713,7 +713,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -748,7 +748,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -783,7 +783,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -818,7 +818,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -853,7 +853,7 @@ class TestRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.RelationshipElement
+                our_types.RelationshipElement
             )
 
             log = [
@@ -890,7 +890,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -925,7 +925,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -960,7 +960,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -995,7 +995,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -1030,7 +1030,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -1065,7 +1065,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -1100,7 +1100,7 @@ class TestSubmodelElementList(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementList
+                our_types.SubmodelElementList
             )
 
             log = [
@@ -1137,7 +1137,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1172,7 +1172,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1207,7 +1207,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1242,7 +1242,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1277,7 +1277,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1312,7 +1312,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1347,7 +1347,7 @@ class TestSubmodelElementCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.SubmodelElementCollection
+                our_types.SubmodelElementCollection
             )
 
             log = [
@@ -1384,7 +1384,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1419,7 +1419,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1454,7 +1454,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1489,7 +1489,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1524,7 +1524,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1559,7 +1559,7 @@ class TestProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Property
+                our_types.Property
             )
 
             log = [
@@ -1596,7 +1596,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1631,7 +1631,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1666,7 +1666,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1701,7 +1701,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1736,7 +1736,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1771,7 +1771,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1806,7 +1806,7 @@ class TestMultiLanguageProperty(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.MultiLanguageProperty
+                our_types.MultiLanguageProperty
             )
 
             log = [
@@ -1843,7 +1843,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -1878,7 +1878,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -1913,7 +1913,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -1948,7 +1948,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -1983,7 +1983,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -2018,7 +2018,7 @@ class TestRange(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Range
+                our_types.Range
             )
 
             log = [
@@ -2055,7 +2055,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2090,7 +2090,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2125,7 +2125,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2160,7 +2160,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2195,7 +2195,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2230,7 +2230,7 @@ class TestReferenceElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ReferenceElement
+                our_types.ReferenceElement
             )
 
             log = [
@@ -2267,7 +2267,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2302,7 +2302,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2337,7 +2337,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2372,7 +2372,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2407,7 +2407,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2442,7 +2442,7 @@ class TestBlob(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Blob
+                our_types.Blob
             )
 
             log = [
@@ -2479,7 +2479,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2514,7 +2514,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2549,7 +2549,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2584,7 +2584,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2619,7 +2619,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2654,7 +2654,7 @@ class TestFile(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.File
+                our_types.File
             )
 
             log = [
@@ -2691,7 +2691,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2726,7 +2726,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2761,7 +2761,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2796,7 +2796,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2831,7 +2831,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2866,7 +2866,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2901,7 +2901,7 @@ class TestAnnotatedRelationshipElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.AnnotatedRelationshipElement
+                our_types.AnnotatedRelationshipElement
             )
 
             log = [
@@ -2938,7 +2938,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -2973,7 +2973,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3008,7 +3008,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3043,7 +3043,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3078,7 +3078,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3113,7 +3113,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3148,7 +3148,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3183,7 +3183,7 @@ class TestEntity(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Entity
+                our_types.Entity
             )
 
             log = [
@@ -3220,7 +3220,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3255,7 +3255,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3290,7 +3290,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3325,7 +3325,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3360,7 +3360,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3395,7 +3395,7 @@ class TestBasicEventElement(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.BasicEventElement
+                our_types.BasicEventElement
             )
 
             log = [
@@ -3432,7 +3432,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3467,7 +3467,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3502,7 +3502,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3537,7 +3537,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3572,7 +3572,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3607,7 +3607,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3642,7 +3642,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3677,7 +3677,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3712,7 +3712,7 @@ class TestOperation(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Operation
+                our_types.Operation
             )
 
             log = [
@@ -3749,7 +3749,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3784,7 +3784,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3819,7 +3819,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3854,7 +3854,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3889,7 +3889,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3924,7 +3924,7 @@ class TestCapability(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Capability
+                our_types.Capability
             )
 
             log = [
@@ -3961,7 +3961,7 @@ class TestConceptDescription(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ConceptDescription
+                our_types.ConceptDescription
             )
 
             log = [
@@ -3996,7 +3996,7 @@ class TestConceptDescription(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ConceptDescription
+                our_types.ConceptDescription
             )
 
             log = [
@@ -4031,7 +4031,7 @@ class TestConceptDescription(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ConceptDescription
+                our_types.ConceptDescription
             )
 
             log = [
@@ -4066,7 +4066,7 @@ class TestConceptDescription(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ConceptDescription
+                our_types.ConceptDescription
             )
 
             log = [
@@ -4101,7 +4101,7 @@ class TestConceptDescription(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.ConceptDescription
+                our_types.ConceptDescription
             )
 
             log = [
@@ -4138,7 +4138,7 @@ class TestEnvironment(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Environment
+                our_types.Environment
             )
 
             log = [
@@ -4173,7 +4173,7 @@ class TestEnvironment(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Environment
+                our_types.Environment
             )
 
             log = [
@@ -4208,7 +4208,7 @@ class TestEnvironment(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Environment
+                our_types.Environment
             )
 
             log = [
@@ -4245,7 +4245,7 @@ class TestDataSpecificationIEC61360(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.DataSpecificationIEC61360
+                our_types.DataSpecificationIEC61360
             )
 
             log = [
@@ -4280,7 +4280,7 @@ class TestDataSpecificationIEC61360(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.DataSpecificationIEC61360
+                our_types.DataSpecificationIEC61360
             )
 
             log = [

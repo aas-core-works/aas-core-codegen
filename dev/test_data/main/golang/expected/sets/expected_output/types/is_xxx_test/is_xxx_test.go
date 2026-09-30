@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCollection(instance) {
+	if ourtypes.IsCollection(instance) {
 		t.Errorf(
 			"Expected IsCollection to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -30,9 +30,9 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfCollection(t *testing.T) {
-	instance := aastesting.MustLoadMinimalCollection()
+	instance := ourtesting.MustLoadMinimalCollection()
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ICollection with runtime type %T and with model type %v",
@@ -40,7 +40,7 @@ func TestIsXxxOnAnInstanceOfCollection(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsCollection(instance) {
+	if !ourtypes.IsCollection(instance) {
 		t.Errorf(
 			"Expected IsCollection to be true on an instance " +
 			"of ICollection with runtime type %T and with model type %v",

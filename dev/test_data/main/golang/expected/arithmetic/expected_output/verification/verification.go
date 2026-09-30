@@ -13,22 +13,22 @@ package verification
 import (
 	"fmt"
 	"math"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -43,7 +43,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check that the remainder of the division by 7 is smaller than 3.
@@ -53,7 +53,7 @@ func (ve *VerificationError) PathString() string {
 func HasSmallRemainder(
 	number int64,
 ) bool {
-	remainder := aascommon.FloorMod(number, 7)
+	remainder := ourcommon.FloorMod(number, 7)
 	return remainder < 3
 }
 
@@ -63,7 +63,7 @@ func IsWithinDistance(
 	center int64,
 	distance int64,
 ) bool {
-	return aascommon.AbsInt64(number - center) <= distance
+	return ourcommon.AbsInt64(number - center) <= distance
 }
 
 // Check that the number is negative, negating it twice.
@@ -81,7 +81,7 @@ func IsLengthAligned(
 	text string,
 	alignment int64,
 ) bool {
-	return aascommon.FloorMod(int64(aascommon.LenStr(text)), alignment) == 0
+	return ourcommon.FloorMod(int64(ourcommon.LenStr(text)), alignment) == 0
 }
 
 // Check that the number gives the remainder 1 when divided by the length plus one.
@@ -91,22 +91,22 @@ func HasRemainderOneByLength(
 	number int64,
 	text string,
 ) bool {
-	return aascommon.FloorMod(number, int64(aascommon.LenStr(text) + 1)) == 1
+	return ourcommon.FloorMod(number, int64(ourcommon.LenStr(text) + 1)) == 1
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.FloorMod(that.Offset(), 7) == 3) {
+	if !(ourcommon.FloorMod(that.Offset(), 7) == 3) {
 		abort = onError(
 			newVerificationError(
 				"Offset must give the remainder 3 when divided by 7",),
@@ -126,7 +126,7 @@ func VerifySomething(
 		}
 	}
 
-	if !(aascommon.FloorMod(that.ByNegative(), -3) == -1) {
+	if !(ourcommon.FloorMod(that.ByNegative(), -3) == -1) {
 		abort = onError(
 			newVerificationError(
 				"By negative must give the remainder -1 when divided by -3",),
@@ -136,7 +136,7 @@ func VerifySomething(
 		}
 	}
 
-	if !(aascommon.LenStr(that.Text()) % 2 == 0) {
+	if !(ourcommon.LenStr(that.Text()) % 2 == 0) {
 		abort = onError(
 			newVerificationError(
 				"Text must have an even length",),
@@ -214,8 +214,8 @@ func VerifySomething(
 
 	if !(
 		!(that.OptionalNumber() != nil) ||
-		(aascommon.FloorMod(*that.OptionalNumber(), 5) == 4 &&
-		aascommon.AbsInt64(*that.OptionalNumber()) < 100)) {
+		(ourcommon.FloorMod(*that.OptionalNumber(), 5) == 4 &&
+		ourcommon.AbsInt64(*that.OptionalNumber()) < 100)) {
 		abort = onError(
 			newVerificationError(
 				"Optional number must give the remainder 4 when divided by " +
@@ -246,7 +246,7 @@ func VerifySomething(
 		that.Even(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Even",
 				},
 			)
@@ -272,7 +272,7 @@ func VerifyEvenInt(
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.FloorMod(that, 2) == 0) {
+	if !(ourcommon.FloorMod(that, 2) == 0) {
 		abort = onError(
 			newVerificationError(
 				"Even",),
@@ -292,14 +292,14 @@ func VerifyEvenInt(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

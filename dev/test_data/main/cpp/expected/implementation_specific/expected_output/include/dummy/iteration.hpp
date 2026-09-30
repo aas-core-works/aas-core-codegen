@@ -163,7 +163,7 @@ class IIterator {
 /// \endcond
 
 /**
- * \brief Iterate over an AAS instance.
+ * \brief Iterate over a model instance.
  *
  * Unlike STL, this is <em>not</em> a light-weight iterator. We implement
  * a "yielding" iterator by composing iterators over the properties so that we

@@ -372,68 +372,68 @@ func IsXsUnsignedByte(value string) bool {
 // Check that `value` is consistent with the given `valueType`.
 func ValueConsistentWithXSDType(
 	value string,
-	valueType aastypes.DataTypeDefXSD,
+	valueType ourtypes.DataTypeDefXSD,
 ) bool {
 	switch valueType {
-		case aastypes.DataTypeDefXSDAnyURI:
+		case ourtypes.DataTypeDefXSDAnyURI:
 			return MatchesXsAnyURI(value)
-		case aastypes.DataTypeDefXSDBase64Binary:
+		case ourtypes.DataTypeDefXSDBase64Binary:
 			return MatchesXsBase64Binary(value)
-		case aastypes.DataTypeDefXSDBoolean:
+		case ourtypes.DataTypeDefXSDBoolean:
 			return MatchesXsBoolean(value)
-		case aastypes.DataTypeDefXSDByte:
+		case ourtypes.DataTypeDefXSDByte:
 			return IsXsByte(value)
-		case aastypes.DataTypeDefXSDDate:
+		case ourtypes.DataTypeDefXSDDate:
 			return IsXsDate(value)
-		case aastypes.DataTypeDefXSDDateTime:
+		case ourtypes.DataTypeDefXSDDateTime:
 			return IsXsDateTime(value)
-		case aastypes.DataTypeDefXSDDecimal:
+		case ourtypes.DataTypeDefXSDDecimal:
 			return MatchesXsDecimal(value)
-		case aastypes.DataTypeDefXSDDouble:
+		case ourtypes.DataTypeDefXSDDouble:
 			return IsXsDouble(value)
-		case aastypes.DataTypeDefXSDDuration:
+		case ourtypes.DataTypeDefXSDDuration:
 			return MatchesXsDuration(value)
-		case aastypes.DataTypeDefXSDFloat:
+		case ourtypes.DataTypeDefXSDFloat:
 		 	return IsXsFloat(value)
-		case aastypes.DataTypeDefXSDGDay:
+		case ourtypes.DataTypeDefXSDGDay:
 			return MatchesXsGDay(value)
-		case aastypes.DataTypeDefXSDGMonth:
+		case ourtypes.DataTypeDefXSDGMonth:
 			return MatchesXsGMonth(value)
-		case aastypes.DataTypeDefXSDGMonthDay:
+		case ourtypes.DataTypeDefXSDGMonthDay:
 			return IsXsGMonthDay(value)
-		case aastypes.DataTypeDefXSDGYear:
+		case ourtypes.DataTypeDefXSDGYear:
 			return MatchesXsGYear(value)
-		case aastypes.DataTypeDefXSDGYearMonth:
+		case ourtypes.DataTypeDefXSDGYearMonth:
 			return MatchesXsGYearMonth(value)
-		case aastypes.DataTypeDefXSDHexBinary:
+		case ourtypes.DataTypeDefXSDHexBinary:
 			return MatchesXsHexBinary(value)
-		case aastypes.DataTypeDefXSDInt:
+		case ourtypes.DataTypeDefXSDInt:
 			return IsXsInt(value)
-		case aastypes.DataTypeDefXSDInteger:
+		case ourtypes.DataTypeDefXSDInteger:
 			return MatchesXsInteger(value)
-		case aastypes.DataTypeDefXSDLong:
+		case ourtypes.DataTypeDefXSDLong:
 			return IsXsLong(value)
-		case aastypes.DataTypeDefXSDNegativeInteger:
+		case ourtypes.DataTypeDefXSDNegativeInteger:
 			return MatchesXsNegativeInteger(value)
-		case aastypes.DataTypeDefXSDNonNegativeInteger:
+		case ourtypes.DataTypeDefXSDNonNegativeInteger:
 			return MatchesXsNonNegativeInteger(value)
-		case aastypes.DataTypeDefXSDNonPositiveInteger:
+		case ourtypes.DataTypeDefXSDNonPositiveInteger:
 			return MatchesXsNonPositiveInteger(value)
-		case aastypes.DataTypeDefXSDPositiveInteger:
+		case ourtypes.DataTypeDefXSDPositiveInteger:
 			return MatchesXsPositiveInteger(value)
-		case aastypes.DataTypeDefXSDShort:
+		case ourtypes.DataTypeDefXSDShort:
 			return IsXsShort(value)
-		case aastypes.DataTypeDefXSDString:
+		case ourtypes.DataTypeDefXSDString:
 			return MatchesXsString(value)
-		case aastypes.DataTypeDefXSDTime:
+		case ourtypes.DataTypeDefXSDTime:
 			return MatchesXsTime(value)
-		case aastypes.DataTypeDefXSDUnsignedByte:
+		case ourtypes.DataTypeDefXSDUnsignedByte:
 			return IsXsUnsignedByte(value)
-		case aastypes.DataTypeDefXSDUnsignedInt:
+		case ourtypes.DataTypeDefXSDUnsignedInt:
 			return IsXsUnsignedInt(value)
-		case aastypes.DataTypeDefXSDUnsignedLong:
+		case ourtypes.DataTypeDefXSDUnsignedLong:
 			return IsXsUnsignedLong(value)
-		case aastypes.DataTypeDefXSDUnsignedShort:
+		case ourtypes.DataTypeDefXSDUnsignedShort:
 			return IsXsUnsignedShort(value)
 		default:
 			panic(fmt.Sprintf("Unhandled value type: %v", valueType))

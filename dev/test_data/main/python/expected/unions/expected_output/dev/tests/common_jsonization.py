@@ -21,9 +21,9 @@ else:
     from typing_extensions import Final
 
 
-import dummy.common as aas_common
-import dummy.jsonization as aas_jsonization
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.jsonization as our_jsonization
+import dummy.types as our_types
 
 
 class Difference:
@@ -34,20 +34,20 @@ class Difference:
 
     #: Path in the expected JSON-able value which is different from
     #: the obtained JSON-able value
-    path: Final[aas_jsonization.Path]
+    path: Final[our_jsonization.Path]
 
     def __init__(self, message: str) -> None:
         """Initialize with the given message and empty path."""
         self.message = message
-        self.path = aas_jsonization.Path()
+        self.path = our_jsonization.Path()
 
     def __str__(self) -> str:
         return f"#{self.path}: {self.message}"
 
 
 def check_equal(
-    expected: aas_jsonization.Jsonable,
-    got: aas_jsonization.Jsonable,
+    expected: our_jsonization.Jsonable,
+    got: our_jsonization.Jsonable,
 ) -> Iterator[Difference]:
     """
     Compare recursively two JSON-able values for equality.
@@ -74,7 +74,7 @@ def check_equal(
 
             for i, (expected_item, got_item) in enumerate(zip(expected, got)):
                 for difference in check_equal(expected_item, got_item):
-                    difference.path._prepend(aas_jsonization.IndexSegment(expected, i))
+                    difference.path._prepend(our_jsonization.IndexSegment(expected, i))
                     yield difference
 
     elif isinstance(expected, collections.abc.Mapping):
@@ -109,71 +109,71 @@ def check_equal(
 
                 for difference in check_equal(expected_value, got_value):
                     difference.path._prepend(
-                        aas_jsonization.PropertySegment(expected, key)
+                        our_jsonization.PropertySegment(expected, key)
                     )
                     yield difference
     else:
-        aas_common.assert_never(expected)
+        our_common.assert_never(expected)
 
 
 _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
     str,
-    Callable[[aas_jsonization.Jsonable], aas_types.Class]
+    Callable[[our_jsonization.Jsonable], our_types.Class]
 ] = {
     'MixedAbstractDescendantOne':
-        aas_jsonization.mixed_abstract_descendant_one_from_jsonable,
+        our_jsonization.mixed_abstract_descendant_one_from_jsonable,
     'MixedAbstractDescendantTwo':
-        aas_jsonization.mixed_abstract_descendant_two_from_jsonable,
+        our_jsonization.mixed_abstract_descendant_two_from_jsonable,
     'MixedConcreteLeaf':
-        aas_jsonization.mixed_concrete_leaf_from_jsonable,
+        our_jsonization.mixed_concrete_leaf_from_jsonable,
     'MixedConcreteWithDescendants':
-        aas_jsonization.mixed_concrete_with_descendants_from_jsonable,
+        our_jsonization.mixed_concrete_with_descendants_from_jsonable,
     'MixedConcreteWithDescendantsChild':
-        aas_jsonization.mixed_concrete_with_descendants_child_from_jsonable,
+        our_jsonization.mixed_concrete_with_descendants_child_from_jsonable,
     'ModelTypedFirst':
-        aas_jsonization.model_typed_first_from_jsonable,
+        our_jsonization.model_typed_first_from_jsonable,
     'ModelTypedSecond':
-        aas_jsonization.model_typed_second_from_jsonable,
+        our_jsonization.model_typed_second_from_jsonable,
     'Something':
-        aas_jsonization.something_from_jsonable,
+        our_jsonization.something_from_jsonable,
     'StructuralFirst':
-        aas_jsonization.structural_first_from_jsonable,
+        our_jsonization.structural_first_from_jsonable,
     'StructuralSecond':
-        aas_jsonization.structural_second_from_jsonable
+        our_jsonization.structural_second_from_jsonable
 }
 
 
 _MODEL_TYPE_TO_CLASS: Mapping[
     str,
-    Type[aas_types.Class]
+    Type[our_types.Class]
 ] = {
     'MixedAbstractDescendantOne':
-        aas_types.MixedAbstractDescendantOne,
+        our_types.MixedAbstractDescendantOne,
     'MixedAbstractDescendantTwo':
-        aas_types.MixedAbstractDescendantTwo,
+        our_types.MixedAbstractDescendantTwo,
     'MixedConcreteLeaf':
-        aas_types.MixedConcreteLeaf,
+        our_types.MixedConcreteLeaf,
     'MixedConcreteWithDescendants':
-        aas_types.MixedConcreteWithDescendants,
+        our_types.MixedConcreteWithDescendants,
     'MixedConcreteWithDescendantsChild':
-        aas_types.MixedConcreteWithDescendantsChild,
+        our_types.MixedConcreteWithDescendantsChild,
     'ModelTypedFirst':
-        aas_types.ModelTypedFirst,
+        our_types.ModelTypedFirst,
     'ModelTypedSecond':
-        aas_types.ModelTypedSecond,
+        our_types.ModelTypedSecond,
     'Something':
-        aas_types.Something,
+        our_types.Something,
     'StructuralFirst':
-        aas_types.StructuralFirst,
+        our_types.StructuralFirst,
     'StructuralSecond':
-        aas_types.StructuralSecond
+        our_types.StructuralSecond
 }
 
 
 def must_load(
     path: pathlib.Path,
     model_type: str
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Load an instance from ``path``.
 

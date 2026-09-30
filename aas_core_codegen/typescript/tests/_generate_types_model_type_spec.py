@@ -36,8 +36,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasTypes from "../src/types";
-import * as AasStringification from "../src/stringification";
+import * as OurTypes from "../src/types";
+import * as OurStringification from "../src/stringification";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
     ]  # type: List[Stripped]
@@ -66,7 +66,7 @@ test("model type of {cls_name_typescript}", () => {{
 {I}const instance = TestCommonJsonization.{load_minimal_name}();
 
 {I}expect(instance.modelType()).toStrictEqual(
-{II}AasTypes.{model_type_enum}.{model_type_literal}
+{II}OurTypes.{model_type_enum}.{model_type_literal}
 {I});
 }});"""
             )
@@ -81,12 +81,12 @@ test("model type of {cls_name_typescript}", () => {{
                 f"""\
 test("model type from string of {cls_name_typescript}", () => {{
 {I}const text = {string_literal};
-{I}const literal = AasStringification.{from_string}(
+{I}const literal = OurStringification.{from_string}(
 {II}text
 {I});
 
 {I}expect(literal).toStrictEqual(
-{II}AasTypes.{model_type_enum}.{model_type_literal}
+{II}OurTypes.{model_type_enum}.{model_type_literal}
 {I});
 }});"""
             )
@@ -96,8 +96,8 @@ test("model type from string of {cls_name_typescript}", () => {{
             Stripped(
                 f"""\
 test("model type to string of {cls_name_typescript}", () => {{
-{I}const text = AasStringification.{must_to_string}(
-{II}AasTypes.{model_type_enum}.{model_type_literal}
+{I}const text = OurStringification.{must_to_string}(
+{II}OurTypes.{model_type_enum}.{model_type_literal}
 {I});
 
 {I}expect(text).toStrictEqual(
@@ -112,7 +112,7 @@ test("model type to string of {cls_name_typescript}", () => {{
             f"""\
 test("model type from invalid string", () => {{
 {I}const text = "This is definitely not a valid model type.";
-{I}const literal = AasStringification.{from_string}(
+{I}const literal = OurStringification.{from_string}(
 {II}text
 {I});
 
@@ -128,8 +128,8 @@ test("model type from invalid string", () => {{
             f"""\
 test("invalid model type to string", () => {{
 {I}// The number 9007199254740991 is the maximum safe integer.
-{I}const literal = <AasTypes.{model_type_enum}>9007199254740991;
-{I}const text = AasStringification.{to_string}(
+{I}const literal = <OurTypes.{model_type_enum}>9007199254740991;
+{I}const text = OurStringification.{to_string}(
 {II}literal
 {I});
 

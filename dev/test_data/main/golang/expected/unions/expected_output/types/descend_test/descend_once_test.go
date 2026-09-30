@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnceOnAnInstanceOfStructuralFirst(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalStructuralFirst()
+	instance := ourtesting.MustLoadMaximalStructuralFirst()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"StructuralFirst",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnceOnAnInstanceOfStructuralFirst(
 func TestDescendOnceOnAnInstanceOfStructuralSecond(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalStructuralSecond()
+	instance := ourtesting.MustLoadMaximalStructuralSecond()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"StructuralSecond",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnceOnAnInstanceOfStructuralSecond(
 func TestDescendOnceOnAnInstanceOfMixedAbstractDescendantOne(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantOne()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantOne()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"MixedAbstractDescendantOne",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnceOnAnInstanceOfMixedAbstractDescendantOne(
 func TestDescendOnceOnAnInstanceOfMixedAbstractDescendantTwo(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantTwo()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantTwo()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"MixedAbstractDescendantTwo",
 		"maximal.json.trace",
@@ -108,10 +108,10 @@ func TestDescendOnceOnAnInstanceOfMixedAbstractDescendantTwo(
 func TestDescendOnceOnAnInstanceOfMixedConcreteWithDescendants(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendants()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendants()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"MixedConcreteWithDescendants",
 		"maximal.json.trace",
@@ -132,10 +132,10 @@ func TestDescendOnceOnAnInstanceOfMixedConcreteWithDescendants(
 func TestDescendOnceOnAnInstanceOfMixedConcreteWithDescendantsChild(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"MixedConcreteWithDescendantsChild",
 		"maximal.json.trace",
@@ -156,10 +156,10 @@ func TestDescendOnceOnAnInstanceOfMixedConcreteWithDescendantsChild(
 func TestDescendOnceOnAnInstanceOfMixedConcreteLeaf(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMixedConcreteLeaf()
+	instance := ourtesting.MustLoadMaximalMixedConcreteLeaf()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"MixedConcreteLeaf",
 		"maximal.json.trace",
@@ -180,10 +180,10 @@ func TestDescendOnceOnAnInstanceOfMixedConcreteLeaf(
 func TestDescendOnceOnAnInstanceOfModelTypedFirst(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalModelTypedFirst()
+	instance := ourtesting.MustLoadMaximalModelTypedFirst()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"ModelTypedFirst",
 		"maximal.json.trace",
@@ -204,10 +204,10 @@ func TestDescendOnceOnAnInstanceOfModelTypedFirst(
 func TestDescendOnceOnAnInstanceOfModelTypedSecond(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalModelTypedSecond()
+	instance := ourtesting.MustLoadMaximalModelTypedSecond()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"ModelTypedSecond",
 		"maximal.json.trace",
@@ -228,10 +228,10 @@ func TestDescendOnceOnAnInstanceOfModelTypedSecond(
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Something",
 		"maximal.json.trace",

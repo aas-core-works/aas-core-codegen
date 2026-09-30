@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/aas-core-works/aas-core3.0-golang/aastesting"
+	ourtesting "github.com/aas-core-works/aas-core3.0-golang/ourtesting"
 )
 
 func TestDescendOnAnInstanceOfExtension(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalExtension()
+	instance := ourtesting.MustLoadMaximalExtension()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Extension",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnAnInstanceOfExtension(
 func TestDescendOnAnInstanceOfAdministrativeInformation(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAdministrativeInformation()
+	instance := ourtesting.MustLoadMaximalAdministrativeInformation()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"AdministrativeInformation",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnAnInstanceOfAdministrativeInformation(
 func TestDescendOnAnInstanceOfQualifier(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalQualifier()
+	instance := ourtesting.MustLoadMaximalQualifier()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Qualifier",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnAnInstanceOfQualifier(
 func TestDescendOnAnInstanceOfAssetAdministrationShell(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAssetAdministrationShell()
+	instance := ourtesting.MustLoadMaximalAssetAdministrationShell()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"AssetAdministrationShell",
 		"maximal.json.trace",
@@ -108,10 +108,10 @@ func TestDescendOnAnInstanceOfAssetAdministrationShell(
 func TestDescendOnAnInstanceOfAssetInformation(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAssetInformation()
+	instance := ourtesting.MustLoadMaximalAssetInformation()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"AssetInformation",
 		"maximal.json.trace",
@@ -132,10 +132,10 @@ func TestDescendOnAnInstanceOfAssetInformation(
 func TestDescendOnAnInstanceOfResource(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalResource()
+	instance := ourtesting.MustLoadMaximalResource()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Resource",
 		"maximal.json.trace",
@@ -156,10 +156,10 @@ func TestDescendOnAnInstanceOfResource(
 func TestDescendOnAnInstanceOfSpecificAssetID(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSpecificAssetID()
+	instance := ourtesting.MustLoadMaximalSpecificAssetID()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"SpecificAssetId",
 		"maximal.json.trace",
@@ -180,10 +180,10 @@ func TestDescendOnAnInstanceOfSpecificAssetID(
 func TestDescendOnAnInstanceOfSubmodel(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSubmodel()
+	instance := ourtesting.MustLoadMaximalSubmodel()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Submodel",
 		"maximal.json.trace",
@@ -204,10 +204,10 @@ func TestDescendOnAnInstanceOfSubmodel(
 func TestDescendOnAnInstanceOfRelationshipElement(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalRelationshipElement()
+	instance := ourtesting.MustLoadMaximalRelationshipElement()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"RelationshipElement",
 		"maximal.json.trace",
@@ -228,10 +228,10 @@ func TestDescendOnAnInstanceOfRelationshipElement(
 func TestDescendOnAnInstanceOfSubmodelElementList(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSubmodelElementList()
+	instance := ourtesting.MustLoadMaximalSubmodelElementList()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"SubmodelElementList",
 		"maximal.json.trace",
@@ -252,10 +252,10 @@ func TestDescendOnAnInstanceOfSubmodelElementList(
 func TestDescendOnAnInstanceOfSubmodelElementCollection(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSubmodelElementCollection()
+	instance := ourtesting.MustLoadMaximalSubmodelElementCollection()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"SubmodelElementCollection",
 		"maximal.json.trace",
@@ -276,10 +276,10 @@ func TestDescendOnAnInstanceOfSubmodelElementCollection(
 func TestDescendOnAnInstanceOfProperty(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalProperty()
+	instance := ourtesting.MustLoadMaximalProperty()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Property",
 		"maximal.json.trace",
@@ -300,10 +300,10 @@ func TestDescendOnAnInstanceOfProperty(
 func TestDescendOnAnInstanceOfMultiLanguageProperty(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalMultiLanguageProperty()
+	instance := ourtesting.MustLoadMaximalMultiLanguageProperty()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"MultiLanguageProperty",
 		"maximal.json.trace",
@@ -324,10 +324,10 @@ func TestDescendOnAnInstanceOfMultiLanguageProperty(
 func TestDescendOnAnInstanceOfRange(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalRange()
+	instance := ourtesting.MustLoadMaximalRange()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Range",
 		"maximal.json.trace",
@@ -348,10 +348,10 @@ func TestDescendOnAnInstanceOfRange(
 func TestDescendOnAnInstanceOfReferenceElement(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalReferenceElement()
+	instance := ourtesting.MustLoadMaximalReferenceElement()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"ReferenceElement",
 		"maximal.json.trace",
@@ -372,10 +372,10 @@ func TestDescendOnAnInstanceOfReferenceElement(
 func TestDescendOnAnInstanceOfBlob(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalBlob()
+	instance := ourtesting.MustLoadMaximalBlob()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Blob",
 		"maximal.json.trace",
@@ -396,10 +396,10 @@ func TestDescendOnAnInstanceOfBlob(
 func TestDescendOnAnInstanceOfFile(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalFile()
+	instance := ourtesting.MustLoadMaximalFile()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"File",
 		"maximal.json.trace",
@@ -420,10 +420,10 @@ func TestDescendOnAnInstanceOfFile(
 func TestDescendOnAnInstanceOfAnnotatedRelationshipElement(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAnnotatedRelationshipElement()
+	instance := ourtesting.MustLoadMaximalAnnotatedRelationshipElement()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"AnnotatedRelationshipElement",
 		"maximal.json.trace",
@@ -444,10 +444,10 @@ func TestDescendOnAnInstanceOfAnnotatedRelationshipElement(
 func TestDescendOnAnInstanceOfEntity(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalEntity()
+	instance := ourtesting.MustLoadMaximalEntity()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Entity",
 		"maximal.json.trace",
@@ -468,10 +468,10 @@ func TestDescendOnAnInstanceOfEntity(
 func TestDescendOnAnInstanceOfEventPayload(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalEventPayload()
+	instance := ourtesting.MustLoadMaximalEventPayload()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"EventPayload",
 		"maximal.json.trace",
@@ -492,10 +492,10 @@ func TestDescendOnAnInstanceOfEventPayload(
 func TestDescendOnAnInstanceOfBasicEventElement(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalBasicEventElement()
+	instance := ourtesting.MustLoadMaximalBasicEventElement()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"BasicEventElement",
 		"maximal.json.trace",
@@ -516,10 +516,10 @@ func TestDescendOnAnInstanceOfBasicEventElement(
 func TestDescendOnAnInstanceOfOperation(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalOperation()
+	instance := ourtesting.MustLoadMaximalOperation()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Operation",
 		"maximal.json.trace",
@@ -540,10 +540,10 @@ func TestDescendOnAnInstanceOfOperation(
 func TestDescendOnAnInstanceOfOperationVariable(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalOperationVariable()
+	instance := ourtesting.MustLoadMaximalOperationVariable()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"OperationVariable",
 		"maximal.json.trace",
@@ -564,10 +564,10 @@ func TestDescendOnAnInstanceOfOperationVariable(
 func TestDescendOnAnInstanceOfCapability(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalCapability()
+	instance := ourtesting.MustLoadMaximalCapability()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Capability",
 		"maximal.json.trace",
@@ -588,10 +588,10 @@ func TestDescendOnAnInstanceOfCapability(
 func TestDescendOnAnInstanceOfConceptDescription(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalConceptDescription()
+	instance := ourtesting.MustLoadMaximalConceptDescription()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"ConceptDescription",
 		"maximal.json.trace",
@@ -612,10 +612,10 @@ func TestDescendOnAnInstanceOfConceptDescription(
 func TestDescendOnAnInstanceOfReference(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalReference()
+	instance := ourtesting.MustLoadMaximalReference()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Reference",
 		"maximal.json.trace",
@@ -636,10 +636,10 @@ func TestDescendOnAnInstanceOfReference(
 func TestDescendOnAnInstanceOfKey(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalKey()
+	instance := ourtesting.MustLoadMaximalKey()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Key",
 		"maximal.json.trace",
@@ -660,10 +660,10 @@ func TestDescendOnAnInstanceOfKey(
 func TestDescendOnAnInstanceOfLangStringNameType(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringNameType()
+	instance := ourtesting.MustLoadMaximalLangStringNameType()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LangStringNameType",
 		"maximal.json.trace",
@@ -684,10 +684,10 @@ func TestDescendOnAnInstanceOfLangStringNameType(
 func TestDescendOnAnInstanceOfLangStringTextType(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringTextType()
+	instance := ourtesting.MustLoadMaximalLangStringTextType()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LangStringTextType",
 		"maximal.json.trace",
@@ -708,10 +708,10 @@ func TestDescendOnAnInstanceOfLangStringTextType(
 func TestDescendOnAnInstanceOfEnvironment(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalEnvironment()
+	instance := ourtesting.MustLoadMaximalEnvironment()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Environment",
 		"maximal.json.trace",
@@ -732,10 +732,10 @@ func TestDescendOnAnInstanceOfEnvironment(
 func TestDescendOnAnInstanceOfEmbeddedDataSpecification(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalEmbeddedDataSpecification()
+	instance := ourtesting.MustLoadMaximalEmbeddedDataSpecification()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"EmbeddedDataSpecification",
 		"maximal.json.trace",
@@ -756,10 +756,10 @@ func TestDescendOnAnInstanceOfEmbeddedDataSpecification(
 func TestDescendOnAnInstanceOfLevelType(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLevelType()
+	instance := ourtesting.MustLoadMaximalLevelType()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LevelType",
 		"maximal.json.trace",
@@ -780,10 +780,10 @@ func TestDescendOnAnInstanceOfLevelType(
 func TestDescendOnAnInstanceOfValueReferencePair(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalValueReferencePair()
+	instance := ourtesting.MustLoadMaximalValueReferencePair()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"ValueReferencePair",
 		"maximal.json.trace",
@@ -804,10 +804,10 @@ func TestDescendOnAnInstanceOfValueReferencePair(
 func TestDescendOnAnInstanceOfValueList(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalValueList()
+	instance := ourtesting.MustLoadMaximalValueList()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"ValueList",
 		"maximal.json.trace",
@@ -828,10 +828,10 @@ func TestDescendOnAnInstanceOfValueList(
 func TestDescendOnAnInstanceOfLangStringPreferredNameTypeIEC61360(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringPreferredNameTypeIEC61360()
+	instance := ourtesting.MustLoadMaximalLangStringPreferredNameTypeIEC61360()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LangStringPreferredNameTypeIec61360",
 		"maximal.json.trace",
@@ -852,10 +852,10 @@ func TestDescendOnAnInstanceOfLangStringPreferredNameTypeIEC61360(
 func TestDescendOnAnInstanceOfLangStringShortNameTypeIEC61360(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringShortNameTypeIEC61360()
+	instance := ourtesting.MustLoadMaximalLangStringShortNameTypeIEC61360()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LangStringShortNameTypeIec61360",
 		"maximal.json.trace",
@@ -876,10 +876,10 @@ func TestDescendOnAnInstanceOfLangStringShortNameTypeIEC61360(
 func TestDescendOnAnInstanceOfLangStringDefinitionTypeIEC61360(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringDefinitionTypeIEC61360()
+	instance := ourtesting.MustLoadMaximalLangStringDefinitionTypeIEC61360()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"LangStringDefinitionTypeIec61360",
 		"maximal.json.trace",
@@ -900,10 +900,10 @@ func TestDescendOnAnInstanceOfLangStringDefinitionTypeIEC61360(
 func TestDescendOnAnInstanceOfDataSpecificationIEC61360(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalDataSpecificationIEC61360()
+	instance := ourtesting.MustLoadMaximalDataSpecificationIEC61360()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"DataSpecificationIec61360",
 		"maximal.json.trace",

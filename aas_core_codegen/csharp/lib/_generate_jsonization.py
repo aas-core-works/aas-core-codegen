@@ -510,7 +510,7 @@ def _generate_from_method_for_enumeration(
 /// </summary>
 /// <param name="node">JSON node to be parsed</param>
 /// <param name="error">Error, if any, during the deserialization</param>
-internal static Aas.{name} {name}From(
+internal static Our.{name} {name}From(
 {I}Nodes.JsonNode? node,
 {I}out Reporting.Error? error)
 {{
@@ -520,7 +520,7 @@ internal static Aas.{name} {name}From(
 {II}return default!;
 {I}}}
 
-{I}Aas.{name}? result = Stringification.{name}FromString(text);
+{I}Our.{name}? result = Stringification.{name}FromString(text);
 {I}if (result == null)
 {I}{{
 {II}error = new Reporting.Error(
@@ -575,7 +575,7 @@ default:
 /// <param name="node">JSON node to be parsed</param>
 /// <param name="error">Error, if any, during the deserialization</param>
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-public static Aas.{name} {name}From(
+public static Our.{name} {name}From(
 {I}Nodes.JsonNode? node,
 {I}out Reporting.Error? error)
 {{
@@ -597,7 +597,7 @@ public static Aas.{name} {name}From(
 {I}{{
 {cases_joined}
 {I}}}
-}}  // public static Aas.{name} {name}From"""
+}}  // public static Our.{name} {name}From"""
     )
 
 
@@ -649,13 +649,13 @@ if (obj == null)
                     f"""\
 case {csharp_common.string_literal(model_type)}:
 {{
-{I}Aas.{implementer_name} instance = {implementer_name}From(
+{I}Our.{implementer_name} instance = {implementer_name}From(
 {II}node, out error);
 {I}if (error != null)
 {I}{{
 {II}return default!;
 {I}}}
-{I}return Aas.{name}.{from_method_name}(instance);
+{I}return Our.{name}.{from_method_name}(instance);
 }}"""
                 )
             )
@@ -726,13 +726,13 @@ if (modelTypeNode != null)
                 f"""\
 if ({indent_but_first_line(condition, I)})
 {{
-{I}Aas.{implementer_name} instance = {implementer_name}From(
+{I}Our.{implementer_name} instance = {implementer_name}From(
 {II}node, out error);
 {I}if (error != null)
 {I}{{
 {II}return default!;
 {I}}}
-{I}return Aas.{name}.{from_method_name}(instance);
+{I}return Our.{name}.{from_method_name}(instance);
 }}"""
             )
         )
@@ -760,7 +760,7 @@ return default!;"""
 /// </summary>
 /// <param name="node">JSON node to be parsed</param>
 /// <param name="error">Error, if any, during the deserialization</param>
-public static Aas.{name} {name}From(
+public static Our.{name} {name}From(
 {I}Nodes.JsonNode? node,
 {I}out Reporting.Error? error)
 {{
@@ -774,7 +774,7 @@ public static Aas.{name} {name}From(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}  // public static Aas.{name} {name}From")
+    writer.write(f"\n}}  // public static Our.{name} {name}From")
 
     return Stripped(writer.getvalue())
 
@@ -1150,10 +1150,10 @@ if (modelType == null)
     # fmt: on
 
     if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return new Aas.{name}();"))
+        blocks.append(Stripped(f"return new Our.{name}();"))
     else:
         init_writer = io.StringIO()
-        init_writer.write(f"return new Aas.{name}(\n")
+        init_writer.write(f"return new Our.{name}(\n")
 
         for i, arg in enumerate(cls.constructor.arguments):
             prop = cls.properties_by_name[arg.name]
@@ -1223,7 +1223,7 @@ if (modelType == null)
 /// </summary>
 /// <param name="node">JSON node to be parsed</param>
 /// <param name="error">Error, if any, during the deserialization</param>
-internal static Aas.{name} {name}From(
+internal static Our.{name} {name}From(
 {I}Nodes.JsonNode? node,
 {I}out Reporting.Error? error)
 {{
@@ -1592,10 +1592,10 @@ def _generate_deserialize_from(name: str) -> Stripped:
 
     writer.write(
         f"""\
-public static Aas.{name} {name}From(
+public static Our.{name} {name}From(
 {I}Nodes.JsonNode node)
 {{
-{I}Aas.{name} result = DeserializeImplementation.{name}From(
+{I}Our.{name} result = DeserializeImplementation.{name}From(
 {II}node,
 {II}out Reporting.Error? error);
 {I}if (error != null)
@@ -1683,7 +1683,7 @@ def _generate_deserialize(
 /// <code>
 /// string someString = "... some JSON ...";
 /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-/// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+/// Our.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
 /// {I}node);
 /// </code>
 /// </example>
@@ -2020,16 +2020,16 @@ def _generate_transform_iunion_helper() -> Stripped:
 /// Serialize the named union <paramref name="that" /> into a JSON object.
 /// </summary>
 /// <remarks>
-/// A named union is not an <see cref="Aas.IClass" />, so it can not be
+/// A named union is not an <see cref="Our.IClass" />, so it can not be
 /// dispatched by <see cref="TransformIClass" />. Dispatching over the
-/// common, non-generic <see cref="Aas.IUnion" /> means we need only this one
+/// common, non-generic <see cref="Our.IUnion" /> means we need only this one
 /// serializer for *all* named unions, and not one per union.
 ///
 /// Should a named union ever be allowed to flatten primitive or enumeration
 /// alternatives, only the body of this method has to change (to dispatch on
 /// the underlying value's kind) -- every call site stays the same.
 /// </remarks>
-private static Nodes.JsonObject TransformIUnion(Aas.IUnion that)
+private static Nodes.JsonObject TransformIUnion(Our.IUnion that)
 {{
 {I}return TransformIClass(that.Underlying);
 }}"""
@@ -2144,10 +2144,10 @@ def _atomic_serializer_value_type(
     )
 
     if isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-        return Stripped("Aas.IClass")
+        return Stripped("Our.IClass")
 
     if isinstance(our_type, intermediate.NamedUnion):
-        return Stripped("Aas.IUnion")
+        return Stripped("Our.IUnion")
 
     return csharp_common.generate_type(type_anno)
 
@@ -2508,7 +2508,7 @@ def _generate_transform_for_class(
     writer.write(
         f"""\
 public override Nodes.JsonObject {transform_name}(
-{I}Aas.{interface_name} that
+{I}Our.{interface_name} that
 )
 {{
 """
@@ -2645,7 +2645,7 @@ private static Nodes.JsonNode SerializeJsonValue(Nodes.JsonNode that)
 {I}// itself into the JSON object we are building would hand the same node
 {I}// a second parent. Concretely, without the copy below:
 {I}//
-{I}//     var instance = new Aas.SomeClass(someJsonObject);
+{I}//     var instance = new Our.SomeClass(someJsonObject);
 {I}//     Jsonization.Serialize.ToJsonObject(instance);  // fine, attaches
 {I}//     Jsonization.Serialize.ToJsonObject(instance);  // throws
 {I}//
@@ -2728,7 +2728,7 @@ private static readonly Transformer _instance = new Transformer();"""
 /// class and every concrete class with descendants, as well as the item of
 /// a list or of a tuple of any of them.
 /// </remarks>
-internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+internal static Nodes.JsonObject TransformIClass(Our.IClass that)
 {{
 {I}return _instance.Transform(that);
 }}"""
@@ -2915,7 +2915,7 @@ def _generate_serialize(
 /// Thrown when a value within <paramref name="that" /> instance can not be
 /// represented in JSON
 /// </exception>
-public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+public static Nodes.JsonObject ToJsonObject(Our.IClass that)
 {{
 {I}try
 {I}{{
@@ -2944,7 +2944,7 @@ public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
 /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
 /// a whole instance catches <see cref="SerializationException" /> instead.
 /// </exception>
-public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
+public static Nodes.JsonValue {name}ToJsonValue(Our.{name} that)
 {{
 {I}string? text = Stringification.ToString(that);
 {I}return Nodes.JsonValue.Create(text)
@@ -2986,7 +2986,7 @@ public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
 /// <example>
 /// Here is an example how to serialize an instance of {cls_name}:
 /// <code>
-/// var {an_instance_variable} = new Aas.{cls_name}(
+/// var {an_instance_variable} = new Our.{cls_name}(
 ///     // ... some constructor arguments ...
 /// );
 /// System.Text.Json.Nodes.JsonObject element = (
@@ -3149,7 +3149,7 @@ namespace {namespace}
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     using_directives.append(

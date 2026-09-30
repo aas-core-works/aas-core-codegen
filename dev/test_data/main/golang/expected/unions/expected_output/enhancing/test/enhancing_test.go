@@ -5,9 +5,9 @@ package enhancing_test
 
 import (
 	"testing"
-	aasenhancing "github.com/dummy-works/dummy/enhancing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourenhancing "github.com/dummy-works/dummy/enhancing"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type Enhancement struct {
@@ -16,17 +16,17 @@ type Enhancement struct {
 
 func collectIDsAndAssertTheyAreConsecutiveAndTheirCountEqualsNextID(
 	t *testing.T,
-	wrapped aastypes.IClass,
+	wrapped ourtypes.IClass,
 	nextID int,
 ) {
 	var ids []int
 
-	instanceEnh := aasenhancing.MustUnwrap[*Enhancement](wrapped)
+	instanceEnh := ourenhancing.MustUnwrap[*Enhancement](wrapped)
 	ids = append(ids, instanceEnh.ID)
 
 	wrapped.Descend(
-		func(that aastypes.IClass) (abort bool) {
-			enh := aasenhancing.MustUnwrap[*Enhancement](that)
+		func(that ourtypes.IClass) (abort bool) {
+			enh := ourenhancing.MustUnwrap[*Enhancement](that)
 			ids = append(ids, enh.ID)
 			return
 		},
@@ -48,12 +48,12 @@ func collectIDsAndAssertTheyAreConsecutiveAndTheirCountEqualsNextID(
 }
 
 func TestStructuralFirstWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalStructuralFirst()
+	instance := ourtesting.MustLoadMaximalStructuralFirst()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -63,7 +63,7 @@ func TestStructuralFirstWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -76,17 +76,17 @@ func TestStructuralFirstWrapped(t *testing.T) {
 }
 
 func TestStructuralFirstNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalStructuralFirst()
+	instance := ourtesting.MustLoadMaximalStructuralFirst()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -99,8 +99,8 @@ func TestStructuralFirstNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -109,12 +109,12 @@ func TestStructuralFirstNothingWrapped(t *testing.T) {
 }
 
 func TestStructuralSecondWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalStructuralSecond()
+	instance := ourtesting.MustLoadMaximalStructuralSecond()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -124,7 +124,7 @@ func TestStructuralSecondWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -137,17 +137,17 @@ func TestStructuralSecondWrapped(t *testing.T) {
 }
 
 func TestStructuralSecondNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalStructuralSecond()
+	instance := ourtesting.MustLoadMaximalStructuralSecond()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -160,8 +160,8 @@ func TestStructuralSecondNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -170,12 +170,12 @@ func TestStructuralSecondNothingWrapped(t *testing.T) {
 }
 
 func TestMixedAbstractDescendantOneWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantOne()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantOne()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -185,7 +185,7 @@ func TestMixedAbstractDescendantOneWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -198,17 +198,17 @@ func TestMixedAbstractDescendantOneWrapped(t *testing.T) {
 }
 
 func TestMixedAbstractDescendantOneNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantOne()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantOne()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -221,8 +221,8 @@ func TestMixedAbstractDescendantOneNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -231,12 +231,12 @@ func TestMixedAbstractDescendantOneNothingWrapped(t *testing.T) {
 }
 
 func TestMixedAbstractDescendantTwoWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantTwo()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantTwo()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -246,7 +246,7 @@ func TestMixedAbstractDescendantTwoWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -259,17 +259,17 @@ func TestMixedAbstractDescendantTwoWrapped(t *testing.T) {
 }
 
 func TestMixedAbstractDescendantTwoNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedAbstractDescendantTwo()
+	instance := ourtesting.MustLoadMaximalMixedAbstractDescendantTwo()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -282,8 +282,8 @@ func TestMixedAbstractDescendantTwoNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -292,12 +292,12 @@ func TestMixedAbstractDescendantTwoNothingWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteWithDescendantsWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendants()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendants()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -307,7 +307,7 @@ func TestMixedConcreteWithDescendantsWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -320,17 +320,17 @@ func TestMixedConcreteWithDescendantsWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteWithDescendantsNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendants()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendants()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -343,8 +343,8 @@ func TestMixedConcreteWithDescendantsNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -353,12 +353,12 @@ func TestMixedConcreteWithDescendantsNothingWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteWithDescendantsChildWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -368,7 +368,7 @@ func TestMixedConcreteWithDescendantsChildWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -381,17 +381,17 @@ func TestMixedConcreteWithDescendantsChildWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteWithDescendantsChildNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
+	instance := ourtesting.MustLoadMaximalMixedConcreteWithDescendantsChild()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -404,8 +404,8 @@ func TestMixedConcreteWithDescendantsChildNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -414,12 +414,12 @@ func TestMixedConcreteWithDescendantsChildNothingWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteLeafWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteLeaf()
+	instance := ourtesting.MustLoadMaximalMixedConcreteLeaf()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -429,7 +429,7 @@ func TestMixedConcreteLeafWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -442,17 +442,17 @@ func TestMixedConcreteLeafWrapped(t *testing.T) {
 }
 
 func TestMixedConcreteLeafNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalMixedConcreteLeaf()
+	instance := ourtesting.MustLoadMaximalMixedConcreteLeaf()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -465,8 +465,8 @@ func TestMixedConcreteLeafNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -475,12 +475,12 @@ func TestMixedConcreteLeafNothingWrapped(t *testing.T) {
 }
 
 func TestModelTypedFirstWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalModelTypedFirst()
+	instance := ourtesting.MustLoadMaximalModelTypedFirst()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -490,7 +490,7 @@ func TestModelTypedFirstWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -503,17 +503,17 @@ func TestModelTypedFirstWrapped(t *testing.T) {
 }
 
 func TestModelTypedFirstNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalModelTypedFirst()
+	instance := ourtesting.MustLoadMaximalModelTypedFirst()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -526,8 +526,8 @@ func TestModelTypedFirstNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -536,12 +536,12 @@ func TestModelTypedFirstNothingWrapped(t *testing.T) {
 }
 
 func TestModelTypedSecondWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalModelTypedSecond()
+	instance := ourtesting.MustLoadMaximalModelTypedSecond()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -551,7 +551,7 @@ func TestModelTypedSecondWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -564,17 +564,17 @@ func TestModelTypedSecondWrapped(t *testing.T) {
 }
 
 func TestModelTypedSecondNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalModelTypedSecond()
+	instance := ourtesting.MustLoadMaximalModelTypedSecond()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -587,8 +587,8 @@ func TestModelTypedSecondNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}
@@ -597,12 +597,12 @@ func TestModelTypedSecondNothingWrapped(t *testing.T) {
 }
 
 func TestSomethingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	nextID := 0
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			enh = &Enhancement{}
 			enh.ID = nextID
 			should = true
@@ -612,7 +612,7 @@ func TestSomethingWrapped(t *testing.T) {
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -625,17 +625,17 @@ func TestSomethingWrapped(t *testing.T) {
 }
 
 func TestSomethingNothingWrapped(t *testing.T) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
-	wrapped := aasenhancing.Wrap[*Enhancement](
+	wrapped := ourenhancing.Wrap[*Enhancement](
 		instance,
-		func(that aastypes.IClass) (enh *Enhancement, should bool) {
+		func(that ourtypes.IClass) (enh *Enhancement, should bool) {
 			should = false
 			return
 		},
 	)
 
-	if !aastesting.DeepEqual(instance, wrapped) {
+	if !ourtesting.DeepEqual(instance, wrapped) {
 		t.Fatalf(
 			"Deep equality failed between the instance and the wrapped: %v %v",
 			instance, wrapped,
@@ -648,8 +648,8 @@ func TestSomethingNothingWrapped(t *testing.T) {
 		t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 	}
 
-	wrapped.Descend(func (that aastypes.IClass) (abort bool) {
-		_, ok := aasenhancing.Unwrap[*Enhancement](that)
+	wrapped.Descend(func (that ourtypes.IClass) (abort bool) {
+		_, ok := ourenhancing.Unwrap[*Enhancement](that)
 		if ok {
 			t.Fatalf("Unexpected wrapped descendant: %v", that)
 		}

@@ -187,7 +187,7 @@ def prepare_project(case_dir: pathlib.Path, project_dir: pathlib.Path) -> Stripp
 
     # NOTE (mristin):
     # We set:
-    # "varsIgnorePattern": "^(_|Aas.*)$"
+    # "varsIgnorePattern": "^(_|Our.*)$"
     # in .eslintrc since we want to ignore unused imports.
 
     (project_dir / ".eslintrc").write_text(
@@ -219,7 +219,7 @@ def prepare_project(case_dir: pathlib.Path, project_dir: pathlib.Path) -> Stripp
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        "varsIgnorePattern": "^(_|Aas.*|.*FromJsonable|.*FromXmlElement|parse.*|serialize.*|check.*|write.*|next.*)$",
+        "varsIgnorePattern": "^(_|Our.*|.*FromJsonable|.*FromXmlElement|parse.*|serialize.*|check.*|write.*|next.*)$",
         // NOTE (mristin):
         // We do not flag unused function/method parameters. Some
         // meta-model-defined functions (*e.g.*, a ``@verification`` function

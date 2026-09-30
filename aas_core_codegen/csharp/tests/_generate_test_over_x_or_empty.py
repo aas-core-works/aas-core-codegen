@@ -56,10 +56,10 @@ def generate(
 [Test]
 public void Test_{cls_name_csharp}_{method_name_csharp}()
 {{
-{I}foreach (Aas.{cls_name_csharp} instance in new[]
+{I}foreach (Our.{cls_name_csharp} instance in new[]
 {I}{{
-{II}Aas.Tests.CommonJsonization.LoadMinimal{cls_name_csharp}(),
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}()
+{II}Our.Tests.CommonJsonization.LoadMinimal{cls_name_csharp}(),
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}()
 {I}}})
 {I}{{
 {II}int count = 0;
@@ -81,7 +81,7 @@ public void Test_{cls_name_csharp}_{method_name_csharp}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

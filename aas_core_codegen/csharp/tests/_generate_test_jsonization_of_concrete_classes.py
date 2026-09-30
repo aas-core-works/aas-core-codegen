@@ -102,17 +102,17 @@ public void {test_name}()
 {II}var node = LoadTheFirstExpected(
 {III}{csharp_common.string_literal(cls_name_json)});
 
-{II}var instance = Aas.Jsonization.Deserialize.{from_name}(
+{II}var instance = Our.Jsonization.Deserialize.{from_name}(
 {III}node);
 
 {II}{indent_but_first_line(mutation, II)}
 
-{II}Aas.Jsonization.SerializationException? exception = null;
+{II}Our.Jsonization.SerializationException? exception = null;
 {II}try
 {II}{{
-{III}var _ = Aas.Jsonization.Serialize.ToJsonObject(instance);
+{III}var _ = Our.Jsonization.Serialize.ToJsonObject(instance);
 {II}}}
-{II}catch (Aas.Jsonization.SerializationException observedException)
+{II}catch (Our.Jsonization.SerializationException observedException)
 {II}{{
 {III}exception = observedException;
 {II}}}
@@ -143,7 +143,7 @@ private static Nodes.JsonNode LoadTheFirstExpected(string modelType)
 {{
 {I}var paths = Directory.GetFiles(
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"Json",
 {III}"Expected",
 {III}modelType),
@@ -155,7 +155,7 @@ private static Nodes.JsonNode LoadTheFirstExpected(string modelType)
 {II}paths,
 {II}$"Expected at least one recorded example of {{modelType}}, but got none");
 
-{I}return Aas.Tests.CommonJson.ReadFromFile(paths[0]);
+{I}return Our.Tests.CommonJson.ReadFromFile(paths[0]);
 }}"""
             ),
         )
@@ -182,12 +182,12 @@ def generate(
         Stripped(
             f"""\
 private static void AssertSerializeDeserializeEqualsOriginal(
-{I}Nodes.JsonNode originalNode, Aas.IClass instance, string path)
+{I}Nodes.JsonNode originalNode, Our.IClass instance, string path)
 {{
 {I}Nodes.JsonObject? serialized = null;
 {I}try
 {I}{{
-{II}serialized = Aas.Jsonization.Serialize.ToJsonObject(instance);
+{II}serialized = Our.Jsonization.Serialize.ToJsonObject(instance);
 {I}}}
 {I}catch (System.Exception exception)
 {I}{{
@@ -205,7 +205,7 @@ private static void AssertSerializeDeserializeEqualsOriginal(
 {I}}}
 {I}else
 {I}{{
-{II}Aas.Tests.CommonJson.CheckJsonNodesEqual(
+{II}Our.Tests.CommonJson.CheckJsonNodesEqual(
 {III}originalNode,
 {III}serialized,
 {III}out Reporting.Error? inequalityError);
@@ -223,7 +223,7 @@ private static void AssertSerializeDeserializeEqualsOriginal(
         Stripped(
             f"""\
 private static void AssertEqualsExpectedOrRerecordDeserializationException(
-{I}Aas.Jsonization.Exception? exception,
+{I}Our.Jsonization.Exception? exception,
 {I}string path)
 {{
 {I}if (exception == null)
@@ -236,7 +236,7 @@ private static void AssertEqualsExpectedOrRerecordDeserializationException(
 {I}{{
 {II}string exceptionPath = path + ".exception";
 {II}string got = exception.Message;
-{II}if (Aas.Tests.Common.RecordMode)
+{II}if (Our.Tests.Common.RecordMode)
 {II}{{
 {III}System.IO.File.WriteAllText(exceptionPath, got);
 {II}}}
@@ -247,7 +247,7 @@ private static void AssertEqualsExpectedOrRerecordDeserializationException(
 {IIII}throw new System.IO.FileNotFoundException(
 {IIIII}$"The file with the recorded exception does not exist: {{exceptionPath}}; " +
 {IIIII}"maybe you want to set the environment " +
-{IIIII}$"variable {{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?");
+{IIIII}$"variable {{Our.Tests.Common.RecordModeEnvironmentVariableName}}?");
 {III}}}
 
 {III}string expected = System.IO.File.ReadAllText(exceptionPath);
@@ -273,7 +273,7 @@ public void Test_{cls_name_csharp}_ok()
 {{
 {I}var paths = Directory.GetFiles(
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"Json",
 {III}"Expected",
 {III}{csharp_common.string_literal(cls_name_json)}
@@ -284,13 +284,13 @@ public void Test_{cls_name_csharp}_ok()
 
 {I}foreach (var path in paths)
 {I}{{
-{II}var node = Aas.Tests.CommonJson.ReadFromFile(path);
+{II}var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-{II}var instance = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{II}var instance = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {III}node);
 
-{II}var errors = Aas.Verification.Verify(instance).ToList();
-{II}Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+{II}var errors = Our.Verification.Verify(instance).ToList();
+{II}Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
 {II}AssertSerializeDeserializeEqualsOriginal(
 {III}node, instance, path);
@@ -309,13 +309,13 @@ public void Test_{cls_name_csharp}_deserialization_from_non_object_fail()
 {II}?? throw new System.InvalidOperationException(
 {III}"Unexpected failure of the node creation");
 
-{I}Aas.Jsonization.Exception? exception = null;
+{I}Our.Jsonization.Exception? exception = null;
 {I}try
 {I}{{
-{II}var _ = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{II}var _ = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {III}node);
 {I}}}
-{I}catch (Aas.Jsonization.Exception observedException)
+{I}catch (Our.Jsonization.Exception observedException)
 {I}{{
 {II}exception = observedException;
 {I}}}
@@ -346,7 +346,7 @@ public void Test_{cls_name_csharp}_deserialization_fail()
 {II}string causeDir in
 {II}Directory.GetDirectories(
 {III}Path.Combine(
-{IIII}Aas.Tests.Common.TestDataDir,
+{IIII}Our.Tests.Common.TestDataDir,
 {IIII}"Json",
 {IIII}"Unexpected",
 {IIII}"Unserializable"
@@ -373,15 +373,15 @@ public void Test_{cls_name_csharp}_deserialization_fail()
 
 {II}foreach (var path in paths)
 {II}{{
-{III}var node = Aas.Tests.CommonJson.ReadFromFile(path);
+{III}var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-{III}Aas.Jsonization.Exception? exception = null;
+{III}Our.Jsonization.Exception? exception = null;
 {III}try
 {III}{{
-{IIII}var _ = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{IIII}var _ = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {IIIII}node);
 {III}}}
-{III}catch (Aas.Jsonization.Exception observedException)
+{III}catch (Our.Jsonization.Exception observedException)
 {III}{{
 {IIII}exception = observedException;
 {III}}}
@@ -404,7 +404,7 @@ public void Test_{cls_name_csharp}_verification_fail()
 {II}string causeDir in
 {II}Directory.GetDirectories(
 {III}Path.Combine(
-{IIII}Aas.Tests.Common.TestDataDir,
+{IIII}Our.Tests.Common.TestDataDir,
 {IIII}"Json",
 {IIII}"Unexpected",
 {IIII}"Invalid"
@@ -431,13 +431,13 @@ public void Test_{cls_name_csharp}_verification_fail()
 
 {II}foreach (var path in paths)
 {II}{{
-{III}var node = Aas.Tests.CommonJson.ReadFromFile(path);
+{III}var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-{III}var instance = Aas.Jsonization.Deserialize.{cls_name_csharp}From(
+{III}var instance = Our.Jsonization.Deserialize.{cls_name_csharp}From(
 {IIII}node);
 
-{III}var errors = Aas.Verification.Verify(instance).ToList();
-{III}Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+{III}var errors = Our.Verification.Verify(instance).ToList();
+{III}Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
 {IIII}errors, path);
 {II}}}
 {I}}}
@@ -452,7 +452,7 @@ public void Test_{cls_name_csharp}_verification_fail()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;

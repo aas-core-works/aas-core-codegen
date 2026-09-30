@@ -6,33 +6,33 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSomething
+    == our::stringification::MustModelTypeFromString(
       "Something"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSomething
+    our::stringification::to_string(
+      our::types::ModelType::kSomething
     )
     == "Something"
   );
 
   REQUIRE(
-    aas::types::ModelType::kCollection
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kCollection
+    == our::stringification::MustModelTypeFromString(
       "Collection"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kCollection
+    our::stringification::to_string(
+      our::types::ModelType::kCollection
     )
     == "Collection"
   );
@@ -40,13 +40,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::stringification::ModelTypeFromString(
+    !our::stringification::ModelTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModelTypeFromString(
+    our::stringification::MustModelTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -55,43 +55,43 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test Kind round-trip") {
   REQUIRE(
-    aas::types::Kind::kAlpha
-    == aas::stringification::MustKindFromString(
+    our::types::Kind::kAlpha
+    == our::stringification::MustKindFromString(
       "alpha"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Kind::kAlpha
+    our::stringification::to_string(
+      our::types::Kind::kAlpha
     )
     == "alpha"
   );
 
   REQUIRE(
-    aas::types::Kind::kBeta
-    == aas::stringification::MustKindFromString(
+    our::types::Kind::kBeta
+    == our::stringification::MustKindFromString(
       "beta"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Kind::kBeta
+    our::stringification::to_string(
+      our::types::Kind::kBeta
     )
     == "beta"
   );
 
   REQUIRE(
-    aas::types::Kind::kGamma
-    == aas::stringification::MustKindFromString(
+    our::types::Kind::kGamma
+    == our::stringification::MustKindFromString(
       "gamma"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Kind::kGamma
+    our::stringification::to_string(
+      our::types::Kind::kGamma
     )
     == "gamma"
   );
@@ -99,13 +99,13 @@ TEST_CASE("Test Kind round-trip") {
 
 TEST_CASE("Test failure on Kind") {
   CHECK(
-    !aas::stringification::KindFromString(
+    !our::stringification::KindFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustKindFromString(
+    our::stringification::MustKindFromString(
       "Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"
@@ -114,43 +114,43 @@ TEST_CASE("Test failure on Kind") {
 
 TEST_CASE("Test Direction round-trip") {
   REQUIRE(
-    aas::types::Direction::kNorth
-    == aas::stringification::MustDirectionFromString(
+    our::types::Direction::kNorth
+    == our::stringification::MustDirectionFromString(
       "up"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Direction::kNorth
+    our::stringification::to_string(
+      our::types::Direction::kNorth
     )
     == "up"
   );
 
   REQUIRE(
-    aas::types::Direction::kSouth
-    == aas::stringification::MustDirectionFromString(
+    our::types::Direction::kSouth
+    == our::stringification::MustDirectionFromString(
       "down"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Direction::kSouth
+    our::stringification::to_string(
+      our::types::Direction::kSouth
     )
     == "down"
   );
 
   REQUIRE(
-    aas::types::Direction::kEast
-    == aas::stringification::MustDirectionFromString(
+    our::types::Direction::kEast
+    == our::stringification::MustDirectionFromString(
       "right"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Direction::kEast
+    our::stringification::to_string(
+      our::types::Direction::kEast
     )
     == "right"
   );
@@ -158,13 +158,13 @@ TEST_CASE("Test Direction round-trip") {
 
 TEST_CASE("Test failure on Direction") {
   CHECK(
-    !aas::stringification::DirectionFromString(
+    !our::stringification::DirectionFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustDirectionFromString(
+    our::stringification::MustDirectionFromString(
       "Totally utterly invalid"
     ),
     "Unexpected Direction literal: Totally utterly invalid"

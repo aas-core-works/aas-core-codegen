@@ -16,23 +16,23 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	aascommon "github.com/aas-core-works/aas-core3.0-golang/common"
-	aasconstants "github.com/aas-core-works/aas-core3.0-golang/constants"
-	aasreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourcommon "github.com/aas-core-works/aas-core3.0-golang/common"
+	ourconstants "github.com/aas-core-works/aas-core3.0-golang/constants"
+	ourreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -47,7 +47,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 func constructMatchesIDShort() *regexp.Regexp {
@@ -103,7 +103,7 @@ func MatchesRevisionType(text string) bool {
 
 func constructMatchesXsDateTimeUTC() *regexp.Regexp {
 	digit := "[0-9]"
-	yearFrag := aascommon.Concat(
+	yearFrag := ourcommon.Concat(
 		"-?(([1-9]",
 		digit,
 		digit,
@@ -115,21 +115,21 @@ func constructMatchesXsDateTimeUTC() *regexp.Regexp {
 		"))",
 	)
 	monthFrag := "((0[1-9])|(1[0-2]))"
-	dayFrag := aascommon.Concat(
+	dayFrag := ourcommon.Concat(
 		"((0[1-9])|([12]",
 		digit,
 		")|(3[01]))",
 	)
-	hourFrag := aascommon.Concat(
+	hourFrag := ourcommon.Concat(
 		"(([01]",
 		digit,
 		")|(2[0-3]))",
 	)
-	minuteFrag := aascommon.Concat(
+	minuteFrag := ourcommon.Concat(
 		"[0-5]",
 		digit,
 	)
-	secondFrag := aascommon.Concat(
+	secondFrag := ourcommon.Concat(
 		"([0-5]",
 		digit,
 		")(\\.",
@@ -138,7 +138,7 @@ func constructMatchesXsDateTimeUTC() *regexp.Regexp {
 	)
 	endOfDayFrag := "24:00:00(\\.0+)?"
 	timezoneFrag := "(Z|\\+00:00|-00:00)"
-	dateTimeLexicalRep := aascommon.Concat(
+	dateTimeLexicalRep := ourcommon.Concat(
 		yearFrag,
 		"-",
 		monthFrag,
@@ -155,7 +155,7 @@ func constructMatchesXsDateTimeUTC() *regexp.Regexp {
 		")",
 		timezoneFrag,
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		dateTimeLexicalRep,
 		"$",
@@ -206,7 +206,7 @@ func IsXsDateTimeUTC(value string) bool {
 
 func constructMatchesMIMEType() *regexp.Regexp {
 	tchar := "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
-	token := aascommon.Concat(
+	token := ourcommon.Concat(
 		"(",
 		tchar,
 		")+",
@@ -215,24 +215,24 @@ func constructMatchesMIMEType() *regexp.Regexp {
 	subtype := token
 	ows := "[ \\t]*"
 	obsText := "[-ÿ]"
-	qdText := aascommon.Concat(
+	qdText := ourcommon.Concat(
 		"([\\t !#-\\[\\]-~]|",
 		obsText,
 		")",
 	)
-	quotedPair := aascommon.Concat(
+	quotedPair := ourcommon.Concat(
 		"\\\\([\\t !-~]|",
 		obsText,
 		")",
 	)
-	quotedString := aascommon.Concat(
+	quotedString := ourcommon.Concat(
 		"\"(",
 		qdText,
 		"|",
 		quotedPair,
 		")*\"",
 	)
-	parameter := aascommon.Concat(
+	parameter := ourcommon.Concat(
 		token,
 		"=(",
 		token,
@@ -240,7 +240,7 @@ func constructMatchesMIMEType() *regexp.Regexp {
 		quotedString,
 		")",
 	)
-	mediaType := aascommon.Concat(
+	mediaType := ourcommon.Concat(
 		"^",
 		typE,
 		"/",
@@ -278,7 +278,7 @@ func MatchesMIMEType(text string) bool {
 func constructMatchesRFC8089Path() *regexp.Regexp {
 	h16 := "[0-9A-Fa-f]{1,4}"
 	decOctet := "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
-	ipv4address := aascommon.Concat(
+	ipv4address := ourcommon.Concat(
 		decOctet,
 		"\\.",
 		decOctet,
@@ -287,7 +287,7 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		"\\.",
 		decOctet,
 	)
-	ls32 := aascommon.Concat(
+	ls32 := ourcommon.Concat(
 		"(",
 		h16,
 		":",
@@ -296,7 +296,7 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		ipv4address,
 		")",
 	)
-	ipv6address := aascommon.Concat(
+	ipv6address := ourcommon.Concat(
 		"((",
 		h16,
 		":){6}",
@@ -355,14 +355,14 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 	)
 	unreserved := "[a-zA-Z0-9\\-._~]"
 	subDelims := "[!$&'()*+,;=]"
-	ipvfuture := aascommon.Concat(
+	ipvfuture := ourcommon.Concat(
 		"[vV][0-9A-Fa-f]+\\.(",
 		unreserved,
 		"|",
 		subDelims,
 		"|:)+",
 	)
-	ipLiteral := aascommon.Concat(
+	ipLiteral := ourcommon.Concat(
 		"\\[(",
 		ipv6address,
 		"|",
@@ -370,7 +370,7 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		")\\]",
 	)
 	pctEncoded := "%[0-9A-Fa-f][0-9A-Fa-f]"
-	regName := aascommon.Concat(
+	regName := ourcommon.Concat(
 		"(",
 		unreserved,
 		"|",
@@ -379,7 +379,7 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		subDelims,
 		")*",
 	)
-	host := aascommon.Concat(
+	host := ourcommon.Concat(
 		"(",
 		ipLiteral,
 		"|",
@@ -388,12 +388,12 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		regName,
 		")",
 	)
-	fileAuth := aascommon.Concat(
+	fileAuth := ourcommon.Concat(
 		"(localhost|",
 		host,
 		")",
 	)
-	pchar := aascommon.Concat(
+	pchar := ourcommon.Concat(
 		"(",
 		unreserved,
 		"|",
@@ -402,31 +402,31 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		subDelims,
 		"|[:@])",
 	)
-	segmentNz := aascommon.Concat(
+	segmentNz := ourcommon.Concat(
 		"(",
 		pchar,
 		")+",
 	)
-	segment := aascommon.Concat(
+	segment := ourcommon.Concat(
 		"(",
 		pchar,
 		")*",
 	)
-	pathAbsolute := aascommon.Concat(
+	pathAbsolute := ourcommon.Concat(
 		"/(",
 		segmentNz,
 		"(/",
 		segment,
 		")*)?",
 	)
-	authPath := aascommon.Concat(
+	authPath := ourcommon.Concat(
 		"(",
 		fileAuth,
 		")?",
 		pathAbsolute,
 	)
 	localPath := pathAbsolute
-	fileHierPart := aascommon.Concat(
+	fileHierPart := ourcommon.Concat(
 		"(//",
 		authPath,
 		"|",
@@ -434,12 +434,12 @@ func constructMatchesRFC8089Path() *regexp.Regexp {
 		")",
 	)
 	fileScheme := "file"
-	fileUri := aascommon.Concat(
+	fileUri := ourcommon.Concat(
 		fileScheme,
 		":",
 		fileHierPart,
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		fileUri,
 		"$",
@@ -468,7 +468,7 @@ func MatchesRFC8089Path(text string) bool {
 func constructMatchesBCP47() *regexp.Regexp {
 	alphanum := "[a-zA-Z0-9]"
 	singleton := "[0-9A-WY-Za-wy-z]"
-	extension := aascommon.Concat(
+	extension := ourcommon.Concat(
 		singleton,
 		"(-(",
 		alphanum,
@@ -477,33 +477,33 @@ func constructMatchesBCP47() *regexp.Regexp {
 	extlang := "[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2}"
 	irregular := "(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)"
 	regular := "(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)"
-	grandfathered := aascommon.Concat(
+	grandfathered := ourcommon.Concat(
 		"(",
 		irregular,
 		"|",
 		regular,
 		")",
 	)
-	language := aascommon.Concat(
+	language := ourcommon.Concat(
 		"([a-zA-Z]{2,3}(-",
 		extlang,
 		")?|[a-zA-Z]{4}|[a-zA-Z]{5,8})",
 	)
 	script := "[a-zA-Z]{4}"
 	region := "([a-zA-Z]{2}|[0-9]{3})"
-	variant := aascommon.Concat(
+	variant := ourcommon.Concat(
 		"((",
 		alphanum,
 		"){5,8}|[0-9](",
 		alphanum,
 		"){3})",
 	)
-	privateuse := aascommon.Concat(
+	privateuse := ourcommon.Concat(
 		"[xX](-(",
 		alphanum,
 		"){1,8})+",
 	)
-	langtag := aascommon.Concat(
+	langtag := ourcommon.Concat(
 		language,
 		"(-",
 		script,
@@ -517,7 +517,7 @@ func constructMatchesBCP47() *regexp.Regexp {
 		privateuse,
 		")?",
 	)
-	languageTag := aascommon.Concat(
+	languageTag := ourcommon.Concat(
 		"(",
 		langtag,
 		"|",
@@ -526,7 +526,7 @@ func constructMatchesBCP47() *regexp.Regexp {
 		grandfathered,
 		")",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		languageTag,
 		"$",
@@ -549,7 +549,7 @@ func MatchesBCP47(text string) bool {
 }
 
 // Check that `langStrings` are specified each for a unique language.
-func LangStringsHaveUniqueLanguages[L aastypes.IAbstractLangString](
+func LangStringsHaveUniqueLanguages[L ourtypes.IAbstractLangString](
 	langStrings []L) bool {
 	languageSet := make(map[string]struct{})
 
@@ -566,9 +566,9 @@ func LangStringsHaveUniqueLanguages[L aastypes.IAbstractLangString](
 	return true
 }
 
-// Check that there are no duplicate [aastypes.IQualifier.Type]'s in
+// Check that there are no duplicate [ourtypes.IQualifier.Type]'s in
 // the `qualifiers`.
-func QualifierTypesAreUnique[Q aastypes.IQualifier](
+func QualifierTypesAreUnique[Q ourtypes.IQualifier](
 	qualifiers []Q) bool {
 	typeSet := make(map[string]struct{})
 	for _, qualifier := range qualifiers {
@@ -609,14 +609,14 @@ func MatchesXMLSerializableString(text string) bool {
 func constructMatchesXsAnyURI() *regexp.Regexp {
 	scheme := "[a-zA-Z][a-zA-Z0-9+\\-.]*"
 	ucschar := "[ -\ud7ff\uf900-\ufdcf\ufdf0-\uffef\U00010000-\U0001fffd\U00020000-\U0002fffd\U00030000-\U0003fffd\U00040000-\U0004fffd\U00050000-\U0005fffd\U00060000-\U0006fffd\U00070000-\U0007fffd\U00080000-\U0008fffd\U00090000-\U0009fffd\U000a0000-\U000afffd\U000b0000-\U000bfffd\U000c0000-\U000cfffd\U000d0000-\U000dfffd\U000e1000-\U000efffd]"
-	iunreserved := aascommon.Concat(
+	iunreserved := ourcommon.Concat(
 		"([a-zA-Z0-9\\-._~]|",
 		ucschar,
 		")",
 	)
 	pctEncoded := "%[0-9A-Fa-f][0-9A-Fa-f]"
 	subDelims := "[!$&'()*+,;=]"
-	iuserinfo := aascommon.Concat(
+	iuserinfo := ourcommon.Concat(
 		"(",
 		iunreserved,
 		"|",
@@ -627,7 +627,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 	)
 	h16 := "[0-9A-Fa-f]{1,4}"
 	decOctet := "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
-	ipv4address := aascommon.Concat(
+	ipv4address := ourcommon.Concat(
 		decOctet,
 		"\\.",
 		decOctet,
@@ -636,7 +636,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		"\\.",
 		decOctet,
 	)
-	ls32 := aascommon.Concat(
+	ls32 := ourcommon.Concat(
 		"(",
 		h16,
 		":",
@@ -645,7 +645,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		ipv4address,
 		")",
 	)
-	ipv6address := aascommon.Concat(
+	ipv6address := ourcommon.Concat(
 		"((",
 		h16,
 		":){6}",
@@ -703,21 +703,21 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		")?::)",
 	)
 	unreserved := "[a-zA-Z0-9\\-._~]"
-	ipvfuture := aascommon.Concat(
+	ipvfuture := ourcommon.Concat(
 		"[vV][0-9A-Fa-f]+\\.(",
 		unreserved,
 		"|",
 		subDelims,
 		"|:)+",
 	)
-	ipLiteral := aascommon.Concat(
+	ipLiteral := ourcommon.Concat(
 		"\\[(",
 		ipv6address,
 		"|",
 		ipvfuture,
 		")\\]",
 	)
-	iregName := aascommon.Concat(
+	iregName := ourcommon.Concat(
 		"(",
 		iunreserved,
 		"|",
@@ -726,7 +726,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		subDelims,
 		")*",
 	)
-	ihost := aascommon.Concat(
+	ihost := ourcommon.Concat(
 		"(",
 		ipLiteral,
 		"|",
@@ -736,7 +736,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		")",
 	)
 	port := "[0-9]*"
-	iauthority := aascommon.Concat(
+	iauthority := ourcommon.Concat(
 		"(",
 		iuserinfo,
 		"@)?",
@@ -745,7 +745,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		port,
 		")?",
 	)
-	ipchar := aascommon.Concat(
+	ipchar := ourcommon.Concat(
 		"(",
 		iunreserved,
 		"|",
@@ -754,40 +754,40 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		subDelims,
 		"|[:@])",
 	)
-	isegment := aascommon.Concat(
+	isegment := ourcommon.Concat(
 		"(",
 		ipchar,
 		")*",
 	)
-	ipathAbempty := aascommon.Concat(
+	ipathAbempty := ourcommon.Concat(
 		"(/",
 		isegment,
 		")*",
 	)
-	isegmentNz := aascommon.Concat(
+	isegmentNz := ourcommon.Concat(
 		"(",
 		ipchar,
 		")+",
 	)
-	ipathAbsolute := aascommon.Concat(
+	ipathAbsolute := ourcommon.Concat(
 		"/(",
 		isegmentNz,
 		"(/",
 		isegment,
 		")*)?",
 	)
-	ipathRootless := aascommon.Concat(
+	ipathRootless := ourcommon.Concat(
 		isegmentNz,
 		"(/",
 		isegment,
 		")*",
 	)
-	ipathEmpty := aascommon.Concat(
+	ipathEmpty := ourcommon.Concat(
 		"(",
 		ipchar,
 		"){0}",
 	)
-	ihierPart := aascommon.Concat(
+	ihierPart := ourcommon.Concat(
 		"(//",
 		iauthority,
 		ipathAbempty,
@@ -800,19 +800,19 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		")",
 	)
 	iprivate := "[\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd]"
-	iquery := aascommon.Concat(
+	iquery := ourcommon.Concat(
 		"(",
 		ipchar,
 		"|",
 		iprivate,
 		"|[/?])*",
 	)
-	ifragment := aascommon.Concat(
+	ifragment := ourcommon.Concat(
 		"(",
 		ipchar,
 		"|[/?])*",
 	)
-	isegmentNzNc := aascommon.Concat(
+	isegmentNzNc := ourcommon.Concat(
 		"(",
 		iunreserved,
 		"|",
@@ -821,13 +821,13 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		subDelims,
 		"|@)+",
 	)
-	ipathNoscheme := aascommon.Concat(
+	ipathNoscheme := ourcommon.Concat(
 		isegmentNzNc,
 		"(/",
 		isegment,
 		")*",
 	)
-	irelativePart := aascommon.Concat(
+	irelativePart := ourcommon.Concat(
 		"(//",
 		iauthority,
 		ipathAbempty,
@@ -839,7 +839,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		ipathEmpty,
 		")",
 	)
-	irelativeRef := aascommon.Concat(
+	irelativeRef := ourcommon.Concat(
 		irelativePart,
 		"(\\?",
 		iquery,
@@ -847,7 +847,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		ifragment,
 		")?",
 	)
-	iri := aascommon.Concat(
+	iri := ourcommon.Concat(
 		scheme,
 		":",
 		ihierPart,
@@ -857,14 +857,14 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		ifragment,
 		")?",
 	)
-	iriReference := aascommon.Concat(
+	iriReference := ourcommon.Concat(
 		"(",
 		iri,
 		"|",
 		irelativeRef,
 		")",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		iriReference,
 		"$",
@@ -892,21 +892,21 @@ func MatchesXsAnyURI(text string) bool {
 
 func constructMatchesXsBase64Binary() *regexp.Regexp {
 	b04Char := "[AQgw]"
-	b04 := aascommon.Concat(
+	b04 := ourcommon.Concat(
 		b04Char,
 		"\\x20?",
 	)
 	b16Char := "[AEIMQUYcgkosw048]"
-	b16 := aascommon.Concat(
+	b16 := ourcommon.Concat(
 		b16Char,
 		"\\x20?",
 	)
 	b64Char := "[A-Za-z0-9+/]"
-	b64 := aascommon.Concat(
+	b64 := ourcommon.Concat(
 		b64Char,
 		"\\x20?",
 	)
-	b64quad := aascommon.Concat(
+	b64quad := ourcommon.Concat(
 		"(",
 		b64,
 		b64,
@@ -914,7 +914,7 @@ func constructMatchesXsBase64Binary() *regexp.Regexp {
 		b64,
 		")",
 	)
-	b64FinalQuad := aascommon.Concat(
+	b64FinalQuad := ourcommon.Concat(
 		"(",
 		b64,
 		b64,
@@ -922,18 +922,18 @@ func constructMatchesXsBase64Binary() *regexp.Regexp {
 		b64Char,
 		")",
 	)
-	padded8 := aascommon.Concat(
+	padded8 := ourcommon.Concat(
 		b64,
 		b04,
 		"= ?=",
 	)
-	padded16 := aascommon.Concat(
+	padded16 := ourcommon.Concat(
 		b64,
 		b64,
 		b16,
 		"=",
 	)
-	b64final := aascommon.Concat(
+	b64final := ourcommon.Concat(
 		"(",
 		b64FinalQuad,
 		"|",
@@ -942,14 +942,14 @@ func constructMatchesXsBase64Binary() *regexp.Regexp {
 		padded8,
 		")",
 	)
-	base64Binary := aascommon.Concat(
+	base64Binary := ourcommon.Concat(
 		"(",
 		b64quad,
 		"*",
 		b64final,
 		")?",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		base64Binary,
 		"$",
@@ -998,7 +998,7 @@ func MatchesXsBoolean(text string) bool {
 
 func constructMatchesXsDate() *regexp.Regexp {
 	digit := "[0-9]"
-	yearFrag := aascommon.Concat(
+	yearFrag := ourcommon.Concat(
 		"-?(([1-9]",
 		digit,
 		digit,
@@ -1010,23 +1010,23 @@ func constructMatchesXsDate() *regexp.Regexp {
 		"))",
 	)
 	monthFrag := "((0[1-9])|(1[0-2]))"
-	dayFrag := aascommon.Concat(
+	dayFrag := ourcommon.Concat(
 		"((0[1-9])|([12]",
 		digit,
 		")|(3[01]))",
 	)
-	minuteFrag := aascommon.Concat(
+	minuteFrag := ourcommon.Concat(
 		"[0-5]",
 		digit,
 	)
-	timezoneFrag := aascommon.Concat(
+	timezoneFrag := ourcommon.Concat(
 		"(Z|(\\+|-)((0",
 		digit,
 		"|1[0-3]):",
 		minuteFrag,
 		"|14:00))",
 	)
-	dateLexicalRep := aascommon.Concat(
+	dateLexicalRep := ourcommon.Concat(
 		yearFrag,
 		"-",
 		monthFrag,
@@ -1035,7 +1035,7 @@ func constructMatchesXsDate() *regexp.Regexp {
 		timezoneFrag,
 		"?",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		dateLexicalRep,
 		"$",
@@ -1062,7 +1062,7 @@ func MatchesXsDate(text string) bool {
 
 func constructMatchesXsDateTime() *regexp.Regexp {
 	digit := "[0-9]"
-	yearFrag := aascommon.Concat(
+	yearFrag := ourcommon.Concat(
 		"-?(([1-9]",
 		digit,
 		digit,
@@ -1074,21 +1074,21 @@ func constructMatchesXsDateTime() *regexp.Regexp {
 		"))",
 	)
 	monthFrag := "((0[1-9])|(1[0-2]))"
-	dayFrag := aascommon.Concat(
+	dayFrag := ourcommon.Concat(
 		"((0[1-9])|([12]",
 		digit,
 		")|(3[01]))",
 	)
-	hourFrag := aascommon.Concat(
+	hourFrag := ourcommon.Concat(
 		"(([01]",
 		digit,
 		")|(2[0-3]))",
 	)
-	minuteFrag := aascommon.Concat(
+	minuteFrag := ourcommon.Concat(
 		"[0-5]",
 		digit,
 	)
-	secondFrag := aascommon.Concat(
+	secondFrag := ourcommon.Concat(
 		"([0-5]",
 		digit,
 		")(\\.",
@@ -1096,14 +1096,14 @@ func constructMatchesXsDateTime() *regexp.Regexp {
 		"+)?",
 	)
 	endOfDayFrag := "24:00:00(\\.0+)?"
-	timezoneFrag := aascommon.Concat(
+	timezoneFrag := ourcommon.Concat(
 		"(Z|(\\+|-)((0",
 		digit,
 		"|1[0-3]):",
 		minuteFrag,
 		"|14:00))",
 	)
-	dateTimeLexicalRep := aascommon.Concat(
+	dateTimeLexicalRep := ourcommon.Concat(
 		yearFrag,
 		"-",
 		monthFrag,
@@ -1121,7 +1121,7 @@ func constructMatchesXsDateTime() *regexp.Regexp {
 		timezoneFrag,
 		"?",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		dateTimeLexicalRep,
 		"$",
@@ -1174,19 +1174,19 @@ func IsXsDateTime(value string) bool {
 
 func constructMatchesXsDecimal() *regexp.Regexp {
 	digit := "[0-9]"
-	unsignedNoDecimalPtNumeral := aascommon.Concat(
+	unsignedNoDecimalPtNumeral := ourcommon.Concat(
 		digit,
 		"+",
 	)
-	noDecimalPtNumeral := aascommon.Concat(
+	noDecimalPtNumeral := ourcommon.Concat(
 		"(\\+|-)?",
 		unsignedNoDecimalPtNumeral,
 	)
-	fracFrag := aascommon.Concat(
+	fracFrag := ourcommon.Concat(
 		digit,
 		"+",
 	)
-	unsignedDecimalPtNumeral := aascommon.Concat(
+	unsignedDecimalPtNumeral := ourcommon.Concat(
 		"(",
 		unsignedNoDecimalPtNumeral,
 		"\\.",
@@ -1195,18 +1195,18 @@ func constructMatchesXsDecimal() *regexp.Regexp {
 		fracFrag,
 		")",
 	)
-	decimalPtNumeral := aascommon.Concat(
+	decimalPtNumeral := ourcommon.Concat(
 		"(\\+|-)?",
 		unsignedDecimalPtNumeral,
 	)
-	decimalLexicalRep := aascommon.Concat(
+	decimalLexicalRep := ourcommon.Concat(
 		"(",
 		decimalPtNumeral,
 		"|",
 		noDecimalPtNumeral,
 		")",
 	)
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		decimalLexicalRep,
 		"$",
@@ -1233,7 +1233,7 @@ func MatchesXsDecimal(text string) bool {
 
 func constructMatchesXsDouble() *regexp.Regexp {
 	doubleRep := "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		doubleRep,
 		"$",
@@ -1260,7 +1260,7 @@ func MatchesXsDouble(text string) bool {
 
 func constructMatchesXsDuration() *regexp.Regexp {
 	durationRep := "-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		durationRep,
 		"$",
@@ -1287,7 +1287,7 @@ func MatchesXsDuration(text string) bool {
 
 func constructMatchesXsFloat() *regexp.Regexp {
 	floatRep := "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		floatRep,
 		"$",
@@ -1314,7 +1314,7 @@ func MatchesXsFloat(text string) bool {
 
 func constructMatchesXsGDay() *regexp.Regexp {
 	gDayLexicalRep := "---(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		gDayLexicalRep,
 		"$",
@@ -1341,7 +1341,7 @@ func MatchesXsGDay(text string) bool {
 
 func constructMatchesXsGMonth() *regexp.Regexp {
 	gMonthLexicalRep := "--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		gMonthLexicalRep,
 		"$",
@@ -1368,7 +1368,7 @@ func MatchesXsGMonth(text string) bool {
 
 func constructMatchesXsGMonthDay() *regexp.Regexp {
 	gMonthDayRep := "--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		gMonthDayRep,
 		"$",
@@ -1395,7 +1395,7 @@ func MatchesXsGMonthDay(text string) bool {
 
 func constructMatchesXsGYear() *regexp.Regexp {
 	gYearRep := "-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		gYearRep,
 		"$",
@@ -1422,7 +1422,7 @@ func MatchesXsGYear(text string) bool {
 
 func constructMatchesXsGYearMonth() *regexp.Regexp {
 	gYearMonthRep := "-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		gYearMonthRep,
 		"$",
@@ -1449,7 +1449,7 @@ func MatchesXsGYearMonth(text string) bool {
 
 func constructMatchesXsHexBinary() *regexp.Regexp {
 	hexBinary := "([0-9a-fA-F]{2})*"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		hexBinary,
 		"$",
@@ -1476,7 +1476,7 @@ func MatchesXsHexBinary(text string) bool {
 
 func constructMatchesXsTime() *regexp.Regexp {
 	timeRep := "(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		timeRep,
 		"$",
@@ -1503,7 +1503,7 @@ func MatchesXsTime(text string) bool {
 
 func constructMatchesXsInteger() *regexp.Regexp {
 	integerRep := "[-+]?[0-9]+"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		integerRep,
 		"$",
@@ -1530,7 +1530,7 @@ func MatchesXsInteger(text string) bool {
 
 func constructMatchesXsLong() *regexp.Regexp {
 	longRep := "[-+]?0*[0-9]{1,20}"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		longRep,
 		"$",
@@ -1557,7 +1557,7 @@ func MatchesXsLong(text string) bool {
 
 func constructMatchesXsInt() *regexp.Regexp {
 	intRep := "[-+]?0*[0-9]{1,10}"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		intRep,
 		"$",
@@ -1584,7 +1584,7 @@ func MatchesXsInt(text string) bool {
 
 func constructMatchesXsShort() *regexp.Regexp {
 	shortRep := "[-+]?0*[0-9]{1,5}"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		shortRep,
 		"$",
@@ -1611,7 +1611,7 @@ func MatchesXsShort(text string) bool {
 
 func constructMatchesXsByte() *regexp.Regexp {
 	byteRep := "[-+]?0*[0-9]{1,3}"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		byteRep,
 		"$",
@@ -1638,7 +1638,7 @@ func MatchesXsByte(text string) bool {
 
 func constructMatchesXsNonNegativeInteger() *regexp.Regexp {
 	nonNegativeIntegerRep := "(-0|\\+?[0-9]+)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		nonNegativeIntegerRep,
 		"$",
@@ -1665,7 +1665,7 @@ func MatchesXsNonNegativeInteger(text string) bool {
 
 func constructMatchesXsPositiveInteger() *regexp.Regexp {
 	positiveIntegerRep := "\\+?0*[1-9][0-9]*"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		positiveIntegerRep,
 		"$",
@@ -1692,7 +1692,7 @@ func MatchesXsPositiveInteger(text string) bool {
 
 func constructMatchesXsUnsignedLong() *regexp.Regexp {
 	unsignedLongRep := "(-0|\\+?0*[0-9]{1,20})"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		unsignedLongRep,
 		"$",
@@ -1719,7 +1719,7 @@ func MatchesXsUnsignedLong(text string) bool {
 
 func constructMatchesXsUnsignedInt() *regexp.Regexp {
 	unsignedIntRep := "(-0|\\+?0*[0-9]{1,10})"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		unsignedIntRep,
 		"$",
@@ -1746,7 +1746,7 @@ func MatchesXsUnsignedInt(text string) bool {
 
 func constructMatchesXsUnsignedShort() *regexp.Regexp {
 	unsignedShortRep := "(-0|\\+?0*[0-9]{1,5})"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		unsignedShortRep,
 		"$",
@@ -1773,7 +1773,7 @@ func MatchesXsUnsignedShort(text string) bool {
 
 func constructMatchesXsUnsignedByte() *regexp.Regexp {
 	unsignedByteRep := "(-0|\\+?0*[0-9]{1,3})"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		unsignedByteRep,
 		"$",
@@ -1800,7 +1800,7 @@ func MatchesXsUnsignedByte(text string) bool {
 
 func constructMatchesXsNonPositiveInteger() *regexp.Regexp {
 	nonPositiveIntegerRep := "(\\+0|0|-[0-9]+)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		nonPositiveIntegerRep,
 		"$",
@@ -1827,7 +1827,7 @@ func MatchesXsNonPositiveInteger(text string) bool {
 
 func constructMatchesXsNegativeInteger() *regexp.Regexp {
 	negativeIntegerRep := "(-0*[1-9][0-9]*)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		negativeIntegerRep,
 		"$",
@@ -2248,68 +2248,68 @@ func IsXsUnsignedByte(value string) bool {
 // Check that `value` is consistent with the given `valueType`.
 func ValueConsistentWithXSDType(
 	value string,
-	valueType aastypes.DataTypeDefXSD,
+	valueType ourtypes.DataTypeDefXSD,
 ) bool {
 	switch valueType {
-		case aastypes.DataTypeDefXSDAnyURI:
+		case ourtypes.DataTypeDefXSDAnyURI:
 			return MatchesXsAnyURI(value)
-		case aastypes.DataTypeDefXSDBase64Binary:
+		case ourtypes.DataTypeDefXSDBase64Binary:
 			return MatchesXsBase64Binary(value)
-		case aastypes.DataTypeDefXSDBoolean:
+		case ourtypes.DataTypeDefXSDBoolean:
 			return MatchesXsBoolean(value)
-		case aastypes.DataTypeDefXSDByte:
+		case ourtypes.DataTypeDefXSDByte:
 			return IsXsByte(value)
-		case aastypes.DataTypeDefXSDDate:
+		case ourtypes.DataTypeDefXSDDate:
 			return IsXsDate(value)
-		case aastypes.DataTypeDefXSDDateTime:
+		case ourtypes.DataTypeDefXSDDateTime:
 			return IsXsDateTime(value)
-		case aastypes.DataTypeDefXSDDecimal:
+		case ourtypes.DataTypeDefXSDDecimal:
 			return MatchesXsDecimal(value)
-		case aastypes.DataTypeDefXSDDouble:
+		case ourtypes.DataTypeDefXSDDouble:
 			return IsXsDouble(value)
-		case aastypes.DataTypeDefXSDDuration:
+		case ourtypes.DataTypeDefXSDDuration:
 			return MatchesXsDuration(value)
-		case aastypes.DataTypeDefXSDFloat:
+		case ourtypes.DataTypeDefXSDFloat:
 		 	return IsXsFloat(value)
-		case aastypes.DataTypeDefXSDGDay:
+		case ourtypes.DataTypeDefXSDGDay:
 			return MatchesXsGDay(value)
-		case aastypes.DataTypeDefXSDGMonth:
+		case ourtypes.DataTypeDefXSDGMonth:
 			return MatchesXsGMonth(value)
-		case aastypes.DataTypeDefXSDGMonthDay:
+		case ourtypes.DataTypeDefXSDGMonthDay:
 			return IsXsGMonthDay(value)
-		case aastypes.DataTypeDefXSDGYear:
+		case ourtypes.DataTypeDefXSDGYear:
 			return MatchesXsGYear(value)
-		case aastypes.DataTypeDefXSDGYearMonth:
+		case ourtypes.DataTypeDefXSDGYearMonth:
 			return MatchesXsGYearMonth(value)
-		case aastypes.DataTypeDefXSDHexBinary:
+		case ourtypes.DataTypeDefXSDHexBinary:
 			return MatchesXsHexBinary(value)
-		case aastypes.DataTypeDefXSDInt:
+		case ourtypes.DataTypeDefXSDInt:
 			return IsXsInt(value)
-		case aastypes.DataTypeDefXSDInteger:
+		case ourtypes.DataTypeDefXSDInteger:
 			return MatchesXsInteger(value)
-		case aastypes.DataTypeDefXSDLong:
+		case ourtypes.DataTypeDefXSDLong:
 			return IsXsLong(value)
-		case aastypes.DataTypeDefXSDNegativeInteger:
+		case ourtypes.DataTypeDefXSDNegativeInteger:
 			return MatchesXsNegativeInteger(value)
-		case aastypes.DataTypeDefXSDNonNegativeInteger:
+		case ourtypes.DataTypeDefXSDNonNegativeInteger:
 			return MatchesXsNonNegativeInteger(value)
-		case aastypes.DataTypeDefXSDNonPositiveInteger:
+		case ourtypes.DataTypeDefXSDNonPositiveInteger:
 			return MatchesXsNonPositiveInteger(value)
-		case aastypes.DataTypeDefXSDPositiveInteger:
+		case ourtypes.DataTypeDefXSDPositiveInteger:
 			return MatchesXsPositiveInteger(value)
-		case aastypes.DataTypeDefXSDShort:
+		case ourtypes.DataTypeDefXSDShort:
 			return IsXsShort(value)
-		case aastypes.DataTypeDefXSDString:
+		case ourtypes.DataTypeDefXSDString:
 			return MatchesXsString(value)
-		case aastypes.DataTypeDefXSDTime:
+		case ourtypes.DataTypeDefXSDTime:
 			return MatchesXsTime(value)
-		case aastypes.DataTypeDefXSDUnsignedByte:
+		case ourtypes.DataTypeDefXSDUnsignedByte:
 			return IsXsUnsignedByte(value)
-		case aastypes.DataTypeDefXSDUnsignedInt:
+		case ourtypes.DataTypeDefXSDUnsignedInt:
 			return IsXsUnsignedInt(value)
-		case aastypes.DataTypeDefXSDUnsignedLong:
+		case ourtypes.DataTypeDefXSDUnsignedLong:
 			return IsXsUnsignedLong(value)
-		case aastypes.DataTypeDefXSDUnsignedShort:
+		case ourtypes.DataTypeDefXSDUnsignedShort:
 			return IsXsUnsignedShort(value)
 		default:
 			panic(fmt.Sprintf("Unhandled value type: %v", valueType))
@@ -2318,29 +2318,29 @@ func ValueConsistentWithXSDType(
 
 // Check that the target of the model reference matches the expectedType.
 func IsModelReferenceTo(
-	reference aastypes.IReference,
-	expectedType aastypes.KeyTypes,
+	reference ourtypes.IReference,
+	expectedType ourtypes.KeyTypes,
 ) bool {
-	return reference.Type() == aastypes.ReferenceTypesModelReference &&
+	return reference.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(reference.Keys()) != 0 &&
 		reference.Keys()[len(reference.Keys()) - 1].Type() == expectedType
 }
 
-// Check that the target of the reference matches a [aasconstants.AASReferables].
+// Check that the target of the reference matches a [ourconstants.AASReferables].
 func IsModelReferenceToReferable(
-	reference aastypes.IReference,
+	reference ourtypes.IReference,
 ) bool {
-	return reference.Type() == aastypes.ReferenceTypesModelReference &&
+	return reference.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(reference.Keys()) != 0 &&
-		aascommon.MapContains(
-			aasconstants.AASReferables,
+		ourcommon.MapContains(
+			ourconstants.AASReferables,
 			reference.Keys()[len(reference.Keys()) - 1].Type(),
 		)
 }
 
-// Check that all [aastypes.IReferable.IDShort] are unique among
+// Check that all [ourtypes.IReferable.IDShort] are unique among
 // `referables`.
-func IDShortsAreUnique[R aastypes.IReferable](
+func IDShortsAreUnique[R ourtypes.IReferable](
 	referables []R) bool {
 	idShortSet := make(map[string]struct{})
 
@@ -2361,11 +2361,11 @@ func IDShortsAreUnique[R aastypes.IReferable](
 	return true
 }
 
-// Check that [aastypes.IReferable.IDShort]'s among all the `inputVariables`,
+// Check that [ourtypes.IReferable.IDShort]'s among all the `inputVariables`,
 // `outputVariables` and `inoutputVariables` are unique.
-func IDShortsOfVariablesAreUnique[O1 aastypes.IOperationVariable,
-		O2 aastypes.IOperationVariable,
-		O3 aastypes.IOperationVariable] (
+func IDShortsOfVariablesAreUnique[O1 ourtypes.IOperationVariable,
+		O2 ourtypes.IOperationVariable,
+		O3 ourtypes.IOperationVariable] (
 	inputVariables []O1,
 	outputVariables []O2,
 	inoutputVariables []O3) bool {
@@ -2421,9 +2421,9 @@ func IDShortsOfVariablesAreUnique[O1 aastypes.IOperationVariable,
 	return true
 }
 
-// Check that all [aastypes.IExtension.Name] are unique among
+// Check that all [ourtypes.IExtension.Name] are unique among
 // `extensions`.
-func ExtensionNamesAreUnique[E aastypes.IExtension](
+func ExtensionNamesAreUnique[E ourtypes.IExtension](
 	extensions []E) bool {
 	nameSet := make(map[string]struct{})
 
@@ -2439,10 +2439,10 @@ func ExtensionNamesAreUnique[E aastypes.IExtension](
 	return true
 }
 
-// Check that all `elements` have the identical [aastypes.IHasSemantics.SemanticID].
-func SubmodelElementsHaveIdenticalSemanticIDs[S aastypes.ISubmodelElement](
+// Check that all `elements` have the identical [ourtypes.IHasSemantics.SemanticID].
+func SubmodelElementsHaveIdenticalSemanticIDs[S ourtypes.ISubmodelElement](
 	elements []S) bool {
-	var thatSemanticID aastypes.IReference
+	var thatSemanticID ourtypes.IReference
 
 	for _, element := range elements {
 		thisSemanticID := element.SemanticID()
@@ -2477,97 +2477,97 @@ func SubmodelElementsHaveIdenticalSemanticIDs[S aastypes.ISubmodelElement](
 // Check that `element` is an instance of the interface corresponding to
 // `expectedType`.
 func SubmodelElementIsOfType(
-	element aastypes.ISubmodelElement,
-	expectedType aastypes.AASSubmodelElements,
+	element ourtypes.ISubmodelElement,
+	expectedType ourtypes.AASSubmodelElements,
 ) bool {
 	switch expectedType {
-	case aastypes.AASSubmodelElementsAnnotatedRelationshipElement:
-		return aastypes.IsAnnotatedRelationshipElement(
+	case ourtypes.AASSubmodelElementsAnnotatedRelationshipElement:
+		return ourtypes.IsAnnotatedRelationshipElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsBasicEventElement:
-		return aastypes.IsBasicEventElement(
+	case ourtypes.AASSubmodelElementsBasicEventElement:
+		return ourtypes.IsBasicEventElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsBlob:
-		return aastypes.IsBlob(
+	case ourtypes.AASSubmodelElementsBlob:
+		return ourtypes.IsBlob(
 			element,
 		)
-	case aastypes.AASSubmodelElementsCapability:
-		return aastypes.IsCapability(
+	case ourtypes.AASSubmodelElementsCapability:
+		return ourtypes.IsCapability(
 			element,
 		)
-	case aastypes.AASSubmodelElementsDataElement:
-		return aastypes.IsDataElement(
+	case ourtypes.AASSubmodelElementsDataElement:
+		return ourtypes.IsDataElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsEntity:
-		return aastypes.IsEntity(
+	case ourtypes.AASSubmodelElementsEntity:
+		return ourtypes.IsEntity(
 			element,
 		)
-	case aastypes.AASSubmodelElementsEventElement:
-		return aastypes.IsEventElement(
+	case ourtypes.AASSubmodelElementsEventElement:
+		return ourtypes.IsEventElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsFile:
-		return aastypes.IsFile(
+	case ourtypes.AASSubmodelElementsFile:
+		return ourtypes.IsFile(
 			element,
 		)
-	case aastypes.AASSubmodelElementsMultiLanguageProperty:
-		return aastypes.IsMultiLanguageProperty(
+	case ourtypes.AASSubmodelElementsMultiLanguageProperty:
+		return ourtypes.IsMultiLanguageProperty(
 			element,
 		)
-	case aastypes.AASSubmodelElementsOperation:
-		return aastypes.IsOperation(
+	case ourtypes.AASSubmodelElementsOperation:
+		return ourtypes.IsOperation(
 			element,
 		)
-	case aastypes.AASSubmodelElementsProperty:
-		return aastypes.IsProperty(
+	case ourtypes.AASSubmodelElementsProperty:
+		return ourtypes.IsProperty(
 			element,
 		)
-	case aastypes.AASSubmodelElementsRange:
-		return aastypes.IsRange(
+	case ourtypes.AASSubmodelElementsRange:
+		return ourtypes.IsRange(
 			element,
 		)
-	case aastypes.AASSubmodelElementsReferenceElement:
-		return aastypes.IsReferenceElement(
+	case ourtypes.AASSubmodelElementsReferenceElement:
+		return ourtypes.IsReferenceElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsRelationshipElement:
-		return aastypes.IsRelationshipElement(
+	case ourtypes.AASSubmodelElementsRelationshipElement:
+		return ourtypes.IsRelationshipElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElement:
-		return aastypes.IsSubmodelElement(
+	case ourtypes.AASSubmodelElementsSubmodelElement:
+		return ourtypes.IsSubmodelElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElementList:
-		return aastypes.IsSubmodelElementList(
+	case ourtypes.AASSubmodelElementsSubmodelElementList:
+		return ourtypes.IsSubmodelElementList(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElementCollection:
-		return aastypes.IsSubmodelElementCollection(
+	case ourtypes.AASSubmodelElementsSubmodelElementCollection:
+		return ourtypes.IsSubmodelElementCollection(
 			element,
 		)
 	}
 	return false
 }
 
-// Check that `elements` which are [aastypes.IProperty] or [aastypes.IRange]
+// Check that `elements` which are [ourtypes.IProperty] or [ourtypes.IRange]
 // have the given `valueType`.
-func PropertiesOrRangesHaveValueType[E aastypes.ISubmodelElement](
+func PropertiesOrRangesHaveValueType[E ourtypes.ISubmodelElement](
 	elements []E,
-	valueType aastypes.DataTypeDefXSD,
+	valueType ourtypes.DataTypeDefXSD,
 ) bool {
 	for _, element := range elements {
 		switch element.ModelType() {
-		case aastypes.ModelTypeProperty:
-			prop := any(element).(aastypes.IProperty)
+		case ourtypes.ModelTypeProperty:
+			prop := any(element).(ourtypes.IProperty)
 			if prop.ValueType() != valueType {
 				return false
 			}
-		case aastypes.ModelTypeRange:
-			rng := any(element).(aastypes.IRange)
+		case ourtypes.ModelTypeRange:
+			rng := any(element).(ourtypes.IRange)
 			if rng.ValueType() != valueType {
 				return false
 			}
@@ -2578,10 +2578,10 @@ func PropertiesOrRangesHaveValueType[E aastypes.ISubmodelElement](
 }
 
 // Check that the two references, `that` and `other`, are equal by
-// comparing their [aastypes.Reference.Keys] by [aastypes.Key.Value]'s.
+// comparing their [ourtypes.Reference.Keys] by [ourtypes.Key.Value]'s.
 func ReferenceKeyValuesEqual(
-	that aastypes.IReference,
-	other aastypes.IReference) bool {
+	that ourtypes.IReference,
+	other ourtypes.IReference) bool {
 	thatKeys := that.Keys()
 	otherKeys := other.Keys()
 
@@ -2600,88 +2600,88 @@ func ReferenceKeyValuesEqual(
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.DataType]
+// Check that [ourtypes.DataSpecificationIec61360.DataType]
 // is defined appropriately for all data specifications whose content is given as
 // IEC 61360.
 func DataSpecificationIEC61360sForPropertyOrValueHaveAppropriateDataType(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		dt := iec61360.DataType()
 		if dt == nil ||
-			!aascommon.MapContains(aasconstants.DataTypeIEC61360ForPropertyOrValue, *dt) {
+			!ourcommon.MapContains(ourconstants.DataTypeIEC61360ForPropertyOrValue, *dt) {
 			return false
 		}
 	}
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.DataType]
+// Check that [ourtypes.DataSpecificationIec61360.DataType]
 // is defined appropriately for all data specifications whose content is given as
 // IEC 61360.
 func DataSpecificationIEC61360sForReferenceHaveAppropriateDataType(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		dt := iec61360.DataType()
 		if dt == nil ||
-			!aascommon.MapContains(aasconstants.DataTypeIEC61360ForReference, *dt) {
+			!ourcommon.MapContains(ourconstants.DataTypeIEC61360ForReference, *dt) {
 			return false
 		}
 	}
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.DataType]
+// Check that [ourtypes.DataSpecificationIec61360.DataType]
 // is defined appropriately for all data specifications whose content is given as
 // IEC 61360.
 func DataSpecificationIEC61360sForDocumentHaveAppropriateDataType(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		dt := iec61360.DataType()
 		if dt == nil ||
-			!aascommon.MapContains(aasconstants.DataTypeIEC61360ForDocument, *dt) {
+			!ourcommon.MapContains(ourconstants.DataTypeIEC61360ForDocument, *dt) {
 			return false
 		}
 	}
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.DataType]
+// Check that [ourtypes.DataSpecificationIec61360.DataType]
 // is defined for all data specifications whose content is given as
 // IEC 61360.
 func DataSpecificationIEC61360sHaveDataType(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		dt := iec61360.DataType()
 		if dt == nil {
@@ -2691,19 +2691,19 @@ func DataSpecificationIEC61360sHaveDataType(
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.Value]
+// Check that [ourtypes.DataSpecificationIec61360.Value]
 // is defined for all data specifications whose content is given as
 // IEC 61360.
 func DataSpecificationIEC61360sHaveValue(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		v := iec61360.Value()
 		if v == nil {
@@ -2713,19 +2713,19 @@ func DataSpecificationIEC61360sHaveValue(
 	return true
 }
 
-// Check that [aastypes.DataSpecificationIec61360.Definition]
+// Check that [ourtypes.DataSpecificationIec61360.Definition]
 // is defined for all data specifications whose content is given as
 // IEC 61360 at least in English.
 func DataSpecificationIEC61360sHaveDefinitionAtLeastInEnglish(
-	embeddedDataSpecifications []aastypes.IEmbeddedDataSpecification) bool {
+	embeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification) bool {
 	for _, eds := range embeddedDataSpecifications {
 		content := eds.DataSpecificationContent()
 
-		ok := aastypes.IsDataSpecificationIEC61360(content)
+		ok := ourtypes.IsDataSpecificationIEC61360(content)
 		if !ok {
 			continue
 		}
-		iec61360 := content.(aastypes.IDataSpecificationIEC61360)
+		iec61360 := content.(ourtypes.IDataSpecificationIEC61360)
 
 		definition := iec61360.Definition()
 		if definition == nil {
@@ -2764,14 +2764,14 @@ func IsBCP47ForEnglish(text string) bool {
 	)
 }
 
-// Verify `that` instance of [aastypes.IExtension].
+// Verify `that` instance of [ourtypes.IExtension].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyExtension(
-	that aastypes.IExtension,
+	that ourtypes.IExtension,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -2836,7 +2836,7 @@ func VerifyExtension(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -2854,13 +2854,13 @@ func VerifyExtension(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -2878,7 +2878,7 @@ func VerifyExtension(
 		that.Name(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Name",
 				},
 			)
@@ -2894,7 +2894,7 @@ func VerifyExtension(
 			*that.ValueType(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueType",
 					},
 				)
@@ -2911,7 +2911,7 @@ func VerifyExtension(
 			*that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -2929,13 +2929,13 @@ func VerifyExtension(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "RefersTo",
 						},
 					)
@@ -2952,14 +2952,14 @@ func VerifyExtension(
 	return
 }
 
-// Verify `that` instance of [aastypes.IAdministrativeInformation].
+// Verify `that` instance of [ourtypes.IAdministrativeInformation].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAdministrativeInformation(
-	that aastypes.IAdministrativeInformation,
+	that ourtypes.IAdministrativeInformation,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -3000,13 +3000,13 @@ func VerifyAdministrativeInformation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -3025,7 +3025,7 @@ func VerifyAdministrativeInformation(
 			*that.Version(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Version",
 					},
 				)
@@ -3042,7 +3042,7 @@ func VerifyAdministrativeInformation(
 			*that.Revision(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Revision",
 					},
 				)
@@ -3059,7 +3059,7 @@ func VerifyAdministrativeInformation(
 			that.Creator(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Creator",
 					},
 				)
@@ -3076,7 +3076,7 @@ func VerifyAdministrativeInformation(
 			*that.TemplateID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "TemplateID",
 					},
 				)
@@ -3091,14 +3091,14 @@ func VerifyAdministrativeInformation(
 	return
 }
 
-// Verify `that` instance of [aastypes.IQualifier].
+// Verify `that` instance of [ourtypes.IQualifier].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyQualifier(
-	that aastypes.IQualifier,
+	that ourtypes.IQualifier,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -3153,7 +3153,7 @@ func VerifyQualifier(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -3171,13 +3171,13 @@ func VerifyQualifier(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -3196,7 +3196,7 @@ func VerifyQualifier(
 			*that.Kind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Kind",
 					},
 				)
@@ -3212,7 +3212,7 @@ func VerifyQualifier(
 		that.Type(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Type",
 				},
 			)
@@ -3227,7 +3227,7 @@ func VerifyQualifier(
 		that.ValueType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ValueType",
 				},
 			)
@@ -3243,7 +3243,7 @@ func VerifyQualifier(
 			*that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -3260,7 +3260,7 @@ func VerifyQualifier(
 			that.ValueID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueID",
 					},
 				)
@@ -3275,14 +3275,14 @@ func VerifyQualifier(
 	return
 }
 
-// Verify `that` instance of [aastypes.IAssetAdministrationShell].
+// Verify `that` instance of [ourtypes.IAssetAdministrationShell].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAssetAdministrationShell(
-	that aastypes.IAssetAdministrationShell,
+	that ourtypes.IAssetAdministrationShell,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -3395,7 +3395,7 @@ func VerifyAssetAdministrationShell(
 		!(that.DerivedFrom() != nil) ||
 		IsModelReferenceTo(
 			that.DerivedFrom(),
-			aastypes.KeyTypesAssetAdministrationShell,
+			ourtypes.KeyTypesAssetAdministrationShell,
 		)) {
 		abort = onError(
 			newVerificationError(
@@ -3410,11 +3410,11 @@ func VerifyAssetAdministrationShell(
 
 	if !(
 		!(that.Submodels() != nil) ||
-		aascommon.All(
-			func(reference aastypes.IReference) bool {
+		ourcommon.All(
+			func(reference ourtypes.IReference) bool {
 				return IsModelReferenceTo(
 						reference,
-						aastypes.KeyTypesSubmodel,
+						ourtypes.KeyTypesSubmodel,
 					)
 			},
 			that.Submodels(),
@@ -3434,13 +3434,13 @@ func VerifyAssetAdministrationShell(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -3459,7 +3459,7 @@ func VerifyAssetAdministrationShell(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -3476,7 +3476,7 @@ func VerifyAssetAdministrationShell(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -3494,13 +3494,13 @@ func VerifyAssetAdministrationShell(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -3520,13 +3520,13 @@ func VerifyAssetAdministrationShell(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -3545,7 +3545,7 @@ func VerifyAssetAdministrationShell(
 			that.Administration(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Administration",
 					},
 				)
@@ -3561,7 +3561,7 @@ func VerifyAssetAdministrationShell(
 		that.ID(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ID",
 				},
 			)
@@ -3578,13 +3578,13 @@ func VerifyAssetAdministrationShell(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -3603,7 +3603,7 @@ func VerifyAssetAdministrationShell(
 			that.DerivedFrom(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "DerivedFrom",
 					},
 				)
@@ -3629,7 +3629,7 @@ func VerifyAssetAdministrationShell(
 			that.AssetInformation(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "AssetInformation",
 					},
 				)
@@ -3647,13 +3647,13 @@ func VerifyAssetAdministrationShell(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Submodels",
 						},
 					)
@@ -3670,22 +3670,22 @@ func VerifyAssetAdministrationShell(
 	return
 }
 
-// Verify `that` instance of [aastypes.IAssetInformation].
+// Verify `that` instance of [ourtypes.IAssetInformation].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAssetInformation(
-	that aastypes.IAssetInformation,
+	that ourtypes.IAssetInformation,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if !(
 		!(that.SpecificAssetIDs() != nil) ||
-		aascommon.All(
-			func(specificAssetID aastypes.ISpecificAssetID) bool {
+		ourcommon.All(
+			func(specificAssetID ourtypes.ISpecificAssetID) bool {
 				return specificAssetID.Name() != "globalAssetId" ||
 					((that.GlobalAssetID() != nil) &&
 					specificAssetID.Name() == "globalAssetId" &&
@@ -3740,7 +3740,7 @@ func VerifyAssetInformation(
 		that.AssetKind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "AssetKind",
 				},
 			)
@@ -3756,7 +3756,7 @@ func VerifyAssetInformation(
 			*that.GlobalAssetID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "GlobalAssetID",
 					},
 				)
@@ -3774,13 +3774,13 @@ func VerifyAssetInformation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SpecificAssetIDs",
 						},
 					)
@@ -3799,7 +3799,7 @@ func VerifyAssetInformation(
 			*that.AssetType(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "AssetType",
 					},
 				)
@@ -3816,7 +3816,7 @@ func VerifyAssetInformation(
 			that.DefaultThumbnail(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "DefaultThumbnail",
 					},
 				)
@@ -3831,14 +3831,14 @@ func VerifyAssetInformation(
 	return
 }
 
-// Verify `that` instance of [aastypes.IResource].
+// Verify `that` instance of [ourtypes.IResource].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyResource(
-	that aastypes.IResource,
+	that ourtypes.IResource,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -3847,7 +3847,7 @@ func VerifyResource(
 		that.Path(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Path",
 				},
 			)
@@ -3863,7 +3863,7 @@ func VerifyResource(
 			*that.ContentType(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ContentType",
 					},
 				)
@@ -3878,14 +3878,14 @@ func VerifyResource(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISpecificAssetID].
+// Verify `that` instance of [ourtypes.ISpecificAssetID].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySpecificAssetID(
-	that aastypes.ISpecificAssetID,
+	that ourtypes.ISpecificAssetID,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -3920,7 +3920,7 @@ func VerifySpecificAssetID(
 
 	if !(
 		!(that.ExternalSubjectID() != nil) ||
-		(that.ExternalSubjectID().Type() == aastypes.ReferenceTypesExternalReference)) {
+		(that.ExternalSubjectID().Type() == ourtypes.ReferenceTypesExternalReference)) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-133: External subject ID shall be " +
@@ -3937,7 +3937,7 @@ func VerifySpecificAssetID(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -3955,13 +3955,13 @@ func VerifySpecificAssetID(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -3979,7 +3979,7 @@ func VerifySpecificAssetID(
 		that.Name(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Name",
 				},
 			)
@@ -3994,7 +3994,7 @@ func VerifySpecificAssetID(
 		that.Value(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Value",
 				},
 			)
@@ -4010,7 +4010,7 @@ func VerifySpecificAssetID(
 			that.ExternalSubjectID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ExternalSubjectID",
 					},
 				)
@@ -4025,14 +4025,14 @@ func VerifySpecificAssetID(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISubmodel].
+// Verify `that` instance of [ourtypes.ISubmodel].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySubmodel(
-	that aastypes.ISubmodel,
+	that ourtypes.ISubmodel,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -4199,8 +4199,8 @@ func VerifySubmodel(
 
 	if !(
 		!(that.SubmodelElements() != nil) ||
-		aascommon.All(
-			func(item aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(item ourtypes.ISubmodelElement) bool {
 				return item.IDShort() != nil
 			},
 			that.SubmodelElements(),
@@ -4235,13 +4235,13 @@ func VerifySubmodel(
 
 	if !(
 		!(that.SubmodelElements() != nil) ||
-		(!(that.KindOrDefault() != aastypes.ModellingKindTemplate) ||
-		aascommon.All(
-			func(submodelElement aastypes.ISubmodelElement) bool {
+		(!(that.KindOrDefault() != ourtypes.ModellingKindTemplate) ||
+		ourcommon.All(
+			func(submodelElement ourtypes.ISubmodelElement) bool {
 				return !(submodelElement.Qualifiers() != nil) ||
-					aascommon.All(
-						func(qualifier aastypes.IQualifier) bool {
-							return qualifier.KindOrDefault() != aastypes.QualifierKindTemplateQualifier
+					ourcommon.All(
+						func(qualifier ourtypes.IQualifier) bool {
+							return qualifier.KindOrDefault() != ourtypes.QualifierKindTemplateQualifier
 						},
 						submodelElement.Qualifiers(),
 					)
@@ -4265,13 +4265,13 @@ func VerifySubmodel(
 
 	if !(
 		!(that.Qualifiers() != nil) ||
-		(!aascommon.Some(
-			func(qualifier aastypes.IQualifier) bool {
-				return qualifier.KindOrDefault() == aastypes.QualifierKindTemplateQualifier
+		(!ourcommon.Some(
+			func(qualifier ourtypes.IQualifier) bool {
+				return qualifier.KindOrDefault() == ourtypes.QualifierKindTemplateQualifier
 			},
 			that.Qualifiers(),
 		) ||
-		(that.KindOrDefault() == aastypes.ModellingKindTemplate))) {
+		(that.KindOrDefault() == ourtypes.ModellingKindTemplate))) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-119: If any qualifier kind value of " +
@@ -4291,13 +4291,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -4316,7 +4316,7 @@ func VerifySubmodel(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -4333,7 +4333,7 @@ func VerifySubmodel(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -4351,13 +4351,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -4377,13 +4377,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -4402,7 +4402,7 @@ func VerifySubmodel(
 			that.Administration(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Administration",
 					},
 				)
@@ -4418,7 +4418,7 @@ func VerifySubmodel(
 		that.ID(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ID",
 				},
 			)
@@ -4434,7 +4434,7 @@ func VerifySubmodel(
 			*that.Kind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Kind",
 					},
 				)
@@ -4451,7 +4451,7 @@ func VerifySubmodel(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -4469,13 +4469,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -4495,13 +4495,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -4521,13 +4521,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -4547,13 +4547,13 @@ func VerifySubmodel(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SubmodelElements",
 						},
 					)
@@ -4570,14 +4570,14 @@ func VerifySubmodel(
 	return
 }
 
-// Verify `that` instance of [aastypes.IRelationshipElement].
+// Verify `that` instance of [ourtypes.IRelationshipElement].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyRelationshipElement(
-	that aastypes.IRelationshipElement,
+	that ourtypes.IRelationshipElement,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -4734,13 +4734,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -4759,7 +4759,7 @@ func VerifyRelationshipElement(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -4776,7 +4776,7 @@ func VerifyRelationshipElement(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -4794,13 +4794,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -4820,13 +4820,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -4845,7 +4845,7 @@ func VerifyRelationshipElement(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -4863,13 +4863,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -4889,13 +4889,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -4915,13 +4915,13 @@ func VerifyRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -4949,7 +4949,7 @@ func VerifyRelationshipElement(
 			that.First(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "First",
 					},
 				)
@@ -4975,7 +4975,7 @@ func VerifyRelationshipElement(
 			that.Second(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Second",
 					},
 				)
@@ -4990,14 +4990,14 @@ func VerifyRelationshipElement(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISubmodelElementList].
+// Verify `that` instance of [ourtypes.ISubmodelElementList].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySubmodelElementList(
-	that aastypes.ISubmodelElementList,
+	that ourtypes.ISubmodelElementList,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -5163,8 +5163,8 @@ func VerifySubmodelElementList(
 	if !(
 		!((that.Value() != nil) &&
 		(that.SemanticIDListElement() != nil)) ||
-		aascommon.All(
-			func(child aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(child ourtypes.ISubmodelElement) bool {
 				return !(child.SemanticID() != nil) ||
 					ReferenceKeyValuesEqual(
 						child.SemanticID(),
@@ -5203,8 +5203,8 @@ func VerifySubmodelElementList(
 
 	if !(
 		!(that.Value() != nil) ||
-		aascommon.All(
-			func(element aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(element ourtypes.ISubmodelElement) bool {
 				return SubmodelElementIsOfType(
 						element,
 						that.TypeValueListElement(),
@@ -5225,8 +5225,8 @@ func VerifySubmodelElementList(
 	}
 
 	if !(
-		!(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
-		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange) ||
+		!(that.TypeValueListElement() == ourtypes.AASSubmodelElementsProperty ||
+		that.TypeValueListElement() == ourtypes.AASSubmodelElementsRange) ||
 		((that.ValueTypeListElement() != nil) &&
 		((that.Value() == nil) ||
 		PropertiesOrRangesHaveValueType(
@@ -5248,8 +5248,8 @@ func VerifySubmodelElementList(
 
 	if !(
 		!(that.Value() != nil) ||
-		aascommon.All(
-			func(element aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(element ourtypes.ISubmodelElement) bool {
 				return element.IDShort() == nil
 			},
 			that.Value(),
@@ -5272,13 +5272,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -5297,7 +5297,7 @@ func VerifySubmodelElementList(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -5314,7 +5314,7 @@ func VerifySubmodelElementList(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -5332,13 +5332,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -5358,13 +5358,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -5383,7 +5383,7 @@ func VerifySubmodelElementList(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -5401,13 +5401,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -5427,13 +5427,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -5453,13 +5453,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -5478,7 +5478,7 @@ func VerifySubmodelElementList(
 			that.SemanticIDListElement(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticIDListElement",
 					},
 				)
@@ -5494,7 +5494,7 @@ func VerifySubmodelElementList(
 		that.TypeValueListElement(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TypeValueListElement",
 				},
 			)
@@ -5510,7 +5510,7 @@ func VerifySubmodelElementList(
 			*that.ValueTypeListElement(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueTypeListElement",
 					},
 				)
@@ -5528,13 +5528,13 @@ func VerifySubmodelElementList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Value",
 						},
 					)
@@ -5551,14 +5551,14 @@ func VerifySubmodelElementList(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISubmodelElementCollection].
+// Verify `that` instance of [ourtypes.ISubmodelElementCollection].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySubmodelElementCollection(
-	that aastypes.ISubmodelElementCollection,
+	that ourtypes.ISubmodelElementCollection,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -5723,8 +5723,8 @@ func VerifySubmodelElementCollection(
 
 	if !(
 		!(that.Value() != nil) ||
-		aascommon.All(
-			func(item aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(item ourtypes.ISubmodelElement) bool {
 				return item.IDShort() != nil
 			},
 			that.Value(),
@@ -5760,13 +5760,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -5785,7 +5785,7 @@ func VerifySubmodelElementCollection(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -5802,7 +5802,7 @@ func VerifySubmodelElementCollection(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -5820,13 +5820,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -5846,13 +5846,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -5871,7 +5871,7 @@ func VerifySubmodelElementCollection(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -5889,13 +5889,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -5915,13 +5915,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -5941,13 +5941,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -5967,13 +5967,13 @@ func VerifySubmodelElementCollection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Value",
 						},
 					)
@@ -5990,14 +5990,14 @@ func VerifySubmodelElementCollection(
 	return
 }
 
-// Verify `that` instance of [aastypes.IProperty].
+// Verify `that` instance of [ourtypes.IProperty].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyProperty(
-	that aastypes.IProperty,
+	that ourtypes.IProperty,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -6150,8 +6150,8 @@ func VerifyProperty(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -6187,13 +6187,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -6212,7 +6212,7 @@ func VerifyProperty(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -6229,7 +6229,7 @@ func VerifyProperty(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -6247,13 +6247,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -6273,13 +6273,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -6298,7 +6298,7 @@ func VerifyProperty(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -6316,13 +6316,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -6342,13 +6342,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -6368,13 +6368,13 @@ func VerifyProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -6392,7 +6392,7 @@ func VerifyProperty(
 		that.ValueType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ValueType",
 				},
 			)
@@ -6408,7 +6408,7 @@ func VerifyProperty(
 			*that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -6425,7 +6425,7 @@ func VerifyProperty(
 			that.ValueID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueID",
 					},
 				)
@@ -6440,14 +6440,14 @@ func VerifyProperty(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMultiLanguageProperty].
+// Verify `that` instance of [ourtypes.IMultiLanguageProperty].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMultiLanguageProperty(
-	that aastypes.IMultiLanguageProperty,
+	that ourtypes.IMultiLanguageProperty,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -6600,8 +6600,8 @@ func VerifyMultiLanguageProperty(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -6646,13 +6646,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -6671,7 +6671,7 @@ func VerifyMultiLanguageProperty(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -6688,7 +6688,7 @@ func VerifyMultiLanguageProperty(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -6706,13 +6706,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -6732,13 +6732,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -6757,7 +6757,7 @@ func VerifyMultiLanguageProperty(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -6775,13 +6775,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -6801,13 +6801,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -6827,13 +6827,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -6853,13 +6853,13 @@ func VerifyMultiLanguageProperty(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Value",
 						},
 					)
@@ -6878,7 +6878,7 @@ func VerifyMultiLanguageProperty(
 			that.ValueID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueID",
 					},
 				)
@@ -6893,14 +6893,14 @@ func VerifyMultiLanguageProperty(
 	return
 }
 
-// Verify `that` instance of [aastypes.IRange].
+// Verify `that` instance of [ourtypes.IRange].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyRange(
-	that aastypes.IRange,
+	that ourtypes.IRange,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -7053,8 +7053,8 @@ func VerifyRange(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -7105,13 +7105,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -7130,7 +7130,7 @@ func VerifyRange(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -7147,7 +7147,7 @@ func VerifyRange(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -7165,13 +7165,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -7191,13 +7191,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -7216,7 +7216,7 @@ func VerifyRange(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -7234,13 +7234,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -7260,13 +7260,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -7286,13 +7286,13 @@ func VerifyRange(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -7310,7 +7310,7 @@ func VerifyRange(
 		that.ValueType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ValueType",
 				},
 			)
@@ -7326,7 +7326,7 @@ func VerifyRange(
 			*that.Min(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Min",
 					},
 				)
@@ -7343,7 +7343,7 @@ func VerifyRange(
 			*that.Max(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Max",
 					},
 				)
@@ -7358,14 +7358,14 @@ func VerifyRange(
 	return
 }
 
-// Verify `that` instance of [aastypes.IReferenceElement].
+// Verify `that` instance of [ourtypes.IReferenceElement].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyReferenceElement(
-	that aastypes.IReferenceElement,
+	that ourtypes.IReferenceElement,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -7518,8 +7518,8 @@ func VerifyReferenceElement(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -7540,13 +7540,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -7565,7 +7565,7 @@ func VerifyReferenceElement(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -7582,7 +7582,7 @@ func VerifyReferenceElement(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -7600,13 +7600,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -7626,13 +7626,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -7651,7 +7651,7 @@ func VerifyReferenceElement(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -7669,13 +7669,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -7695,13 +7695,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -7721,13 +7721,13 @@ func VerifyReferenceElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -7746,7 +7746,7 @@ func VerifyReferenceElement(
 			that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -7761,14 +7761,14 @@ func VerifyReferenceElement(
 	return
 }
 
-// Verify `that` instance of [aastypes.IBlob].
+// Verify `that` instance of [ourtypes.IBlob].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBlob(
-	that aastypes.IBlob,
+	that ourtypes.IBlob,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -7921,8 +7921,8 @@ func VerifyBlob(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -7943,13 +7943,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -7968,7 +7968,7 @@ func VerifyBlob(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -7985,7 +7985,7 @@ func VerifyBlob(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -8003,13 +8003,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -8029,13 +8029,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -8054,7 +8054,7 @@ func VerifyBlob(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -8072,13 +8072,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -8098,13 +8098,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -8124,13 +8124,13 @@ func VerifyBlob(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -8149,7 +8149,7 @@ func VerifyBlob(
 			that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -8165,7 +8165,7 @@ func VerifyBlob(
 		that.ContentType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ContentType",
 				},
 			)
@@ -8179,14 +8179,14 @@ func VerifyBlob(
 	return
 }
 
-// Verify `that` instance of [aastypes.IFile].
+// Verify `that` instance of [ourtypes.IFile].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyFile(
-	that aastypes.IFile,
+	that ourtypes.IFile,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -8339,8 +8339,8 @@ func VerifyFile(
 
 	if !(
 		!(that.Category() != nil) ||
-		aascommon.MapContains(
-			aasconstants.ValidCategoriesForDataElement,
+		ourcommon.MapContains(
+			ourconstants.ValidCategoriesForDataElement,
 			*that.Category(),
 		)) {
 		abort = onError(
@@ -8361,13 +8361,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -8386,7 +8386,7 @@ func VerifyFile(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -8403,7 +8403,7 @@ func VerifyFile(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -8421,13 +8421,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -8447,13 +8447,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -8472,7 +8472,7 @@ func VerifyFile(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -8490,13 +8490,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -8516,13 +8516,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -8542,13 +8542,13 @@ func VerifyFile(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -8567,7 +8567,7 @@ func VerifyFile(
 			*that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -8583,7 +8583,7 @@ func VerifyFile(
 		that.ContentType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ContentType",
 				},
 			)
@@ -8597,14 +8597,14 @@ func VerifyFile(
 	return
 }
 
-// Verify `that` instance of [aastypes.IAnnotatedRelationshipElement].
+// Verify `that` instance of [ourtypes.IAnnotatedRelationshipElement].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAnnotatedRelationshipElement(
-	that aastypes.IAnnotatedRelationshipElement,
+	that ourtypes.IAnnotatedRelationshipElement,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -8771,8 +8771,8 @@ func VerifyAnnotatedRelationshipElement(
 
 	if !(
 		!(that.Annotations() != nil) ||
-		aascommon.All(
-			func(item aastypes.IDataElement) bool {
+		ourcommon.All(
+			func(item ourtypes.IDataElement) bool {
 				return item.IDShort() != nil
 			},
 			that.Annotations(),
@@ -8796,13 +8796,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -8821,7 +8821,7 @@ func VerifyAnnotatedRelationshipElement(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -8838,7 +8838,7 @@ func VerifyAnnotatedRelationshipElement(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -8856,13 +8856,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -8882,13 +8882,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -8907,7 +8907,7 @@ func VerifyAnnotatedRelationshipElement(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -8925,13 +8925,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -8951,13 +8951,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -8977,13 +8977,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -9011,7 +9011,7 @@ func VerifyAnnotatedRelationshipElement(
 			that.First(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "First",
 					},
 				)
@@ -9037,7 +9037,7 @@ func VerifyAnnotatedRelationshipElement(
 			that.Second(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Second",
 					},
 				)
@@ -9055,13 +9055,13 @@ func VerifyAnnotatedRelationshipElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Annotations",
 						},
 					)
@@ -9078,14 +9078,14 @@ func VerifyAnnotatedRelationshipElement(
 	return
 }
 
-// Verify `that` instance of [aastypes.IEntity].
+// Verify `that` instance of [ourtypes.IEntity].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyEntity(
-	that aastypes.IEntity,
+	that ourtypes.IEntity,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -9250,8 +9250,8 @@ func VerifyEntity(
 
 	if !(
 		!(that.Statements() != nil) ||
-		aascommon.All(
-			func(item aastypes.ISubmodelElement) bool {
+		ourcommon.All(
+			func(item ourtypes.ISubmodelElement) bool {
 				return item.IDShort() != nil
 			},
 			that.Statements(),
@@ -9270,13 +9270,13 @@ func VerifyEntity(
 	}
 
 	if !(
-		(that.EntityType() == aastypes.EntityTypeSelfManagedEntity &&
+		(that.EntityType() == ourtypes.EntityTypeSelfManagedEntity &&
 		(((that.GlobalAssetID() != nil) &&
 		(that.SpecificAssetIDs() == nil)) ||
 		((that.GlobalAssetID() == nil) &&
 		(that.SpecificAssetIDs() != nil) &&
 		len(that.SpecificAssetIDs()) >= 1))) ||
-		(that.EntityType() != aastypes.EntityTypeSelfManagedEntity &&
+		(that.EntityType() != ourtypes.EntityTypeSelfManagedEntity &&
 		(that.GlobalAssetID() == nil) &&
 		(that.SpecificAssetIDs() == nil))) {
 		abort = onError(
@@ -9311,13 +9311,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -9336,7 +9336,7 @@ func VerifyEntity(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -9353,7 +9353,7 @@ func VerifyEntity(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -9371,13 +9371,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -9397,13 +9397,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -9422,7 +9422,7 @@ func VerifyEntity(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -9440,13 +9440,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -9466,13 +9466,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -9492,13 +9492,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -9518,13 +9518,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Statements",
 						},
 					)
@@ -9542,7 +9542,7 @@ func VerifyEntity(
 		that.EntityType(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "EntityType",
 				},
 			)
@@ -9558,7 +9558,7 @@ func VerifyEntity(
 			*that.GlobalAssetID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "GlobalAssetID",
 					},
 				)
@@ -9576,13 +9576,13 @@ func VerifyEntity(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SpecificAssetIDs",
 						},
 					)
@@ -9599,14 +9599,14 @@ func VerifyEntity(
 	return
 }
 
-// Verify `that` instance of [aastypes.IEventPayload].
+// Verify `that` instance of [ourtypes.IEventPayload].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyEventPayload(
-	that aastypes.IEventPayload,
+	that ourtypes.IEventPayload,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -9614,11 +9614,11 @@ func VerifyEventPayload(
 	if !(
 		IsModelReferenceTo(
 			that.Source(),
-			aastypes.KeyTypesEventElement,
+			ourtypes.KeyTypesEventElement,
 		) ||
 		IsModelReferenceTo(
 			that.Source(),
-			aastypes.KeyTypesBasicEventElement,
+			ourtypes.KeyTypesBasicEventElement,
 		)) {
 		abort = onError(
 			newVerificationError(
@@ -9658,7 +9658,7 @@ func VerifyEventPayload(
 			that.Source(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Source",
 					},
 				)
@@ -9675,7 +9675,7 @@ func VerifyEventPayload(
 			that.SourceSemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SourceSemanticID",
 					},
 				)
@@ -9701,7 +9701,7 @@ func VerifyEventPayload(
 			that.ObservableReference(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ObservableReference",
 					},
 				)
@@ -9718,7 +9718,7 @@ func VerifyEventPayload(
 			that.ObservableSemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ObservableSemanticID",
 					},
 				)
@@ -9735,7 +9735,7 @@ func VerifyEventPayload(
 			*that.Topic(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Topic",
 					},
 				)
@@ -9752,7 +9752,7 @@ func VerifyEventPayload(
 			that.SubjectID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SubjectID",
 					},
 				)
@@ -9768,7 +9768,7 @@ func VerifyEventPayload(
 		that.TimeStamp(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TimeStamp",
 				},
 			)
@@ -9784,7 +9784,7 @@ func VerifyEventPayload(
 			that.Payload(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Payload",
 					},
 				)
@@ -9799,14 +9799,14 @@ func VerifyEventPayload(
 	return
 }
 
-// Verify `that` instance of [aastypes.IBasicEventElement].
+// Verify `that` instance of [ourtypes.IBasicEventElement].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBasicEventElement(
-	that aastypes.IBasicEventElement,
+	that ourtypes.IBasicEventElement,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -9958,7 +9958,7 @@ func VerifyBasicEventElement(
 	}
 
 	if !(
-		!(that.Direction() == aastypes.DirectionInput) ||
+		!(that.Direction() == ourtypes.DirectionInput) ||
 		(that.MaxInterval() == nil)) {
 		abort = onError(
 			newVerificationError(
@@ -9997,13 +9997,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -10022,7 +10022,7 @@ func VerifyBasicEventElement(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -10039,7 +10039,7 @@ func VerifyBasicEventElement(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -10057,13 +10057,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -10083,13 +10083,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -10108,7 +10108,7 @@ func VerifyBasicEventElement(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -10126,13 +10126,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -10152,13 +10152,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -10178,13 +10178,13 @@ func VerifyBasicEventElement(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -10212,7 +10212,7 @@ func VerifyBasicEventElement(
 			that.Observed(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Observed",
 					},
 				)
@@ -10228,7 +10228,7 @@ func VerifyBasicEventElement(
 		that.Direction(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Direction",
 				},
 			)
@@ -10243,7 +10243,7 @@ func VerifyBasicEventElement(
 		that.State(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "State",
 				},
 			)
@@ -10259,7 +10259,7 @@ func VerifyBasicEventElement(
 			*that.MessageTopic(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "MessageTopic",
 					},
 				)
@@ -10276,7 +10276,7 @@ func VerifyBasicEventElement(
 			that.MessageBroker(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "MessageBroker",
 					},
 				)
@@ -10293,7 +10293,7 @@ func VerifyBasicEventElement(
 			*that.LastUpdate(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "LastUpdate",
 					},
 				)
@@ -10310,7 +10310,7 @@ func VerifyBasicEventElement(
 			*that.MinInterval(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "MinInterval",
 					},
 				)
@@ -10327,7 +10327,7 @@ func VerifyBasicEventElement(
 			*that.MaxInterval(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "MaxInterval",
 					},
 				)
@@ -10342,14 +10342,14 @@ func VerifyBasicEventElement(
 	return
 }
 
-// Verify `that` instance of [aastypes.IOperation].
+// Verify `that` instance of [ourtypes.IOperation].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyOperation(
-	that aastypes.IOperation,
+	that ourtypes.IOperation,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -10565,13 +10565,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -10590,7 +10590,7 @@ func VerifyOperation(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -10607,7 +10607,7 @@ func VerifyOperation(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -10625,13 +10625,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -10651,13 +10651,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -10676,7 +10676,7 @@ func VerifyOperation(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -10694,13 +10694,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -10720,13 +10720,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -10746,13 +10746,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -10772,13 +10772,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "InputVariables",
 						},
 					)
@@ -10798,13 +10798,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "OutputVariables",
 						},
 					)
@@ -10824,13 +10824,13 @@ func VerifyOperation(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "InoutputVariables",
 						},
 					)
@@ -10847,14 +10847,14 @@ func VerifyOperation(
 	return
 }
 
-// Verify `that` instance of [aastypes.IOperationVariable].
+// Verify `that` instance of [ourtypes.IOperationVariable].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyOperationVariable(
-	that aastypes.IOperationVariable,
+	that ourtypes.IOperationVariable,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -10887,7 +10887,7 @@ func VerifyOperationVariable(
 			that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -10902,14 +10902,14 @@ func VerifyOperationVariable(
 	return
 }
 
-// Verify `that` instance of [aastypes.ICapability].
+// Verify `that` instance of [ourtypes.ICapability].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyCapability(
-	that aastypes.ICapability,
+	that ourtypes.ICapability,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -11066,13 +11066,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -11091,7 +11091,7 @@ func VerifyCapability(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -11108,7 +11108,7 @@ func VerifyCapability(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -11126,13 +11126,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -11152,13 +11152,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -11177,7 +11177,7 @@ func VerifyCapability(
 			that.SemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SemanticID",
 					},
 				)
@@ -11195,13 +11195,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "SupplementalSemanticIDs",
 						},
 					)
@@ -11221,13 +11221,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Qualifiers",
 						},
 					)
@@ -11247,13 +11247,13 @@ func VerifyCapability(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -11270,14 +11270,14 @@ func VerifyCapability(
 	return
 }
 
-// Verify `that` instance of [aastypes.IConceptDescription].
+// Verify `that` instance of [ourtypes.IConceptDescription].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyConceptDescription(
-	that aastypes.IConceptDescription,
+	that ourtypes.IConceptDescription,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -11497,13 +11497,13 @@ func VerifyConceptDescription(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Extensions",
 						},
 					)
@@ -11522,7 +11522,7 @@ func VerifyConceptDescription(
 			*that.Category(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Category",
 					},
 				)
@@ -11539,7 +11539,7 @@ func VerifyConceptDescription(
 			*that.IDShort(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "IDShort",
 					},
 				)
@@ -11557,13 +11557,13 @@ func VerifyConceptDescription(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "DisplayName",
 						},
 					)
@@ -11583,13 +11583,13 @@ func VerifyConceptDescription(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Description",
 						},
 					)
@@ -11608,7 +11608,7 @@ func VerifyConceptDescription(
 			that.Administration(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Administration",
 					},
 				)
@@ -11624,7 +11624,7 @@ func VerifyConceptDescription(
 		that.ID(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "ID",
 				},
 			)
@@ -11641,13 +11641,13 @@ func VerifyConceptDescription(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "EmbeddedDataSpecifications",
 						},
 					)
@@ -11667,13 +11667,13 @@ func VerifyConceptDescription(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "IsCaseOf",
 						},
 					)
@@ -11690,14 +11690,14 @@ func VerifyConceptDescription(
 	return
 }
 
-// Verify `that` instance of [aastypes.IReference].
+// Verify `that` instance of [ourtypes.IReference].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyReference(
-	that aastypes.IReference,
+	that ourtypes.IReference,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -11714,8 +11714,8 @@ func VerifyReference(
 
 	if !(
 		!(len(that.Keys()) >= 1) ||
-		aascommon.MapContains(
-			aasconstants.GloballyIdentifiables,
+		ourcommon.MapContains(
+			ourconstants.GloballyIdentifiables,
 			that.Keys()[0].Type(),
 		)) {
 		abort = onError(
@@ -11731,10 +11731,10 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesExternalReference &&
+		!(that.Type() == ourtypes.ReferenceTypesExternalReference &&
 		len(that.Keys()) >= 1) ||
-		aascommon.MapContains(
-			aasconstants.GenericGloballyIdentifiables,
+		ourcommon.MapContains(
+			ourconstants.GenericGloballyIdentifiables,
 			that.Keys()[0].Type(),
 		)) {
 		abort = onError(
@@ -11750,10 +11750,10 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesModelReference &&
+		!(that.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(that.Keys()) >= 1) ||
-		aascommon.MapContains(
-			aasconstants.AASIdentifiables,
+		ourcommon.MapContains(
+			ourconstants.AASIdentifiables,
 			that.Keys()[0].Type(),
 		)) {
 		abort = onError(
@@ -11768,14 +11768,14 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesExternalReference &&
+		!(that.Type() == ourtypes.ReferenceTypesExternalReference &&
 		len(that.Keys()) >= 1) ||
-		(aascommon.MapContains(
-			aasconstants.GenericGloballyIdentifiables,
+		(ourcommon.MapContains(
+			ourconstants.GenericGloballyIdentifiables,
 			that.Keys()[len(that.Keys()) - 1].Type(),
 		) ||
-		aascommon.MapContains(
-			aasconstants.GenericFragmentKeys,
+		ourcommon.MapContains(
+			ourconstants.GenericFragmentKeys,
 			that.Keys()[len(that.Keys()) - 1].Type(),
 		))) {
 		abort = onError(
@@ -11791,12 +11791,12 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesModelReference &&
+		!(that.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(that.Keys()) > 1) ||
-		aascommon.AllRange(
+		ourcommon.AllRange(
 			func(i int) bool {
-				return aascommon.MapContains(
-						aasconstants.FragmentKeys,
+				return ourcommon.MapContains(
+						ourconstants.FragmentKeys,
 						that.Keys()[i].Type(),
 					)
 			},
@@ -11817,12 +11817,12 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesModelReference &&
+		!(that.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(that.Keys()) > 1) ||
-		aascommon.AllRange(
+		ourcommon.AllRange(
 			func(i int) bool {
-				return !aascommon.MapContains(
-						aasconstants.GenericFragmentKeys,
+				return !ourcommon.MapContains(
+						ourconstants.GenericFragmentKeys,
 						that.Keys()[i].Type(),
 					)
 			},
@@ -11844,11 +11844,11 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesModelReference &&
+		!(that.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(that.Keys()) > 1 &&
-		that.Keys()[len(that.Keys()) - 1].Type() == aastypes.KeyTypesFragmentReference) ||
-		(that.Keys()[len(that.Keys()) - 2].Type() == aastypes.KeyTypesFile ||
-		that.Keys()[len(that.Keys()) - 2].Type() == aastypes.KeyTypesBlob)) {
+		that.Keys()[len(that.Keys()) - 1].Type() == ourtypes.KeyTypesFragmentReference) ||
+		(that.Keys()[len(that.Keys()) - 2].Type() == ourtypes.KeyTypesFile ||
+		that.Keys()[len(that.Keys()) - 2].Type() == ourtypes.KeyTypesBlob)) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-127: For model references, with more than " +
@@ -11862,11 +11862,11 @@ func VerifyReference(
 	}
 
 	if !(
-		!(that.Type() == aastypes.ReferenceTypesModelReference &&
+		!(that.Type() == ourtypes.ReferenceTypesModelReference &&
 		len(that.Keys()) > 2) ||
-		aascommon.AllRange(
+		ourcommon.AllRange(
 			func(i int) bool {
-				return !(that.Keys()[i].Type() == aastypes.KeyTypesSubmodelElementList) ||
+				return !(that.Keys()[i].Type() == ourtypes.KeyTypesSubmodelElementList) ||
 					MatchesXsNonNegativeInteger(
 						that.Keys()[i + 1].Value(),
 					)
@@ -11891,7 +11891,7 @@ func VerifyReference(
 		that.Type(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Type",
 				},
 			)
@@ -11907,7 +11907,7 @@ func VerifyReference(
 			that.ReferredSemanticID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ReferredSemanticID",
 					},
 				)
@@ -11934,13 +11934,13 @@ func VerifyReference(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Keys",
 						},
 					)
@@ -11957,14 +11957,14 @@ func VerifyReference(
 	return
 }
 
-// Verify `that` instance of [aastypes.IKey].
+// Verify `that` instance of [ourtypes.IKey].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKey(
-	that aastypes.IKey,
+	that ourtypes.IKey,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -11973,7 +11973,7 @@ func VerifyKey(
 		that.Type(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Type",
 				},
 			)
@@ -11988,7 +11988,7 @@ func VerifyKey(
 		that.Value(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Value",
 				},
 			)
@@ -12002,19 +12002,19 @@ func VerifyKey(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringNameType].
+// Verify `that` instance of [ourtypes.ILangStringNameType].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringNameType(
-	that aastypes.ILangStringNameType,
+	that ourtypes.ILangStringNameType,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.Text()) <= 128) {
+	if !(ourcommon.LenStr(that.Text()) <= 128) {
 		abort = onError(
 			newVerificationError(
 				"String shall have a maximum length of 128 characters.",),
@@ -12028,7 +12028,7 @@ func VerifyLangStringNameType(
 		that.Language(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Language",
 				},
 			)
@@ -12043,7 +12043,7 @@ func VerifyLangStringNameType(
 		that.Text(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Text",
 				},
 			)
@@ -12057,19 +12057,19 @@ func VerifyLangStringNameType(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringTextType].
+// Verify `that` instance of [ourtypes.ILangStringTextType].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringTextType(
-	that aastypes.ILangStringTextType,
+	that ourtypes.ILangStringTextType,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.Text()) <= 1023) {
+	if !(ourcommon.LenStr(that.Text()) <= 1023) {
 		abort = onError(
 			newVerificationError(
 				"String shall have a maximum length of 1023 characters.",),
@@ -12083,7 +12083,7 @@ func VerifyLangStringTextType(
 		that.Language(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Language",
 				},
 			)
@@ -12098,7 +12098,7 @@ func VerifyLangStringTextType(
 		that.Text(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Text",
 				},
 			)
@@ -12112,14 +12112,14 @@ func VerifyLangStringTextType(
 	return
 }
 
-// Verify `that` instance of [aastypes.IEnvironment].
+// Verify `that` instance of [ourtypes.IEnvironment].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyEnvironment(
-	that aastypes.IEnvironment,
+	that ourtypes.IEnvironment,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12170,13 +12170,13 @@ func VerifyEnvironment(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "AssetAdministrationShells",
 						},
 					)
@@ -12196,13 +12196,13 @@ func VerifyEnvironment(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Submodels",
 						},
 					)
@@ -12222,13 +12222,13 @@ func VerifyEnvironment(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ConceptDescriptions",
 						},
 					)
@@ -12245,14 +12245,14 @@ func VerifyEnvironment(
 	return
 }
 
-// Verify `that` instance of [aastypes.IEmbeddedDataSpecification].
+// Verify `that` instance of [ourtypes.IEmbeddedDataSpecification].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyEmbeddedDataSpecification(
-	that aastypes.IEmbeddedDataSpecification,
+	that ourtypes.IEmbeddedDataSpecification,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12271,7 +12271,7 @@ func VerifyEmbeddedDataSpecification(
 			that.DataSpecification(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "DataSpecification",
 					},
 				)
@@ -12297,7 +12297,7 @@ func VerifyEmbeddedDataSpecification(
 			that.DataSpecificationContent(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "DataSpecificationContent",
 					},
 				)
@@ -12312,14 +12312,14 @@ func VerifyEmbeddedDataSpecification(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILevelType].
+// Verify `that` instance of [ourtypes.ILevelType].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLevelType(
-	that aastypes.ILevelType,
+	that ourtypes.ILevelType,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12329,14 +12329,14 @@ func VerifyLevelType(
 	return
 }
 
-// Verify `that` instance of [aastypes.IValueReferencePair].
+// Verify `that` instance of [ourtypes.IValueReferencePair].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyValueReferencePair(
-	that aastypes.IValueReferencePair,
+	that ourtypes.IValueReferencePair,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12345,7 +12345,7 @@ func VerifyValueReferencePair(
 		that.Value(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Value",
 				},
 			)
@@ -12370,7 +12370,7 @@ func VerifyValueReferencePair(
 			that.ValueID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueID",
 					},
 				)
@@ -12385,14 +12385,14 @@ func VerifyValueReferencePair(
 	return
 }
 
-// Verify `that` instance of [aastypes.IValueList].
+// Verify `that` instance of [ourtypes.IValueList].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyValueList(
-	that aastypes.IValueList,
+	that ourtypes.IValueList,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12422,13 +12422,13 @@ func VerifyValueList(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ValueReferencePairs",
 						},
 					)
@@ -12445,19 +12445,19 @@ func VerifyValueList(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringPreferredNameTypeIEC61360].
+// Verify `that` instance of [ourtypes.ILangStringPreferredNameTypeIEC61360].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringPreferredNameTypeIEC61360(
-	that aastypes.ILangStringPreferredNameTypeIEC61360,
+	that ourtypes.ILangStringPreferredNameTypeIEC61360,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.Text()) <= 255) {
+	if !(ourcommon.LenStr(that.Text()) <= 255) {
 		abort = onError(
 			newVerificationError(
 				"String shall have a maximum length of 255 characters.",),
@@ -12471,7 +12471,7 @@ func VerifyLangStringPreferredNameTypeIEC61360(
 		that.Language(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Language",
 				},
 			)
@@ -12486,7 +12486,7 @@ func VerifyLangStringPreferredNameTypeIEC61360(
 		that.Text(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Text",
 				},
 			)
@@ -12500,19 +12500,19 @@ func VerifyLangStringPreferredNameTypeIEC61360(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringShortNameTypeIEC61360].
+// Verify `that` instance of [ourtypes.ILangStringShortNameTypeIEC61360].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringShortNameTypeIEC61360(
-	that aastypes.ILangStringShortNameTypeIEC61360,
+	that ourtypes.ILangStringShortNameTypeIEC61360,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.Text()) <= 18) {
+	if !(ourcommon.LenStr(that.Text()) <= 18) {
 		abort = onError(
 			newVerificationError(
 				"String shall have a maximum length of 18 characters.",),
@@ -12526,7 +12526,7 @@ func VerifyLangStringShortNameTypeIEC61360(
 		that.Language(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Language",
 				},
 			)
@@ -12541,7 +12541,7 @@ func VerifyLangStringShortNameTypeIEC61360(
 		that.Text(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Text",
 				},
 			)
@@ -12555,19 +12555,19 @@ func VerifyLangStringShortNameTypeIEC61360(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILangStringDefinitionTypeIEC61360].
+// Verify `that` instance of [ourtypes.ILangStringDefinitionTypeIEC61360].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLangStringDefinitionTypeIEC61360(
-	that aastypes.ILangStringDefinitionTypeIEC61360,
+	that ourtypes.ILangStringDefinitionTypeIEC61360,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.Text()) <= 1023) {
+	if !(ourcommon.LenStr(that.Text()) <= 1023) {
 		abort = onError(
 			newVerificationError(
 				"String shall have a maximum length of 1023 characters.",),
@@ -12581,7 +12581,7 @@ func VerifyLangStringDefinitionTypeIEC61360(
 		that.Language(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Language",
 				},
 			)
@@ -12596,7 +12596,7 @@ func VerifyLangStringDefinitionTypeIEC61360(
 		that.Text(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Text",
 				},
 			)
@@ -12610,14 +12610,14 @@ func VerifyLangStringDefinitionTypeIEC61360(
 	return
 }
 
-// Verify `that` instance of [aastypes.IDataSpecificationIEC61360].
+// Verify `that` instance of [ourtypes.IDataSpecificationIEC61360].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyDataSpecificationIEC61360(
-	that aastypes.IDataSpecificationIEC61360,
+	that ourtypes.IDataSpecificationIEC61360,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -12638,8 +12638,8 @@ func VerifyDataSpecificationIEC61360(
 
 	if !(
 		!((that.DataType() != nil) &&
-		aascommon.MapContains(
-			aasconstants.IEC61360DataTypesWithUnit,
+		ourcommon.MapContains(
+			ourconstants.IEC61360DataTypesWithUnit,
 			*that.DataType(),
 		)) ||
 		((that.Unit() != nil) ||
@@ -12726,8 +12726,8 @@ func VerifyDataSpecificationIEC61360(
 	}
 
 	if !(
-		aascommon.Some(
-			func(langString aastypes.ILangStringPreferredNameTypeIEC61360) bool {
+		ourcommon.Some(
+			func(langString ourtypes.ILangStringPreferredNameTypeIEC61360) bool {
 				return IsBCP47ForEnglish(langString.Language())
 			},
 			that.PreferredName(),
@@ -12758,13 +12758,13 @@ func VerifyDataSpecificationIEC61360(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "PreferredName",
 						},
 					)
@@ -12784,13 +12784,13 @@ func VerifyDataSpecificationIEC61360(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ShortName",
 						},
 					)
@@ -12809,7 +12809,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.Unit(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Unit",
 					},
 				)
@@ -12826,7 +12826,7 @@ func VerifyDataSpecificationIEC61360(
 			that.UnitID(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "UnitID",
 					},
 				)
@@ -12843,7 +12843,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.SourceOfDefinition(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SourceOfDefinition",
 					},
 				)
@@ -12860,7 +12860,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.Symbol(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Symbol",
 					},
 				)
@@ -12877,7 +12877,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.DataType(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "DataType",
 					},
 				)
@@ -12895,13 +12895,13 @@ func VerifyDataSpecificationIEC61360(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Definition",
 						},
 					)
@@ -12920,7 +12920,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.ValueFormat(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueFormat",
 					},
 				)
@@ -12937,7 +12937,7 @@ func VerifyDataSpecificationIEC61360(
 			that.ValueList(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ValueList",
 					},
 				)
@@ -12954,7 +12954,7 @@ func VerifyDataSpecificationIEC61360(
 			*that.Value(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -12971,7 +12971,7 @@ func VerifyDataSpecificationIEC61360(
 			that.LevelType(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "LevelType",
 					},
 				)
@@ -12994,14 +12994,14 @@ func VerifyDataSpecificationIEC61360(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyModellingKind(
-	that aastypes.ModellingKind,
+	that ourtypes.ModellingKind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.ModellingKindTemplate ||
-		that > aastypes.ModellingKindInstance {
+		that < ourtypes.ModellingKindTemplate ||
+		that > ourtypes.ModellingKindInstance {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13023,14 +13023,14 @@ func VerifyModellingKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyQualifierKind(
-	that aastypes.QualifierKind,
+	that ourtypes.QualifierKind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.QualifierKindValueQualifier ||
-		that > aastypes.QualifierKindTemplateQualifier {
+		that < ourtypes.QualifierKindValueQualifier ||
+		that > ourtypes.QualifierKindTemplateQualifier {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13052,14 +13052,14 @@ func VerifyQualifierKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAssetKind(
-	that aastypes.AssetKind,
+	that ourtypes.AssetKind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.AssetKindType ||
-		that > aastypes.AssetKindNotApplicable {
+		that < ourtypes.AssetKindType ||
+		that > ourtypes.AssetKindNotApplicable {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13081,14 +13081,14 @@ func VerifyAssetKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAASSubmodelElements(
-	that aastypes.AASSubmodelElements,
+	that ourtypes.AASSubmodelElements,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.AASSubmodelElementsAnnotatedRelationshipElement ||
-		that > aastypes.AASSubmodelElementsSubmodelElementCollection {
+		that < ourtypes.AASSubmodelElementsAnnotatedRelationshipElement ||
+		that > ourtypes.AASSubmodelElementsSubmodelElementCollection {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13110,14 +13110,14 @@ func VerifyAASSubmodelElements(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyEntityType(
-	that aastypes.EntityType,
+	that ourtypes.EntityType,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.EntityTypeCoManagedEntity ||
-		that > aastypes.EntityTypeSelfManagedEntity {
+		that < ourtypes.EntityTypeCoManagedEntity ||
+		that > ourtypes.EntityTypeSelfManagedEntity {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13139,14 +13139,14 @@ func VerifyEntityType(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyDirection(
-	that aastypes.Direction,
+	that ourtypes.Direction,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.DirectionInput ||
-		that > aastypes.DirectionOutput {
+		that < ourtypes.DirectionInput ||
+		that > ourtypes.DirectionOutput {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13168,14 +13168,14 @@ func VerifyDirection(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyStateOfEvent(
-	that aastypes.StateOfEvent,
+	that ourtypes.StateOfEvent,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.StateOfEventOn ||
-		that > aastypes.StateOfEventOff {
+		that < ourtypes.StateOfEventOn ||
+		that > ourtypes.StateOfEventOff {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13197,14 +13197,14 @@ func VerifyStateOfEvent(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyReferenceTypes(
-	that aastypes.ReferenceTypes,
+	that ourtypes.ReferenceTypes,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.ReferenceTypesExternalReference ||
-		that > aastypes.ReferenceTypesModelReference {
+		that < ourtypes.ReferenceTypesExternalReference ||
+		that > ourtypes.ReferenceTypesModelReference {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13226,14 +13226,14 @@ func VerifyReferenceTypes(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKeyTypes(
-	that aastypes.KeyTypes,
+	that ourtypes.KeyTypes,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KeyTypesAnnotatedRelationshipElement ||
-		that > aastypes.KeyTypesSubmodelElementList {
+		that < ourtypes.KeyTypesAnnotatedRelationshipElement ||
+		that > ourtypes.KeyTypesSubmodelElementList {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13255,14 +13255,14 @@ func VerifyKeyTypes(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyDataTypeDefXSD(
-	that aastypes.DataTypeDefXSD,
+	that ourtypes.DataTypeDefXSD,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.DataTypeDefXSDAnyURI ||
-		that > aastypes.DataTypeDefXSDUnsignedShort {
+		that < ourtypes.DataTypeDefXSDAnyURI ||
+		that > ourtypes.DataTypeDefXSDUnsignedShort {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13284,14 +13284,14 @@ func VerifyDataTypeDefXSD(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyDataTypeIEC61360(
-	that aastypes.DataTypeIEC61360,
+	that ourtypes.DataTypeIEC61360,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.DataTypeIEC61360Date ||
-		that > aastypes.DataTypeIEC61360Blob {
+		that < ourtypes.DataTypeIEC61360Date ||
+		that > ourtypes.DataTypeIEC61360Blob {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -13358,7 +13358,7 @@ func VerifyNonEmptyXMLSerializableString(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13477,7 +13477,7 @@ func VerifyIdentifier(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13487,7 +13487,7 @@ func VerifyIdentifier(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 2000) {
+	if !(ourcommon.LenStr(that) <= 2000) {
 		abort = onError(
 			newVerificationError(
 				"Identifier shall have a maximum length of 2000 characters.",),
@@ -13525,7 +13525,7 @@ func VerifyValueTypeIEC61360(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13535,7 +13535,7 @@ func VerifyValueTypeIEC61360(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 2000) {
+	if !(ourcommon.LenStr(that) <= 2000) {
 		abort = onError(
 			newVerificationError(
 				"Value type IEC 61360 shall have a maximum length of 2000 " +
@@ -13575,7 +13575,7 @@ func VerifyNameType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13585,7 +13585,7 @@ func VerifyNameType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 128) {
+	if !(ourcommon.LenStr(that) <= 128) {
 		abort = onError(
 			newVerificationError(
 				"Name type shall have a maximum length of 128 characters.",),
@@ -13623,7 +13623,7 @@ func VerifyVersionType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13643,7 +13643,7 @@ func VerifyVersionType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 4) {
+	if !(ourcommon.LenStr(that) <= 4) {
 		abort = onError(
 			newVerificationError(
 				"Version type shall have a maximum length of 4 characters.",),
@@ -13681,7 +13681,7 @@ func VerifyRevisionType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13701,7 +13701,7 @@ func VerifyRevisionType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 4) {
+	if !(ourcommon.LenStr(that) <= 4) {
 		abort = onError(
 			newVerificationError(
 				"Revision type shall have a maximum length of 4 characters.",),
@@ -13739,7 +13739,7 @@ func VerifyLabelType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13749,7 +13749,7 @@ func VerifyLabelType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 64) {
+	if !(ourcommon.LenStr(that) <= 64) {
 		abort = onError(
 			newVerificationError(
 				"Label type shall have a maximum length of 64 characters.",),
@@ -13787,7 +13787,7 @@ func VerifyMessageTopicType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13797,7 +13797,7 @@ func VerifyMessageTopicType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 255) {
+	if !(ourcommon.LenStr(that) <= 255) {
 		abort = onError(
 			newVerificationError(
 				"Message topic type shall have a maximum length of 255 " +
@@ -13864,7 +13864,7 @@ func VerifyContentType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13874,7 +13874,7 @@ func VerifyContentType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 100) {
+	if !(ourcommon.LenStr(that) <= 100) {
 		abort = onError(
 			newVerificationError(
 				"Content type shall have a maximum length of 100 characters.",),
@@ -13924,7 +13924,7 @@ func VerifyPathType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13934,7 +13934,7 @@ func VerifyPathType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 2000) {
+	if !(ourcommon.LenStr(that) <= 2000) {
 		abort = onError(
 			newVerificationError(
 				"Identifier shall have a maximum length of 2000 characters.",),
@@ -13972,7 +13972,7 @@ func VerifyQualifierType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -13982,7 +13982,7 @@ func VerifyQualifierType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 128) {
+	if !(ourcommon.LenStr(that) <= 128) {
 		abort = onError(
 			newVerificationError(
 				"Name type shall have a maximum length of 128 characters.",),
@@ -14048,7 +14048,7 @@ func VerifyIDShortType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) >= 1) {
+	if !(ourcommon.LenStr(that) >= 1) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -14058,7 +14058,7 @@ func VerifyIDShortType(
 		}
 	}
 
-	if !(aascommon.LenStr(that) <= 128) {
+	if !(ourcommon.LenStr(that) <= 128) {
 		abort = onError(
 			newVerificationError(
 				"Name type shall have a maximum length of 128 characters.",),
@@ -14091,199 +14091,199 @@ func VerifyIDShortType(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeExtension:
+	case ourtypes.ModelTypeExtension:
 		abort = VerifyExtension(
-			that.(aastypes.IExtension),
+			that.(ourtypes.IExtension),
 			onError,
 		)
-	case aastypes.ModelTypeAdministrativeInformation:
+	case ourtypes.ModelTypeAdministrativeInformation:
 		abort = VerifyAdministrativeInformation(
-			that.(aastypes.IAdministrativeInformation),
+			that.(ourtypes.IAdministrativeInformation),
 			onError,
 		)
-	case aastypes.ModelTypeQualifier:
+	case ourtypes.ModelTypeQualifier:
 		abort = VerifyQualifier(
-			that.(aastypes.IQualifier),
+			that.(ourtypes.IQualifier),
 			onError,
 		)
-	case aastypes.ModelTypeAssetAdministrationShell:
+	case ourtypes.ModelTypeAssetAdministrationShell:
 		abort = VerifyAssetAdministrationShell(
-			that.(aastypes.IAssetAdministrationShell),
+			that.(ourtypes.IAssetAdministrationShell),
 			onError,
 		)
-	case aastypes.ModelTypeAssetInformation:
+	case ourtypes.ModelTypeAssetInformation:
 		abort = VerifyAssetInformation(
-			that.(aastypes.IAssetInformation),
+			that.(ourtypes.IAssetInformation),
 			onError,
 		)
-	case aastypes.ModelTypeResource:
+	case ourtypes.ModelTypeResource:
 		abort = VerifyResource(
-			that.(aastypes.IResource),
+			that.(ourtypes.IResource),
 			onError,
 		)
-	case aastypes.ModelTypeSpecificAssetID:
+	case ourtypes.ModelTypeSpecificAssetID:
 		abort = VerifySpecificAssetID(
-			that.(aastypes.ISpecificAssetID),
+			that.(ourtypes.ISpecificAssetID),
 			onError,
 		)
-	case aastypes.ModelTypeSubmodel:
+	case ourtypes.ModelTypeSubmodel:
 		abort = VerifySubmodel(
-			that.(aastypes.ISubmodel),
+			that.(ourtypes.ISubmodel),
 			onError,
 		)
-	case aastypes.ModelTypeRelationshipElement:
+	case ourtypes.ModelTypeRelationshipElement:
 		abort = VerifyRelationshipElement(
-			that.(aastypes.IRelationshipElement),
+			that.(ourtypes.IRelationshipElement),
 			onError,
 		)
-	case aastypes.ModelTypeSubmodelElementList:
+	case ourtypes.ModelTypeSubmodelElementList:
 		abort = VerifySubmodelElementList(
-			that.(aastypes.ISubmodelElementList),
+			that.(ourtypes.ISubmodelElementList),
 			onError,
 		)
-	case aastypes.ModelTypeSubmodelElementCollection:
+	case ourtypes.ModelTypeSubmodelElementCollection:
 		abort = VerifySubmodelElementCollection(
-			that.(aastypes.ISubmodelElementCollection),
+			that.(ourtypes.ISubmodelElementCollection),
 			onError,
 		)
-	case aastypes.ModelTypeProperty:
+	case ourtypes.ModelTypeProperty:
 		abort = VerifyProperty(
-			that.(aastypes.IProperty),
+			that.(ourtypes.IProperty),
 			onError,
 		)
-	case aastypes.ModelTypeMultiLanguageProperty:
+	case ourtypes.ModelTypeMultiLanguageProperty:
 		abort = VerifyMultiLanguageProperty(
-			that.(aastypes.IMultiLanguageProperty),
+			that.(ourtypes.IMultiLanguageProperty),
 			onError,
 		)
-	case aastypes.ModelTypeRange:
+	case ourtypes.ModelTypeRange:
 		abort = VerifyRange(
-			that.(aastypes.IRange),
+			that.(ourtypes.IRange),
 			onError,
 		)
-	case aastypes.ModelTypeReferenceElement:
+	case ourtypes.ModelTypeReferenceElement:
 		abort = VerifyReferenceElement(
-			that.(aastypes.IReferenceElement),
+			that.(ourtypes.IReferenceElement),
 			onError,
 		)
-	case aastypes.ModelTypeBlob:
+	case ourtypes.ModelTypeBlob:
 		abort = VerifyBlob(
-			that.(aastypes.IBlob),
+			that.(ourtypes.IBlob),
 			onError,
 		)
-	case aastypes.ModelTypeFile:
+	case ourtypes.ModelTypeFile:
 		abort = VerifyFile(
-			that.(aastypes.IFile),
+			that.(ourtypes.IFile),
 			onError,
 		)
-	case aastypes.ModelTypeAnnotatedRelationshipElement:
+	case ourtypes.ModelTypeAnnotatedRelationshipElement:
 		abort = VerifyAnnotatedRelationshipElement(
-			that.(aastypes.IAnnotatedRelationshipElement),
+			that.(ourtypes.IAnnotatedRelationshipElement),
 			onError,
 		)
-	case aastypes.ModelTypeEntity:
+	case ourtypes.ModelTypeEntity:
 		abort = VerifyEntity(
-			that.(aastypes.IEntity),
+			that.(ourtypes.IEntity),
 			onError,
 		)
-	case aastypes.ModelTypeEventPayload:
+	case ourtypes.ModelTypeEventPayload:
 		abort = VerifyEventPayload(
-			that.(aastypes.IEventPayload),
+			that.(ourtypes.IEventPayload),
 			onError,
 		)
-	case aastypes.ModelTypeBasicEventElement:
+	case ourtypes.ModelTypeBasicEventElement:
 		abort = VerifyBasicEventElement(
-			that.(aastypes.IBasicEventElement),
+			that.(ourtypes.IBasicEventElement),
 			onError,
 		)
-	case aastypes.ModelTypeOperation:
+	case ourtypes.ModelTypeOperation:
 		abort = VerifyOperation(
-			that.(aastypes.IOperation),
+			that.(ourtypes.IOperation),
 			onError,
 		)
-	case aastypes.ModelTypeOperationVariable:
+	case ourtypes.ModelTypeOperationVariable:
 		abort = VerifyOperationVariable(
-			that.(aastypes.IOperationVariable),
+			that.(ourtypes.IOperationVariable),
 			onError,
 		)
-	case aastypes.ModelTypeCapability:
+	case ourtypes.ModelTypeCapability:
 		abort = VerifyCapability(
-			that.(aastypes.ICapability),
+			that.(ourtypes.ICapability),
 			onError,
 		)
-	case aastypes.ModelTypeConceptDescription:
+	case ourtypes.ModelTypeConceptDescription:
 		abort = VerifyConceptDescription(
-			that.(aastypes.IConceptDescription),
+			that.(ourtypes.IConceptDescription),
 			onError,
 		)
-	case aastypes.ModelTypeReference:
+	case ourtypes.ModelTypeReference:
 		abort = VerifyReference(
-			that.(aastypes.IReference),
+			that.(ourtypes.IReference),
 			onError,
 		)
-	case aastypes.ModelTypeKey:
+	case ourtypes.ModelTypeKey:
 		abort = VerifyKey(
-			that.(aastypes.IKey),
+			that.(ourtypes.IKey),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringNameType:
+	case ourtypes.ModelTypeLangStringNameType:
 		abort = VerifyLangStringNameType(
-			that.(aastypes.ILangStringNameType),
+			that.(ourtypes.ILangStringNameType),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringTextType:
+	case ourtypes.ModelTypeLangStringTextType:
 		abort = VerifyLangStringTextType(
-			that.(aastypes.ILangStringTextType),
+			that.(ourtypes.ILangStringTextType),
 			onError,
 		)
-	case aastypes.ModelTypeEnvironment:
+	case ourtypes.ModelTypeEnvironment:
 		abort = VerifyEnvironment(
-			that.(aastypes.IEnvironment),
+			that.(ourtypes.IEnvironment),
 			onError,
 		)
-	case aastypes.ModelTypeEmbeddedDataSpecification:
+	case ourtypes.ModelTypeEmbeddedDataSpecification:
 		abort = VerifyEmbeddedDataSpecification(
-			that.(aastypes.IEmbeddedDataSpecification),
+			that.(ourtypes.IEmbeddedDataSpecification),
 			onError,
 		)
-	case aastypes.ModelTypeLevelType:
+	case ourtypes.ModelTypeLevelType:
 		abort = VerifyLevelType(
-			that.(aastypes.ILevelType),
+			that.(ourtypes.ILevelType),
 			onError,
 		)
-	case aastypes.ModelTypeValueReferencePair:
+	case ourtypes.ModelTypeValueReferencePair:
 		abort = VerifyValueReferencePair(
-			that.(aastypes.IValueReferencePair),
+			that.(ourtypes.IValueReferencePair),
 			onError,
 		)
-	case aastypes.ModelTypeValueList:
+	case ourtypes.ModelTypeValueList:
 		abort = VerifyValueList(
-			that.(aastypes.IValueList),
+			that.(ourtypes.IValueList),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringPreferredNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringPreferredNameTypeIEC61360:
 		abort = VerifyLangStringPreferredNameTypeIEC61360(
-			that.(aastypes.ILangStringPreferredNameTypeIEC61360),
+			that.(ourtypes.ILangStringPreferredNameTypeIEC61360),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringShortNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringShortNameTypeIEC61360:
 		abort = VerifyLangStringShortNameTypeIEC61360(
-			that.(aastypes.ILangStringShortNameTypeIEC61360),
+			that.(ourtypes.ILangStringShortNameTypeIEC61360),
 			onError,
 		)
-	case aastypes.ModelTypeLangStringDefinitionTypeIEC61360:
+	case ourtypes.ModelTypeLangStringDefinitionTypeIEC61360:
 		abort = VerifyLangStringDefinitionTypeIEC61360(
-			that.(aastypes.ILangStringDefinitionTypeIEC61360),
+			that.(ourtypes.ILangStringDefinitionTypeIEC61360),
 			onError,
 		)
-	case aastypes.ModelTypeDataSpecificationIEC61360:
+	case ourtypes.ModelTypeDataSpecificationIEC61360:
 		abort = VerifyDataSpecificationIEC61360(
-			that.(aastypes.IDataSpecificationIEC61360),
+			that.(ourtypes.IDataSpecificationIEC61360),
 			onError,
 		)
 	default:

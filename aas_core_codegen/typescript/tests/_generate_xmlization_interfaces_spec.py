@@ -36,8 +36,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasXmlization from "../src/xmlization";
-import * as AasTypes from "../src/types";
+import * as OurXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
 
 import * as TestCommonXmlization from "./commonXmlization";"""
         ),
@@ -74,12 +74,12 @@ test(
 {I}() => {{
 {II}const instance = TestCommonXmlization.{load_minimal_name}();
 
-{II}const xmlText = AasXmlization.toXmlString(instance);
-{II}const anotherInstanceOrError = AasXmlization.fromXmlString(xmlText);
+{II}const xmlText = OurXmlization.toXmlString(instance);
+{II}const anotherInstanceOrError = OurXmlization.fromXmlString(xmlText);
 {II}expect(anotherInstanceOrError.error).toBeNull();
 {II}const anotherInstance = anotherInstanceOrError.mustValue();
 
-{II}const asInterface = AasTypes.{as_function}(anotherInstance);
+{II}const asInterface = OurTypes.{as_function}(anotherInstance);
 {II}expect(asInterface).not.toBeNull();
 {I}}}
 );"""
@@ -95,8 +95,8 @@ test(
 {I}() => {{
 {II}const instance = TestCommonXmlization.{load_minimal_name}();
 
-{II}const xmlText = AasXmlization.toXmlString(instance);
-{II}const anotherInstanceOrError = AasXmlization.{from_xml_string_function}(
+{II}const xmlText = OurXmlization.toXmlString(instance);
+{II}const anotherInstanceOrError = OurXmlization.{from_xml_string_function}(
 {III}xmlText
 {II});
 {II}expect(anotherInstanceOrError.error).toBeNull();
@@ -109,7 +109,7 @@ test(
             Stripped(
                 f"""\
 test("{interface_name_typescript} XML deserialization fail", () => {{
-{I}const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
+{I}const instanceOrError = OurXmlization.fromXmlString("This is not XML.");
 {I}expect(instanceOrError.error).not.toBeNull();
 }});"""
             )
@@ -122,7 +122,7 @@ test(
 {I}"{interface_name_typescript} XML deserialization fail via " +
 {I}"{from_xml_string_function}",
 {I}() => {{
-{II}const instanceOrError = AasXmlization.{from_xml_string_function}(
+{II}const instanceOrError = OurXmlization.{from_xml_string_function}(
 {III}"This is not XML."
 {II});
 {II}expect(instanceOrError.error).not.toBeNull();

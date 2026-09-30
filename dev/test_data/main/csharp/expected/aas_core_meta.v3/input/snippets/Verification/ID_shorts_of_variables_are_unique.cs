@@ -1,12 +1,12 @@
 /// <summary>
-/// Check that all <see cref="Aas.IReferable.IdShort" />'s are among all the
+/// Check that all <see cref="Our.IReferable.IdShort" />'s are among all the
 /// <paramref name="inputVariables" />, <paramref name="outputVariables" /> and
 /// <paramref name="inoutputVariables" /> are unique.
 /// </summary>
 public static bool IdShortsOfVariablesAreUnique(
-    IEnumerable<Aas.IOperationVariable>? inputVariables,
-    IEnumerable<Aas.IOperationVariable>? outputVariables,
-    IEnumerable<Aas.IOperationVariable>? inoutputVariables
+    IEnumerable<Our.IOperationVariable>? inputVariables,
+    IEnumerable<Our.IOperationVariable>? outputVariables,
+    IEnumerable<Our.IOperationVariable>? inoutputVariables
 )
 {
     var idShortSet = new HashSet<string>();

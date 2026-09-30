@@ -39,35 +39,35 @@ import (
 {I}"os"
 {I}"path/filepath"
 {I}"strings"
-{I}aastesting "{repo_url}/aastesting"
-{I}aastypes "{repo_url}/types"
+{I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
 )"""
         ),
         Stripped(
             f"""\
 // Trace the `instance` and compare the trace against the golden one from
-// the test data, or re-record the trace if [aastesting.RecordMode] is set.
+// the test data, or re-record the trace if [ourtesting.RecordMode] is set.
 //
-// If `onlyOnce`, trace the `instance` with [aastypes.DescendOnce]. Otherwise,
-// trace with [aastypes.Descend].
+// If `onlyOnce`, trace the `instance` with [ourtypes.DescendOnce]. Otherwise,
+// trace with [ourtypes.Descend].
 //
 // If we are comparing, and not recording, return the error message if
 // the expected and the obtained trace differ.
 func compareOrRerecordTrace(
-{I}instance aastypes.IClass,
+{I}instance ourtypes.IClass,
 {I}expectedPath string,
 {I}onlyOnce bool,
 ) (message *string) {{
-{I}lines := []string{{aastesting.TraceMark(instance)}}
+{I}lines := []string{{ourtesting.TraceMark(instance)}}
 
 {I}if onlyOnce {{
-{II}instance.DescendOnce(func(descendant aastypes.IClass) (abort bool) {{
-{III}lines = append(lines, aastesting.TraceMark(descendant))
+{II}instance.DescendOnce(func(descendant ourtypes.IClass) (abort bool) {{
+{III}lines = append(lines, ourtesting.TraceMark(descendant))
 {III}return
 {II}}})
 {I}}} else {{
-{II}instance.Descend(func(descendant aastypes.IClass) (abort bool) {{
-{III}lines = append(lines, aastesting.TraceMark(descendant))
+{II}instance.Descend(func(descendant ourtypes.IClass) (abort bool) {{
+{III}lines = append(lines, ourtesting.TraceMark(descendant))
 {III}return
 {II}}})
 {I}}}
@@ -77,7 +77,7 @@ func compareOrRerecordTrace(
 {I}// Add a new line for POSIX systems.
 {I}got += "\\n"
 
-{I}if aastesting.RecordMode {{
+{I}if ourtesting.RecordMode {{
 {II}parent := filepath.Dir(expectedPath)
 {II}err := os.MkdirAll(parent, os.ModePerm)
 {II}if err != nil {{

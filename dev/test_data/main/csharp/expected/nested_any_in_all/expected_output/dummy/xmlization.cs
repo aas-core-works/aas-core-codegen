@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -420,43 +420,43 @@ namespace dummy
             /// <summary>
             /// Read an instance of class LangString from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.LangString> LangStringFromElement = (
-                AtElement<Aas.LangString>(
+            internal static readonly ElementReader<Our.LangString> LangStringFromElement = (
+                AtElement<Our.LangString>(
                     LangStringFromSequence, "langString"));
 
             /// <summary>
             /// Read an instance of class LangStringSet from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.LangStringSet> LangStringSetFromElement = (
-                AtElement<Aas.LangStringSet>(
+            internal static readonly ElementReader<Our.LangStringSet> LangStringSetFromElement = (
+                AtElement<Our.LangStringSet>(
                     LangStringSetFromSequence, "langStringSet"));
 
             /// <summary>
             /// Read an instance of class IecContent from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.IecContent> IecContentFromElement = (
-                AtElement<Aas.IecContent>(
+            internal static readonly ElementReader<Our.IecContent> IecContentFromElement = (
+                AtElement<Our.IecContent>(
                     IecContentFromSequence, "iecContent"));
 
             /// <summary>
             /// Read an instance of class OtherContent from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.OtherContent> OtherContentFromElement = (
-                AtElement<Aas.OtherContent>(
+            internal static readonly ElementReader<Our.OtherContent> OtherContentFromElement = (
+                AtElement<Our.OtherContent>(
                     OtherContentFromSequence, "otherContent"));
 
             /// <summary>
             /// Read an instance of class Specification from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Specification> SpecificationFromElement = (
-                AtElement<Aas.Specification>(
+            internal static readonly ElementReader<Our.Specification> SpecificationFromElement = (
+                AtElement<Our.Specification>(
                     SpecificationFromSequence, "specification"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -467,7 +467,7 @@ namespace dummy
                     LangStringFromElement));
 
             private static readonly ContentReader<IContent> Read_IContent = (
-                AsElement<Aas.IContent>(
+                AsElement<Our.IContent>(
                     IContentFromElement));
 
             private static readonly ContentReader<
@@ -490,7 +490,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangString LangStringFromSequence(
+            internal static Our.LangString LangStringFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -590,14 +590,14 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LangString(
+                return new Our.LangString(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangString? LangStringFromSequence
+            }  // internal static Our.LangString? LangStringFromSequence
 
             /// <summary>
             /// Deserialize an instance of class LangStringSet from a sequence of XML elements.
@@ -607,7 +607,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LangStringSet LangStringSetFromSequence(
+            internal static Our.LangStringSet LangStringSetFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -689,17 +689,17 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LangStringSet(
+                return new Our.LangStringSet(
                     theLangStrings
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LangStringSet? LangStringSetFromSequence
+            }  // internal static Our.LangStringSet? LangStringSetFromSequence
 
             /// <summary>
             /// Deserialize an instance of IContent from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IContent IContentFromElement(
+            internal static Our.IContent IContentFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -723,7 +723,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IContent? IContentFromElement
+            }  // internal static Our.IContent? IContentFromElement
 
             /// <summary>
             /// Deserialize an instance of class IecContent from a sequence of XML elements.
@@ -733,7 +733,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.IecContent IecContentFromSequence(
+            internal static Our.IecContent IecContentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -807,9 +807,9 @@ namespace dummy
                     }
                 }
 
-                return new Aas.IecContent(
+                return new Our.IecContent(
                     theDefinition);
-            }  // internal static Aas.IecContent? IecContentFromSequence
+            }  // internal static Our.IecContent? IecContentFromSequence
 
             /// <summary>
             /// Deserialize an instance of class OtherContent from a sequence of XML elements.
@@ -819,14 +819,14 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.OtherContent OtherContentFromSequence(
+            internal static Our.OtherContent OtherContentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
             {
                 error = null;
-                return new Aas.OtherContent();
-            }  // internal static Aas.OtherContent OtherContentFromSequence
+                return new Our.OtherContent();
+            }  // internal static Our.OtherContent OtherContentFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Specification from a sequence of XML elements.
@@ -836,7 +836,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Specification SpecificationFromSequence(
+            internal static Our.Specification SpecificationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -918,11 +918,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Specification(
+                return new Our.Specification(
                     theContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Specification? SpecificationFromSequence
+            }  // internal static Our.Specification? SpecificationFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -932,7 +932,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1042,7 +1042,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theDefaultLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1050,7 +1050,7 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theSpecifications);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -1075,7 +1075,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class LangString:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.LangString anInstance = Deserialize.LangStringFrom(
+        /// Our.LangString anInstance = Deserialize.LangStringFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -1094,7 +1094,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of LangString.
             /// </exception>
-            public static Aas.LangString LangStringFrom(
+            public static Our.LangString LangStringFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1108,7 +1108,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangString result = DeserializeImplementation.LangStringFromElement(
+                Our.LangString result = DeserializeImplementation.LangStringFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1128,7 +1128,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of LangStringSet.
             /// </exception>
-            public static Aas.LangStringSet LangStringSetFrom(
+            public static Our.LangStringSet LangStringSetFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1142,7 +1142,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LangStringSet result = DeserializeImplementation.LangStringSetFromElement(
+                Our.LangStringSet result = DeserializeImplementation.LangStringSetFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1162,7 +1162,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IContent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IContent IContentFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IContent IContentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1176,7 +1176,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IContent result = DeserializeImplementation.IContentFromElement(
+                Our.IContent result = DeserializeImplementation.IContentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1196,7 +1196,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IecContent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IecContent IecContentFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IecContent IecContentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1210,7 +1210,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IecContent result = DeserializeImplementation.IecContentFromElement(
+                Our.IecContent result = DeserializeImplementation.IecContentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1230,7 +1230,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of OtherContent.
             /// </exception>
-            public static Aas.OtherContent OtherContentFrom(
+            public static Our.OtherContent OtherContentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1244,7 +1244,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.OtherContent result = DeserializeImplementation.OtherContentFromElement(
+                Our.OtherContent result = DeserializeImplementation.OtherContentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1264,7 +1264,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Specification.
             /// </exception>
-            public static Aas.Specification SpecificationFrom(
+            public static Our.Specification SpecificationFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1278,7 +1278,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Specification result = DeserializeImplementation.SpecificationFromElement(
+                Our.Specification result = DeserializeImplementation.SpecificationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1298,7 +1298,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1312,7 +1312,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1462,7 +1462,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -1491,7 +1491,7 @@ namespace dummy
                     WriteIClass));
 
             private static void LangStringToSequence(
-                Aas.ILangString that,
+                Our.ILangString that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1502,7 +1502,7 @@ namespace dummy
             }  // private static void LangStringToSequence
 
             public override void VisitLangString(
-                Aas.ILangString that,
+                Our.ILangString that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1515,7 +1515,7 @@ namespace dummy
             }
 
             private static void LangStringSetToSequence(
-                Aas.ILangStringSet that,
+                Our.ILangStringSet that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1527,7 +1527,7 @@ namespace dummy
             }  // private static void LangStringSetToSequence
 
             public override void VisitLangStringSet(
-                Aas.ILangStringSet that,
+                Our.ILangStringSet that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1540,7 +1540,7 @@ namespace dummy
             }
 
             private static void IecContentToSequence(
-                Aas.IIecContent that,
+                Our.IIecContent that,
                 Xml.XmlWriter writer)
             {
                 if (that.Definition != null)
@@ -1555,7 +1555,7 @@ namespace dummy
             }  // private static void IecContentToSequence
 
             public override void VisitIecContent(
-                Aas.IIecContent that,
+                Our.IIecContent that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1569,14 +1569,14 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "UnusedParameter.Local")]
             private static void OtherContentToSequence(
-                Aas.IOtherContent that,
+                Our.IOtherContent that,
                 Xml.XmlWriter writer)
             {
                 // Intentionally empty.
             }  // private static void OtherContentToSequence
 
             public override void VisitOtherContent(
-                Aas.IOtherContent that,
+                Our.IOtherContent that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1589,7 +1589,7 @@ namespace dummy
             }
 
             private static void SpecificationToSequence(
-                Aas.ISpecification that,
+                Our.ISpecification that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1597,7 +1597,7 @@ namespace dummy
             }  // private static void SpecificationToSequence
 
             public override void VisitSpecification(
-                Aas.ISpecification that,
+                Our.ISpecification that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1610,7 +1610,7 @@ namespace dummy
             }
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1639,7 +1639,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1658,7 +1658,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of LangString:
         /// <code>
-        /// var anInstance = new Aas.LangString(
+        /// var anInstance = new Our.LangString(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -1677,7 +1677,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

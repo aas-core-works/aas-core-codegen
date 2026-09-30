@@ -33,7 +33,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
  */"""
         ),
         typescript_common.WARNING,
-        Stripped('import * as AasTypes from "../src/types";'),
+        Stripped('import * as OurTypes from "../src/types";'),
     ]  # type: List[Stripped]
 
     for enumeration in symbol_table.enumerations:
@@ -42,12 +42,12 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         body_writer = io.StringIO()
         body_writer.write(
             f"""\
-const expected: Array<AasTypes.{name}> = [
+const expected: Array<OurTypes.{name}> = [
 """
         )
         for i, literal in enumerate(enumeration.literals):
             literal_name = typescript_naming.enum_literal_name(literal.name)
-            body_writer.write(f"{I}AasTypes.{name}.{literal_name}")
+            body_writer.write(f"{I}OurTypes.{name}.{literal_name}")
 
             if i < len(enumeration.literals) - 1:
                 body_writer.write(",")
@@ -62,8 +62,8 @@ const expected: Array<AasTypes.{name}> = [
 
         body_writer.write(
             f"""\
-const got = new Array<AasTypes.{name}>();
-for (const literal of AasTypes.{over_enum_name}()) {{
+const got = new Array<OurTypes.{name}>();
+for (const literal of OurTypes.{over_enum_name}()) {{
 {I}got.push(literal);
 }}
 

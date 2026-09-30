@@ -6,75 +6,75 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kAbstractDescendantWithoutNumbers
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAbstractDescendantWithoutNumbers
+    == our::wstringification::MustModelTypeFromWstring(
       L"AbstractDescendantWithoutNumbers"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAbstractDescendantWithoutNumbers
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAbstractDescendantWithoutNumbers
     )
     == L"AbstractDescendantWithoutNumbers"
   );
 
   REQUIRE(
-    aas::types::ModelType::kParentWithoutNumbers
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kParentWithoutNumbers
+    == our::wstringification::MustModelTypeFromWstring(
       L"ParentWithoutNumbers"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kParentWithoutNumbers
+    our::wstringification::to_wstring(
+      our::types::ModelType::kParentWithoutNumbers
     )
     == L"ParentWithoutNumbers"
   );
 
   REQUIRE(
-    aas::types::ModelType::kChildWithoutNumbers
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kChildWithoutNumbers
+    == our::wstringification::MustModelTypeFromWstring(
       L"ChildWithoutNumbers"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kChildWithoutNumbers
+    our::wstringification::to_wstring(
+      our::types::ModelType::kChildWithoutNumbers
     )
     == L"ChildWithoutNumbers"
   );
 
   REQUIRE(
-    aas::types::ModelType::kWithNumber
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kWithNumber
+    == our::wstringification::MustModelTypeFromWstring(
       L"WithNumber"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kWithNumber
+    our::wstringification::to_wstring(
+      our::types::ModelType::kWithNumber
     )
     == L"WithNumber"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
@@ -82,13 +82,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

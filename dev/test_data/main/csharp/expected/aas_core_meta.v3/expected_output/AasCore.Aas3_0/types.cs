@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
@@ -11,7 +11,7 @@ using System.Collections.Generic;  // can't alias
 namespace AasCore.Aas3_0
 {
     /// <summary>
-    /// Represent a general class of an AAS model.
+    /// Represent a general class of the meta-model.
     /// </summary>
     public interface IClass
     {
@@ -66,8 +66,8 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-118:
-    ///     If there are ID <see cref="Aas.IHasSemantics.SupplementalSemanticIds" /> defined
-    ///     then there shall be also a main semantic ID <see cref="Aas.IHasSemantics.SemanticId" />.
+    ///     If there are ID <see cref="Our.IHasSemantics.SupplementalSemanticIds" /> defined
+    ///     then there shall be also a main semantic ID <see cref="Our.IHasSemantics.SemanticId" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -112,7 +112,7 @@ namespace AasCore.Aas3_0
         /// <ul>
         ///   <li>
         ///     Constraint AASd-077:
-        ///     The name of an extension (Extension/name) within <see cref="Aas.IHasExtensions" /> needs
+        ///     The name of an extension (Extension/name) within <see cref="Our.IHasExtensions" /> needs
         ///     to be unique.
         ///   </li>
         /// </ul>
@@ -123,7 +123,7 @@ namespace AasCore.Aas3_0
         /// Type of the value of the extension.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.DataTypeDefXsd.String" />
+        /// Default: <see cref="Our.DataTypeDefXsd.String" />
         /// </remarks>
         public DataTypeDefXsd? ValueType { get; set; }
 
@@ -178,7 +178,7 @@ namespace AasCore.Aas3_0
         /// <ul>
         ///   <li>
         ///     Constraint AASd-077:
-        ///     The name of an extension (Extension/name) within <see cref="Aas.IHasExtensions" /> needs
+        ///     The name of an extension (Extension/name) within <see cref="Our.IHasExtensions" /> needs
         ///     to be unique.
         ///   </li>
         /// </ul>
@@ -189,7 +189,7 @@ namespace AasCore.Aas3_0
         /// Type of the value of the extension.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.DataTypeDefXsd.String" />
+        /// Default: <see cref="Our.DataTypeDefXsd.String" />
         /// </remarks>
         public DataTypeDefXsd? ValueType { get; set; }
 
@@ -380,7 +380,7 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// An element that is referable by its <see cref="Aas.IReferable.IdShort" />.
+    /// An element that is referable by its <see cref="Our.IReferable.IdShort" />.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -393,7 +393,7 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-022:
-    ///     <see cref="Aas.IReferable.IdShort" /> of non-identifiable referables
+    ///     <see cref="Our.IReferable.IdShort" /> of non-identifiable referables
     ///     within the same name space shall be unique (case-sensitive).
     ///   </li>
     /// </ul>
@@ -408,7 +408,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -421,8 +421,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -515,7 +515,7 @@ namespace AasCore.Aas3_0
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.ModellingKind.Instance" />
+        /// Default: <see cref="Our.ModellingKind.Instance" />
         /// </remarks>
         public ModellingKind? Kind { get; set; }
 
@@ -554,7 +554,7 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-005:
-    ///     If <see cref="Aas.AdministrativeInformation.Version" /> is not specified then also <see cref="Aas.AdministrativeInformation.Revision" /> shall be
+    ///     If <see cref="Our.AdministrativeInformation.Version" /> is not specified then also <see cref="Our.AdministrativeInformation.Revision" /> shall be
     ///     unspecified. This means, a revision requires a version. If there is no version
     ///     there is no revision neither. Revision is optional.
     ///   </li>
@@ -582,15 +582,15 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// In case of a submodel the <see cref="Aas.AdministrativeInformation.TemplateId" /> is the identifier
+        /// In case of a submodel the <see cref="Our.AdministrativeInformation.TemplateId" /> is the identifier
         /// of the submodel template ID that guided the creation of the submodel
         /// </para>
         /// <para>
-        /// The <see cref="Aas.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
-        /// For validation the <see cref="Aas.Submodel.SemanticId" /> shall be used.
+        /// The <see cref="Our.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
+        /// For validation the <see cref="Our.Submodel.SemanticId" /> shall be used.
         /// </para>
         /// <para>
-        /// Usage of <see cref="Aas.AdministrativeInformation.TemplateId" /> is not restricted to submodel instances. So also
+        /// Usage of <see cref="Our.AdministrativeInformation.TemplateId" /> is not restricted to submodel instances. So also
         /// the creation of submodel templates can be guided by another submodel template.
         /// </para>
         /// </remarks>
@@ -608,7 +608,7 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-005:
-    ///     If <see cref="Aas.AdministrativeInformation.Version" /> is not specified then also <see cref="Aas.AdministrativeInformation.Revision" /> shall be
+    ///     If <see cref="Our.AdministrativeInformation.Version" /> is not specified then also <see cref="Our.AdministrativeInformation.Revision" /> shall be
     ///     unspecified. This means, a revision requires a version. If there is no version
     ///     there is no revision neither. Revision is optional.
     ///   </li>
@@ -641,15 +641,15 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// In case of a submodel the <see cref="Aas.AdministrativeInformation.TemplateId" /> is the identifier
+        /// In case of a submodel the <see cref="Our.AdministrativeInformation.TemplateId" /> is the identifier
         /// of the submodel template ID that guided the creation of the submodel
         /// </para>
         /// <para>
-        /// The <see cref="Aas.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
-        /// For validation the <see cref="Aas.Submodel.SemanticId" /> shall be used.
+        /// The <see cref="Our.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
+        /// For validation the <see cref="Our.Submodel.SemanticId" /> shall be used.
         /// </para>
         /// <para>
-        /// Usage of <see cref="Aas.AdministrativeInformation.TemplateId" /> is not restricted to submodel instances. So also
+        /// Usage of <see cref="Our.AdministrativeInformation.TemplateId" /> is not restricted to submodel instances. So also
         /// the creation of submodel templates can be guided by another submodel template.
         /// </para>
         /// </remarks>
@@ -782,13 +782,13 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASd-119:
-    ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.IQualifiable.Qualifiers" /> is
-    ///     equal to <see cref="Aas.QualifierKind.TemplateQualifier" /> and the qualified element
-    ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shall be of
-    ///     kind Template (<see cref="Aas.IHasKind.Kind" /> = <see cref="Aas.ModellingKind.Template" />).
+    ///     If any <see cref="Our.Qualifier.Kind" /> value of <see cref="Our.IQualifiable.Qualifiers" /> is
+    ///     equal to <see cref="Our.QualifierKind.TemplateQualifier" /> and the qualified element
+    ///     inherits from <see cref="Our.IHasKind" /> then the qualified element shall be of
+    ///     kind Template (<see cref="Our.IHasKind.Kind" /> = <see cref="Our.ModellingKind.Template" />).
     ///     </para>
     ///     <para>
-    ///     This constraint is checked at <see cref="Aas.Submodel" />.
+    ///     This constraint is checked at <see cref="Our.Submodel" />.
     ///     </para>
     ///   </li>
     /// </ul>
@@ -806,7 +806,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -832,14 +832,14 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// Value qualifiers are only applicable to elements with kind
-        /// <see cref="Aas.ModellingKind.Instance" />.
+        /// <see cref="Our.ModellingKind.Instance" />.
         /// </remarks>
         [EnumMember(Value = "ValueQualifier")]
         ValueQualifier,
 
         /// <summary>
         /// qualifies the semantic definition the element is referring to
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />)
+        /// (<see cref="Our.IHasSemantics.SemanticId" />)
         /// </summary>
         [EnumMember(Value = "ConceptQualifier")]
         ConceptQualifier,
@@ -849,7 +849,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// Template qualifiers are only applicable to elements with kind
-        /// <see cref="Aas.ModellingKind.Template" />.
+        /// <see cref="Our.ModellingKind.Template" />.
         /// </remarks>
         [EnumMember(Value = "TemplateQualifier")]
         TemplateQualifier
@@ -866,15 +866,15 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-006:
-    ///     If both the <see cref="Aas.Qualifier.Value" /> and the <see cref="Aas.Qualifier.ValueId" /> of
-    ///     a <see cref="Aas.Qualifier" /> are present then the <see cref="Aas.Qualifier.Value" /> needs
+    ///     If both the <see cref="Our.Qualifier.Value" /> and the <see cref="Our.Qualifier.ValueId" /> of
+    ///     a <see cref="Our.Qualifier" /> are present then the <see cref="Our.Qualifier.Value" /> needs
     ///     to be identical to the value of the referenced coded value
-    ///     in <see cref="Aas.Qualifier.ValueId" />.
+    ///     in <see cref="Our.Qualifier.ValueId" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-020:
-    ///     The value of <see cref="Aas.Qualifier.Value" /> shall be consistent to the data type as
-    ///     defined in <see cref="Aas.Qualifier.ValueType" />.
+    ///     The value of <see cref="Our.Qualifier.Value" /> shall be consistent to the data type as
+    ///     defined in <see cref="Our.Qualifier.ValueType" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -885,7 +885,7 @@ namespace AasCore.Aas3_0
         /// element.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.QualifierKind.ConceptQualifier" />
+        /// Default: <see cref="Our.QualifierKind.ConceptQualifier" />
         /// </remarks>
         public QualifierKind? Kind { get; set; }
 
@@ -927,15 +927,15 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-006:
-    ///     If both the <see cref="Aas.Qualifier.Value" /> and the <see cref="Aas.Qualifier.ValueId" /> of
-    ///     a <see cref="Aas.Qualifier" /> are present then the <see cref="Aas.Qualifier.Value" /> needs
+    ///     If both the <see cref="Our.Qualifier.Value" /> and the <see cref="Our.Qualifier.ValueId" /> of
+    ///     a <see cref="Our.Qualifier" /> are present then the <see cref="Our.Qualifier.Value" /> needs
     ///     to be identical to the value of the referenced coded value
-    ///     in <see cref="Aas.Qualifier.ValueId" />.
+    ///     in <see cref="Our.Qualifier.ValueId" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-020:
-    ///     The value of <see cref="Aas.Qualifier.Value" /> shall be consistent to the data type as
-    ///     defined in <see cref="Aas.Qualifier.ValueType" />.
+    ///     The value of <see cref="Our.Qualifier.Value" /> shall be consistent to the data type as
+    ///     defined in <see cref="Our.Qualifier.ValueType" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -964,7 +964,7 @@ namespace AasCore.Aas3_0
         /// element.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.QualifierKind.ConceptQualifier" />
+        /// Default: <see cref="Our.QualifierKind.ConceptQualifier" />
         /// </remarks>
         public QualifierKind? Kind { get; set; }
 
@@ -1193,7 +1193,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -1206,8 +1206,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1559,7 +1559,7 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// In <see cref="Aas.AssetInformation" /> identifying meta data of the asset that is
+    /// In <see cref="Our.AssetInformation" /> identifying meta data of the asset that is
     /// represented by an AAS is defined.
     /// </summary>
     /// <remarks>
@@ -1570,7 +1570,7 @@ namespace AasCore.Aas3_0
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant_set global asset identifier
-    /// does not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is
+    /// does not already exist, the corresponding attribute <see cref="Our.AssetInformation.GlobalAssetId" /> is
     /// optional.
     /// </para>
     /// <para>
@@ -1581,8 +1581,8 @@ namespace AasCore.Aas3_0
     ///     <para>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> is a reserved key. If used as value for
-    ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
-    ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
+    ///     <see cref="Our.SpecificAssetId.Name" /> then <see cref="Our.SpecificAssetId.Value" /> shall be
+    ///     identical to <see cref="Our.AssetInformation.GlobalAssetId" />.
     ///     </para>
     ///     <para>
     ///     Constraint AASd-116 is important to enable a generic search across
@@ -1604,16 +1604,16 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
-    ///     For <see cref="Aas.AssetInformation" /> either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be
-    ///     defined or at least one item in <see cref="Aas.AssetInformation.SpecificAssetIds" />.
+    ///     For <see cref="Our.AssetInformation" /> either the <see cref="Our.AssetInformation.GlobalAssetId" /> shall be
+    ///     defined or at least one item in <see cref="Our.AssetInformation.SpecificAssetIds" />.
     ///   </li>
     /// </ul>
     /// </remarks>
     public interface IAssetInformation : IClass
     {
         /// <summary>
-        /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.Type" /> or
-        /// <see cref="Aas.AssetKind.Instance" />.
+        /// Denotes whether the Asset is of kind <see cref="Our.AssetKind.Type" /> or
+        /// <see cref="Our.AssetKind.Instance" />.
         /// </summary>
         public AssetKind AssetKind { get; set; }
 
@@ -1625,7 +1625,7 @@ namespace AasCore.Aas3_0
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
-        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetIds" />.
+        /// modelled via <see cref="Our.AssetInformation.SpecificAssetIds" />.
         /// </para>
         /// <para>
         /// This is a global reference.
@@ -1640,14 +1640,14 @@ namespace AasCore.Aas3_0
         public List<ISpecificAssetId>? SpecificAssetIds { get; set; }
 
         /// <summary>
-        /// In case <see cref="Aas.AssetInformation.AssetKind" /> is applicable the <see cref="Aas.AssetInformation.AssetType" /> is the asset ID
+        /// In case <see cref="Our.AssetInformation.AssetKind" /> is applicable the <see cref="Our.AssetInformation.AssetType" /> is the asset ID
         /// of the type asset of the asset under consideration
-        /// as identified by <see cref="Aas.AssetInformation.GlobalAssetId" />.
+        /// as identified by <see cref="Our.AssetInformation.GlobalAssetId" />.
         /// </summary>
         /// <remarks>
-        /// In case <see cref="Aas.AssetInformation.AssetKind" /> is "Instance" than the <see cref="Aas.AssetInformation.AssetType" /> denotes
+        /// In case <see cref="Our.AssetInformation.AssetKind" /> is "Instance" than the <see cref="Our.AssetInformation.AssetType" /> denotes
         /// which "Type" the asset is of. But it is also possible
-        /// to have an <see cref="Aas.AssetInformation.AssetType" /> of an asset of kind "Type".
+        /// to have an <see cref="Our.AssetInformation.AssetType" /> of an asset of kind "Type".
         /// </remarks>
         public string? AssetType { get; set; }
 
@@ -1666,7 +1666,7 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// In <see cref="Aas.AssetInformation" /> identifying meta data of the asset that is
+    /// In <see cref="Our.AssetInformation" /> identifying meta data of the asset that is
     /// represented by an AAS is defined.
     /// </summary>
     /// <remarks>
@@ -1677,7 +1677,7 @@ namespace AasCore.Aas3_0
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant_set global asset identifier
-    /// does not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is
+    /// does not already exist, the corresponding attribute <see cref="Our.AssetInformation.GlobalAssetId" /> is
     /// optional.
     /// </para>
     /// <para>
@@ -1688,8 +1688,8 @@ namespace AasCore.Aas3_0
     ///     <para>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> is a reserved key. If used as value for
-    ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
-    ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
+    ///     <see cref="Our.SpecificAssetId.Name" /> then <see cref="Our.SpecificAssetId.Value" /> shall be
+    ///     identical to <see cref="Our.AssetInformation.GlobalAssetId" />.
     ///     </para>
     ///     <para>
     ///     Constraint AASd-116 is important to enable a generic search across
@@ -1711,16 +1711,16 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
-    ///     For <see cref="Aas.AssetInformation" /> either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be
-    ///     defined or at least one item in <see cref="Aas.AssetInformation.SpecificAssetIds" />.
+    ///     For <see cref="Our.AssetInformation" /> either the <see cref="Our.AssetInformation.GlobalAssetId" /> shall be
+    ///     defined or at least one item in <see cref="Our.AssetInformation.SpecificAssetIds" />.
     ///   </li>
     /// </ul>
     /// </remarks>
     public class AssetInformation : IAssetInformation
     {
         /// <summary>
-        /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.Type" /> or
-        /// <see cref="Aas.AssetKind.Instance" />.
+        /// Denotes whether the Asset is of kind <see cref="Our.AssetKind.Type" /> or
+        /// <see cref="Our.AssetKind.Instance" />.
         /// </summary>
         public AssetKind AssetKind { get; set; }
 
@@ -1732,7 +1732,7 @@ namespace AasCore.Aas3_0
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
-        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetIds" />.
+        /// modelled via <see cref="Our.AssetInformation.SpecificAssetIds" />.
         /// </para>
         /// <para>
         /// This is a global reference.
@@ -1747,14 +1747,14 @@ namespace AasCore.Aas3_0
         public List<ISpecificAssetId>? SpecificAssetIds { get; set; }
 
         /// <summary>
-        /// In case <see cref="Aas.AssetInformation.AssetKind" /> is applicable the <see cref="Aas.AssetInformation.AssetType" /> is the asset ID
+        /// In case <see cref="Our.AssetInformation.AssetKind" /> is applicable the <see cref="Our.AssetInformation.AssetType" /> is the asset ID
         /// of the type asset of the asset under consideration
-        /// as identified by <see cref="Aas.AssetInformation.GlobalAssetId" />.
+        /// as identified by <see cref="Our.AssetInformation.GlobalAssetId" />.
         /// </summary>
         /// <remarks>
-        /// In case <see cref="Aas.AssetInformation.AssetKind" /> is "Instance" than the <see cref="Aas.AssetInformation.AssetType" /> denotes
+        /// In case <see cref="Our.AssetInformation.AssetKind" /> is "Instance" than the <see cref="Our.AssetInformation.AssetType" /> denotes
         /// which "Type" the asset is of. But it is also possible
-        /// to have an <see cref="Aas.AssetInformation.AssetType" /> of an asset of kind "Type".
+        /// to have an <see cref="Our.AssetInformation.AssetType" /> of an asset of kind "Type".
         /// </remarks>
         public string? AssetType { get; set; }
 
@@ -2032,8 +2032,8 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-133:
-    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
-    ///     i.e. <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />.
+    ///     <see cref="Our.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
+    ///     i.e. <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2072,8 +2072,8 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-133:
-    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
-    ///     i.e. <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />.
+    ///     <see cref="Our.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
+    ///     i.e. <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2297,7 +2297,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -2310,8 +2310,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2358,7 +2358,7 @@ namespace AasCore.Aas3_0
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="Aas.ModellingKind.Instance" />
+        /// Default: <see cref="Our.ModellingKind.Instance" />
         /// </remarks>
         public ModellingKind? Kind { get; set; }
 
@@ -2391,7 +2391,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -2755,7 +2755,7 @@ namespace AasCore.Aas3_0
     /// </summary>
     /// <remarks>
     /// <para>
-    /// It is recommended to add a <see cref="Aas.IHasSemantics.SemanticId" /> to a submodel element.
+    /// It is recommended to add a <see cref="Our.IHasSemantics.SemanticId" /> to a submodel element.
     /// </para>
     /// <para>
     /// Constraints:
@@ -2763,11 +2763,11 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-129:
-    ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.ISubmodelElement.Qualifiers" /> (attribute qualifier
-    ///     inherited via Qualifiable) is equal to <see cref="Aas.QualifierKind.TemplateQualifier" />
+    ///     If any <see cref="Our.Qualifier.Kind" /> value of <see cref="Our.ISubmodelElement.Qualifiers" /> (attribute qualifier
+    ///     inherited via Qualifiable) is equal to <see cref="Our.QualifierKind.TemplateQualifier" />
     ///     then the submodel element shall be part of a submodel template, i.e.
-    ///     a Submodel with <see cref="Aas.Submodel.Kind" /> (attribute kind inherited via
-    ///     <see cref="Aas.IHasKind" />) value is equal to <see cref="Aas.ModellingKind.Template" />.
+    ///     a Submodel with <see cref="Our.Submodel.Kind" /> (attribute kind inherited via
+    ///     <see cref="Our.IHasKind" />) value is equal to <see cref="Our.ModellingKind.Template" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2816,7 +2816,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -2829,8 +2829,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2888,7 +2888,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -3212,7 +3212,7 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// Enumeration of all possible elements of a <see cref="Aas.SubmodelElementList" />.
+    /// Enumeration of all possible elements of a <see cref="Our.SubmodelElementList" />.
     /// </summary>
     public enum AasSubmodelElements
     {
@@ -3281,46 +3281,46 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-107:
-    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
-    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> it
-    ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Our.SubmodelElementList" /> has
+    ///     a <see cref="Our.IHasSemantics.SemanticId" /> it
+    ///     shall be identical to <see cref="Our.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-114:
-    ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
-    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> then they shall be identical.
+    ///     If two first level child elements in a <see cref="Our.SubmodelElementList" /> have
+    ///     a <see cref="Our.IHasSemantics.SemanticId" /> then they shall be identical.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-115:
-    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
-    ///     specify a <see cref="Aas.IHasSemantics.SemanticId" /> then the value is assumed to be
-    ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Our.SubmodelElementList" /> does not
+    ///     specify a <see cref="Our.IHasSemantics.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="Our.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-120:
-    ///     The <see cref="Aas.SubmodelElementList.IdShort" /> of a <see cref="Aas.ISubmodelElement" /> being a direct child of a
-    ///     <see cref="Aas.SubmodelElementList" /> shall not be specified.
+    ///     The <see cref="Our.SubmodelElementList.IdShort" /> of a <see cref="Our.ISubmodelElement" /> being a direct child of a
+    ///     <see cref="Our.SubmodelElementList" /> shall not be specified.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-108:
-    ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
-    ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
+    ///     All first level child elements in a <see cref="Our.SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="Our.SubmodelElementList.TypeValueListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-109:
-    ///     If <see cref="Aas.SubmodelElementList.TypeValueListElement" /> is equal to
-    ///     <see cref="Aas.AasSubmodelElements.Property" /> or
-    ///     <see cref="Aas.AasSubmodelElements.Range" />
-    ///     <see cref="Aas.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
-    ///     level child elements in the <see cref="Aas.SubmodelElementList" /> shall have
-    ///     the value type as specified in <see cref="Aas.SubmodelElementList.ValueTypeListElement" />.
+    ///     If <see cref="Our.SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="Our.AasSubmodelElements.Property" /> or
+    ///     <see cref="Our.AasSubmodelElements.Range" />
+    ///     <see cref="Our.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="Our.SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="Our.SubmodelElementList.ValueTypeListElement" />.
     ///   </li>
     /// </ul>
     /// </remarks>
     public interface ISubmodelElementList : ISubmodelElement
     {
         /// <summary>
-        /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// Defines whether order in list is relevant. If <see cref="Our.SubmodelElementList.OrderRelevant" /> = <c>False</c>
         /// then the list is representing a set or a bag.
         /// </summary>
         /// <remarks>
@@ -3375,39 +3375,39 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-107:
-    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
-    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> it
-    ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Our.SubmodelElementList" /> has
+    ///     a <see cref="Our.IHasSemantics.SemanticId" /> it
+    ///     shall be identical to <see cref="Our.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-114:
-    ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
-    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> then they shall be identical.
+    ///     If two first level child elements in a <see cref="Our.SubmodelElementList" /> have
+    ///     a <see cref="Our.IHasSemantics.SemanticId" /> then they shall be identical.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-115:
-    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
-    ///     specify a <see cref="Aas.IHasSemantics.SemanticId" /> then the value is assumed to be
-    ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Our.SubmodelElementList" /> does not
+    ///     specify a <see cref="Our.IHasSemantics.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="Our.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-120:
-    ///     The <see cref="Aas.SubmodelElementList.IdShort" /> of a <see cref="Aas.ISubmodelElement" /> being a direct child of a
-    ///     <see cref="Aas.SubmodelElementList" /> shall not be specified.
+    ///     The <see cref="Our.SubmodelElementList.IdShort" /> of a <see cref="Our.ISubmodelElement" /> being a direct child of a
+    ///     <see cref="Our.SubmodelElementList" /> shall not be specified.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-108:
-    ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
-    ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
+    ///     All first level child elements in a <see cref="Our.SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="Our.SubmodelElementList.TypeValueListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-109:
-    ///     If <see cref="Aas.SubmodelElementList.TypeValueListElement" /> is equal to
-    ///     <see cref="Aas.AasSubmodelElements.Property" /> or
-    ///     <see cref="Aas.AasSubmodelElements.Range" />
-    ///     <see cref="Aas.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
-    ///     level child elements in the <see cref="Aas.SubmodelElementList" /> shall have
-    ///     the value type as specified in <see cref="Aas.SubmodelElementList.ValueTypeListElement" />.
+    ///     If <see cref="Our.SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="Our.AasSubmodelElements.Property" /> or
+    ///     <see cref="Our.AasSubmodelElements.Range" />
+    ///     <see cref="Our.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="Our.SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="Our.SubmodelElementList.ValueTypeListElement" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -3426,7 +3426,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -3439,8 +3439,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3498,7 +3498,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -3510,7 +3510,7 @@ namespace AasCore.Aas3_0
         public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
-        /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// Defines whether order in list is relevant. If <see cref="Our.SubmodelElementList.OrderRelevant" /> = <c>False</c>
         /// then the list is representing a set or a bag.
         /// </summary>
         /// <remarks>
@@ -3924,7 +3924,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -3937,8 +3937,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3996,7 +3996,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -4339,7 +4339,7 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASd-090:
-    ///     For data elements <see cref="Aas.IDataElement.Category" /> shall be one of the following
+    ///     For data elements <see cref="Our.IDataElement.Category" /> shall be one of the following
     ///     values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
     ///     </para>
     ///     <para>
@@ -4363,9 +4363,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-007:
-    ///     If both, the <see cref="Aas.Property.Value" /> and the <see cref="Aas.Property.ValueId" /> are
-    ///     present then the value of <see cref="Aas.Property.Value" /> needs to be identical to
-    ///     the value of the referenced coded value in <see cref="Aas.Property.ValueId" />.
+    ///     If both, the <see cref="Our.Property.Value" /> and the <see cref="Our.Property.ValueId" /> are
+    ///     present then the value of <see cref="Our.Property.Value" /> needs to be identical to
+    ///     the value of the referenced coded value in <see cref="Our.Property.ValueId" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -4400,9 +4400,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-007:
-    ///     If both, the <see cref="Aas.Property.Value" /> and the <see cref="Aas.Property.ValueId" /> are
-    ///     present then the value of <see cref="Aas.Property.Value" /> needs to be identical to
-    ///     the value of the referenced coded value in <see cref="Aas.Property.ValueId" />.
+    ///     If both, the <see cref="Our.Property.Value" /> and the <see cref="Our.Property.ValueId" /> are
+    ///     present then the value of <see cref="Our.Property.Value" /> needs to be identical to
+    ///     the value of the referenced coded value in <see cref="Our.Property.ValueId" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -4421,7 +4421,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -4434,8 +4434,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4493,7 +4493,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -4853,9 +4853,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-012:
-    ///     If both the <see cref="Aas.MultiLanguageProperty.Value" /> and the <see cref="Aas.MultiLanguageProperty.ValueId" /> are present then for each
+    ///     If both the <see cref="Our.MultiLanguageProperty.Value" /> and the <see cref="Our.MultiLanguageProperty.ValueId" /> are present then for each
     ///     string in a specific language the meaning must be the same as specified in
-    ///     <see cref="Aas.MultiLanguageProperty.ValueId" />.
+    ///     <see cref="Our.MultiLanguageProperty.ValueId" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -4890,9 +4890,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-012:
-    ///     If both the <see cref="Aas.MultiLanguageProperty.Value" /> and the <see cref="Aas.MultiLanguageProperty.ValueId" /> are present then for each
+    ///     If both the <see cref="Our.MultiLanguageProperty.Value" /> and the <see cref="Our.MultiLanguageProperty.ValueId" /> are present then for each
     ///     string in a specific language the meaning must be the same as specified in
-    ///     <see cref="Aas.MultiLanguageProperty.ValueId" />.
+    ///     <see cref="Our.MultiLanguageProperty.ValueId" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -4911,7 +4911,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -4924,8 +4924,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4983,7 +4983,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -5402,7 +5402,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -5415,8 +5415,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5474,7 +5474,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -5846,7 +5846,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -5859,8 +5859,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5918,7 +5918,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -6254,22 +6254,22 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// A <see cref="Aas.Blob" /> is a data element that represents a file that is contained with its
+    /// A <see cref="Our.Blob" /> is a data element that represents a file that is contained with its
     /// source code in the value attribute.
     /// </summary>
     public interface IBlob : IDataElement
     {
         /// <summary>
-        /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
+        /// The value of the <see cref="Our.Blob" /> instance of a blob data element.
         /// </summary>
         /// <remarks>
         /// In contrast to the file property the file content is stored directly as value
-        /// in the <see cref="Aas.Blob" /> data element.
+        /// in the <see cref="Our.Blob" /> data element.
         /// </remarks>
         public byte[]? Value { get; set; }
 
         /// <summary>
-        /// Content type of the content of the <see cref="Aas.Blob" />.
+        /// Content type of the content of the <see cref="Our.Blob" />.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -6287,7 +6287,7 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// A <see cref="Aas.Blob" /> is a data element that represents a file that is contained with its
+    /// A <see cref="Our.Blob" /> is a data element that represents a file that is contained with its
     /// source code in the value attribute.
     /// </summary>
     public class Blob : IBlob
@@ -6305,7 +6305,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -6318,8 +6318,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6377,7 +6377,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -6389,16 +6389,16 @@ namespace AasCore.Aas3_0
         public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
-        /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
+        /// The value of the <see cref="Our.Blob" /> instance of a blob data element.
         /// </summary>
         /// <remarks>
         /// In contrast to the file property the file content is stored directly as value
-        /// in the <see cref="Aas.Blob" /> data element.
+        /// in the <see cref="Our.Blob" /> data element.
         /// </remarks>
         public byte[]? Value { get; set; }
 
         /// <summary>
-        /// Content type of the content of the <see cref="Aas.Blob" />.
+        /// Content type of the content of the <see cref="Our.Blob" />.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -6763,7 +6763,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -6776,8 +6776,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6835,7 +6835,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -7202,7 +7202,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -7215,8 +7215,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7274,7 +7274,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -7646,9 +7646,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-014:
-    ///     Either the attribute <see cref="Aas.Entity.GlobalAssetId" /> or <see cref="Aas.Entity.SpecificAssetIds" />
-    ///     of an <see cref="Aas.Entity" /> must be set if <see cref="Aas.Entity.EntityType" /> is set to
-    ///     <see cref="Aas.EntityType.SelfManagedEntity" />. They are not existing otherwise.
+    ///     Either the attribute <see cref="Our.Entity.GlobalAssetId" /> or <see cref="Our.Entity.SpecificAssetIds" />
+    ///     of an <see cref="Our.Entity" /> must be set if <see cref="Our.Entity.EntityType" /> is set to
+    ///     <see cref="Our.EntityType.SelfManagedEntity" />. They are not existing otherwise.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -7700,9 +7700,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-014:
-    ///     Either the attribute <see cref="Aas.Entity.GlobalAssetId" /> or <see cref="Aas.Entity.SpecificAssetIds" />
-    ///     of an <see cref="Aas.Entity" /> must be set if <see cref="Aas.Entity.EntityType" /> is set to
-    ///     <see cref="Aas.EntityType.SelfManagedEntity" />. They are not existing otherwise.
+    ///     Either the attribute <see cref="Our.Entity.GlobalAssetId" /> or <see cref="Our.Entity.SpecificAssetIds" />
+    ///     of an <see cref="Our.Entity" /> must be set if <see cref="Our.Entity.EntityType" /> is set to
+    ///     <see cref="Our.EntityType.SelfManagedEntity" />. They are not existing otherwise.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -7721,7 +7721,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -7734,8 +7734,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7793,7 +7793,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -8256,13 +8256,13 @@ namespace AasCore.Aas3_0
     {
         /// <summary>
         /// Reference to the source event element, including identification of
-        /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
-        /// <see cref="Aas.ISubmodelElement" />'s.
+        /// <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" />,
+        /// <see cref="Our.ISubmodelElement" />'s.
         /// </summary>
         public IReference Source { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the source event element, if available
         /// </summary>
         /// <remarks>
         /// It is recommended to use a global reference.
@@ -8273,13 +8273,13 @@ namespace AasCore.Aas3_0
         /// Reference to the referable, which defines the scope of the event.
         /// </summary>
         /// <remarks>
-        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
-        /// <see cref="Aas.ISubmodelElement" />.
+        /// Can be <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" /> or
+        /// <see cref="Our.ISubmodelElement" />.
         /// </remarks>
         public IReference ObservableReference { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the referable which defines the scope of
         /// the event, if available.
         /// </summary>
         /// <remarks>
@@ -8323,13 +8323,13 @@ namespace AasCore.Aas3_0
     {
         /// <summary>
         /// Reference to the source event element, including identification of
-        /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
-        /// <see cref="Aas.ISubmodelElement" />'s.
+        /// <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" />,
+        /// <see cref="Our.ISubmodelElement" />'s.
         /// </summary>
         public IReference Source { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the source event element, if available
         /// </summary>
         /// <remarks>
         /// It is recommended to use a global reference.
@@ -8340,13 +8340,13 @@ namespace AasCore.Aas3_0
         /// Reference to the referable, which defines the scope of the event.
         /// </summary>
         /// <remarks>
-        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
-        /// <see cref="Aas.ISubmodelElement" />.
+        /// Can be <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" /> or
+        /// <see cref="Our.ISubmodelElement" />.
         /// </remarks>
         public IReference ObservableReference { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the referable which defines the scope of
         /// the event, if available.
         /// </summary>
         /// <remarks>
@@ -8542,9 +8542,9 @@ namespace AasCore.Aas3_0
     public interface IBasicEventElement : IEventElement
     {
         /// <summary>
-        /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
-        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
-        /// <see cref="Aas.ISubmodelElement" />.
+        /// Reference to the <see cref="Our.IReferable" />, which defines the scope of the event.
+        /// Can be <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" />, or
+        /// <see cref="Our.ISubmodelElement" />.
         /// </summary>
         /// <remarks>
         /// Reference to a referable, e.g., a data element or
@@ -8576,9 +8576,9 @@ namespace AasCore.Aas3_0
 
         /// <summary>
         /// Information, which outer message infrastructure shall handle messages for
-        /// the <see cref="Aas.IEventElement" />. Refers to a <see cref="Aas.Submodel" />,
-        /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
-        /// <see cref="Aas.Entity" />, which contains <see cref="Aas.IDataElement" />'s describing
+        /// the <see cref="Our.IEventElement" />. Refers to a <see cref="Our.Submodel" />,
+        /// <see cref="Our.SubmodelElementList" />, <see cref="Our.SubmodelElementCollection" /> or
+        /// <see cref="Our.Entity" />, which contains <see cref="Our.IDataElement" />'s describing
         /// the proprietary specification for the message broker.
         /// </summary>
         /// <remarks>
@@ -8646,7 +8646,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -8659,8 +8659,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -8718,7 +8718,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -8730,9 +8730,9 @@ namespace AasCore.Aas3_0
         public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
-        /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
-        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
-        /// <see cref="Aas.ISubmodelElement" />.
+        /// Reference to the <see cref="Our.IReferable" />, which defines the scope of the event.
+        /// Can be <see cref="Our.AssetAdministrationShell" />, <see cref="Our.Submodel" />, or
+        /// <see cref="Our.ISubmodelElement" />.
         /// </summary>
         /// <remarks>
         /// Reference to a referable, e.g., a data element or
@@ -8764,9 +8764,9 @@ namespace AasCore.Aas3_0
 
         /// <summary>
         /// Information, which outer message infrastructure shall handle messages for
-        /// the <see cref="Aas.IEventElement" />. Refers to a <see cref="Aas.Submodel" />,
-        /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
-        /// <see cref="Aas.Entity" />, which contains <see cref="Aas.IDataElement" />'s describing
+        /// the <see cref="Our.IEventElement" />. Refers to a <see cref="Our.Submodel" />,
+        /// <see cref="Our.SubmodelElementList" />, <see cref="Our.SubmodelElementCollection" /> or
+        /// <see cref="Our.Entity" />, which contains <see cref="Our.IDataElement" />'s describing
         /// the proprietary specification for the message broker.
         /// </summary>
         /// <remarks>
@@ -9141,10 +9141,10 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-134:
-    ///     For an <see cref="Aas.Operation" /> the <see cref="Aas.IReferable.IdShort" /> of all
-    ///     <see cref="Aas.OperationVariable.Value" />'s in
-    ///     <see cref="Aas.Operation.InputVariables" />, <see cref="Aas.Operation.OutputVariables" />
-    ///     and <see cref="Aas.Operation.InoutputVariables" /> shall be unique.
+    ///     For an <see cref="Our.Operation" /> the <see cref="Our.IReferable.IdShort" /> of all
+    ///     <see cref="Our.OperationVariable.Value" />'s in
+    ///     <see cref="Our.Operation.InputVariables" />, <see cref="Our.Operation.OutputVariables" />
+    ///     and <see cref="Our.Operation.InoutputVariables" /> shall be unique.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -9191,10 +9191,10 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-134:
-    ///     For an <see cref="Aas.Operation" /> the <see cref="Aas.IReferable.IdShort" /> of all
-    ///     <see cref="Aas.OperationVariable.Value" />'s in
-    ///     <see cref="Aas.Operation.InputVariables" />, <see cref="Aas.Operation.OutputVariables" />
-    ///     and <see cref="Aas.Operation.InoutputVariables" /> shall be unique.
+    ///     For an <see cref="Our.Operation" /> the <see cref="Our.IReferable.IdShort" /> of all
+    ///     <see cref="Our.OperationVariable.Value" />'s in
+    ///     <see cref="Our.Operation.InputVariables" />, <see cref="Our.Operation.OutputVariables" />
+    ///     and <see cref="Our.Operation.InoutputVariables" /> shall be unique.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -9213,7 +9213,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -9226,8 +9226,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -9285,7 +9285,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -9785,7 +9785,7 @@ namespace AasCore.Aas3_0
     /// asset to achieve a certain effect in the physical or virtual world.
     /// </summary>
     /// <remarks>
-    /// The <see cref="Aas.Capability.SemanticId" /> of a capability is typically an ontology.
+    /// The <see cref="Our.Capability.SemanticId" /> of a capability is typically an ontology.
     /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
     public interface ICapability : ISubmodelElement
@@ -9798,7 +9798,7 @@ namespace AasCore.Aas3_0
     /// asset to achieve a certain effect in the physical or virtual world.
     /// </summary>
     /// <remarks>
-    /// The <see cref="Aas.Capability.SemanticId" /> of a capability is typically an ontology.
+    /// The <see cref="Our.Capability.SemanticId" /> of a capability is typically an ontology.
     /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
     public class Capability : ICapability
@@ -9816,7 +9816,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -9829,8 +9829,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -9888,7 +9888,7 @@ namespace AasCore.Aas3_0
         ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Aas.Qualifier.Type" />.
+        ///     <see cref="Our.Qualifier.Type" />.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -10193,9 +10193,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-004:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>PROPERTY</c> or
     ///     <c>VALUE</c> using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> is mandatory and shall be
     ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
     ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
     ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
@@ -10209,9 +10209,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-005:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>REFERENCE</c>
     ///     using data specification template IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> shall be
     ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
     ///     </para>
     ///     <para>
@@ -10222,9 +10222,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-006:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>DOCUMENT</c>
     ///     using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
     ///     <c>BLOB</c>, <c>HTML</c>
     ///     </para>
     ///     <para>
@@ -10235,9 +10235,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-007:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
     ///     using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> is mandatory and shall be
     ///     defined.
     ///     </para>
     ///     <para>
@@ -10248,21 +10248,21 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-008:
-    ///     For a <see cref="Aas.ConceptDescription" /> using data specification template IEC61360,
-    ///     <see cref="Aas.DataSpecificationIec61360.Definition" /> is mandatory and shall be
+    ///     For a <see cref="Our.ConceptDescription" /> using data specification template IEC61360,
+    ///     <see cref="Our.DataSpecificationIec61360.Definition" /> is mandatory and shall be
     ///     defined at least in English.
     ///     </para>
     ///     <para>
     ///     Exception: The concept description describes a value, i.e.
-    ///     <see cref="Aas.DataSpecificationIec61360.Value" /> is defined.
+    ///     <see cref="Our.DataSpecificationIec61360.Value" /> is defined.
     ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-003:
-    ///     For a <see cref="Aas.ConceptDescription" /> using data specification template IEC61360,
-    ///     referenced via <see cref="Aas.DataSpecificationIec61360.ValueList" />
-    ///     <see cref="Aas.ValueReferencePair.ValueId" />
-    ///     the <see cref="Aas.DataSpecificationIec61360.Value" /> shall be set.
+    ///     For a <see cref="Our.ConceptDescription" /> using data specification template IEC61360,
+    ///     referenced via <see cref="Our.DataSpecificationIec61360.ValueList" />
+    ///     <see cref="Our.ValueReferencePair.ValueId" />
+    ///     the <see cref="Our.DataSpecificationIec61360.Value" /> shall be set.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -10306,9 +10306,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-004:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>PROPERTY</c> or
     ///     <c>VALUE</c> using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> is mandatory and shall be
     ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
     ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
     ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
@@ -10322,9 +10322,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-005:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>REFERENCE</c>
     ///     using data specification template IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> shall be
     ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
     ///     </para>
     ///     <para>
@@ -10335,9 +10335,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-006:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>DOCUMENT</c>
     ///     using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
     ///     <c>BLOB</c>, <c>HTML</c>
     ///     </para>
     ///     <para>
@@ -10348,9 +10348,9 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-007:
-    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     For a <see cref="Our.ConceptDescription" /> with <see cref="Our.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
     ///     using data specification IEC61360,
-    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     the <see cref="Our.DataSpecificationIec61360.DataType" /> is mandatory and shall be
     ///     defined.
     ///     </para>
     ///     <para>
@@ -10361,21 +10361,21 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-008:
-    ///     For a <see cref="Aas.ConceptDescription" /> using data specification template IEC61360,
-    ///     <see cref="Aas.DataSpecificationIec61360.Definition" /> is mandatory and shall be
+    ///     For a <see cref="Our.ConceptDescription" /> using data specification template IEC61360,
+    ///     <see cref="Our.DataSpecificationIec61360.Definition" /> is mandatory and shall be
     ///     defined at least in English.
     ///     </para>
     ///     <para>
     ///     Exception: The concept description describes a value, i.e.
-    ///     <see cref="Aas.DataSpecificationIec61360.Value" /> is defined.
+    ///     <see cref="Our.DataSpecificationIec61360.Value" /> is defined.
     ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-003:
-    ///     For a <see cref="Aas.ConceptDescription" /> using data specification template IEC61360,
-    ///     referenced via <see cref="Aas.DataSpecificationIec61360.ValueList" />
-    ///     <see cref="Aas.ValueReferencePair.ValueId" />
-    ///     the <see cref="Aas.DataSpecificationIec61360.Value" /> shall be set.
+    ///     For a <see cref="Our.ConceptDescription" /> using data specification template IEC61360,
+    ///     referenced via <see cref="Our.DataSpecificationIec61360.ValueList" />
+    ///     <see cref="Our.ValueReferencePair.ValueId" />
+    ///     the <see cref="Our.DataSpecificationIec61360.Value" /> shall be set.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -10394,7 +10394,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Our.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -10407,8 +10407,8 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Our.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Our.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -10757,39 +10757,39 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-121:
-    ///     For <see cref="Aas.Reference" />'s the value of <see cref="Aas.Key.Type" /> of the first key of "
-    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.GloballyIdentifiables" />.
+    ///     For <see cref="Our.Reference" />'s the value of <see cref="Our.Key.Type" /> of the first key of "
+    ///     <see cref="Our.Reference.Keys" /> shall be one of <see cref="Our.Constants.GloballyIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-122:
-    ///     For external references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />, the value
-    ///     of <see cref="Aas.Key.Type" /> of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" />.
+    ///     For external references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />, the value
+    ///     of <see cref="Our.Key.Type" /> of the first key of <see cref="Our.Reference.Keys" /> shall be one of
+    ///     <see cref="Our.Constants.GenericGloballyIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-123:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the value
-    ///     of <see cref="Aas.Key.Type" /> of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.Constants.AasIdentifiables" />.
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, the value
+    ///     of <see cref="Our.Key.Type" /> of the first key of <see cref="Our.Reference.Keys" /> shall be one of
+    ///     <see cref="Our.Constants.AasIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-124:
-    ///     For external references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />, the last
-    ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
-    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" /> or one of
-    ///     <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///     For external references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />, the last
+    ///     key of <see cref="Our.Reference.Keys" /> shall be either one of
+    ///     <see cref="Our.Constants.GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="Our.Constants.GenericFragmentKeys" />.
     ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASd-125:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> the value of <see cref="Aas.Key.Type" />
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> the value of <see cref="Our.Key.Type" />
     ///     of each of the keys following the first
-    ///     key of <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
+    ///     key of <see cref="Our.Reference.Keys" /> shall be one of <see cref="Our.Constants.FragmentKeys" />.
     ///     </para>
     ///     <para>
     ///     Constraint AASd-125 ensures that the shortest path is used.
@@ -10797,23 +10797,23 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-126:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> the value of <see cref="Aas.Key.Type" />
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> the value of <see cref="Our.Key.Type" />
     ///     of the last key in the reference key chain may be
-    ///     one of <see cref="Aas.Constants.GenericFragmentKeys" /> or no key at all
-    ///     shall have a value out of <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///     one of <see cref="Our.Constants.GenericFragmentKeys" /> or no key at all
+    ///     shall have a value out of <see cref="Our.Constants.GenericFragmentKeys" />.
     ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASd-127:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> a key with <see cref="Aas.Key.Type" />
-    ///     <see cref="Aas.KeyTypes.FragmentReference" /> shall be preceded by a key with
-    ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
-    ///     AAS fragments, i.e. <see cref="Aas.Key.Type" /> values
-    ///     out of <see cref="Aas.Constants.AasSubmodelElementsAsKeys" />, do not support fragments.
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> a key with <see cref="Our.Key.Type" />
+    ///     <see cref="Our.KeyTypes.FragmentReference" /> shall be preceded by a key with
+    ///     <see cref="Our.Key.Type" /> <see cref="Our.KeyTypes.File" /> or <see cref="Our.KeyTypes.Blob" />. All other
+    ///     AAS fragments, i.e. <see cref="Our.Key.Type" /> values
+    ///     out of <see cref="Our.Constants.AasSubmodelElementsAsKeys" />, do not support fragments.
     ///     </para>
     ///     <para>
     ///     Which kind of fragments are supported depends on the content type and the
@@ -10823,10 +10823,10 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-128:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the
-    ///     <see cref="Aas.Key.Value" /> of a <see cref="Aas.Key" /> preceded by a <see cref="Aas.Key" /> with
-    ///     <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.SubmodelElementList" /> is an integer
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, the
+    ///     <see cref="Our.Key.Value" /> of a <see cref="Our.Key" /> preceded by a <see cref="Our.Key" /> with
+    ///     <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.SubmodelElementList" /> is an integer
     ///     number denoting the position in the array of the submodel element list.
     ///   </li>
     /// </ul>
@@ -10842,8 +10842,8 @@ namespace AasCore.Aas3_0
         public ReferenceTypes Type { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referenced model element
-        /// (<see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />).
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the referenced model element
+        /// (<see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />).
         /// </summary>
         /// <remarks>
         /// <para>
@@ -10883,39 +10883,39 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-121:
-    ///     For <see cref="Aas.Reference" />'s the value of <see cref="Aas.Key.Type" /> of the first key of "
-    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.GloballyIdentifiables" />.
+    ///     For <see cref="Our.Reference" />'s the value of <see cref="Our.Key.Type" /> of the first key of "
+    ///     <see cref="Our.Reference.Keys" /> shall be one of <see cref="Our.Constants.GloballyIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-122:
-    ///     For external references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />, the value
-    ///     of <see cref="Aas.Key.Type" /> of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" />.
+    ///     For external references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />, the value
+    ///     of <see cref="Our.Key.Type" /> of the first key of <see cref="Our.Reference.Keys" /> shall be one of
+    ///     <see cref="Our.Constants.GenericGloballyIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-123:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the value
-    ///     of <see cref="Aas.Key.Type" /> of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.Constants.AasIdentifiables" />.
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, the value
+    ///     of <see cref="Our.Key.Type" /> of the first key of <see cref="Our.Reference.Keys" /> shall be one of
+    ///     <see cref="Our.Constants.AasIdentifiables" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-124:
-    ///     For external references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />, the last
-    ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
-    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" /> or one of
-    ///     <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///     For external references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ExternalReference" />, the last
+    ///     key of <see cref="Our.Reference.Keys" /> shall be either one of
+    ///     <see cref="Our.Constants.GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="Our.Constants.GenericFragmentKeys" />.
     ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASd-125:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> the value of <see cref="Aas.Key.Type" />
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> the value of <see cref="Our.Key.Type" />
     ///     of each of the keys following the first
-    ///     key of <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
+    ///     key of <see cref="Our.Reference.Keys" /> shall be one of <see cref="Our.Constants.FragmentKeys" />.
     ///     </para>
     ///     <para>
     ///     Constraint AASd-125 ensures that the shortest path is used.
@@ -10923,23 +10923,23 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-126:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> the value of <see cref="Aas.Key.Type" />
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> the value of <see cref="Our.Key.Type" />
     ///     of the last key in the reference key chain may be
-    ///     one of <see cref="Aas.Constants.GenericFragmentKeys" /> or no key at all
-    ///     shall have a value out of <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///     one of <see cref="Our.Constants.GenericFragmentKeys" /> or no key at all
+    ///     shall have a value out of <see cref="Our.Constants.GenericFragmentKeys" />.
     ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASd-127:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Aas.Reference.Keys" /> a key with <see cref="Aas.Key.Type" />
-    ///     <see cref="Aas.KeyTypes.FragmentReference" /> shall be preceded by a key with
-    ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
-    ///     AAS fragments, i.e. <see cref="Aas.Key.Type" /> values
-    ///     out of <see cref="Aas.Constants.AasSubmodelElementsAsKeys" />, do not support fragments.
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Our.Reference.Keys" /> a key with <see cref="Our.Key.Type" />
+    ///     <see cref="Our.KeyTypes.FragmentReference" /> shall be preceded by a key with
+    ///     <see cref="Our.Key.Type" /> <see cref="Our.KeyTypes.File" /> or <see cref="Our.KeyTypes.Blob" />. All other
+    ///     AAS fragments, i.e. <see cref="Our.Key.Type" /> values
+    ///     out of <see cref="Our.Constants.AasSubmodelElementsAsKeys" />, do not support fragments.
     ///     </para>
     ///     <para>
     ///     Which kind of fragments are supported depends on the content type and the
@@ -10949,10 +10949,10 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-128:
-    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
-    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the
-    ///     <see cref="Aas.Key.Value" /> of a <see cref="Aas.Key" /> preceded by a <see cref="Aas.Key" /> with
-    ///     <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.SubmodelElementList" /> is an integer
+    ///     For model references, i.e. <see cref="Our.Reference" />'s with
+    ///     <see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />, the
+    ///     <see cref="Our.Key.Value" /> of a <see cref="Our.Key" /> preceded by a <see cref="Our.Key" /> with
+    ///     <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.SubmodelElementList" /> is an integer
     ///     number denoting the position in the array of the submodel element list.
     ///   </li>
     /// </ul>
@@ -10968,8 +10968,8 @@ namespace AasCore.Aas3_0
         public ReferenceTypes Type { get; set; }
 
         /// <summary>
-        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referenced model element
-        /// (<see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />).
+        /// <see cref="Our.IHasSemantics.SemanticId" /> of the referenced model element
+        /// (<see cref="Our.Reference.Type" /> = <see cref="Our.ReferenceTypes.ModelReference" />).
         /// </summary>
         /// <remarks>
         /// <para>
@@ -11092,11 +11092,11 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.GlobalReference" />,
+        /// In case <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.GlobalReference" />,
         /// the key represents a reference to a source that can be globally identified.
         /// </para>
         /// <para>
-        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
+        /// In case <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified
         /// by the key that precedes this key.
         /// </para>
@@ -11123,11 +11123,11 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.GlobalReference" />,
+        /// In case <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.GlobalReference" />,
         /// the key represents a reference to a source that can be globally identified.
         /// </para>
         /// <para>
-        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
+        /// In case <see cref="Our.Key.Type" /> = <see cref="Our.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified
         /// by the key that precedes this key.
         /// </para>
@@ -11238,7 +11238,7 @@ namespace AasCore.Aas3_0
         /// Data element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.KeyTypes.DataElement" />
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Our.KeyTypes.DataElement" />
         /// the reference may be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
@@ -11251,7 +11251,7 @@ namespace AasCore.Aas3_0
         /// Event.
         /// </summary>
         /// <remarks>
-        /// <see cref="Aas.IEventElement" /> is abstract.
+        /// <see cref="Our.IEventElement" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -11319,8 +11319,8 @@ namespace AasCore.Aas3_0
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.KeyTypes.SubmodelElement" />
-        /// the reference may be a <see cref="Aas.Property" />, an <see cref="Aas.Operation" /> etc.
+        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="Our.KeyTypes.SubmodelElement" />
+        /// the reference may be a <see cref="Our.Property" />, an <see cref="Our.Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -11445,7 +11445,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
     }
@@ -11469,7 +11469,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
 
@@ -11560,7 +11560,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
 
@@ -11867,9 +11867,9 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASc-3a-050:
-    ///     If the <see cref="Aas.DataSpecificationIec61360" /> is used
+    ///     If the <see cref="Our.DataSpecificationIec61360" /> is used
     ///     for an element, the value of
-    ///     <see cref="Aas.IHasDataSpecification.EmbeddedDataSpecifications" />
+    ///     <see cref="Our.IHasDataSpecification.EmbeddedDataSpecifications" />
     ///     shall contain the global reference to the IRI of the corresponding
     ///     data specification template
     ///     https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0
@@ -12186,31 +12186,31 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Either all attributes are false. In this case the concept is mapped
-    ///     to a <see cref="Aas.Property" /> and level type is ignored.
+    ///     to a <see cref="Our.Property" /> and level type is ignored.
     ///   </li>
     ///   <li>
     ///     At most one of the attributes is set to true. In this case
-    ///     the concept is mapped to a <see cref="Aas.Property" />.
+    ///     the concept is mapped to a <see cref="Our.Property" />.
     ///   </li>
     ///   <li>
     ///     Min and max are set to true. In this case the concept is mapped
-    ///     to a <see cref="Aas.Range" />.
+    ///     to a <see cref="Our.Range" />.
     ///   </li>
     ///   <li>
     ///     More than one attribute is set to true but not min and max only
     ///     (see second case). In this case the concept is mapped
-    ///     to a <see cref="Aas.SubmodelElementCollection" /> with the corresponding
+    ///     to a <see cref="Our.SubmodelElementCollection" /> with the corresponding
     ///     number of Properties.
-    ///     Example: If attribute <see cref="Aas.LevelType.Min" /> and <see cref="Aas.LevelType.Nom" /> are set to true
-    ///     then the concept is mapped to a <see cref="Aas.SubmodelElementCollection" />
+    ///     Example: If attribute <see cref="Our.LevelType.Min" /> and <see cref="Our.LevelType.Nom" /> are set to true
+    ///     then the concept is mapped to a <see cref="Our.SubmodelElementCollection" />
     ///     with two Properties within: min and nom.
     ///     The data type of both Properties is the same.
     ///   </li>
     /// </ul>
     /// </para>
     /// <para>
-    /// In the cases 2. and 4. the <see cref="Aas.Property.SemanticId" /> of the Property
-    /// or Properties within the <see cref="Aas.SubmodelElementCollection" /> needs to include
+    /// In the cases 2. and 4. the <see cref="Our.Property.SemanticId" /> of the Property
+    /// or Properties within the <see cref="Our.SubmodelElementCollection" /> needs to include
     /// information about the level type. Otherwise, the semantics is not described
     /// in a unique way. Please refer to the specification.
     /// </para>
@@ -12256,31 +12256,31 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Either all attributes are false. In this case the concept is mapped
-    ///     to a <see cref="Aas.Property" /> and level type is ignored.
+    ///     to a <see cref="Our.Property" /> and level type is ignored.
     ///   </li>
     ///   <li>
     ///     At most one of the attributes is set to true. In this case
-    ///     the concept is mapped to a <see cref="Aas.Property" />.
+    ///     the concept is mapped to a <see cref="Our.Property" />.
     ///   </li>
     ///   <li>
     ///     Min and max are set to true. In this case the concept is mapped
-    ///     to a <see cref="Aas.Range" />.
+    ///     to a <see cref="Our.Range" />.
     ///   </li>
     ///   <li>
     ///     More than one attribute is set to true but not min and max only
     ///     (see second case). In this case the concept is mapped
-    ///     to a <see cref="Aas.SubmodelElementCollection" /> with the corresponding
+    ///     to a <see cref="Our.SubmodelElementCollection" /> with the corresponding
     ///     number of Properties.
-    ///     Example: If attribute <see cref="Aas.LevelType.Min" /> and <see cref="Aas.LevelType.Nom" /> are set to true
-    ///     then the concept is mapped to a <see cref="Aas.SubmodelElementCollection" />
+    ///     Example: If attribute <see cref="Our.LevelType.Min" /> and <see cref="Our.LevelType.Nom" /> are set to true
+    ///     then the concept is mapped to a <see cref="Our.SubmodelElementCollection" />
     ///     with two Properties within: min and nom.
     ///     The data type of both Properties is the same.
     ///   </li>
     /// </ul>
     /// </para>
     /// <para>
-    /// In the cases 2. and 4. the <see cref="Aas.Property.SemanticId" /> of the Property
-    /// or Properties within the <see cref="Aas.SubmodelElementCollection" /> needs to include
+    /// In the cases 2. and 4. the <see cref="Our.Property.SemanticId" /> of the Property
+    /// or Properties within the <see cref="Our.SubmodelElementCollection" /> needs to include
     /// information about the level type. Otherwise, the semantics is not described
     /// in a unique way. Please refer to the specification.
     /// </para>
@@ -12386,7 +12386,7 @@ namespace AasCore.Aas3_0
     public interface IValueReferencePair : IClass
     {
         /// <summary>
-        /// The value of the referenced concept definition of the value in <see cref="Aas.ValueReferencePair.ValueId" />.
+        /// The value of the referenced concept definition of the value in <see cref="Our.ValueReferencePair.ValueId" />.
         /// </summary>
         public string Value { get; set; }
 
@@ -12406,7 +12406,7 @@ namespace AasCore.Aas3_0
     public class ValueReferencePair : IValueReferencePair
     {
         /// <summary>
-        /// The value of the referenced concept definition of the value in <see cref="Aas.ValueReferencePair.ValueId" />.
+        /// The value of the referenced concept definition of the value in <see cref="Our.ValueReferencePair.ValueId" />.
         /// </summary>
         public string Value { get; set; }
 
@@ -12611,7 +12611,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
 
@@ -12702,7 +12702,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
 
@@ -12793,7 +12793,7 @@ namespace AasCore.Aas3_0
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="Aas.IAbstractLangString.Language" />
+        /// Text in the <see cref="Our.IAbstractLangString.Language" />
         /// </summary>
         public string Text { get; set; }
 
@@ -12873,17 +12873,17 @@ namespace AasCore.Aas3_0
     /// <para>
     /// IEC61360 requires also a globally unique identifier for a concept
     /// description. This ID is not part of the data specification template.
-    /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
-    /// <see cref="Aas.IIdentifiable" /> is used. Same holds for administrative
+    /// Instead the <see cref="Our.ConceptDescription.Id" /> as inherited via
+    /// <see cref="Our.IIdentifiable" /> is used. Same holds for administrative
     /// information like the version and revision.
     /// </para>
     /// <para>
-    /// <see cref="Aas.ConceptDescription.IdShort" /> and <see cref="Aas.DataSpecificationIec61360.ShortName" /> are very
+    /// <see cref="Our.ConceptDescription.IdShort" /> and <see cref="Our.DataSpecificationIec61360.ShortName" /> are very
     /// similar. However, in this case the decision was to add
-    /// <see cref="Aas.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
-    /// <see cref="Aas.ConceptDescription.DisplayName" /> and
-    /// <see cref="Aas.DataSpecificationIec61360.PreferredName" />. Same holds for
-    /// <see cref="Aas.ConceptDescription.Description" /> and <see cref="Aas.DataSpecificationIec61360.Definition" />.
+    /// <see cref="Our.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
+    /// <see cref="Our.ConceptDescription.DisplayName" /> and
+    /// <see cref="Our.DataSpecificationIec61360.PreferredName" />. Same holds for
+    /// <see cref="Our.ConceptDescription.Description" /> and <see cref="Our.DataSpecificationIec61360.Definition" />.
     /// </para>
     /// <para>
     /// Constraints:
@@ -12892,32 +12892,32 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-010:
-    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     If <see cref="Our.DataSpecificationIec61360.Value" /> is not empty then <see cref="Our.DataSpecificationIec61360.ValueList" /> shall be empty
     ///     and vice versa.
     ///     </para>
     ///     <para>
-    ///     It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are
+    ///     It is also possible that both <see cref="Our.DataSpecificationIec61360.Value" /> and <see cref="Our.DataSpecificationIec61360.ValueList" /> are
     ///     empty. This is the case for concept descriptions that define the semantics
-    ///     of a property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as
+    ///     of a property but do not have an enumeration (<see cref="Our.DataSpecificationIec61360.ValueList" />) as
     ///     data type.
     ///     </para>
     ///     <para>
-    ///     Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
+    ///     Although it is possible to define a <see cref="Our.ConceptDescription" /> for a
     ///     :attr:´value_list`,
-    ///     it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
-    ///     It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
+    ///     it is not possible to reuse this <see cref="Our.DataSpecificationIec61360.ValueList" />.
+    ///     It is only possible to directly add a <see cref="Our.DataSpecificationIec61360.ValueList" /> as data type
     ///     to a specific semantic definition of a property.
     ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-009:
-    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:
-    ///     <see cref="Aas.DataTypeIec61360.IntegerMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.RealMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.RationalMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.IntegerCurrency" />,
-    ///     <see cref="Aas.DataTypeIec61360.RealCurrency" />, then <see cref="Aas.DataSpecificationIec61360.Unit" /> or
-    ///     <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
+    ///     If <see cref="Our.DataSpecificationIec61360.DataType" /> one of:
+    ///     <see cref="Our.DataTypeIec61360.IntegerMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.RealMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.RationalMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.IntegerCurrency" />,
+    ///     <see cref="Our.DataTypeIec61360.RealCurrency" />, then <see cref="Our.DataSpecificationIec61360.Unit" /> or
+    ///     <see cref="Our.DataSpecificationIec61360.UnitId" /> shall be defined.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -12936,7 +12936,7 @@ namespace AasCore.Aas3_0
         /// <ul>
         ///   <li>
         ///     Constraint AASc-3a-002:
-        ///     <see cref="Aas.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
+        ///     <see cref="Our.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -12957,7 +12957,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// <see cref="Aas.DataSpecificationIec61360.Unit" /> and <see cref="Aas.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
+        /// <see cref="Our.DataSpecificationIec61360.Unit" /> and <see cref="Our.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
         /// are set
         /// </para>
         /// <para>
@@ -13028,17 +13028,17 @@ namespace AasCore.Aas3_0
     /// <para>
     /// IEC61360 requires also a globally unique identifier for a concept
     /// description. This ID is not part of the data specification template.
-    /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
-    /// <see cref="Aas.IIdentifiable" /> is used. Same holds for administrative
+    /// Instead the <see cref="Our.ConceptDescription.Id" /> as inherited via
+    /// <see cref="Our.IIdentifiable" /> is used. Same holds for administrative
     /// information like the version and revision.
     /// </para>
     /// <para>
-    /// <see cref="Aas.ConceptDescription.IdShort" /> and <see cref="Aas.DataSpecificationIec61360.ShortName" /> are very
+    /// <see cref="Our.ConceptDescription.IdShort" /> and <see cref="Our.DataSpecificationIec61360.ShortName" /> are very
     /// similar. However, in this case the decision was to add
-    /// <see cref="Aas.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
-    /// <see cref="Aas.ConceptDescription.DisplayName" /> and
-    /// <see cref="Aas.DataSpecificationIec61360.PreferredName" />. Same holds for
-    /// <see cref="Aas.ConceptDescription.Description" /> and <see cref="Aas.DataSpecificationIec61360.Definition" />.
+    /// <see cref="Our.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
+    /// <see cref="Our.ConceptDescription.DisplayName" /> and
+    /// <see cref="Our.DataSpecificationIec61360.PreferredName" />. Same holds for
+    /// <see cref="Our.ConceptDescription.Description" /> and <see cref="Our.DataSpecificationIec61360.Definition" />.
     /// </para>
     /// <para>
     /// Constraints:
@@ -13047,32 +13047,32 @@ namespace AasCore.Aas3_0
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-010:
-    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     If <see cref="Our.DataSpecificationIec61360.Value" /> is not empty then <see cref="Our.DataSpecificationIec61360.ValueList" /> shall be empty
     ///     and vice versa.
     ///     </para>
     ///     <para>
-    ///     It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are
+    ///     It is also possible that both <see cref="Our.DataSpecificationIec61360.Value" /> and <see cref="Our.DataSpecificationIec61360.ValueList" /> are
     ///     empty. This is the case for concept descriptions that define the semantics
-    ///     of a property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as
+    ///     of a property but do not have an enumeration (<see cref="Our.DataSpecificationIec61360.ValueList" />) as
     ///     data type.
     ///     </para>
     ///     <para>
-    ///     Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
+    ///     Although it is possible to define a <see cref="Our.ConceptDescription" /> for a
     ///     :attr:´value_list`,
-    ///     it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
-    ///     It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
+    ///     it is not possible to reuse this <see cref="Our.DataSpecificationIec61360.ValueList" />.
+    ///     It is only possible to directly add a <see cref="Our.DataSpecificationIec61360.ValueList" /> as data type
     ///     to a specific semantic definition of a property.
     ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-009:
-    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:
-    ///     <see cref="Aas.DataTypeIec61360.IntegerMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.RealMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.RationalMeasure" />,
-    ///     <see cref="Aas.DataTypeIec61360.IntegerCurrency" />,
-    ///     <see cref="Aas.DataTypeIec61360.RealCurrency" />, then <see cref="Aas.DataSpecificationIec61360.Unit" /> or
-    ///     <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
+    ///     If <see cref="Our.DataSpecificationIec61360.DataType" /> one of:
+    ///     <see cref="Our.DataTypeIec61360.IntegerMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.RealMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.RationalMeasure" />,
+    ///     <see cref="Our.DataTypeIec61360.IntegerCurrency" />,
+    ///     <see cref="Our.DataTypeIec61360.RealCurrency" />, then <see cref="Our.DataSpecificationIec61360.Unit" /> or
+    ///     <see cref="Our.DataSpecificationIec61360.UnitId" /> shall be defined.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -13091,7 +13091,7 @@ namespace AasCore.Aas3_0
         /// <ul>
         ///   <li>
         ///     Constraint AASc-3a-002:
-        ///     <see cref="Aas.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
+        ///     <see cref="Our.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
         ///   </li>
         /// </ul>
         /// </remarks>
@@ -13112,7 +13112,7 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// <see cref="Aas.DataSpecificationIec61360.Unit" /> and <see cref="Aas.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
+        /// <see cref="Our.DataSpecificationIec61360.Unit" /> and <see cref="Our.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
         /// are set
         /// </para>
         /// <para>

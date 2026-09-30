@@ -212,7 +212,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
         # NOTE (mristin):
         # We need to prefix the cref in case there are naming conflicts.
-        prefixed_name = f"Aas.{name}"
+        prefixed_name = f"Our.{name}"
 
         return (
             _Element(
@@ -278,7 +278,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
         # NOTE (mristin):
         # We need to prefix the cref in case there are naming conflicts.
-        prefixed_cref = f"Aas.{cref}"
+        prefixed_cref = f"Our.{cref}"
 
         return (
             _Element(
@@ -309,7 +309,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
         # NOTE (mristin):
         # We need to prefix the cref in case there are naming conflicts.
-        prefixed_cref = f"Aas.{name_of_our_type}.{method_name}"
+        prefixed_cref = f"Our.{name_of_our_type}.{method_name}"
 
         return (
             _Element(
@@ -339,7 +339,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
         self, element: intermediate_doc.ReferenceToConstant
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
         constant_as_prop_name = csharp_naming.property_name(element.constant.name)
-        cref = f"Aas.Constants.{constant_as_prop_name}"
+        cref = f"Our.Constants.{constant_as_prop_name}"
 
         return (
             _Element(name="see", attrs=collections.OrderedDict([("cref", cref)])),
@@ -350,7 +350,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
         self, element: intermediate_doc.ReferenceToVerificationFunction
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
         method_name = csharp_naming.method_name(element.verification.name)
-        cref = f"Aas.Verification.{method_name}"
+        cref = f"Our.Verification.{method_name}"
 
         return (
             _Element(name="see", attrs=collections.OrderedDict([("cref", cref)])),

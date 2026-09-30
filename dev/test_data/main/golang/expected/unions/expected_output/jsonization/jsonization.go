@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -27,13 +27,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -48,7 +48,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -57,7 +57,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -68,7 +68,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -79,7 +79,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -431,14 +431,14 @@ func unionFromMap[I any, U any](
 }
 
 // Parse `jsonable` as an array of exactly 3 item(s) and parse them into
-// a aascommon.Tuple3[T0, T1, T2] with `parseItem0`, `parseItem1`, *etc.*,
+// a ourcommon.Tuple3[T0, T1, T2] with `parseItem0`, `parseItem1`, *etc.*,
 // or return an error.
 func parseTuple3[T0 any, T1 any, T2 any](
 	jsonable interface{},
 	parseItem0 func(jsonable interface{}) (T0, error),
 	parseItem1 func(jsonable interface{}) (T1, error),
 	parseItem2 func(jsonable interface{}) (T2, error),
-) (result aascommon.Tuple3[T0, T1, T2], err error) {
+) (result ourcommon.Tuple3[T0, T1, T2], err error) {
 	jsonableArray, ok := jsonable.([]interface{})
 	if !ok {
 		err = newDeserializationError(
@@ -481,7 +481,7 @@ func parseTuple3[T0 any, T1 any, T2 any](
 		return
 	}
 
-	result = aascommon.Tuple3[T0, T1, T2]{
+	result = ourcommon.Tuple3[T0, T1, T2]{
 		Item1: item0,
 		Item2: item1,
 		Item3: item2,
@@ -489,12 +489,12 @@ func parseTuple3[T0 any, T1 any, T2 any](
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IStructuralFirst],
+// Parse `jsonable` as an instance of [ourtypes.IStructuralFirst],
 // or return an error.
 func StructuralFirstFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IStructuralFirst,
+	result ourtypes.IStructuralFirst,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -506,12 +506,12 @@ func StructuralFirstFromJsonable(
 	return structuralFirstFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IStructuralFirst] from a map,
+// Parse [ourtypes.IStructuralFirst] from a map,
 // or return an error, if any.
 func structuralFirstFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IStructuralFirst,
+	result ourtypes.IStructuralFirst,
 	err error,
 ) {
 	var theUniqueToFirst string
@@ -547,19 +547,19 @@ func structuralFirstFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewStructuralFirst(
+	result = ourtypes.NewStructuralFirst(
 		theUniqueToFirst,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IStructuralSecond],
+// Parse `jsonable` as an instance of [ourtypes.IStructuralSecond],
 // or return an error.
 func StructuralSecondFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IStructuralSecond,
+	result ourtypes.IStructuralSecond,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -571,12 +571,12 @@ func StructuralSecondFromJsonable(
 	return structuralSecondFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IStructuralSecond] from a map,
+// Parse [ourtypes.IStructuralSecond] from a map,
 // or return an error, if any.
 func structuralSecondFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IStructuralSecond,
+	result ourtypes.IStructuralSecond,
 	err error,
 ) {
 	var theUniqueToSecond string
@@ -612,19 +612,19 @@ func structuralSecondFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewStructuralSecond(
+	result = ourtypes.NewStructuralSecond(
 		theUniqueToSecond,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.StructuralUnion],
+// Parse `jsonable` as an instance of [ourtypes.StructuralUnion],
 // or return an error.
 func StructuralUnionFromJsonable(
 	jsonable interface{},
 ) (
-	result *aastypes.StructuralUnion,
+	result *ourtypes.StructuralUnion,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -637,7 +637,7 @@ func StructuralUnionFromJsonable(
 		return unionFromMap(
 			m,
 			structuralFirstFromMapWithoutDispatch,
-			aastypes.NewStructuralUnionFromStructuralFirst,
+			ourtypes.NewStructuralUnionFromStructuralFirst,
 		)
 	}
 
@@ -645,7 +645,7 @@ func StructuralUnionFromJsonable(
 		return unionFromMap(
 			m,
 			structuralSecondFromMapWithoutDispatch,
-			aastypes.NewStructuralUnionFromStructuralSecond,
+			ourtypes.NewStructuralUnionFromStructuralSecond,
 		)
 	}
 
@@ -656,12 +656,12 @@ func StructuralUnionFromJsonable(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedAbstractMember],
+// Parse `jsonable` as an instance of [ourtypes.IMixedAbstractMember],
 // or return an error.
 func MixedAbstractMemberFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedAbstractMember,
+	result ourtypes.IMixedAbstractMember,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -673,12 +673,12 @@ func MixedAbstractMemberFromJsonable(
 	return mixedAbstractMemberFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedAbstractDescendantOne],
+// Parse `jsonable` as an instance of [ourtypes.IMixedAbstractDescendantOne],
 // or return an error.
 func MixedAbstractDescendantOneFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedAbstractDescendantOne,
+	result ourtypes.IMixedAbstractDescendantOne,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -690,12 +690,12 @@ func MixedAbstractDescendantOneFromJsonable(
 	return mixedAbstractDescendantOneFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IMixedAbstractDescendantOne] from a map,
+// Parse [ourtypes.IMixedAbstractDescendantOne] from a map,
 // or return an error, if any.
 func mixedAbstractDescendantOneFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedAbstractDescendantOne,
+	result ourtypes.IMixedAbstractDescendantOne,
 	err error,
 ) {
 	var theUniqueToAbstractDescendantOne string
@@ -731,19 +731,19 @@ func mixedAbstractDescendantOneFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewMixedAbstractDescendantOne(
+	result = ourtypes.NewMixedAbstractDescendantOne(
 		theUniqueToAbstractDescendantOne,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedAbstractDescendantTwo],
+// Parse `jsonable` as an instance of [ourtypes.IMixedAbstractDescendantTwo],
 // or return an error.
 func MixedAbstractDescendantTwoFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedAbstractDescendantTwo,
+	result ourtypes.IMixedAbstractDescendantTwo,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -755,12 +755,12 @@ func MixedAbstractDescendantTwoFromJsonable(
 	return mixedAbstractDescendantTwoFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IMixedAbstractDescendantTwo] from a map,
+// Parse [ourtypes.IMixedAbstractDescendantTwo] from a map,
 // or return an error, if any.
 func mixedAbstractDescendantTwoFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedAbstractDescendantTwo,
+	result ourtypes.IMixedAbstractDescendantTwo,
 	err error,
 ) {
 	var theUniqueToAbstractDescendantTwo string
@@ -796,19 +796,19 @@ func mixedAbstractDescendantTwoFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewMixedAbstractDescendantTwo(
+	result = ourtypes.NewMixedAbstractDescendantTwo(
 		theUniqueToAbstractDescendantTwo,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedConcreteWithDescendants],
+// Parse `jsonable` as an instance of [ourtypes.IMixedConcreteWithDescendants],
 // or return an error.
 func MixedConcreteWithDescendantsFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedConcreteWithDescendants,
+	result ourtypes.IMixedConcreteWithDescendants,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -820,19 +820,19 @@ func MixedConcreteWithDescendantsFromJsonable(
 	return mixedConcreteWithDescendantsFromMap(m)
 }
 
-// Parse [aastypes.IMixedConcreteWithDescendants] from a map,
+// Parse [ourtypes.IMixedConcreteWithDescendants] from a map,
 // or return an error, if any.
 //
 // This function performs no dispatch! It is used to parse the properties
 // as-are, and already assumes the exact model type. Usually, this function
 // is called from within a from-jsonable or from-map function, and you never
 // call it directly. If you want to de-serialize an instance of
-// [aastypes.IMixedConcreteWithDescendants], call
+// [ourtypes.IMixedConcreteWithDescendants], call
 // [MixedConcreteWithDescendantsFromJsonable].
 func mixedConcreteWithDescendantsFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedConcreteWithDescendants,
+	result ourtypes.IMixedConcreteWithDescendants,
 	err error,
 ) {
 	var theSomeBaseProperty string
@@ -871,19 +871,19 @@ func mixedConcreteWithDescendantsFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewMixedConcreteWithDescendants(
+	result = ourtypes.NewMixedConcreteWithDescendants(
 		theSomeBaseProperty,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedConcreteWithDescendantsChild],
+// Parse `jsonable` as an instance of [ourtypes.IMixedConcreteWithDescendantsChild],
 // or return an error.
 func MixedConcreteWithDescendantsChildFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedConcreteWithDescendantsChild,
+	result ourtypes.IMixedConcreteWithDescendantsChild,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -900,12 +900,12 @@ func MixedConcreteWithDescendantsChildFromJsonable(
 	return mixedConcreteWithDescendantsChildFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IMixedConcreteWithDescendantsChild] from a map,
+// Parse [ourtypes.IMixedConcreteWithDescendantsChild] from a map,
 // or return an error, if any.
 func mixedConcreteWithDescendantsChildFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedConcreteWithDescendantsChild,
+	result ourtypes.IMixedConcreteWithDescendantsChild,
 	err error,
 ) {
 	var theSomeBaseProperty string
@@ -957,7 +957,7 @@ func mixedConcreteWithDescendantsChildFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewMixedConcreteWithDescendantsChild(
+	result = ourtypes.NewMixedConcreteWithDescendantsChild(
 		theSomeBaseProperty,
 		theSomeChildProperty,
 	)
@@ -965,12 +965,12 @@ func mixedConcreteWithDescendantsChildFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMixedConcreteLeaf],
+// Parse `jsonable` as an instance of [ourtypes.IMixedConcreteLeaf],
 // or return an error.
 func MixedConcreteLeafFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMixedConcreteLeaf,
+	result ourtypes.IMixedConcreteLeaf,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -982,12 +982,12 @@ func MixedConcreteLeafFromJsonable(
 	return mixedConcreteLeafFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IMixedConcreteLeaf] from a map,
+// Parse [ourtypes.IMixedConcreteLeaf] from a map,
 // or return an error, if any.
 func mixedConcreteLeafFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedConcreteLeaf,
+	result ourtypes.IMixedConcreteLeaf,
 	err error,
 ) {
 	var theUniqueToConcreteLeaf string
@@ -1023,19 +1023,19 @@ func mixedConcreteLeafFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewMixedConcreteLeaf(
+	result = ourtypes.NewMixedConcreteLeaf(
 		theUniqueToConcreteLeaf,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.MixedUnion],
+// Parse `jsonable` as an instance of [ourtypes.MixedUnion],
 // or return an error.
 func MixedUnionFromJsonable(
 	jsonable interface{},
 ) (
-	result *aastypes.MixedUnion,
+	result *ourtypes.MixedUnion,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1056,15 +1056,15 @@ func MixedUnionFromJsonable(
 			return unionFromMap(
 				m,
 				mixedConcreteWithDescendantsChildFromMapWithoutDispatch,
-				func(that aastypes.IMixedConcreteWithDescendantsChild) *aastypes.MixedUnion {
-					return aastypes.NewMixedUnionFromMixedConcreteWithDescendants(that)
+				func(that ourtypes.IMixedConcreteWithDescendantsChild) *ourtypes.MixedUnion {
+					return ourtypes.NewMixedUnionFromMixedConcreteWithDescendants(that)
 				},
 			)
 		case "MixedConcreteWithDescendants":
 			return unionFromMap(
 				m,
 				mixedConcreteWithDescendantsFromMapWithoutDispatch,
-				aastypes.NewMixedUnionFromMixedConcreteWithDescendants,
+				ourtypes.NewMixedUnionFromMixedConcreteWithDescendants,
 			)
 		default:
 			err = newDeserializationError(
@@ -1081,8 +1081,8 @@ func MixedUnionFromJsonable(
 		return unionFromMap(
 			m,
 			mixedAbstractDescendantOneFromMapWithoutDispatch,
-			func(that aastypes.IMixedAbstractDescendantOne) *aastypes.MixedUnion {
-				return aastypes.NewMixedUnionFromMixedAbstractMember(that)
+			func(that ourtypes.IMixedAbstractDescendantOne) *ourtypes.MixedUnion {
+				return ourtypes.NewMixedUnionFromMixedAbstractMember(that)
 			},
 		)
 	}
@@ -1091,8 +1091,8 @@ func MixedUnionFromJsonable(
 		return unionFromMap(
 			m,
 			mixedAbstractDescendantTwoFromMapWithoutDispatch,
-			func(that aastypes.IMixedAbstractDescendantTwo) *aastypes.MixedUnion {
-				return aastypes.NewMixedUnionFromMixedAbstractMember(that)
+			func(that ourtypes.IMixedAbstractDescendantTwo) *ourtypes.MixedUnion {
+				return ourtypes.NewMixedUnionFromMixedAbstractMember(that)
 			},
 		)
 	}
@@ -1101,7 +1101,7 @@ func MixedUnionFromJsonable(
 		return unionFromMap(
 			m,
 			mixedConcreteLeafFromMapWithoutDispatch,
-			aastypes.NewMixedUnionFromMixedConcreteLeaf,
+			ourtypes.NewMixedUnionFromMixedConcreteLeaf,
 		)
 	}
 
@@ -1112,12 +1112,12 @@ func MixedUnionFromJsonable(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IModelTypedFirst],
+// Parse `jsonable` as an instance of [ourtypes.IModelTypedFirst],
 // or return an error.
 func ModelTypedFirstFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IModelTypedFirst,
+	result ourtypes.IModelTypedFirst,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1134,12 +1134,12 @@ func ModelTypedFirstFromJsonable(
 	return modelTypedFirstFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IModelTypedFirst] from a map,
+// Parse [ourtypes.IModelTypedFirst] from a map,
 // or return an error, if any.
 func modelTypedFirstFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IModelTypedFirst,
+	result ourtypes.IModelTypedFirst,
 	err error,
 ) {
 	var theSomeProperty string
@@ -1178,19 +1178,19 @@ func modelTypedFirstFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewModelTypedFirst(
+	result = ourtypes.NewModelTypedFirst(
 		theSomeProperty,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IModelTypedSecond],
+// Parse `jsonable` as an instance of [ourtypes.IModelTypedSecond],
 // or return an error.
 func ModelTypedSecondFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IModelTypedSecond,
+	result ourtypes.IModelTypedSecond,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1207,12 +1207,12 @@ func ModelTypedSecondFromJsonable(
 	return modelTypedSecondFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IModelTypedSecond] from a map,
+// Parse [ourtypes.IModelTypedSecond] from a map,
 // or return an error, if any.
 func modelTypedSecondFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IModelTypedSecond,
+	result ourtypes.IModelTypedSecond,
 	err error,
 ) {
 	var theSomeProperty string
@@ -1251,19 +1251,19 @@ func modelTypedSecondFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewModelTypedSecond(
+	result = ourtypes.NewModelTypedSecond(
 		theSomeProperty,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ModelTypedUnion],
+// Parse `jsonable` as an instance of [ourtypes.ModelTypedUnion],
 // or return an error.
 func ModelTypedUnionFromJsonable(
 	jsonable interface{},
 ) (
-	result *aastypes.ModelTypedUnion,
+	result *ourtypes.ModelTypedUnion,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1284,13 +1284,13 @@ func ModelTypedUnionFromJsonable(
 			return unionFromMap(
 				m,
 				modelTypedFirstFromMapWithoutDispatch,
-				aastypes.NewModelTypedUnionFromModelTypedFirst,
+				ourtypes.NewModelTypedUnionFromModelTypedFirst,
 			)
 		case "ModelTypedSecond":
 			return unionFromMap(
 				m,
 				modelTypedSecondFromMapWithoutDispatch,
-				aastypes.NewModelTypedUnionFromModelTypedSecond,
+				ourtypes.NewModelTypedUnionFromModelTypedSecond,
 			)
 		default:
 			err = newDeserializationError(
@@ -1310,12 +1310,12 @@ func ModelTypedUnionFromJsonable(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.OverlappingUnion],
+// Parse `jsonable` as an instance of [ourtypes.OverlappingUnion],
 // or return an error.
 func OverlappingUnionFromJsonable(
 	jsonable interface{},
 ) (
-	result *aastypes.OverlappingUnion,
+	result *ourtypes.OverlappingUnion,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1336,25 +1336,25 @@ func OverlappingUnionFromJsonable(
 			return unionFromMap(
 				m,
 				modelTypedFirstFromMapWithoutDispatch,
-				aastypes.NewOverlappingUnionFromModelTypedFirst,
+				ourtypes.NewOverlappingUnionFromModelTypedFirst,
 			)
 		case "ModelTypedSecond":
 			return unionFromMap(
 				m,
 				modelTypedSecondFromMapWithoutDispatch,
-				aastypes.NewOverlappingUnionFromModelTypedSecond,
+				ourtypes.NewOverlappingUnionFromModelTypedSecond,
 			)
 		case "MixedConcreteWithDescendantsChild":
 			return unionFromMap(
 				m,
 				mixedConcreteWithDescendantsChildFromMapWithoutDispatch,
-				aastypes.NewOverlappingUnionFromMixedConcreteWithDescendantsChild,
+				ourtypes.NewOverlappingUnionFromMixedConcreteWithDescendantsChild,
 			)
 		case "MixedConcreteWithDescendants":
 			return unionFromMap(
 				m,
 				mixedConcreteWithDescendantsFromMapWithoutDispatch,
-				aastypes.NewOverlappingUnionFromMixedConcreteWithDescendants,
+				ourtypes.NewOverlappingUnionFromMixedConcreteWithDescendants,
 			)
 		default:
 			err = newDeserializationError(
@@ -1374,12 +1374,12 @@ func OverlappingUnionFromJsonable(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISomething],
+// Parse `jsonable` as an instance of [ourtypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1391,25 +1391,25 @@ func SomethingFromJsonable(
 	return somethingFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISomething] from a map,
+// Parse [ourtypes.ISomething] from a map,
 // or return an error, if any.
 func somethingFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
-	var theStructuralProperty *aastypes.StructuralUnion
-	var theMixedProperty *aastypes.MixedUnion
-	var theModelTypedProperty *aastypes.ModelTypedUnion
-	var theListStructuralProperty []*aastypes.StructuralUnion
-	var theListMixedProperty []*aastypes.MixedUnion
-	var theListModelTypedProperty []*aastypes.ModelTypedUnion
-	var theTupleProperty aascommon.Tuple3[*aastypes.StructuralUnion, *aastypes.MixedUnion, *aastypes.ModelTypedUnion]
-	var theOptionalStructuralProperty *aastypes.StructuralUnion
-	var theOptionalMixedProperty *aastypes.MixedUnion
-	var theOptionalModelTypedProperty *aastypes.ModelTypedUnion
-	var theOptionalListOverlappingProperty []*aastypes.OverlappingUnion
+	var theStructuralProperty *ourtypes.StructuralUnion
+	var theMixedProperty *ourtypes.MixedUnion
+	var theModelTypedProperty *ourtypes.ModelTypedUnion
+	var theListStructuralProperty []*ourtypes.StructuralUnion
+	var theListMixedProperty []*ourtypes.MixedUnion
+	var theListModelTypedProperty []*ourtypes.ModelTypedUnion
+	var theTupleProperty ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion]
+	var theOptionalStructuralProperty *ourtypes.StructuralUnion
+	var theOptionalMixedProperty *ourtypes.MixedUnion
+	var theOptionalModelTypedProperty *ourtypes.ModelTypedUnion
+	var theOptionalListOverlappingProperty []*ourtypes.OverlappingUnion
 
 	foundStructuralProperty := false
 	foundMixedProperty := false
@@ -1533,7 +1533,7 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSomething(
+	result = ourtypes.NewSomething(
 		theStructuralProperty,
 		theMixedProperty,
 		theModelTypedProperty,
@@ -1558,12 +1558,12 @@ func somethingFromMapWithoutDispatch(
 	return
 }
 
-// De-serialize an instance of [aastypes.IMixedAbstractMember]
+// De-serialize an instance of [ourtypes.IMixedAbstractMember]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func mixedAbstractMemberFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedAbstractMember,
+	result ourtypes.IMixedAbstractMember,
 	err error,
 ) {
 	var modelType string
@@ -1590,12 +1590,12 @@ func mixedAbstractMemberFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IMixedConcreteWithDescendants]
+// De-serialize an instance of [ourtypes.IMixedConcreteWithDescendants]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func mixedConcreteWithDescendantsFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IMixedConcreteWithDescendants,
+	result ourtypes.IMixedConcreteWithDescendants,
 	err error,
 ) {
 	var modelType string
@@ -1630,13 +1630,13 @@ func mixedConcreteWithDescendantsFromMap(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -1651,7 +1651,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -1660,7 +1660,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -1671,7 +1671,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -1682,7 +1682,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -1807,7 +1807,7 @@ func serializeArray[T any](
 // Constrain a generic type to a named union, giving access to its
 // underlying instance for serialization.
 type namedUnion interface {
-	Underlying() aastypes.IClass
+	Underlying() ourtypes.IClass
 }
 
 // Serialize `that` union to a JSON-able value, or return an error.
@@ -1818,7 +1818,7 @@ func unionAsJsonableInterface[T namedUnion](that T) (interface{}, error) {
 // Serialize `that` with `serializeItem0`, `serializeItem1`, *etc.* into
 // a JSON-able array, or return an error.
 func serializeTuple3[T0 any, T1 any, T2 any](
-	that aascommon.Tuple3[T0, T1, T2],
+	that ourcommon.Tuple3[T0, T1, T2],
 	serializeItem0 func(item T0) (interface{}, error),
 	serializeItem1 func(item T1) (interface{}, error),
 	serializeItem2 func(item T2) (interface{}, error),
@@ -1846,14 +1846,14 @@ func serializeTuple3[T0 any, T1 any, T2 any](
 	return
 }
 
-// Serialize [aastypes.IStructuralFirst] as a JSON-able map.
+// Serialize [ourtypes.IStructuralFirst] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IStructuralFirst] with proper dispatch, call
+// [ourtypes.IStructuralFirst] with proper dispatch, call
 // [ToJsonable].
 func structuralFirstToMap(
-	that aastypes.IStructuralFirst,
+	that ourtypes.IStructuralFirst,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1862,14 +1862,14 @@ func structuralFirstToMap(
 	return
 }
 
-// Serialize [aastypes.IStructuralSecond] as a JSON-able map.
+// Serialize [ourtypes.IStructuralSecond] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IStructuralSecond] with proper dispatch, call
+// [ourtypes.IStructuralSecond] with proper dispatch, call
 // [ToJsonable].
 func structuralSecondToMap(
-	that aastypes.IStructuralSecond,
+	that ourtypes.IStructuralSecond,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1878,14 +1878,14 @@ func structuralSecondToMap(
 	return
 }
 
-// Serialize [aastypes.IMixedAbstractDescendantOne] as a JSON-able map.
+// Serialize [ourtypes.IMixedAbstractDescendantOne] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMixedAbstractDescendantOne] with proper dispatch, call
+// [ourtypes.IMixedAbstractDescendantOne] with proper dispatch, call
 // [ToJsonable].
 func mixedAbstractDescendantOneToMap(
-	that aastypes.IMixedAbstractDescendantOne,
+	that ourtypes.IMixedAbstractDescendantOne,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1894,14 +1894,14 @@ func mixedAbstractDescendantOneToMap(
 	return
 }
 
-// Serialize [aastypes.IMixedAbstractDescendantTwo] as a JSON-able map.
+// Serialize [ourtypes.IMixedAbstractDescendantTwo] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMixedAbstractDescendantTwo] with proper dispatch, call
+// [ourtypes.IMixedAbstractDescendantTwo] with proper dispatch, call
 // [ToJsonable].
 func mixedAbstractDescendantTwoToMap(
-	that aastypes.IMixedAbstractDescendantTwo,
+	that ourtypes.IMixedAbstractDescendantTwo,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1910,14 +1910,14 @@ func mixedAbstractDescendantTwoToMap(
 	return
 }
 
-// Serialize [aastypes.IMixedConcreteWithDescendants] as a JSON-able map.
+// Serialize [ourtypes.IMixedConcreteWithDescendants] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMixedConcreteWithDescendants] with proper dispatch, call
+// [ourtypes.IMixedConcreteWithDescendants] with proper dispatch, call
 // [ToJsonable].
 func mixedConcreteWithDescendantsToMap(
-	that aastypes.IMixedConcreteWithDescendants,
+	that ourtypes.IMixedConcreteWithDescendants,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1928,14 +1928,14 @@ func mixedConcreteWithDescendantsToMap(
 	return
 }
 
-// Serialize [aastypes.IMixedConcreteWithDescendantsChild] as a JSON-able map.
+// Serialize [ourtypes.IMixedConcreteWithDescendantsChild] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMixedConcreteWithDescendantsChild] with proper dispatch, call
+// [ourtypes.IMixedConcreteWithDescendantsChild] with proper dispatch, call
 // [ToJsonable].
 func mixedConcreteWithDescendantsChildToMap(
-	that aastypes.IMixedConcreteWithDescendantsChild,
+	that ourtypes.IMixedConcreteWithDescendantsChild,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1948,14 +1948,14 @@ func mixedConcreteWithDescendantsChildToMap(
 	return
 }
 
-// Serialize [aastypes.IMixedConcreteLeaf] as a JSON-able map.
+// Serialize [ourtypes.IMixedConcreteLeaf] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMixedConcreteLeaf] with proper dispatch, call
+// [ourtypes.IMixedConcreteLeaf] with proper dispatch, call
 // [ToJsonable].
 func mixedConcreteLeafToMap(
-	that aastypes.IMixedConcreteLeaf,
+	that ourtypes.IMixedConcreteLeaf,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1964,14 +1964,14 @@ func mixedConcreteLeafToMap(
 	return
 }
 
-// Serialize [aastypes.IModelTypedFirst] as a JSON-able map.
+// Serialize [ourtypes.IModelTypedFirst] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IModelTypedFirst] with proper dispatch, call
+// [ourtypes.IModelTypedFirst] with proper dispatch, call
 // [ToJsonable].
 func modelTypedFirstToMap(
-	that aastypes.IModelTypedFirst,
+	that ourtypes.IModelTypedFirst,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1982,14 +1982,14 @@ func modelTypedFirstToMap(
 	return
 }
 
-// Serialize [aastypes.IModelTypedSecond] as a JSON-able map.
+// Serialize [ourtypes.IModelTypedSecond] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IModelTypedSecond] with proper dispatch, call
+// [ourtypes.IModelTypedSecond] with proper dispatch, call
 // [ToJsonable].
 func modelTypedSecondToMap(
-	that aastypes.IModelTypedSecond,
+	that ourtypes.IModelTypedSecond,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -2000,14 +2000,14 @@ func modelTypedSecondToMap(
 	return
 }
 
-// Serialize [aastypes.ISomething] as a JSON-able map.
+// Serialize [ourtypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISomething] with proper dispatch, call
+// [ourtypes.ISomething] with proper dispatch, call
 // [ToJsonable].
 func somethingToMap(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -2035,7 +2035,7 @@ func somethingToMap(
 
 	result["listStructuralProperty"], err = serializeArray(
 		that.ListStructuralProperty(),
-		unionAsJsonableInterface[*aastypes.StructuralUnion],
+		unionAsJsonableInterface[*ourtypes.StructuralUnion],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("ListStructuralProperty()")
@@ -2043,7 +2043,7 @@ func somethingToMap(
 	}
 
 	result["listMixedProperty"], err = serializeArray(
-		that.ListMixedProperty(), unionAsJsonableInterface[*aastypes.MixedUnion],
+		that.ListMixedProperty(), unionAsJsonableInterface[*ourtypes.MixedUnion],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("ListMixedProperty()")
@@ -2052,7 +2052,7 @@ func somethingToMap(
 
 	result["listModelTypedProperty"], err = serializeArray(
 		that.ListModelTypedProperty(),
-		unionAsJsonableInterface[*aastypes.ModelTypedUnion],
+		unionAsJsonableInterface[*ourtypes.ModelTypedUnion],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("ListModelTypedProperty()")
@@ -2061,9 +2061,9 @@ func somethingToMap(
 
 	result["tupleProperty"], err = serializeTuple3(
 		that.TupleProperty(),
-		unionAsJsonableInterface[*aastypes.StructuralUnion],
-		unionAsJsonableInterface[*aastypes.MixedUnion],
-		unionAsJsonableInterface[*aastypes.ModelTypedUnion],
+		unionAsJsonableInterface[*ourtypes.StructuralUnion],
+		unionAsJsonableInterface[*ourtypes.MixedUnion],
+		unionAsJsonableInterface[*ourtypes.ModelTypedUnion],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("TupleProperty()")
@@ -2103,7 +2103,7 @@ func somethingToMap(
 	if that.OptionalListOverlappingProperty() != nil {
 		result["optionalListOverlappingProperty"], err = serializeArray(
 			that.OptionalListOverlappingProperty(),
-			unionAsJsonableInterface[*aastypes.OverlappingUnion],
+			unionAsJsonableInterface[*ourtypes.OverlappingUnion],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("OptionalListOverlappingProperty()")
@@ -2119,48 +2119,48 @@ func somethingToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeStructuralFirst:
+	case ourtypes.ModelTypeStructuralFirst:
 		result, err = structuralFirstToMap(
-			that.(aastypes.IStructuralFirst),
+			that.(ourtypes.IStructuralFirst),
 		)
-	case aastypes.ModelTypeStructuralSecond:
+	case ourtypes.ModelTypeStructuralSecond:
 		result, err = structuralSecondToMap(
-			that.(aastypes.IStructuralSecond),
+			that.(ourtypes.IStructuralSecond),
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantOne:
+	case ourtypes.ModelTypeMixedAbstractDescendantOne:
 		result, err = mixedAbstractDescendantOneToMap(
-			that.(aastypes.IMixedAbstractDescendantOne),
+			that.(ourtypes.IMixedAbstractDescendantOne),
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantTwo:
+	case ourtypes.ModelTypeMixedAbstractDescendantTwo:
 		result, err = mixedAbstractDescendantTwoToMap(
-			that.(aastypes.IMixedAbstractDescendantTwo),
+			that.(ourtypes.IMixedAbstractDescendantTwo),
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendants:
+	case ourtypes.ModelTypeMixedConcreteWithDescendants:
 		result, err = mixedConcreteWithDescendantsToMap(
-			that.(aastypes.IMixedConcreteWithDescendants),
+			that.(ourtypes.IMixedConcreteWithDescendants),
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendantsChild:
+	case ourtypes.ModelTypeMixedConcreteWithDescendantsChild:
 		result, err = mixedConcreteWithDescendantsChildToMap(
-			that.(aastypes.IMixedConcreteWithDescendantsChild),
+			that.(ourtypes.IMixedConcreteWithDescendantsChild),
 		)
-	case aastypes.ModelTypeMixedConcreteLeaf:
+	case ourtypes.ModelTypeMixedConcreteLeaf:
 		result, err = mixedConcreteLeafToMap(
-			that.(aastypes.IMixedConcreteLeaf),
+			that.(ourtypes.IMixedConcreteLeaf),
 		)
-	case aastypes.ModelTypeModelTypedFirst:
+	case ourtypes.ModelTypeModelTypedFirst:
 		result, err = modelTypedFirstToMap(
-			that.(aastypes.IModelTypedFirst),
+			that.(ourtypes.IModelTypedFirst),
 		)
-	case aastypes.ModelTypeModelTypedSecond:
+	case ourtypes.ModelTypeModelTypedSecond:
 		result, err = modelTypedSecondToMap(
-			that.(aastypes.IModelTypedSecond),
+			that.(ourtypes.IModelTypedSecond),
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 		)
 	default:
 		err = newSerializationError(

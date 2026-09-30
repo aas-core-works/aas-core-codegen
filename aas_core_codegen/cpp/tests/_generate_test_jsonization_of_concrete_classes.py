@@ -30,9 +30,9 @@ template<class ClassT>
 std::shared_ptr<ClassT> MustDeserializeTheFirstExpected(
 {I}const std::string& model_type,
 {I}std::function<
-{II}aas::common::expected<
+{II}our::common::expected<
 {III}std::shared_ptr<ClassT>,
-{III}aas::jsonization::DeserializationError
+{III}our::jsonization::DeserializationError
 {II}>(const nlohmann::json&, bool)
 {I}> deserialization_function
 ) {{
@@ -50,13 +50,13 @@ std::shared_ptr<ClassT> MustDeserializeTheFirstExpected(
 {II}paths.front()
 {I});
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::shared_ptr<ClassT>,
-{II}aas::jsonization::DeserializationError
+{II}our::jsonization::DeserializationError
 {I}> deserialized = deserialization_function(json, false);
 
 {I}INFO(
-{II}aas::common::Concat(
+{II}our::common::Concat(
 {III}"Failed to de-serialize from ",
 {III}paths.front().string()
 {II})
@@ -73,26 +73,26 @@ std::shared_ptr<ClassT> MustDeserializeTheFirstExpected(
  * the failure is reported at \\p expected_path.
  */
 void AssertSerializationFailsAt(
-{I}const aas::types::IClass& that,
+{I}const our::types::IClass& that,
 {I}const std::string& expected_path
 ) {{
 {I}try {{
-{II}aas::jsonization::Serialize(that);
-{I}}} catch (const aas::jsonization::SerializationException& exception) {{
+{II}our::jsonization::Serialize(that);
+{I}}} catch (const our::jsonization::SerializationException& exception) {{
 {II}const std::string observed_path(
-{III}aas::common::WstringToUtf8(
+{III}our::common::WstringToUtf8(
 {IIII}exception.path().ToWstring()
 {III})
 {II});
 
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Expected the serialization to fail at ",
 {IIII}expected_path,
 {IIII}", but it failed at ",
 {IIII}observed_path,
 {IIII}": ",
-{IIII}aas::common::WstringToUtf8(exception.cause())
+{IIII}our::common::WstringToUtf8(exception.cause())
 {III})
 {II})
 {II}REQUIRE(observed_path == expected_path);
@@ -101,7 +101,7 @@ void AssertSerializationFailsAt(
 {I}}}
 
 {I}INFO(
-{II}aas::common::Concat(
+{II}our::common::Concat(
 {III}"Expected the serialization to fail at ",
 {III}expected_path,
 {III}", but it succeeded"
@@ -188,10 +188,10 @@ TEST_CASE(
 {III}{indent_but_first_line(values_joined, III)}
 {II}}}
 {I}) {{
-{II}std::shared_ptr<aas::types::{interface_name}> instance(
-{III}MustDeserializeTheFirstExpected<aas::types::{interface_name}>(
+{II}std::shared_ptr<our::types::{interface_name}> instance(
+{III}MustDeserializeTheFirstExpected<our::types::{interface_name}>(
 {IIII}{cpp_common.string_literal(model_type)},
-{IIII}aas::jsonization::{deserialization_function}
+{IIII}our::jsonization::{deserialization_function}
 {III})
 {II});
 
@@ -238,7 +238,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
@@ -246,30 +246,30 @@ template<class ClassT>
 void AssertRoundTrip(
 {I}const std::filesystem::path& path,
 {I}std::function<
-{II}aas::common::expected<
+{II}our::common::expected<
 {III}std::shared_ptr<ClassT>,
-{III}aas::jsonization::DeserializationError
+{III}our::jsonization::DeserializationError
 {II}>(const nlohmann::json&, bool)
 {I}> deserialization_function
 ) {{
 {I}const nlohmann::json json = test::common::jsonization::MustReadJson(path);
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::shared_ptr<ClassT>,
-{II}aas::jsonization::DeserializationError
+{II}our::jsonization::DeserializationError
 {I}> deserialized = deserialization_function(json, false);
 
 {I}if (!deserialized.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to de-serialize from ",
 {IIII}path.string(),
 {IIII}": ",
-{IIII}aas::common::WstringToUtf8(
+{IIII}our::common::WstringToUtf8(
 {IIIII}deserialized.error().path.ToWstring()
 {IIII}),
 {IIII}": ",
-{IIII}aas::common::WstringToUtf8(
+{IIII}our::common::WstringToUtf8(
 {IIIII}deserialized.error().cause
 {IIII})
 {III})
@@ -277,7 +277,7 @@ void AssertRoundTrip(
 {II}REQUIRE(deserialized.has_value());
 {I}}}
 
-{I}nlohmann::json another_json = aas::jsonization::Serialize(
+{I}nlohmann::json another_json = our::jsonization::Serialize(
 {II}*(deserialized.value())
 {I});
 
@@ -287,7 +287,7 @@ void AssertRoundTrip(
 {I});
 {I}if (diff_message.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"The JSON round-trip from ",
 {IIII}path.string(),
 {IIII}" failed. There is a diff between the original JSON "
@@ -305,23 +305,23 @@ template<typename ClassT>
 void AssertDeserializationFailure(
 {I}const std::filesystem::path& path,
 {I}std::function<
-{II}aas::common::expected<
+{II}our::common::expected<
 {III}std::shared_ptr<ClassT>,
-{III}aas::jsonization::DeserializationError
+{III}our::jsonization::DeserializationError
 {II}>(const nlohmann::json&, bool)
 {I}> deserialization_function,
 {I}const std::filesystem::path& error_path
 ) {{
 {I}const nlohmann::json json = test::common::jsonization::MustReadJson(path);
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::shared_ptr<ClassT>,
-{II}aas::jsonization::DeserializationError
+{II}our::jsonization::DeserializationError
 {I}> deserialized = deserialization_function(json, false);
 
 {I}if (deserialized.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Expected the de-serialization to fail on ",
 {IIII}path.string(),
 {IIII}", but the de-serialization succeeded"
@@ -331,12 +331,12 @@ void AssertDeserializationFailure(
 {I}}}
 
 {I}test::common::AssertContentEqualsExpectedOrRecord(
-{II}aas::common::Concat(
-{III}aas::common::WstringToUtf8(
+{II}our::common::Concat(
+{III}our::common::WstringToUtf8(
 {IIII}deserialized.error().path.ToWstring()
 {III}),
 {III}": ",
-{III}aas::common::WstringToUtf8(
+{III}our::common::WstringToUtf8(
 {IIII}deserialized.error().cause
 {III})
 {II}),
@@ -347,7 +347,7 @@ void AssertDeserializationFailure(
         Stripped(
             f"""\
 const std::filesystem::path& DetermineJsonDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "Json";
 {I}}}
@@ -358,7 +358,7 @@ const std::filesystem::path& DetermineJsonDir() {{
         Stripped(
             f"""\
 const std::filesystem::path& DetermineErrorDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "JsonizationError";
 {I}}}
@@ -397,8 +397,8 @@ TEST_CASE("Test the round-trip of an expected {cls_name}") {{
 
 {I}for (const std::filesystem::path& path : paths) {{
 {II}AssertRoundTrip<
-{III}aas::types::{interface_name}
-{II}>(path, aas::jsonization::{deserialization_function});
+{III}our::types::{interface_name}
+{II}>(path, our::jsonization::{deserialization_function});
 {I}}}
 }}"""
             )
@@ -436,10 +436,10 @@ TEST_CASE("Test the de-serialization failure on an unexpected {cls_name}") {{
 {III});
 
 {III}AssertDeserializationFailure<
-{IIII}aas::types::{interface_name}
+{IIII}our::types::{interface_name}
 {III}>(
 {IIII}path,
-{IIII}aas::jsonization::{deserialization_function},
+{IIII}our::jsonization::{deserialization_function},
 {IIII}error_path
 {III});
 {II}}}

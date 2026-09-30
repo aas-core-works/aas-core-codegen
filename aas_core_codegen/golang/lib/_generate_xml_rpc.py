@@ -65,7 +65,7 @@ var doubleRe = regexp.MustCompile(
 func ReadValueContent(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}return xmlcommon.ReadElementDispatchedInNoNamespace(
 {II}decoder, current, readValueByLocal,
 {I})
@@ -78,7 +78,7 @@ func readValueByLocal(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}switch local {{
 {II}case "boolean":
 {III}value, next, err = readBoolean(decoder, current)
@@ -92,11 +92,11 @@ func readValueByLocal(
 {III}// its whitespace, unlike a `<boolean>` or a `<double>`.
 {III}value = text
 {II}case "array":
-{III}var items aastypes.JsonArray
+{III}var items ourtypes.JsonArray
 {III}items, next, err = ReadArrayContent(decoder, current)
 {III}value = items
 {II}case "struct":
-{III}var members aastypes.JsonObject
+{III}var members ourtypes.JsonObject
 {III}members, next, err = ReadObjectContent(decoder, current)
 {III}value = members
 {II}default:
@@ -128,7 +128,7 @@ func readValueByLocal(
 func readBoolean(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}var text string
 {I}text, next, err = xmlcommon.ReadText(decoder, current)
 {I}if err != nil {{
@@ -163,7 +163,7 @@ func readBoolean(
 func readDouble(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}var text string
 {I}text, next, err = xmlcommon.ReadText(decoder, current)
 {I}if err != nil {{
@@ -223,7 +223,7 @@ func readDouble(
 func ReadArrayContent(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonArray, next xml.Token, err error) {{
+) (value ourtypes.JsonArray, next xml.Token, err error) {{
 {I}return xmlcommon.ReadElementDispatchedInNoNamespace(decoder, current, readData)
 }}"""
         ),
@@ -234,7 +234,7 @@ func readData(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
-) (value aastypes.JsonArray, next xml.Token, err error) {{
+) (value ourtypes.JsonArray, next xml.Token, err error) {{
 {I}if local != "data" {{
 {II}err = xmlcommon.NewDeserializationError(
 {III}fmt.Sprintf(
@@ -248,7 +248,7 @@ func readData(
 {I}// NOTE (mristin):
 {I}// An empty data element gives an empty array, and not a nil one, so
 {I}// that the value round-trips as the empty array it was.
-{I}value = aastypes.JsonArray{{}}
+{I}value = ourtypes.JsonArray{{}}
 
 {I}next = current
 {I}for {{
@@ -261,7 +261,7 @@ func readData(
 {III}break
 {II}}}
 
-{II}var item aastypes.JsonValue
+{II}var item ourtypes.JsonValue
 {II}item, next, err = xmlcommon.ReadElementDispatchedInNoNamespace(
 {III}decoder, next, readArrayItem,
 {II})
@@ -288,7 +288,7 @@ func readArrayItem(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}if local != "value" {{
 {II}err = xmlcommon.NewDeserializationError(
 {III}fmt.Sprintf(
@@ -311,11 +311,11 @@ func readArrayItem(
 func ReadObjectContent(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
-) (value aastypes.JsonObject, next xml.Token, err error) {{
+) (value ourtypes.JsonObject, next xml.Token, err error) {{
 {I}// NOTE (mristin):
 {I}// An element with no members gives an empty object, and not a nil one,
 {I}// so that the value round-trips as the empty object it was.
-{I}value = aastypes.JsonObject{{}}
+{I}value = ourtypes.JsonObject{{}}
 
 {I}next = current
 {I}for {{
@@ -358,7 +358,7 @@ func ReadObjectContent(
 // Represent the name and the value of a single `<member>`.
 type member struct {{
 {I}name  string
-{I}value aastypes.JsonValue
+{I}value ourtypes.JsonValue
 }}"""
         ),
         Stripped(
@@ -440,7 +440,7 @@ func readMemberValue(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
-) (value aastypes.JsonValue, next xml.Token, err error) {{
+) (value ourtypes.JsonValue, next xml.Token, err error) {{
 {I}if local != "value" {{
 {II}err = xmlcommon.NewDeserializationError(
 {III}fmt.Sprintf(
@@ -479,7 +479,7 @@ def _generate_writers() -> List[Stripped]:
 // Do not flush.
 func WriteValueContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonValue,
+{I}value ourtypes.JsonValue,
 ) (err error) {{
 {I}return writeValueContent(encoder, value, true)
 }}
@@ -490,14 +490,14 @@ func WriteValueContent(
 // Do not flush.
 func writeNestedValueContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonValue,
+{I}value ourtypes.JsonValue,
 ) (err error) {{
 {I}return writeValueContent(encoder, value, false)
 }}
 
 func writeValueContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonValue,
+{I}value ourtypes.JsonValue,
 {I}undeclareNamespace bool,
 ) (err error) {{
 {I}if value == nil {{
@@ -556,7 +556,7 @@ func writeValueContent(
 {III})
 {III}return
 
-{II}case aastypes.JsonArray:
+{II}case ourtypes.JsonArray:
 {III}err = xmlcommon.WriteElementInNoNamespace(
 {IIII}encoder, "array", undeclareNamespace,
 {IIII}casted,
@@ -564,7 +564,7 @@ func writeValueContent(
 {III})
 {III}return
 
-{II}case aastypes.JsonObject:
+{II}case ourtypes.JsonObject:
 {III}err = xmlcommon.WriteElementInNoNamespace(
 {IIII}encoder, "struct", undeclareNamespace,
 {IIII}casted,
@@ -593,7 +593,7 @@ func writeValueContent(
 // Do not flush.
 func WriteArrayContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonArray,
+{I}value ourtypes.JsonArray,
 ) (err error) {{
 {I}return writeArrayContent(encoder, value, true)
 }}
@@ -604,14 +604,14 @@ func WriteArrayContent(
 // Do not flush.
 func writeNestedArrayContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonArray,
+{I}value ourtypes.JsonArray,
 ) (err error) {{
 {I}return writeArrayContent(encoder, value, false)
 }}
 
 func writeArrayContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonArray,
+{I}value ourtypes.JsonArray,
 {I}undeclareNamespace bool,
 ) (err error) {{
 {I}err = xmlcommon.WriteStartElementInNoNamespace(encoder, "data", undeclareNamespace)
@@ -641,7 +641,7 @@ func writeArrayContent(
 // Do not flush.
 func WriteObjectContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonObject,
+{I}value ourtypes.JsonObject,
 ) (err error) {{
 {I}return writeObjectContent(encoder, value, true)
 }}
@@ -652,14 +652,14 @@ func WriteObjectContent(
 // Do not flush.
 func writeNestedObjectContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonObject,
+{I}value ourtypes.JsonObject,
 ) (err error) {{
 {I}return writeObjectContent(encoder, value, false)
 }}
 
 func writeObjectContent(
 {I}encoder *xml.Encoder,
-{I}value aastypes.JsonObject,
+{I}value ourtypes.JsonObject,
 {I}undeclareNamespace bool,
 ) (err error) {{
 {I}// NOTE (mristin):
@@ -727,7 +727,7 @@ def generate(repo_url: Stripped) -> str:
 
     The ``repo_url`` is the URL of the repository of the generated module.
     """
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     xmlcommon_url_literal = golang_common.string_literal(
         f"{repo_url}/internal/xmlcommon"
@@ -760,7 +760,7 @@ import (
 {I}"sort"
 {I}"strconv"
 {I}xmlcommon {xmlcommon_url_literal}
-{I}aastypes {aastypes_url_literal}
+{I}ourtypes {ourtypes_url_literal}
 )"""
         ),
         Stripped(

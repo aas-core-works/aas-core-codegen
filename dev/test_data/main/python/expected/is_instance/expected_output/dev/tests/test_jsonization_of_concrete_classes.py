@@ -14,7 +14,7 @@ from typing import Any
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 import tests.common
@@ -34,11 +34,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.leaf_from_jsonable(
+            instance = our_jsonization.leaf_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -58,11 +58,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.ordered_container_from_jsonable(
+            instance = our_jsonization.ordered_container_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -82,11 +82,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.unordered_container_from_jsonable(
+            instance = our_jsonization.unordered_container_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -106,11 +106,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.global_attribute_from_jsonable(
+            instance = our_jsonization.global_attribute_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -130,11 +130,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.local_attribute_from_jsonable(
+            instance = our_jsonization.local_attribute_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -154,11 +154,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.attribute_operand_from_jsonable(
+            instance = our_jsonization.attribute_operand_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -178,11 +178,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.string_literal_from_jsonable(
+            instance = our_jsonization.string_literal_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -202,11 +202,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.number_literal_from_jsonable(
+            instance = our_jsonization.number_literal_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -226,11 +226,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -261,16 +261,16 @@ def _load_the_first_expected(model_type: str) -> Any:
 class TestSerializationFailures(unittest.TestCase):
     def test_number_literal_number_non_finite(self) -> None:
         for value in [math.inf, -math.inf, math.nan]:
-            instance = aas_jsonization.number_literal_from_jsonable(
+            instance = our_jsonization.number_literal_from_jsonable(
                 _load_the_first_expected('NumberLiteral')
             )
 
             instance.number = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.number',

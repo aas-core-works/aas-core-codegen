@@ -3098,7 +3098,7 @@ public class Xmlization {{
 {I}/**
 {I} * The XML namespace of the meta-model
 {I} */
-{I}public static final String AAS_NAME_SPACE =
+{I}public static final String NAMESPACE =
 {II}XmlCommon.NAMESPACE;
 
 

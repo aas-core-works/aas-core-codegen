@@ -74,7 +74,7 @@ func Test{function_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, c := range cases {{
-{II}got := aascommon.{function_name}(c.dividend, c.divisor)
+{II}got := ourcommon.{function_name}(c.dividend, c.divisor)
 {II}if got != c.expected {{
 {III}t.Errorf(
 {IIII}"Expected {function_name}(%d, %d) to be %d, but got %d",
@@ -113,7 +113,7 @@ func Test{function_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, c := range cases {{
-{II}got := aascommon.{function_name}(c.argument)
+{II}got := ourcommon.{function_name}(c.argument)
 {II}if got != c.expected {{
 {III}t.Errorf(
 {IIII}"Expected {function_name}(%d) to be %d, but got %d",
@@ -193,7 +193,7 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
         import_lines.append(f'{I}"math"')
 
     import_lines.append(f'{I}"testing"')
-    import_lines.append(f'{I}aascommon "{repo_url}/common"')
+    import_lines.append(f'{I}ourcommon "{repo_url}/common"')
 
     import_lines_joined = "\n".join(import_lines)
 
@@ -216,7 +216,7 @@ import (
 // the modulo takes the sign of the divisor in Python (`-7 % 3 == 2`), while
 // the native Go operator `%` gives the remainder with the sign of the dividend
 // (`-7 % 3 == -1`). Therefore, we transpile the modulo to
-// aascommon.{golang_transpilation.FLOOR_MOD_FUNCTION_NAME} instead of the native operator.
+// ourcommon.{golang_transpilation.FLOOR_MOD_FUNCTION_NAME} instead of the native operator.
 //
 // The tests in this file document how the generated code behaves, and make sure
 // that it matches the Python semantics."""

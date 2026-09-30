@@ -58,7 +58,7 @@ func {test_name}(t *testing.T) {{
 {II}source := fmt.Sprintf("<string literal %s>", literal)
 {II}jsonable := any(literal)
 
-{II}deserialized, deseriaErr := aasjsonization.{deserialization_function}(
+{II}deserialized, deseriaErr := ourjsonization.{deserialization_function}(
 {III}jsonable,
 {II})
 {II}ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -67,7 +67,7 @@ func {test_name}(t *testing.T) {{
 {II}}}
 
 {II}anotherJsonable, seriaErr :=
-{III}aasjsonization.{serialization_function}(deserialized)
+{III}ourjsonization.{serialization_function}(deserialized)
 {II}ok = assertNoSerializationError(t, seriaErr, source)
 {II}if !ok {{
 {III}return
@@ -113,7 +113,7 @@ def _generate_deserialization_fail_for_enum(
 func {test_name}(t *testing.T) {{
 {I}jsonable := any({golang_common.string_literal(invalid_literal)})
 
-{I}_, err := aasjsonization.{deserialization_function}(
+{I}_, err := ourjsonization.{deserialization_function}(
 {II}jsonable,
 {I})
 
@@ -122,7 +122,7 @@ func {test_name}(t *testing.T) {{
 {II}return
 {I}}}
 
-{I}deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+{I}deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 {I}if !ok {{
 {II}t.Fatalf("Expected a de-serialization error, but got: %v", err)
 {II}return
@@ -184,7 +184,7 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     for module, literal in (
         ("fmt", f'{I}"fmt"'),
         ("testing", f'{I}"testing"'),
-        ("aasjsonization", f'{I}aasjsonization "{repo_url}/jsonization"'),
+        ("ourjsonization", f'{I}ourjsonization "{repo_url}/jsonization"'),
     ):
         if golang_common.names_package(blocks, module):
             import_lines.append(literal)

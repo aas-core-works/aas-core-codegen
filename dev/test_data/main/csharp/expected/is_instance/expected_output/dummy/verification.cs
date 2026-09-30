@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of IElement:
     /// <code>
-    /// var anInstance = new Aas.IElement(
+    /// var anInstance = new Our.IElement(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -42,11 +42,11 @@ namespace dummy
             IElement element
         )
         {
-            return element is Aas.ILeaf
+            return element is Our.ILeaf
             || (
-                element is Aas.IContainer
+                element is Our.IContainer
                 && (
-                    ((Aas.IContainer)element).Children.Any(
+                    ((Our.IContainer)element).Children.Any(
                         child => Verification.HasLeafInTree(child))
                 )
             );
@@ -65,13 +65,13 @@ namespace dummy
         )
         {
             return (
-                !(element is Aas.ILeaf)
-                || (Common.StringHelpers.Len(((Aas.ILeaf)element).Text) > 0)
+                !(element is Our.ILeaf)
+                || (Common.StringHelpers.Len(((Our.ILeaf)element).Text) > 0)
             )
             && (
-                !(element is Aas.IContainer)
+                !(element is Our.IContainer)
                 || (
-                    ((Aas.IContainer)element).Children.All(
+                    ((Our.IContainer)element).Children.All(
                         child => Verification.LeavesInTreeAreNotEmpty(child))
                 )
             );
@@ -88,9 +88,9 @@ namespace dummy
             IElement element
         )
         {
-            return (!(element is Aas.ILeaf))
-            || Common.StringHelpers.Len(((Aas.ILeaf)element).Text) == 0
-            || Common.StringHelpers.Len(((Aas.ILeaf)element).Text) < 16;
+            return (!(element is Our.ILeaf))
+            || Common.StringHelpers.Len(((Our.ILeaf)element).Text) == 0
+            || Common.StringHelpers.Len(((Our.ILeaf)element).Text) < 16;
         }  // public static bool IsShortLeafOrNoLeaf
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace dummy
         )
         {
             return (
-                (element is Aas.IOrderedContainer || element is Aas.IUnorderedContainer));
+                (element is Our.IOrderedContainer || element is Our.IUnorderedContainer));
         }  // public static bool IsContainer
 
         /// <summary>
@@ -117,9 +117,9 @@ namespace dummy
             IElement element
         )
         {
-            return element is Aas.IContainer
-            && element is Aas.IOrderedContainer
-            && ((Aas.IOrderedContainer)element).IsSorted;
+            return element is Our.IContainer
+            && element is Our.IOrderedContainer
+            && ((Our.IOrderedContainer)element).IsSorted;
         }  // public static bool IsSortedOrderedContainer
 
         /// <summary>
@@ -143,9 +143,9 @@ namespace dummy
             Value value
         )
         {
-            return value.Underlying is Aas.IAttributeOperand
-            && ((Aas.IAttributeOperand)value.Underlying).Attribute.Underlying is Aas.IGlobalAttribute
-            && ((Aas.IGlobalAttribute)((Aas.IAttributeOperand)value.Underlying).Attribute.Underlying).Kind == "name";
+            return value.Underlying is Our.IAttributeOperand
+            && ((Our.IAttributeOperand)value.Underlying).Attribute.Underlying is Our.IGlobalAttribute
+            && ((Our.IGlobalAttribute)((Our.IAttributeOperand)value.Underlying).Attribute.Underlying).Kind == "name";
         }  // public static bool IsGlobalAttributeOfKindName
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace dummy
         )
         {
             return (
-                (value.Underlying is Aas.IStringLiteral || value.Underlying is Aas.IAttributeOperand));
+                (value.Underlying is Our.IStringLiteral || value.Underlying is Our.IAttributeOperand));
         }  // public static bool IsStringValue
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLeaf(
-                Aas.ILeaf that
+                Our.ILeaf that
             )
             {
                 // No verification has been defined for Leaf.
@@ -188,7 +188,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformOrderedContainer(
-                Aas.IOrderedContainer that
+                Our.IOrderedContainer that
             )
             {
                 int indexChildren = 0;
@@ -210,7 +210,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformUnorderedContainer(
-                Aas.IUnorderedContainer that
+                Our.IUnorderedContainer that
             )
             {
                 int indexChildren = 0;
@@ -232,7 +232,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformGlobalAttribute(
-                Aas.IGlobalAttribute that
+                Our.IGlobalAttribute that
             )
             {
                 // No verification has been defined for GlobalAttribute.
@@ -241,7 +241,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLocalAttribute(
-                Aas.ILocalAttribute that
+                Our.ILocalAttribute that
             )
             {
                 // No verification has been defined for LocalAttribute.
@@ -250,7 +250,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAttributeOperand(
-                Aas.IAttributeOperand that
+                Our.IAttributeOperand that
             )
             {
                 foreach (var error in Verification.Verify(that.Attribute))
@@ -264,7 +264,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformStringLiteral(
-                Aas.IStringLiteral that
+                Our.IStringLiteral that
             )
             {
                 // No verification has been defined for StringLiteral.
@@ -273,7 +273,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformNumberLiteral(
-                Aas.INumberLiteral that
+                Our.INumberLiteral that
             )
             {
                 // No verification has been defined for NumberLiteral.
@@ -282,7 +282,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!Verification.HasLeafInTree(that.Root))
@@ -302,8 +302,8 @@ namespace dummy
 
                 if (!(
                     that.Values.All(
-                        value => !(value.Underlying is Aas.INumberLiteral)
-                            || (((Aas.INumberLiteral)value.Underlying).Number >= 0.0))))
+                        value => !(value.Underlying is Our.INumberLiteral)
+                            || (((Our.INumberLiteral)value.Underlying).Number >= 0.0))))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -312,8 +312,8 @@ namespace dummy
 
                 if (!(
                     that.Values.Any(
-                        value => value.Underlying is Aas.IStringLiteral
-                            && ((Aas.IStringLiteral)value.Underlying).Text == "root")))
+                        value => value.Underlying is Our.IStringLiteral
+                            && ((Our.IStringLiteral)value.Underlying).Text == "root")))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -322,8 +322,8 @@ namespace dummy
                 }
 
                 if (!(
-                    !(that.Root is Aas.IContainer)
-                    || Verification.ContainerHasChildren(((Aas.IContainer)that.Root))))
+                    !(that.Root is Our.IContainer)
+                    || Verification.ContainerHasChildren(((Our.IContainer)that.Root))))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -333,9 +333,9 @@ namespace dummy
                 if (!(
                     !(
                         (that.OptionalElement != null)
-                        && that.OptionalElement is Aas.ILeaf
+                        && that.OptionalElement is Our.ILeaf
                     )
-                    || (Common.StringHelpers.Len(((Aas.ILeaf)that.OptionalElement).Text) > 0)))
+                    || (Common.StringHelpers.Len(((Our.ILeaf)that.OptionalElement).Text) > 0)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -393,7 +393,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -401,7 +401,7 @@ namespace dummy
             }
         }
 
-        public static IEnumerable<Reporting.Error> Verify(Aas.IUnion that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IUnion that)
         {
             foreach (var error in Verify(that.Underlying))
             {

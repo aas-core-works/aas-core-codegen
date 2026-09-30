@@ -33,9 +33,9 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
             f"""\
 import (
 {I}"testing"
-{I}aasenhancing "{repo_url}/enhancing"
-{I}aastesting "{repo_url}/aastesting"
-{I}aastypes "{repo_url}/types"
+{I}ourenhancing "{repo_url}/enhancing"
+{I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
 )"""
         ),
         Stripped(
@@ -48,17 +48,17 @@ type Enhancement struct {{
             f"""\
 func collectIDsAndAssertTheyAreConsecutiveAndTheirCountEqualsNextID(
 {I}t *testing.T,
-{I}wrapped aastypes.IClass,
+{I}wrapped ourtypes.IClass,
 {I}nextID int,
 ) {{
 {I}var ids []int
 
-{I}instanceEnh := aasenhancing.MustUnwrap[*Enhancement](wrapped)
+{I}instanceEnh := ourenhancing.MustUnwrap[*Enhancement](wrapped)
 {I}ids = append(ids, instanceEnh.ID)
 
 {I}wrapped.Descend(
-{II}func(that aastypes.IClass) (abort bool) {{
-{III}enh := aasenhancing.MustUnwrap[*Enhancement](that)
+{II}func(that ourtypes.IClass) (abort bool) {{
+{III}enh := ourenhancing.MustUnwrap[*Enhancement](that)
 {III}ids = append(ids, enh.ID)
 {III}return
 {II}}},
@@ -94,12 +94,12 @@ func collectIDsAndAssertTheyAreConsecutiveAndTheirCountEqualsNextID(
             Stripped(
                 f"""\
 func {test_name}(t *testing.T) {{
-{I}instance := aastesting.{must_load_maximal_name}()
+{I}instance := ourtesting.{must_load_maximal_name}()
 
 {I}nextID := 0
-{I}wrapped := aasenhancing.Wrap[*Enhancement](
+{I}wrapped := ourenhancing.Wrap[*Enhancement](
 {II}instance,
-{II}func(that aastypes.IClass) (enh *Enhancement, should bool) {{
+{II}func(that ourtypes.IClass) (enh *Enhancement, should bool) {{
 {III}enh = &Enhancement{{}}
 {III}enh.ID = nextID
 {III}should = true
@@ -109,7 +109,7 @@ func {test_name}(t *testing.T) {{
 {II}}},
 {I})
 
-{I}if !aastesting.DeepEqual(instance, wrapped) {{
+{I}if !ourtesting.DeepEqual(instance, wrapped) {{
 {II}t.Fatalf(
 {III}"Deep equality failed between the instance and the wrapped: %v %v",
 {III}instance, wrapped,
@@ -131,17 +131,17 @@ func {test_name}(t *testing.T) {{
             Stripped(
                 f"""\
 func {test_name}(t *testing.T) {{
-{I}instance := aastesting.{must_load_maximal_name}()
+{I}instance := ourtesting.{must_load_maximal_name}()
 
-{I}wrapped := aasenhancing.Wrap[*Enhancement](
+{I}wrapped := ourenhancing.Wrap[*Enhancement](
 {II}instance,
-{II}func(that aastypes.IClass) (enh *Enhancement, should bool) {{
+{II}func(that ourtypes.IClass) (enh *Enhancement, should bool) {{
 {III}should = false
 {III}return
 {II}}},
 {I})
 
-{I}if !aastesting.DeepEqual(instance, wrapped) {{
+{I}if !ourtesting.DeepEqual(instance, wrapped) {{
 {II}t.Fatalf(
 {III}"Deep equality failed between the instance and the wrapped: %v %v",
 {III}instance, wrapped,
@@ -154,8 +154,8 @@ func {test_name}(t *testing.T) {{
 {II}t.Fatalf("Unexpected inequality between %v and %v", wrapped, instance)
 {I}}}
 
-{I}wrapped.Descend(func (that aastypes.IClass) (abort bool) {{
-{II}_, ok := aasenhancing.Unwrap[*Enhancement](that)
+{I}wrapped.Descend(func (that ourtypes.IClass) (abort bool) {{
+{II}_, ok := ourenhancing.Unwrap[*Enhancement](that)
 {II}if ok {{
 {III}t.Fatalf("Unexpected wrapped descendant: %v", that)
 {II}}}

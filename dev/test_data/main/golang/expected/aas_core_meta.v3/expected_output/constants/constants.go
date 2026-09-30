@@ -8,10 +8,10 @@ package constants
 // Do NOT edit or append.
 
 import (
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
-// Categories for [aastypes.IDataElement] as defined in Constraint AASd-090
+// Categories for [ourtypes.IDataElement] as defined in Constraint AASd-090
 var ValidCategoriesForDataElement = map[string]struct{} {
 	"CONSTANT": struct{}{},
 	"PARAMETER": struct{}{},
@@ -19,161 +19,161 @@ var ValidCategoriesForDataElement = map[string]struct{} {
 }
 
 // Enumeration of all identifiable elements within an asset administration shell.
-var GenericFragmentKeys = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesFragmentReference: struct{}{},
+var GenericFragmentKeys = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesFragmentReference: struct{}{},
 }
 
 // Enumeration of different key value types within a key.
-var GenericGloballyIdentifiables = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesGlobalReference: struct{}{},
+var GenericGloballyIdentifiables = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesGlobalReference: struct{}{},
 }
 
 // Enumeration of different key value types within a key.
-var AASIdentifiables = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesAssetAdministrationShell: struct{}{},
-	aastypes.KeyTypesConceptDescription: struct{}{},
-	aastypes.KeyTypesIdentifiable: struct{}{},
-	aastypes.KeyTypesSubmodel: struct{}{},
+var AASIdentifiables = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesAssetAdministrationShell: struct{}{},
+	ourtypes.KeyTypesConceptDescription: struct{}{},
+	ourtypes.KeyTypesIdentifiable: struct{}{},
+	ourtypes.KeyTypesSubmodel: struct{}{},
 }
 
 // Enumeration of all submodel elements within an asset administration shell.
-var AASSubmodelElementsAsKeys = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
-	aastypes.KeyTypesBasicEventElement: struct{}{},
-	aastypes.KeyTypesBlob: struct{}{},
-	aastypes.KeyTypesCapability: struct{}{},
-	aastypes.KeyTypesDataElement: struct{}{},
-	aastypes.KeyTypesEntity: struct{}{},
-	aastypes.KeyTypesEventElement: struct{}{},
-	aastypes.KeyTypesFile: struct{}{},
-	aastypes.KeyTypesMultiLanguageProperty: struct{}{},
-	aastypes.KeyTypesOperation: struct{}{},
-	aastypes.KeyTypesProperty: struct{}{},
-	aastypes.KeyTypesRange: struct{}{},
-	aastypes.KeyTypesReferenceElement: struct{}{},
-	aastypes.KeyTypesRelationshipElement: struct{}{},
-	aastypes.KeyTypesSubmodelElement: struct{}{},
-	aastypes.KeyTypesSubmodelElementCollection: struct{}{},
-	aastypes.KeyTypesSubmodelElementList: struct{}{},
+var AASSubmodelElementsAsKeys = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
+	ourtypes.KeyTypesBasicEventElement: struct{}{},
+	ourtypes.KeyTypesBlob: struct{}{},
+	ourtypes.KeyTypesCapability: struct{}{},
+	ourtypes.KeyTypesDataElement: struct{}{},
+	ourtypes.KeyTypesEntity: struct{}{},
+	ourtypes.KeyTypesEventElement: struct{}{},
+	ourtypes.KeyTypesFile: struct{}{},
+	ourtypes.KeyTypesMultiLanguageProperty: struct{}{},
+	ourtypes.KeyTypesOperation: struct{}{},
+	ourtypes.KeyTypesProperty: struct{}{},
+	ourtypes.KeyTypesRange: struct{}{},
+	ourtypes.KeyTypesReferenceElement: struct{}{},
+	ourtypes.KeyTypesRelationshipElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElementCollection: struct{}{},
+	ourtypes.KeyTypesSubmodelElementList: struct{}{},
 }
 
 // Enumeration of different fragment key value types within a key.
-var AASReferableNonIdentifiables = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
-	aastypes.KeyTypesBasicEventElement: struct{}{},
-	aastypes.KeyTypesBlob: struct{}{},
-	aastypes.KeyTypesCapability: struct{}{},
-	aastypes.KeyTypesDataElement: struct{}{},
-	aastypes.KeyTypesEntity: struct{}{},
-	aastypes.KeyTypesEventElement: struct{}{},
-	aastypes.KeyTypesFile: struct{}{},
-	aastypes.KeyTypesMultiLanguageProperty: struct{}{},
-	aastypes.KeyTypesOperation: struct{}{},
-	aastypes.KeyTypesProperty: struct{}{},
-	aastypes.KeyTypesRange: struct{}{},
-	aastypes.KeyTypesReferenceElement: struct{}{},
-	aastypes.KeyTypesRelationshipElement: struct{}{},
-	aastypes.KeyTypesSubmodelElement: struct{}{},
-	aastypes.KeyTypesSubmodelElementCollection: struct{}{},
-	aastypes.KeyTypesSubmodelElementList: struct{}{},
+var AASReferableNonIdentifiables = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
+	ourtypes.KeyTypesBasicEventElement: struct{}{},
+	ourtypes.KeyTypesBlob: struct{}{},
+	ourtypes.KeyTypesCapability: struct{}{},
+	ourtypes.KeyTypesDataElement: struct{}{},
+	ourtypes.KeyTypesEntity: struct{}{},
+	ourtypes.KeyTypesEventElement: struct{}{},
+	ourtypes.KeyTypesFile: struct{}{},
+	ourtypes.KeyTypesMultiLanguageProperty: struct{}{},
+	ourtypes.KeyTypesOperation: struct{}{},
+	ourtypes.KeyTypesProperty: struct{}{},
+	ourtypes.KeyTypesRange: struct{}{},
+	ourtypes.KeyTypesReferenceElement: struct{}{},
+	ourtypes.KeyTypesRelationshipElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElementCollection: struct{}{},
+	ourtypes.KeyTypesSubmodelElementList: struct{}{},
 }
 
 // Enumeration of referables. We need this to check that model references refer to a Referable. For example, the observed attribute of the Basic Event Element object must be a model reference to a Referable.
-var AASReferables = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesAssetAdministrationShell: struct{}{},
-	aastypes.KeyTypesConceptDescription: struct{}{},
-	aastypes.KeyTypesIdentifiable: struct{}{},
-	aastypes.KeyTypesSubmodel: struct{}{},
-	aastypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
-	aastypes.KeyTypesBasicEventElement: struct{}{},
-	aastypes.KeyTypesBlob: struct{}{},
-	aastypes.KeyTypesCapability: struct{}{},
-	aastypes.KeyTypesDataElement: struct{}{},
-	aastypes.KeyTypesEntity: struct{}{},
-	aastypes.KeyTypesEventElement: struct{}{},
-	aastypes.KeyTypesFile: struct{}{},
-	aastypes.KeyTypesMultiLanguageProperty: struct{}{},
-	aastypes.KeyTypesOperation: struct{}{},
-	aastypes.KeyTypesProperty: struct{}{},
-	aastypes.KeyTypesRange: struct{}{},
-	aastypes.KeyTypesReferenceElement: struct{}{},
-	aastypes.KeyTypesReferable: struct{}{},
-	aastypes.KeyTypesRelationshipElement: struct{}{},
-	aastypes.KeyTypesSubmodelElement: struct{}{},
-	aastypes.KeyTypesSubmodelElementCollection: struct{}{},
-	aastypes.KeyTypesSubmodelElementList: struct{}{},
+var AASReferables = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesAssetAdministrationShell: struct{}{},
+	ourtypes.KeyTypesConceptDescription: struct{}{},
+	ourtypes.KeyTypesIdentifiable: struct{}{},
+	ourtypes.KeyTypesSubmodel: struct{}{},
+	ourtypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
+	ourtypes.KeyTypesBasicEventElement: struct{}{},
+	ourtypes.KeyTypesBlob: struct{}{},
+	ourtypes.KeyTypesCapability: struct{}{},
+	ourtypes.KeyTypesDataElement: struct{}{},
+	ourtypes.KeyTypesEntity: struct{}{},
+	ourtypes.KeyTypesEventElement: struct{}{},
+	ourtypes.KeyTypesFile: struct{}{},
+	ourtypes.KeyTypesMultiLanguageProperty: struct{}{},
+	ourtypes.KeyTypesOperation: struct{}{},
+	ourtypes.KeyTypesProperty: struct{}{},
+	ourtypes.KeyTypesRange: struct{}{},
+	ourtypes.KeyTypesReferenceElement: struct{}{},
+	ourtypes.KeyTypesReferable: struct{}{},
+	ourtypes.KeyTypesRelationshipElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElementCollection: struct{}{},
+	ourtypes.KeyTypesSubmodelElementList: struct{}{},
 }
 
 // Enumeration of all referable elements within an asset administration shell
-var GloballyIdentifiables = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesGlobalReference: struct{}{},
-	aastypes.KeyTypesAssetAdministrationShell: struct{}{},
-	aastypes.KeyTypesConceptDescription: struct{}{},
-	aastypes.KeyTypesIdentifiable: struct{}{},
-	aastypes.KeyTypesSubmodel: struct{}{},
+var GloballyIdentifiables = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesGlobalReference: struct{}{},
+	ourtypes.KeyTypesAssetAdministrationShell: struct{}{},
+	ourtypes.KeyTypesConceptDescription: struct{}{},
+	ourtypes.KeyTypesIdentifiable: struct{}{},
+	ourtypes.KeyTypesSubmodel: struct{}{},
 }
 
 // Enumeration of different key value types within a key.
-var FragmentKeys = map[aastypes.KeyTypes]struct{} {
-	aastypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
-	aastypes.KeyTypesBasicEventElement: struct{}{},
-	aastypes.KeyTypesBlob: struct{}{},
-	aastypes.KeyTypesCapability: struct{}{},
-	aastypes.KeyTypesDataElement: struct{}{},
-	aastypes.KeyTypesEntity: struct{}{},
-	aastypes.KeyTypesEventElement: struct{}{},
-	aastypes.KeyTypesFile: struct{}{},
-	aastypes.KeyTypesFragmentReference: struct{}{},
-	aastypes.KeyTypesMultiLanguageProperty: struct{}{},
-	aastypes.KeyTypesOperation: struct{}{},
-	aastypes.KeyTypesProperty: struct{}{},
-	aastypes.KeyTypesRange: struct{}{},
-	aastypes.KeyTypesReferenceElement: struct{}{},
-	aastypes.KeyTypesRelationshipElement: struct{}{},
-	aastypes.KeyTypesSubmodelElement: struct{}{},
-	aastypes.KeyTypesSubmodelElementCollection: struct{}{},
-	aastypes.KeyTypesSubmodelElementList: struct{}{},
+var FragmentKeys = map[ourtypes.KeyTypes]struct{} {
+	ourtypes.KeyTypesAnnotatedRelationshipElement: struct{}{},
+	ourtypes.KeyTypesBasicEventElement: struct{}{},
+	ourtypes.KeyTypesBlob: struct{}{},
+	ourtypes.KeyTypesCapability: struct{}{},
+	ourtypes.KeyTypesDataElement: struct{}{},
+	ourtypes.KeyTypesEntity: struct{}{},
+	ourtypes.KeyTypesEventElement: struct{}{},
+	ourtypes.KeyTypesFile: struct{}{},
+	ourtypes.KeyTypesFragmentReference: struct{}{},
+	ourtypes.KeyTypesMultiLanguageProperty: struct{}{},
+	ourtypes.KeyTypesOperation: struct{}{},
+	ourtypes.KeyTypesProperty: struct{}{},
+	ourtypes.KeyTypesRange: struct{}{},
+	ourtypes.KeyTypesReferenceElement: struct{}{},
+	ourtypes.KeyTypesRelationshipElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElement: struct{}{},
+	ourtypes.KeyTypesSubmodelElementCollection: struct{}{},
+	ourtypes.KeyTypesSubmodelElementList: struct{}{},
 }
 
 // IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.
-var DataTypeIEC61360ForPropertyOrValue = map[aastypes.DataTypeIEC61360]struct{} {
-	aastypes.DataTypeIEC61360Date: struct{}{},
-	aastypes.DataTypeIEC61360String: struct{}{},
-	aastypes.DataTypeIEC61360StringTranslatable: struct{}{},
-	aastypes.DataTypeIEC61360IntegerMeasure: struct{}{},
-	aastypes.DataTypeIEC61360IntegerCount: struct{}{},
-	aastypes.DataTypeIEC61360IntegerCurrency: struct{}{},
-	aastypes.DataTypeIEC61360RealMeasure: struct{}{},
-	aastypes.DataTypeIEC61360RealCount: struct{}{},
-	aastypes.DataTypeIEC61360RealCurrency: struct{}{},
-	aastypes.DataTypeIEC61360Boolean: struct{}{},
-	aastypes.DataTypeIEC61360Rational: struct{}{},
-	aastypes.DataTypeIEC61360RationalMeasure: struct{}{},
-	aastypes.DataTypeIEC61360Time: struct{}{},
-	aastypes.DataTypeIEC61360Timestamp: struct{}{},
+var DataTypeIEC61360ForPropertyOrValue = map[ourtypes.DataTypeIEC61360]struct{} {
+	ourtypes.DataTypeIEC61360Date: struct{}{},
+	ourtypes.DataTypeIEC61360String: struct{}{},
+	ourtypes.DataTypeIEC61360StringTranslatable: struct{}{},
+	ourtypes.DataTypeIEC61360IntegerMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360IntegerCount: struct{}{},
+	ourtypes.DataTypeIEC61360IntegerCurrency: struct{}{},
+	ourtypes.DataTypeIEC61360RealMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360RealCount: struct{}{},
+	ourtypes.DataTypeIEC61360RealCurrency: struct{}{},
+	ourtypes.DataTypeIEC61360Boolean: struct{}{},
+	ourtypes.DataTypeIEC61360Rational: struct{}{},
+	ourtypes.DataTypeIEC61360RationalMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360Time: struct{}{},
+	ourtypes.DataTypeIEC61360Timestamp: struct{}{},
 }
 
 // IEC 61360 data types for concept descriptions categorized with REFERENCE.
-var DataTypeIEC61360ForReference = map[aastypes.DataTypeIEC61360]struct{} {
-	aastypes.DataTypeIEC61360String: struct{}{},
-	aastypes.DataTypeIEC61360IRI: struct{}{},
-	aastypes.DataTypeIEC61360IRDI: struct{}{},
+var DataTypeIEC61360ForReference = map[ourtypes.DataTypeIEC61360]struct{} {
+	ourtypes.DataTypeIEC61360String: struct{}{},
+	ourtypes.DataTypeIEC61360IRI: struct{}{},
+	ourtypes.DataTypeIEC61360IRDI: struct{}{},
 }
 
 // IEC 61360 data types for concept descriptions categorized with DOCUMENT.
-var DataTypeIEC61360ForDocument = map[aastypes.DataTypeIEC61360]struct{} {
-	aastypes.DataTypeIEC61360File: struct{}{},
-	aastypes.DataTypeIEC61360Blob: struct{}{},
-	aastypes.DataTypeIEC61360HTML: struct{}{},
+var DataTypeIEC61360ForDocument = map[ourtypes.DataTypeIEC61360]struct{} {
+	ourtypes.DataTypeIEC61360File: struct{}{},
+	ourtypes.DataTypeIEC61360Blob: struct{}{},
+	ourtypes.DataTypeIEC61360HTML: struct{}{},
 }
 
 // These data types imply that the unit is defined in the data specification.
-var IEC61360DataTypesWithUnit = map[aastypes.DataTypeIEC61360]struct{} {
-	aastypes.DataTypeIEC61360IntegerMeasure: struct{}{},
-	aastypes.DataTypeIEC61360RealMeasure: struct{}{},
-	aastypes.DataTypeIEC61360RationalMeasure: struct{}{},
-	aastypes.DataTypeIEC61360IntegerCurrency: struct{}{},
-	aastypes.DataTypeIEC61360RealCurrency: struct{}{},
+var IEC61360DataTypesWithUnit = map[ourtypes.DataTypeIEC61360]struct{} {
+	ourtypes.DataTypeIEC61360IntegerMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360RealMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360RationalMeasure: struct{}{},
+	ourtypes.DataTypeIEC61360IntegerCurrency: struct{}{},
+	ourtypes.DataTypeIEC61360RealCurrency: struct{}{},
 }
 
 // This code has been automatically generated by aas-core-codegen.

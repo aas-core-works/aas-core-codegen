@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,141 +14,141 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.Item LoadMaximalItem()
+        public static Our.Item LoadMaximalItem()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Item",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ItemFrom(
+            var instance = Our.Jsonization.Deserialize.ItemFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Item LoadMaximalItem
+        }  // public static Our.Item LoadMaximalItem
 
-        public static Aas.Item LoadMinimalItem()
+        public static Our.Item LoadMinimalItem()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Item",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ItemFrom(
+            var instance = Our.Jsonization.Deserialize.ItemFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Item LoadMinimalItem
+        }  // public static Our.Item LoadMinimalItem
 
-        public static Aas.ChildA LoadMaximalChildA()
+        public static Our.ChildA LoadMaximalChildA()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ChildA",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ChildAFrom(
+            var instance = Our.Jsonization.Deserialize.ChildAFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ChildA LoadMaximalChildA
+        }  // public static Our.ChildA LoadMaximalChildA
 
-        public static Aas.ChildA LoadMinimalChildA()
+        public static Our.ChildA LoadMinimalChildA()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ChildA",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ChildAFrom(
+            var instance = Our.Jsonization.Deserialize.ChildAFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ChildA LoadMinimalChildA
+        }  // public static Our.ChildA LoadMinimalChildA
 
-        public static Aas.ChildB LoadMaximalChildB()
+        public static Our.ChildB LoadMaximalChildB()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ChildB",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ChildBFrom(
+            var instance = Our.Jsonization.Deserialize.ChildBFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ChildB LoadMaximalChildB
+        }  // public static Our.ChildB LoadMaximalChildB
 
-        public static Aas.ChildB LoadMinimalChildB()
+        public static Our.ChildB LoadMinimalChildB()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "ChildB",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.ChildBFrom(
+            var instance = Our.Jsonization.Deserialize.ChildBFrom(
                 node);
 
             return instance;
-        }  // public static Aas.ChildB LoadMinimalChildB
+        }  // public static Our.ChildB LoadMinimalChildB
 
-        public static Aas.Something LoadMaximalSomething()
+        public static Our.Something LoadMaximalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMaximalSomething
+        }  // public static Our.Something LoadMaximalSomething
 
-        public static Aas.Something LoadMinimalSomething()
+        public static Our.Something LoadMinimalSomething()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Something",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+            var instance = Our.Jsonization.Deserialize.SomethingFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Something LoadMinimalSomething
+        }  // public static Our.Something LoadMinimalSomething
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

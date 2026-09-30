@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of Item:
     /// <code>
-    /// var anInstance = new Aas.Item(
+    /// var anInstance = new Our.Item(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -38,12 +38,12 @@ namespace dummy
             List<IParent> parents
         )
         {
-            Aas.IChildA? found = null;
+            Our.IChildA? found = null;
             foreach (var parent in parents)
             {
-                if (parent is Aas.IChildA)
+                if (parent is Our.IChildA)
                 {
-                    found = ((Aas.IChildA)parent);
+                    found = ((Our.IChildA)parent);
                     break;
                 }
             }
@@ -96,14 +96,14 @@ namespace dummy
             List<IParent> parents
         )
         {
-            Aas.IParent last = parent;
+            Our.IParent last = parent;
             foreach (var other in parents)
             {
                 last = other;
             }
-            if (last is Aas.IChildB)
+            if (last is Our.IChildB)
             {
-                return ((Aas.IChildB)last).BOnly != 0;
+                return ((Our.IChildB)last).BOnly != 0;
             }
             return true;
         }  // public static bool LastChildBIsNotZero
@@ -115,18 +115,18 @@ namespace dummy
             IParent parent
         )
         {
-            if (parent is Aas.IChildA)
+            if (parent is Our.IChildA)
             {
-                Aas.IChildA child = ((Aas.IChildA)parent);
-                var childCopy = ((Aas.IChildA)parent);
-                Aas.IParent wider = ((Aas.IChildA)parent);
-                if (wider is Aas.IChildB)
+                Our.IChildA child = ((Our.IChildA)parent);
+                var childCopy = ((Our.IChildA)parent);
+                Our.IParent wider = ((Our.IChildA)parent);
+                if (wider is Our.IChildB)
                 {
                     return false;
                 }
                 wider = child;
                 return child.AOnly == childCopy.AOnly
-                && ((Aas.IChildA)wider).AOnly > -1000;
+                && ((Our.IChildA)wider).AOnly > -1000;
             }
             return true;
         }  // public static bool ChildADeclarationsAgree
@@ -193,8 +193,8 @@ namespace dummy
             Kind? optionalKind
         )
         {
-            Aas.Kind current = kind;
-            Aas.Kind? other = null;
+            Our.Kind current = kind;
+            Our.Kind? other = null;
             if (optionalKind != null)
             {
                 other = optionalKind.Value;
@@ -268,7 +268,7 @@ namespace dummy
                 text,
                 number
             );
-            (string, Aas.IParent)? optionalPair = null;
+            (string, Our.IParent)? optionalPair = null;
             if (optionalParent != null)
             {
                 optionalPair = (
@@ -295,44 +295,44 @@ namespace dummy
             IItem item
         )
         {
-            Aas.ParentOrItem current = Aas.ParentOrItem.FromParent(parent);
-            if (parent is Aas.IChildA)
+            Our.ParentOrItem current = Our.ParentOrItem.FromParent(parent);
+            if (parent is Our.IChildA)
             {
-                current = Aas.ParentOrItem.FromParent(((Aas.IChildA)parent));
-                switch (((Aas.IChildA)current.Underlying).AOnly)
+                current = Our.ParentOrItem.FromParent(((Our.IChildA)parent));
+                switch (((Our.IChildA)current.Underlying).AOnly)
                 {
                     case 13:
                         return false;
                 }
             }
-            current = Aas.ParentOrItem.FromItem(item);
-            if (Common.StringHelpers.Len(((Aas.IItem)current.Underlying).Name) < 1)
+            current = Our.ParentOrItem.FromItem(item);
+            if (Common.StringHelpers.Len(((Our.IItem)current.Underlying).Name) < 1)
             {
                 return false;
             }
-            Aas.ParentOrItem? optionalMember = null;
-            if (parent is Aas.IChildB)
+            Our.ParentOrItem? optionalMember = null;
+            if (parent is Our.IChildB)
             {
-                optionalMember = Aas.ParentOrItem.FromParent(((Aas.IChildB)parent));
+                optionalMember = Our.ParentOrItem.FromParent(((Our.IChildB)parent));
             }
             if (
                 (optionalMember != null)
-                && optionalMember.Underlying is Aas.IChildB
+                && optionalMember.Underlying is Our.IChildB
             )
             {
-                switch (((Aas.IChildB)optionalMember.Underlying).BOnly)
+                switch (((Our.IChildB)optionalMember.Underlying).BOnly)
                 {
                     case 13:
                         return false;
                 }
             }
-            Aas.WideUnion wide = Aas.WideUnion.FromItem(item);
-            if (parent is Aas.IChildB)
+            Our.WideUnion wide = Our.WideUnion.FromItem(item);
+            if (parent is Our.IChildB)
             {
-                wide = Aas.WideUnion.FromChildB(((Aas.IChildB)parent));
+                wide = Our.WideUnion.FromChildB(((Our.IChildB)parent));
             }
-            return !(wide.Underlying is Aas.IChildB)
-            || (((Aas.IChildB)wide.Underlying).BOnly != 14);
+            return !(wide.Underlying is Our.IChildB)
+            || (((Our.IChildB)wide.Underlying).BOnly != 14);
         }  // public static bool UnionLocalsAreConsistent
 
         /// <summary>
@@ -344,10 +344,10 @@ namespace dummy
         {
             if (
                 (member != null)
-                && member.Underlying is Aas.IChildA
+                && member.Underlying is Our.IChildA
             )
             {
-                return ((Aas.IChildA)member.Underlying).AOnly != 13;
+                return ((Our.IChildA)member.Underlying).AOnly != 13;
             }
             return true;
         }  // public static bool MemberIsLucky
@@ -360,7 +360,7 @@ namespace dummy
             IItem item
         )
         {
-            something.OptionalMember = Aas.ParentOrItem.FromItem(item);
+            something.OptionalMember = Our.ParentOrItem.FromItem(item);
             return true;
         }  // public static bool WrapIntoMember
 
@@ -382,12 +382,12 @@ namespace dummy
             HashSet<string> seen = new HashSet<string>();
             seen.Add(text);
             HashSet<string> reservedSeen = (
-                new HashSet<string>(seen.Intersect(Aas.Constants.ReservedTexts)));
+                new HashSet<string>(seen.Intersect(Our.Constants.ReservedTexts)));
             (string, long) pair = (
                 text,
                 number
             );
-            Aas.IParent basE = parent;
+            Our.IParent basE = parent;
             if (
                 reservedSeen.Count > 0
                 || Common.StringHelpers.Len(label) > limit
@@ -411,8 +411,8 @@ namespace dummy
                 return false;
             }
             if (
-                basE is Aas.IChildA
-                && ((Aas.IChildA)basE).AOnly == 77
+                basE is Our.IChildA
+                && ((Our.IChildA)basE).AOnly == 77
             )
             {
                 return false;
@@ -450,8 +450,8 @@ namespace dummy
             internal static readonly HashSet<int> ForKind = new HashSet<int>
             {
 
-                (int)Aas.Kind.Alpha,
-                (int)Aas.Kind.Beta
+                (int)Our.Kind.Alpha,
+                (int)Our.Kind.Beta
             };
         }  // internal static class EnumValueSet
 
@@ -464,7 +464,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformItem(
-                Aas.IItem that
+                Our.IItem that
             )
             {
                 // No verification has been defined for Item.
@@ -473,7 +473,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformChildA(
-                Aas.IChildA that
+                Our.IChildA that
             )
             {
                 // No verification has been defined for ChildA.
@@ -482,7 +482,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformChildB(
-                Aas.IChildB that
+                Our.IChildB that
             )
             {
                 // No verification has been defined for ChildB.
@@ -491,7 +491,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!that.FirstChildBIsNotFortyTwo())
@@ -704,7 +704,7 @@ namespace dummy
                 if (that.OptionalKind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.Kind value = that.OptionalKind
+                    Our.Kind value = that.OptionalKind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyKind(value))
                     {
@@ -745,7 +745,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -757,7 +757,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKind(
-            Aas.Kind that)
+            Our.Kind that)
         {
             if (!EnumValueSet.ForKind.Contains(
                 (int)that))
@@ -781,7 +781,7 @@ namespace dummy
             }
         }
 
-        public static IEnumerable<Reporting.Error> Verify(Aas.IUnion that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IUnion that)
         {
             foreach (var error in Verify(that.Underlying))
             {

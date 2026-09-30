@@ -6,47 +6,47 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kBox
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBox
+    == our::wstringification::MustModelTypeFromWstring(
       L"Box"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBox
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBox
     )
     == L"Box"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBag
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kBag
+    == our::wstringification::MustModelTypeFromWstring(
       L"Bag"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kBag
+    our::wstringification::to_wstring(
+      our::types::ModelType::kBag
     )
     == L"Bag"
   );
 
   REQUIRE(
-    aas::types::ModelType::kContainer
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kContainer
+    == our::wstringification::MustModelTypeFromWstring(
       L"Container"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kContainer
+    our::wstringification::to_wstring(
+      our::types::ModelType::kContainer
     )
     == L"Container"
   );
@@ -54,13 +54,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -69,29 +69,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test Color round-trip") {
   REQUIRE(
-    aas::types::Color::kRed
-    == aas::wstringification::MustColorFromWstring(
+    our::types::Color::kRed
+    == our::wstringification::MustColorFromWstring(
       L"Red"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Color::kRed
+    our::wstringification::to_wstring(
+      our::types::Color::kRed
     )
     == L"Red"
   );
 
   REQUIRE(
-    aas::types::Color::kGreen
-    == aas::wstringification::MustColorFromWstring(
+    our::types::Color::kGreen
+    == our::wstringification::MustColorFromWstring(
       L"Green"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Color::kGreen
+    our::wstringification::to_wstring(
+      our::types::Color::kGreen
     )
     == L"Green"
   );
@@ -99,13 +99,13 @@ TEST_CASE("Test Color round-trip") {
 
 TEST_CASE("Test failure on Color") {
   CHECK(
-    !aas::wstringification::ColorFromWstring(
+    !our::wstringification::ColorFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustColorFromWstring(
+    our::wstringification::MustColorFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected Color literal: Totally utterly invalid"

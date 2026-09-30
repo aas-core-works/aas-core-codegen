@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,14 +42,14 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check the if-statement with a single branch and no default.
 func IfWithASingleBranch(
 	text string,
 ) bool {
-	if aascommon.LenStr(text) > 10 {
+	if ourcommon.LenStr(text) > 10 {
 		return false
 	}
 	return true
@@ -65,7 +65,7 @@ func IfElifElse(
 ) bool {
 	if (
 		number < 0 &&
-		aascommon.LenStr(text) > 0) {
+		ourcommon.LenStr(text) > 0) {
 		return false
 	} else if (
 		number > 100 ||
@@ -99,16 +99,16 @@ func IfWithPass(
 // The `elif` becomes an if-statement in the default of the switch, and nests
 // a switch in turn.
 func IfInDefaultOfSwitch(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 	number int64,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha:
+	case ourtypes.KindAlpha:
 		return number < 10
 	default:
 		if number < -5 {
 			switch kind {
-			case aastypes.KindBeta:
+			case ourtypes.KindBeta:
 				return false
 			}
 		}
@@ -118,11 +118,11 @@ func IfInDefaultOfSwitch(
 
 // Check the condition which guards an optional value itself.
 func IfWithNonNullInCondition(
-	item aastypes.IItem,
+	item ourtypes.IItem,
 ) bool {
 	if (
 		(item.OptionalText() != nil) &&
-		aascommon.LenStr(*item.OptionalText()) > 5) {
+		ourcommon.LenStr(*item.OptionalText()) > 5) {
 		return false
 	}
 	return true
@@ -150,7 +150,7 @@ func IfWithContinueInFor(
 	count := int64(0)
 	for i := int64(0); i < 10; i++ {
 		if (
-			aascommon.FloorMod(i, 2) == 0 ||
+			ourcommon.FloorMod(i, 2) == 0 ||
 			i > number) {
 			continue
 		}
@@ -161,67 +161,67 @@ func IfWithContinueInFor(
 
 // Check the narrowing in the body of a branch by its condition.
 func NarrowingInBody(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	if (
 		(parent != nil) &&
-		aastypes.IsChildA(parent)) {
-		return parent.(aastypes.IChildA).AOnly() < 100
+		ourtypes.IsChildA(parent)) {
+		return parent.(ourtypes.IChildA).AOnly() < 100
 	}
 	return true
 }
 
 // Check the narrowing by the negation of the previous conditions.
 func NarrowingInElifAndElse(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	if parent == nil {
 		return true
-	} else if !aastypes.IsChildB(parent) {
+	} else if !ourtypes.IsChildB(parent) {
 		return (parent.OptionalText() == nil) ||
 			*parent.OptionalText() != "forbidden"
 	} else {
-		return parent.(aastypes.IChildB).BOnly() > 0
+		return parent.(ourtypes.IChildB).BOnly() > 0
 	}
 }
 
 // Check the narrowing after an if-statement whose branch always returns.
 func NarrowingAfterEarlyReturn(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	if (
 		(parent == nil) ||
-		(!aastypes.IsChildB(parent))) {
+		(!ourtypes.IsChildB(parent))) {
 		return true
 	}
-	return parent.(aastypes.IChildB).BOnly() < 50
+	return parent.(ourtypes.IChildB).BOnly() < 50
 }
 
 // Check the narrowing after an if-statement whose `else` always returns.
 func NarrowingAfterTheOnlyCompletingBranch(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	if (
 		(parent != nil) &&
-		aastypes.IsChildA(parent)) {
+		ourtypes.IsChildA(parent)) {
 	} else {
 		return true
 	}
-	return parent.(aastypes.IChildA).AOnly() > -10
+	return parent.(ourtypes.IChildA).AOnly() > -10
 }
 
 // Check the narrowing after the `continue` and the early return in a loop.
 func ChildAsHaveTexts(
-	parents []aastypes.IParent,
+	parents []ourtypes.IParent,
 ) bool {
 	for _, parent := range parents {
-		if !aastypes.IsChildA(parent) {
+		if !ourtypes.IsChildA(parent) {
 			continue
 		}
-		if parent.(aastypes.IChildA).OptionalText() == nil {
+		if parent.(ourtypes.IChildA).OptionalText() == nil {
 			return false
 		}
-		if aascommon.LenStr(*parent.(aastypes.IChildA).OptionalText()) < 1 {
+		if ourcommon.LenStr(*parent.(ourtypes.IChildA).OptionalText()) < 1 {
 			return false
 		}
 	}
@@ -230,43 +230,43 @@ func ChildAsHaveTexts(
 
 // Check the narrowing after the `continue` in a loop with a `break`.
 func TextsBeforeContainerAreShort(
-	parents []aastypes.IParent,
+	parents []ourtypes.IParent,
 ) bool {
 	total := int64(0)
 	for _, parent := range parents {
-		if aastypes.IsContainer(parent) {
+		if ourtypes.IsContainer(parent) {
 			break
 		}
 		if parent.OptionalText() == nil {
 			continue
 		}
 		total =
-			total + int64(aascommon.LenStr(*parent.OptionalText()))
+			total + int64(ourcommon.LenStr(*parent.OptionalText()))
 	}
 	return total < 20
 }
 
 // Check the narrowing by the value assigned in a branch.
 func TextOrDefaultIsShort(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	text := parent.OptionalText()
 	if text == nil {
-		text = aascommon.NewAndPointTo("default")
+		text = ourcommon.NewAndPointTo("default")
 	}
-	return aascommon.LenStr(*text) < 10
+	return ourcommon.LenStr(*text) < 10
 }
 
 // Check the narrowing of a variable to a class by the assigned value.
 func LastChildAIsSmall(
-	parent aastypes.IParent,
-	parents []aastypes.IParent,
+	parent ourtypes.IParent,
+	parents []ourtypes.IParent,
 ) bool {
 	last := parent
 	for _, other := range parents {
-		if aastypes.IsChildA(other) {
-			last = other.(aastypes.IChildA)
-			if last.(aastypes.IChildA).AOnly() >= 1000 {
+		if ourtypes.IsChildA(other) {
+			last = other.(ourtypes.IChildA)
+			if last.(ourtypes.IChildA).AOnly() >= 1000 {
 				return false
 			}
 		}
@@ -276,33 +276,33 @@ func LastChildAIsSmall(
 
 // Check the recursive chain of `isinstance` checks with early returns.
 func HasMarkerInTree(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	if (
 		(parent.OptionalText() != nil) &&
 		*parent.OptionalText() == "marker") {
 		return true
 	}
-	if aastypes.IsContainer(parent) {
-		return (parent.(aastypes.IContainer).Children() != nil) &&
-			aascommon.Some(
-				func(child aastypes.IParent) bool {
+	if ourtypes.IsContainer(parent) {
+		return (parent.(ourtypes.IContainer).Children() != nil) &&
+			ourcommon.Some(
+				func(child ourtypes.IParent) bool {
 					return HasMarkerInTree(child)
 				},
-				parent.(aastypes.IContainer).Children(),
+				parent.(ourtypes.IContainer).Children(),
 			)
 	}
 	return false
 }
 
-// Verify `that` instance of [aastypes.IItem].
+// Verify `that` instance of [ourtypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyItem(
-	that aastypes.IItem,
+	that ourtypes.IItem,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -312,14 +312,14 @@ func VerifyItem(
 	return
 }
 
-// Verify `that` instance of [aastypes.IChildA].
+// Verify `that` instance of [ourtypes.IChildA].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyChildA(
-	that aastypes.IChildA,
+	that ourtypes.IChildA,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -329,14 +329,14 @@ func VerifyChildA(
 	return
 }
 
-// Verify `that` instance of [aastypes.IChildB].
+// Verify `that` instance of [ourtypes.IChildB].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyChildB(
-	that aastypes.IChildB,
+	that ourtypes.IChildB,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -346,14 +346,14 @@ func VerifyChildB(
 	return
 }
 
-// Verify `that` instance of [aastypes.IContainer].
+// Verify `that` instance of [ourtypes.IContainer].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyContainer(
-	that aastypes.IContainer,
+	that ourtypes.IContainer,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -364,13 +364,13 @@ func VerifyContainer(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Children",
 						},
 					)
@@ -387,14 +387,14 @@ func VerifyContainer(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -582,7 +582,7 @@ func VerifySomething(
 		that.Kind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Kind",
 				},
 			)
@@ -607,7 +607,7 @@ func VerifySomething(
 			that.Item(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Item",
 					},
 				)
@@ -624,7 +624,7 @@ func VerifySomething(
 			that.OptionalParent(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalParent",
 					},
 				)
@@ -642,13 +642,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Parents",
 						},
 					)
@@ -673,14 +673,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindGamma {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindGamma {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -701,34 +701,34 @@ func VerifyKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		abort = VerifyItem(
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 			onError,
 		)
-	case aastypes.ModelTypeChildA:
+	case ourtypes.ModelTypeChildA:
 		abort = VerifyChildA(
-			that.(aastypes.IChildA),
+			that.(ourtypes.IChildA),
 			onError,
 		)
-	case aastypes.ModelTypeChildB:
+	case ourtypes.ModelTypeChildB:
 		abort = VerifyChildB(
-			that.(aastypes.IChildB),
+			that.(ourtypes.IChildB),
 			onError,
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		abort = VerifyContainer(
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

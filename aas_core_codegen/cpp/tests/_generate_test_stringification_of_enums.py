@@ -44,8 +44,8 @@ def _generate_test_round_trip_for_model_type(
             Stripped(
                 f"""\
 REQUIRE(
-{I}aas::types::{enum_name}::{literal_name}
-{I}== aas::stringification::{must_from_string}(
+{I}our::types::{enum_name}::{literal_name}
+{I}== our::stringification::{must_from_string}(
 {II}{cpp_common.string_literal(literal_value)}
 {I})
 );"""
@@ -56,8 +56,8 @@ REQUIRE(
             Stripped(
                 f"""\
 REQUIRE(
-{I}aas::stringification::to_string(
-{II}aas::types::{enum_name}::{literal_name}
+{I}our::stringification::to_string(
+{II}our::types::{enum_name}::{literal_name}
 {I})
 {I}== {cpp_common.string_literal(literal_value)}
 );"""
@@ -93,13 +93,13 @@ def _generate_test_failure_for_model_type() -> Stripped:
         f"""\
 TEST_CASE("Test failure on {enum_name}") {{
 {I}CHECK(
-{II}!aas::stringification::{from_string}(
+{II}!our::stringification::{from_string}(
 {III}"Totally utterly invalid"
 {II}).has_value()
 {I});
 
 {I}REQUIRE_THROWS_WITH(
-{II}aas::stringification::{must_from_string}(
+{II}our::stringification::{must_from_string}(
 {III}"Totally utterly invalid"
 {II}),
 {II}"Unexpected {enum_name} literal: Totally utterly invalid"
@@ -125,8 +125,8 @@ def _generate_test_round_trip_for(enum: intermediate.Enumeration) -> Stripped:
             Stripped(
                 f"""\
 REQUIRE(
-{I}aas::types::{enum_name}::{literal_name}
-{I}== aas::stringification::{must_from_string}(
+{I}our::types::{enum_name}::{literal_name}
+{I}== our::stringification::{must_from_string}(
 {II}{cpp_common.string_literal(literal.value)}
 {I})
 );"""
@@ -137,8 +137,8 @@ REQUIRE(
             Stripped(
                 f"""\
 REQUIRE(
-{I}aas::stringification::to_string(
-{II}aas::types::{enum_name}::{literal_name}
+{I}our::stringification::to_string(
+{II}our::types::{enum_name}::{literal_name}
 {I})
 {I}== {cpp_common.string_literal(literal.value)}
 );"""
@@ -169,13 +169,13 @@ def _generate_test_failure_for(enum: intermediate.Enumeration) -> Stripped:
         f"""\
 TEST_CASE("Test failure on {enum_name}") {{
 {I}CHECK(
-{II}!aas::stringification::{from_string}(
+{II}!our::stringification::{from_string}(
 {III}"Totally utterly invalid"
 {II}).has_value()
 {I});
 
 {I}REQUIRE_THROWS_WITH(
-{II}aas::stringification::{must_from_string}(
+{II}our::stringification::{must_from_string}(
 {III}"Totally utterly invalid"
 {II}),
 {II}"Unexpected {enum_name} literal: Totally utterly invalid"
@@ -206,7 +206,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         _generate_test_round_trip_for_model_type(symbol_table=symbol_table),
         _generate_test_failure_for_model_type(),

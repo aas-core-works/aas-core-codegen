@@ -3,5 +3,5 @@
 /// </summary>
 public Color ColorOrDefault()
 {
-    return Color ?? Aas.Color.Red;
+    return Color ?? Our.Color.Red;
 }

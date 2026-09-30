@@ -6,61 +6,61 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kItem
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kItem
+    == our::wstringification::MustModelTypeFromWstring(
       L"Item"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kItem
+    our::wstringification::to_wstring(
+      our::types::ModelType::kItem
     )
     == L"Item"
   );
 
   REQUIRE(
-    aas::types::ModelType::kChildA
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kChildA
+    == our::wstringification::MustModelTypeFromWstring(
       L"ChildA"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kChildA
+    our::wstringification::to_wstring(
+      our::types::ModelType::kChildA
     )
     == L"ChildA"
   );
 
   REQUIRE(
-    aas::types::ModelType::kChildB
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kChildB
+    == our::wstringification::MustModelTypeFromWstring(
       L"ChildB"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kChildB
+    our::wstringification::to_wstring(
+      our::types::ModelType::kChildB
     )
     == L"ChildB"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
@@ -68,13 +68,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -83,29 +83,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test Kind round-trip") {
   REQUIRE(
-    aas::types::Kind::kAlpha
-    == aas::wstringification::MustKindFromWstring(
+    our::types::Kind::kAlpha
+    == our::wstringification::MustKindFromWstring(
       L"alpha"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Kind::kAlpha
+    our::wstringification::to_wstring(
+      our::types::Kind::kAlpha
     )
     == L"alpha"
   );
 
   REQUIRE(
-    aas::types::Kind::kBeta
-    == aas::wstringification::MustKindFromWstring(
+    our::types::Kind::kBeta
+    == our::wstringification::MustKindFromWstring(
       L"beta"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Kind::kBeta
+    our::wstringification::to_wstring(
+      our::types::Kind::kBeta
     )
     == L"beta"
   );
@@ -113,13 +113,13 @@ TEST_CASE("Test Kind round-trip") {
 
 TEST_CASE("Test failure on Kind") {
   CHECK(
-    !aas::wstringification::KindFromWstring(
+    !our::wstringification::KindFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustKindFromWstring(
+    our::wstringification::MustKindFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"

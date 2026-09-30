@@ -1,58 +1,58 @@
 # fmt: off
 _AAS_SUBMODEL_ELEMENTS_TO_TYPE: Mapping[
-    aas_types.AASSubmodelElements,
+    our_types.AASSubmodelElements,
     type
 ] = {
-    aas_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
-        aas_types.AnnotatedRelationshipElement,
+    our_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
+        our_types.AnnotatedRelationshipElement,
 
-    aas_types.AASSubmodelElements.BASIC_EVENT_ELEMENT:
-        aas_types.BasicEventElement,
+    our_types.AASSubmodelElements.BASIC_EVENT_ELEMENT:
+        our_types.BasicEventElement,
 
-    aas_types.AASSubmodelElements.BLOB:
-        aas_types.Blob,
+    our_types.AASSubmodelElements.BLOB:
+        our_types.Blob,
 
-    aas_types.AASSubmodelElements.CAPABILITY:
-        aas_types.Capability,
+    our_types.AASSubmodelElements.CAPABILITY:
+        our_types.Capability,
 
-    aas_types.AASSubmodelElements.DATA_ELEMENT:
-        aas_types.DataElement,
+    our_types.AASSubmodelElements.DATA_ELEMENT:
+        our_types.DataElement,
 
-    aas_types.AASSubmodelElements.ENTITY:
-        aas_types.Entity,
+    our_types.AASSubmodelElements.ENTITY:
+        our_types.Entity,
 
-    aas_types.AASSubmodelElements.EVENT_ELEMENT:
-        aas_types.EventElement,
+    our_types.AASSubmodelElements.EVENT_ELEMENT:
+        our_types.EventElement,
 
-    aas_types.AASSubmodelElements.FILE:
-        aas_types.File,
+    our_types.AASSubmodelElements.FILE:
+        our_types.File,
 
-    aas_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY:
-        aas_types.MultiLanguageProperty,
+    our_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY:
+        our_types.MultiLanguageProperty,
 
-    aas_types.AASSubmodelElements.OPERATION:
-        aas_types.Operation,
+    our_types.AASSubmodelElements.OPERATION:
+        our_types.Operation,
 
-    aas_types.AASSubmodelElements.PROPERTY:
-        aas_types.Property,
+    our_types.AASSubmodelElements.PROPERTY:
+        our_types.Property,
 
-    aas_types.AASSubmodelElements.RANGE:
-        aas_types.Range,
+    our_types.AASSubmodelElements.RANGE:
+        our_types.Range,
 
-    aas_types.AASSubmodelElements.REFERENCE_ELEMENT:
-        aas_types.ReferenceElement,
+    our_types.AASSubmodelElements.REFERENCE_ELEMENT:
+        our_types.ReferenceElement,
 
-    aas_types.AASSubmodelElements.RELATIONSHIP_ELEMENT:
-        aas_types.RelationshipElement,
+    our_types.AASSubmodelElements.RELATIONSHIP_ELEMENT:
+        our_types.RelationshipElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT:
-        aas_types.SubmodelElement,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT:
+        our_types.SubmodelElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST:
-        aas_types.SubmodelElementList,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST:
+        our_types.SubmodelElementList,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
-        aas_types.SubmodelElementCollection,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
+        our_types.SubmodelElementCollection,
 }
 # fmt: on
 
@@ -63,7 +63,7 @@ def _assert_all_types_covered_in_aas_submodel_elements_to_type() -> None:
     """
     missing_literals = [
         literal
-        for literal in aas_types.AASSubmodelElements
+        for literal in our_types.AASSubmodelElements
         if literal not in _AAS_SUBMODEL_ELEMENTS_TO_TYPE
     ]
 
@@ -77,7 +77,7 @@ _assert_all_types_covered_in_aas_submodel_elements_to_type()
 
 
 def submodel_element_is_of_type(
-    element: aas_types.SubmodelElement, expected_type: aas_types.AASSubmodelElements
+    element: our_types.SubmodelElement, expected_type: our_types.AASSubmodelElements
 ) -> bool:
     """
     Check that :paramref:`element` is an instance of class corresponding

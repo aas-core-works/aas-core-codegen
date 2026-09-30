@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of Something:
     /// <code>
-    /// var anInstance = new Aas.Something(
+    /// var anInstance = new Our.Something(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -82,7 +82,7 @@ namespace dummy
             List<Kind> kinds
         )
         {
-            HashSet<Aas.Kind> seen = new HashSet<Aas.Kind>();
+            HashSet<Our.Kind> seen = new HashSet<Our.Kind>();
             foreach (var kind in kinds)
             {
                 if (seen.Contains(kind))
@@ -247,8 +247,8 @@ namespace dummy
             string text
         )
         {
-            return (!Verification.IsInTexts(text, Aas.Constants.ReservedTexts))
-            && (!Verification.IsInOptionalTexts(text, Aas.Constants.ReservedTexts));
+            return (!Verification.IsInTexts(text, Our.Constants.ReservedTexts))
+            && (!Verification.IsInOptionalTexts(text, Our.Constants.ReservedTexts));
         }  // public static bool TextIsNotReserved
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace dummy
             HashSet<string> seen = new HashSet<string>();
             Verification.AddTexts(texts, seen);
             var reserved = (
-                new HashSet<string>(Aas.Constants.ReservedTexts.Intersect(seen)));
+                new HashSet<string>(Our.Constants.ReservedTexts.Intersect(seen)));
             return reserved.Count <= 1;
         }  // public static bool AtMostOneTextIsReserved
 
@@ -322,7 +322,7 @@ namespace dummy
             Kind? optionalKind
         )
         {
-            HashSet<Aas.Kind> seen = new HashSet<Aas.Kind>();
+            HashSet<Our.Kind> seen = new HashSet<Our.Kind>();
             foreach (var kind in kinds)
             {
                 seen.Add(kind);
@@ -332,7 +332,7 @@ namespace dummy
                 seen.Add(optionalKind.Value);
             }
             return seen.Count == 0
-            || new HashSet<Aas.Kind>(seen.Except(Aas.Constants.SpecialKinds)).Count > 0;
+            || new HashSet<Our.Kind>(seen.Except(Our.Constants.SpecialKinds)).Count > 0;
         }  // public static bool SomeKindIsNotSpecial
 
         /// <summary>
@@ -343,17 +343,17 @@ namespace dummy
             internal static readonly HashSet<int> ForKind = new HashSet<int>
             {
 
-                (int)Aas.Kind.Alpha,
-                (int)Aas.Kind.Beta,
-                (int)Aas.Kind.Gamma
+                (int)Our.Kind.Alpha,
+                (int)Our.Kind.Beta,
+                (int)Our.Kind.Gamma
             };
 
             internal static readonly HashSet<int> ForDirection = new HashSet<int>
             {
 
-                (int)Aas.Direction.North,
-                (int)Aas.Direction.South,
-                (int)Aas.Direction.East
+                (int)Our.Direction.North,
+                (int)Our.Direction.South,
+                (int)Our.Direction.East
             };
         }  // internal static class EnumValueSet
 
@@ -366,11 +366,11 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!(
-                    that.OptionalTextsAreUniqueIgnoring(Aas.Constants.ReservedTexts)))
+                    that.OptionalTextsAreUniqueIgnoring(Our.Constants.ReservedTexts)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -386,7 +386,7 @@ namespace dummy
                 }
 
                 if (!(
-                    !Verification.IsInKinds(that.Kind, Aas.Constants.SpecialKinds)))
+                    !Verification.IsInKinds(that.Kind, Our.Constants.SpecialKinds)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -394,14 +394,14 @@ namespace dummy
                 }
 
                 if (!(
-                    !Aas.Constants.LuckyNumbers.Contains(that.Numbers.Count)))
+                    !Our.Constants.LuckyNumbers.Contains(that.Numbers.Count)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Number of numbers must not be lucky.");
                 }
 
-                if (!(!Aas.Constants.LuckyNumbers.Contains(that.Number)))
+                if (!(!Our.Constants.LuckyNumbers.Contains(that.Number)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -453,7 +453,7 @@ namespace dummy
 
                 if (!(
                     !(that.OptionalKind != null)
-                    || (!Aas.Constants.SpecialKinds.Contains(that.OptionalKind.Value))))
+                    || (!Our.Constants.SpecialKinds.Contains(that.OptionalKind.Value))))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -540,7 +540,7 @@ namespace dummy
                 if (that.OptionalKind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.Kind value = that.OptionalKind
+                    Our.Kind value = that.OptionalKind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyKind(value))
                     {
@@ -554,10 +554,10 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformCollection(
-                Aas.ICollection that
+                Our.ICollection that
             )
             {
-                if (!that.TextsAreNotAllIn(Aas.Constants.ReservedTexts))
+                if (!that.TextsAreNotAllIn(Our.Constants.ReservedTexts))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -673,7 +673,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -685,7 +685,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKind(
-            Aas.Kind that)
+            Our.Kind that)
         {
             if (!EnumValueSet.ForKind.Contains(
                 (int)that))
@@ -699,7 +699,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyDirection(
-            Aas.Direction that)
+            Our.Direction that)
         {
             if (!EnumValueSet.ForDirection.Contains(
                 (int)that))

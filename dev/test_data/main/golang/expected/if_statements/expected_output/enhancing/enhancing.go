@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedItem[E any] struct {
-	instance aastypes.IItem
+	instance ourtypes.IItem
 	enhancement E
 }
 
 func (ei *enhancedItem[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ei.instance.ModelType()
 }
 
 func (ei *enhancedItem[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ei.instance.DescendOnce(action)
 }
 
 func (ei *enhancedItem[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ei.instance.Descend(action)
 }
@@ -73,9 +73,9 @@ func (ei *enhancedItem[E]) setEnhancement(
 }
 
 func wrapItem[E any](
-	that aastypes.IItem,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IItem) {
+	that ourtypes.IItem,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IItem) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -93,23 +93,23 @@ func wrapItem[E any](
 }
 
 type enhancedChildA[E any] struct {
-	instance aastypes.IChildA
+	instance ourtypes.IChildA
 	enhancement E
 }
 
 func (eca *enhancedChildA[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eca.instance.ModelType()
 }
 
 func (eca *enhancedChildA[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eca.instance.DescendOnce(action)
 }
 
 func (eca *enhancedChildA[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eca.instance.Descend(action)
 }
@@ -148,9 +148,9 @@ func (eca *enhancedChildA[E]) setEnhancement(
 }
 
 func wrapChildA[E any](
-	that aastypes.IChildA,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IChildA) {
+	that ourtypes.IChildA,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IChildA) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -168,23 +168,23 @@ func wrapChildA[E any](
 }
 
 type enhancedChildB[E any] struct {
-	instance aastypes.IChildB
+	instance ourtypes.IChildB
 	enhancement E
 }
 
 func (ecb *enhancedChildB[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ecb.instance.ModelType()
 }
 
 func (ecb *enhancedChildB[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ecb.instance.DescendOnce(action)
 }
 
 func (ecb *enhancedChildB[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ecb.instance.Descend(action)
 }
@@ -223,9 +223,9 @@ func (ecb *enhancedChildB[E]) setEnhancement(
 }
 
 func wrapChildB[E any](
-	that aastypes.IChildB,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IChildB) {
+	that ourtypes.IChildB,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IChildB) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -243,23 +243,23 @@ func wrapChildB[E any](
 }
 
 type enhancedContainer[E any] struct {
-	instance aastypes.IContainer
+	instance ourtypes.IContainer
 	enhancement E
 }
 
 func (ec *enhancedContainer[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ec.instance.ModelType()
 }
 
 func (ec *enhancedContainer[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ec.instance.DescendOnce(action)
 }
 
 func (ec *enhancedContainer[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ec.instance.Descend(action)
 }
@@ -276,12 +276,12 @@ func (ec *enhancedContainer[E]) SetOptionalText(
 }
 
 func (ec *enhancedContainer[E]) Children(
-) []aastypes.IParent {
+) []ourtypes.IParent {
 	return ec.instance.Children()
 }
 
 func (ec *enhancedContainer[E]) SetChildren(
-	value []aastypes.IParent,
+	value []ourtypes.IParent,
 ) {
 	ec.instance.SetChildren(value)
 }
@@ -298,9 +298,9 @@ func (ec *enhancedContainer[E]) setEnhancement(
 }
 
 func wrapContainer[E any](
-	that aastypes.IContainer,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IContainer) {
+	that ourtypes.IContainer,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IContainer) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -321,7 +321,7 @@ func wrapContainer[E any](
 			theChildren[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IParent)
+			).(ourtypes.IParent)
 		}
 	}
 
@@ -329,34 +329,34 @@ func wrapContainer[E any](
 }
 
 type enhancedSomething[E any] struct {
-	instance aastypes.ISomething
+	instance ourtypes.ISomething
 	enhancement E
 }
 
 func (es *enhancedSomething[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSomething[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSomething[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
 
 func (es *enhancedSomething[E]) Kind(
-) aastypes.Kind {
+) ourtypes.Kind {
 	return es.instance.Kind()
 }
 
 func (es *enhancedSomething[E]) SetKind(
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) {
 	es.instance.SetKind(value)
 }
@@ -395,34 +395,34 @@ func (es *enhancedSomething[E]) SetFlag(
 }
 
 func (es *enhancedSomething[E]) Item(
-) aastypes.IItem {
+) ourtypes.IItem {
 	return es.instance.Item()
 }
 
 func (es *enhancedSomething[E]) SetItem(
-	value aastypes.IItem,
+	value ourtypes.IItem,
 ) {
 	es.instance.SetItem(value)
 }
 
 func (es *enhancedSomething[E]) OptionalParent(
-) aastypes.IParent {
+) ourtypes.IParent {
 	return es.instance.OptionalParent()
 }
 
 func (es *enhancedSomething[E]) SetOptionalParent(
-	value aastypes.IParent,
+	value ourtypes.IParent,
 ) {
 	es.instance.SetOptionalParent(value)
 }
 
 func (es *enhancedSomething[E]) Parents(
-) []aastypes.IParent {
+) []ourtypes.IParent {
 	return es.instance.Parents()
 }
 
 func (es *enhancedSomething[E]) SetParents(
-	value []aastypes.IParent,
+	value []ourtypes.IParent,
 ) {
 	es.instance.SetParents(value)
 }
@@ -439,9 +439,9 @@ func (es *enhancedSomething[E]) setEnhancement(
 }
 
 func wrapSomething[E any](
-	that aastypes.ISomething,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomething) {
+	that ourtypes.ISomething,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomething) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -460,7 +460,7 @@ func wrapSomething[E any](
 		Wrap[E](
 			theItem,
 			factory,
-		).(aastypes.IItem),
+		).(ourtypes.IItem),
 	)
 
 	theOptionalParent := that.OptionalParent()
@@ -469,7 +469,7 @@ func wrapSomething[E any](
 			Wrap[E](
 				theOptionalParent,
 				factory,
-			).(aastypes.IParent),
+			).(ourtypes.IParent),
 		)
 	}
 
@@ -480,7 +480,7 @@ func wrapSomething[E any](
 			theParents[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IParent)
+			).(ourtypes.IParent)
 		}
 	}
 
@@ -496,9 +496,9 @@ func wrapSomething[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -510,29 +510,29 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		result = wrapItem[E](
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 			factory,
 		)
-	case aastypes.ModelTypeChildA:
+	case ourtypes.ModelTypeChildA:
 		result = wrapChildA[E](
-			that.(aastypes.IChildA),
+			that.(ourtypes.IChildA),
 			factory,
 		)
-	case aastypes.ModelTypeChildB:
+	case ourtypes.ModelTypeChildB:
 		result = wrapChildB[E](
-			that.(aastypes.IChildB),
+			that.(ourtypes.IChildB),
 			factory,
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		result = wrapContainer[E](
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 			factory,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			factory,
 		)
 	default:
@@ -551,7 +551,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -564,7 +564,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

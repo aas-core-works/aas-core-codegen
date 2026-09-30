@@ -30,7 +30,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         Stripped(
             """\
 /**
- * Provide functions for loading generated examples of AAS instances.
+ * Provide functions for loading generated examples of model instances.
  */"""
         ),
         typescript_common.WARNING,
@@ -38,8 +38,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
             """\
 import * as path from "path";
 
-import * as AasTypes from "../src/types";
-import * as AasJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";
+import * as OurJsonization from "../src/jsonization";
 
 import * as TestCommon from "./common";"""
         ),
@@ -73,7 +73,7 @@ import * as TestCommon from "./common";"""
  * the test data directory.
  */
 export function {load_maximal_name}(
-): AasTypes.{cls_name_typescript} {{
+): OurTypes.{cls_name_typescript} {{
 {I}const aPath = path.join(
 {II}TestCommon.TEST_DATA_DIR,
 {II}"Json",
@@ -84,13 +84,13 @@ export function {load_maximal_name}(
 
 {I}const jsonable = TestCommon.readJsonFromFileSync(aPath);
 
-{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{I}const instanceOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 {I}expect(instanceOrError.error).toBeNull();
 {I}const instance = instanceOrError.mustValue();
 
-{I}const casted = AasTypes.{as_function}(instance);
+{I}const casted = OurTypes.{as_function}(instance);
 {I}if (casted === null) {{
 {II}throw new Error(
 {III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +
@@ -110,7 +110,7 @@ export function {load_maximal_name}(
  * the test data directory.
  */
 export function {load_minimal_name}(
-): AasTypes.{cls_name_typescript} {{
+): OurTypes.{cls_name_typescript} {{
 {I}const aPath = path.join(
 {II}TestCommon.TEST_DATA_DIR,
 {II}"Json",
@@ -121,13 +121,13 @@ export function {load_minimal_name}(
 
 {I}const jsonable = TestCommon.readJsonFromFileSync(aPath);
 
-{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{I}const instanceOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 {I}expect(instanceOrError.error).toBeNull();
 {I}const instance = instanceOrError.mustValue();
 
-{I}const casted = AasTypes.{as_function}(instance);
+{I}const casted = OurTypes.{as_function}(instance);
 {I}if (casted === null) {{
 {II}throw new Error(
 {III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +

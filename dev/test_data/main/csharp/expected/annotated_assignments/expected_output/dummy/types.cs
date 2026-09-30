@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
@@ -12,7 +12,7 @@ using System.Linq;  // can't alias
 namespace dummy
 {
     /// <summary>
-    /// Represent a general class of an AAS model.
+    /// Represent a general class of the meta-model.
     /// </summary>
     public interface IClass
     {
@@ -615,7 +615,7 @@ namespace dummy
         public long NumberOrAlternative(long? alternative);
 
         /// <summary>
-        /// Return the first parent which is a <see cref="Aas.ChildB" />, if any.
+        /// Return the first parent which is a <see cref="Our.ChildB" />, if any.
         /// </summary>
         public IChildB? FirstChildBOrNone();
 
@@ -693,7 +693,7 @@ namespace dummy
             IItem item
         )
         {
-            this.OptionalMember = Aas.ParentOrItem.FromItem(item);
+            this.OptionalMember = Our.ParentOrItem.FromItem(item);
         }
 
         /// <summary>
@@ -708,9 +708,9 @@ namespace dummy
             IParent parent
         )
         {
-            if (parent is Aas.IChildA)
+            if (parent is Our.IChildA)
             {
-                this.OptionalMember = Aas.ParentOrItem.FromParent(((Aas.IChildA)parent));
+                this.OptionalMember = Our.ParentOrItem.FromParent(((Our.IChildA)parent));
             }
             else
             {
@@ -767,16 +767,16 @@ namespace dummy
         }
 
         /// <summary>
-        /// Return the first parent which is a <see cref="Aas.ChildB" />, if any.
+        /// Return the first parent which is a <see cref="Our.ChildB" />, if any.
         /// </summary>
         public IChildB? FirstChildBOrNone()
         {
-            Aas.IChildB? found = null;
+            Our.IChildB? found = null;
             foreach (var parent in this.Parents)
             {
-                if (parent is Aas.IChildB)
+                if (parent is Our.IChildB)
                 {
-                    found = ((Aas.IChildB)parent);
+                    found = ((Our.IChildB)parent);
                     break;
                 }
             }
@@ -815,7 +815,7 @@ namespace dummy
         /// </summary>
         public bool FirstChildBIsNotFortyTwo()
         {
-            Aas.IChildB? first = this.FirstChildBOrNone();
+            Our.IChildB? first = this.FirstChildBOrNone();
             return (first == null)
             || first.BOnly != 42;
         }

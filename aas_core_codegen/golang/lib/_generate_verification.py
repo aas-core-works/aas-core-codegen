@@ -179,7 +179,7 @@ class _PatternVerificationTranspiler(
             return (
                 Stripped(
                     f"""\
-aascommon.Concat(
+ourcommon.Concat(
 {I}{indent_but_first_line(parts_joined, I)}
 )"""
                 ),
@@ -442,7 +442,7 @@ class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
             is_pointer_map=is_pointer_map,
             downcast_map=downcast_map,
             environment=environment,
-            types_package=Identifier("aastypes"),
+            types_package=Identifier("ourtypes"),
         )
 
         self._symbol_table = symbol_table
@@ -455,7 +455,7 @@ class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
         literal = golang_naming.enum_literal_name(
             enumeration_name=enumeration_name, literal_name=literal_name
         )
-        return Stripped(f"aastypes.{literal}")
+        return Stripped(f"ourtypes.{literal}")
 
     def transform_name(
         self, node: parse_tree.Name
@@ -468,7 +468,7 @@ class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_name = golang_naming.constant_name(node.identifier)
-            return Stripped(f"aasconstants.{constant_name}"), None
+            return Stripped(f"ourconstants.{constant_name}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(golang_naming.function_name(node.identifier)), None
@@ -476,7 +476,7 @@ class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
         our_type = self._symbol_table.find_our_type(name=node.identifier)
         if isinstance(our_type, intermediate.Enumeration):
             return (
-                Stripped(f"aastypes.{golang_naming.enum_name(node.identifier)}"),
+                Stripped(f"ourtypes.{golang_naming.enum_name(node.identifier)}"),
                 None,
             )
 
@@ -577,14 +577,14 @@ def _transpile_transpilable_verification(
         return_type_suffix = ""
     else:
         return_type = golang_common.generate_type(
-            type_annotation=verification.returns, types_package=Identifier("aastypes")
+            type_annotation=verification.returns, types_package=Identifier("ourtypes")
         )
         return_type_suffix = f" {return_type}"
 
     arg_defs = []  # type: List[Stripped]
     for arg in verification.arguments:
         arg_type = golang_common.generate_type(
-            arg.type_annotation, types_package=Identifier("aastypes")
+            arg.type_annotation, types_package=Identifier("ourtypes")
         )
         arg_name = golang_naming.argument_name(arg.name)
         arg_defs.append(Stripped(f"{arg_name} {arg_type}"))
@@ -634,7 +634,7 @@ class _InvariantTranspiler(golang_transpilation.Transpiler):
             is_pointer_map=is_pointer_map,
             downcast_map=downcast_map,
             environment=environment,
-            types_package=Identifier("aastypes"),
+            types_package=Identifier("ourtypes"),
         )
 
         self._symbol_table = symbol_table
@@ -645,7 +645,7 @@ class _InvariantTranspiler(golang_transpilation.Transpiler):
         literal = golang_naming.enum_literal_name(
             enumeration_name=enumeration_name, literal_name=literal_name
         )
-        return Stripped(f"aastypes.{literal}")
+        return Stripped(f"ourtypes.{literal}")
 
     def transform_name(
         self, node: parse_tree.Name
@@ -659,7 +659,7 @@ class _InvariantTranspiler(golang_transpilation.Transpiler):
 
         elif node.identifier in self._symbol_table.constants_by_name:
             constant_name = golang_naming.constant_name(node.identifier)
-            name = Stripped(f"aasconstants.{constant_name}")
+            name = Stripped(f"ourconstants.{constant_name}")
 
         elif node.identifier in self._symbol_table.verification_functions_by_name:
             name = Stripped(golang_naming.function_name(node.identifier))
@@ -668,7 +668,7 @@ class _InvariantTranspiler(golang_transpilation.Transpiler):
             our_type := self._symbol_table.find_our_type(name=node.identifier),
             isinstance(our_type, intermediate.Enumeration),
         )[1]:
-            name = Stripped(f"aastypes.{golang_naming.enum_name(node.identifier)}")
+            name = Stripped(f"ourtypes.{golang_naming.enum_name(node.identifier)}")
         else:
             return None, Error(
                 node.original_node,
@@ -885,7 +885,7 @@ abort = {verify_function_name}(
 {I}{pointer_prefix}that.{getter_name}(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -906,7 +906,7 @@ abort = Verify(
 {I}that.{getter_name}(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -932,7 +932,7 @@ abort = Verify(
 {I}that.{getter_name}().Underlying(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -986,13 +986,13 @@ abort = {verify_function_name}(
 {I}{pointer_prefix}v,
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: i,
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1015,13 +1015,13 @@ abort = Verify(
 {I}v,
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: i,
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1048,13 +1048,13 @@ abort = Verify(
 {I}v.Underlying(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: i,
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1093,12 +1093,12 @@ abort = {item_verify_function}(
 {I}v,
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: i,
 {III}}},
 {II})
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1157,13 +1157,13 @@ abort = {verify_function_name}(
 {I}{item_expr},
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: {i},
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1188,13 +1188,13 @@ abort = Verify(
 {I}{item_expr},
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: {i},
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1224,13 +1224,13 @@ abort = Verify(
 {I}{item_expr}.Underlying(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: {i},
 {III}}},
 {II})
 
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1271,12 +1271,12 @@ abort = {tuple_verify_function}(
 {I}that.{getter_name}().Item{i + 1},
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
+{III}&ourreporting.IndexSegment{{
 {IIII}Index: {i},
 {III}}},
 {II})
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1320,7 +1320,7 @@ abort = {json_verify_function}(
 {I}that.{getter_name}(),
 {I}func(err *VerificationError) bool {{
 {II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
+{III}&ourreporting.NameSegment{{
 {IIII}Name: {prop_name_literal},
 {III}}},
 {II})
@@ -1354,13 +1354,13 @@ for key := range that.{getter_name}() {{
 {II}key,
 {II}func(err *VerificationError) bool {{
 {III}err.Path.PrependKey(
-{IIII}&aasreporting.KeySegment{{
+{IIII}&ourreporting.KeySegment{{
 {IIIII}Key: key,
 {IIII}}},
 {III})
 
 {III}err.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{
+{IIII}&ourreporting.NameSegment{{
 {IIIII}Name: {prop_name_literal},
 {IIII}}},
 {III})
@@ -1418,13 +1418,13 @@ for key := range that.{getter_name}() {{
 {II}v,
 {II}func(err *VerificationError) bool {{
 {III}err.Path.PrependIndex(
-{IIII}&aasreporting.IndexSegment{{
+{IIII}&ourreporting.IndexSegment{{
 {IIIII}Index: i,
 {IIII}}},
 {III})
 
 {III}err.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{
+{IIII}&ourreporting.NameSegment{{
 {IIIII}Name: {prop_name_literal},
 {IIII}}},
 {III})
@@ -1535,7 +1535,7 @@ def _generate_verify_json_value(
 // The path of an error is relative to `value`, and the caller is expected to
 // prepend the way to it.
 func verifyJsonValue(
-{I}value aastypes.JsonValue,
+{I}value ourtypes.JsonValue,
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}if value == nil {{
@@ -1570,13 +1570,13 @@ func verifyJsonValue(
 {III}}}
 {III}return false
 
-{II}case aastypes.JsonArray:
+{II}case ourtypes.JsonArray:
 {III}for i, item := range casted {{
 {IIII}abort = verifyJsonValue(
 {IIIII}item,
 {IIIII}func(err *VerificationError) bool {{
 {IIIIII}err.Path.PrependIndex(
-{IIIIIII}&aasreporting.IndexSegment{{
+{IIIIIII}&ourreporting.IndexSegment{{
 {IIIIIIII}Index: i,
 {IIIIIII}}},
 {IIIIII})
@@ -1590,7 +1590,7 @@ func verifyJsonValue(
 {III}}}
 {III}return false
 
-{II}case aastypes.JsonObject:
+{II}case ourtypes.JsonObject:
 {III}// NOTE (mristin):
 {III}// The keys are sorted so that the errors come in a stable order,
 {III}// as the iteration order of a Go map is deliberately random.
@@ -1605,7 +1605,7 @@ func verifyJsonValue(
 {IIIII}casted[key],
 {IIIII}func(err *VerificationError) bool {{
 {IIIIII}err.Path.PrependKey(
-{IIIIIII}&aasreporting.KeySegment{{
+{IIIIIII}&ourreporting.KeySegment{{
 {IIIIIIII}Key: key,
 {IIIIIII}}},
 {IIIIII})
@@ -1636,7 +1636,7 @@ func verifyJsonValue(
             f"""\
 // Verify that `value` is a JSON-able array.
 func verifyJsonArray(
-{I}value aastypes.JsonArray,
+{I}value ourtypes.JsonArray,
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}if value == nil {{
@@ -1654,7 +1654,7 @@ func verifyJsonArray(
             f"""\
 // Verify that `value` is a JSON-able object.
 func verifyJsonObject(
-{I}value aastypes.JsonObject,
+{I}value ourtypes.JsonObject,
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}if value == nil {{
@@ -1755,14 +1755,14 @@ def _generate_verify_class(
     return (
         Stripped(
             f"""\
-// Verify `that` instance of [aastypes.{interface_name}].
+// Verify `that` instance of [ourtypes.{interface_name}].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func {function_name}(
-{I}that aastypes.{interface_name},
+{I}that ourtypes.{interface_name},
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}abort = false
@@ -1794,9 +1794,9 @@ def _generate_verify(symbol_table: intermediate.SymbolTable) -> Stripped:
         case_blocks.append(
             Stripped(
                 f"""\
-case aastypes.{literal}:
+case ourtypes.{literal}:
 {I}abort = {verification_function}(
-{II}that.(aastypes.{interface_name}),
+{II}that.(ourtypes.{interface_name}),
 {II}onError,
 {I})"""
             )
@@ -1836,7 +1836,7 @@ switch modelType {{
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-{I}that aastypes.IClass,
+{I}that ourtypes.IClass,
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}modelType := that.{model_type_getter}()
@@ -1891,8 +1891,8 @@ return"""
 abort = false
 
 if
-{I}that < aastypes.{first_literal} ||
-{I}that > aastypes.{last_literal} {{
+{I}that < ourtypes.{first_literal} ||
+{I}that > ourtypes.{last_literal} {{
 {I}abort = onError(
 {II}newVerificationError(
 {III}fmt.Sprintf(
@@ -1916,7 +1916,7 @@ return"""
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func {function_name}(
-{I}that aastypes.{enum_name},
+{I}that ourtypes.{enum_name},
 {I}onError func(*VerificationError) bool,
 ) (abort bool) {{
 {I}{indent_but_first_line(body, I)}
@@ -2056,7 +2056,7 @@ package verification"""
 //
 // Implements `error`.
 type VerificationError struct{{
-{I}Path *aasreporting.Path
+{I}Path *ourreporting.Path
 {I}Message string
 }}"""
         ),
@@ -2064,7 +2064,7 @@ type VerificationError struct{{
             f"""\
 func newVerificationError(message string) *VerificationError {{
 {I}return &VerificationError{{
-{II}Path: &aasreporting.Path{{}},
+{II}Path: &ourreporting.Path{{}},
 {II}Message: message,
 {I}}}
 }}"""
@@ -2083,7 +2083,7 @@ func (ve *VerificationError) Error() string {{
             f"""\
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {{
-{I}return aasreporting.ToGolangPath(ve.Path)
+{I}return ourreporting.ToGolangPath(ve.Path)
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -2238,14 +2238,14 @@ func (ve *VerificationError) PathString() string {{
         ("sort", f'{I}"sort"'),
         ("strconv", f'{I}"strconv"'),
         ("strings", f'{I}"strings"'),
-        ("aascommon", f"{I}aascommon {common_url_literal}"),
-        ("aasconstants", f"{I}aasconstants {constants_url_literal}"),
-        ("aasreporting", f"{I}aasreporting {reporting_url_literal}"),
+        ("ourcommon", f"{I}ourcommon {common_url_literal}"),
+        ("ourconstants", f"{I}ourconstants {constants_url_literal}"),
+        ("ourreporting", f"{I}ourreporting {reporting_url_literal}"),
         (
-            "aasstringification",
-            f"{I}aasstringification {stringification_url_literal}",
+            "ourstringification",
+            f"{I}ourstringification {stringification_url_literal}",
         ),
-        ("aastypes", f"{I}aastypes {types_url_literal}"),
+        ("ourtypes", f"{I}ourtypes {types_url_literal}"),
     ):
         if golang_common.names_package(blocks, module):
             import_lines.append(literal)

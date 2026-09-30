@@ -28,25 +28,25 @@ def generate() -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasXmlization from "../src/xmlization";"""
+import * as OurXmlization from "../src/xmlization";"""
         ),
         Stripped(
             f"""\
 test("xmlization path renders as a relative XPath", () => {{
-{I}const path = new AasXmlization.Path();
+{I}const path = new OurXmlization.Path();
 
-{I}path.prepend(new AasXmlization.IndexSegment(3));
-{I}path.prepend(new AasXmlization.ElementSegment("something"));
+{I}path.prepend(new OurXmlization.IndexSegment(3));
+{I}path.prepend(new OurXmlization.ElementSegment("something"));
 
 {I}expect(path.toString()).toStrictEqual("something/*[3]");
 }});
 
 test("xmlization key segment renders as a predicate on the name", () => {{
-{I}const path = new AasXmlization.Path();
+{I}const path = new OurXmlization.Path();
 
-{I}path.prepend(new AasXmlization.ElementSegment("value"));
-{I}path.prepend(new AasXmlization.KeySegment("a \\"tricky\\" <key>"));
-{I}path.prepend(new AasXmlization.ElementSegment("struct"));
+{I}path.prepend(new OurXmlization.ElementSegment("value"));
+{I}path.prepend(new OurXmlization.KeySegment("a \\"tricky\\" <key>"));
+{I}path.prepend(new OurXmlization.ElementSegment("struct"));
 
 {I}expect(path.toString()).toStrictEqual(
 {II}"struct/member[name=\\"a &quot;tricky&quot; &lt;key&gt;\\"]/value"
@@ -56,17 +56,17 @@ test("xmlization key segment renders as a predicate on the name", () => {{
         Stripped(
             f"""\
 test("xmlization errors default to empty path", () => {{
-{I}const deserializationError = new AasXmlization.DeserializationError("broken XML");
+{I}const deserializationError = new OurXmlization.DeserializationError("broken XML");
 {I}expect(deserializationError.message).toStrictEqual("broken XML");
 {I}expect(deserializationError.path.toString()).toStrictEqual("");
 
-{I}const serializationError = new AasXmlization.SerializationError("broken object graph");
+{I}const serializationError = new OurXmlization.SerializationError("broken object graph");
 {I}expect(serializationError.message).toStrictEqual("broken object graph");
 {I}expect(serializationError.path).toStrictEqual("");
 }});
 
 test("xmlization serialization path renders as an access expression", () => {{
-{I}const error = new AasXmlization.SerializationError("broken object graph");
+{I}const error = new OurXmlization.SerializationError("broken object graph");
 
 {I}error.prependKey("a b");
 {I}error.prependIndex(3);
@@ -79,21 +79,21 @@ test("xmlization serialization path renders as an access expression", () => {{
             f"""\
 test("xmlization fails on malformed XML", () => {{
 {I}const malformedXml = "<something><notClosed>";
-{I}const instanceOrError = AasXmlization.fromXmlString(malformedXml);
+{I}const instanceOrError = OurXmlization.fromXmlString(malformedXml);
 {I}expect(instanceOrError.error).not.toBeNull();
 }});"""
         ),
         Stripped(
             f"""\
 test("xmlization fails on empty XML", () => {{
-{I}const instanceOrError = AasXmlization.fromXmlString("");
+{I}const instanceOrError = OurXmlization.fromXmlString("");
 {I}expect(instanceOrError.error).not.toBeNull();
 }});"""
         ),
         Stripped(
             f"""\
 test("xmlization fails on non-XML text", () => {{
-{I}const instanceOrError = AasXmlization.fromXmlString("Definitely not XML");
+{I}const instanceOrError = OurXmlization.fromXmlString("Definitely not XML");
 {I}expect(instanceOrError.error).not.toBeNull();
 }});"""
         ),

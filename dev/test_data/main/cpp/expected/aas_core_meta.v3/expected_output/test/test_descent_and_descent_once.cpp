@@ -14,10 +14,10 @@
 
 #include <deque>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -26,7 +26,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineDescentDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Descent";
   }
@@ -35,7 +35,7 @@ const std::filesystem::path& DetermineDescentDir() {
 }
 
 const std::filesystem::path& DetermineDescentOnceDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "DescentOnce";
   }
@@ -48,7 +48,7 @@ void AssertOrRerecordDescent(
   const std::filesystem::path& trace_path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > instance(
     test::common::xmlization::MustDeserializeFile(xml_path)
   );
@@ -56,15 +56,15 @@ void AssertOrRerecordDescent(
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::Descent(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::Descent(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -72,21 +72,21 @@ void AssertOrRerecordDescent(
 }
 
 void AssertOrRerecordDescentOnce(
-  const std::shared_ptr<aas::types::IClass>& instance,
+  const std::shared_ptr<our::types::IClass>& instance,
   const std::filesystem::path& trace_path
 ) {
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::DescentOnce(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::DescentOnce(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -122,7 +122,7 @@ TEST_CASE("Test Descent over an Extension") {
 
 TEST_CASE("Test DescentOnce over an Extension") {
   const std::shared_ptr<
-    aas::types::IExtension
+    our::types::IExtension
   > instance(
     test::common::examples::LoadMaxExtension()
   );
@@ -164,7 +164,7 @@ TEST_CASE("Test Descent over an AdministrativeInformation") {
 
 TEST_CASE("Test DescentOnce over an AdministrativeInformation") {
   const std::shared_ptr<
-    aas::types::IAdministrativeInformation
+    our::types::IAdministrativeInformation
   > instance(
     test::common::examples::LoadMaxAdministrativeInformation()
   );
@@ -206,7 +206,7 @@ TEST_CASE("Test Descent over an Qualifier") {
 
 TEST_CASE("Test DescentOnce over an Qualifier") {
   const std::shared_ptr<
-    aas::types::IQualifier
+    our::types::IQualifier
   > instance(
     test::common::examples::LoadMaxQualifier()
   );
@@ -248,7 +248,7 @@ TEST_CASE("Test Descent over an AssetAdministrationShell") {
 
 TEST_CASE("Test DescentOnce over an AssetAdministrationShell") {
   const std::shared_ptr<
-    aas::types::IAssetAdministrationShell
+    our::types::IAssetAdministrationShell
   > instance(
     test::common::examples::LoadMaxAssetAdministrationShell()
   );
@@ -290,7 +290,7 @@ TEST_CASE("Test Descent over an AssetInformation") {
 
 TEST_CASE("Test DescentOnce over an AssetInformation") {
   const std::shared_ptr<
-    aas::types::IAssetInformation
+    our::types::IAssetInformation
   > instance(
     test::common::examples::LoadMaxAssetInformation()
   );
@@ -332,7 +332,7 @@ TEST_CASE("Test Descent over an Resource") {
 
 TEST_CASE("Test DescentOnce over an Resource") {
   const std::shared_ptr<
-    aas::types::IResource
+    our::types::IResource
   > instance(
     test::common::examples::LoadMaxResource()
   );
@@ -374,7 +374,7 @@ TEST_CASE("Test Descent over an SpecificAssetId") {
 
 TEST_CASE("Test DescentOnce over an SpecificAssetId") {
   const std::shared_ptr<
-    aas::types::ISpecificAssetId
+    our::types::ISpecificAssetId
   > instance(
     test::common::examples::LoadMaxSpecificAssetId()
   );
@@ -416,7 +416,7 @@ TEST_CASE("Test Descent over an Submodel") {
 
 TEST_CASE("Test DescentOnce over an Submodel") {
   const std::shared_ptr<
-    aas::types::ISubmodel
+    our::types::ISubmodel
   > instance(
     test::common::examples::LoadMaxSubmodel()
   );
@@ -458,7 +458,7 @@ TEST_CASE("Test Descent over an RelationshipElement") {
 
 TEST_CASE("Test DescentOnce over an RelationshipElement") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > instance(
     test::common::examples::LoadMaxRelationshipElement()
   );
@@ -500,7 +500,7 @@ TEST_CASE("Test Descent over an SubmodelElementList") {
 
 TEST_CASE("Test DescentOnce over an SubmodelElementList") {
   const std::shared_ptr<
-    aas::types::ISubmodelElementList
+    our::types::ISubmodelElementList
   > instance(
     test::common::examples::LoadMaxSubmodelElementList()
   );
@@ -542,7 +542,7 @@ TEST_CASE("Test Descent over an SubmodelElementCollection") {
 
 TEST_CASE("Test DescentOnce over an SubmodelElementCollection") {
   const std::shared_ptr<
-    aas::types::ISubmodelElementCollection
+    our::types::ISubmodelElementCollection
   > instance(
     test::common::examples::LoadMaxSubmodelElementCollection()
   );
@@ -584,7 +584,7 @@ TEST_CASE("Test Descent over an Property") {
 
 TEST_CASE("Test DescentOnce over an Property") {
   const std::shared_ptr<
-    aas::types::IProperty
+    our::types::IProperty
   > instance(
     test::common::examples::LoadMaxProperty()
   );
@@ -626,7 +626,7 @@ TEST_CASE("Test Descent over an MultiLanguageProperty") {
 
 TEST_CASE("Test DescentOnce over an MultiLanguageProperty") {
   const std::shared_ptr<
-    aas::types::IMultiLanguageProperty
+    our::types::IMultiLanguageProperty
   > instance(
     test::common::examples::LoadMaxMultiLanguageProperty()
   );
@@ -668,7 +668,7 @@ TEST_CASE("Test Descent over an Range") {
 
 TEST_CASE("Test DescentOnce over an Range") {
   const std::shared_ptr<
-    aas::types::IRange
+    our::types::IRange
   > instance(
     test::common::examples::LoadMaxRange()
   );
@@ -710,7 +710,7 @@ TEST_CASE("Test Descent over an ReferenceElement") {
 
 TEST_CASE("Test DescentOnce over an ReferenceElement") {
   const std::shared_ptr<
-    aas::types::IReferenceElement
+    our::types::IReferenceElement
   > instance(
     test::common::examples::LoadMaxReferenceElement()
   );
@@ -752,7 +752,7 @@ TEST_CASE("Test Descent over an Blob") {
 
 TEST_CASE("Test DescentOnce over an Blob") {
   const std::shared_ptr<
-    aas::types::IBlob
+    our::types::IBlob
   > instance(
     test::common::examples::LoadMaxBlob()
   );
@@ -794,7 +794,7 @@ TEST_CASE("Test Descent over an File") {
 
 TEST_CASE("Test DescentOnce over an File") {
   const std::shared_ptr<
-    aas::types::IFile
+    our::types::IFile
   > instance(
     test::common::examples::LoadMaxFile()
   );
@@ -836,7 +836,7 @@ TEST_CASE("Test Descent over an AnnotatedRelationshipElement") {
 
 TEST_CASE("Test DescentOnce over an AnnotatedRelationshipElement") {
   const std::shared_ptr<
-    aas::types::IAnnotatedRelationshipElement
+    our::types::IAnnotatedRelationshipElement
   > instance(
     test::common::examples::LoadMaxAnnotatedRelationshipElement()
   );
@@ -878,7 +878,7 @@ TEST_CASE("Test Descent over an Entity") {
 
 TEST_CASE("Test DescentOnce over an Entity") {
   const std::shared_ptr<
-    aas::types::IEntity
+    our::types::IEntity
   > instance(
     test::common::examples::LoadMaxEntity()
   );
@@ -920,7 +920,7 @@ TEST_CASE("Test Descent over an EventPayload") {
 
 TEST_CASE("Test DescentOnce over an EventPayload") {
   const std::shared_ptr<
-    aas::types::IEventPayload
+    our::types::IEventPayload
   > instance(
     test::common::examples::LoadMaxEventPayload()
   );
@@ -962,7 +962,7 @@ TEST_CASE("Test Descent over an BasicEventElement") {
 
 TEST_CASE("Test DescentOnce over an BasicEventElement") {
   const std::shared_ptr<
-    aas::types::IBasicEventElement
+    our::types::IBasicEventElement
   > instance(
     test::common::examples::LoadMaxBasicEventElement()
   );
@@ -1004,7 +1004,7 @@ TEST_CASE("Test Descent over an Operation") {
 
 TEST_CASE("Test DescentOnce over an Operation") {
   const std::shared_ptr<
-    aas::types::IOperation
+    our::types::IOperation
   > instance(
     test::common::examples::LoadMaxOperation()
   );
@@ -1046,7 +1046,7 @@ TEST_CASE("Test Descent over an OperationVariable") {
 
 TEST_CASE("Test DescentOnce over an OperationVariable") {
   const std::shared_ptr<
-    aas::types::IOperationVariable
+    our::types::IOperationVariable
   > instance(
     test::common::examples::LoadMaxOperationVariable()
   );
@@ -1088,7 +1088,7 @@ TEST_CASE("Test Descent over an Capability") {
 
 TEST_CASE("Test DescentOnce over an Capability") {
   const std::shared_ptr<
-    aas::types::ICapability
+    our::types::ICapability
   > instance(
     test::common::examples::LoadMaxCapability()
   );
@@ -1130,7 +1130,7 @@ TEST_CASE("Test Descent over an ConceptDescription") {
 
 TEST_CASE("Test DescentOnce over an ConceptDescription") {
   const std::shared_ptr<
-    aas::types::IConceptDescription
+    our::types::IConceptDescription
   > instance(
     test::common::examples::LoadMaxConceptDescription()
   );
@@ -1172,7 +1172,7 @@ TEST_CASE("Test Descent over an Reference") {
 
 TEST_CASE("Test DescentOnce over an Reference") {
   const std::shared_ptr<
-    aas::types::IReference
+    our::types::IReference
   > instance(
     test::common::examples::LoadMaxReference()
   );
@@ -1214,7 +1214,7 @@ TEST_CASE("Test Descent over an Key") {
 
 TEST_CASE("Test DescentOnce over an Key") {
   const std::shared_ptr<
-    aas::types::IKey
+    our::types::IKey
   > instance(
     test::common::examples::LoadMaxKey()
   );
@@ -1256,7 +1256,7 @@ TEST_CASE("Test Descent over an LangStringNameType") {
 
 TEST_CASE("Test DescentOnce over an LangStringNameType") {
   const std::shared_ptr<
-    aas::types::ILangStringNameType
+    our::types::ILangStringNameType
   > instance(
     test::common::examples::LoadMaxLangStringNameType()
   );
@@ -1298,7 +1298,7 @@ TEST_CASE("Test Descent over an LangStringTextType") {
 
 TEST_CASE("Test DescentOnce over an LangStringTextType") {
   const std::shared_ptr<
-    aas::types::ILangStringTextType
+    our::types::ILangStringTextType
   > instance(
     test::common::examples::LoadMaxLangStringTextType()
   );
@@ -1340,7 +1340,7 @@ TEST_CASE("Test Descent over an Environment") {
 
 TEST_CASE("Test DescentOnce over an Environment") {
   const std::shared_ptr<
-    aas::types::IEnvironment
+    our::types::IEnvironment
   > instance(
     test::common::examples::LoadMaxEnvironment()
   );
@@ -1382,7 +1382,7 @@ TEST_CASE("Test Descent over an EmbeddedDataSpecification") {
 
 TEST_CASE("Test DescentOnce over an EmbeddedDataSpecification") {
   const std::shared_ptr<
-    aas::types::IEmbeddedDataSpecification
+    our::types::IEmbeddedDataSpecification
   > instance(
     test::common::examples::LoadMaxEmbeddedDataSpecification()
   );
@@ -1424,7 +1424,7 @@ TEST_CASE("Test Descent over an LevelType") {
 
 TEST_CASE("Test DescentOnce over an LevelType") {
   const std::shared_ptr<
-    aas::types::ILevelType
+    our::types::ILevelType
   > instance(
     test::common::examples::LoadMaxLevelType()
   );
@@ -1466,7 +1466,7 @@ TEST_CASE("Test Descent over an ValueReferencePair") {
 
 TEST_CASE("Test DescentOnce over an ValueReferencePair") {
   const std::shared_ptr<
-    aas::types::IValueReferencePair
+    our::types::IValueReferencePair
   > instance(
     test::common::examples::LoadMaxValueReferencePair()
   );
@@ -1508,7 +1508,7 @@ TEST_CASE("Test Descent over an ValueList") {
 
 TEST_CASE("Test DescentOnce over an ValueList") {
   const std::shared_ptr<
-    aas::types::IValueList
+    our::types::IValueList
   > instance(
     test::common::examples::LoadMaxValueList()
   );
@@ -1550,7 +1550,7 @@ TEST_CASE("Test Descent over an LangStringPreferredNameTypeIec61360") {
 
 TEST_CASE("Test DescentOnce over an LangStringPreferredNameTypeIec61360") {
   const std::shared_ptr<
-    aas::types::ILangStringPreferredNameTypeIec61360
+    our::types::ILangStringPreferredNameTypeIec61360
   > instance(
     test::common::examples::LoadMaxLangStringPreferredNameTypeIec61360()
   );
@@ -1592,7 +1592,7 @@ TEST_CASE("Test Descent over an LangStringShortNameTypeIec61360") {
 
 TEST_CASE("Test DescentOnce over an LangStringShortNameTypeIec61360") {
   const std::shared_ptr<
-    aas::types::ILangStringShortNameTypeIec61360
+    our::types::ILangStringShortNameTypeIec61360
   > instance(
     test::common::examples::LoadMaxLangStringShortNameTypeIec61360()
   );
@@ -1634,7 +1634,7 @@ TEST_CASE("Test Descent over an LangStringDefinitionTypeIec61360") {
 
 TEST_CASE("Test DescentOnce over an LangStringDefinitionTypeIec61360") {
   const std::shared_ptr<
-    aas::types::ILangStringDefinitionTypeIec61360
+    our::types::ILangStringDefinitionTypeIec61360
   > instance(
     test::common::examples::LoadMaxLangStringDefinitionTypeIec61360()
   );
@@ -1676,7 +1676,7 @@ TEST_CASE("Test Descent over an DataSpecificationIec61360") {
 
 TEST_CASE("Test DescentOnce over an DataSpecificationIec61360") {
   const std::shared_ptr<
-    aas::types::IDataSpecificationIec61360
+    our::types::IDataSpecificationIec61360
   > instance(
     test::common::examples::LoadMaxDataSpecificationIec61360()
   );

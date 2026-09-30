@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using System.Linq;  // can't alias
 using NUnit.Framework;  // can't alias
@@ -15,8 +15,8 @@ namespace dummy.Tests
         [Test]
         public void Test_Result_valid()
         {
-            var errors = Aas.Verification.VerifyResult(
-                Aas.Result.Ok).ToList();
+            var errors = Our.Verification.VerifyResult(
+                Our.Result.Ok).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_Result_valid
@@ -25,9 +25,9 @@ namespace dummy.Tests
         public void Test_Result_invalid()
         {
             int valueAsInt = -1;
-            Aas.Result value = (Aas.Result)valueAsInt;
+            Our.Result value = (Our.Result)valueAsInt;
 
-            var errors = Aas.Verification.VerifyResult(
+            var errors = Our.Verification.VerifyResult(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);

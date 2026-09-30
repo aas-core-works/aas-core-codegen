@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -36,7 +36,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "123",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "000123",
                     "0"));
         }
@@ -46,7 +46,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "12",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "+-+12",
                     "+-"));
         }
@@ -56,7 +56,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "102",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "0102",
                     "0"));
         }
@@ -66,7 +66,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "",
                     "0"));
         }
@@ -76,7 +76,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "000",
                     "0"));
         }
@@ -86,7 +86,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "abc",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "abc",
                     ""));
         }
@@ -96,7 +96,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "abc",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "abc",
                     "xyz"));
         }
@@ -106,7 +106,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "abc",
                     "cba"));
         }
@@ -116,7 +116,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "x",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "éé-x",
                     "-é"));
         }
@@ -126,7 +126,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "a😀",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "😀😀a😀",
                     "😀"));
         }
@@ -136,7 +136,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "😁x",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "😁x",
                     "😀"));
         }
@@ -146,7 +146,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 "😀",
-                Aas.Common.StringHelpers.LStrip(
+                Our.Common.StringHelpers.LStrip(
                     "a😀",
                     "a"));
         }
@@ -156,7 +156,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0L,
-                Aas.Common.ParseSafeInt("0"));
+                Our.Common.ParseSafeInt("0"));
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 0L,
-                Aas.Common.ParseSafeInt("-0"));
+                Our.Common.ParseSafeInt("-0"));
         }
 
         [Test]
@@ -172,7 +172,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 7L,
-                Aas.Common.ParseSafeInt("+7"));
+                Our.Common.ParseSafeInt("+7"));
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 42L,
-                Aas.Common.ParseSafeInt("42"));
+                Our.Common.ParseSafeInt("42"));
         }
 
         [Test]
@@ -188,7 +188,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -42L,
-                Aas.Common.ParseSafeInt("-42"));
+                Our.Common.ParseSafeInt("-42"));
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 7L,
-                Aas.Common.ParseSafeInt("0007"));
+                Our.Common.ParseSafeInt("0007"));
         }
 
         [Test]
@@ -204,7 +204,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -42L,
-                Aas.Common.ParseSafeInt("-0042"));
+                Our.Common.ParseSafeInt("-0042"));
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 1L,
-                Aas.Common.ParseSafeInt("0000000000000000000000000000001"));
+                Our.Common.ParseSafeInt("0000000000000000000000000000001"));
         }
 
         [Test]
@@ -220,7 +220,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 9007199254740991L,
-                Aas.Common.ParseSafeInt("9007199254740991"));
+                Our.Common.ParseSafeInt("9007199254740991"));
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 -9007199254740991L,
-                Aas.Common.ParseSafeInt("-9007199254740991"));
+                Our.Common.ParseSafeInt("-9007199254740991"));
         }
 
         [Test]
@@ -236,14 +236,14 @@ namespace dummy.Tests
         {
             Assert.AreEqual(
                 9007199254740991L,
-                Aas.Common.ParseSafeInt("+0009007199254740991"));
+                Our.Common.ParseSafeInt("+0009007199254740991"));
         }
 
         [Test]
         public void Test_ParseSafeInt_invalid_0()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     ""));
         }
 
@@ -251,7 +251,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_1()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "+"));
         }
 
@@ -259,7 +259,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_2()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "-"));
         }
 
@@ -267,7 +267,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_3()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "+-1"));
         }
 
@@ -275,7 +275,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_4()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     " 1"));
         }
 
@@ -283,7 +283,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_5()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "1 "));
         }
 
@@ -291,7 +291,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_6()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "1_0"));
         }
 
@@ -299,7 +299,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_7()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "1.0"));
         }
 
@@ -307,7 +307,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_8()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "1e3"));
         }
 
@@ -315,7 +315,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_9()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "0x10"));
         }
 
@@ -323,7 +323,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_10()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "٥"));
         }
 
@@ -331,7 +331,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_11()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "１"));
         }
 
@@ -339,7 +339,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_12()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "9007199254740992"));
         }
 
@@ -347,7 +347,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_13()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "-9007199254740992"));
         }
 
@@ -355,7 +355,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_14()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "9223372036854775807"));
         }
 
@@ -363,7 +363,7 @@ namespace dummy.Tests
         public void Test_ParseSafeInt_invalid_15()
         {
             Assert.Throws<System.ArgumentException>(
-                () => Aas.Common.ParseSafeInt(
+                () => Our.Common.ParseSafeInt(
                     "999999999999999999999999999999"));
         }
     }  // class TestLStripAndInt

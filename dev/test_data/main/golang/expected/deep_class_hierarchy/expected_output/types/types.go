@@ -17,7 +17,7 @@ const (
 	ModelTypeContainer
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -55,7 +55,7 @@ type INode interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.INode]
+// Check whether the instance corresponds to [ourtypes.INode]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -84,7 +84,7 @@ type IBranch interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IBranch]
+// Check whether the instance corresponds to [ourtypes.IBranch]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -188,7 +188,7 @@ type ILeaf interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILeaf]
+// Check whether the instance corresponds to [ourtypes.ILeaf]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -304,7 +304,7 @@ type IBlossom interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IBlossom]
+// Check whether the instance corresponds to [ourtypes.IBlossom]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -435,7 +435,7 @@ type ISomething interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -574,7 +574,7 @@ type IContainer interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IContainer]
+// Check whether the instance corresponds to [ourtypes.IContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

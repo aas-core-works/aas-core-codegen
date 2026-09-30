@@ -15,7 +15,7 @@ import aas_core.aas3_0.types.impl.*;
 import aas_core.aas3_0.types.model.*;
 
 /**
- * Allow for making shallow and deep copies of AAS model instances.
+ * Allow for making shallow and deep copies of model instances.
  */
 public class Copying
 {

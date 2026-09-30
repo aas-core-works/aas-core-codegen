@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,10 +14,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Extension instance in new[]
+            foreach (Our.Extension instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalExtension(),
-                Aas.Tests.CommonJsonization.LoadMaximalExtension()
+                Our.Tests.CommonJsonization.LoadMinimalExtension(),
+                Our.Tests.CommonJsonization.LoadMaximalExtension()
             })
             {
                 int count = 0;
@@ -35,10 +35,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_OverRefersToOrEmpty()
         {
-            foreach (Aas.Extension instance in new[]
+            foreach (Our.Extension instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalExtension(),
-                Aas.Tests.CommonJsonization.LoadMaximalExtension()
+                Our.Tests.CommonJsonization.LoadMinimalExtension(),
+                Our.Tests.CommonJsonization.LoadMaximalExtension()
             })
             {
                 int count = 0;
@@ -56,10 +56,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AdministrativeInformation_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.AdministrativeInformation instance in new[]
+            foreach (Our.AdministrativeInformation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAdministrativeInformation(),
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation()
+                Our.Tests.CommonJsonization.LoadMinimalAdministrativeInformation(),
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation()
             })
             {
                 int count = 0;
@@ -77,10 +77,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Qualifier_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Qualifier instance in new[]
+            foreach (Our.Qualifier instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalQualifier(),
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier()
+                Our.Tests.CommonJsonization.LoadMinimalQualifier(),
+                Our.Tests.CommonJsonization.LoadMaximalQualifier()
             })
             {
                 int count = 0;
@@ -98,10 +98,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_OverExtensionsOrEmpty()
         {
-            foreach (Aas.AssetAdministrationShell instance in new[]
+            foreach (Our.AssetAdministrationShell instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             })
             {
                 int count = 0;
@@ -119,10 +119,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.AssetAdministrationShell instance in new[]
+            foreach (Our.AssetAdministrationShell instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             })
             {
                 int count = 0;
@@ -140,10 +140,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_OverDescriptionOrEmpty()
         {
-            foreach (Aas.AssetAdministrationShell instance in new[]
+            foreach (Our.AssetAdministrationShell instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             })
             {
                 int count = 0;
@@ -161,10 +161,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.AssetAdministrationShell instance in new[]
+            foreach (Our.AssetAdministrationShell instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             })
             {
                 int count = 0;
@@ -182,10 +182,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_OverSubmodelsOrEmpty()
         {
-            foreach (Aas.AssetAdministrationShell instance in new[]
+            foreach (Our.AssetAdministrationShell instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMinimalAssetAdministrationShell(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             })
             {
                 int count = 0;
@@ -203,10 +203,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetInformation_OverSpecificAssetIdsOrEmpty()
         {
-            foreach (Aas.AssetInformation instance in new[]
+            foreach (Our.AssetInformation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAssetInformation(),
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation()
+                Our.Tests.CommonJsonization.LoadMinimalAssetInformation(),
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation()
             })
             {
                 int count = 0;
@@ -224,10 +224,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SpecificAssetId_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.SpecificAssetId instance in new[]
+            foreach (Our.SpecificAssetId instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSpecificAssetId(),
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId()
+                Our.Tests.CommonJsonization.LoadMinimalSpecificAssetId(),
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId()
             })
             {
                 int count = 0;
@@ -245,10 +245,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -266,10 +266,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -287,10 +287,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -308,10 +308,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -329,10 +329,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -350,10 +350,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -371,10 +371,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_OverSubmodelElementsOrEmpty()
         {
-            foreach (Aas.Submodel instance in new[]
+            foreach (Our.Submodel instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             })
             {
                 int count = 0;
@@ -392,10 +392,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverExtensionsOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -413,10 +413,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -434,10 +434,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverDescriptionOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -455,10 +455,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -476,10 +476,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverQualifiersOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -497,10 +497,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.RelationshipElement instance in new[]
+            foreach (Our.RelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             })
             {
                 int count = 0;
@@ -518,10 +518,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverExtensionsOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -539,10 +539,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -560,10 +560,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverDescriptionOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -581,10 +581,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -602,10 +602,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverQualifiersOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -623,10 +623,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -644,10 +644,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OverValueOrEmpty()
         {
-            foreach (Aas.SubmodelElementList instance in new[]
+            foreach (Our.SubmodelElementList instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             })
             {
                 int count = 0;
@@ -665,10 +665,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverExtensionsOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -686,10 +686,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -707,10 +707,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverDescriptionOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -728,10 +728,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -749,10 +749,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverQualifiersOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -770,10 +770,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -791,10 +791,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_OverValueOrEmpty()
         {
-            foreach (Aas.SubmodelElementCollection instance in new[]
+            foreach (Our.SubmodelElementCollection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             })
             {
                 int count = 0;
@@ -812,10 +812,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -833,10 +833,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -854,10 +854,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -875,10 +875,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -896,10 +896,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -917,10 +917,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Property instance in new[]
+            foreach (Our.Property instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMinimalProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             })
             {
                 int count = 0;
@@ -938,10 +938,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverExtensionsOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -959,10 +959,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -980,10 +980,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverDescriptionOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -1001,10 +1001,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -1022,10 +1022,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverQualifiersOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -1043,10 +1043,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -1064,10 +1064,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_OverValueOrEmpty()
         {
-            foreach (Aas.MultiLanguageProperty instance in new[]
+            foreach (Our.MultiLanguageProperty instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty(),
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             })
             {
                 int count = 0;
@@ -1085,10 +1085,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1106,10 +1106,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1127,10 +1127,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1148,10 +1148,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1169,10 +1169,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1190,10 +1190,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Range instance in new[]
+            foreach (Our.Range instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalRange(),
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMinimalRange(),
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             })
             {
                 int count = 0;
@@ -1211,10 +1211,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverExtensionsOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1232,10 +1232,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1253,10 +1253,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverDescriptionOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1274,10 +1274,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1295,10 +1295,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverQualifiersOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1316,10 +1316,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.ReferenceElement instance in new[]
+            foreach (Our.ReferenceElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement(),
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             })
             {
                 int count = 0;
@@ -1337,10 +1337,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1358,10 +1358,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1379,10 +1379,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1400,10 +1400,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1421,10 +1421,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1442,10 +1442,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Blob instance in new[]
+            foreach (Our.Blob instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBlob(),
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMinimalBlob(),
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             })
             {
                 int count = 0;
@@ -1463,10 +1463,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverExtensionsOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1484,10 +1484,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1505,10 +1505,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverDescriptionOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1526,10 +1526,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1547,10 +1547,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverQualifiersOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1568,10 +1568,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.File instance in new[]
+            foreach (Our.File instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalFile(),
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMinimalFile(),
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             })
             {
                 int count = 0;
@@ -1589,10 +1589,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverExtensionsOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1610,10 +1610,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1631,10 +1631,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverDescriptionOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1652,10 +1652,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1673,10 +1673,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverQualifiersOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1694,10 +1694,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1715,10 +1715,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_OverAnnotationsOrEmpty()
         {
-            foreach (Aas.AnnotatedRelationshipElement instance in new[]
+            foreach (Our.AnnotatedRelationshipElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMinimalAnnotatedRelationshipElement(),
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             })
             {
                 int count = 0;
@@ -1736,10 +1736,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1757,10 +1757,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1778,10 +1778,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1799,10 +1799,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1820,10 +1820,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1841,10 +1841,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1862,10 +1862,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverStatementsOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1883,10 +1883,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_OverSpecificAssetIdsOrEmpty()
         {
-            foreach (Aas.Entity instance in new[]
+            foreach (Our.Entity instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEntity(),
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMinimalEntity(),
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             })
             {
                 int count = 0;
@@ -1904,10 +1904,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverExtensionsOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -1925,10 +1925,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -1946,10 +1946,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverDescriptionOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -1967,10 +1967,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -1988,10 +1988,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverQualifiersOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -2009,10 +2009,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.BasicEventElement instance in new[]
+            foreach (Our.BasicEventElement instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMinimalBasicEventElement(),
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             })
             {
                 int count = 0;
@@ -2030,10 +2030,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2051,10 +2051,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2072,10 +2072,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2093,10 +2093,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2114,10 +2114,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2135,10 +2135,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2156,10 +2156,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverInputVariablesOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2177,10 +2177,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverOutputVariablesOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2198,10 +2198,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_OverInoutputVariablesOrEmpty()
         {
-            foreach (Aas.Operation instance in new[]
+            foreach (Our.Operation instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalOperation(),
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMinimalOperation(),
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             })
             {
                 int count = 0;
@@ -2219,10 +2219,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverExtensionsOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2240,10 +2240,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2261,10 +2261,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverDescriptionOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2282,10 +2282,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverSupplementalSemanticIdsOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2303,10 +2303,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverQualifiersOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2324,10 +2324,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.Capability instance in new[]
+            foreach (Our.Capability instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCapability(),
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMinimalCapability(),
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             })
             {
                 int count = 0;
@@ -2345,10 +2345,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_OverExtensionsOrEmpty()
         {
-            foreach (Aas.ConceptDescription instance in new[]
+            foreach (Our.ConceptDescription instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalConceptDescription(),
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMinimalConceptDescription(),
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             })
             {
                 int count = 0;
@@ -2366,10 +2366,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_OverDisplayNameOrEmpty()
         {
-            foreach (Aas.ConceptDescription instance in new[]
+            foreach (Our.ConceptDescription instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalConceptDescription(),
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMinimalConceptDescription(),
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             })
             {
                 int count = 0;
@@ -2387,10 +2387,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_OverDescriptionOrEmpty()
         {
-            foreach (Aas.ConceptDescription instance in new[]
+            foreach (Our.ConceptDescription instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalConceptDescription(),
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMinimalConceptDescription(),
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             })
             {
                 int count = 0;
@@ -2408,10 +2408,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_OverEmbeddedDataSpecificationsOrEmpty()
         {
-            foreach (Aas.ConceptDescription instance in new[]
+            foreach (Our.ConceptDescription instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalConceptDescription(),
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMinimalConceptDescription(),
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             })
             {
                 int count = 0;
@@ -2429,10 +2429,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_OverIsCaseOfOrEmpty()
         {
-            foreach (Aas.ConceptDescription instance in new[]
+            foreach (Our.ConceptDescription instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalConceptDescription(),
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMinimalConceptDescription(),
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             })
             {
                 int count = 0;
@@ -2450,10 +2450,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Environment_OverAssetAdministrationShellsOrEmpty()
         {
-            foreach (Aas.Environment instance in new[]
+            foreach (Our.Environment instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEnvironment(),
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment()
+                Our.Tests.CommonJsonization.LoadMinimalEnvironment(),
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment()
             })
             {
                 int count = 0;
@@ -2471,10 +2471,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Environment_OverSubmodelsOrEmpty()
         {
-            foreach (Aas.Environment instance in new[]
+            foreach (Our.Environment instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEnvironment(),
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment()
+                Our.Tests.CommonJsonization.LoadMinimalEnvironment(),
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment()
             })
             {
                 int count = 0;
@@ -2492,10 +2492,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Environment_OverConceptDescriptionsOrEmpty()
         {
-            foreach (Aas.Environment instance in new[]
+            foreach (Our.Environment instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalEnvironment(),
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment()
+                Our.Tests.CommonJsonization.LoadMinimalEnvironment(),
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment()
             })
             {
                 int count = 0;
@@ -2513,10 +2513,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataSpecificationIec61360_OverShortNameOrEmpty()
         {
-            foreach (Aas.DataSpecificationIec61360 instance in new[]
+            foreach (Our.DataSpecificationIec61360 instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalDataSpecificationIec61360(),
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
+                Our.Tests.CommonJsonization.LoadMinimalDataSpecificationIec61360(),
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
             })
             {
                 int count = 0;
@@ -2534,10 +2534,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataSpecificationIec61360_OverDefinitionOrEmpty()
         {
-            foreach (Aas.DataSpecificationIec61360 instance in new[]
+            foreach (Our.DataSpecificationIec61360 instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalDataSpecificationIec61360(),
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
+                Our.Tests.CommonJsonization.LoadMinimalDataSpecificationIec61360(),
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
             })
             {
                 int count = 0;

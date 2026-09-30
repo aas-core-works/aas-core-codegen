@@ -44,12 +44,12 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
 const std::filesystem::path& DetermineLogDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "XxxOrDefault";
 {I}}}
@@ -87,7 +87,7 @@ const std::filesystem::path& DetermineLogDir() {{
                 serialization_snippet = Stripped(
                     f"""\
 const std::string serialized(
-{I}aas::stringification::Base64Encode(
+{I}our::stringification::Base64Encode(
 {II}instance->{method_name}()
 {I})
 );"""
@@ -98,7 +98,7 @@ const std::string serialized(
                 serialization_snippet = Stripped(
                     f"""\
 const std::string serialized(
-{I}aas::common::WstringToUtf8(
+{I}our::common::WstringToUtf8(
 {II}instance->{method_name}()
 {I})
 );"""
@@ -119,7 +119,7 @@ const std::string serialized(
                     serialization_snippet = Stripped(
                         f"""\
 const std::string serialized(
-{I}aas::stringification::to_string(
+{I}our::stringification::to_string(
 {II}instance->{method_name}()
 {I})
 );"""
@@ -137,7 +137,7 @@ const std::string serialized(
                     f"""\
 TEST_CASE("Test {method_name} on a min. {cls_name}") {{
 {I}const std::shared_ptr<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}> instance(
 {II}test::common::examples::{load_min}()
 {I});
@@ -162,7 +162,7 @@ TEST_CASE("Test {method_name} on a min. {cls_name}") {{
                     f"""\
 TEST_CASE("Test {method_name} on a max. {cls_name}") {{
 {I}const std::shared_ptr<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}> instance(
 {II}test::common::examples::{load_max}()
 {I});

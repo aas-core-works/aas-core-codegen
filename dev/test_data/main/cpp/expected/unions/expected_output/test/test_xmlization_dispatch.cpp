@@ -8,17 +8,17 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IMixedAbstractMember") {
   const std::shared_ptr<
-    aas::types::IMixedAbstractDescendantOne
+    our::types::IMixedAbstractDescendantOne
   > original_instance(
     test::common::examples::LoadMinMixedAbstractDescendantOne()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -28,23 +28,23 @@ TEST_CASE("Test the round-trip of an expected IMixedAbstractMember") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IMixedAbstractDescendantOne: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -53,13 +53,13 @@ TEST_CASE("Test the round-trip of an expected IMixedAbstractMember") {
   }
 
   std::shared_ptr<
-    aas::types::IMixedAbstractMember
+    our::types::IMixedAbstractMember
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IMixedAbstractMember
+    our::types::IMixedAbstractMember
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -80,13 +80,13 @@ TEST_CASE("Test the round-trip of an expected IMixedAbstractMember") {
 
 TEST_CASE("Test the round-trip of an expected IMixedConcreteWithDescendants") {
   const std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendantsChild
+    our::types::IMixedConcreteWithDescendantsChild
   > original_instance(
     test::common::examples::LoadMinMixedConcreteWithDescendantsChild()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -96,23 +96,23 @@ TEST_CASE("Test the round-trip of an expected IMixedConcreteWithDescendants") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IMixedConcreteWithDescendantsChild: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -121,13 +121,13 @@ TEST_CASE("Test the round-trip of an expected IMixedConcreteWithDescendants") {
   }
 
   std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendants
+    our::types::IMixedConcreteWithDescendants
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IMixedConcreteWithDescendants
+    our::types::IMixedConcreteWithDescendants
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss

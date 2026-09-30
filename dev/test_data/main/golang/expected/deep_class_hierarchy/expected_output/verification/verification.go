@@ -12,21 +12,21 @@ package verification
 
 import (
 	"fmt"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -41,17 +41,17 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
-// Verify `that` instance of [aastypes.IBranch].
+// Verify `that` instance of [ourtypes.IBranch].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBranch(
-	that aastypes.IBranch,
+	that ourtypes.IBranch,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -61,14 +61,14 @@ func VerifyBranch(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILeaf].
+// Verify `that` instance of [ourtypes.ILeaf].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLeaf(
-	that aastypes.ILeaf,
+	that ourtypes.ILeaf,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -78,14 +78,14 @@ func VerifyLeaf(
 	return
 }
 
-// Verify `that` instance of [aastypes.IBlossom].
+// Verify `that` instance of [ourtypes.IBlossom].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBlossom(
-	that aastypes.IBlossom,
+	that ourtypes.IBlossom,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -95,14 +95,14 @@ func VerifyBlossom(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -121,7 +121,7 @@ func VerifySomething(
 			that.SomeChoice(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SomeChoice",
 					},
 				)
@@ -147,7 +147,7 @@ func VerifySomething(
 			that.SomethingWithoutChoice(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "SomethingWithoutChoice",
 					},
 				)
@@ -162,14 +162,14 @@ func VerifySomething(
 	return
 }
 
-// Verify `that` instance of [aastypes.IContainer].
+// Verify `that` instance of [ourtypes.IContainer].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyContainer(
-	that aastypes.IContainer,
+	that ourtypes.IContainer,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -188,7 +188,7 @@ func VerifyContainer(
 			that.Node(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Node",
 					},
 				)
@@ -214,7 +214,7 @@ func VerifyContainer(
 			that.Something(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Something",
 					},
 				)
@@ -236,34 +236,34 @@ func VerifyContainer(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeBranch:
+	case ourtypes.ModelTypeBranch:
 		abort = VerifyBranch(
-			that.(aastypes.IBranch),
+			that.(ourtypes.IBranch),
 			onError,
 		)
-	case aastypes.ModelTypeLeaf:
+	case ourtypes.ModelTypeLeaf:
 		abort = VerifyLeaf(
-			that.(aastypes.ILeaf),
+			that.(ourtypes.ILeaf),
 			onError,
 		)
-	case aastypes.ModelTypeBlossom:
+	case ourtypes.ModelTypeBlossom:
 		abort = VerifyBlossom(
-			that.(aastypes.IBlossom),
+			that.(ourtypes.IBlossom),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		abort = VerifyContainer(
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 			onError,
 		)
 	default:

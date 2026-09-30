@@ -143,42 +143,42 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
-            base_rel_path / "aastesting/common_jsonization.go",
+            base_rel_path / "ourtesting/common_jsonization.go",
             lambda: (
-                golang_tests.generate_aastesting_common_jsonization(
+                golang_tests.generate_ourtesting_common_jsonization(
                     symbol_table=verified_ir_table, repo_url=repo_url
                 ),
                 None,
             ),
         ),
         (
-            base_rel_path / "aastesting/constants.go",
+            base_rel_path / "ourtesting/constants.go",
             lambda: (
-                golang_tests.generate_aastesting_constants(repo_url=repo_url),
+                golang_tests.generate_ourtesting_constants(repo_url=repo_url),
                 None,
             ),
         ),
         (
-            base_rel_path / "aastesting/deep_equal.go",
+            base_rel_path / "ourtesting/deep_equal.go",
             lambda: (
-                golang_tests.generate_aastesting_deep_equal(
+                golang_tests.generate_ourtesting_deep_equal(
                     symbol_table=verified_ir_table, repo_url=repo_url
                 ),
                 None,
             ),
         ),
         (
-            base_rel_path / "aastesting/doc.go",
-            lambda: (golang_tests.generate_aastesting_doc(), None),
+            base_rel_path / "ourtesting/doc.go",
+            lambda: (golang_tests.generate_ourtesting_doc(), None),
         ),
         (
-            base_rel_path / "aastesting/filesystem.go",
-            lambda: (golang_tests.generate_aastesting_filesystem(), None),
+            base_rel_path / "ourtesting/filesystem.go",
+            lambda: (golang_tests.generate_ourtesting_filesystem(), None),
         ),
         (
-            base_rel_path / "aastesting/tracing.go",
+            base_rel_path / "ourtesting/tracing.go",
             lambda: (
-                golang_tests.generate_aastesting_tracing(repo_url=repo_url),
+                golang_tests.generate_ourtesting_tracing(repo_url=repo_url),
                 None,
             ),
         ),

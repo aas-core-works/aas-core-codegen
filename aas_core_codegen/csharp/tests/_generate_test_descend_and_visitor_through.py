@@ -33,13 +33,13 @@ def generate(
     blocks = [
         Stripped(
             f"""\
-class TracingVisitorThrough : Aas.Visitation.VisitorThrough
+class TracingVisitorThrough : Our.Visitation.VisitorThrough
 {{
 {I}public readonly List<string> Log = new List<string>();
 
 {I}public override void Visit(IClass that)
 {I}{{
-{II}Log.Add(Aas.Tests.Common.Trace(that));
+{II}Log.Add(Our.Tests.Common.Trace(that));
 {II}base.Visit(that);
 {I}}}
 }}"""
@@ -47,12 +47,12 @@ class TracingVisitorThrough : Aas.Visitation.VisitorThrough
         Stripped(
             f"""\
 private static void AssertDescendAndVisitorThroughSame(
-{I}Aas.IClass instance)
+{I}Our.IClass instance)
 {{
 {I}var logFromDescend = new List<string>();
 {I}foreach (var subInstance in instance.Descend())
 {I}{{
-{II}logFromDescend.Add(Aas.Tests.Common.Trace(subInstance));
+{II}logFromDescend.Add(Our.Tests.Common.Trace(subInstance));
 {I}}}
 
 {I}var visitor = new TracingVisitorThrough();
@@ -62,7 +62,7 @@ private static void AssertDescendAndVisitorThroughSame(
 {I}Assert.IsNotEmpty(traceFromVisitor);
 
 {I}Assert.AreEqual(
-{II}Aas.Tests.Common.Trace(instance),
+{II}Our.Tests.Common.Trace(instance),
 {II}traceFromVisitor[0]);
 
 {I}traceFromVisitor.RemoveAt(0);
@@ -79,12 +79,12 @@ private static void CompareOrRerecordTrace(
 {I}var writer = new System.IO.StringWriter();
 {I}foreach (var descendant in instance.Descend())
 {I}{{
-{II}writer.WriteLine(Aas.Tests.Common.Trace(descendant));
+{II}writer.WriteLine(Our.Tests.Common.Trace(descendant));
 {I}}}
 
 {I}string got = writer.ToString();
 
-{I}if (Aas.Tests.Common.RecordMode)
+{I}if (Our.Tests.Common.RecordMode)
 {I}{{
 {II}string? parent = Path.GetDirectoryName(expectedPath);
 {II}if (parent != null)
@@ -104,7 +104,7 @@ private static void CompareOrRerecordTrace(
 {III}throw new System.IO.FileNotFoundException(
 {IIII}"The file with the recorded trace does not " +
 {IIII}$"exist: {{expectedPath}}; maybe you want to set the environment " +
-{IIII}$"variable {{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?");
+{IIII}$"variable {{Our.Tests.Common.RecordModeEnvironmentVariableName}}?");
 {II}}}
 
 {II}string expected = System.IO.File.ReadAllText(expectedPath);
@@ -127,13 +127,13 @@ private static void CompareOrRerecordTrace(
 [Test]
 public void Test_Descend_of_{cls_name_csharp}()
 {{
-{I}Aas.{cls_name_csharp} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
+{I}Our.{cls_name_csharp} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
 
 {I}CompareOrRerecordTrace(
 {II}instance,
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"Descend",
 {III}{csharp_common.string_literal(cls_name_json)},
 {III}"maximal.json.trace"));
@@ -142,8 +142,8 @@ public void Test_Descend_of_{cls_name_csharp}()
 [Test]
 public void Test_Descend_against_VisitorThrough_for_{cls_name_csharp}()
 {{
-{I}Aas.{cls_name_csharp} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
+{I}Our.{cls_name_csharp} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
 
 {I}AssertDescendAndVisitorThroughSame(
 {II}instance);
@@ -156,7 +156,7 @@ public void Test_Descend_against_VisitorThrough_for_{cls_name_csharp}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;

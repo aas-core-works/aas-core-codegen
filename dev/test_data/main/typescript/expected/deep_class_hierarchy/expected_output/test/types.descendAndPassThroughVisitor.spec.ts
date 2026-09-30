@@ -8,17 +8,17 @@
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasTypes from "../src/types";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";
 
 /**
  * Record a human-readable trace of a descent over an object tree.
  */
-class TracingVisitor extends AasTypes.PassThroughVisitor {
+class TracingVisitor extends OurTypes.PassThroughVisitor {
   readonly log = new Array<string>();
 
-  visit(that: AasTypes.Class) {
+  visit(that: OurTypes.Class) {
     this.log.push(TestCommon.traceMark(that));
     super.visit(that);
   }
@@ -32,7 +32,7 @@ class TracingVisitor extends AasTypes.PassThroughVisitor {
  * @throws an {@link Error} if the two traces are not equal
  */
 function expectDescendAndPassThroughVisitorSame(
-  instance: AasTypes.Class
+  instance: OurTypes.Class
 ): void {
   const traceFromDescend = new Array<string>();
   for (const subInstance of instance.descend()) {
@@ -59,7 +59,7 @@ function expectDescendAndPassThroughVisitorSame(
  * @param expectedPath - path to the golden trace
  */
 function compareOrRecordTrace(
-  instance: AasTypes.Class,
+  instance: OurTypes.Class,
   expectedPath: string
 ) {
   const lines = new Array<string>();

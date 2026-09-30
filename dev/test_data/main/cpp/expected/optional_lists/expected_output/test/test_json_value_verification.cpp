@@ -21,8 +21,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
-namespace verification = aas::verification;
+namespace our = dummy;
+namespace verification = our::verification;
 
 namespace {
 /**

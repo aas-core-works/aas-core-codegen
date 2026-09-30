@@ -1,8 +1,8 @@
 // Check that the two references, `that` and `other`, are equal by
-// comparing their [aastypes.Reference.Keys] by [aastypes.Key.Value]'s.
+// comparing their [ourtypes.Reference.Keys] by [ourtypes.Key.Value]'s.
 func ReferenceKeyValuesEqual(
-	that aastypes.IReference,
-	other aastypes.IReference) bool {
+	that ourtypes.IReference,
+	other ourtypes.IReference) bool {
 	thatKeys := that.Keys()
 	otherKeys := other.Keys()
 

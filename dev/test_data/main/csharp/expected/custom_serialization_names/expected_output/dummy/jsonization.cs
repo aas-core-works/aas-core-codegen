@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -245,7 +245,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.QueryCondition QueryConditionFrom(
+            internal static Our.QueryCondition QueryConditionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -289,7 +289,7 @@ namespace dummy
                     }
                 }
 
-                return new Aas.QueryCondition(
+                return new Our.QueryCondition(
                     theEq,
                     theNotEq);
             }  // internal static QueryConditionFrom
@@ -354,7 +354,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.QueryCondition anInstance = Deserialize.QueryConditionFrom(
+        /// Our.QueryCondition anInstance = Deserialize.QueryConditionFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -368,10 +368,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of QueryCondition.
             /// </exception>
-            public static Aas.QueryCondition QueryConditionFrom(
+            public static Our.QueryCondition QueryConditionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.QueryCondition result = DeserializeImplementation.QueryConditionFrom(
+                Our.QueryCondition result = DeserializeImplementation.QueryConditionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -408,7 +408,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -516,7 +516,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformQueryCondition(
-                Aas.IQueryCondition that
+                Our.IQueryCondition that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -541,7 +541,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of QueryCondition:
         /// <code>
-        /// var anInstance = new Aas.QueryCondition(
+        /// var anInstance = new Our.QueryCondition(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -558,7 +558,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

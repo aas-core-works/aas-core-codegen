@@ -288,14 +288,14 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer.write(
         f"""\
-{constant_name}: Final[AbstractSet[aas_types.{enum_name}]] = {{
+{constant_name}: Final[AbstractSet[our_types.{enum_name}]] = {{
 """
     )
 
     for i, literal in enumerate(constant.literals):
         literal_name = python_naming.enum_literal_name(literal.name)
 
-        writer.write(textwrap.indent(f"aas_types.{enum_name}.{literal_name}", I))
+        writer.write(textwrap.indent(f"our_types.{enum_name}.{literal_name}", I))
 
         if i < len(constant.literals) - 1:
             writer.write(",\n")
@@ -339,7 +339,7 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         ),
     ]  # type: List[Stripped]
 

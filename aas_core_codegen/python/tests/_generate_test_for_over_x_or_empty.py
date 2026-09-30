@@ -87,7 +87,7 @@ def {test_case_method_name}(self) -> None:
 
 {II}assert isinstance(
 {III}instance,
-{III}aas_types.{python_cls_name}
+{III}our_types.{python_cls_name}
 {II})
 
 {II}log = [
@@ -154,7 +154,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         ),
         Stripped(
             """\

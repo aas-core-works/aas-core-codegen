@@ -14,10 +14,10 @@
 
 #include <deque>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -26,7 +26,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineDescentDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Descent";
   }
@@ -35,7 +35,7 @@ const std::filesystem::path& DetermineDescentDir() {
 }
 
 const std::filesystem::path& DetermineDescentOnceDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "DescentOnce";
   }
@@ -48,7 +48,7 @@ void AssertOrRerecordDescent(
   const std::filesystem::path& trace_path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > instance(
     test::common::xmlization::MustDeserializeFile(xml_path)
   );
@@ -56,15 +56,15 @@ void AssertOrRerecordDescent(
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::Descent(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::Descent(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -72,21 +72,21 @@ void AssertOrRerecordDescent(
 }
 
 void AssertOrRerecordDescentOnce(
-  const std::shared_ptr<aas::types::IClass>& instance,
+  const std::shared_ptr<our::types::IClass>& instance,
   const std::filesystem::path& trace_path
 ) {
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::DescentOnce(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::DescentOnce(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -122,7 +122,7 @@ TEST_CASE("Test Descent over an First") {
 
 TEST_CASE("Test DescentOnce over an First") {
   const std::shared_ptr<
-    aas::types::IFirst
+    our::types::IFirst
   > instance(
     test::common::examples::LoadMaxFirst()
   );
@@ -164,7 +164,7 @@ TEST_CASE("Test Descent over an Second") {
 
 TEST_CASE("Test DescentOnce over an Second") {
   const std::shared_ptr<
-    aas::types::ISecond
+    our::types::ISecond
   > instance(
     test::common::examples::LoadMaxSecond()
   );

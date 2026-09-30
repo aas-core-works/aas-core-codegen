@@ -1,9 +1,9 @@
 /// <summary>
-/// Check that there are no duplicate <see cref="Aas.IQualifier.Type" />'s
+/// Check that there are no duplicate <see cref="Our.IQualifier.Type" />'s
 /// in the <paramref name="qualifiers" />.
 /// </summary>
 public static bool QualifierTypesAreUnique(
-    IEnumerable<Aas.IQualifier> qualifiers
+    IEnumerable<Our.IQualifier> qualifiers
 )
 {
     var typeSet = new HashSet<string>();

@@ -4,24 +4,24 @@
 /// </summary>
 public static bool ValueConsistentWithXsdType(
     string value,
-    Aas.DataTypeDefXsd valueType
+    Our.DataTypeDefXsd valueType
 )
 {
     switch (valueType)
     {
-        case Aas.DataTypeDefXsd.AnyUri:
+        case Our.DataTypeDefXsd.AnyUri:
         {
             return MatchesXsAnyUri(value);
         }
-        case Aas.DataTypeDefXsd.Base64Binary:
+        case Our.DataTypeDefXsd.Base64Binary:
         {
             return MatchesXsBase64Binary(value);
         }
-        case Aas.DataTypeDefXsd.Boolean:
+        case Our.DataTypeDefXsd.Boolean:
         {
             return MatchesXsBoolean(value);
         }
-        case Aas.DataTypeDefXsd.Byte:
+        case Our.DataTypeDefXsd.Byte:
         {
             try
             {
@@ -38,7 +38,7 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.Date:
+        case Our.DataTypeDefXsd.Date:
         {
             if (!MatchesXsDate(value))
             {
@@ -47,7 +47,7 @@ public static bool ValueConsistentWithXsdType(
 
             return IsPrefixedWithValidDate(value);
         }
-        case Aas.DataTypeDefXsd.DateTime:
+        case Our.DataTypeDefXsd.DateTime:
         {
             if (!MatchesXsDateTime(value))
             {
@@ -59,11 +59,11 @@ public static bool ValueConsistentWithXsdType(
             // correct in sense of the day/month combination.
             return IsPrefixedWithValidDate(value);
         }
-        case Aas.DataTypeDefXsd.Decimal:
+        case Our.DataTypeDefXsd.Decimal:
         {
             return MatchesXsDecimal(value);
         }
-        case Aas.DataTypeDefXsd.Double:
+        case Our.DataTypeDefXsd.Double:
         {
             // We need to check explicitly for the regular expression since
             // System.Xml.XmlConvert.ToDouble is too permissive. For example,
@@ -110,11 +110,11 @@ public static bool ValueConsistentWithXsdType(
             }
             return true;
         }
-        case Aas.DataTypeDefXsd.Duration:
+        case Our.DataTypeDefXsd.Duration:
         {
             return MatchesXsDuration(value);
         }
-        case Aas.DataTypeDefXsd.Float:
+        case Our.DataTypeDefXsd.Float:
         {
             // We need to check explicitly for the regular expression since
             // System.Xml.XmlConvert.ToSingle is too permissive. For example,
@@ -161,15 +161,15 @@ public static bool ValueConsistentWithXsdType(
             }
             return true;
         }
-        case Aas.DataTypeDefXsd.GDay:
+        case Our.DataTypeDefXsd.GDay:
         {
             return MatchesXsGDay(value);
         }
-        case Aas.DataTypeDefXsd.GMonth:
+        case Our.DataTypeDefXsd.GMonth:
         {
             return MatchesXsGMonth(value);
         }
-        case Aas.DataTypeDefXsd.GMonthDay:
+        case Our.DataTypeDefXsd.GMonthDay:
         {
             if (!MatchesXsGMonthDay(value))
             {
@@ -193,19 +193,19 @@ public static bool ValueConsistentWithXsdType(
                     );
             }
         }
-        case Aas.DataTypeDefXsd.GYear:
+        case Our.DataTypeDefXsd.GYear:
         {
             return MatchesXsGYear(value);
         }
-        case Aas.DataTypeDefXsd.GYearMonth:
+        case Our.DataTypeDefXsd.GYearMonth:
         {
             return MatchesXsGYearMonth(value);
         }
-        case Aas.DataTypeDefXsd.HexBinary:
+        case Our.DataTypeDefXsd.HexBinary:
         {
             return MatchesXsHexBinary(value);
         }
-        case Aas.DataTypeDefXsd.Int:
+        case Our.DataTypeDefXsd.Int:
         {
             try
             {
@@ -222,11 +222,11 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.Integer:
+        case Our.DataTypeDefXsd.Integer:
         {
             return MatchesXsInteger(value);
         }
-        case Aas.DataTypeDefXsd.Long:
+        case Our.DataTypeDefXsd.Long:
         {
             try
             {
@@ -243,23 +243,23 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.NegativeInteger:
+        case Our.DataTypeDefXsd.NegativeInteger:
         {
             return MatchesXsNegativeInteger(value);
         }
-        case Aas.DataTypeDefXsd.NonNegativeInteger:
+        case Our.DataTypeDefXsd.NonNegativeInteger:
         {
             return MatchesXsNonNegativeInteger(value);
         }
-        case Aas.DataTypeDefXsd.NonPositiveInteger:
+        case Our.DataTypeDefXsd.NonPositiveInteger:
         {
             return MatchesXsNonPositiveInteger(value);
         }
-        case Aas.DataTypeDefXsd.PositiveInteger:
+        case Our.DataTypeDefXsd.PositiveInteger:
         {
             return MatchesXsPositiveInteger(value);
         }
-        case Aas.DataTypeDefXsd.Short:
+        case Our.DataTypeDefXsd.Short:
         {
             try
             {
@@ -276,15 +276,15 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.String:
+        case Our.DataTypeDefXsd.String:
         {
             return MatchesXsString(value);
         }
-        case Aas.DataTypeDefXsd.Time:
+        case Our.DataTypeDefXsd.Time:
         {
             return MatchesXsTime(value);
         }
-        case Aas.DataTypeDefXsd.UnsignedByte:
+        case Our.DataTypeDefXsd.UnsignedByte:
         {
             if (value.Length == 0)
             {
@@ -325,7 +325,7 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.UnsignedInt:
+        case Our.DataTypeDefXsd.UnsignedInt:
         {
             if (value.Length == 0)
             {
@@ -366,7 +366,7 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.UnsignedLong:
+        case Our.DataTypeDefXsd.UnsignedLong:
         {
             if (value.Length == 0)
             {
@@ -407,7 +407,7 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
         }
-        case Aas.DataTypeDefXsd.UnsignedShort:
+        case Our.DataTypeDefXsd.UnsignedShort:
         {
             if (value.Length == 0)
             {

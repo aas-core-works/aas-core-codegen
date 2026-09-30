@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,10 +14,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_OverOptionalTextsOrEmpty()
         {
-            foreach (Aas.Something instance in new[]
+            foreach (Our.Something instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSomething(),
-                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+                Our.Tests.CommonJsonization.LoadMinimalSomething(),
+                Our.Tests.CommonJsonization.LoadMaximalSomething()
             })
             {
                 int count = 0;
@@ -35,10 +35,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Collection_OverOptionalTextsOrEmpty()
         {
-            foreach (Aas.Collection instance in new[]
+            foreach (Our.Collection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalCollection()
+                Our.Tests.CommonJsonization.LoadMinimalCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalCollection()
             })
             {
                 int count = 0;
@@ -56,10 +56,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Collection_OverOptionalDirectionsOrEmpty()
         {
-            foreach (Aas.Collection instance in new[]
+            foreach (Our.Collection instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalCollection(),
-                Aas.Tests.CommonJsonization.LoadMaximalCollection()
+                Our.Tests.CommonJsonization.LoadMinimalCollection(),
+                Our.Tests.CommonJsonization.LoadMaximalCollection()
             })
             {
                 int count = 0;

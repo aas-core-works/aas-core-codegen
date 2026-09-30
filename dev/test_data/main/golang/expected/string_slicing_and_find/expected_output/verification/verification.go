@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,63 +42,63 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check the slice up to the position found with `find`.
 func DateBeforeTimeIsLongEnough(
 	text string,
 ) bool {
-	position := aascommon.FindStr(text, "T", 0)
+	position := ourcommon.FindStr(text, "T", 0)
 	switch position {
 	case -1:
 		return true
 	}
-	return aascommon.LenStr(aascommon.SliceStr(text, 0, position)) == 10
+	return ourcommon.LenStr(ourcommon.SliceStr(text, 0, position)) == 10
 }
 
 // Check the slice from the position after the one found with `find`.
 func TimeAfterDateIsLongEnough(
 	text string,
 ) bool {
-	position := aascommon.FindStr(text, "T", 0)
+	position := ourcommon.FindStr(text, "T", 0)
 	switch position {
 	case -1:
 		return true
 	}
-	return aascommon.LenStr(aascommon.SliceStrFrom(text, position + 1)) == 8
+	return ourcommon.LenStr(ourcommon.SliceStrFrom(text, position + 1)) == 8
 }
 
 // Check `find` with a start and the slice between the found positions.
 func MonthIsSeptember(
 	text string,
 ) bool {
-	first := aascommon.FindStr(text, "-", 0)
+	first := ourcommon.FindStr(text, "-", 0)
 	switch first {
 	case -1:
 		return true
 	}
-	second := aascommon.FindStr(text, "-", first + 1)
+	second := ourcommon.FindStr(text, "-", first + 1)
 	switch second {
 	case -1:
 		return false
 	}
-	return aascommon.SliceStr(text, first + 1, second) == "09"
+	return ourcommon.SliceStr(text, first + 1, second) == "09"
 }
 
 // Check the slices and `find` with negative literal positions.
 func SecondsFollowColon(
 	text string,
 ) bool {
-	position := aascommon.FindStr(text, "T", 0)
+	position := ourcommon.FindStr(text, "T", 0)
 	switch position {
 	case -1:
 		return true
 	}
-	return aascommon.LenStr(text) < 10 ||
-		(aascommon.SliceStr(text, -3, -2) == ":" &&
-		aascommon.FindStr(text, ":", -3) != -1 &&
-		aascommon.LenStr(aascommon.SliceStr(text, 0, -9)) > 0)
+	return ourcommon.LenStr(text) < 10 ||
+		(ourcommon.SliceStr(text, -3, -2) == ":" &&
+		ourcommon.FindStr(text, ":", -3) != -1 &&
+		ourcommon.LenStr(ourcommon.SliceStr(text, 0, -9)) > 0)
 }
 
 // Check the positions computed at run time which are negative or out of range.
@@ -108,45 +108,45 @@ func SecondsFollowColon(
 func LastCharacterIsNotZ(
 	text string,
 ) bool {
-	position := aascommon.FindStr(text, "#", 0)
-	return aascommon.SliceStrFrom(text, position) != "Z" &&
-		aascommon.SliceStr(text, -100, 100) == text &&
-		aascommon.SliceStr(text, 3, 1) == "" &&
-		aascommon.FindStr(text, "", 100) == -1 &&
-		aascommon.FindStr(text, aascommon.SliceStrFrom(text, position), position) >= 0
+	position := ourcommon.FindStr(text, "#", 0)
+	return ourcommon.SliceStrFrom(text, position) != "Z" &&
+		ourcommon.SliceStr(text, -100, 100) == text &&
+		ourcommon.SliceStr(text, 3, 1) == "" &&
+		ourcommon.FindStr(text, "", 100) == -1 &&
+		ourcommon.FindStr(text, ourcommon.SliceStrFrom(text, position), position) >= 0
 }
 
 // Check the slice of a constrained primitive with literal bounds.
 func NameStartsWithPrefix(
 	name string,
 ) bool {
-	return aascommon.LenStr(name) < 4 ||
-		aascommon.SliceStr(name, 0, 4) == "name"
+	return ourcommon.LenStr(name) < 4 ||
+		ourcommon.SliceStr(name, 0, 4) == "name"
 }
 
 // Check `find` on a constrained primitive and a slice with a literal start.
 func NameHasNoSpaceAfterPrefix(
 	name string,
 ) bool {
-	return aascommon.LenStr(name) < 4 ||
-		aascommon.FindStr(aascommon.SliceStrFrom(name, 4), " ", 0) == -1
+	return ourcommon.LenStr(name) < 4 ||
+		ourcommon.FindStr(ourcommon.SliceStrFrom(name, 4), " ", 0) == -1
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if !(
-		!(aascommon.LenStr(that.Text()) >= 1) ||
-		(aascommon.SliceStr(that.Text(), 0, 1) != "X")) {
+		!(ourcommon.LenStr(that.Text()) >= 1) ||
+		(ourcommon.SliceStr(that.Text(), 0, 1) != "X")) {
 		abort = onError(
 			newVerificationError(
 				"Text must not start with X",),
@@ -230,7 +230,7 @@ func VerifySomething(
 		that.Name(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Name",
 				},
 			)
@@ -256,7 +256,7 @@ func VerifyNonEmptyString(
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that) > 0) {
+	if !(ourcommon.LenStr(that) > 0) {
 		abort = onError(
 			newVerificationError(
 				"At least one character",),
@@ -276,14 +276,14 @@ func VerifyNonEmptyString(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

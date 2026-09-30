@@ -14,7 +14,7 @@ from typing import Any
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 import tests.common
@@ -34,11 +34,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.first_from_jsonable(
+            instance = our_jsonization.first_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -58,11 +58,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.second_from_jsonable(
+            instance = our_jsonization.second_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -93,16 +93,16 @@ def _load_the_first_expected(model_type: str) -> Any:
 class TestSerializationFailures(unittest.TestCase):
     def test_first_count_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.first_from_jsonable(
+            instance = our_jsonization.first_from_jsonable(
                 _load_the_first_expected('First')
             )
 
             instance.count = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.count',
@@ -111,16 +111,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_second_count_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.second_from_jsonable(
+            instance = our_jsonization.second_from_jsonable(
                 _load_the_first_expected('Second')
             )
 
             instance.count = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.count',

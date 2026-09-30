@@ -7,7 +7,7 @@
 
 #include <fstream>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 namespace test {
 namespace common {
@@ -21,7 +21,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {
     result = nlohmann::json::parse(ifs);
   } catch (nlohmann::json::parse_error& exception) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read JSON from ",
         path.string(),
         ": ",
@@ -32,7 +32,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {
 
   if (ifs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read JSON from ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -42,7 +42,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {
 
   if (ifs.fail()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read JSON from ",
         path.string(),
         "; the fail bit of the file stream is set"
@@ -52,7 +52,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {
 
   if (!ifs.eof()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read JSON from ",
         path.string(),
         "; the EOF bit is not set meaning that we did not parse all the content"
@@ -71,7 +71,7 @@ std::optional<std::string> CompareJsons(
 
   if (!patch.is_array()) {
     throw std::logic_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected the patch to be an array, but got ",
         patch.type_name()
       )

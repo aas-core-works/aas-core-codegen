@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfFirst(t *testing.T) {
-	instance := aastesting.MustLoadMinimalFirst()
+	instance := ourtesting.MustLoadMinimalFirst()
 
-	if !aastypes.IsFirst(instance) {
+	if !ourtypes.IsFirst(instance) {
 		t.Errorf(
 			"Expected IsFirst to be true on an instance " +
 			"of IFirst with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSecond(instance) {
+	if ourtypes.IsSecond(instance) {
 		t.Errorf(
 			"Expected IsSecond to be false on an instance " +
 			"of IFirst with runtime type %T and with model type %v",
@@ -30,9 +30,9 @@ func TestIsXxxOnAnInstanceOfFirst(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSecond(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSecond()
+	instance := ourtesting.MustLoadMinimalSecond()
 
-	if aastypes.IsFirst(instance) {
+	if ourtypes.IsFirst(instance) {
 		t.Errorf(
 			"Expected IsFirst to be false on an instance " +
 			"of ISecond with runtime type %T and with model type %v",
@@ -40,7 +40,7 @@ func TestIsXxxOnAnInstanceOfSecond(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSecond(instance) {
+	if !ourtypes.IsSecond(instance) {
 		t.Errorf(
 			"Expected IsSecond to be true on an instance " +
 			"of ISecond with runtime type %T and with model type %v",

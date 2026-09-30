@@ -15,7 +15,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 
-import dummy.xmlization as aas_xmlization
+import dummy.xmlization as our_xmlization
 
 
 import tests.common

@@ -32,8 +32,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasStringification from "../src/stringification";
-import * as AasTypes from "../src/types";"""
+import * as OurStringification from "../src/stringification";
+import * as OurTypes from "../src/types";"""
         ),
     ]  # type: List[Stripped]
 
@@ -58,15 +58,15 @@ import * as AasTypes from "../src/types";"""
                 Stripped(
                     f"""\
 test("{enum_name_typescript} stringification round-trip {literal_name_typescript}", () => {{
-{I}const literal = AasTypes.{enum_name_typescript}.{literal_name_typescript};
+{I}const literal = OurTypes.{enum_name_typescript}.{literal_name_typescript};
 
-{I}const text = AasStringification.{must_to_str_name}(literal);
+{I}const text = OurStringification.{must_to_str_name}(literal);
 {I}expect(text).toStrictEqual({literal_value_literal});
 
-{I}const nullableText = AasStringification.{to_str_name}(literal);
+{I}const nullableText = OurStringification.{to_str_name}(literal);
 {I}expect(nullableText).toStrictEqual({literal_value_literal});
 
-{I}const parsed = AasStringification.{from_str_name}(text);
+{I}const parsed = OurStringification.{from_str_name}(text);
 {I}expect(parsed).toStrictEqual(literal);
 }});"""
                 )
@@ -81,7 +81,7 @@ test("{enum_name_typescript} stringification round-trip {literal_name_typescript
             Stripped(
                 f"""\
 test("{enum_name_typescript} from invalid string", () => {{
-{I}const parsed = AasStringification.{from_str_name}(
+{I}const parsed = OurStringification.{from_str_name}(
 {I}{I}{typescript_common.string_literal(invalid_literal_value)}
 {I});
 
@@ -95,10 +95,10 @@ test("{enum_name_typescript} from invalid string", () => {{
                 f"""\
 test("{enum_name_typescript} invalid literal to string", () => {{
 {I}// The number 9007199254740991 is the maximum safe integer.
-{I}const invalidLiteral = <AasTypes.{enum_name_typescript}>9007199254740991;
+{I}const invalidLiteral = <OurTypes.{enum_name_typescript}>9007199254740991;
 
-{I}expect(AasStringification.{to_str_name}(invalidLiteral)).toBeNull();
-{I}expect(() => AasStringification.{must_to_str_name}(invalidLiteral)).toThrow();
+{I}expect(OurStringification.{to_str_name}(invalidLiteral)).toBeNull();
+{I}expect(() => OurStringification.{must_to_str_name}(invalidLiteral)).toThrow();
 }});"""
             )
         )

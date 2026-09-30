@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import * as AasTypes from "./types";
+import * as OurTypes from "./types";
 
 /* eslint-enable @typescript-eslint/no-unused-vars */
 

@@ -46,13 +46,13 @@ import math
 import unittest
 from typing import Any, cast, Iterable, List, Mapping, Sequence, Tuple
 
-import {qualified_module_name}.jsonvalueverification as aas_json_value_verification
-import {qualified_module_name}.reporting as aas_reporting"""
+import {qualified_module_name}.jsonvalueverification as our_json_value_verification
+import {qualified_module_name}.reporting as our_reporting"""
         ),
         Stripped(
             f"""\
 def _paths_and_causes(
-{II}errors: Iterable[aas_reporting.Error]
+{II}errors: Iterable[our_reporting.Error]
 ) -> List[Tuple[str, str]]:
 {I}return [(str(error.path), error.cause) for error in errors]"""
         ),
@@ -68,7 +68,7 @@ class TestJsonValue(unittest.TestCase):
 {II}self.assertListEqual(
 {III}[],
 {III}_paths_and_causes(
-{IIII}aas_json_value_verification.verify_json_value(value)
+{IIII}our_json_value_verification.verify_json_value(value)
 {III})
 {II})
 
@@ -87,7 +87,7 @@ class TestJsonValue(unittest.TestCase):
 {III}[
 {IIII}path
 {IIII}for path, _ in _paths_and_causes(
-{IIIII}aas_json_value_verification.verify_json_value(value)
+{IIIII}our_json_value_verification.verify_json_value(value)
 {IIII})
 {III}]
 {II})
@@ -96,7 +96,7 @@ class TestJsonValue(unittest.TestCase):
 {II}value = {{"a b": [0, {{"c'd": math.nan}}]}}
 
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_value(value)
+{III}our_json_value_verification.verify_json_value(value)
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
@@ -109,7 +109,7 @@ class TestJsonValue(unittest.TestCase):
 {II}value = {{"a": {{1: "the key is no string"}}}}
 
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_value(value)
+{III}our_json_value_verification.verify_json_value(value)
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
@@ -120,7 +120,7 @@ class TestJsonValue(unittest.TestCase):
 {II}inner = {{"deep": math.nan}}
 {II}value = {{"a": inner}}
 
-{II}errors = list(aas_json_value_verification.verify_json_value(value))
+{II}errors = list(our_json_value_verification.verify_json_value(value))
 
 {II}self.assertEqual(1, len(errors))
 
@@ -128,19 +128,19 @@ class TestJsonValue(unittest.TestCase):
 {II}self.assertEqual(2, len(segments))
 
 {II}outer_segment = segments[0]
-{II}assert isinstance(outer_segment, aas_reporting.KeySegment)
+{II}assert isinstance(outer_segment, our_reporting.KeySegment)
 {II}self.assertIs(value, outer_segment.mapping)
 {II}self.assertEqual("a", outer_segment.key)
 
 {II}inner_segment = segments[1]
-{II}assert isinstance(inner_segment, aas_reporting.KeySegment)
+{II}assert isinstance(inner_segment, our_reporting.KeySegment)
 {II}self.assertIs(inner, inner_segment.mapping)
 {II}self.assertEqual("deep", inner_segment.key)
 
 {I}def test_neither_an_infinity_nor_a_not_a_number_is_json_able(self) -> None:
 {II}for number in (math.inf, -math.inf, math.nan):
 {III}paths_and_causes = _paths_and_causes(
-{IIII}aas_json_value_verification.verify_json_value([number])
+{IIII}our_json_value_verification.verify_json_value([number])
 {III})
 
 {III}self.assertEqual(1, len(paths_and_causes), f"for the number {{number}}")
@@ -155,7 +155,7 @@ class TestJsonValue(unittest.TestCase):
 {III}self.assertListEqual(
 {IIII}[],
 {IIII}_paths_and_causes(
-{IIIII}aas_json_value_verification.verify_json_value([number])
+{IIIII}our_json_value_verification.verify_json_value([number])
 {IIII}),
 {IIII}f"for the number {{number}}"
 {III})
@@ -168,7 +168,7 @@ class TestJsonValue(unittest.TestCase):
 {II}# altogether.
 {II}for number in (2 ** 53 + 1, 10 ** 400):
 {III}paths_and_causes = _paths_and_causes(
-{IIII}aas_json_value_verification.verify_json_value([number])
+{IIII}our_json_value_verification.verify_json_value([number])
 {III})
 
 {III}self.assertEqual(1, len(paths_and_causes), f"for the number {{number}}")
@@ -180,7 +180,7 @@ class TestJsonValue(unittest.TestCase):
 
 {I}def test_a_value_of_an_unexpected_type_is_refused(self) -> None:
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_value({{"a": object()}})
+{III}our_json_value_verification.verify_json_value({{"a": object()}})
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
@@ -192,7 +192,7 @@ class TestJsonValue(unittest.TestCase):
 class TestJsonArrayAndJsonObject(unittest.TestCase):
 {I}def test_an_array_has_to_be_an_array(self) -> None:
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_array(
+{III}our_json_value_verification.verify_json_array(
 {IIII}cast(Sequence[Any], {{"a": 1}})
 {III})
 {II})
@@ -206,7 +206,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 {II}# A ``str`` is a ``Sequence`` in Python, so it has to be ruled out
 {II}# explicitly.
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_array("not an array")
+{III}our_json_value_verification.verify_json_array("not an array")
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
@@ -214,7 +214,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 
 {I}def test_an_object_has_to_be_an_object(self) -> None:
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_object(
+{III}our_json_value_verification.verify_json_object(
 {IIII}cast(Mapping[str, Any], [1, 2])
 {III})
 {II})
@@ -225,7 +225,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 
 {I}def test_the_content_is_verified_beneath_the_shape(self) -> None:
 {II}paths_and_causes = _paths_and_causes(
-{III}aas_json_value_verification.verify_json_object(
+{III}our_json_value_verification.verify_json_object(
 {IIII}{{"a": [{{"b": math.nan}}]}}
 {III})
 {II})

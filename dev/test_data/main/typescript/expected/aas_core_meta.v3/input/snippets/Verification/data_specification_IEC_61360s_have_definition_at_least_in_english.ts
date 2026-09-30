@@ -7,11 +7,11 @@
  * @returns `true` if the check passes
  */
 export function dataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
-  embeddedDataSpecifications: Iterable<AasTypes.EmbeddedDataSpecification>
+  embeddedDataSpecifications: Iterable<OurTypes.EmbeddedDataSpecification>
 ): boolean {
   for (const embeddedDataSpecification of embeddedDataSpecifications) {
     const content = embeddedDataSpecification.dataSpecificationContent;
-    if (AasTypes.isDataSpecificationIec61360(content)) {
+    if (OurTypes.isDataSpecificationIec61360(content)) {
       if (content.definition === null) {
         return false;
       }

@@ -44,7 +44,7 @@ def generate_implementation(library_namespace: Stripped) -> str:
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>"""
         ),
-        Stripped(f"namespace aas = {library_namespace};"),
+        Stripped(f"namespace our = {library_namespace};"),
     ]  # type: List[Stripped]
 
     for len_case in len_slicing_and_find_cases.LEN_CASES:
@@ -58,7 +58,7 @@ def generate_implementation(library_namespace: Stripped) -> str:
                 f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE(
-{II}aas::common::LenStr({cpp_common.wstring_literal(len_case.text)})
+{II}our::common::LenStr({cpp_common.wstring_literal(len_case.text)})
 {II}== {len_case.expected}U
 {I});
 }}"""
@@ -85,7 +85,7 @@ TEST_CASE({name}) {{
                 f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE(
-{II}aas::common::SliceStr({", ".join(args)})
+{II}our::common::SliceStr({", ".join(args)})
 {II}== {cpp_common.wstring_literal(slice_case.expected)}
 {I});
 }}"""
@@ -110,7 +110,7 @@ TEST_CASE({name}) {{
                 f"""\
 TEST_CASE({name}) {{
 {I}REQUIRE(
-{II}aas::common::FindStr({", ".join(args)})
+{II}our::common::FindStr({", ".join(args)})
 {II}== {find_case.expected}
 {I});
 }}"""

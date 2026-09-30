@@ -18,7 +18,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -62,7 +62,7 @@ type ILangString interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILangString]
+// Check whether the instance corresponds to [ourtypes.ILangString]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -159,7 +159,7 @@ type ILangStringSet interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringSet]
+// Check whether the instance corresponds to [ourtypes.ILangStringSet]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -253,7 +253,7 @@ type IContent interface {
 	IClass
 }
 
-// Check whether the instance corresponds to [aastypes.IContent]
+// Check whether the instance corresponds to [ourtypes.IContent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -280,7 +280,7 @@ type IIecContent interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IIecContent]
+// Check whether the instance corresponds to [ourtypes.IIecContent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -376,7 +376,7 @@ type IOtherContent interface {
 	IContent
 }
 
-// Check whether the instance corresponds to [aastypes.IOtherContent]
+// Check whether the instance corresponds to [ourtypes.IOtherContent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -445,7 +445,7 @@ type ISpecification interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISpecification]
+// Check whether the instance corresponds to [ourtypes.ISpecification]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -556,7 +556,7 @@ type ISomething interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

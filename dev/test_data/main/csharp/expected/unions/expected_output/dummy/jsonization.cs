@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -447,7 +447,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.StructuralFirst StructuralFirstFrom(
+            internal static Our.StructuralFirst StructuralFirstFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -493,7 +493,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StructuralFirst(
+                return new Our.StructuralFirst(
                     theUniqueToFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -504,7 +504,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.StructuralSecond StructuralSecondFrom(
+            internal static Our.StructuralSecond StructuralSecondFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -550,7 +550,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StructuralSecond(
+                return new Our.StructuralSecond(
                     theUniqueToSecond
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -563,7 +563,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.StructuralUnion StructuralUnionFrom(
+            public static Our.StructuralUnion StructuralUnionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -579,31 +579,31 @@ namespace dummy
 
                 if (obj.ContainsKey("uniqueToFirst"))
                 {
-                    Aas.StructuralFirst instance = StructuralFirstFrom(
+                    Our.StructuralFirst instance = StructuralFirstFrom(
                         node, out error);
                     if (error != null)
                     {
                         return default!;
                     }
-                    return Aas.StructuralUnion.FromStructuralFirst(instance);
+                    return Our.StructuralUnion.FromStructuralFirst(instance);
                 }
 
                 if (obj.ContainsKey("uniqueToSecond"))
                 {
-                    Aas.StructuralSecond instance = StructuralSecondFrom(
+                    Our.StructuralSecond instance = StructuralSecondFrom(
                         node, out error);
                     if (error != null)
                     {
                         return default!;
                     }
-                    return Aas.StructuralUnion.FromStructuralSecond(instance);
+                    return Our.StructuralUnion.FromStructuralSecond(instance);
                 }
 
                 error = new Reporting.Error(
                     "Could not determine the concrete type of the union StructuralUnion " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.StructuralUnion StructuralUnionFrom
+            }  // public static Our.StructuralUnion StructuralUnionFrom
 
             /// <summary>
             /// Deserialize an instance of IMixedAbstractMember by dispatching
@@ -612,7 +612,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IMixedAbstractMember IMixedAbstractMemberFrom(
+            public static Our.IMixedAbstractMember IMixedAbstractMemberFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -643,14 +643,14 @@ namespace dummy
                         $"Unexpected model type for IMixedAbstractMember: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IMixedAbstractMember IMixedAbstractMemberFrom
+            }  // public static Our.IMixedAbstractMember IMixedAbstractMemberFrom
 
             /// <summary>
             /// Deserialize an instance of MixedAbstractDescendantOne from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
+            internal static Our.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -696,7 +696,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedAbstractDescendantOne(
+                return new Our.MixedAbstractDescendantOne(
                     theUniqueToAbstractDescendantOne
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -707,7 +707,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
+            internal static Our.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -753,7 +753,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedAbstractDescendantTwo(
+                return new Our.MixedAbstractDescendantTwo(
                     theUniqueToAbstractDescendantTwo
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -766,7 +766,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
+            public static Our.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -797,14 +797,14 @@ namespace dummy
                         $"Unexpected model type for IMixedConcreteWithDescendants: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom
+            }  // public static Our.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom
 
             /// <summary>
             /// Deserialize an instance of MixedConcreteWithDescendants from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
+            internal static Our.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -869,7 +869,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteWithDescendants(
+                return new Our.MixedConcreteWithDescendants(
                     theSomeBaseProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -880,7 +880,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
+            internal static Our.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -957,7 +957,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteWithDescendantsChild(
+                return new Our.MixedConcreteWithDescendantsChild(
                     theSomeBaseProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -971,7 +971,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MixedConcreteLeaf MixedConcreteLeafFrom(
+            internal static Our.MixedConcreteLeaf MixedConcreteLeafFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1017,7 +1017,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.MixedConcreteLeaf(
+                return new Our.MixedConcreteLeaf(
                     theUniqueToConcreteLeaf
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1030,7 +1030,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.MixedUnion MixedUnionFrom(
+            public static Our.MixedUnion MixedUnionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1057,23 +1057,23 @@ namespace dummy
                     {
                         case "MixedConcreteWithDescendantsChild":
                         {
-                            Aas.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFrom(
+                            Our.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.MixedUnion.FromMixedConcreteWithDescendants(instance);
+                            return Our.MixedUnion.FromMixedConcreteWithDescendants(instance);
                         }
                         case "MixedConcreteWithDescendants":
                         {
-                            Aas.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFrom(
+                            Our.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.MixedUnion.FromMixedConcreteWithDescendants(instance);
+                            return Our.MixedUnion.FromMixedConcreteWithDescendants(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -1084,49 +1084,49 @@ namespace dummy
 
                 if (obj.ContainsKey("uniqueToAbstractDescendantOne"))
                 {
-                    Aas.MixedAbstractDescendantOne instance = MixedAbstractDescendantOneFrom(
+                    Our.MixedAbstractDescendantOne instance = MixedAbstractDescendantOneFrom(
                         node, out error);
                     if (error != null)
                     {
                         return default!;
                     }
-                    return Aas.MixedUnion.FromMixedAbstractMember(instance);
+                    return Our.MixedUnion.FromMixedAbstractMember(instance);
                 }
 
                 if (obj.ContainsKey("uniqueToAbstractDescendantTwo"))
                 {
-                    Aas.MixedAbstractDescendantTwo instance = MixedAbstractDescendantTwoFrom(
+                    Our.MixedAbstractDescendantTwo instance = MixedAbstractDescendantTwoFrom(
                         node, out error);
                     if (error != null)
                     {
                         return default!;
                     }
-                    return Aas.MixedUnion.FromMixedAbstractMember(instance);
+                    return Our.MixedUnion.FromMixedAbstractMember(instance);
                 }
 
                 if (obj.ContainsKey("uniqueToConcreteLeaf"))
                 {
-                    Aas.MixedConcreteLeaf instance = MixedConcreteLeafFrom(
+                    Our.MixedConcreteLeaf instance = MixedConcreteLeafFrom(
                         node, out error);
                     if (error != null)
                     {
                         return default!;
                     }
-                    return Aas.MixedUnion.FromMixedConcreteLeaf(instance);
+                    return Our.MixedUnion.FromMixedConcreteLeaf(instance);
                 }
 
                 error = new Reporting.Error(
                     "Could not determine the concrete type of the union MixedUnion " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.MixedUnion MixedUnionFrom
+            }  // public static Our.MixedUnion MixedUnionFrom
 
             /// <summary>
             /// Deserialize an instance of ModelTypedFirst from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ModelTypedFirst ModelTypedFirstFrom(
+            internal static Our.ModelTypedFirst ModelTypedFirstFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1191,7 +1191,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ModelTypedFirst(
+                return new Our.ModelTypedFirst(
                     theSomeProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1202,7 +1202,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ModelTypedSecond ModelTypedSecondFrom(
+            internal static Our.ModelTypedSecond ModelTypedSecondFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1267,7 +1267,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ModelTypedSecond(
+                return new Our.ModelTypedSecond(
                     theSomeProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1280,7 +1280,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.ModelTypedUnion ModelTypedUnionFrom(
+            public static Our.ModelTypedUnion ModelTypedUnionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1307,23 +1307,23 @@ namespace dummy
                     {
                         case "ModelTypedFirst":
                         {
-                            Aas.ModelTypedFirst instance = ModelTypedFirstFrom(
+                            Our.ModelTypedFirst instance = ModelTypedFirstFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.ModelTypedUnion.FromModelTypedFirst(instance);
+                            return Our.ModelTypedUnion.FromModelTypedFirst(instance);
                         }
                         case "ModelTypedSecond":
                         {
-                            Aas.ModelTypedSecond instance = ModelTypedSecondFrom(
+                            Our.ModelTypedSecond instance = ModelTypedSecondFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.ModelTypedUnion.FromModelTypedSecond(instance);
+                            return Our.ModelTypedUnion.FromModelTypedSecond(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -1336,7 +1336,7 @@ namespace dummy
                     "Could not determine the concrete type of the union ModelTypedUnion " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.ModelTypedUnion ModelTypedUnionFrom
+            }  // public static Our.ModelTypedUnion ModelTypedUnionFrom
 
             /// <summary>
             /// Deserialize an instance of OverlappingUnion by dispatching
@@ -1345,7 +1345,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.OverlappingUnion OverlappingUnionFrom(
+            public static Our.OverlappingUnion OverlappingUnionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1372,43 +1372,43 @@ namespace dummy
                     {
                         case "ModelTypedFirst":
                         {
-                            Aas.ModelTypedFirst instance = ModelTypedFirstFrom(
+                            Our.ModelTypedFirst instance = ModelTypedFirstFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.OverlappingUnion.FromModelTypedFirst(instance);
+                            return Our.OverlappingUnion.FromModelTypedFirst(instance);
                         }
                         case "ModelTypedSecond":
                         {
-                            Aas.ModelTypedSecond instance = ModelTypedSecondFrom(
+                            Our.ModelTypedSecond instance = ModelTypedSecondFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.OverlappingUnion.FromModelTypedSecond(instance);
+                            return Our.OverlappingUnion.FromModelTypedSecond(instance);
                         }
                         case "MixedConcreteWithDescendantsChild":
                         {
-                            Aas.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFrom(
+                            Our.MixedConcreteWithDescendantsChild instance = MixedConcreteWithDescendantsChildFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.OverlappingUnion.FromMixedConcreteWithDescendantsChild(instance);
+                            return Our.OverlappingUnion.FromMixedConcreteWithDescendantsChild(instance);
                         }
                         case "MixedConcreteWithDescendants":
                         {
-                            Aas.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFrom(
+                            Our.MixedConcreteWithDescendants instance = MixedConcreteWithDescendantsFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.OverlappingUnion.FromMixedConcreteWithDescendants(instance);
+                            return Our.OverlappingUnion.FromMixedConcreteWithDescendants(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -1421,14 +1421,14 @@ namespace dummy
                     "Could not determine the concrete type of the union OverlappingUnion " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.OverlappingUnion OverlappingUnionFrom
+            }  // public static Our.OverlappingUnion OverlappingUnionFrom
 
             /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1566,7 +1566,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theStructuralProperty
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1654,7 +1654,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.StructuralFirst anInstance = Deserialize.StructuralFirstFrom(
+        /// Our.StructuralFirst anInstance = Deserialize.StructuralFirstFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -1668,10 +1668,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StructuralFirst.
             /// </exception>
-            public static Aas.StructuralFirst StructuralFirstFrom(
+            public static Our.StructuralFirst StructuralFirstFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StructuralFirst result = DeserializeImplementation.StructuralFirstFrom(
+                Our.StructuralFirst result = DeserializeImplementation.StructuralFirstFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1691,10 +1691,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StructuralSecond.
             /// </exception>
-            public static Aas.StructuralSecond StructuralSecondFrom(
+            public static Our.StructuralSecond StructuralSecondFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StructuralSecond result = DeserializeImplementation.StructuralSecondFrom(
+                Our.StructuralSecond result = DeserializeImplementation.StructuralSecondFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1714,10 +1714,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StructuralUnion.
             /// </exception>
-            public static Aas.StructuralUnion StructuralUnionFrom(
+            public static Our.StructuralUnion StructuralUnionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StructuralUnion result = DeserializeImplementation.StructuralUnionFrom(
+                Our.StructuralUnion result = DeserializeImplementation.StructuralUnionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1738,10 +1738,10 @@ namespace dummy
             /// representation of IMixedAbstractMember.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IMixedAbstractMember IMixedAbstractMemberFrom(
+            public static Our.IMixedAbstractMember IMixedAbstractMemberFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IMixedAbstractMember result = DeserializeImplementation.IMixedAbstractMemberFrom(
+                Our.IMixedAbstractMember result = DeserializeImplementation.IMixedAbstractMemberFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1761,10 +1761,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedAbstractDescendantOne.
             /// </exception>
-            public static Aas.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
+            public static Our.MixedAbstractDescendantOne MixedAbstractDescendantOneFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedAbstractDescendantOne result = DeserializeImplementation.MixedAbstractDescendantOneFrom(
+                Our.MixedAbstractDescendantOne result = DeserializeImplementation.MixedAbstractDescendantOneFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1784,10 +1784,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedAbstractDescendantTwo.
             /// </exception>
-            public static Aas.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
+            public static Our.MixedAbstractDescendantTwo MixedAbstractDescendantTwoFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedAbstractDescendantTwo result = DeserializeImplementation.MixedAbstractDescendantTwoFrom(
+                Our.MixedAbstractDescendantTwo result = DeserializeImplementation.MixedAbstractDescendantTwoFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1808,10 +1808,10 @@ namespace dummy
             /// representation of IMixedConcreteWithDescendants.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
+            public static Our.IMixedConcreteWithDescendants IMixedConcreteWithDescendantsFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IMixedConcreteWithDescendants result = DeserializeImplementation.IMixedConcreteWithDescendantsFrom(
+                Our.IMixedConcreteWithDescendants result = DeserializeImplementation.IMixedConcreteWithDescendantsFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1831,10 +1831,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedConcreteWithDescendants.
             /// </exception>
-            public static Aas.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
+            public static Our.MixedConcreteWithDescendants MixedConcreteWithDescendantsFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedConcreteWithDescendants result = DeserializeImplementation.MixedConcreteWithDescendantsFrom(
+                Our.MixedConcreteWithDescendants result = DeserializeImplementation.MixedConcreteWithDescendantsFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1854,10 +1854,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedConcreteWithDescendantsChild.
             /// </exception>
-            public static Aas.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
+            public static Our.MixedConcreteWithDescendantsChild MixedConcreteWithDescendantsChildFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedConcreteWithDescendantsChild result = DeserializeImplementation.MixedConcreteWithDescendantsChildFrom(
+                Our.MixedConcreteWithDescendantsChild result = DeserializeImplementation.MixedConcreteWithDescendantsChildFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1877,10 +1877,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedConcreteLeaf.
             /// </exception>
-            public static Aas.MixedConcreteLeaf MixedConcreteLeafFrom(
+            public static Our.MixedConcreteLeaf MixedConcreteLeafFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedConcreteLeaf result = DeserializeImplementation.MixedConcreteLeafFrom(
+                Our.MixedConcreteLeaf result = DeserializeImplementation.MixedConcreteLeafFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1900,10 +1900,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MixedUnion.
             /// </exception>
-            public static Aas.MixedUnion MixedUnionFrom(
+            public static Our.MixedUnion MixedUnionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MixedUnion result = DeserializeImplementation.MixedUnionFrom(
+                Our.MixedUnion result = DeserializeImplementation.MixedUnionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1923,10 +1923,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ModelTypedFirst.
             /// </exception>
-            public static Aas.ModelTypedFirst ModelTypedFirstFrom(
+            public static Our.ModelTypedFirst ModelTypedFirstFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ModelTypedFirst result = DeserializeImplementation.ModelTypedFirstFrom(
+                Our.ModelTypedFirst result = DeserializeImplementation.ModelTypedFirstFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1946,10 +1946,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ModelTypedSecond.
             /// </exception>
-            public static Aas.ModelTypedSecond ModelTypedSecondFrom(
+            public static Our.ModelTypedSecond ModelTypedSecondFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ModelTypedSecond result = DeserializeImplementation.ModelTypedSecondFrom(
+                Our.ModelTypedSecond result = DeserializeImplementation.ModelTypedSecondFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1969,10 +1969,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ModelTypedUnion.
             /// </exception>
-            public static Aas.ModelTypedUnion ModelTypedUnionFrom(
+            public static Our.ModelTypedUnion ModelTypedUnionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ModelTypedUnion result = DeserializeImplementation.ModelTypedUnionFrom(
+                Our.ModelTypedUnion result = DeserializeImplementation.ModelTypedUnionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1992,10 +1992,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of OverlappingUnion.
             /// </exception>
-            public static Aas.OverlappingUnion OverlappingUnionFrom(
+            public static Our.OverlappingUnion OverlappingUnionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.OverlappingUnion result = DeserializeImplementation.OverlappingUnionFrom(
+                Our.OverlappingUnion result = DeserializeImplementation.OverlappingUnionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2015,10 +2015,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2055,7 +2055,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -2111,16 +2111,16 @@ namespace dummy
             /// Serialize the named union <paramref name="that" /> into a JSON object.
             /// </summary>
             /// <remarks>
-            /// A named union is not an <see cref="Aas.IClass" />, so it can not be
+            /// A named union is not an <see cref="Our.IClass" />, so it can not be
             /// dispatched by <see cref="TransformIClass" />. Dispatching over the
-            /// common, non-generic <see cref="Aas.IUnion" /> means we need only this one
+            /// common, non-generic <see cref="Our.IUnion" /> means we need only this one
             /// serializer for *all* named unions, and not one per union.
             ///
             /// Should a named union ever be allowed to flatten primitive or enumeration
             /// alternatives, only the body of this method has to change (to dispatch on
             /// the underlying value's kind) -- every call site stays the same.
             /// </remarks>
-            private static Nodes.JsonObject TransformIUnion(Aas.IUnion that)
+            private static Nodes.JsonObject TransformIUnion(Our.IUnion that)
             {
                 return TransformIClass(that.Underlying);
             }
@@ -2270,7 +2270,7 @@ namespace dummy
 
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
-            private static readonly Serializer<Aas.IUnion> Serialize_IUnion = TransformIUnion;
+            private static readonly Serializer<Our.IUnion> Serialize_IUnion = TransformIUnion;
 
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
@@ -2304,7 +2304,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformStructuralFirst(
-                Aas.IStructuralFirst that
+                Our.IStructuralFirst that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2320,7 +2320,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformStructuralSecond(
-                Aas.IStructuralSecond that
+                Our.IStructuralSecond that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2336,7 +2336,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformMixedAbstractDescendantOne(
-                Aas.IMixedAbstractDescendantOne that
+                Our.IMixedAbstractDescendantOne that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2352,7 +2352,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformMixedAbstractDescendantTwo(
-                Aas.IMixedAbstractDescendantTwo that
+                Our.IMixedAbstractDescendantTwo that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2368,7 +2368,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformMixedConcreteWithDescendants(
-                Aas.IMixedConcreteWithDescendants that
+                Our.IMixedConcreteWithDescendants that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2386,7 +2386,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformMixedConcreteWithDescendantsChild(
-                Aas.IMixedConcreteWithDescendantsChild that
+                Our.IMixedConcreteWithDescendantsChild that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2411,7 +2411,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformMixedConcreteLeaf(
-                Aas.IMixedConcreteLeaf that
+                Our.IMixedConcreteLeaf that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2427,7 +2427,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformModelTypedFirst(
-                Aas.IModelTypedFirst that
+                Our.IModelTypedFirst that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2445,7 +2445,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformModelTypedSecond(
-                Aas.IModelTypedSecond that
+                Our.IModelTypedSecond that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2463,7 +2463,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2567,7 +2567,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of StructuralFirst:
         /// <code>
-        /// var anInstance = new Aas.StructuralFirst(
+        /// var anInstance = new Our.StructuralFirst(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -2584,7 +2584,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

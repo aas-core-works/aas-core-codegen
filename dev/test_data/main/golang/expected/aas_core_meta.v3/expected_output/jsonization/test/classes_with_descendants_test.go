@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/aas-core-works/aas-core3.0-golang/jsonization"
-	aastesting "github.com/aas-core-works/aas-core3.0-golang/aastesting"
+	ourjsonization "github.com/aas-core-works/aas-core3.0-golang/jsonization"
+	ourtesting "github.com/aas-core-works/aas-core3.0-golang/ourtesting"
 )
 
 func TestHasSemanticsRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -23,7 +23,7 @@ func TestHasSemanticsRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.HasSemanticsFromJsonable(
+	deserialized, deseriaErr := ourjsonization.HasSemanticsFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestHasSemanticsRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -51,7 +51,7 @@ func TestHasSemanticsRoundTripOKOverDescendant(t *testing.T) {
 func TestHasSemanticsDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.HasSemanticsFromJsonable(
+	_, err := ourjsonization.HasSemanticsFromJsonable(
 		jsonable,
 	)
 
@@ -60,7 +60,7 @@ func TestHasSemanticsDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -88,9 +88,9 @@ func TestHasSemanticsDeserializationFail(t *testing.T) {
 }
 
 func TestHasExtensionsRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -101,7 +101,7 @@ func TestHasExtensionsRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.HasExtensionsFromJsonable(
+	deserialized, deseriaErr := ourjsonization.HasExtensionsFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -109,7 +109,7 @@ func TestHasExtensionsRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -129,7 +129,7 @@ func TestHasExtensionsRoundTripOKOverDescendant(t *testing.T) {
 func TestHasExtensionsDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.HasExtensionsFromJsonable(
+	_, err := ourjsonization.HasExtensionsFromJsonable(
 		jsonable,
 	)
 
@@ -138,7 +138,7 @@ func TestHasExtensionsDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -166,9 +166,9 @@ func TestHasExtensionsDeserializationFail(t *testing.T) {
 }
 
 func TestReferableRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -179,7 +179,7 @@ func TestReferableRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.ReferableFromJsonable(
+	deserialized, deseriaErr := ourjsonization.ReferableFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -187,7 +187,7 @@ func TestReferableRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -207,7 +207,7 @@ func TestReferableRoundTripOKOverDescendant(t *testing.T) {
 func TestReferableDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.ReferableFromJsonable(
+	_, err := ourjsonization.ReferableFromJsonable(
 		jsonable,
 	)
 
@@ -216,7 +216,7 @@ func TestReferableDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -244,9 +244,9 @@ func TestReferableDeserializationFail(t *testing.T) {
 }
 
 func TestIdentifiableRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAssetAdministrationShell()
+	instance := ourtesting.MustLoadMinimalAssetAdministrationShell()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal AssetAdministrationShell: %v",
@@ -257,7 +257,7 @@ func TestIdentifiableRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal AssetAdministrationShell>"
 
-	deserialized, deseriaErr := aasjsonization.IdentifiableFromJsonable(
+	deserialized, deseriaErr := ourjsonization.IdentifiableFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -265,7 +265,7 @@ func TestIdentifiableRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -285,7 +285,7 @@ func TestIdentifiableRoundTripOKOverDescendant(t *testing.T) {
 func TestIdentifiableDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.IdentifiableFromJsonable(
+	_, err := ourjsonization.IdentifiableFromJsonable(
 		jsonable,
 	)
 
@@ -294,7 +294,7 @@ func TestIdentifiableDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -322,9 +322,9 @@ func TestIdentifiableDeserializationFail(t *testing.T) {
 }
 
 func TestHasKindRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodel()
+	instance := ourtesting.MustLoadMinimalSubmodel()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Submodel: %v",
@@ -335,7 +335,7 @@ func TestHasKindRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Submodel>"
 
-	deserialized, deseriaErr := aasjsonization.HasKindFromJsonable(
+	deserialized, deseriaErr := ourjsonization.HasKindFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -343,7 +343,7 @@ func TestHasKindRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -363,7 +363,7 @@ func TestHasKindRoundTripOKOverDescendant(t *testing.T) {
 func TestHasKindDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.HasKindFromJsonable(
+	_, err := ourjsonization.HasKindFromJsonable(
 		jsonable,
 	)
 
@@ -372,7 +372,7 @@ func TestHasKindDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -400,9 +400,9 @@ func TestHasKindDeserializationFail(t *testing.T) {
 }
 
 func TestHasDataSpecificationRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -413,7 +413,7 @@ func TestHasDataSpecificationRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.HasDataSpecificationFromJsonable(
+	deserialized, deseriaErr := ourjsonization.HasDataSpecificationFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -421,7 +421,7 @@ func TestHasDataSpecificationRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -441,7 +441,7 @@ func TestHasDataSpecificationRoundTripOKOverDescendant(t *testing.T) {
 func TestHasDataSpecificationDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.HasDataSpecificationFromJsonable(
+	_, err := ourjsonization.HasDataSpecificationFromJsonable(
 		jsonable,
 	)
 
@@ -450,7 +450,7 @@ func TestHasDataSpecificationDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -478,9 +478,9 @@ func TestHasDataSpecificationDeserializationFail(t *testing.T) {
 }
 
 func TestQualifiableRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -491,7 +491,7 @@ func TestQualifiableRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.QualifiableFromJsonable(
+	deserialized, deseriaErr := ourjsonization.QualifiableFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -499,7 +499,7 @@ func TestQualifiableRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -519,7 +519,7 @@ func TestQualifiableRoundTripOKOverDescendant(t *testing.T) {
 func TestQualifiableDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.QualifiableFromJsonable(
+	_, err := ourjsonization.QualifiableFromJsonable(
 		jsonable,
 	)
 
@@ -528,7 +528,7 @@ func TestQualifiableDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -556,9 +556,9 @@ func TestQualifiableDeserializationFail(t *testing.T) {
 }
 
 func TestSubmodelElementRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal RelationshipElement: %v",
@@ -569,7 +569,7 @@ func TestSubmodelElementRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal RelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.SubmodelElementFromJsonable(
+	deserialized, deseriaErr := ourjsonization.SubmodelElementFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -577,7 +577,7 @@ func TestSubmodelElementRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -597,7 +597,7 @@ func TestSubmodelElementRoundTripOKOverDescendant(t *testing.T) {
 func TestSubmodelElementDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.SubmodelElementFromJsonable(
+	_, err := ourjsonization.SubmodelElementFromJsonable(
 		jsonable,
 	)
 
@@ -606,7 +606,7 @@ func TestSubmodelElementDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -634,9 +634,9 @@ func TestSubmodelElementDeserializationFail(t *testing.T) {
 }
 
 func TestRelationshipElementRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAnnotatedRelationshipElement()
+	instance := ourtesting.MustLoadMinimalAnnotatedRelationshipElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal AnnotatedRelationshipElement: %v",
@@ -647,7 +647,7 @@ func TestRelationshipElementRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal AnnotatedRelationshipElement>"
 
-	deserialized, deseriaErr := aasjsonization.RelationshipElementFromJsonable(
+	deserialized, deseriaErr := ourjsonization.RelationshipElementFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -655,7 +655,7 @@ func TestRelationshipElementRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -673,9 +673,9 @@ func TestRelationshipElementRoundTripOKOverDescendant(t *testing.T) {
 }
 
 func TestDataElementRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBlob()
+	instance := ourtesting.MustLoadMinimalBlob()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Blob: %v",
@@ -686,7 +686,7 @@ func TestDataElementRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Blob>"
 
-	deserialized, deseriaErr := aasjsonization.DataElementFromJsonable(
+	deserialized, deseriaErr := ourjsonization.DataElementFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -694,7 +694,7 @@ func TestDataElementRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -714,7 +714,7 @@ func TestDataElementRoundTripOKOverDescendant(t *testing.T) {
 func TestDataElementDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.DataElementFromJsonable(
+	_, err := ourjsonization.DataElementFromJsonable(
 		jsonable,
 	)
 
@@ -723,7 +723,7 @@ func TestDataElementDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -751,9 +751,9 @@ func TestDataElementDeserializationFail(t *testing.T) {
 }
 
 func TestEventElementRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBasicEventElement()
+	instance := ourtesting.MustLoadMinimalBasicEventElement()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal BasicEventElement: %v",
@@ -764,7 +764,7 @@ func TestEventElementRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal BasicEventElement>"
 
-	deserialized, deseriaErr := aasjsonization.EventElementFromJsonable(
+	deserialized, deseriaErr := ourjsonization.EventElementFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -772,7 +772,7 @@ func TestEventElementRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -792,7 +792,7 @@ func TestEventElementRoundTripOKOverDescendant(t *testing.T) {
 func TestEventElementDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.EventElementFromJsonable(
+	_, err := ourjsonization.EventElementFromJsonable(
 		jsonable,
 	)
 
@@ -801,7 +801,7 @@ func TestEventElementDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -829,9 +829,9 @@ func TestEventElementDeserializationFail(t *testing.T) {
 }
 
 func TestDataSpecificationContentRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalDataSpecificationIEC61360()
+	instance := ourtesting.MustLoadMinimalDataSpecificationIEC61360()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal DataSpecificationIec61360: %v",
@@ -842,7 +842,7 @@ func TestDataSpecificationContentRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal DataSpecificationIec61360>"
 
-	deserialized, deseriaErr := aasjsonization.DataSpecificationContentFromJsonable(
+	deserialized, deseriaErr := ourjsonization.DataSpecificationContentFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -850,7 +850,7 @@ func TestDataSpecificationContentRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -870,7 +870,7 @@ func TestDataSpecificationContentRoundTripOKOverDescendant(t *testing.T) {
 func TestDataSpecificationContentDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.DataSpecificationContentFromJsonable(
+	_, err := ourjsonization.DataSpecificationContentFromJsonable(
 		jsonable,
 	)
 
@@ -879,7 +879,7 @@ func TestDataSpecificationContentDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

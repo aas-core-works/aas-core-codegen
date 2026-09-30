@@ -6,19 +6,19 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSomething
+    == our::stringification::MustModelTypeFromString(
       "Something"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSomething
+    our::stringification::to_string(
+      our::types::ModelType::kSomething
     )
     == "Something"
   );
@@ -26,13 +26,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::stringification::ModelTypeFromString(
+    !our::stringification::ModelTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModelTypeFromString(
+    our::stringification::MustModelTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

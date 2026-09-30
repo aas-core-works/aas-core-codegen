@@ -678,7 +678,7 @@ len(
 
         if node.end is None:
             return (
-                Stripped(f"aascommon.SliceStrFrom({collection}, {start_int64})"),
+                Stripped(f"ourcommon.SliceStrFrom({collection}, {start_int64})"),
                 None,
             )
 
@@ -686,7 +686,7 @@ len(
         end_int64 = self._as_int64_position(node.end, end)
 
         return (
-            Stripped(f"aascommon.SliceStr({collection}, {start_int64}, {end_int64})"),
+            Stripped(f"ourcommon.SliceStr({collection}, {start_int64}, {end_int64})"),
             None,
         )
 
@@ -813,7 +813,7 @@ len(
             return (
                 Stripped(
                     f"""\
-aascommon.MapContains(
+ourcommon.MapContains(
 {I}{indent_but_first_line(container, I)},
 {I}{indent_but_first_line(member, I)},
 )"""
@@ -1002,7 +1002,7 @@ aascommon.MapContains(
                     else Stripped("0")
                 )
                 return (
-                    Stripped(f"aascommon.FindStr({instance}, {args[0]}, {start})"),
+                    Stripped(f"ourcommon.FindStr({instance}, {args[0]}, {start})"),
                     None,
                 )
 
@@ -1038,7 +1038,7 @@ aascommon.MapContains(
                 return (
                     Stripped(
                         f"""\
-aascommon.{function_name}(
+ourcommon.{function_name}(
 {I}{indent_but_first_line(instance, I)},
 {I}{indent_but_first_line(args[0], I)},
 )"""
@@ -1223,7 +1223,7 @@ aascommon.{function_name}(
                     )
                     is intermediate_type_inference.PrimitiveType.STR
                 ):
-                    len_function = "aascommon.LenStr"
+                    len_function = "ourcommon.LenStr"
 
                 if "\n" in args[0]:
                     return (
@@ -1263,7 +1263,7 @@ aascommon.{function_name}(
                     # Go provides no absolute value of integers in its standard
                     # library, so we call our own helper, see
                     # :py:data:`aas_core_codegen.golang.lib._generate_common.ABS_INT64`.
-                    abs_function = f"aascommon.{ABS_INT64_FUNCTION_NAME}"
+                    abs_function = f"ourcommon.{ABS_INT64_FUNCTION_NAME}"
 
                 else:
                     return None, Error(
@@ -1316,7 +1316,7 @@ aascommon.{function_name}(
                     return (
                         Stripped(
                             f"""\
-aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
+ourcommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
 {I}{indent_but_first_line(args[0], I)},
 )"""
                         ),
@@ -1324,7 +1324,7 @@ aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
                     )
 
                 return (
-                    Stripped(f"aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}({args[0]})"),
+                    Stripped(f"ourcommon.{PARSE_SAFE_INT_FUNCTION_NAME}({args[0]})"),
                     None,
                 )
 
@@ -1757,13 +1757,13 @@ aascommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
         if "\n" in args_joined or len(args_joined) > 50:
             call = Stripped(
                 f"""\
-aascommon.{FLOOR_MOD_FUNCTION_NAME}(
+ourcommon.{FLOOR_MOD_FUNCTION_NAME}(
 {I}{indent_but_first_line(left, I)},
 {I}{indent_but_first_line(right, I)},
 )"""
             )
         else:
-            call = Stripped(f"aascommon.{FLOOR_MOD_FUNCTION_NAME}({args_joined})")
+            call = Stripped(f"ourcommon.{FLOOR_MOD_FUNCTION_NAME}({args_joined})")
 
         if result_a_type is length:
             # NOTE (mristin):
@@ -2031,7 +2031,7 @@ fmt.Sprintf(
             return (
                 Stripped(
                     f"""\
-aascommon.{qualifier_function}(
+ourcommon.{qualifier_function}(
 {I}func({variable_name_go} {variable_type_go}) bool {{
 {II}return {indent_but_first_line(condition, III)}
 {I}}},
@@ -2055,7 +2055,7 @@ aascommon.{qualifier_function}(
             return (
                 Stripped(
                     f"""\
-aascommon.{qualifier_function}(
+ourcommon.{qualifier_function}(
 {I}func({variable_name_go} {variable_type_go}) bool {{
 {II}return {indent_but_first_line(condition, III)}
 {I}}},

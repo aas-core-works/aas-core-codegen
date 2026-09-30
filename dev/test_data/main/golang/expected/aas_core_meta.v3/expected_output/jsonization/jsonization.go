@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aasreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
-	aasstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
+	ourstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
 // region De-serialization
@@ -27,13 +27,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -48,7 +48,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -57,7 +57,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -68,7 +68,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -79,7 +79,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -430,12 +430,12 @@ func unexpectedEnumLiteralError(
 	)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IHasSemantics],
+// Parse `jsonable` as an instance of [ourtypes.IHasSemantics],
 // or return an error.
 func HasSemanticsFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IHasSemantics,
+	result ourtypes.IHasSemantics,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -447,12 +447,12 @@ func HasSemanticsFromJsonable(
 	return hasSemanticsFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IExtension],
+// Parse `jsonable` as an instance of [ourtypes.IExtension],
 // or return an error.
 func ExtensionFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IExtension,
+	result ourtypes.IExtension,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -464,20 +464,20 @@ func ExtensionFromJsonable(
 	return extensionFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IExtension] from a map,
+// Parse [ourtypes.IExtension] from a map,
 // or return an error, if any.
 func extensionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IExtension,
+	result ourtypes.IExtension,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
 	var theName string
-	var theValueType *aastypes.DataTypeDefXSD
+	var theValueType *ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theRefersTo []aastypes.IReference
+	var theRefersTo []ourtypes.IReference
 
 	foundName := false
 
@@ -525,7 +525,7 @@ func extensionFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewExtension(
+	result = ourtypes.NewExtension(
 		theName,
 	)
 	result.SetSemanticID(
@@ -547,12 +547,12 @@ func extensionFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IHasExtensions],
+// Parse `jsonable` as an instance of [ourtypes.IHasExtensions],
 // or return an error.
 func HasExtensionsFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IHasExtensions,
+	result ourtypes.IHasExtensions,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -564,12 +564,12 @@ func HasExtensionsFromJsonable(
 	return hasExtensionsFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IReferable],
+// Parse `jsonable` as an instance of [ourtypes.IReferable],
 // or return an error.
 func ReferableFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IReferable,
+	result ourtypes.IReferable,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -581,12 +581,12 @@ func ReferableFromJsonable(
 	return referableFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IIdentifiable],
+// Parse `jsonable` as an instance of [ourtypes.IIdentifiable],
 // or return an error.
 func IdentifiableFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IIdentifiable,
+	result ourtypes.IIdentifiable,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -598,30 +598,30 @@ func IdentifiableFromJsonable(
 	return identifiableFromMap(m)
 }
 
-// Parse `jsonable` as a literal of [aastypes.ModellingKind],
+// Parse `jsonable` as a literal of [ourtypes.ModellingKind],
 // or return an error.
 func ModellingKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.ModellingKind, err error) {
+) (result ourtypes.ModellingKind, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "ModellingKind")
 		return
 	}
 
-	result, ok = aasstringification.ModellingKindFromString(text)
+	result, ok = ourstringification.ModellingKindFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "ModellingKind")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IHasKind],
+// Parse `jsonable` as an instance of [ourtypes.IHasKind],
 // or return an error.
 func HasKindFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IHasKind,
+	result ourtypes.IHasKind,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -633,12 +633,12 @@ func HasKindFromJsonable(
 	return hasKindFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IHasDataSpecification],
+// Parse `jsonable` as an instance of [ourtypes.IHasDataSpecification],
 // or return an error.
 func HasDataSpecificationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IHasDataSpecification,
+	result ourtypes.IHasDataSpecification,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -650,12 +650,12 @@ func HasDataSpecificationFromJsonable(
 	return hasDataSpecificationFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IAdministrativeInformation],
+// Parse `jsonable` as an instance of [ourtypes.IAdministrativeInformation],
 // or return an error.
 func AdministrativeInformationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IAdministrativeInformation,
+	result ourtypes.IAdministrativeInformation,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -667,18 +667,18 @@ func AdministrativeInformationFromJsonable(
 	return administrativeInformationFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IAdministrativeInformation] from a map,
+// Parse [ourtypes.IAdministrativeInformation] from a map,
 // or return an error, if any.
 func administrativeInformationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IAdministrativeInformation,
+	result ourtypes.IAdministrativeInformation,
 	err error,
 ) {
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theVersion *string
 	var theRevision *string
-	var theCreator aastypes.IReference
+	var theCreator ourtypes.IReference
 	var theTemplateID *string
 
 	for k, v := range m {
@@ -716,7 +716,7 @@ func administrativeInformationFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewAdministrativeInformation()
+	result = ourtypes.NewAdministrativeInformation()
 	result.SetEmbeddedDataSpecifications(
 		theEmbeddedDataSpecifications,
 	)
@@ -736,12 +736,12 @@ func administrativeInformationFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IQualifiable],
+// Parse `jsonable` as an instance of [ourtypes.IQualifiable],
 // or return an error.
 func QualifiableFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IQualifiable,
+	result ourtypes.IQualifiable,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -753,30 +753,30 @@ func QualifiableFromJsonable(
 	return qualifiableFromMap(m)
 }
 
-// Parse `jsonable` as a literal of [aastypes.QualifierKind],
+// Parse `jsonable` as a literal of [ourtypes.QualifierKind],
 // or return an error.
 func QualifierKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.QualifierKind, err error) {
+) (result ourtypes.QualifierKind, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "QualifierKind")
 		return
 	}
 
-	result, ok = aasstringification.QualifierKindFromString(text)
+	result, ok = ourstringification.QualifierKindFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "QualifierKind")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IQualifier],
+// Parse `jsonable` as an instance of [ourtypes.IQualifier],
 // or return an error.
 func QualifierFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IQualifier,
+	result ourtypes.IQualifier,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -788,21 +788,21 @@ func QualifierFromJsonable(
 	return qualifierFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IQualifier] from a map,
+// Parse [ourtypes.IQualifier] from a map,
 // or return an error, if any.
 func qualifierFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IQualifier,
+	result ourtypes.IQualifier,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theKind *aastypes.QualifierKind
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theKind *ourtypes.QualifierKind
 	var theType string
-	var theValueType aastypes.DataTypeDefXSD
+	var theValueType ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundType := false
 	foundValueType := false
@@ -862,7 +862,7 @@ func qualifierFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewQualifier(
+	result = ourtypes.NewQualifier(
 		theType,
 		theValueType,
 	)
@@ -885,12 +885,12 @@ func qualifierFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IAssetAdministrationShell],
+// Parse `jsonable` as an instance of [ourtypes.IAssetAdministrationShell],
 // or return an error.
 func AssetAdministrationShellFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IAssetAdministrationShell,
+	result ourtypes.IAssetAdministrationShell,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -907,25 +907,25 @@ func AssetAdministrationShellFromJsonable(
 	return assetAdministrationShellFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IAssetAdministrationShell] from a map,
+// Parse [ourtypes.IAssetAdministrationShell] from a map,
 // or return an error, if any.
 func assetAdministrationShellFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IAssetAdministrationShell,
+	result ourtypes.IAssetAdministrationShell,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theDerivedFrom aastypes.IReference
-	var theAssetInformation aastypes.IAssetInformation
-	var theSubmodels []aastypes.IReference
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theDerivedFrom ourtypes.IReference
+	var theAssetInformation ourtypes.IAssetInformation
+	var theSubmodels []ourtypes.IReference
 
 	foundID := false
 	foundAssetInformation := false
@@ -1002,7 +1002,7 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewAssetAdministrationShell(
+	result = ourtypes.NewAssetAdministrationShell(
 		theID,
 		theAssetInformation,
 	)
@@ -1037,12 +1037,12 @@ func assetAdministrationShellFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IAssetInformation],
+// Parse `jsonable` as an instance of [ourtypes.IAssetInformation],
 // or return an error.
 func AssetInformationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IAssetInformation,
+	result ourtypes.IAssetInformation,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1054,19 +1054,19 @@ func AssetInformationFromJsonable(
 	return assetInformationFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IAssetInformation] from a map,
+// Parse [ourtypes.IAssetInformation] from a map,
 // or return an error, if any.
 func assetInformationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IAssetInformation,
+	result ourtypes.IAssetInformation,
 	err error,
 ) {
-	var theAssetKind aastypes.AssetKind
+	var theAssetKind ourtypes.AssetKind
 	var theGlobalAssetID *string
-	var theSpecificAssetIDs []aastypes.ISpecificAssetID
+	var theSpecificAssetIDs []ourtypes.ISpecificAssetID
 	var theAssetType *string
-	var theDefaultThumbnail aastypes.IResource
+	var theDefaultThumbnail ourtypes.IResource
 
 	foundAssetKind := false
 
@@ -1111,7 +1111,7 @@ func assetInformationFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewAssetInformation(
+	result = ourtypes.NewAssetInformation(
 		theAssetKind,
 	)
 	result.SetGlobalAssetID(
@@ -1130,12 +1130,12 @@ func assetInformationFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IResource],
+// Parse `jsonable` as an instance of [ourtypes.IResource],
 // or return an error.
 func ResourceFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IResource,
+	result ourtypes.IResource,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1147,12 +1147,12 @@ func ResourceFromJsonable(
 	return resourceFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IResource] from a map,
+// Parse [ourtypes.IResource] from a map,
 // or return an error, if any.
 func resourceFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IResource,
+	result ourtypes.IResource,
 	err error,
 ) {
 	var thePath string
@@ -1192,7 +1192,7 @@ func resourceFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewResource(
+	result = ourtypes.NewResource(
 		thePath,
 	)
 	result.SetContentType(
@@ -1202,30 +1202,30 @@ func resourceFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.AssetKind],
+// Parse `jsonable` as a literal of [ourtypes.AssetKind],
 // or return an error.
 func AssetKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.AssetKind, err error) {
+) (result ourtypes.AssetKind, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "AssetKind")
 		return
 	}
 
-	result, ok = aasstringification.AssetKindFromString(text)
+	result, ok = ourstringification.AssetKindFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "AssetKind")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISpecificAssetID],
+// Parse `jsonable` as an instance of [ourtypes.ISpecificAssetID],
 // or return an error.
 func SpecificAssetIDFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISpecificAssetID,
+	result ourtypes.ISpecificAssetID,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1237,19 +1237,19 @@ func SpecificAssetIDFromJsonable(
 	return specificAssetIDFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISpecificAssetID] from a map,
+// Parse [ourtypes.ISpecificAssetID] from a map,
 // or return an error, if any.
 func specificAssetIDFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISpecificAssetID,
+	result ourtypes.ISpecificAssetID,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
 	var theName string
 	var theValue string
-	var theExternalSubjectID aastypes.IReference
+	var theExternalSubjectID ourtypes.IReference
 
 	foundName := false
 	foundValue := false
@@ -1303,7 +1303,7 @@ func specificAssetIDFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSpecificAssetID(
+	result = ourtypes.NewSpecificAssetID(
 		theName,
 		theValue,
 	)
@@ -1320,12 +1320,12 @@ func specificAssetIDFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISubmodel],
+// Parse `jsonable` as an instance of [ourtypes.ISubmodel],
 // or return an error.
 func SubmodelFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISubmodel,
+	result ourtypes.ISubmodel,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1342,27 +1342,27 @@ func SubmodelFromJsonable(
 	return submodelFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISubmodel] from a map,
+// Parse [ourtypes.ISubmodel] from a map,
 // or return an error, if any.
 func submodelFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISubmodel,
+	result ourtypes.ISubmodel,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theKind *aastypes.ModellingKind
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theSubmodelElements []aastypes.ISubmodelElement
+	var theKind *ourtypes.ModellingKind
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theSubmodelElements []ourtypes.ISubmodelElement
 
 	foundID := false
 
@@ -1436,7 +1436,7 @@ func submodelFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSubmodel(
+	result = ourtypes.NewSubmodel(
 		theID,
 	)
 	result.SetExtensions(
@@ -1479,12 +1479,12 @@ func submodelFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISubmodelElement],
+// Parse `jsonable` as an instance of [ourtypes.ISubmodelElement],
 // or return an error.
 func SubmodelElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISubmodelElement,
+	result ourtypes.ISubmodelElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1496,12 +1496,12 @@ func SubmodelElementFromJsonable(
 	return submodelElementFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IRelationshipElement],
+// Parse `jsonable` as an instance of [ourtypes.IRelationshipElement],
 // or return an error.
 func RelationshipElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IRelationshipElement,
+	result ourtypes.IRelationshipElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1513,32 +1513,32 @@ func RelationshipElementFromJsonable(
 	return relationshipElementFromMap(m)
 }
 
-// Parse [aastypes.IRelationshipElement] from a map,
+// Parse [ourtypes.IRelationshipElement] from a map,
 // or return an error, if any.
 //
 // This function performs no dispatch! It is used to parse the properties
 // as-are, and already assumes the exact model type. Usually, this function
 // is called from within a from-jsonable or from-map function, and you never
 // call it directly. If you want to de-serialize an instance of
-// [aastypes.IRelationshipElement], call
+// [ourtypes.IRelationshipElement], call
 // [RelationshipElementFromJsonable].
 func relationshipElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IRelationshipElement,
+	result ourtypes.IRelationshipElement,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theFirst aastypes.IReference
-	var theSecond aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theFirst ourtypes.IReference
+	var theSecond ourtypes.IReference
 
 	foundFirst := false
 	foundSecond := false
@@ -1615,7 +1615,7 @@ func relationshipElementFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewRelationshipElement(
+	result = ourtypes.NewRelationshipElement(
 		theFirst,
 		theSecond,
 	)
@@ -1650,30 +1650,30 @@ func relationshipElementFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.AASSubmodelElements],
+// Parse `jsonable` as a literal of [ourtypes.AASSubmodelElements],
 // or return an error.
 func AASSubmodelElementsFromJsonable(
 	jsonable interface{},
-) (result aastypes.AASSubmodelElements, err error) {
+) (result ourtypes.AASSubmodelElements, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "AASSubmodelElements")
 		return
 	}
 
-	result, ok = aasstringification.AASSubmodelElementsFromString(text)
+	result, ok = ourstringification.AASSubmodelElementsFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "AASSubmodelElements")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISubmodelElementList],
+// Parse `jsonable` as an instance of [ourtypes.ISubmodelElementList],
 // or return an error.
 func SubmodelElementListFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISubmodelElementList,
+	result ourtypes.ISubmodelElementList,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1690,28 +1690,28 @@ func SubmodelElementListFromJsonable(
 	return submodelElementListFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISubmodelElementList] from a map,
+// Parse [ourtypes.ISubmodelElementList] from a map,
 // or return an error, if any.
 func submodelElementListFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISubmodelElementList,
+	result ourtypes.ISubmodelElementList,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theOrderRelevant *bool
-	var theSemanticIDListElement aastypes.IReference
-	var theTypeValueListElement aastypes.AASSubmodelElements
-	var theValueTypeListElement *aastypes.DataTypeDefXSD
-	var theValue []aastypes.ISubmodelElement
+	var theSemanticIDListElement ourtypes.IReference
+	var theTypeValueListElement ourtypes.AASSubmodelElements
+	var theValueTypeListElement *ourtypes.DataTypeDefXSD
+	var theValue []ourtypes.ISubmodelElement
 
 	foundTypeValueListElement := false
 
@@ -1788,7 +1788,7 @@ func submodelElementListFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSubmodelElementList(
+	result = ourtypes.NewSubmodelElementList(
 		theTypeValueListElement,
 	)
 	result.SetExtensions(
@@ -1834,12 +1834,12 @@ func submodelElementListFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISubmodelElementCollection],
+// Parse `jsonable` as an instance of [ourtypes.ISubmodelElementCollection],
 // or return an error.
 func SubmodelElementCollectionFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISubmodelElementCollection,
+	result ourtypes.ISubmodelElementCollection,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1856,24 +1856,24 @@ func SubmodelElementCollectionFromJsonable(
 	return submodelElementCollectionFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISubmodelElementCollection] from a map,
+// Parse [ourtypes.ISubmodelElementCollection] from a map,
 // or return an error, if any.
 func submodelElementCollectionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISubmodelElementCollection,
+	result ourtypes.ISubmodelElementCollection,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue []aastypes.ISubmodelElement
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue []ourtypes.ISubmodelElement
 
 	for k, v := range m {
 		switch k {
@@ -1928,7 +1928,7 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewSubmodelElementCollection()
+	result = ourtypes.NewSubmodelElementCollection()
 	result.SetExtensions(
 		theExtensions,
 	)
@@ -1963,12 +1963,12 @@ func submodelElementCollectionFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IDataElement],
+// Parse `jsonable` as an instance of [ourtypes.IDataElement],
 // or return an error.
 func DataElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IDataElement,
+	result ourtypes.IDataElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -1980,12 +1980,12 @@ func DataElementFromJsonable(
 	return dataElementFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IProperty],
+// Parse `jsonable` as an instance of [ourtypes.IProperty],
 // or return an error.
 func PropertyFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IProperty,
+	result ourtypes.IProperty,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2002,26 +2002,26 @@ func PropertyFromJsonable(
 	return propertyFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IProperty] from a map,
+// Parse [ourtypes.IProperty] from a map,
 // or return an error, if any.
 func propertyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IProperty,
+	result ourtypes.IProperty,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValueType aastypes.DataTypeDefXSD
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValueType ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundValueType := false
 
@@ -2092,7 +2092,7 @@ func propertyFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewProperty(
+	result = ourtypes.NewProperty(
 		theValueType,
 	)
 	result.SetExtensions(
@@ -2132,12 +2132,12 @@ func propertyFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IMultiLanguageProperty],
+// Parse `jsonable` as an instance of [ourtypes.IMultiLanguageProperty],
 // or return an error.
 func MultiLanguagePropertyFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IMultiLanguageProperty,
+	result ourtypes.IMultiLanguageProperty,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2154,25 +2154,25 @@ func MultiLanguagePropertyFromJsonable(
 	return multiLanguagePropertyFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IMultiLanguageProperty] from a map,
+// Parse [ourtypes.IMultiLanguageProperty] from a map,
 // or return an error, if any.
 func multiLanguagePropertyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IMultiLanguageProperty,
+	result ourtypes.IMultiLanguageProperty,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue []aastypes.ILangStringTextType
-	var theValueID aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue []ourtypes.ILangStringTextType
+	var theValueID ourtypes.IReference
 
 	for k, v := range m {
 		switch k {
@@ -2230,7 +2230,7 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewMultiLanguageProperty()
+	result = ourtypes.NewMultiLanguageProperty()
 	result.SetExtensions(
 		theExtensions,
 	)
@@ -2268,12 +2268,12 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IRange],
+// Parse `jsonable` as an instance of [ourtypes.IRange],
 // or return an error.
 func RangeFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IRange,
+	result ourtypes.IRange,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2290,24 +2290,24 @@ func RangeFromJsonable(
 	return rangeFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IRange] from a map,
+// Parse [ourtypes.IRange] from a map,
 // or return an error, if any.
 func rangeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IRange,
+	result ourtypes.IRange,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValueType aastypes.DataTypeDefXSD
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValueType ourtypes.DataTypeDefXSD
 	var theMin *string
 	var theMax *string
 
@@ -2380,7 +2380,7 @@ func rangeFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewRange(
+	result = ourtypes.NewRange(
 		theValueType,
 	)
 	result.SetExtensions(
@@ -2420,12 +2420,12 @@ func rangeFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IReferenceElement],
+// Parse `jsonable` as an instance of [ourtypes.IReferenceElement],
 // or return an error.
 func ReferenceElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IReferenceElement,
+	result ourtypes.IReferenceElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2442,24 +2442,24 @@ func ReferenceElementFromJsonable(
 	return referenceElementFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IReferenceElement] from a map,
+// Parse [ourtypes.IReferenceElement] from a map,
 // or return an error, if any.
 func referenceElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IReferenceElement,
+	result ourtypes.IReferenceElement,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue ourtypes.IReference
 
 	for k, v := range m {
 		switch k {
@@ -2514,7 +2514,7 @@ func referenceElementFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewReferenceElement()
+	result = ourtypes.NewReferenceElement()
 	result.SetExtensions(
 		theExtensions,
 	)
@@ -2549,12 +2549,12 @@ func referenceElementFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IBlob],
+// Parse `jsonable` as an instance of [ourtypes.IBlob],
 // or return an error.
 func BlobFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IBlob,
+	result ourtypes.IBlob,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2571,23 +2571,23 @@ func BlobFromJsonable(
 	return blobFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IBlob] from a map,
+// Parse [ourtypes.IBlob] from a map,
 // or return an error, if any.
 func blobFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IBlob,
+	result ourtypes.IBlob,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theValue []byte
 	var theContentType string
 
@@ -2657,7 +2657,7 @@ func blobFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewBlob(
+	result = ourtypes.NewBlob(
 		theContentType,
 	)
 	result.SetExtensions(
@@ -2694,12 +2694,12 @@ func blobFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IFile],
+// Parse `jsonable` as an instance of [ourtypes.IFile],
 // or return an error.
 func FileFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IFile,
+	result ourtypes.IFile,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2716,23 +2716,23 @@ func FileFromJsonable(
 	return fileFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IFile] from a map,
+// Parse [ourtypes.IFile] from a map,
 // or return an error, if any.
 func fileFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IFile,
+	result ourtypes.IFile,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theValue *string
 	var theContentType string
 
@@ -2802,7 +2802,7 @@ func fileFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewFile(
+	result = ourtypes.NewFile(
 		theContentType,
 	)
 	result.SetExtensions(
@@ -2839,12 +2839,12 @@ func fileFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IAnnotatedRelationshipElement],
+// Parse `jsonable` as an instance of [ourtypes.IAnnotatedRelationshipElement],
 // or return an error.
 func AnnotatedRelationshipElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IAnnotatedRelationshipElement,
+	result ourtypes.IAnnotatedRelationshipElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -2861,26 +2861,26 @@ func AnnotatedRelationshipElementFromJsonable(
 	return annotatedRelationshipElementFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IAnnotatedRelationshipElement] from a map,
+// Parse [ourtypes.IAnnotatedRelationshipElement] from a map,
 // or return an error, if any.
 func annotatedRelationshipElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IAnnotatedRelationshipElement,
+	result ourtypes.IAnnotatedRelationshipElement,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theFirst aastypes.IReference
-	var theSecond aastypes.IReference
-	var theAnnotations []aastypes.IDataElement
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theFirst ourtypes.IReference
+	var theSecond ourtypes.IReference
+	var theAnnotations []ourtypes.IDataElement
 
 	foundFirst := false
 	foundSecond := false
@@ -2960,7 +2960,7 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewAnnotatedRelationshipElement(
+	result = ourtypes.NewAnnotatedRelationshipElement(
 		theFirst,
 		theSecond,
 	)
@@ -2998,12 +2998,12 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IEntity],
+// Parse `jsonable` as an instance of [ourtypes.IEntity],
 // or return an error.
 func EntityFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IEntity,
+	result ourtypes.IEntity,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3020,27 +3020,27 @@ func EntityFromJsonable(
 	return entityFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IEntity] from a map,
+// Parse [ourtypes.IEntity] from a map,
 // or return an error, if any.
 func entityFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IEntity,
+	result ourtypes.IEntity,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theStatements []aastypes.ISubmodelElement
-	var theEntityType aastypes.EntityType
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theStatements []ourtypes.ISubmodelElement
+	var theEntityType ourtypes.EntityType
 	var theGlobalAssetID *string
-	var theSpecificAssetIDs []aastypes.ISpecificAssetID
+	var theSpecificAssetIDs []ourtypes.ISpecificAssetID
 
 	foundEntityType := false
 
@@ -3114,7 +3114,7 @@ func entityFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewEntity(
+	result = ourtypes.NewEntity(
 		theEntityType,
 	)
 	result.SetExtensions(
@@ -3157,66 +3157,66 @@ func entityFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.EntityType],
+// Parse `jsonable` as a literal of [ourtypes.EntityType],
 // or return an error.
 func EntityTypeFromJsonable(
 	jsonable interface{},
-) (result aastypes.EntityType, err error) {
+) (result ourtypes.EntityType, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "EntityType")
 		return
 	}
 
-	result, ok = aasstringification.EntityTypeFromString(text)
+	result, ok = ourstringification.EntityTypeFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "EntityType")
 	}
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.Direction],
+// Parse `jsonable` as a literal of [ourtypes.Direction],
 // or return an error.
 func DirectionFromJsonable(
 	jsonable interface{},
-) (result aastypes.Direction, err error) {
+) (result ourtypes.Direction, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "Direction")
 		return
 	}
 
-	result, ok = aasstringification.DirectionFromString(text)
+	result, ok = ourstringification.DirectionFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "Direction")
 	}
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.StateOfEvent],
+// Parse `jsonable` as a literal of [ourtypes.StateOfEvent],
 // or return an error.
 func StateOfEventFromJsonable(
 	jsonable interface{},
-) (result aastypes.StateOfEvent, err error) {
+) (result ourtypes.StateOfEvent, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "StateOfEvent")
 		return
 	}
 
-	result, ok = aasstringification.StateOfEventFromString(text)
+	result, ok = ourstringification.StateOfEventFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "StateOfEvent")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IEventPayload],
+// Parse `jsonable` as an instance of [ourtypes.IEventPayload],
 // or return an error.
 func EventPayloadFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IEventPayload,
+	result ourtypes.IEventPayload,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3228,20 +3228,20 @@ func EventPayloadFromJsonable(
 	return eventPayloadFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IEventPayload] from a map,
+// Parse [ourtypes.IEventPayload] from a map,
 // or return an error, if any.
 func eventPayloadFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IEventPayload,
+	result ourtypes.IEventPayload,
 	err error,
 ) {
-	var theSource aastypes.IReference
-	var theSourceSemanticID aastypes.IReference
-	var theObservableReference aastypes.IReference
-	var theObservableSemanticID aastypes.IReference
+	var theSource ourtypes.IReference
+	var theSourceSemanticID ourtypes.IReference
+	var theObservableReference ourtypes.IReference
+	var theObservableSemanticID ourtypes.IReference
 	var theTopic *string
-	var theSubjectID aastypes.IReference
+	var theSubjectID ourtypes.IReference
 	var theTimeStamp string
 	var thePayload []byte
 
@@ -3315,7 +3315,7 @@ func eventPayloadFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewEventPayload(
+	result = ourtypes.NewEventPayload(
 		theSource,
 		theObservableReference,
 		theTimeStamp,
@@ -3339,12 +3339,12 @@ func eventPayloadFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IEventElement],
+// Parse `jsonable` as an instance of [ourtypes.IEventElement],
 // or return an error.
 func EventElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IEventElement,
+	result ourtypes.IEventElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3356,12 +3356,12 @@ func EventElementFromJsonable(
 	return eventElementFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IBasicEventElement],
+// Parse `jsonable` as an instance of [ourtypes.IBasicEventElement],
 // or return an error.
 func BasicEventElementFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IBasicEventElement,
+	result ourtypes.IBasicEventElement,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3378,28 +3378,28 @@ func BasicEventElementFromJsonable(
 	return basicEventElementFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IBasicEventElement] from a map,
+// Parse [ourtypes.IBasicEventElement] from a map,
 // or return an error, if any.
 func basicEventElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IBasicEventElement,
+	result ourtypes.IBasicEventElement,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theObserved aastypes.IReference
-	var theDirection aastypes.Direction
-	var theState aastypes.StateOfEvent
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theObserved ourtypes.IReference
+	var theDirection ourtypes.Direction
+	var theState ourtypes.StateOfEvent
 	var theMessageTopic *string
-	var theMessageBroker aastypes.IReference
+	var theMessageBroker ourtypes.IReference
 	var theLastUpdate *string
 	var theMinInterval *string
 	var theMaxInterval *string
@@ -3506,7 +3506,7 @@ func basicEventElementFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewBasicEventElement(
+	result = ourtypes.NewBasicEventElement(
 		theObserved,
 		theDirection,
 		theState,
@@ -3557,12 +3557,12 @@ func basicEventElementFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IOperation],
+// Parse `jsonable` as an instance of [ourtypes.IOperation],
 // or return an error.
 func OperationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IOperation,
+	result ourtypes.IOperation,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3579,26 +3579,26 @@ func OperationFromJsonable(
 	return operationFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IOperation] from a map,
+// Parse [ourtypes.IOperation] from a map,
 // or return an error, if any.
 func operationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IOperation,
+	result ourtypes.IOperation,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theInputVariables []aastypes.IOperationVariable
-	var theOutputVariables []aastypes.IOperationVariable
-	var theInoutputVariables []aastypes.IOperationVariable
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theInputVariables []ourtypes.IOperationVariable
+	var theOutputVariables []ourtypes.IOperationVariable
+	var theInoutputVariables []ourtypes.IOperationVariable
 
 	for k, v := range m {
 		switch k {
@@ -3659,7 +3659,7 @@ func operationFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewOperation()
+	result = ourtypes.NewOperation()
 	result.SetExtensions(
 		theExtensions,
 	)
@@ -3700,12 +3700,12 @@ func operationFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IOperationVariable],
+// Parse `jsonable` as an instance of [ourtypes.IOperationVariable],
 // or return an error.
 func OperationVariableFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IOperationVariable,
+	result ourtypes.IOperationVariable,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3717,15 +3717,15 @@ func OperationVariableFromJsonable(
 	return operationVariableFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IOperationVariable] from a map,
+// Parse [ourtypes.IOperationVariable] from a map,
 // or return an error, if any.
 func operationVariableFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IOperationVariable,
+	result ourtypes.IOperationVariable,
 	err error,
 ) {
-	var theValue aastypes.ISubmodelElement
+	var theValue ourtypes.ISubmodelElement
 
 	foundValue := false
 
@@ -3758,19 +3758,19 @@ func operationVariableFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewOperationVariable(
+	result = ourtypes.NewOperationVariable(
 		theValue,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ICapability],
+// Parse `jsonable` as an instance of [ourtypes.ICapability],
 // or return an error.
 func CapabilityFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ICapability,
+	result ourtypes.ICapability,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3787,23 +3787,23 @@ func CapabilityFromJsonable(
 	return capabilityFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ICapability] from a map,
+// Parse [ourtypes.ICapability] from a map,
 // or return an error, if any.
 func capabilityFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ICapability,
+	result ourtypes.ICapability,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 
 	for k, v := range m {
 		switch k {
@@ -3855,7 +3855,7 @@ func capabilityFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewCapability()
+	result = ourtypes.NewCapability()
 	result.SetExtensions(
 		theExtensions,
 	)
@@ -3887,12 +3887,12 @@ func capabilityFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IConceptDescription],
+// Parse `jsonable` as an instance of [ourtypes.IConceptDescription],
 // or return an error.
 func ConceptDescriptionFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IConceptDescription,
+	result ourtypes.IConceptDescription,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -3909,23 +3909,23 @@ func ConceptDescriptionFromJsonable(
 	return conceptDescriptionFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IConceptDescription] from a map,
+// Parse [ourtypes.IConceptDescription] from a map,
 // or return an error, if any.
 func conceptDescriptionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IConceptDescription,
+	result ourtypes.IConceptDescription,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theIsCaseOf []aastypes.IReference
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theIsCaseOf []ourtypes.IReference
 
 	foundID := false
 
@@ -3987,7 +3987,7 @@ func conceptDescriptionFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewConceptDescription(
+	result = ourtypes.NewConceptDescription(
 		theID,
 	)
 	result.SetExtensions(
@@ -4018,30 +4018,30 @@ func conceptDescriptionFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.ReferenceTypes],
+// Parse `jsonable` as a literal of [ourtypes.ReferenceTypes],
 // or return an error.
 func ReferenceTypesFromJsonable(
 	jsonable interface{},
-) (result aastypes.ReferenceTypes, err error) {
+) (result ourtypes.ReferenceTypes, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "ReferenceTypes")
 		return
 	}
 
-	result, ok = aasstringification.ReferenceTypesFromString(text)
+	result, ok = ourstringification.ReferenceTypesFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "ReferenceTypes")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IReference],
+// Parse `jsonable` as an instance of [ourtypes.IReference],
 // or return an error.
 func ReferenceFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IReference,
+	result ourtypes.IReference,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4053,17 +4053,17 @@ func ReferenceFromJsonable(
 	return referenceFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IReference] from a map,
+// Parse [ourtypes.IReference] from a map,
 // or return an error, if any.
 func referenceFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IReference,
+	result ourtypes.IReference,
 	err error,
 ) {
-	var theType aastypes.ReferenceTypes
-	var theReferredSemanticID aastypes.IReference
-	var theKeys []aastypes.IKey
+	var theType ourtypes.ReferenceTypes
+	var theReferredSemanticID ourtypes.IReference
+	var theKeys []ourtypes.IKey
 
 	foundType := false
 	foundKeys := false
@@ -4111,7 +4111,7 @@ func referenceFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewReference(
+	result = ourtypes.NewReference(
 		theType,
 		theKeys,
 	)
@@ -4122,12 +4122,12 @@ func referenceFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IKey],
+// Parse `jsonable` as an instance of [ourtypes.IKey],
 // or return an error.
 func KeyFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IKey,
+	result ourtypes.IKey,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4139,15 +4139,15 @@ func KeyFromJsonable(
 	return keyFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IKey] from a map,
+// Parse [ourtypes.IKey] from a map,
 // or return an error, if any.
 func keyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IKey,
+	result ourtypes.IKey,
 	err error,
 ) {
-	var theType aastypes.KeyTypes
+	var theType ourtypes.KeyTypes
 	var theValue string
 
 	foundType := false
@@ -4193,7 +4193,7 @@ func keyFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewKey(
+	result = ourtypes.NewKey(
 		theType,
 		theValue,
 	)
@@ -4201,48 +4201,48 @@ func keyFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.KeyTypes],
+// Parse `jsonable` as a literal of [ourtypes.KeyTypes],
 // or return an error.
 func KeyTypesFromJsonable(
 	jsonable interface{},
-) (result aastypes.KeyTypes, err error) {
+) (result ourtypes.KeyTypes, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "KeyTypes")
 		return
 	}
 
-	result, ok = aasstringification.KeyTypesFromString(text)
+	result, ok = ourstringification.KeyTypesFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "KeyTypes")
 	}
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.DataTypeDefXSD],
+// Parse `jsonable` as a literal of [ourtypes.DataTypeDefXSD],
 // or return an error.
 func DataTypeDefXSDFromJsonable(
 	jsonable interface{},
-) (result aastypes.DataTypeDefXSD, err error) {
+) (result ourtypes.DataTypeDefXSD, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "DataTypeDefXSD")
 		return
 	}
 
-	result, ok = aasstringification.DataTypeDefXSDFromString(text)
+	result, ok = ourstringification.DataTypeDefXSDFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "DataTypeDefXSD")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IAbstractLangString],
+// Parse `jsonable` as an instance of [ourtypes.IAbstractLangString],
 // or return an error.
 func AbstractLangStringFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IAbstractLangString,
+	result ourtypes.IAbstractLangString,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4254,12 +4254,12 @@ func AbstractLangStringFromJsonable(
 	return abstractLangStringFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringNameType],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringNameType],
 // or return an error.
 func LangStringNameTypeFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringNameType,
+	result ourtypes.ILangStringNameType,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4271,12 +4271,12 @@ func LangStringNameTypeFromJsonable(
 	return langStringNameTypeFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringNameType] from a map,
+// Parse [ourtypes.ILangStringNameType] from a map,
 // or return an error, if any.
 func langStringNameTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringNameType,
+	result ourtypes.ILangStringNameType,
 	err error,
 ) {
 	var theLanguage string
@@ -4325,7 +4325,7 @@ func langStringNameTypeFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringNameType(
+	result = ourtypes.NewLangStringNameType(
 		theLanguage,
 		theText,
 	)
@@ -4333,12 +4333,12 @@ func langStringNameTypeFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringTextType],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringTextType],
 // or return an error.
 func LangStringTextTypeFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringTextType,
+	result ourtypes.ILangStringTextType,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4350,12 +4350,12 @@ func LangStringTextTypeFromJsonable(
 	return langStringTextTypeFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringTextType] from a map,
+// Parse [ourtypes.ILangStringTextType] from a map,
 // or return an error, if any.
 func langStringTextTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringTextType,
+	result ourtypes.ILangStringTextType,
 	err error,
 ) {
 	var theLanguage string
@@ -4404,7 +4404,7 @@ func langStringTextTypeFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringTextType(
+	result = ourtypes.NewLangStringTextType(
 		theLanguage,
 		theText,
 	)
@@ -4412,12 +4412,12 @@ func langStringTextTypeFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IEnvironment],
+// Parse `jsonable` as an instance of [ourtypes.IEnvironment],
 // or return an error.
 func EnvironmentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IEnvironment,
+	result ourtypes.IEnvironment,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4429,17 +4429,17 @@ func EnvironmentFromJsonable(
 	return environmentFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IEnvironment] from a map,
+// Parse [ourtypes.IEnvironment] from a map,
 // or return an error, if any.
 func environmentFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IEnvironment,
+	result ourtypes.IEnvironment,
 	err error,
 ) {
-	var theAssetAdministrationShells []aastypes.IAssetAdministrationShell
-	var theSubmodels []aastypes.ISubmodel
-	var theConceptDescriptions []aastypes.IConceptDescription
+	var theAssetAdministrationShells []ourtypes.IAssetAdministrationShell
+	var theSubmodels []ourtypes.ISubmodel
+	var theConceptDescriptions []ourtypes.IConceptDescription
 
 	for k, v := range m {
 		switch k {
@@ -4470,7 +4470,7 @@ func environmentFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewEnvironment()
+	result = ourtypes.NewEnvironment()
 	result.SetAssetAdministrationShells(
 		theAssetAdministrationShells,
 	)
@@ -4484,12 +4484,12 @@ func environmentFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IDataSpecificationContent],
+// Parse `jsonable` as an instance of [ourtypes.IDataSpecificationContent],
 // or return an error.
 func DataSpecificationContentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IDataSpecificationContent,
+	result ourtypes.IDataSpecificationContent,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4501,12 +4501,12 @@ func DataSpecificationContentFromJsonable(
 	return dataSpecificationContentFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IEmbeddedDataSpecification],
+// Parse `jsonable` as an instance of [ourtypes.IEmbeddedDataSpecification],
 // or return an error.
 func EmbeddedDataSpecificationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IEmbeddedDataSpecification,
+	result ourtypes.IEmbeddedDataSpecification,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4518,16 +4518,16 @@ func EmbeddedDataSpecificationFromJsonable(
 	return embeddedDataSpecificationFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IEmbeddedDataSpecification] from a map,
+// Parse [ourtypes.IEmbeddedDataSpecification] from a map,
 // or return an error, if any.
 func embeddedDataSpecificationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IEmbeddedDataSpecification,
+	result ourtypes.IEmbeddedDataSpecification,
 	err error,
 ) {
-	var theDataSpecification aastypes.IReference
-	var theDataSpecificationContent aastypes.IDataSpecificationContent
+	var theDataSpecification ourtypes.IReference
+	var theDataSpecificationContent ourtypes.IDataSpecificationContent
 
 	foundDataSpecification := false
 	foundDataSpecificationContent := false
@@ -4572,7 +4572,7 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewEmbeddedDataSpecification(
+	result = ourtypes.NewEmbeddedDataSpecification(
 		theDataSpecification,
 		theDataSpecificationContent,
 	)
@@ -4580,30 +4580,30 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as a literal of [aastypes.DataTypeIEC61360],
+// Parse `jsonable` as a literal of [ourtypes.DataTypeIEC61360],
 // or return an error.
 func DataTypeIEC61360FromJsonable(
 	jsonable interface{},
-) (result aastypes.DataTypeIEC61360, err error) {
+) (result ourtypes.DataTypeIEC61360, err error) {
 	text, ok := jsonable.(string)
 	if !ok {
 		err = notAnEnumTextError(jsonable, "DataTypeIEC61360")
 		return
 	}
 
-	result, ok = aasstringification.DataTypeIEC61360FromString(text)
+	result, ok = ourstringification.DataTypeIEC61360FromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "DataTypeIEC61360")
 	}
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILevelType],
+// Parse `jsonable` as an instance of [ourtypes.ILevelType],
 // or return an error.
 func LevelTypeFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILevelType,
+	result ourtypes.ILevelType,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4615,12 +4615,12 @@ func LevelTypeFromJsonable(
 	return levelTypeFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILevelType] from a map,
+// Parse [ourtypes.ILevelType] from a map,
 // or return an error, if any.
 func levelTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILevelType,
+	result ourtypes.ILevelType,
 	err error,
 ) {
 	var theMin bool
@@ -4695,7 +4695,7 @@ func levelTypeFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLevelType(
+	result = ourtypes.NewLevelType(
 		theMin,
 		theNom,
 		theTyp,
@@ -4705,12 +4705,12 @@ func levelTypeFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IValueReferencePair],
+// Parse `jsonable` as an instance of [ourtypes.IValueReferencePair],
 // or return an error.
 func ValueReferencePairFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IValueReferencePair,
+	result ourtypes.IValueReferencePair,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4722,16 +4722,16 @@ func ValueReferencePairFromJsonable(
 	return valueReferencePairFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IValueReferencePair] from a map,
+// Parse [ourtypes.IValueReferencePair] from a map,
 // or return an error, if any.
 func valueReferencePairFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IValueReferencePair,
+	result ourtypes.IValueReferencePair,
 	err error,
 ) {
 	var theValue string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundValue := false
 	foundValueID := false
@@ -4776,7 +4776,7 @@ func valueReferencePairFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewValueReferencePair(
+	result = ourtypes.NewValueReferencePair(
 		theValue,
 		theValueID,
 	)
@@ -4784,12 +4784,12 @@ func valueReferencePairFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IValueList],
+// Parse `jsonable` as an instance of [ourtypes.IValueList],
 // or return an error.
 func ValueListFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IValueList,
+	result ourtypes.IValueList,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4801,15 +4801,15 @@ func ValueListFromJsonable(
 	return valueListFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IValueList] from a map,
+// Parse [ourtypes.IValueList] from a map,
 // or return an error, if any.
 func valueListFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IValueList,
+	result ourtypes.IValueList,
 	err error,
 ) {
-	var theValueReferencePairs []aastypes.IValueReferencePair
+	var theValueReferencePairs []ourtypes.IValueReferencePair
 
 	foundValueReferencePairs := false
 
@@ -4842,19 +4842,19 @@ func valueListFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewValueList(
+	result = ourtypes.NewValueList(
 		theValueReferencePairs,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringPreferredNameTypeIEC61360],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringPreferredNameTypeIEC61360],
 // or return an error.
 func LangStringPreferredNameTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringPreferredNameTypeIEC61360,
+	result ourtypes.ILangStringPreferredNameTypeIEC61360,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4866,12 +4866,12 @@ func LangStringPreferredNameTypeIEC61360FromJsonable(
 	return langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringPreferredNameTypeIEC61360] from a map,
+// Parse [ourtypes.ILangStringPreferredNameTypeIEC61360] from a map,
 // or return an error, if any.
 func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringPreferredNameTypeIEC61360,
+	result ourtypes.ILangStringPreferredNameTypeIEC61360,
 	err error,
 ) {
 	var theLanguage string
@@ -4920,7 +4920,7 @@ func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringPreferredNameTypeIEC61360(
+	result = ourtypes.NewLangStringPreferredNameTypeIEC61360(
 		theLanguage,
 		theText,
 	)
@@ -4928,12 +4928,12 @@ func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringShortNameTypeIEC61360],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringShortNameTypeIEC61360],
 // or return an error.
 func LangStringShortNameTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringShortNameTypeIEC61360,
+	result ourtypes.ILangStringShortNameTypeIEC61360,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -4945,12 +4945,12 @@ func LangStringShortNameTypeIEC61360FromJsonable(
 	return langStringShortNameTypeIEC61360FromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringShortNameTypeIEC61360] from a map,
+// Parse [ourtypes.ILangStringShortNameTypeIEC61360] from a map,
 // or return an error, if any.
 func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringShortNameTypeIEC61360,
+	result ourtypes.ILangStringShortNameTypeIEC61360,
 	err error,
 ) {
 	var theLanguage string
@@ -4999,7 +4999,7 @@ func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringShortNameTypeIEC61360(
+	result = ourtypes.NewLangStringShortNameTypeIEC61360(
 		theLanguage,
 		theText,
 	)
@@ -5007,12 +5007,12 @@ func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringDefinitionTypeIEC61360],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringDefinitionTypeIEC61360],
 // or return an error.
 func LangStringDefinitionTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringDefinitionTypeIEC61360,
+	result ourtypes.ILangStringDefinitionTypeIEC61360,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -5024,12 +5024,12 @@ func LangStringDefinitionTypeIEC61360FromJsonable(
 	return langStringDefinitionTypeIEC61360FromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringDefinitionTypeIEC61360] from a map,
+// Parse [ourtypes.ILangStringDefinitionTypeIEC61360] from a map,
 // or return an error, if any.
 func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringDefinitionTypeIEC61360,
+	result ourtypes.ILangStringDefinitionTypeIEC61360,
 	err error,
 ) {
 	var theLanguage string
@@ -5078,7 +5078,7 @@ func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringDefinitionTypeIEC61360(
+	result = ourtypes.NewLangStringDefinitionTypeIEC61360(
 		theLanguage,
 		theText,
 	)
@@ -5086,12 +5086,12 @@ func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IDataSpecificationIEC61360],
+// Parse `jsonable` as an instance of [ourtypes.IDataSpecificationIEC61360],
 // or return an error.
 func DataSpecificationIEC61360FromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IDataSpecificationIEC61360,
+	result ourtypes.IDataSpecificationIEC61360,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -5108,26 +5108,26 @@ func DataSpecificationIEC61360FromJsonable(
 	return dataSpecificationIEC61360FromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IDataSpecificationIEC61360] from a map,
+// Parse [ourtypes.IDataSpecificationIEC61360] from a map,
 // or return an error, if any.
 func dataSpecificationIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IDataSpecificationIEC61360,
+	result ourtypes.IDataSpecificationIEC61360,
 	err error,
 ) {
-	var thePreferredName []aastypes.ILangStringPreferredNameTypeIEC61360
-	var theShortName []aastypes.ILangStringShortNameTypeIEC61360
+	var thePreferredName []ourtypes.ILangStringPreferredNameTypeIEC61360
+	var theShortName []ourtypes.ILangStringShortNameTypeIEC61360
 	var theUnit *string
-	var theUnitID aastypes.IReference
+	var theUnitID ourtypes.IReference
 	var theSourceOfDefinition *string
 	var theSymbol *string
-	var theDataType *aastypes.DataTypeIEC61360
-	var theDefinition []aastypes.ILangStringDefinitionTypeIEC61360
+	var theDataType *ourtypes.DataTypeIEC61360
+	var theDefinition []ourtypes.ILangStringDefinitionTypeIEC61360
 	var theValueFormat *string
-	var theValueList aastypes.IValueList
+	var theValueList ourtypes.IValueList
 	var theValue *string
-	var theLevelType aastypes.ILevelType
+	var theLevelType ourtypes.ILevelType
 
 	foundPreferredName := false
 
@@ -5202,7 +5202,7 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewDataSpecificationIEC61360(
+	result = ourtypes.NewDataSpecificationIEC61360(
 		thePreferredName,
 	)
 	result.SetShortName(
@@ -5242,12 +5242,12 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 	return
 }
 
-// De-serialize an instance of [aastypes.IHasSemantics]
+// De-serialize an instance of [ourtypes.IHasSemantics]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func hasSemanticsFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IHasSemantics,
+	result ourtypes.IHasSemantics,
 	err error,
 ) {
 	var modelType string
@@ -5306,12 +5306,12 @@ func hasSemanticsFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IHasExtensions]
+// De-serialize an instance of [ourtypes.IHasExtensions]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func hasExtensionsFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IHasExtensions,
+	result ourtypes.IHasExtensions,
 	err error,
 ) {
 	var modelType string
@@ -5368,12 +5368,12 @@ func hasExtensionsFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IReferable]
+// De-serialize an instance of [ourtypes.IReferable]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func referableFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IReferable,
+	result ourtypes.IReferable,
 	err error,
 ) {
 	var modelType string
@@ -5430,12 +5430,12 @@ func referableFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IIdentifiable]
+// De-serialize an instance of [ourtypes.IIdentifiable]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func identifiableFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IIdentifiable,
+	result ourtypes.IIdentifiable,
 	err error,
 ) {
 	var modelType string
@@ -5464,12 +5464,12 @@ func identifiableFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IHasKind]
+// De-serialize an instance of [ourtypes.IHasKind]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func hasKindFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IHasKind,
+	result ourtypes.IHasKind,
 	err error,
 ) {
 	var modelType string
@@ -5494,12 +5494,12 @@ func hasKindFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IHasDataSpecification]
+// De-serialize an instance of [ourtypes.IHasDataSpecification]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func hasDataSpecificationFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IHasDataSpecification,
+	result ourtypes.IHasDataSpecification,
 	err error,
 ) {
 	var modelType string
@@ -5558,12 +5558,12 @@ func hasDataSpecificationFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IQualifiable]
+// De-serialize an instance of [ourtypes.IQualifiable]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func qualifiableFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IQualifiable,
+	result ourtypes.IQualifiable,
 	err error,
 ) {
 	var modelType string
@@ -5616,12 +5616,12 @@ func qualifiableFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.ISubmodelElement]
+// De-serialize an instance of [ourtypes.ISubmodelElement]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func submodelElementFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.ISubmodelElement,
+	result ourtypes.ISubmodelElement,
 	err error,
 ) {
 	var modelType string
@@ -5672,12 +5672,12 @@ func submodelElementFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IRelationshipElement]
+// De-serialize an instance of [ourtypes.IRelationshipElement]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func relationshipElementFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IRelationshipElement,
+	result ourtypes.IRelationshipElement,
 	err error,
 ) {
 	var modelType string
@@ -5704,12 +5704,12 @@ func relationshipElementFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IDataElement]
+// De-serialize an instance of [ourtypes.IDataElement]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func dataElementFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IDataElement,
+	result ourtypes.IDataElement,
 	err error,
 ) {
 	var modelType string
@@ -5744,12 +5744,12 @@ func dataElementFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IEventElement]
+// De-serialize an instance of [ourtypes.IEventElement]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func eventElementFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IEventElement,
+	result ourtypes.IEventElement,
 	err error,
 ) {
 	var modelType string
@@ -5774,12 +5774,12 @@ func eventElementFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IAbstractLangString]
+// De-serialize an instance of [ourtypes.IAbstractLangString]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func abstractLangStringFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IAbstractLangString,
+	result ourtypes.IAbstractLangString,
 	err error,
 ) {
 	var modelType string
@@ -5812,12 +5812,12 @@ func abstractLangStringFromMap(
 	return
 }
 
-// De-serialize an instance of [aastypes.IDataSpecificationContent]
+// De-serialize an instance of [ourtypes.IDataSpecificationContent]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func dataSpecificationContentFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IDataSpecificationContent,
+	result ourtypes.IDataSpecificationContent,
 	err error,
 ) {
 	var modelType string
@@ -5850,13 +5850,13 @@ func dataSpecificationContentFromMap(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -5871,7 +5871,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -5880,7 +5880,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -5891,7 +5891,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -5902,7 +5902,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -6026,27 +6026,27 @@ func serializeArray[T any](
 
 // Serialize `that` to a JSON-able value, or return an error.
 //
-// `ToJsonable` takes an `aastypes.IClass`, but a list or a tuple item's own
-// (more specific) interface type, e.g., `aastypes.ISomeItem`, can not be
+// `ToJsonable` takes an `ourtypes.IClass`, but a list or a tuple item's own
+// (more specific) interface type, e.g., `ourtypes.ISomeItem`, can not be
 // unified with that when passing `ToJsonable` itself as a
 // `func(item T) (interface{}, error)` value -- Go function values are
 // invariant in their parameter type (no contravariance, unlike, say, a C#
 // delegate). Making this wrapper itself generic (instead of fixing its
-// parameter to `aastypes.IClass`) lets the very same one be passed on bare,
+// parameter to `ourtypes.IClass`) lets the very same one be passed on bare,
 // uninstantiated, for every class-typed item regardless of its
 // concrete interface: Go infers both the item's type and this
 // wrapper's own type parameter together from the context of the
 // `serializeArray`/`serializeTupleN` call.
-func classAsJsonableInterface[T aastypes.IClass](that T) (interface{}, error) {
+func classAsJsonableInterface[T ourtypes.IClass](that T) (interface{}, error) {
 	return ToJsonable(that)
 }
 
 // Serialize `that` to a string, or return an error.
 func ModellingKindToJsonable(
-	that aastypes.ModellingKind,
+	that ourtypes.ModellingKind,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.ModellingKindToString(
+	result, ok = ourstringification.ModellingKindToString(
 		that,
 	)
 	if !ok {
@@ -6064,10 +6064,10 @@ func ModellingKindToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func QualifierKindToJsonable(
-	that aastypes.QualifierKind,
+	that ourtypes.QualifierKind,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.QualifierKindToString(
+	result, ok = ourstringification.QualifierKindToString(
 		that,
 	)
 	if !ok {
@@ -6085,10 +6085,10 @@ func QualifierKindToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func AssetKindToJsonable(
-	that aastypes.AssetKind,
+	that ourtypes.AssetKind,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.AssetKindToString(
+	result, ok = ourstringification.AssetKindToString(
 		that,
 	)
 	if !ok {
@@ -6106,10 +6106,10 @@ func AssetKindToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func AASSubmodelElementsToJsonable(
-	that aastypes.AASSubmodelElements,
+	that ourtypes.AASSubmodelElements,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.AASSubmodelElementsToString(
+	result, ok = ourstringification.AASSubmodelElementsToString(
 		that,
 	)
 	if !ok {
@@ -6127,10 +6127,10 @@ func AASSubmodelElementsToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func EntityTypeToJsonable(
-	that aastypes.EntityType,
+	that ourtypes.EntityType,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.EntityTypeToString(
+	result, ok = ourstringification.EntityTypeToString(
 		that,
 	)
 	if !ok {
@@ -6148,10 +6148,10 @@ func EntityTypeToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func DirectionToJsonable(
-	that aastypes.Direction,
+	that ourtypes.Direction,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.DirectionToString(
+	result, ok = ourstringification.DirectionToString(
 		that,
 	)
 	if !ok {
@@ -6169,10 +6169,10 @@ func DirectionToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func StateOfEventToJsonable(
-	that aastypes.StateOfEvent,
+	that ourtypes.StateOfEvent,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.StateOfEventToString(
+	result, ok = ourstringification.StateOfEventToString(
 		that,
 	)
 	if !ok {
@@ -6190,10 +6190,10 @@ func StateOfEventToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func ReferenceTypesToJsonable(
-	that aastypes.ReferenceTypes,
+	that ourtypes.ReferenceTypes,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.ReferenceTypesToString(
+	result, ok = ourstringification.ReferenceTypesToString(
 		that,
 	)
 	if !ok {
@@ -6211,10 +6211,10 @@ func ReferenceTypesToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func KeyTypesToJsonable(
-	that aastypes.KeyTypes,
+	that ourtypes.KeyTypes,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.KeyTypesToString(
+	result, ok = ourstringification.KeyTypesToString(
 		that,
 	)
 	if !ok {
@@ -6232,10 +6232,10 @@ func KeyTypesToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func DataTypeDefXSDToJsonable(
-	that aastypes.DataTypeDefXSD,
+	that ourtypes.DataTypeDefXSD,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.DataTypeDefXSDToString(
+	result, ok = ourstringification.DataTypeDefXSDToString(
 		that,
 	)
 	if !ok {
@@ -6253,10 +6253,10 @@ func DataTypeDefXSDToJsonable(
 
 // Serialize `that` to a string, or return an error.
 func DataTypeIEC61360ToJsonable(
-	that aastypes.DataTypeIEC61360,
+	that ourtypes.DataTypeIEC61360,
 ) (result string, err error) {
 	var ok bool
-	result, ok = aasstringification.DataTypeIEC61360ToString(
+	result, ok = ourstringification.DataTypeIEC61360ToString(
 		that,
 	)
 	if !ok {
@@ -6272,14 +6272,14 @@ func DataTypeIEC61360ToJsonable(
 	return
 }
 
-// Serialize [aastypes.IExtension] as a JSON-able map.
+// Serialize [ourtypes.IExtension] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IExtension] with proper dispatch, call
+// [ourtypes.IExtension] with proper dispatch, call
 // [ToJsonable].
 func extensionToMap(
-	that aastypes.IExtension,
+	that ourtypes.IExtension,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -6294,7 +6294,7 @@ func extensionToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6318,7 +6318,7 @@ func extensionToMap(
 
 	if that.RefersTo() != nil {
 		result["refersTo"], err = serializeArray(
-			that.RefersTo(), classAsJsonableInterface[aastypes.IReference],
+			that.RefersTo(), classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("RefersTo()")
@@ -6329,21 +6329,21 @@ func extensionToMap(
 	return
 }
 
-// Serialize [aastypes.IAdministrativeInformation] as a JSON-able map.
+// Serialize [ourtypes.IAdministrativeInformation] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IAdministrativeInformation] with proper dispatch, call
+// [ourtypes.IAdministrativeInformation] with proper dispatch, call
 // [ToJsonable].
 func administrativeInformationToMap(
-	that aastypes.IAdministrativeInformation,
+	that ourtypes.IAdministrativeInformation,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -6374,14 +6374,14 @@ func administrativeInformationToMap(
 	return
 }
 
-// Serialize [aastypes.IQualifier] as a JSON-able map.
+// Serialize [ourtypes.IQualifier] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IQualifier] with proper dispatch, call
+// [ourtypes.IQualifier] with proper dispatch, call
 // [ToJsonable].
 func qualifierToMap(
-	that aastypes.IQualifier,
+	that ourtypes.IQualifier,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -6396,7 +6396,7 @@ func qualifierToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6435,20 +6435,20 @@ func qualifierToMap(
 	return
 }
 
-// Serialize [aastypes.IAssetAdministrationShell] as a JSON-able map.
+// Serialize [ourtypes.IAssetAdministrationShell] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IAssetAdministrationShell] with proper dispatch, call
+// [ourtypes.IAssetAdministrationShell] with proper dispatch, call
 // [ToJsonable].
 func assetAdministrationShellToMap(
-	that aastypes.IAssetAdministrationShell,
+	that ourtypes.IAssetAdministrationShell,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -6466,7 +6466,7 @@ func assetAdministrationShellToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -6476,7 +6476,7 @@ func assetAdministrationShellToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -6497,7 +6497,7 @@ func assetAdministrationShellToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -6521,7 +6521,7 @@ func assetAdministrationShellToMap(
 
 	if that.Submodels() != nil {
 		result["submodels"], err = serializeArray(
-			that.Submodels(), classAsJsonableInterface[aastypes.IReference],
+			that.Submodels(), classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Submodels()")
@@ -6534,14 +6534,14 @@ func assetAdministrationShellToMap(
 	return
 }
 
-// Serialize [aastypes.IAssetInformation] as a JSON-able map.
+// Serialize [ourtypes.IAssetInformation] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IAssetInformation] with proper dispatch, call
+// [ourtypes.IAssetInformation] with proper dispatch, call
 // [ToJsonable].
 func assetInformationToMap(
-	that aastypes.IAssetInformation,
+	that ourtypes.IAssetInformation,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -6558,7 +6558,7 @@ func assetInformationToMap(
 	if that.SpecificAssetIDs() != nil {
 		result["specificAssetIds"], err = serializeArray(
 			that.SpecificAssetIDs(),
-			classAsJsonableInterface[aastypes.ISpecificAssetID],
+			classAsJsonableInterface[ourtypes.ISpecificAssetID],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SpecificAssetIDs()")
@@ -6581,14 +6581,14 @@ func assetInformationToMap(
 	return
 }
 
-// Serialize [aastypes.IResource] as a JSON-able map.
+// Serialize [ourtypes.IResource] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IResource] with proper dispatch, call
+// [ourtypes.IResource] with proper dispatch, call
 // [ToJsonable].
 func resourceToMap(
-	that aastypes.IResource,
+	that ourtypes.IResource,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -6601,14 +6601,14 @@ func resourceToMap(
 	return
 }
 
-// Serialize [aastypes.ISpecificAssetID] as a JSON-able map.
+// Serialize [ourtypes.ISpecificAssetID] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISpecificAssetID] with proper dispatch, call
+// [ourtypes.ISpecificAssetID] with proper dispatch, call
 // [ToJsonable].
 func specificAssetIDToMap(
-	that aastypes.ISpecificAssetID,
+	that ourtypes.ISpecificAssetID,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -6623,7 +6623,7 @@ func specificAssetIDToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6646,20 +6646,20 @@ func specificAssetIDToMap(
 	return
 }
 
-// Serialize [aastypes.ISubmodel] as a JSON-able map.
+// Serialize [ourtypes.ISubmodel] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISubmodel] with proper dispatch, call
+// [ourtypes.ISubmodel] with proper dispatch, call
 // [ToJsonable].
 func submodelToMap(
-	that aastypes.ISubmodel,
+	that ourtypes.ISubmodel,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -6677,7 +6677,7 @@ func submodelToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -6687,7 +6687,7 @@ func submodelToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -6724,7 +6724,7 @@ func submodelToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6734,7 +6734,7 @@ func submodelToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -6745,7 +6745,7 @@ func submodelToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -6756,7 +6756,7 @@ func submodelToMap(
 	if that.SubmodelElements() != nil {
 		result["submodelElements"], err = serializeArray(
 			that.SubmodelElements(),
-			classAsJsonableInterface[aastypes.ISubmodelElement],
+			classAsJsonableInterface[ourtypes.ISubmodelElement],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SubmodelElements()")
@@ -6769,20 +6769,20 @@ func submodelToMap(
 	return
 }
 
-// Serialize [aastypes.IRelationshipElement] as a JSON-able map.
+// Serialize [ourtypes.IRelationshipElement] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IRelationshipElement] with proper dispatch, call
+// [ourtypes.IRelationshipElement] with proper dispatch, call
 // [ToJsonable].
 func relationshipElementToMap(
-	that aastypes.IRelationshipElement,
+	that ourtypes.IRelationshipElement,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -6800,7 +6800,7 @@ func relationshipElementToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -6810,7 +6810,7 @@ func relationshipElementToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -6829,7 +6829,7 @@ func relationshipElementToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6839,7 +6839,7 @@ func relationshipElementToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -6850,7 +6850,7 @@ func relationshipElementToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -6875,20 +6875,20 @@ func relationshipElementToMap(
 	return
 }
 
-// Serialize [aastypes.ISubmodelElementList] as a JSON-able map.
+// Serialize [ourtypes.ISubmodelElementList] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISubmodelElementList] with proper dispatch, call
+// [ourtypes.ISubmodelElementList] with proper dispatch, call
 // [ToJsonable].
 func submodelElementListToMap(
-	that aastypes.ISubmodelElementList,
+	that ourtypes.ISubmodelElementList,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -6906,7 +6906,7 @@ func submodelElementListToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -6916,7 +6916,7 @@ func submodelElementListToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -6935,7 +6935,7 @@ func submodelElementListToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -6945,7 +6945,7 @@ func submodelElementListToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -6956,7 +6956,7 @@ func submodelElementListToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -6996,7 +6996,7 @@ func submodelElementListToMap(
 
 	if that.Value() != nil {
 		result["value"], err = serializeArray(
-			that.Value(), classAsJsonableInterface[aastypes.ISubmodelElement],
+			that.Value(), classAsJsonableInterface[ourtypes.ISubmodelElement],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Value()")
@@ -7009,20 +7009,20 @@ func submodelElementListToMap(
 	return
 }
 
-// Serialize [aastypes.ISubmodelElementCollection] as a JSON-able map.
+// Serialize [ourtypes.ISubmodelElementCollection] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISubmodelElementCollection] with proper dispatch, call
+// [ourtypes.ISubmodelElementCollection] with proper dispatch, call
 // [ToJsonable].
 func submodelElementCollectionToMap(
-	that aastypes.ISubmodelElementCollection,
+	that ourtypes.ISubmodelElementCollection,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7040,7 +7040,7 @@ func submodelElementCollectionToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7050,7 +7050,7 @@ func submodelElementCollectionToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7069,7 +7069,7 @@ func submodelElementCollectionToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7079,7 +7079,7 @@ func submodelElementCollectionToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7090,7 +7090,7 @@ func submodelElementCollectionToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7100,7 +7100,7 @@ func submodelElementCollectionToMap(
 
 	if that.Value() != nil {
 		result["value"], err = serializeArray(
-			that.Value(), classAsJsonableInterface[aastypes.ISubmodelElement],
+			that.Value(), classAsJsonableInterface[ourtypes.ISubmodelElement],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Value()")
@@ -7113,20 +7113,20 @@ func submodelElementCollectionToMap(
 	return
 }
 
-// Serialize [aastypes.IProperty] as a JSON-able map.
+// Serialize [ourtypes.IProperty] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IProperty] with proper dispatch, call
+// [ourtypes.IProperty] with proper dispatch, call
 // [ToJsonable].
 func propertyToMap(
-	that aastypes.IProperty,
+	that ourtypes.IProperty,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7144,7 +7144,7 @@ func propertyToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7154,7 +7154,7 @@ func propertyToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7173,7 +7173,7 @@ func propertyToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7183,7 +7183,7 @@ func propertyToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7194,7 +7194,7 @@ func propertyToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7225,20 +7225,20 @@ func propertyToMap(
 	return
 }
 
-// Serialize [aastypes.IMultiLanguageProperty] as a JSON-able map.
+// Serialize [ourtypes.IMultiLanguageProperty] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IMultiLanguageProperty] with proper dispatch, call
+// [ourtypes.IMultiLanguageProperty] with proper dispatch, call
 // [ToJsonable].
 func multiLanguagePropertyToMap(
-	that aastypes.IMultiLanguageProperty,
+	that ourtypes.IMultiLanguageProperty,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7256,7 +7256,7 @@ func multiLanguagePropertyToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7266,7 +7266,7 @@ func multiLanguagePropertyToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7285,7 +7285,7 @@ func multiLanguagePropertyToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7295,7 +7295,7 @@ func multiLanguagePropertyToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7306,7 +7306,7 @@ func multiLanguagePropertyToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7316,7 +7316,7 @@ func multiLanguagePropertyToMap(
 
 	if that.Value() != nil {
 		result["value"], err = serializeArray(
-			that.Value(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Value(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Value()")
@@ -7337,20 +7337,20 @@ func multiLanguagePropertyToMap(
 	return
 }
 
-// Serialize [aastypes.IRange] as a JSON-able map.
+// Serialize [ourtypes.IRange] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IRange] with proper dispatch, call
+// [ourtypes.IRange] with proper dispatch, call
 // [ToJsonable].
 func rangeToMap(
-	that aastypes.IRange,
+	that ourtypes.IRange,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7368,7 +7368,7 @@ func rangeToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7378,7 +7378,7 @@ func rangeToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7397,7 +7397,7 @@ func rangeToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7407,7 +7407,7 @@ func rangeToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7418,7 +7418,7 @@ func rangeToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7445,20 +7445,20 @@ func rangeToMap(
 	return
 }
 
-// Serialize [aastypes.IReferenceElement] as a JSON-able map.
+// Serialize [ourtypes.IReferenceElement] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IReferenceElement] with proper dispatch, call
+// [ourtypes.IReferenceElement] with proper dispatch, call
 // [ToJsonable].
 func referenceElementToMap(
-	that aastypes.IReferenceElement,
+	that ourtypes.IReferenceElement,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7476,7 +7476,7 @@ func referenceElementToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7486,7 +7486,7 @@ func referenceElementToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7505,7 +7505,7 @@ func referenceElementToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7515,7 +7515,7 @@ func referenceElementToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7526,7 +7526,7 @@ func referenceElementToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7547,20 +7547,20 @@ func referenceElementToMap(
 	return
 }
 
-// Serialize [aastypes.IBlob] as a JSON-able map.
+// Serialize [ourtypes.IBlob] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IBlob] with proper dispatch, call
+// [ourtypes.IBlob] with proper dispatch, call
 // [ToJsonable].
 func blobToMap(
-	that aastypes.IBlob,
+	that ourtypes.IBlob,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7578,7 +7578,7 @@ func blobToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7588,7 +7588,7 @@ func blobToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7607,7 +7607,7 @@ func blobToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7617,7 +7617,7 @@ func blobToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7628,7 +7628,7 @@ func blobToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7651,20 +7651,20 @@ func blobToMap(
 	return
 }
 
-// Serialize [aastypes.IFile] as a JSON-able map.
+// Serialize [ourtypes.IFile] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IFile] with proper dispatch, call
+// [ourtypes.IFile] with proper dispatch, call
 // [ToJsonable].
 func fileToMap(
-	that aastypes.IFile,
+	that ourtypes.IFile,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7682,7 +7682,7 @@ func fileToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7692,7 +7692,7 @@ func fileToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7711,7 +7711,7 @@ func fileToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7721,7 +7721,7 @@ func fileToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7732,7 +7732,7 @@ func fileToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7751,20 +7751,20 @@ func fileToMap(
 	return
 }
 
-// Serialize [aastypes.IAnnotatedRelationshipElement] as a JSON-able map.
+// Serialize [ourtypes.IAnnotatedRelationshipElement] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IAnnotatedRelationshipElement] with proper dispatch, call
+// [ourtypes.IAnnotatedRelationshipElement] with proper dispatch, call
 // [ToJsonable].
 func annotatedRelationshipElementToMap(
-	that aastypes.IAnnotatedRelationshipElement,
+	that ourtypes.IAnnotatedRelationshipElement,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7782,7 +7782,7 @@ func annotatedRelationshipElementToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7792,7 +7792,7 @@ func annotatedRelationshipElementToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7811,7 +7811,7 @@ func annotatedRelationshipElementToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7821,7 +7821,7 @@ func annotatedRelationshipElementToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7832,7 +7832,7 @@ func annotatedRelationshipElementToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7854,7 +7854,7 @@ func annotatedRelationshipElementToMap(
 
 	if that.Annotations() != nil {
 		result["annotations"], err = serializeArray(
-			that.Annotations(), classAsJsonableInterface[aastypes.IDataElement],
+			that.Annotations(), classAsJsonableInterface[ourtypes.IDataElement],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Annotations()")
@@ -7867,20 +7867,20 @@ func annotatedRelationshipElementToMap(
 	return
 }
 
-// Serialize [aastypes.IEntity] as a JSON-able map.
+// Serialize [ourtypes.IEntity] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IEntity] with proper dispatch, call
+// [ourtypes.IEntity] with proper dispatch, call
 // [ToJsonable].
 func entityToMap(
-	that aastypes.IEntity,
+	that ourtypes.IEntity,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -7898,7 +7898,7 @@ func entityToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -7908,7 +7908,7 @@ func entityToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -7927,7 +7927,7 @@ func entityToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -7937,7 +7937,7 @@ func entityToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -7948,7 +7948,7 @@ func entityToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -7958,7 +7958,7 @@ func entityToMap(
 
 	if that.Statements() != nil {
 		result["statements"], err = serializeArray(
-			that.Statements(), classAsJsonableInterface[aastypes.ISubmodelElement],
+			that.Statements(), classAsJsonableInterface[ourtypes.ISubmodelElement],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Statements()")
@@ -7979,7 +7979,7 @@ func entityToMap(
 	if that.SpecificAssetIDs() != nil {
 		result["specificAssetIds"], err = serializeArray(
 			that.SpecificAssetIDs(),
-			classAsJsonableInterface[aastypes.ISpecificAssetID],
+			classAsJsonableInterface[ourtypes.ISpecificAssetID],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SpecificAssetIDs()")
@@ -7992,14 +7992,14 @@ func entityToMap(
 	return
 }
 
-// Serialize [aastypes.IEventPayload] as a JSON-able map.
+// Serialize [ourtypes.IEventPayload] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IEventPayload] with proper dispatch, call
+// [ourtypes.IEventPayload] with proper dispatch, call
 // [ToJsonable].
 func eventPayloadToMap(
-	that aastypes.IEventPayload,
+	that ourtypes.IEventPayload,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8056,20 +8056,20 @@ func eventPayloadToMap(
 	return
 }
 
-// Serialize [aastypes.IBasicEventElement] as a JSON-able map.
+// Serialize [ourtypes.IBasicEventElement] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IBasicEventElement] with proper dispatch, call
+// [ourtypes.IBasicEventElement] with proper dispatch, call
 // [ToJsonable].
 func basicEventElementToMap(
-	that aastypes.IBasicEventElement,
+	that ourtypes.IBasicEventElement,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -8087,7 +8087,7 @@ func basicEventElementToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -8097,7 +8097,7 @@ func basicEventElementToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -8116,7 +8116,7 @@ func basicEventElementToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -8126,7 +8126,7 @@ func basicEventElementToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -8137,7 +8137,7 @@ func basicEventElementToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -8192,20 +8192,20 @@ func basicEventElementToMap(
 	return
 }
 
-// Serialize [aastypes.IOperation] as a JSON-able map.
+// Serialize [ourtypes.IOperation] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IOperation] with proper dispatch, call
+// [ourtypes.IOperation] with proper dispatch, call
 // [ToJsonable].
 func operationToMap(
-	that aastypes.IOperation,
+	that ourtypes.IOperation,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -8223,7 +8223,7 @@ func operationToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -8233,7 +8233,7 @@ func operationToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -8252,7 +8252,7 @@ func operationToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -8262,7 +8262,7 @@ func operationToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -8273,7 +8273,7 @@ func operationToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -8284,7 +8284,7 @@ func operationToMap(
 	if that.InputVariables() != nil {
 		result["inputVariables"], err = serializeArray(
 			that.InputVariables(),
-			classAsJsonableInterface[aastypes.IOperationVariable],
+			classAsJsonableInterface[ourtypes.IOperationVariable],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("InputVariables()")
@@ -8295,7 +8295,7 @@ func operationToMap(
 	if that.OutputVariables() != nil {
 		result["outputVariables"], err = serializeArray(
 			that.OutputVariables(),
-			classAsJsonableInterface[aastypes.IOperationVariable],
+			classAsJsonableInterface[ourtypes.IOperationVariable],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("OutputVariables()")
@@ -8306,7 +8306,7 @@ func operationToMap(
 	if that.InoutputVariables() != nil {
 		result["inoutputVariables"], err = serializeArray(
 			that.InoutputVariables(),
-			classAsJsonableInterface[aastypes.IOperationVariable],
+			classAsJsonableInterface[ourtypes.IOperationVariable],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("InoutputVariables()")
@@ -8319,14 +8319,14 @@ func operationToMap(
 	return
 }
 
-// Serialize [aastypes.IOperationVariable] as a JSON-able map.
+// Serialize [ourtypes.IOperationVariable] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IOperationVariable] with proper dispatch, call
+// [ourtypes.IOperationVariable] with proper dispatch, call
 // [ToJsonable].
 func operationVariableToMap(
-	that aastypes.IOperationVariable,
+	that ourtypes.IOperationVariable,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8339,20 +8339,20 @@ func operationVariableToMap(
 	return
 }
 
-// Serialize [aastypes.ICapability] as a JSON-able map.
+// Serialize [ourtypes.ICapability] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ICapability] with proper dispatch, call
+// [ourtypes.ICapability] with proper dispatch, call
 // [ToJsonable].
 func capabilityToMap(
-	that aastypes.ICapability,
+	that ourtypes.ICapability,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -8370,7 +8370,7 @@ func capabilityToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -8380,7 +8380,7 @@ func capabilityToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -8399,7 +8399,7 @@ func capabilityToMap(
 	if that.SupplementalSemanticIDs() != nil {
 		result["supplementalSemanticIds"], err = serializeArray(
 			that.SupplementalSemanticIDs(),
-			classAsJsonableInterface[aastypes.IReference],
+			classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("SupplementalSemanticIDs()")
@@ -8409,7 +8409,7 @@ func capabilityToMap(
 
 	if that.Qualifiers() != nil {
 		result["qualifiers"], err = serializeArray(
-			that.Qualifiers(), classAsJsonableInterface[aastypes.IQualifier],
+			that.Qualifiers(), classAsJsonableInterface[ourtypes.IQualifier],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Qualifiers()")
@@ -8420,7 +8420,7 @@ func capabilityToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -8433,20 +8433,20 @@ func capabilityToMap(
 	return
 }
 
-// Serialize [aastypes.IConceptDescription] as a JSON-able map.
+// Serialize [ourtypes.IConceptDescription] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IConceptDescription] with proper dispatch, call
+// [ourtypes.IConceptDescription] with proper dispatch, call
 // [ToJsonable].
 func conceptDescriptionToMap(
-	that aastypes.IConceptDescription,
+	that ourtypes.IConceptDescription,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
 		result["extensions"], err = serializeArray(
-			that.Extensions(), classAsJsonableInterface[aastypes.IExtension],
+			that.Extensions(), classAsJsonableInterface[ourtypes.IExtension],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Extensions()")
@@ -8464,7 +8464,7 @@ func conceptDescriptionToMap(
 
 	if that.DisplayName() != nil {
 		result["displayName"], err = serializeArray(
-			that.DisplayName(), classAsJsonableInterface[aastypes.ILangStringNameType],
+			that.DisplayName(), classAsJsonableInterface[ourtypes.ILangStringNameType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("DisplayName()")
@@ -8474,7 +8474,7 @@ func conceptDescriptionToMap(
 
 	if that.Description() != nil {
 		result["description"], err = serializeArray(
-			that.Description(), classAsJsonableInterface[aastypes.ILangStringTextType],
+			that.Description(), classAsJsonableInterface[ourtypes.ILangStringTextType],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Description()")
@@ -8495,7 +8495,7 @@ func conceptDescriptionToMap(
 	if that.EmbeddedDataSpecifications() != nil {
 		result["embeddedDataSpecifications"], err = serializeArray(
 			that.EmbeddedDataSpecifications(),
-			classAsJsonableInterface[aastypes.IEmbeddedDataSpecification],
+			classAsJsonableInterface[ourtypes.IEmbeddedDataSpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("EmbeddedDataSpecifications()")
@@ -8505,7 +8505,7 @@ func conceptDescriptionToMap(
 
 	if that.IsCaseOf() != nil {
 		result["isCaseOf"], err = serializeArray(
-			that.IsCaseOf(), classAsJsonableInterface[aastypes.IReference],
+			that.IsCaseOf(), classAsJsonableInterface[ourtypes.IReference],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("IsCaseOf()")
@@ -8518,14 +8518,14 @@ func conceptDescriptionToMap(
 	return
 }
 
-// Serialize [aastypes.IReference] as a JSON-able map.
+// Serialize [ourtypes.IReference] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IReference] with proper dispatch, call
+// [ourtypes.IReference] with proper dispatch, call
 // [ToJsonable].
 func referenceToMap(
-	that aastypes.IReference,
+	that ourtypes.IReference,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8544,7 +8544,7 @@ func referenceToMap(
 	}
 
 	result["keys"], err = serializeArray(
-		that.Keys(), classAsJsonableInterface[aastypes.IKey],
+		that.Keys(), classAsJsonableInterface[ourtypes.IKey],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("Keys()")
@@ -8554,14 +8554,14 @@ func referenceToMap(
 	return
 }
 
-// Serialize [aastypes.IKey] as a JSON-able map.
+// Serialize [ourtypes.IKey] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IKey] with proper dispatch, call
+// [ourtypes.IKey] with proper dispatch, call
 // [ToJsonable].
 func keyToMap(
-	that aastypes.IKey,
+	that ourtypes.IKey,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8576,14 +8576,14 @@ func keyToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringNameType] as a JSON-able map.
+// Serialize [ourtypes.ILangStringNameType] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringNameType] with proper dispatch, call
+// [ourtypes.ILangStringNameType] with proper dispatch, call
 // [ToJsonable].
 func langStringNameTypeToMap(
-	that aastypes.ILangStringNameType,
+	that ourtypes.ILangStringNameType,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8594,14 +8594,14 @@ func langStringNameTypeToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringTextType] as a JSON-able map.
+// Serialize [ourtypes.ILangStringTextType] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringTextType] with proper dispatch, call
+// [ourtypes.ILangStringTextType] with proper dispatch, call
 // [ToJsonable].
 func langStringTextTypeToMap(
-	that aastypes.ILangStringTextType,
+	that ourtypes.ILangStringTextType,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8612,21 +8612,21 @@ func langStringTextTypeToMap(
 	return
 }
 
-// Serialize [aastypes.IEnvironment] as a JSON-able map.
+// Serialize [ourtypes.IEnvironment] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IEnvironment] with proper dispatch, call
+// [ourtypes.IEnvironment] with proper dispatch, call
 // [ToJsonable].
 func environmentToMap(
-	that aastypes.IEnvironment,
+	that ourtypes.IEnvironment,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.AssetAdministrationShells() != nil {
 		result["assetAdministrationShells"], err = serializeArray(
 			that.AssetAdministrationShells(),
-			classAsJsonableInterface[aastypes.IAssetAdministrationShell],
+			classAsJsonableInterface[ourtypes.IAssetAdministrationShell],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("AssetAdministrationShells()")
@@ -8636,7 +8636,7 @@ func environmentToMap(
 
 	if that.Submodels() != nil {
 		result["submodels"], err = serializeArray(
-			that.Submodels(), classAsJsonableInterface[aastypes.ISubmodel],
+			that.Submodels(), classAsJsonableInterface[ourtypes.ISubmodel],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Submodels()")
@@ -8647,7 +8647,7 @@ func environmentToMap(
 	if that.ConceptDescriptions() != nil {
 		result["conceptDescriptions"], err = serializeArray(
 			that.ConceptDescriptions(),
-			classAsJsonableInterface[aastypes.IConceptDescription],
+			classAsJsonableInterface[ourtypes.IConceptDescription],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("ConceptDescriptions()")
@@ -8658,14 +8658,14 @@ func environmentToMap(
 	return
 }
 
-// Serialize [aastypes.IEmbeddedDataSpecification] as a JSON-able map.
+// Serialize [ourtypes.IEmbeddedDataSpecification] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IEmbeddedDataSpecification] with proper dispatch, call
+// [ourtypes.IEmbeddedDataSpecification] with proper dispatch, call
 // [ToJsonable].
 func embeddedDataSpecificationToMap(
-	that aastypes.IEmbeddedDataSpecification,
+	that ourtypes.IEmbeddedDataSpecification,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8686,14 +8686,14 @@ func embeddedDataSpecificationToMap(
 	return
 }
 
-// Serialize [aastypes.ILevelType] as a JSON-able map.
+// Serialize [ourtypes.ILevelType] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILevelType] with proper dispatch, call
+// [ourtypes.ILevelType] with proper dispatch, call
 // [ToJsonable].
 func levelTypeToMap(
-	that aastypes.ILevelType,
+	that ourtypes.ILevelType,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8708,14 +8708,14 @@ func levelTypeToMap(
 	return
 }
 
-// Serialize [aastypes.IValueReferencePair] as a JSON-able map.
+// Serialize [ourtypes.IValueReferencePair] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IValueReferencePair] with proper dispatch, call
+// [ourtypes.IValueReferencePair] with proper dispatch, call
 // [ToJsonable].
 func valueReferencePairToMap(
-	that aastypes.IValueReferencePair,
+	that ourtypes.IValueReferencePair,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8730,20 +8730,20 @@ func valueReferencePairToMap(
 	return
 }
 
-// Serialize [aastypes.IValueList] as a JSON-able map.
+// Serialize [ourtypes.IValueList] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IValueList] with proper dispatch, call
+// [ourtypes.IValueList] with proper dispatch, call
 // [ToJsonable].
 func valueListToMap(
-	that aastypes.IValueList,
+	that ourtypes.IValueList,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["valueReferencePairs"], err = serializeArray(
 		that.ValueReferencePairs(),
-		classAsJsonableInterface[aastypes.IValueReferencePair],
+		classAsJsonableInterface[ourtypes.IValueReferencePair],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("ValueReferencePairs()")
@@ -8753,14 +8753,14 @@ func valueListToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringPreferredNameTypeIEC61360] as a JSON-able map.
+// Serialize [ourtypes.ILangStringPreferredNameTypeIEC61360] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringPreferredNameTypeIEC61360] with proper dispatch, call
+// [ourtypes.ILangStringPreferredNameTypeIEC61360] with proper dispatch, call
 // [ToJsonable].
 func langStringPreferredNameTypeIEC61360ToMap(
-	that aastypes.ILangStringPreferredNameTypeIEC61360,
+	that ourtypes.ILangStringPreferredNameTypeIEC61360,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8771,14 +8771,14 @@ func langStringPreferredNameTypeIEC61360ToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringShortNameTypeIEC61360] as a JSON-able map.
+// Serialize [ourtypes.ILangStringShortNameTypeIEC61360] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringShortNameTypeIEC61360] with proper dispatch, call
+// [ourtypes.ILangStringShortNameTypeIEC61360] with proper dispatch, call
 // [ToJsonable].
 func langStringShortNameTypeIEC61360ToMap(
-	that aastypes.ILangStringShortNameTypeIEC61360,
+	that ourtypes.ILangStringShortNameTypeIEC61360,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8789,14 +8789,14 @@ func langStringShortNameTypeIEC61360ToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringDefinitionTypeIEC61360] as a JSON-able map.
+// Serialize [ourtypes.ILangStringDefinitionTypeIEC61360] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringDefinitionTypeIEC61360] with proper dispatch, call
+// [ourtypes.ILangStringDefinitionTypeIEC61360] with proper dispatch, call
 // [ToJsonable].
 func langStringDefinitionTypeIEC61360ToMap(
-	that aastypes.ILangStringDefinitionTypeIEC61360,
+	that ourtypes.ILangStringDefinitionTypeIEC61360,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -8807,20 +8807,20 @@ func langStringDefinitionTypeIEC61360ToMap(
 	return
 }
 
-// Serialize [aastypes.IDataSpecificationIEC61360] as a JSON-able map.
+// Serialize [ourtypes.IDataSpecificationIEC61360] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IDataSpecificationIEC61360] with proper dispatch, call
+// [ourtypes.IDataSpecificationIEC61360] with proper dispatch, call
 // [ToJsonable].
 func dataSpecificationIEC61360ToMap(
-	that aastypes.IDataSpecificationIEC61360,
+	that ourtypes.IDataSpecificationIEC61360,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["preferredName"], err = serializeArray(
 		that.PreferredName(),
-		classAsJsonableInterface[aastypes.ILangStringPreferredNameTypeIEC61360],
+		classAsJsonableInterface[ourtypes.ILangStringPreferredNameTypeIEC61360],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("PreferredName()")
@@ -8830,7 +8830,7 @@ func dataSpecificationIEC61360ToMap(
 	if that.ShortName() != nil {
 		result["shortName"], err = serializeArray(
 			that.ShortName(),
-			classAsJsonableInterface[aastypes.ILangStringShortNameTypeIEC61360],
+			classAsJsonableInterface[ourtypes.ILangStringShortNameTypeIEC61360],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("ShortName()")
@@ -8869,7 +8869,7 @@ func dataSpecificationIEC61360ToMap(
 	if that.Definition() != nil {
 		result["definition"], err = serializeArray(
 			that.Definition(),
-			classAsJsonableInterface[aastypes.ILangStringDefinitionTypeIEC61360],
+			classAsJsonableInterface[ourtypes.ILangStringDefinitionTypeIEC61360],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Definition()")
@@ -8911,160 +8911,160 @@ func dataSpecificationIEC61360ToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeExtension:
+	case ourtypes.ModelTypeExtension:
 		result, err = extensionToMap(
-			that.(aastypes.IExtension),
+			that.(ourtypes.IExtension),
 		)
-	case aastypes.ModelTypeAdministrativeInformation:
+	case ourtypes.ModelTypeAdministrativeInformation:
 		result, err = administrativeInformationToMap(
-			that.(aastypes.IAdministrativeInformation),
+			that.(ourtypes.IAdministrativeInformation),
 		)
-	case aastypes.ModelTypeQualifier:
+	case ourtypes.ModelTypeQualifier:
 		result, err = qualifierToMap(
-			that.(aastypes.IQualifier),
+			that.(ourtypes.IQualifier),
 		)
-	case aastypes.ModelTypeAssetAdministrationShell:
+	case ourtypes.ModelTypeAssetAdministrationShell:
 		result, err = assetAdministrationShellToMap(
-			that.(aastypes.IAssetAdministrationShell),
+			that.(ourtypes.IAssetAdministrationShell),
 		)
-	case aastypes.ModelTypeAssetInformation:
+	case ourtypes.ModelTypeAssetInformation:
 		result, err = assetInformationToMap(
-			that.(aastypes.IAssetInformation),
+			that.(ourtypes.IAssetInformation),
 		)
-	case aastypes.ModelTypeResource:
+	case ourtypes.ModelTypeResource:
 		result, err = resourceToMap(
-			that.(aastypes.IResource),
+			that.(ourtypes.IResource),
 		)
-	case aastypes.ModelTypeSpecificAssetID:
+	case ourtypes.ModelTypeSpecificAssetID:
 		result, err = specificAssetIDToMap(
-			that.(aastypes.ISpecificAssetID),
+			that.(ourtypes.ISpecificAssetID),
 		)
-	case aastypes.ModelTypeSubmodel:
+	case ourtypes.ModelTypeSubmodel:
 		result, err = submodelToMap(
-			that.(aastypes.ISubmodel),
+			that.(ourtypes.ISubmodel),
 		)
-	case aastypes.ModelTypeRelationshipElement:
+	case ourtypes.ModelTypeRelationshipElement:
 		result, err = relationshipElementToMap(
-			that.(aastypes.IRelationshipElement),
+			that.(ourtypes.IRelationshipElement),
 		)
-	case aastypes.ModelTypeSubmodelElementList:
+	case ourtypes.ModelTypeSubmodelElementList:
 		result, err = submodelElementListToMap(
-			that.(aastypes.ISubmodelElementList),
+			that.(ourtypes.ISubmodelElementList),
 		)
-	case aastypes.ModelTypeSubmodelElementCollection:
+	case ourtypes.ModelTypeSubmodelElementCollection:
 		result, err = submodelElementCollectionToMap(
-			that.(aastypes.ISubmodelElementCollection),
+			that.(ourtypes.ISubmodelElementCollection),
 		)
-	case aastypes.ModelTypeProperty:
+	case ourtypes.ModelTypeProperty:
 		result, err = propertyToMap(
-			that.(aastypes.IProperty),
+			that.(ourtypes.IProperty),
 		)
-	case aastypes.ModelTypeMultiLanguageProperty:
+	case ourtypes.ModelTypeMultiLanguageProperty:
 		result, err = multiLanguagePropertyToMap(
-			that.(aastypes.IMultiLanguageProperty),
+			that.(ourtypes.IMultiLanguageProperty),
 		)
-	case aastypes.ModelTypeRange:
+	case ourtypes.ModelTypeRange:
 		result, err = rangeToMap(
-			that.(aastypes.IRange),
+			that.(ourtypes.IRange),
 		)
-	case aastypes.ModelTypeReferenceElement:
+	case ourtypes.ModelTypeReferenceElement:
 		result, err = referenceElementToMap(
-			that.(aastypes.IReferenceElement),
+			that.(ourtypes.IReferenceElement),
 		)
-	case aastypes.ModelTypeBlob:
+	case ourtypes.ModelTypeBlob:
 		result, err = blobToMap(
-			that.(aastypes.IBlob),
+			that.(ourtypes.IBlob),
 		)
-	case aastypes.ModelTypeFile:
+	case ourtypes.ModelTypeFile:
 		result, err = fileToMap(
-			that.(aastypes.IFile),
+			that.(ourtypes.IFile),
 		)
-	case aastypes.ModelTypeAnnotatedRelationshipElement:
+	case ourtypes.ModelTypeAnnotatedRelationshipElement:
 		result, err = annotatedRelationshipElementToMap(
-			that.(aastypes.IAnnotatedRelationshipElement),
+			that.(ourtypes.IAnnotatedRelationshipElement),
 		)
-	case aastypes.ModelTypeEntity:
+	case ourtypes.ModelTypeEntity:
 		result, err = entityToMap(
-			that.(aastypes.IEntity),
+			that.(ourtypes.IEntity),
 		)
-	case aastypes.ModelTypeEventPayload:
+	case ourtypes.ModelTypeEventPayload:
 		result, err = eventPayloadToMap(
-			that.(aastypes.IEventPayload),
+			that.(ourtypes.IEventPayload),
 		)
-	case aastypes.ModelTypeBasicEventElement:
+	case ourtypes.ModelTypeBasicEventElement:
 		result, err = basicEventElementToMap(
-			that.(aastypes.IBasicEventElement),
+			that.(ourtypes.IBasicEventElement),
 		)
-	case aastypes.ModelTypeOperation:
+	case ourtypes.ModelTypeOperation:
 		result, err = operationToMap(
-			that.(aastypes.IOperation),
+			that.(ourtypes.IOperation),
 		)
-	case aastypes.ModelTypeOperationVariable:
+	case ourtypes.ModelTypeOperationVariable:
 		result, err = operationVariableToMap(
-			that.(aastypes.IOperationVariable),
+			that.(ourtypes.IOperationVariable),
 		)
-	case aastypes.ModelTypeCapability:
+	case ourtypes.ModelTypeCapability:
 		result, err = capabilityToMap(
-			that.(aastypes.ICapability),
+			that.(ourtypes.ICapability),
 		)
-	case aastypes.ModelTypeConceptDescription:
+	case ourtypes.ModelTypeConceptDescription:
 		result, err = conceptDescriptionToMap(
-			that.(aastypes.IConceptDescription),
+			that.(ourtypes.IConceptDescription),
 		)
-	case aastypes.ModelTypeReference:
+	case ourtypes.ModelTypeReference:
 		result, err = referenceToMap(
-			that.(aastypes.IReference),
+			that.(ourtypes.IReference),
 		)
-	case aastypes.ModelTypeKey:
+	case ourtypes.ModelTypeKey:
 		result, err = keyToMap(
-			that.(aastypes.IKey),
+			that.(ourtypes.IKey),
 		)
-	case aastypes.ModelTypeLangStringNameType:
+	case ourtypes.ModelTypeLangStringNameType:
 		result, err = langStringNameTypeToMap(
-			that.(aastypes.ILangStringNameType),
+			that.(ourtypes.ILangStringNameType),
 		)
-	case aastypes.ModelTypeLangStringTextType:
+	case ourtypes.ModelTypeLangStringTextType:
 		result, err = langStringTextTypeToMap(
-			that.(aastypes.ILangStringTextType),
+			that.(ourtypes.ILangStringTextType),
 		)
-	case aastypes.ModelTypeEnvironment:
+	case ourtypes.ModelTypeEnvironment:
 		result, err = environmentToMap(
-			that.(aastypes.IEnvironment),
+			that.(ourtypes.IEnvironment),
 		)
-	case aastypes.ModelTypeEmbeddedDataSpecification:
+	case ourtypes.ModelTypeEmbeddedDataSpecification:
 		result, err = embeddedDataSpecificationToMap(
-			that.(aastypes.IEmbeddedDataSpecification),
+			that.(ourtypes.IEmbeddedDataSpecification),
 		)
-	case aastypes.ModelTypeLevelType:
+	case ourtypes.ModelTypeLevelType:
 		result, err = levelTypeToMap(
-			that.(aastypes.ILevelType),
+			that.(ourtypes.ILevelType),
 		)
-	case aastypes.ModelTypeValueReferencePair:
+	case ourtypes.ModelTypeValueReferencePair:
 		result, err = valueReferencePairToMap(
-			that.(aastypes.IValueReferencePair),
+			that.(ourtypes.IValueReferencePair),
 		)
-	case aastypes.ModelTypeValueList:
+	case ourtypes.ModelTypeValueList:
 		result, err = valueListToMap(
-			that.(aastypes.IValueList),
+			that.(ourtypes.IValueList),
 		)
-	case aastypes.ModelTypeLangStringPreferredNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringPreferredNameTypeIEC61360:
 		result, err = langStringPreferredNameTypeIEC61360ToMap(
-			that.(aastypes.ILangStringPreferredNameTypeIEC61360),
+			that.(ourtypes.ILangStringPreferredNameTypeIEC61360),
 		)
-	case aastypes.ModelTypeLangStringShortNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringShortNameTypeIEC61360:
 		result, err = langStringShortNameTypeIEC61360ToMap(
-			that.(aastypes.ILangStringShortNameTypeIEC61360),
+			that.(ourtypes.ILangStringShortNameTypeIEC61360),
 		)
-	case aastypes.ModelTypeLangStringDefinitionTypeIEC61360:
+	case ourtypes.ModelTypeLangStringDefinitionTypeIEC61360:
 		result, err = langStringDefinitionTypeIEC61360ToMap(
-			that.(aastypes.ILangStringDefinitionTypeIEC61360),
+			that.(ourtypes.ILangStringDefinitionTypeIEC61360),
 		)
-	case aastypes.ModelTypeDataSpecificationIEC61360:
+	case ourtypes.ModelTypeDataSpecificationIEC61360:
 		result, err = dataSpecificationIEC61360ToMap(
-			that.(aastypes.IDataSpecificationIEC61360),
+			that.(ourtypes.IDataSpecificationIEC61360),
 		)
 	default:
 		err = newSerializationError(

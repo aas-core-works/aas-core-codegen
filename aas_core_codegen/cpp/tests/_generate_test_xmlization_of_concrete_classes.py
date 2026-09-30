@@ -98,7 +98,7 @@ def _generate_lexical_tests(
  * \\brief Read the first recorded example of {interface_name} with the content
  * of the element \\p xml_name replaced by \\p text.
  */
-std::shared_ptr<aas::types::{interface_name}> ReadWith(
+std::shared_ptr<our::types::{interface_name}> ReadWith(
 {I}const std::string& xml_name,
 {I}const std::string& text
 ) {{
@@ -119,11 +119,11 @@ std::shared_ptr<aas::types::{interface_name}> ReadWith(
 {I}const std::string original(test::common::MustReadString(paths.front()));
 
 {I}const std::size_t start(
-{II}original.find(aas::common::Concat("<", xml_name, ">"))
+{II}original.find(our::common::Concat("<", xml_name, ">"))
 {III}+ xml_name.size() + 2
 {I});
 {I}const std::size_t end(
-{II}original.find(aas::common::Concat("</", xml_name, ">"))
+{II}original.find(our::common::Concat("</", xml_name, ">"))
 {I});
 
 {I}const std::string patched(
@@ -132,16 +132,16 @@ std::shared_ptr<aas::types::{interface_name}> ReadWith(
 
 {I}std::istringstream iss(patched);
 
-{I}aas::common::expected<
-{II}std::shared_ptr<aas::types::IClass>,
-{II}aas::xmlization::DeserializationError
-{I}> deserialized = aas::xmlization::From(iss);
+{I}our::common::expected<
+{II}std::shared_ptr<our::types::IClass>,
+{II}our::xmlization::DeserializationError
+{I}> deserialized = our::xmlization::From(iss);
 
-{I}INFO(aas::common::Concat("De-serializing: ", patched))
+{I}INFO(our::common::Concat("De-serializing: ", patched))
 {I}REQUIRE(deserialized.has_value());
 
-{I}std::shared_ptr<aas::types::{interface_name}> casted(
-{II}std::dynamic_pointer_cast<aas::types::{interface_name}>(*deserialized)
+{I}std::shared_ptr<our::types::{interface_name}> casted(
+{II}std::dynamic_pointer_cast<our::types::{interface_name}>(*deserialized)
 {I});
 {I}REQUIRE(casted != nullptr);
 
@@ -161,7 +161,7 @@ std::shared_ptr<aas::types::{interface_name}> ReadWith(
                 Stripped(
                     f"""\
 TEST_CASE({cpp_common.string_literal(title)}) {{
-{I}std::shared_ptr<aas::types::{interface_name}> instance(
+{I}std::shared_ptr<our::types::{interface_name}> instance(
 {II}ReadWith(
 {III}{cpp_common.string_literal(prop_xml_name)},
 {III}{cpp_common.string_literal(a_text)}
@@ -201,7 +201,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
@@ -209,17 +209,17 @@ void AssertRoundTrip(
 {I}const std::filesystem::path& path
 ) {{
 {I}std::shared_ptr<
-{II}aas::types::IClass
+{II}our::types::IClass
 {I}> deserialized(
 {II}test::common::xmlization::MustDeserializeFile(path)
 {I});
 
 {I}std::stringstream ss;
-{I}aas::xmlization::Serialize(*deserialized, {{}}, ss);
+{I}our::xmlization::Serialize(*deserialized, {{}}, ss);
 
 {I}std::string expected_xml = test::common::MustReadString(path);
 
-{I}INFO(aas::common::Concat("XML round-trip on ", path.string()))
+{I}INFO(our::common::Concat("XML round-trip on ", path.string()))
 {I}REQUIRE(
 {II}test::common::xmlization::CanonicalizeXml(expected_xml)
 {III}== test::common::xmlization::CanonicalizeXml(ss.str())
@@ -234,16 +234,16 @@ void AssertDeserializationFailure(
 ) {{
 {I}std::ifstream ifs(path, std::ios::binary);
 
-{I}aas::common::expected<
-{II}std::shared_ptr<aas::types::IClass>,
-{II}aas::xmlization::DeserializationError
-{I}> deserialized = aas::xmlization::From(
+{I}our::common::expected<
+{II}std::shared_ptr<our::types::IClass>,
+{II}our::xmlization::DeserializationError
+{I}> deserialized = our::xmlization::From(
 {II}ifs
 {I});
 
 {I}if (deserialized.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Expected the de-serialization to fail on ",
 {IIII}path.string(),
 {IIII}", but the de-serialization succeeded"
@@ -253,12 +253,12 @@ void AssertDeserializationFailure(
 {I}}}
 
 {I}test::common::AssertContentEqualsExpectedOrRecord(
-{II}aas::common::Concat(
-{III}aas::common::WstringToUtf8(
+{II}our::common::Concat(
+{III}our::common::WstringToUtf8(
 {IIII}deserialized.error().path.ToWstring()
 {III}),
 {III}": ",
-{III}aas::common::WstringToUtf8(
+{III}our::common::WstringToUtf8(
 {IIII}deserialized.error().cause
 {III})
 {II}),
@@ -269,7 +269,7 @@ void AssertDeserializationFailure(
         Stripped(
             f"""\
 const std::filesystem::path& DetermineXmlDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "Xml";
 {I}}}
@@ -280,7 +280,7 @@ const std::filesystem::path& DetermineXmlDir() {{
         Stripped(
             f"""\
 const std::filesystem::path& DetermineErrorDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "XmlizationError";
 {I}}}
@@ -404,7 +404,7 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {{
 {II}original.rfind({cpp_common.string_literal(root_close_tag)})
 {I});
 
-{I}INFO(aas::common::Concat("Looking for {root_close_tag} in ", path.string()))
+{I}INFO(our::common::Concat("Looking for {root_close_tag} in ", path.string()))
 {I}REQUIRE(insertion_index != std::string::npos);
 
 {I}const std::string broken(
@@ -415,12 +415,12 @@ TEST_CASE("Test the de-serialization failure on a duplicate property") {{
 
 {I}std::istringstream iss(broken);
 
-{I}aas::common::expected<
-{II}std::shared_ptr<aas::types::IClass>,
-{II}aas::xmlization::DeserializationError
-{I}> deserialized = aas::xmlization::From(iss);
+{I}our::common::expected<
+{II}std::shared_ptr<our::types::IClass>,
+{II}our::xmlization::DeserializationError
+{I}> deserialized = our::xmlization::From(iss);
 
-{I}INFO(aas::common::Concat("De-serializing: ", broken))
+{I}INFO(our::common::Concat("De-serializing: ", broken))
 {I}REQUIRE(!deserialized.has_value());
 }}"""
             )

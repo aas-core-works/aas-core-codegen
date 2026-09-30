@@ -67,9 +67,9 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
             Stripped(
                 f"""\
 func {test_name}(t *testing.T) {{
-{I}instance := aastesting.{must_load_minimal_name}()
+{I}instance := ourtesting.{must_load_minimal_name}()
 
-{I}jsonable, err := aasjsonization.ToJsonable(instance)
+{I}jsonable, err := ourjsonization.ToJsonable(instance)
 {I}if err != nil {{
 {II}t.Fatalf(
 {III}"Failed to serialize the minimal {model_type}: %v",
@@ -80,7 +80,7 @@ func {test_name}(t *testing.T) {{
 
 {I}source := "<minimal {model_type}>"
 
-{I}deserialized, deseriaErr := aasjsonization.{deserialization_function}(
+{I}deserialized, deseriaErr := ourjsonization.{deserialization_function}(
 {II}jsonable,
 {I})
 {I}ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -88,7 +88,7 @@ func {test_name}(t *testing.T) {{
 {II}return
 {I}}}
 
-{I}anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+{I}anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 {I}ok = assertNoSerializationError(t, seriaErr, source)
 {I}if !ok {{
 {II}return
@@ -121,7 +121,7 @@ func {test_name}(t *testing.T) {{
 func {test_name}(t *testing.T) {{
 {I}jsonable := any("this is not an object")
 
-{I}_, err := aasjsonization.{deserialization_function}(
+{I}_, err := ourjsonization.{deserialization_function}(
 {II}jsonable,
 {I})
 
@@ -130,7 +130,7 @@ func {test_name}(t *testing.T) {{
 {II}return
 {I}}}
 
-{I}deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+{I}deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 {I}if !ok {{
 {II}t.Fatalf("Expected a de-serialization error, but got: %v", err)
 {II}return
@@ -166,8 +166,8 @@ func {test_name}(t *testing.T) {{
     import_lines = []  # type: List[str]
     for module, literal in (
         ("testing", f'{I}"testing"'),
-        ("aasjsonization", f'{I}aasjsonization "{repo_url}/jsonization"'),
-        ("aastesting", f'{I}aastesting "{repo_url}/aastesting"'),
+        ("ourjsonization", f'{I}ourjsonization "{repo_url}/jsonization"'),
+        ("ourtesting", f'{I}ourtesting "{repo_url}/ourtesting"'),
     ):
         if golang_common.names_package(blocks, module):
             import_lines.append(literal)

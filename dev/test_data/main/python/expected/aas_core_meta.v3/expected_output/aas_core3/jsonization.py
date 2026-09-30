@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -34,9 +34,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import aas_core3.common as aas_common
-import aas_core3.stringification as aas_stringification
-import aas_core3.types as aas_types
+import aas_core3.common as our_common
+import aas_core3.stringification as our_stringification
+import aas_core3.types as our_types
 
 
 # NOTE (mristin):
@@ -170,7 +170,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -180,7 +180,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -374,7 +374,7 @@ def _list_from_jsonable(
     :return: parsed list
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is None:
         raise DeserializationException(
             f"Expected something array-like, but got: {type(jsonable)}"
@@ -395,7 +395,7 @@ def _list_from_jsonable(
 
 def _list_of__asset_administration_shell_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.AssetAdministrationShell]:
+) -> List[our_types.AssetAdministrationShell]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.AssetAdministrationShell`.
@@ -412,7 +412,7 @@ def _list_of__asset_administration_shell_from_jsonable(
 
 def _list_of__concept_description_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.ConceptDescription]:
+) -> List[our_types.ConceptDescription]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.ConceptDescription`.
@@ -429,7 +429,7 @@ def _list_of__concept_description_from_jsonable(
 
 def _list_of__data_element_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.DataElement]:
+) -> List[our_types.DataElement]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.DataElement`.
@@ -446,7 +446,7 @@ def _list_of__data_element_from_jsonable(
 
 def _list_of__embedded_data_specification_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.EmbeddedDataSpecification]:
+) -> List[our_types.EmbeddedDataSpecification]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.EmbeddedDataSpecification`.
@@ -463,7 +463,7 @@ def _list_of__embedded_data_specification_from_jsonable(
 
 def _list_of__extension_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Extension]:
+) -> List[our_types.Extension]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Extension`.
@@ -480,7 +480,7 @@ def _list_of__extension_from_jsonable(
 
 def _list_of__key_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Key]:
+) -> List[our_types.Key]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Key`.
@@ -497,7 +497,7 @@ def _list_of__key_from_jsonable(
 
 def _list_of__lang_string_definition_type_iec_61360_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.LangStringDefinitionTypeIEC61360]:
+) -> List[our_types.LangStringDefinitionTypeIEC61360]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.LangStringDefinitionTypeIEC61360`.
@@ -514,7 +514,7 @@ def _list_of__lang_string_definition_type_iec_61360_from_jsonable(
 
 def _list_of__lang_string_name_type_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.LangStringNameType]:
+) -> List[our_types.LangStringNameType]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.LangStringNameType`.
@@ -531,7 +531,7 @@ def _list_of__lang_string_name_type_from_jsonable(
 
 def _list_of__lang_string_preferred_name_type_iec_61360_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.LangStringPreferredNameTypeIEC61360]:
+) -> List[our_types.LangStringPreferredNameTypeIEC61360]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.LangStringPreferredNameTypeIEC61360`.
@@ -548,7 +548,7 @@ def _list_of__lang_string_preferred_name_type_iec_61360_from_jsonable(
 
 def _list_of__lang_string_short_name_type_iec_61360_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.LangStringShortNameTypeIEC61360]:
+) -> List[our_types.LangStringShortNameTypeIEC61360]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.LangStringShortNameTypeIEC61360`.
@@ -565,7 +565,7 @@ def _list_of__lang_string_short_name_type_iec_61360_from_jsonable(
 
 def _list_of__lang_string_text_type_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.LangStringTextType]:
+) -> List[our_types.LangStringTextType]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.LangStringTextType`.
@@ -582,7 +582,7 @@ def _list_of__lang_string_text_type_from_jsonable(
 
 def _list_of__operation_variable_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.OperationVariable]:
+) -> List[our_types.OperationVariable]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.OperationVariable`.
@@ -599,7 +599,7 @@ def _list_of__operation_variable_from_jsonable(
 
 def _list_of__qualifier_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Qualifier]:
+) -> List[our_types.Qualifier]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Qualifier`.
@@ -616,7 +616,7 @@ def _list_of__qualifier_from_jsonable(
 
 def _list_of__reference_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Reference]:
+) -> List[our_types.Reference]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Reference`.
@@ -633,7 +633,7 @@ def _list_of__reference_from_jsonable(
 
 def _list_of__specific_asset_id_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.SpecificAssetID]:
+) -> List[our_types.SpecificAssetID]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.SpecificAssetID`.
@@ -650,7 +650,7 @@ def _list_of__specific_asset_id_from_jsonable(
 
 def _list_of__submodel_element_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.SubmodelElement]:
+) -> List[our_types.SubmodelElement]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.SubmodelElement`.
@@ -667,7 +667,7 @@ def _list_of__submodel_element_from_jsonable(
 
 def _list_of__submodel_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Submodel]:
+) -> List[our_types.Submodel]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Submodel`.
@@ -684,7 +684,7 @@ def _list_of__submodel_from_jsonable(
 
 def _list_of__value_reference_pair_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.ValueReferencePair]:
+) -> List[our_types.ValueReferencePair]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.ValueReferencePair`.
@@ -701,7 +701,7 @@ def _list_of__value_reference_pair_from_jsonable(
 
 def has_semantics_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.HasSemantics:
+) -> our_types.HasSemantics:
     """
     Parse an instance of :py:class:`.types.HasSemantics` from the JSON-able
     structure :paramref:`jsonable`.
@@ -719,7 +719,7 @@ def has_semantics_from_jsonable(
 
 def extension_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Extension:
+) -> our_types.Extension:
     """
     Parse an instance of :py:class:`.types.Extension` from the JSON-able
     structure :paramref:`jsonable`.
@@ -730,12 +730,12 @@ def extension_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
     the_name: Optional[str] = None
-    the_value_type: Optional[aas_types.DataTypeDefXSD] = None
+    the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_value: Optional[str] = None
-    the_refers_to: Optional[List[aas_types.Reference]] = None
+    the_refers_to: Optional[List[our_types.Reference]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -771,7 +771,7 @@ def extension_from_jsonable(
             "The required property 'name' is missing"
         )
 
-    return aas_types.Extension(
+    return our_types.Extension(
         the_name,
         the_semantic_id,
         the_supplemental_semantic_ids,
@@ -783,7 +783,7 @@ def extension_from_jsonable(
 
 def has_extensions_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.HasExtensions:
+) -> our_types.HasExtensions:
     """
     Parse an instance of :py:class:`.types.HasExtensions` from the JSON-able
     structure :paramref:`jsonable`.
@@ -801,7 +801,7 @@ def has_extensions_from_jsonable(
 
 def referable_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Referable:
+) -> our_types.Referable:
     """
     Parse an instance of :py:class:`.types.Referable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -819,7 +819,7 @@ def referable_from_jsonable(
 
 def identifiable_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Identifiable:
+) -> our_types.Identifiable:
     """
     Parse an instance of :py:class:`.types.Identifiable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -837,7 +837,7 @@ def identifiable_from_jsonable(
 
 def modelling_kind_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.ModellingKind:
+) -> our_types.ModellingKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.ModellingKind`.
@@ -851,7 +851,7 @@ def modelling_kind_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.modelling_kind_from_str(jsonable)
+    literal = our_stringification.modelling_kind_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -863,7 +863,7 @@ def modelling_kind_from_jsonable(
 
 def has_kind_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.HasKind:
+) -> our_types.HasKind:
     """
     Parse an instance of :py:class:`.types.HasKind` from the JSON-able
     structure :paramref:`jsonable`.
@@ -881,7 +881,7 @@ def has_kind_from_jsonable(
 
 def has_data_specification_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.HasDataSpecification:
+) -> our_types.HasDataSpecification:
     """
     Parse an instance of :py:class:`.types.HasDataSpecification` from the JSON-able
     structure :paramref:`jsonable`.
@@ -899,7 +899,7 @@ def has_data_specification_from_jsonable(
 
 def administrative_information_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.AdministrativeInformation:
+) -> our_types.AdministrativeInformation:
     """
     Parse an instance of :py:class:`.types.AdministrativeInformation` from the JSON-able
     structure :paramref:`jsonable`.
@@ -910,10 +910,10 @@ def administrative_information_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_version: Optional[str] = None
     the_revision: Optional[str] = None
-    the_creator: Optional[aas_types.Reference] = None
+    the_creator: Optional[our_types.Reference] = None
     the_template_id: Optional[str] = None
 
     try:
@@ -943,7 +943,7 @@ def administrative_information_from_jsonable(
         )
         raise
 
-    return aas_types.AdministrativeInformation(
+    return our_types.AdministrativeInformation(
         the_embedded_data_specifications,
         the_version,
         the_revision,
@@ -954,7 +954,7 @@ def administrative_information_from_jsonable(
 
 def qualifiable_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Qualifiable:
+) -> our_types.Qualifiable:
     """
     Parse an instance of :py:class:`.types.Qualifiable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -972,7 +972,7 @@ def qualifiable_from_jsonable(
 
 def qualifier_kind_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.QualifierKind:
+) -> our_types.QualifierKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.QualifierKind`.
@@ -986,7 +986,7 @@ def qualifier_kind_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.qualifier_kind_from_str(jsonable)
+    literal = our_stringification.qualifier_kind_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -998,7 +998,7 @@ def qualifier_kind_from_jsonable(
 
 def qualifier_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Qualifier:
+) -> our_types.Qualifier:
     """
     Parse an instance of :py:class:`.types.Qualifier` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1009,13 +1009,13 @@ def qualifier_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_kind: Optional[aas_types.QualifierKind] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_kind: Optional[our_types.QualifierKind] = None
     the_type: Optional[str] = None
-    the_value_type: Optional[aas_types.DataTypeDefXSD] = None
+    the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_value: Optional[str] = None
-    the_value_id: Optional[aas_types.Reference] = None
+    the_value_id: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1058,7 +1058,7 @@ def qualifier_from_jsonable(
             "The required property 'valueType' is missing"
         )
 
-    return aas_types.Qualifier(
+    return our_types.Qualifier(
         the_type,
         the_value_type,
         the_semantic_id,
@@ -1071,7 +1071,7 @@ def qualifier_from_jsonable(
 
 def asset_administration_shell_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.AssetAdministrationShell:
+) -> our_types.AssetAdministrationShell:
     """
     Parse an instance of :py:class:`.types.AssetAdministrationShell` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1089,17 +1089,17 @@ def asset_administration_shell_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_administration: Optional[aas_types.AdministrativeInformation] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_administration: Optional[our_types.AdministrativeInformation] = None
     the_id: Optional[str] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_derived_from: Optional[aas_types.Reference] = None
-    the_asset_information: Optional[aas_types.AssetInformation] = None
-    the_submodels: Optional[List[aas_types.Reference]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_derived_from: Optional[our_types.Reference] = None
+    the_asset_information: Optional[our_types.AssetInformation] = None
+    the_submodels: Optional[List[our_types.Reference]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1156,7 +1156,7 @@ def asset_administration_shell_from_jsonable(
             "The required property 'assetInformation' is missing"
         )
 
-    return aas_types.AssetAdministrationShell(
+    return our_types.AssetAdministrationShell(
         the_id,
         the_asset_information,
         the_extensions,
@@ -1173,7 +1173,7 @@ def asset_administration_shell_from_jsonable(
 
 def asset_information_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.AssetInformation:
+) -> our_types.AssetInformation:
     """
     Parse an instance of :py:class:`.types.AssetInformation` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1184,11 +1184,11 @@ def asset_information_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_asset_kind: Optional[aas_types.AssetKind] = None
+    the_asset_kind: Optional[our_types.AssetKind] = None
     the_global_asset_id: Optional[str] = None
-    the_specific_asset_ids: Optional[List[aas_types.SpecificAssetID]] = None
+    the_specific_asset_ids: Optional[List[our_types.SpecificAssetID]] = None
     the_asset_type: Optional[str] = None
-    the_default_thumbnail: Optional[aas_types.Resource] = None
+    the_default_thumbnail: Optional[our_types.Resource] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1222,7 +1222,7 @@ def asset_information_from_jsonable(
             "The required property 'assetKind' is missing"
         )
 
-    return aas_types.AssetInformation(
+    return our_types.AssetInformation(
         the_asset_kind,
         the_global_asset_id,
         the_specific_asset_ids,
@@ -1233,7 +1233,7 @@ def asset_information_from_jsonable(
 
 def resource_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Resource:
+) -> our_types.Resource:
     """
     Parse an instance of :py:class:`.types.Resource` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1271,7 +1271,7 @@ def resource_from_jsonable(
             "The required property 'path' is missing"
         )
 
-    return aas_types.Resource(
+    return our_types.Resource(
         the_path,
         the_content_type
     )
@@ -1279,7 +1279,7 @@ def resource_from_jsonable(
 
 def asset_kind_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.AssetKind:
+) -> our_types.AssetKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.AssetKind`.
@@ -1293,7 +1293,7 @@ def asset_kind_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.asset_kind_from_str(jsonable)
+    literal = our_stringification.asset_kind_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -1305,7 +1305,7 @@ def asset_kind_from_jsonable(
 
 def specific_asset_id_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.SpecificAssetID:
+) -> our_types.SpecificAssetID:
     """
     Parse an instance of :py:class:`.types.SpecificAssetID` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1316,11 +1316,11 @@ def specific_asset_id_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
     the_name: Optional[str] = None
     the_value: Optional[str] = None
-    the_external_subject_id: Optional[aas_types.Reference] = None
+    the_external_subject_id: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1359,7 +1359,7 @@ def specific_asset_id_from_jsonable(
             "The required property 'value' is missing"
         )
 
-    return aas_types.SpecificAssetID(
+    return our_types.SpecificAssetID(
         the_name,
         the_value,
         the_semantic_id,
@@ -1370,7 +1370,7 @@ def specific_asset_id_from_jsonable(
 
 def submodel_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Submodel:
+) -> our_types.Submodel:
     """
     Parse an instance of :py:class:`.types.Submodel` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1388,19 +1388,19 @@ def submodel_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_administration: Optional[aas_types.AdministrativeInformation] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_administration: Optional[our_types.AdministrativeInformation] = None
     the_id: Optional[str] = None
-    the_kind: Optional[aas_types.ModellingKind] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_submodel_elements: Optional[List[aas_types.SubmodelElement]] = None
+    the_kind: Optional[our_types.ModellingKind] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_submodel_elements: Optional[List[our_types.SubmodelElement]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1460,7 +1460,7 @@ def submodel_from_jsonable(
             "The required property 'id' is missing"
         )
 
-    return aas_types.Submodel(
+    return our_types.Submodel(
         the_id,
         the_extensions,
         the_category,
@@ -1479,7 +1479,7 @@ def submodel_from_jsonable(
 
 def submodel_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.SubmodelElement:
+) -> our_types.SubmodelElement:
     """
     Parse an instance of :py:class:`.types.SubmodelElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1497,7 +1497,7 @@ def submodel_element_from_jsonable(
 
 def relationship_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.RelationshipElement:
+) -> our_types.RelationshipElement:
     """
     Parse an instance of :py:class:`.types.RelationshipElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1515,7 +1515,7 @@ def relationship_element_from_jsonable(
 
 def _relationship_element_from_jsonable_without_dispatch(
         jsonable: Jsonable
-) -> aas_types.RelationshipElement:
+) -> our_types.RelationshipElement:
     """
     Parse an instance of :py:class:`.types.RelationshipElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1533,17 +1533,17 @@ def _relationship_element_from_jsonable_without_dispatch(
     """
     mapping = _as_mapping(jsonable)
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_first: Optional[aas_types.Reference] = None
-    the_second: Optional[aas_types.Reference] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_first: Optional[our_types.Reference] = None
+    the_second: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1600,7 +1600,7 @@ def _relationship_element_from_jsonable_without_dispatch(
             "The required property 'second' is missing"
         )
 
-    return aas_types.RelationshipElement(
+    return our_types.RelationshipElement(
         the_first,
         the_second,
         the_extensions,
@@ -1617,7 +1617,7 @@ def _relationship_element_from_jsonable_without_dispatch(
 
 def aas_submodel_elements_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.AASSubmodelElements:
+) -> our_types.AASSubmodelElements:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.AASSubmodelElements`.
@@ -1631,7 +1631,7 @@ def aas_submodel_elements_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.aas_submodel_elements_from_str(jsonable)
+    literal = our_stringification.aas_submodel_elements_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -1643,7 +1643,7 @@ def aas_submodel_elements_from_jsonable(
 
 def submodel_element_list_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.SubmodelElementList:
+) -> our_types.SubmodelElementList:
     """
     Parse an instance of :py:class:`.types.SubmodelElementList` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1661,20 +1661,20 @@ def submodel_element_list_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_order_relevant: Optional[bool] = None
-    the_semantic_id_list_element: Optional[aas_types.Reference] = None
-    the_type_value_list_element: Optional[aas_types.AASSubmodelElements] = None
-    the_value_type_list_element: Optional[aas_types.DataTypeDefXSD] = None
-    the_value: Optional[List[aas_types.SubmodelElement]] = None
+    the_semantic_id_list_element: Optional[our_types.Reference] = None
+    the_type_value_list_element: Optional[our_types.AASSubmodelElements] = None
+    the_value_type_list_element: Optional[our_types.DataTypeDefXSD] = None
+    the_value: Optional[List[our_types.SubmodelElement]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1736,7 +1736,7 @@ def submodel_element_list_from_jsonable(
             "The required property 'typeValueListElement' is missing"
         )
 
-    return aas_types.SubmodelElementList(
+    return our_types.SubmodelElementList(
         the_type_value_list_element,
         the_extensions,
         the_category,
@@ -1756,7 +1756,7 @@ def submodel_element_list_from_jsonable(
 
 def submodel_element_collection_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.SubmodelElementCollection:
+) -> our_types.SubmodelElementCollection:
     """
     Parse an instance of :py:class:`.types.SubmodelElementCollection` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1774,16 +1774,16 @@ def submodel_element_collection_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_value: Optional[List[aas_types.SubmodelElement]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_value: Optional[List[our_types.SubmodelElement]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1828,7 +1828,7 @@ def submodel_element_collection_from_jsonable(
         )
         raise
 
-    return aas_types.SubmodelElementCollection(
+    return our_types.SubmodelElementCollection(
         the_extensions,
         the_category,
         the_id_short,
@@ -1844,7 +1844,7 @@ def submodel_element_collection_from_jsonable(
 
 def data_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.DataElement:
+) -> our_types.DataElement:
     """
     Parse an instance of :py:class:`.types.DataElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1862,7 +1862,7 @@ def data_element_from_jsonable(
 
 def property_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Property:
+) -> our_types.Property:
     """
     Parse an instance of :py:class:`.types.Property` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1880,18 +1880,18 @@ def property_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_value_type: Optional[aas_types.DataTypeDefXSD] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_value: Optional[str] = None
-    the_value_id: Optional[aas_types.Reference] = None
+    the_value_id: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1945,7 +1945,7 @@ def property_from_jsonable(
             "The required property 'valueType' is missing"
         )
 
-    return aas_types.Property(
+    return our_types.Property(
         the_value_type,
         the_extensions,
         the_category,
@@ -1963,7 +1963,7 @@ def property_from_jsonable(
 
 def multi_language_property_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MultiLanguageProperty:
+) -> our_types.MultiLanguageProperty:
     """
     Parse an instance of :py:class:`.types.MultiLanguageProperty` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1981,17 +1981,17 @@ def multi_language_property_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_value: Optional[List[aas_types.LangStringTextType]] = None
-    the_value_id: Optional[aas_types.Reference] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_value: Optional[List[our_types.LangStringTextType]] = None
+    the_value_id: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2038,7 +2038,7 @@ def multi_language_property_from_jsonable(
         )
         raise
 
-    return aas_types.MultiLanguageProperty(
+    return our_types.MultiLanguageProperty(
         the_extensions,
         the_category,
         the_id_short,
@@ -2055,7 +2055,7 @@ def multi_language_property_from_jsonable(
 
 def range_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Range:
+) -> our_types.Range:
     """
     Parse an instance of :py:class:`.types.Range` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2073,16 +2073,16 @@ def range_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_value_type: Optional[aas_types.DataTypeDefXSD] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_min: Optional[str] = None
     the_max: Optional[str] = None
 
@@ -2138,7 +2138,7 @@ def range_from_jsonable(
             "The required property 'valueType' is missing"
         )
 
-    return aas_types.Range(
+    return our_types.Range(
         the_value_type,
         the_extensions,
         the_category,
@@ -2156,7 +2156,7 @@ def range_from_jsonable(
 
 def reference_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ReferenceElement:
+) -> our_types.ReferenceElement:
     """
     Parse an instance of :py:class:`.types.ReferenceElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2174,16 +2174,16 @@ def reference_element_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_value: Optional[aas_types.Reference] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_value: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2228,7 +2228,7 @@ def reference_element_from_jsonable(
         )
         raise
 
-    return aas_types.ReferenceElement(
+    return our_types.ReferenceElement(
         the_extensions,
         the_category,
         the_id_short,
@@ -2244,7 +2244,7 @@ def reference_element_from_jsonable(
 
 def blob_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Blob:
+) -> our_types.Blob:
     """
     Parse an instance of :py:class:`.types.Blob` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2262,15 +2262,15 @@ def blob_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[bytes] = None
     the_content_type: Optional[str] = None
 
@@ -2324,7 +2324,7 @@ def blob_from_jsonable(
             "The required property 'contentType' is missing"
         )
 
-    return aas_types.Blob(
+    return our_types.Blob(
         the_content_type,
         the_extensions,
         the_category,
@@ -2341,7 +2341,7 @@ def blob_from_jsonable(
 
 def file_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.File:
+) -> our_types.File:
     """
     Parse an instance of :py:class:`.types.File` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2359,15 +2359,15 @@ def file_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[str] = None
     the_content_type: Optional[str] = None
 
@@ -2421,7 +2421,7 @@ def file_from_jsonable(
             "The required property 'contentType' is missing"
         )
 
-    return aas_types.File(
+    return our_types.File(
         the_content_type,
         the_extensions,
         the_category,
@@ -2438,7 +2438,7 @@ def file_from_jsonable(
 
 def annotated_relationship_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.AnnotatedRelationshipElement:
+) -> our_types.AnnotatedRelationshipElement:
     """
     Parse an instance of :py:class:`.types.AnnotatedRelationshipElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2456,18 +2456,18 @@ def annotated_relationship_element_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_first: Optional[aas_types.Reference] = None
-    the_second: Optional[aas_types.Reference] = None
-    the_annotations: Optional[List[aas_types.DataElement]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_first: Optional[our_types.Reference] = None
+    the_second: Optional[our_types.Reference] = None
+    the_annotations: Optional[List[our_types.DataElement]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2526,7 +2526,7 @@ def annotated_relationship_element_from_jsonable(
             "The required property 'second' is missing"
         )
 
-    return aas_types.AnnotatedRelationshipElement(
+    return our_types.AnnotatedRelationshipElement(
         the_first,
         the_second,
         the_extensions,
@@ -2544,7 +2544,7 @@ def annotated_relationship_element_from_jsonable(
 
 def entity_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Entity:
+) -> our_types.Entity:
     """
     Parse an instance of :py:class:`.types.Entity` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2562,19 +2562,19 @@ def entity_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_statements: Optional[List[aas_types.SubmodelElement]] = None
-    the_entity_type: Optional[aas_types.EntityType] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_statements: Optional[List[our_types.SubmodelElement]] = None
+    the_entity_type: Optional[our_types.EntityType] = None
     the_global_asset_id: Optional[str] = None
-    the_specific_asset_ids: Optional[List[aas_types.SpecificAssetID]] = None
+    the_specific_asset_ids: Optional[List[our_types.SpecificAssetID]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2632,7 +2632,7 @@ def entity_from_jsonable(
             "The required property 'entityType' is missing"
         )
 
-    return aas_types.Entity(
+    return our_types.Entity(
         the_entity_type,
         the_extensions,
         the_category,
@@ -2651,7 +2651,7 @@ def entity_from_jsonable(
 
 def entity_type_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.EntityType:
+) -> our_types.EntityType:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.EntityType`.
@@ -2665,7 +2665,7 @@ def entity_type_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.entity_type_from_str(jsonable)
+    literal = our_stringification.entity_type_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -2677,7 +2677,7 @@ def entity_type_from_jsonable(
 
 def direction_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.Direction:
+) -> our_types.Direction:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.Direction`.
@@ -2691,7 +2691,7 @@ def direction_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.direction_from_str(jsonable)
+    literal = our_stringification.direction_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -2703,7 +2703,7 @@ def direction_from_jsonable(
 
 def state_of_event_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.StateOfEvent:
+) -> our_types.StateOfEvent:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.StateOfEvent`.
@@ -2717,7 +2717,7 @@ def state_of_event_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.state_of_event_from_str(jsonable)
+    literal = our_stringification.state_of_event_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -2729,7 +2729,7 @@ def state_of_event_from_jsonable(
 
 def event_payload_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.EventPayload:
+) -> our_types.EventPayload:
     """
     Parse an instance of :py:class:`.types.EventPayload` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2740,12 +2740,12 @@ def event_payload_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_source: Optional[aas_types.Reference] = None
-    the_source_semantic_id: Optional[aas_types.Reference] = None
-    the_observable_reference: Optional[aas_types.Reference] = None
-    the_observable_semantic_id: Optional[aas_types.Reference] = None
+    the_source: Optional[our_types.Reference] = None
+    the_source_semantic_id: Optional[our_types.Reference] = None
+    the_observable_reference: Optional[our_types.Reference] = None
+    the_observable_semantic_id: Optional[our_types.Reference] = None
     the_topic: Optional[str] = None
-    the_subject_id: Optional[aas_types.Reference] = None
+    the_subject_id: Optional[our_types.Reference] = None
     the_time_stamp: Optional[str] = None
     the_payload: Optional[bytes] = None
 
@@ -2795,7 +2795,7 @@ def event_payload_from_jsonable(
             "The required property 'timeStamp' is missing"
         )
 
-    return aas_types.EventPayload(
+    return our_types.EventPayload(
         the_source,
         the_observable_reference,
         the_time_stamp,
@@ -2809,7 +2809,7 @@ def event_payload_from_jsonable(
 
 def event_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.EventElement:
+) -> our_types.EventElement:
     """
     Parse an instance of :py:class:`.types.EventElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2827,7 +2827,7 @@ def event_element_from_jsonable(
 
 def basic_event_element_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.BasicEventElement:
+) -> our_types.BasicEventElement:
     """
     Parse an instance of :py:class:`.types.BasicEventElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2845,20 +2845,20 @@ def basic_event_element_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_observed: Optional[aas_types.Reference] = None
-    the_direction: Optional[aas_types.Direction] = None
-    the_state: Optional[aas_types.StateOfEvent] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_observed: Optional[our_types.Reference] = None
+    the_direction: Optional[our_types.Direction] = None
+    the_state: Optional[our_types.StateOfEvent] = None
     the_message_topic: Optional[str] = None
-    the_message_broker: Optional[aas_types.Reference] = None
+    the_message_broker: Optional[our_types.Reference] = None
     the_last_update: Optional[str] = None
     the_min_interval: Optional[str] = None
     the_max_interval: Optional[str] = None
@@ -2935,7 +2935,7 @@ def basic_event_element_from_jsonable(
             "The required property 'state' is missing"
         )
 
-    return aas_types.BasicEventElement(
+    return our_types.BasicEventElement(
         the_observed,
         the_direction,
         the_state,
@@ -2958,7 +2958,7 @@ def basic_event_element_from_jsonable(
 
 def operation_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Operation:
+) -> our_types.Operation:
     """
     Parse an instance of :py:class:`.types.Operation` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2976,18 +2976,18 @@ def operation_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_input_variables: Optional[List[aas_types.OperationVariable]] = None
-    the_output_variables: Optional[List[aas_types.OperationVariable]] = None
-    the_inoutput_variables: Optional[List[aas_types.OperationVariable]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_input_variables: Optional[List[our_types.OperationVariable]] = None
+    the_output_variables: Optional[List[our_types.OperationVariable]] = None
+    the_inoutput_variables: Optional[List[our_types.OperationVariable]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3042,7 +3042,7 @@ def operation_from_jsonable(
         )
         raise
 
-    return aas_types.Operation(
+    return our_types.Operation(
         the_extensions,
         the_category,
         the_id_short,
@@ -3060,7 +3060,7 @@ def operation_from_jsonable(
 
 def operation_variable_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.OperationVariable:
+) -> our_types.OperationVariable:
     """
     Parse an instance of :py:class:`.types.OperationVariable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3071,7 +3071,7 @@ def operation_variable_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_value: Optional[aas_types.SubmodelElement] = None
+    the_value: Optional[our_types.SubmodelElement] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3095,14 +3095,14 @@ def operation_variable_from_jsonable(
             "The required property 'value' is missing"
         )
 
-    return aas_types.OperationVariable(
+    return our_types.OperationVariable(
         the_value
     )
 
 
 def capability_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Capability:
+) -> our_types.Capability:
     """
     Parse an instance of :py:class:`.types.Capability` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3120,15 +3120,15 @@ def capability_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_semantic_id: Optional[aas_types.Reference] = None
-    the_supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
-    the_qualifiers: Optional[List[aas_types.Qualifier]] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_semantic_id: Optional[our_types.Reference] = None
+    the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
+    the_qualifiers: Optional[List[our_types.Qualifier]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3171,7 +3171,7 @@ def capability_from_jsonable(
         )
         raise
 
-    return aas_types.Capability(
+    return our_types.Capability(
         the_extensions,
         the_category,
         the_id_short,
@@ -3186,7 +3186,7 @@ def capability_from_jsonable(
 
 def concept_description_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ConceptDescription:
+) -> our_types.ConceptDescription:
     """
     Parse an instance of :py:class:`.types.ConceptDescription` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3204,15 +3204,15 @@ def concept_description_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_extensions: Optional[List[aas_types.Extension]] = None
+    the_extensions: Optional[List[our_types.Extension]] = None
     the_category: Optional[str] = None
     the_id_short: Optional[str] = None
-    the_display_name: Optional[List[aas_types.LangStringNameType]] = None
-    the_description: Optional[List[aas_types.LangStringTextType]] = None
-    the_administration: Optional[aas_types.AdministrativeInformation] = None
+    the_display_name: Optional[List[our_types.LangStringNameType]] = None
+    the_description: Optional[List[our_types.LangStringTextType]] = None
+    the_administration: Optional[our_types.AdministrativeInformation] = None
     the_id: Optional[str] = None
-    the_embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
-    the_is_case_of: Optional[List[aas_types.Reference]] = None
+    the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+    the_is_case_of: Optional[List[our_types.Reference]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3260,7 +3260,7 @@ def concept_description_from_jsonable(
             "The required property 'id' is missing"
         )
 
-    return aas_types.ConceptDescription(
+    return our_types.ConceptDescription(
         the_id,
         the_extensions,
         the_category,
@@ -3275,7 +3275,7 @@ def concept_description_from_jsonable(
 
 def reference_types_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.ReferenceTypes:
+) -> our_types.ReferenceTypes:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.ReferenceTypes`.
@@ -3289,7 +3289,7 @@ def reference_types_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.reference_types_from_str(jsonable)
+    literal = our_stringification.reference_types_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -3301,7 +3301,7 @@ def reference_types_from_jsonable(
 
 def reference_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Reference:
+) -> our_types.Reference:
     """
     Parse an instance of :py:class:`.types.Reference` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3312,9 +3312,9 @@ def reference_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_type: Optional[aas_types.ReferenceTypes] = None
-    the_referred_semantic_id: Optional[aas_types.Reference] = None
-    the_keys: Optional[List[aas_types.Key]] = None
+    the_type: Optional[our_types.ReferenceTypes] = None
+    the_referred_semantic_id: Optional[our_types.Reference] = None
+    the_keys: Optional[List[our_types.Key]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3347,7 +3347,7 @@ def reference_from_jsonable(
             "The required property 'keys' is missing"
         )
 
-    return aas_types.Reference(
+    return our_types.Reference(
         the_type,
         the_keys,
         the_referred_semantic_id
@@ -3356,7 +3356,7 @@ def reference_from_jsonable(
 
 def key_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Key:
+) -> our_types.Key:
     """
     Parse an instance of :py:class:`.types.Key` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3367,7 +3367,7 @@ def key_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_type: Optional[aas_types.KeyTypes] = None
+    the_type: Optional[our_types.KeyTypes] = None
     the_value: Optional[str] = None
 
     try:
@@ -3399,7 +3399,7 @@ def key_from_jsonable(
             "The required property 'value' is missing"
         )
 
-    return aas_types.Key(
+    return our_types.Key(
         the_type,
         the_value
     )
@@ -3407,7 +3407,7 @@ def key_from_jsonable(
 
 def key_types_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.KeyTypes:
+) -> our_types.KeyTypes:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.KeyTypes`.
@@ -3421,7 +3421,7 @@ def key_types_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.key_types_from_str(jsonable)
+    literal = our_stringification.key_types_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -3433,7 +3433,7 @@ def key_types_from_jsonable(
 
 def data_type_def_xsd_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.DataTypeDefXSD:
+) -> our_types.DataTypeDefXSD:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.DataTypeDefXSD`.
@@ -3447,7 +3447,7 @@ def data_type_def_xsd_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.data_type_def_xsd_from_str(jsonable)
+    literal = our_stringification.data_type_def_xsd_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -3459,7 +3459,7 @@ def data_type_def_xsd_from_jsonable(
 
 def abstract_lang_string_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.AbstractLangString:
+) -> our_types.AbstractLangString:
     """
     Parse an instance of :py:class:`.types.AbstractLangString` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3477,7 +3477,7 @@ def abstract_lang_string_from_jsonable(
 
 def lang_string_name_type_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LangStringNameType:
+) -> our_types.LangStringNameType:
     """
     Parse an instance of :py:class:`.types.LangStringNameType` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3520,7 +3520,7 @@ def lang_string_name_type_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    return aas_types.LangStringNameType(
+    return our_types.LangStringNameType(
         the_language,
         the_text
     )
@@ -3528,7 +3528,7 @@ def lang_string_name_type_from_jsonable(
 
 def lang_string_text_type_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LangStringTextType:
+) -> our_types.LangStringTextType:
     """
     Parse an instance of :py:class:`.types.LangStringTextType` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3571,7 +3571,7 @@ def lang_string_text_type_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    return aas_types.LangStringTextType(
+    return our_types.LangStringTextType(
         the_language,
         the_text
     )
@@ -3579,7 +3579,7 @@ def lang_string_text_type_from_jsonable(
 
 def environment_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Environment:
+) -> our_types.Environment:
     """
     Parse an instance of :py:class:`.types.Environment` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3590,9 +3590,9 @@ def environment_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_asset_administration_shells: Optional[List[aas_types.AssetAdministrationShell]] = None
-    the_submodels: Optional[List[aas_types.Submodel]] = None
-    the_concept_descriptions: Optional[List[aas_types.ConceptDescription]] = None
+    the_asset_administration_shells: Optional[List[our_types.AssetAdministrationShell]] = None
+    the_submodels: Optional[List[our_types.Submodel]] = None
+    the_concept_descriptions: Optional[List[our_types.ConceptDescription]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3619,7 +3619,7 @@ def environment_from_jsonable(
         )
         raise
 
-    return aas_types.Environment(
+    return our_types.Environment(
         the_asset_administration_shells,
         the_submodels,
         the_concept_descriptions
@@ -3628,7 +3628,7 @@ def environment_from_jsonable(
 
 def data_specification_content_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.DataSpecificationContent:
+) -> our_types.DataSpecificationContent:
     """
     Parse an instance of :py:class:`.types.DataSpecificationContent` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3646,7 +3646,7 @@ def data_specification_content_from_jsonable(
 
 def embedded_data_specification_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.EmbeddedDataSpecification:
+) -> our_types.EmbeddedDataSpecification:
     """
     Parse an instance of :py:class:`.types.EmbeddedDataSpecification` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3657,8 +3657,8 @@ def embedded_data_specification_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_data_specification: Optional[aas_types.Reference] = None
-    the_data_specification_content: Optional[aas_types.DataSpecificationContent] = None
+    the_data_specification: Optional[our_types.Reference] = None
+    the_data_specification_content: Optional[our_types.DataSpecificationContent] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3691,7 +3691,7 @@ def embedded_data_specification_from_jsonable(
             "The required property 'dataSpecificationContent' is missing"
         )
 
-    return aas_types.EmbeddedDataSpecification(
+    return our_types.EmbeddedDataSpecification(
         the_data_specification,
         the_data_specification_content
     )
@@ -3699,7 +3699,7 @@ def embedded_data_specification_from_jsonable(
 
 def data_type_iec_61360_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.DataTypeIEC61360:
+) -> our_types.DataTypeIEC61360:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.DataTypeIEC61360`.
@@ -3713,7 +3713,7 @@ def data_type_iec_61360_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.data_type_iec_61360_from_str(jsonable)
+    literal = our_stringification.data_type_iec_61360_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -3725,7 +3725,7 @@ def data_type_iec_61360_from_jsonable(
 
 def level_type_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LevelType:
+) -> our_types.LevelType:
     """
     Parse an instance of :py:class:`.types.LevelType` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3784,7 +3784,7 @@ def level_type_from_jsonable(
             "The required property 'max' is missing"
         )
 
-    return aas_types.LevelType(
+    return our_types.LevelType(
         the_min,
         the_nom,
         the_typ,
@@ -3794,7 +3794,7 @@ def level_type_from_jsonable(
 
 def value_reference_pair_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ValueReferencePair:
+) -> our_types.ValueReferencePair:
     """
     Parse an instance of :py:class:`.types.ValueReferencePair` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3806,7 +3806,7 @@ def value_reference_pair_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     the_value: Optional[str] = None
-    the_value_id: Optional[aas_types.Reference] = None
+    the_value_id: Optional[our_types.Reference] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3837,7 +3837,7 @@ def value_reference_pair_from_jsonable(
             "The required property 'valueId' is missing"
         )
 
-    return aas_types.ValueReferencePair(
+    return our_types.ValueReferencePair(
         the_value,
         the_value_id
     )
@@ -3845,7 +3845,7 @@ def value_reference_pair_from_jsonable(
 
 def value_list_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ValueList:
+) -> our_types.ValueList:
     """
     Parse an instance of :py:class:`.types.ValueList` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3856,7 +3856,7 @@ def value_list_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_value_reference_pairs: Optional[List[aas_types.ValueReferencePair]] = None
+    the_value_reference_pairs: Optional[List[our_types.ValueReferencePair]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3882,14 +3882,14 @@ def value_list_from_jsonable(
             "The required property 'valueReferencePairs' is missing"
         )
 
-    return aas_types.ValueList(
+    return our_types.ValueList(
         the_value_reference_pairs
     )
 
 
 def lang_string_preferred_name_type_iec_61360_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LangStringPreferredNameTypeIEC61360:
+) -> our_types.LangStringPreferredNameTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringPreferredNameTypeIEC61360` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3932,7 +3932,7 @@ def lang_string_preferred_name_type_iec_61360_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    return aas_types.LangStringPreferredNameTypeIEC61360(
+    return our_types.LangStringPreferredNameTypeIEC61360(
         the_language,
         the_text
     )
@@ -3940,7 +3940,7 @@ def lang_string_preferred_name_type_iec_61360_from_jsonable(
 
 def lang_string_short_name_type_iec_61360_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LangStringShortNameTypeIEC61360:
+) -> our_types.LangStringShortNameTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringShortNameTypeIEC61360` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3983,7 +3983,7 @@ def lang_string_short_name_type_iec_61360_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    return aas_types.LangStringShortNameTypeIEC61360(
+    return our_types.LangStringShortNameTypeIEC61360(
         the_language,
         the_text
     )
@@ -3991,7 +3991,7 @@ def lang_string_short_name_type_iec_61360_from_jsonable(
 
 def lang_string_definition_type_iec_61360_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.LangStringDefinitionTypeIEC61360:
+) -> our_types.LangStringDefinitionTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringDefinitionTypeIEC61360` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4034,7 +4034,7 @@ def lang_string_definition_type_iec_61360_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    return aas_types.LangStringDefinitionTypeIEC61360(
+    return our_types.LangStringDefinitionTypeIEC61360(
         the_language,
         the_text
     )
@@ -4042,7 +4042,7 @@ def lang_string_definition_type_iec_61360_from_jsonable(
 
 def data_specification_iec_61360_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.DataSpecificationIEC61360:
+) -> our_types.DataSpecificationIEC61360:
     """
     Parse an instance of :py:class:`.types.DataSpecificationIEC61360` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4060,18 +4060,18 @@ def data_specification_iec_61360_from_jsonable(
             f"but got: {model_type!r}"
         )
 
-    the_preferred_name: Optional[List[aas_types.LangStringPreferredNameTypeIEC61360]] = None
-    the_short_name: Optional[List[aas_types.LangStringShortNameTypeIEC61360]] = None
+    the_preferred_name: Optional[List[our_types.LangStringPreferredNameTypeIEC61360]] = None
+    the_short_name: Optional[List[our_types.LangStringShortNameTypeIEC61360]] = None
     the_unit: Optional[str] = None
-    the_unit_id: Optional[aas_types.Reference] = None
+    the_unit_id: Optional[our_types.Reference] = None
     the_source_of_definition: Optional[str] = None
     the_symbol: Optional[str] = None
-    the_data_type: Optional[aas_types.DataTypeIEC61360] = None
-    the_definition: Optional[List[aas_types.LangStringDefinitionTypeIEC61360]] = None
+    the_data_type: Optional[our_types.DataTypeIEC61360] = None
+    the_definition: Optional[List[our_types.LangStringDefinitionTypeIEC61360]] = None
     the_value_format: Optional[str] = None
-    the_value_list: Optional[aas_types.ValueList] = None
+    the_value_list: Optional[our_types.ValueList] = None
     the_value: Optional[str] = None
-    the_level_type: Optional[aas_types.LevelType] = None
+    the_level_type: Optional[our_types.LevelType] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -4123,7 +4123,7 @@ def data_specification_iec_61360_from_jsonable(
             "The required property 'preferredName' is missing"
         )
 
-    return aas_types.DataSpecificationIEC61360(
+    return our_types.DataSpecificationIEC61360(
         the_preferred_name,
         the_short_name,
         the_unit,
@@ -4143,7 +4143,7 @@ def data_specification_iec_61360_from_jsonable(
 #: :py:class:`.types.HasSemantics`, by its model type
 _HAS_SEMANTICS_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.HasSemantics]
+    _Parser[our_types.HasSemantics]
 ] = {
     'RelationshipElement': relationship_element_from_jsonable,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4170,7 +4170,7 @@ _HAS_SEMANTICS_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.HasExtensions`, by its model type
 _HAS_EXTENSIONS_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.HasExtensions]
+    _Parser[our_types.HasExtensions]
 ] = {
     'RelationshipElement': relationship_element_from_jsonable,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4196,7 +4196,7 @@ _HAS_EXTENSIONS_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.Referable`, by its model type
 _REFERABLE_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Referable]
+    _Parser[our_types.Referable]
 ] = {
     'RelationshipElement': relationship_element_from_jsonable,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4222,7 +4222,7 @@ _REFERABLE_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.Identifiable`, by its model type
 _IDENTIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Identifiable]
+    _Parser[our_types.Identifiable]
 ] = {
     'AssetAdministrationShell': asset_administration_shell_from_jsonable,
     'ConceptDescription': concept_description_from_jsonable,
@@ -4234,7 +4234,7 @@ _IDENTIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.HasKind`, by its model type
 _HAS_KIND_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.HasKind]
+    _Parser[our_types.HasKind]
 ] = {
     'Submodel': submodel_from_jsonable,
 }
@@ -4244,7 +4244,7 @@ _HAS_KIND_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.HasDataSpecification`, by its model type
 _HAS_DATA_SPECIFICATION_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.HasDataSpecification]
+    _Parser[our_types.HasDataSpecification]
 ] = {
     'AdministrativeInformation': administrative_information_from_jsonable,
     'RelationshipElement': relationship_element_from_jsonable,
@@ -4271,7 +4271,7 @@ _HAS_DATA_SPECIFICATION_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.Qualifiable`, by its model type
 _QUALIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Qualifiable]
+    _Parser[our_types.Qualifiable]
 ] = {
     'RelationshipElement': relationship_element_from_jsonable,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4295,7 +4295,7 @@ _QUALIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.SubmodelElement`, by its model type
 _SUBMODEL_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.SubmodelElement]
+    _Parser[our_types.SubmodelElement]
 ] = {
     'RelationshipElement': relationship_element_from_jsonable,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4318,7 +4318,7 @@ _SUBMODEL_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.RelationshipElement`, by its model type
 _RELATIONSHIP_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.RelationshipElement]
+    _Parser[our_types.RelationshipElement]
 ] = {
     'RelationshipElement': _relationship_element_from_jsonable_without_dispatch,
     'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
@@ -4329,7 +4329,7 @@ _RELATIONSHIP_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.DataElement`, by its model type
 _DATA_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.DataElement]
+    _Parser[our_types.DataElement]
 ] = {
     'Blob': blob_from_jsonable,
     'File': file_from_jsonable,
@@ -4344,7 +4344,7 @@ _DATA_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.EventElement`, by its model type
 _EVENT_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.EventElement]
+    _Parser[our_types.EventElement]
 ] = {
     'BasicEventElement': basic_event_element_from_jsonable,
 }
@@ -4354,7 +4354,7 @@ _EVENT_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.AbstractLangString`, by its model type
 _ABSTRACT_LANG_STRING_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.AbstractLangString]
+    _Parser[our_types.AbstractLangString]
 ] = {
     'LangStringDefinitionTypeIec61360': lang_string_definition_type_iec_61360_from_jsonable,
     'LangStringNameType': lang_string_name_type_from_jsonable,
@@ -4368,7 +4368,7 @@ _ABSTRACT_LANG_STRING_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.DataSpecificationContent`, by its model type
 _DATA_SPECIFICATION_CONTENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.DataSpecificationContent]
+    _Parser[our_types.DataSpecificationContent]
 ] = {
     'DataSpecificationIec61360': data_specification_iec_61360_from_jsonable,
 }
@@ -4446,7 +4446,7 @@ def _bytes_to_base64_str(
 
 
 def _list_of__asset_administration_shell_to_jsonable(
-    that: List[aas_types.AssetAdministrationShell]
+    that: List[our_types.AssetAdministrationShell]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4470,7 +4470,7 @@ def _list_of__asset_administration_shell_to_jsonable(
 
 
 def _list_of__concept_description_to_jsonable(
-    that: List[aas_types.ConceptDescription]
+    that: List[our_types.ConceptDescription]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4494,7 +4494,7 @@ def _list_of__concept_description_to_jsonable(
 
 
 def _list_of__data_element_to_jsonable(
-    that: List[aas_types.DataElement]
+    that: List[our_types.DataElement]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4516,7 +4516,7 @@ def _list_of__data_element_to_jsonable(
 
 
 def _list_of__embedded_data_specification_to_jsonable(
-    that: List[aas_types.EmbeddedDataSpecification]
+    that: List[our_types.EmbeddedDataSpecification]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4540,7 +4540,7 @@ def _list_of__embedded_data_specification_to_jsonable(
 
 
 def _list_of__extension_to_jsonable(
-    that: List[aas_types.Extension]
+    that: List[our_types.Extension]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4564,7 +4564,7 @@ def _list_of__extension_to_jsonable(
 
 
 def _list_of__key_to_jsonable(
-    that: List[aas_types.Key]
+    that: List[our_types.Key]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4588,7 +4588,7 @@ def _list_of__key_to_jsonable(
 
 
 def _list_of__lang_string_definition_type_iec_61360_to_jsonable(
-    that: List[aas_types.LangStringDefinitionTypeIEC61360]
+    that: List[our_types.LangStringDefinitionTypeIEC61360]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4612,7 +4612,7 @@ def _list_of__lang_string_definition_type_iec_61360_to_jsonable(
 
 
 def _list_of__lang_string_name_type_to_jsonable(
-    that: List[aas_types.LangStringNameType]
+    that: List[our_types.LangStringNameType]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4636,7 +4636,7 @@ def _list_of__lang_string_name_type_to_jsonable(
 
 
 def _list_of__lang_string_preferred_name_type_iec_61360_to_jsonable(
-    that: List[aas_types.LangStringPreferredNameTypeIEC61360]
+    that: List[our_types.LangStringPreferredNameTypeIEC61360]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4660,7 +4660,7 @@ def _list_of__lang_string_preferred_name_type_iec_61360_to_jsonable(
 
 
 def _list_of__lang_string_short_name_type_iec_61360_to_jsonable(
-    that: List[aas_types.LangStringShortNameTypeIEC61360]
+    that: List[our_types.LangStringShortNameTypeIEC61360]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4684,7 +4684,7 @@ def _list_of__lang_string_short_name_type_iec_61360_to_jsonable(
 
 
 def _list_of__lang_string_text_type_to_jsonable(
-    that: List[aas_types.LangStringTextType]
+    that: List[our_types.LangStringTextType]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4708,7 +4708,7 @@ def _list_of__lang_string_text_type_to_jsonable(
 
 
 def _list_of__operation_variable_to_jsonable(
-    that: List[aas_types.OperationVariable]
+    that: List[our_types.OperationVariable]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4732,7 +4732,7 @@ def _list_of__operation_variable_to_jsonable(
 
 
 def _list_of__qualifier_to_jsonable(
-    that: List[aas_types.Qualifier]
+    that: List[our_types.Qualifier]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4756,7 +4756,7 @@ def _list_of__qualifier_to_jsonable(
 
 
 def _list_of__reference_to_jsonable(
-    that: List[aas_types.Reference]
+    that: List[our_types.Reference]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4780,7 +4780,7 @@ def _list_of__reference_to_jsonable(
 
 
 def _list_of__specific_asset_id_to_jsonable(
-    that: List[aas_types.SpecificAssetID]
+    that: List[our_types.SpecificAssetID]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4804,7 +4804,7 @@ def _list_of__specific_asset_id_to_jsonable(
 
 
 def _list_of__submodel_element_to_jsonable(
-    that: List[aas_types.SubmodelElement]
+    that: List[our_types.SubmodelElement]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4826,7 +4826,7 @@ def _list_of__submodel_element_to_jsonable(
 
 
 def _list_of__submodel_to_jsonable(
-    that: List[aas_types.Submodel]
+    that: List[our_types.Submodel]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4850,7 +4850,7 @@ def _list_of__submodel_to_jsonable(
 
 
 def _list_of__value_reference_pair_to_jsonable(
-    that: List[aas_types.ValueReferencePair]
+    that: List[our_types.ValueReferencePair]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -4874,7 +4874,7 @@ def _list_of__value_reference_pair_to_jsonable(
 
 
 def _extension_to_jsonable(
-    that: aas_types.Extension
+    that: our_types.Extension
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -4923,7 +4923,7 @@ def _extension_to_jsonable(
 
 
 def _administrative_information_to_jsonable(
-    that: aas_types.AdministrativeInformation
+    that: our_types.AdministrativeInformation
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -4965,7 +4965,7 @@ def _administrative_information_to_jsonable(
 
 
 def _qualifier_to_jsonable(
-    that: aas_types.Qualifier
+    that: our_types.Qualifier
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5019,7 +5019,7 @@ def _qualifier_to_jsonable(
 
 
 def _asset_administration_shell_to_jsonable(
-    that: aas_types.AssetAdministrationShell
+    that: our_types.AssetAdministrationShell
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5108,7 +5108,7 @@ def _asset_administration_shell_to_jsonable(
 
 
 def _asset_information_to_jsonable(
-    that: aas_types.AssetInformation
+    that: our_types.AssetInformation
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5149,7 +5149,7 @@ def _asset_information_to_jsonable(
 
 
 def _resource_to_jsonable(
-    that: aas_types.Resource
+    that: our_types.Resource
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5168,7 +5168,7 @@ def _resource_to_jsonable(
 
 
 def _specific_asset_id_to_jsonable(
-    that: aas_types.SpecificAssetID
+    that: our_types.SpecificAssetID
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5210,7 +5210,7 @@ def _specific_asset_id_to_jsonable(
 
 
 def _submodel_to_jsonable(
-    that: aas_types.Submodel
+    that: our_types.Submodel
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5314,7 +5314,7 @@ def _submodel_to_jsonable(
 
 
 def _relationship_element_to_jsonable(
-    that: aas_types.RelationshipElement
+    that: our_types.RelationshipElement
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5405,7 +5405,7 @@ def _relationship_element_to_jsonable(
 
 
 def _submodel_element_list_to_jsonable(
-    that: aas_types.SubmodelElementList
+    that: our_types.SubmodelElementList
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5515,7 +5515,7 @@ def _submodel_element_list_to_jsonable(
 
 
 def _submodel_element_collection_to_jsonable(
-    that: aas_types.SubmodelElementCollection
+    that: our_types.SubmodelElementCollection
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5600,7 +5600,7 @@ def _submodel_element_collection_to_jsonable(
 
 
 def _property_to_jsonable(
-    that: aas_types.Property
+    that: our_types.Property
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5696,7 +5696,7 @@ def _property_to_jsonable(
 
 
 def _multi_language_property_to_jsonable(
-    that: aas_types.MultiLanguageProperty
+    that: our_types.MultiLanguageProperty
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5789,7 +5789,7 @@ def _multi_language_property_to_jsonable(
 
 
 def _range_to_jsonable(
-    that: aas_types.Range
+    that: our_types.Range
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5883,7 +5883,7 @@ def _range_to_jsonable(
 
 
 def _reference_element_to_jsonable(
-    that: aas_types.ReferenceElement
+    that: our_types.ReferenceElement
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -5968,7 +5968,7 @@ def _reference_element_to_jsonable(
 
 
 def _blob_to_jsonable(
-    that: aas_types.Blob
+    that: our_types.Blob
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6058,7 +6058,7 @@ def _blob_to_jsonable(
 
 
 def _file_to_jsonable(
-    that: aas_types.File
+    that: our_types.File
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6146,7 +6146,7 @@ def _file_to_jsonable(
 
 
 def _annotated_relationship_element_to_jsonable(
-    that: aas_types.AnnotatedRelationshipElement
+    that: our_types.AnnotatedRelationshipElement
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6245,7 +6245,7 @@ def _annotated_relationship_element_to_jsonable(
 
 
 def _entity_to_jsonable(
-    that: aas_types.Entity
+    that: our_types.Entity
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6349,7 +6349,7 @@ def _entity_to_jsonable(
 
 
 def _event_payload_to_jsonable(
-    that: aas_types.EventPayload
+    that: our_types.EventPayload
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6414,7 +6414,7 @@ def _event_payload_to_jsonable(
 
 
 def _basic_event_element_to_jsonable(
-    that: aas_types.BasicEventElement
+    that: our_types.BasicEventElement
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6540,7 +6540,7 @@ def _basic_event_element_to_jsonable(
 
 
 def _operation_to_jsonable(
-    that: aas_types.Operation
+    that: our_types.Operation
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6641,7 +6641,7 @@ def _operation_to_jsonable(
 
 
 def _operation_variable_to_jsonable(
-    that: aas_types.OperationVariable
+    that: our_types.OperationVariable
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6654,7 +6654,7 @@ def _operation_variable_to_jsonable(
 
 
 def _capability_to_jsonable(
-    that: aas_types.Capability
+    that: our_types.Capability
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6731,7 +6731,7 @@ def _capability_to_jsonable(
 
 
 def _concept_description_to_jsonable(
-    that: aas_types.ConceptDescription
+    that: our_types.ConceptDescription
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6805,7 +6805,7 @@ def _concept_description_to_jsonable(
 
 
 def _reference_to_jsonable(
-    that: aas_types.Reference
+    that: our_types.Reference
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6833,7 +6833,7 @@ def _reference_to_jsonable(
 
 
 def _key_to_jsonable(
-    that: aas_types.Key
+    that: our_types.Key
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6851,7 +6851,7 @@ def _key_to_jsonable(
 
 
 def _lang_string_name_type_to_jsonable(
-    that: aas_types.LangStringNameType
+    that: our_types.LangStringNameType
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6869,7 +6869,7 @@ def _lang_string_name_type_to_jsonable(
 
 
 def _lang_string_text_type_to_jsonable(
-    that: aas_types.LangStringTextType
+    that: our_types.LangStringTextType
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6887,7 +6887,7 @@ def _lang_string_text_type_to_jsonable(
 
 
 def _environment_to_jsonable(
-    that: aas_types.Environment
+    that: our_types.Environment
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6919,7 +6919,7 @@ def _environment_to_jsonable(
 
 
 def _embedded_data_specification_to_jsonable(
-    that: aas_types.EmbeddedDataSpecification
+    that: our_types.EmbeddedDataSpecification
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6939,7 +6939,7 @@ def _embedded_data_specification_to_jsonable(
 
 
 def _level_type_to_jsonable(
-    that: aas_types.LevelType
+    that: our_types.LevelType
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6967,7 +6967,7 @@ def _level_type_to_jsonable(
 
 
 def _value_reference_pair_to_jsonable(
-    that: aas_types.ValueReferencePair
+    that: our_types.ValueReferencePair
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -6987,7 +6987,7 @@ def _value_reference_pair_to_jsonable(
 
 
 def _value_list_to_jsonable(
-    that: aas_types.ValueList
+    that: our_types.ValueList
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -7002,7 +7002,7 @@ def _value_list_to_jsonable(
 
 
 def _lang_string_preferred_name_type_iec_61360_to_jsonable(
-    that: aas_types.LangStringPreferredNameTypeIEC61360
+    that: our_types.LangStringPreferredNameTypeIEC61360
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -7020,7 +7020,7 @@ def _lang_string_preferred_name_type_iec_61360_to_jsonable(
 
 
 def _lang_string_short_name_type_iec_61360_to_jsonable(
-    that: aas_types.LangStringShortNameTypeIEC61360
+    that: our_types.LangStringShortNameTypeIEC61360
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -7038,7 +7038,7 @@ def _lang_string_short_name_type_iec_61360_to_jsonable(
 
 
 def _lang_string_definition_type_iec_61360_to_jsonable(
-    that: aas_types.LangStringDefinitionTypeIEC61360
+    that: our_types.LangStringDefinitionTypeIEC61360
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -7056,7 +7056,7 @@ def _lang_string_definition_type_iec_61360_to_jsonable(
 
 
 def _data_specification_iec_61360_to_jsonable(
-    that: aas_types.DataSpecificationIEC61360
+    that: our_types.DataSpecificationIEC61360
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -7148,7 +7148,7 @@ def _data_specification_iec_61360_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -7278,12 +7278,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

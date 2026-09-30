@@ -90,7 +90,7 @@ test(
 {I}+ "at {expected_path}",
 {I}() => {{
 {II}for (const value of {values_literal}) {{
-{III}const instance = AasJsonization.{deserialization_function}(
+{III}const instance = OurJsonization.{deserialization_function}(
 {IIII}loadTheFirstExpected({typescript_common.string_literal(cls_name_json)})
 {III}).mustValue();
 
@@ -98,12 +98,12 @@ test(
 
 {III}let caught: unknown = null;
 {III}try {{
-{IIII}AasJsonization.toJsonable(instance);
+{IIII}OurJsonization.toJsonable(instance);
 {III}}} catch (error) {{
 {IIII}caught = error;
 {III}}}
 
-{III}if (!(caught instanceof AasJsonization.SerializationError)) {{
+{III}if (!(caught instanceof OurJsonization.SerializationError)) {{
 {IIII}throw new Error(
 {IIIII}`Expected a SerializationError, but got: ${{caught}}`
 {IIII});
@@ -124,7 +124,7 @@ test(
 /**
  * Load the first recorded example of the `modelType`.
  */
-function loadTheFirstExpected(modelType: string): AasJsonization.JsonValue {{
+function loadTheFirstExpected(modelType: string): OurJsonization.JsonValue {{
 {I}const pths = Array.from(
 {II}TestCommon.findFilesBySuffixRecursively(
 {III}path.join(
@@ -173,9 +173,9 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasJsonization from "../src/jsonization";
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
+import * as OurJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
 
 import * as TestCommon from "./common";"""
         ),
@@ -186,13 +186,13 @@ import * as TestCommon from "./common";"""
  * gives the input.
  */
 function assertSerializeDeserializeEqualsOriginal(
-{I}originalJsonable: AasJsonization.JsonValue,
-{I}instance: AasTypes.Class,
+{I}originalJsonable: OurJsonization.JsonValue,
+{I}instance: OurTypes.Class,
 {I}aPath: string
 ): void {{
-{I}let jsonable: AasJsonization.JsonValue | null = null;
+{I}let jsonable: OurJsonization.JsonValue | null = null;
 {I}try {{
-{II}jsonable = AasJsonization.toJsonable(instance);
+{II}jsonable = OurJsonization.toJsonable(instance);
 {I}}} catch (error) {{
 {II}throw new Error(
 {III}"Expected no exception during JSON serialization " +
@@ -224,7 +224,7 @@ function assertSerializeDeserializeEqualsOriginal(
  * @throws an {{@link Error}} if assertion fails
  */
 function assertDeserializationErrorEqualsExpectedOrRecord(
-{I}error: AasJsonization.DeserializationError,
+{I}error: OurJsonization.DeserializationError,
 {I}aPath: string
 ): void {{
 {I}const errorPath = aPath + ".error";
@@ -265,7 +265,7 @@ function assertDeserializationErrorEqualsExpectedOrRecord(
  * @throws an {{@link Error}} if assertion fails
  */
 function assertVerificationErrorsEqualExpectedOrRecord(
-{I}errors: Array<AasVerification.VerificationError>,
+{I}errors: Array<OurVerification.VerificationError>,
 {I}aPath: string
 ): void {{
 {I}const errorsPath = aPath + ".errors";
@@ -335,13 +335,13 @@ test("{cls_name_typescript} round-trip OK", () => {{
 {I}for (const pth of pths) {{
 {II}const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-{II}const instanceOrError = AasJsonization.{deserialization_function}(
+{II}const instanceOrError = OurJsonization.{deserialization_function}(
 {III}jsonable
 {II});
 {II}expect(instanceOrError.error).toBeNull();
 {II}const instance = instanceOrError.mustValue();
 
-{II}TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+{II}TestCommon.assertNoVerificationErrors(OurVerification.verify(instance), pth);
 
 {II}assertSerializeDeserializeEqualsOriginal(
 {III}jsonable,
@@ -394,7 +394,7 @@ test("{cls_name_typescript} deserialization fail", () => {{
 {II}for (const pth of pths) {{
 {III}const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-{III}const instanceOrError = AasJsonization.{deserialization_function}(
+{III}const instanceOrError = OurJsonization.{deserialization_function}(
 {IIII}jsonable
 {III});
 {III}if (instanceOrError.error === null) {{
@@ -444,7 +444,7 @@ test("{cls_name_typescript} verification fail", () => {{
 {II}for (const pth of pths) {{
 {III}const jsonable = TestCommon.readJsonFromFileSync(pth);
 
-{III}const instanceOrError = AasJsonization.{deserialization_function}(
+{III}const instanceOrError = OurJsonization.{deserialization_function}(
 {IIII}jsonable
 {III});
 {III}if (instanceOrError.error !== null) {{
@@ -456,7 +456,7 @@ test("{cls_name_typescript} verification fail", () => {{
 
 {III}const instance = instanceOrError.mustValue();
 
-{III}const verificationErrors = Array.from(AasVerification.verify(instance));
+{III}const verificationErrors = Array.from(OurVerification.verify(instance));
 {III}assertVerificationErrorsEqualExpectedOrRecord(
 {IIII}verificationErrors,
 {IIII}pth

@@ -16,8 +16,8 @@ import unittest
 import xml.etree.ElementTree as ET
 
 
-import dummy.types as aas_types
-import dummy.xmlization as aas_xmlization
+import dummy.types as our_types
+import dummy.xmlization as our_xmlization
 
 
 import tests.common
@@ -41,22 +41,22 @@ class TestRoundTrips(unittest.TestCase):
             # region From iterparse
             iterator = ET.iterparse(source=io.StringIO(text), events=["start", "end"])
             got_from_iterparse = (
-                aas_xmlization.something_from_iterparse(iterator)
+                our_xmlization.something_from_iterparse(iterator)
             )
 
-            et_from_iterparse = ET.fromstring(aas_xmlization.to_str(got_from_iterparse))
+            et_from_iterparse = ET.fromstring(our_xmlization.to_str(got_from_iterparse))
             tests.common_xmlization.remove_redundant_whitespace(et_from_iterparse)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_iterparse)
             # endregion
 
             # region From stream
             got_from_stream = (
-                aas_xmlization
+                our_xmlization
                 .something_from_stream(
                     io.StringIO(text)
                 )
             )
-            et_from_stream = ET.fromstring(aas_xmlization.to_str(got_from_stream))
+            et_from_stream = ET.fromstring(our_xmlization.to_str(got_from_stream))
             tests.common_xmlization.remove_redundant_whitespace(et_from_stream)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_stream)
             # endregion
@@ -67,20 +67,20 @@ class TestRoundTrips(unittest.TestCase):
                 path.write_text(text, encoding="utf-8")
 
                 got_from_file = (
-                    aas_xmlization
+                    our_xmlization
                     .something_from_file(path)
                 )
-            et_from_file = ET.fromstring(aas_xmlization.to_str(got_from_file))
+            et_from_file = ET.fromstring(our_xmlization.to_str(got_from_file))
             tests.common_xmlization.remove_redundant_whitespace(et_from_file)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_file)
             # endregion
 
             # region From string
             got_from_str = (
-                aas_xmlization
+                our_xmlization
                 .something_from_str(text)
             )
-            et_from_str = ET.fromstring(aas_xmlization.to_str(got_from_str))
+            et_from_str = ET.fromstring(our_xmlization.to_str(got_from_str))
             tests.common_xmlization.remove_redundant_whitespace(et_from_str)
             tests.common_xmlization.assert_elements_equal(et_concrete, et_from_str)
             # endregion
@@ -89,7 +89,7 @@ class TestRoundTrips(unittest.TestCase):
 class TestLexicalForms(unittest.TestCase):
     """Test the lexical forms which a recorded example can not hold."""
 
-    def _read_with(self, xml_name: str, text: str) -> aas_types.Something:
+    def _read_with(self, xml_name: str, text: str) -> our_types.Something:
         """Read a recorded example with the content of ``xml_name`` put to ``text``."""
         paths = sorted(
             (
@@ -110,7 +110,7 @@ class TestLexicalForms(unittest.TestCase):
         start = original.index(f"<{xml_name}>") + len(xml_name) + 2
         end = original.index(f"</{xml_name}>")
 
-        return aas_xmlization.something_from_str(
+        return our_xmlization.something_from_str(
             original[:start] + text + original[end:]
         )
 
@@ -175,7 +175,7 @@ class TestLexicalForms(unittest.TestCase):
         self.assertEqual(-42, instance.some_int)
 
     def test_some_int_read_from_many_digits_fails(self) -> None:
-        with self.assertRaises(aas_xmlization.DeserializationException):
+        with self.assertRaises(our_xmlization.DeserializationException):
             self._read_with('someInt', "1" + "0" * 5000)
 
 
@@ -215,8 +215,8 @@ class TestDuplicateProperty(unittest.TestCase):
             text[:insertion_index] + duplicated + text[insertion_index:]
         )
 
-        with self.assertRaises(aas_xmlization.DeserializationException):
-            aas_xmlization.something_from_str(broken_text)
+        with self.assertRaises(our_xmlization.DeserializationException):
+            our_xmlization.something_from_str(broken_text)
 
 
 if __name__ == "__main__":

@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`aas_core3.types.Exten
 
 .. code-block::
 
-    import aas_core3.types as aas_types
-    import aas_core3.verification as aas_verification
+    import aas_core3.types as our_types
+    import aas_core3.verification as our_verification
 
-    an_instance = aas_types.Extension(
+    an_instance = our_types.Extension(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,19 +47,19 @@ else:
     from typing_extensions import Final
 
 from aas_core3 import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 # noinspection SpellCheckingInspection
@@ -272,7 +272,7 @@ def matches_bcp_47(text: str) -> bool:
 
 
 def lang_strings_have_unique_languages(
-    lang_strings: Iterable[aas_types.AbstractLangString],
+    lang_strings: Iterable[our_types.AbstractLangString],
 ) -> bool:
     """
     Check that :paramref:`lang_strings` are specified each for a unique
@@ -288,7 +288,7 @@ def lang_strings_have_unique_languages(
     return True
 
 
-def qualifier_types_are_unique(qualifiers: Iterable[aas_types.Qualifier]) -> bool:
+def qualifier_types_are_unique(qualifiers: Iterable[our_types.Qualifier]) -> bool:
     """
     Check that there are no duplicate
     :py:attr:`.types.Qualifier.type`'s
@@ -1373,47 +1373,47 @@ def is_xs_unsigned_byte(value: str) -> bool:
 
 
 _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY: Mapping[
-    aas_types.DataTypeDefXSD, Callable[[str], bool]
+    our_types.DataTypeDefXSD, Callable[[str], bool]
 ] = {
-    aas_types.DataTypeDefXSD.ANY_URI: matches_xs_any_uri,
-    aas_types.DataTypeDefXSD.BASE_64_BINARY: matches_xs_base_64_binary,
-    aas_types.DataTypeDefXSD.BOOLEAN: matches_xs_boolean,
-    aas_types.DataTypeDefXSD.BYTE: is_xs_byte,
-    aas_types.DataTypeDefXSD.DATE: is_xs_date,
-    aas_types.DataTypeDefXSD.DATE_TIME: is_xs_date_time,
-    aas_types.DataTypeDefXSD.DECIMAL: matches_xs_decimal,
-    aas_types.DataTypeDefXSD.DOUBLE: is_xs_double,
-    aas_types.DataTypeDefXSD.DURATION: matches_xs_duration,
-    aas_types.DataTypeDefXSD.FLOAT: is_xs_float,
-    aas_types.DataTypeDefXSD.G_DAY: matches_xs_g_day,
-    aas_types.DataTypeDefXSD.G_MONTH: matches_xs_g_month,
-    aas_types.DataTypeDefXSD.G_MONTH_DAY: is_xs_g_month_day,
-    aas_types.DataTypeDefXSD.G_YEAR: matches_xs_g_year,
-    aas_types.DataTypeDefXSD.G_YEAR_MONTH: matches_xs_g_year_month,
-    aas_types.DataTypeDefXSD.HEX_BINARY: matches_xs_hex_binary,
-    aas_types.DataTypeDefXSD.INT: is_xs_int,
-    aas_types.DataTypeDefXSD.INTEGER: matches_xs_integer,
-    aas_types.DataTypeDefXSD.LONG: is_xs_long,
-    aas_types.DataTypeDefXSD.NEGATIVE_INTEGER: matches_xs_negative_integer,
-    aas_types.DataTypeDefXSD.NON_NEGATIVE_INTEGER: matches_xs_non_negative_integer,
-    aas_types.DataTypeDefXSD.NON_POSITIVE_INTEGER: matches_xs_non_positive_integer,
-    aas_types.DataTypeDefXSD.POSITIVE_INTEGER: matches_xs_positive_integer,
-    aas_types.DataTypeDefXSD.SHORT: is_xs_short,
-    aas_types.DataTypeDefXSD.STRING: matches_xs_string,
-    aas_types.DataTypeDefXSD.TIME: matches_xs_time,
-    aas_types.DataTypeDefXSD.UNSIGNED_BYTE: is_xs_unsigned_byte,
-    aas_types.DataTypeDefXSD.UNSIGNED_INT: is_xs_unsigned_int,
-    aas_types.DataTypeDefXSD.UNSIGNED_LONG: is_xs_unsigned_long,
-    aas_types.DataTypeDefXSD.UNSIGNED_SHORT: is_xs_unsigned_short,
+    our_types.DataTypeDefXSD.ANY_URI: matches_xs_any_uri,
+    our_types.DataTypeDefXSD.BASE_64_BINARY: matches_xs_base_64_binary,
+    our_types.DataTypeDefXSD.BOOLEAN: matches_xs_boolean,
+    our_types.DataTypeDefXSD.BYTE: is_xs_byte,
+    our_types.DataTypeDefXSD.DATE: is_xs_date,
+    our_types.DataTypeDefXSD.DATE_TIME: is_xs_date_time,
+    our_types.DataTypeDefXSD.DECIMAL: matches_xs_decimal,
+    our_types.DataTypeDefXSD.DOUBLE: is_xs_double,
+    our_types.DataTypeDefXSD.DURATION: matches_xs_duration,
+    our_types.DataTypeDefXSD.FLOAT: is_xs_float,
+    our_types.DataTypeDefXSD.G_DAY: matches_xs_g_day,
+    our_types.DataTypeDefXSD.G_MONTH: matches_xs_g_month,
+    our_types.DataTypeDefXSD.G_MONTH_DAY: is_xs_g_month_day,
+    our_types.DataTypeDefXSD.G_YEAR: matches_xs_g_year,
+    our_types.DataTypeDefXSD.G_YEAR_MONTH: matches_xs_g_year_month,
+    our_types.DataTypeDefXSD.HEX_BINARY: matches_xs_hex_binary,
+    our_types.DataTypeDefXSD.INT: is_xs_int,
+    our_types.DataTypeDefXSD.INTEGER: matches_xs_integer,
+    our_types.DataTypeDefXSD.LONG: is_xs_long,
+    our_types.DataTypeDefXSD.NEGATIVE_INTEGER: matches_xs_negative_integer,
+    our_types.DataTypeDefXSD.NON_NEGATIVE_INTEGER: matches_xs_non_negative_integer,
+    our_types.DataTypeDefXSD.NON_POSITIVE_INTEGER: matches_xs_non_positive_integer,
+    our_types.DataTypeDefXSD.POSITIVE_INTEGER: matches_xs_positive_integer,
+    our_types.DataTypeDefXSD.SHORT: is_xs_short,
+    our_types.DataTypeDefXSD.STRING: matches_xs_string,
+    our_types.DataTypeDefXSD.TIME: matches_xs_time,
+    our_types.DataTypeDefXSD.UNSIGNED_BYTE: is_xs_unsigned_byte,
+    our_types.DataTypeDefXSD.UNSIGNED_INT: is_xs_unsigned_int,
+    our_types.DataTypeDefXSD.UNSIGNED_LONG: is_xs_unsigned_long,
+    our_types.DataTypeDefXSD.UNSIGNED_SHORT: is_xs_unsigned_short,
 }
 assert all(
     data_type_def_xsd in _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY
-    for data_type_def_xsd in aas_types.DataTypeDefXSD
+    for data_type_def_xsd in our_types.DataTypeDefXSD
 )
 
 
 def value_consistent_with_xsd_type(
-    value: str, value_type: aas_types.DataTypeDefXSD
+    value: str, value_type: our_types.DataTypeDefXSD
 ) -> bool:
     """
     Check that :paramref:`value` is consistent with the given
@@ -1423,8 +1423,8 @@ def value_consistent_with_xsd_type(
 
 
 def is_model_reference_to(
-    reference: aas_types.Reference,
-    expected_type: aas_types.KeyTypes
+    reference: our_types.Reference,
+    expected_type: our_types.KeyTypes
 ) -> bool:
     """
     Check that the target of the model reference matches the :paramref:`expected_type`.
@@ -1432,14 +1432,14 @@ def is_model_reference_to(
     # pylint: disable=all
     return (
         (
-            reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+            reference.type == our_types.ReferenceTypes.MODEL_REFERENCE
             and len(reference.keys) != 0
             and reference.keys[-1].type == expected_type
         ))
 
 
 def is_model_reference_to_referable(
-    reference: aas_types.Reference
+    reference: our_types.Reference
 ) -> bool:
     """
     Check that the target of the reference matches a :py:attr:`.constants.AAS_REFERABLES`.
@@ -1447,13 +1447,13 @@ def is_model_reference_to_referable(
     # pylint: disable=all
     return (
         (
-            reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+            reference.type == our_types.ReferenceTypes.MODEL_REFERENCE
             and len(reference.keys) != 0
-            and (reference.keys[-1].type in aas_constants.AAS_REFERABLES)
+            and (reference.keys[-1].type in our_constants.AAS_REFERABLES)
         ))
 
 
-def id_shorts_are_unique(referables: Iterable[aas_types.Referable]) -> bool:
+def id_shorts_are_unique(referables: Iterable[our_types.Referable]) -> bool:
     """
     Check that all :py:attr:`.types.Referable.id_short` are unique
     among :paramref:`referables`.
@@ -1470,9 +1470,9 @@ def id_shorts_are_unique(referables: Iterable[aas_types.Referable]) -> bool:
 
 
 def id_shorts_of_variables_are_unique(
-    input_variables: Optional[List[aas_types.OperationVariable]],
-    output_variables: Optional[List[aas_types.OperationVariable]],
-    inoutput_variables: Optional[List[aas_types.OperationVariable]],
+    input_variables: Optional[List[our_types.OperationVariable]],
+    output_variables: Optional[List[our_types.OperationVariable]],
+    inoutput_variables: Optional[List[our_types.OperationVariable]],
 ) -> bool:
     """
     Check that the :py:attr:`.types.Referable.id_short`'s among all the
@@ -1504,7 +1504,7 @@ def id_shorts_of_variables_are_unique(
     return True
 
 
-def extension_names_are_unique(extensions: Iterable[aas_types.Extension]) -> bool:
+def extension_names_are_unique(extensions: Iterable[our_types.Extension]) -> bool:
     """
     Check that all :py:attr:`.types.Extension.name` are unique
     among :paramref:`extensions`.
@@ -1520,13 +1520,13 @@ def extension_names_are_unique(extensions: Iterable[aas_types.Extension]) -> boo
 
 
 def submodel_elements_have_identical_semantic_ids(
-    elements: Iterable[aas_types.SubmodelElement],
+    elements: Iterable[our_types.SubmodelElement],
 ) -> bool:
     """
     Check that all :paramref:`elements` have the identical
     :py:attr:`.types.HasSemantics.semantic_id`.
     """
-    that_semantic_id = None  # type: Optional[aas_types.Reference]
+    that_semantic_id = None  # type: Optional[our_types.Reference]
 
     for element in elements:
         if element.semantic_id is None:
@@ -1550,59 +1550,59 @@ def submodel_elements_have_identical_semantic_ids(
 
 # fmt: off
 _AAS_SUBMODEL_ELEMENTS_TO_TYPE: Mapping[
-    aas_types.AASSubmodelElements,
+    our_types.AASSubmodelElements,
     type
 ] = {
-    aas_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
-        aas_types.AnnotatedRelationshipElement,
+    our_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
+        our_types.AnnotatedRelationshipElement,
 
-    aas_types.AASSubmodelElements.BASIC_EVENT_ELEMENT:
-        aas_types.BasicEventElement,
+    our_types.AASSubmodelElements.BASIC_EVENT_ELEMENT:
+        our_types.BasicEventElement,
 
-    aas_types.AASSubmodelElements.BLOB:
-        aas_types.Blob,
+    our_types.AASSubmodelElements.BLOB:
+        our_types.Blob,
 
-    aas_types.AASSubmodelElements.CAPABILITY:
-        aas_types.Capability,
+    our_types.AASSubmodelElements.CAPABILITY:
+        our_types.Capability,
 
-    aas_types.AASSubmodelElements.DATA_ELEMENT:
-        aas_types.DataElement,
+    our_types.AASSubmodelElements.DATA_ELEMENT:
+        our_types.DataElement,
 
-    aas_types.AASSubmodelElements.ENTITY:
-        aas_types.Entity,
+    our_types.AASSubmodelElements.ENTITY:
+        our_types.Entity,
 
-    aas_types.AASSubmodelElements.EVENT_ELEMENT:
-        aas_types.EventElement,
+    our_types.AASSubmodelElements.EVENT_ELEMENT:
+        our_types.EventElement,
 
-    aas_types.AASSubmodelElements.FILE:
-        aas_types.File,
+    our_types.AASSubmodelElements.FILE:
+        our_types.File,
 
-    aas_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY:
-        aas_types.MultiLanguageProperty,
+    our_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY:
+        our_types.MultiLanguageProperty,
 
-    aas_types.AASSubmodelElements.OPERATION:
-        aas_types.Operation,
+    our_types.AASSubmodelElements.OPERATION:
+        our_types.Operation,
 
-    aas_types.AASSubmodelElements.PROPERTY:
-        aas_types.Property,
+    our_types.AASSubmodelElements.PROPERTY:
+        our_types.Property,
 
-    aas_types.AASSubmodelElements.RANGE:
-        aas_types.Range,
+    our_types.AASSubmodelElements.RANGE:
+        our_types.Range,
 
-    aas_types.AASSubmodelElements.REFERENCE_ELEMENT:
-        aas_types.ReferenceElement,
+    our_types.AASSubmodelElements.REFERENCE_ELEMENT:
+        our_types.ReferenceElement,
 
-    aas_types.AASSubmodelElements.RELATIONSHIP_ELEMENT:
-        aas_types.RelationshipElement,
+    our_types.AASSubmodelElements.RELATIONSHIP_ELEMENT:
+        our_types.RelationshipElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT:
-        aas_types.SubmodelElement,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT:
+        our_types.SubmodelElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST:
-        aas_types.SubmodelElementList,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST:
+        our_types.SubmodelElementList,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
-        aas_types.SubmodelElementCollection,
+    our_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
+        our_types.SubmodelElementCollection,
 }
 # fmt: on
 
@@ -1613,7 +1613,7 @@ def _assert_all_types_covered_in_aas_submodel_elements_to_type() -> None:
     """
     missing_literals = [
         literal
-        for literal in aas_types.AASSubmodelElements
+        for literal in our_types.AASSubmodelElements
         if literal not in _AAS_SUBMODEL_ELEMENTS_TO_TYPE
     ]
 
@@ -1627,7 +1627,7 @@ _assert_all_types_covered_in_aas_submodel_elements_to_type()
 
 
 def submodel_element_is_of_type(
-    element: aas_types.SubmodelElement, expected_type: aas_types.AASSubmodelElements
+    element: our_types.SubmodelElement, expected_type: our_types.AASSubmodelElements
 ) -> bool:
     """
     Check that :paramref:`element` is an instance of class corresponding
@@ -1638,14 +1638,14 @@ def submodel_element_is_of_type(
 
 
 def properties_or_ranges_have_value_type(
-    elements: Iterable[aas_types.SubmodelElement], value_type: aas_types.DataTypeDefXSD
+    elements: Iterable[our_types.SubmodelElement], value_type: our_types.DataTypeDefXSD
 ) -> bool:
     """
     Check that :paramref:`elements` which are
     :py:class:`.types.Property` or :py:class:`.types.Range`
     have the given :paramref:`value_type`.
     """
-    range_or_property = (aas_types.Property, aas_types.Range)
+    range_or_property = (our_types.Property, our_types.Range)
     for element in elements:
         if isinstance(element, range_or_property):
             if element.value_type is not value_type:
@@ -1655,7 +1655,7 @@ def properties_or_ranges_have_value_type(
 
 
 def reference_key_values_equal(
-    that: aas_types.Reference, other: aas_types.Reference
+    that: our_types.Reference, other: our_types.Reference
 ) -> bool:
     """
     Check that the two references, :paramref:`that` and :paramref:`other`,
@@ -1673,7 +1673,7 @@ def reference_key_values_equal(
 
 
 def data_specification_iec_61360s_for_property_or_value_have_appropriate_data_type(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.data_type`
@@ -1683,13 +1683,13 @@ def data_specification_iec_61360s_for_property_or_value_have_appropriate_data_ty
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if (
                 iec61360.data_type is None
                 or iec61360.data_type
-                not in aas_constants.DATA_TYPE_IEC_61360_FOR_PROPERTY_OR_VALUE
+                not in our_constants.DATA_TYPE_IEC_61360_FOR_PROPERTY_OR_VALUE
             ):
                 return False
 
@@ -1697,7 +1697,7 @@ def data_specification_iec_61360s_for_property_or_value_have_appropriate_data_ty
 
 
 def data_specification_iec_61360s_for_reference_have_appropriate_data_type(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.data_type`
@@ -1707,13 +1707,13 @@ def data_specification_iec_61360s_for_reference_have_appropriate_data_type(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if (
                 iec61360.data_type is None
                 or iec61360.data_type
-                not in aas_constants.DATA_TYPE_IEC_61360_FOR_REFERENCE
+                not in our_constants.DATA_TYPE_IEC_61360_FOR_REFERENCE
             ):
                 return False
 
@@ -1721,7 +1721,7 @@ def data_specification_iec_61360s_for_reference_have_appropriate_data_type(
 
 
 def data_specification_iec_61360s_for_document_have_appropriate_data_type(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.data_type`
@@ -1731,13 +1731,13 @@ def data_specification_iec_61360s_for_document_have_appropriate_data_type(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if (
                 iec61360.data_type is None
                 or iec61360.data_type
-                not in aas_constants.DATA_TYPE_IEC_61360_FOR_DOCUMENT
+                not in our_constants.DATA_TYPE_IEC_61360_FOR_DOCUMENT
             ):
                 return False
 
@@ -1745,7 +1745,7 @@ def data_specification_iec_61360s_for_document_have_appropriate_data_type(
 
 
 def data_specification_iec_61360s_have_data_type(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.data_type`
@@ -1754,7 +1754,7 @@ def data_specification_iec_61360s_have_data_type(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if iec61360.data_type is None:
@@ -1764,7 +1764,7 @@ def data_specification_iec_61360s_have_data_type(
 
 
 def data_specification_iec_61360s_have_value(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.value`
@@ -1773,7 +1773,7 @@ def data_specification_iec_61360s_have_value(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if iec61360.value is None:
@@ -1783,7 +1783,7 @@ def data_specification_iec_61360s_have_value(
 
 
 def data_specification_iec_61360s_have_definition_at_least_in_english(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.definition`
@@ -1793,7 +1793,7 @@ def data_specification_iec_61360s_have_definition_at_least_in_english(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if iec61360.definition is None:
@@ -1829,14 +1829,14 @@ def is_bcp_47_for_english(text: str) -> bool:
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_extension(
             self,
-            that: aas_types.Extension
+            that: our_types.Extension
     ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
@@ -1941,7 +1941,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_administrative_information(
             self,
-            that: aas_types.AdministrativeInformation
+            that: our_types.AdministrativeInformation
     ) -> Iterator[Error]:
         if not (
             not (that.embedded_data_specifications is not None)
@@ -2023,7 +2023,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_qualifier(
             self,
-            that: aas_types.Qualifier
+            that: our_types.Qualifier
     ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
@@ -2114,7 +2114,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_asset_administration_shell(
             self,
-            that: aas_types.AssetAdministrationShell
+            that: our_types.AssetAdministrationShell
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -2190,7 +2190,7 @@ class _Transformer(
             not (that.derived_from is not None)
             or is_model_reference_to(
                 that.derived_from,
-                aas_types.KeyTypes.ASSET_ADMINISTRATION_SHELL
+                our_types.KeyTypes.ASSET_ADMINISTRATION_SHELL
             )
         ):
             yield Error(
@@ -2204,7 +2204,7 @@ class _Transformer(
                 all(
                     is_model_reference_to(
                         reference,
-                        aas_types.KeyTypes.SUBMODEL
+                        our_types.KeyTypes.SUBMODEL
                     )
                     for reference in that.submodels
                 )
@@ -2362,7 +2362,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_asset_information(
             self,
-            that: aas_types.AssetInformation
+            that: our_types.AssetInformation
     ) -> Iterator[Error]:
         if not (
             not (that.specific_asset_ids is not None)
@@ -2467,7 +2467,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_resource(
             self,
-            that: aas_types.Resource
+            that: our_types.Resource
     ) -> Iterator[Error]:
         for error in verify_path_type(that.path):
             error.path._prepend(
@@ -2491,7 +2491,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_specific_asset_id(
             self,
-            that: aas_types.SpecificAssetID
+            that: our_types.SpecificAssetID
     ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
@@ -2513,7 +2513,7 @@ class _Transformer(
 
         if not (
             not (that.external_subject_id is not None)
-            or (that.external_subject_id.type == aas_types.ReferenceTypes.EXTERNAL_REFERENCE)
+            or (that.external_subject_id.type == our_types.ReferenceTypes.EXTERNAL_REFERENCE)
         ):
             yield Error(
                 'Constraint AASd-133: External subject ID shall be ' +
@@ -2578,7 +2578,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_submodel(
             self,
-            that: aas_types.Submodel
+            that: our_types.Submodel
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -2715,13 +2715,13 @@ class _Transformer(
         if not (
             not (that.submodel_elements is not None)
             or (
-                not (that.kind_or_default() != aas_types.ModellingKind.TEMPLATE)
+                not (that.kind_or_default() != our_types.ModellingKind.TEMPLATE)
                 or (
                     all(
                         not (submodel_element.qualifiers is not None)
                         or (
                             all(
-                                qualifier.kind_or_default() != aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                                qualifier.kind_or_default() != our_types.QualifierKind.TEMPLATE_QUALIFIER
                                 for qualifier in submodel_element.qualifiers
                             )
                         )
@@ -2744,11 +2744,11 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == our_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
-                or (that.kind_or_default() == aas_types.ModellingKind.TEMPLATE)
+                or (that.kind_or_default() == our_types.ModellingKind.TEMPLATE)
             )
         ):
             yield Error(
@@ -2935,7 +2935,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_relationship_element(
             self,
-            that: aas_types.RelationshipElement
+            that: our_types.RelationshipElement
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -3191,7 +3191,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_submodel_element_list(
             self,
-            that: aas_types.SubmodelElementList
+            that: our_types.SubmodelElementList
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -3354,8 +3354,8 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type_value_list_element == aas_types.AASSubmodelElements.PROPERTY
-                    or that.type_value_list_element == aas_types.AASSubmodelElements.RANGE
+                    that.type_value_list_element == our_types.AASSubmodelElements.PROPERTY
+                    or that.type_value_list_element == our_types.AASSubmodelElements.RANGE
                 )
             )
             or (
@@ -3561,7 +3561,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_submodel_element_collection(
             self,
-            that: aas_types.SubmodelElementCollection
+            that: our_types.SubmodelElementCollection
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -3848,7 +3848,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_property(
             self,
-            that: aas_types.Property
+            that: our_types.Property
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -3949,7 +3949,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -4127,7 +4127,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_multi_language_property(
             self,
-            that: aas_types.MultiLanguageProperty
+            that: our_types.MultiLanguageProperty
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -4228,7 +4228,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -4418,7 +4418,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_range(
             self,
-            that: aas_types.Range
+            that: our_types.Range
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -4519,7 +4519,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -4708,7 +4708,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_reference_element(
             self,
-            that: aas_types.ReferenceElement
+            that: our_types.ReferenceElement
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -4809,7 +4809,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -4966,7 +4966,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_blob(
             self,
-            that: aas_types.Blob
+            that: our_types.Blob
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -5067,7 +5067,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -5233,7 +5233,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_file(
             self,
-            that: aas_types.File
+            that: our_types.File
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -5334,7 +5334,7 @@ class _Transformer(
 
         if not (
             not (that.category is not None)
-            or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
+            or (that.category in our_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
@@ -5500,7 +5500,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_annotated_relationship_element(
             self,
-            that: aas_types.AnnotatedRelationshipElement
+            that: our_types.AnnotatedRelationshipElement
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -5798,7 +5798,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_entity(
             self,
-            that: aas_types.Entity
+            that: our_types.Entity
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -5925,7 +5925,7 @@ class _Transformer(
             (
                 (
                 (
-                    that.entity_type == aas_types.EntityType.SELF_MANAGED_ENTITY
+                    that.entity_type == our_types.EntityType.SELF_MANAGED_ENTITY
                     and (
                         (
                             (
@@ -5947,7 +5947,7 @@ class _Transformer(
             )
                 or (
                     (
-                        that.entity_type != aas_types.EntityType.SELF_MANAGED_ENTITY
+                        that.entity_type != our_types.EntityType.SELF_MANAGED_ENTITY
                         and (that.global_asset_id is None)
                         and (that.specific_asset_ids is None)
                     )
@@ -6154,17 +6154,17 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_event_payload(
             self,
-            that: aas_types.EventPayload
+            that: our_types.EventPayload
     ) -> Iterator[Error]:
         if not (
             (
                 is_model_reference_to(
                 that.source,
-                aas_types.KeyTypes.EVENT_ELEMENT
+                our_types.KeyTypes.EVENT_ELEMENT
             )
                 or is_model_reference_to(
                     that.source,
-                    aas_types.KeyTypes.BASIC_EVENT_ELEMENT
+                    our_types.KeyTypes.BASIC_EVENT_ELEMENT
                 )
             )
         ):
@@ -6262,7 +6262,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_basic_event_element(
             self,
-            that: aas_types.BasicEventElement
+            that: our_types.BasicEventElement
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -6362,7 +6362,7 @@ class _Transformer(
             )
 
         if not (
-            not (that.direction == aas_types.Direction.INPUT)
+            not (that.direction == our_types.Direction.INPUT)
             or (that.max_interval is None)
         ):
             yield Error(
@@ -6580,7 +6580,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_operation(
             self,
-            that: aas_types.Operation
+            that: our_types.Operation
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -6914,7 +6914,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_operation_variable(
             self,
-            that: aas_types.OperationVariable
+            that: our_types.OperationVariable
     ) -> Iterator[Error]:
         if not (that.value.id_short is not None):
             yield Error(
@@ -6936,7 +6936,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_capability(
             self,
-            that: aas_types.Capability
+            that: our_types.Capability
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -7174,7 +7174,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_concept_description(
             self,
-            that: aas_types.ConceptDescription
+            that: our_types.ConceptDescription
     ) -> Iterator[Error]:
         if not (
             not (that.extensions is not None)
@@ -7479,7 +7479,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_reference(
             self,
-            that: aas_types.Reference
+            that: our_types.Reference
     ) -> Iterator[Error]:
         if not (len(that.keys) >= 1):
             yield Error(
@@ -7488,7 +7488,7 @@ class _Transformer(
 
         if not (
             not (len(that.keys) >= 1)
-            or (that.keys[0].type in aas_constants.GLOBALLY_IDENTIFIABLES)
+            or (that.keys[0].type in our_constants.GLOBALLY_IDENTIFIABLES)
         ):
             yield Error(
                 'Constraint AASd-121: For References the value of type of ' +
@@ -7499,11 +7499,11 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.EXTERNAL_REFERENCE
+                    that.type == our_types.ReferenceTypes.EXTERNAL_REFERENCE
                     and len(that.keys) >= 1
                 )
             )
-            or (that.keys[0].type in aas_constants.GENERIC_GLOBALLY_IDENTIFIABLES)
+            or (that.keys[0].type in our_constants.GENERIC_GLOBALLY_IDENTIFIABLES)
         ):
             yield Error(
                 'Constraint AASd-122: For external references the value of ' +
@@ -7514,11 +7514,11 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+                    that.type == our_types.ReferenceTypes.MODEL_REFERENCE
                     and len(that.keys) >= 1
                 )
             )
-            or (that.keys[0].type in aas_constants.AAS_IDENTIFIABLES)
+            or (that.keys[0].type in our_constants.AAS_IDENTIFIABLES)
         ):
             yield Error(
                 'Constraint AASd-123: For model references the value of type ' +
@@ -7528,14 +7528,14 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.EXTERNAL_REFERENCE
+                    that.type == our_types.ReferenceTypes.EXTERNAL_REFERENCE
                     and len(that.keys) >= 1
                 )
             )
             or (
                 (
-                    (that.keys[-1].type in aas_constants.GENERIC_GLOBALLY_IDENTIFIABLES)
-                    or (that.keys[-1].type in aas_constants.GENERIC_FRAGMENT_KEYS)
+                    (that.keys[-1].type in our_constants.GENERIC_GLOBALLY_IDENTIFIABLES)
+                    or (that.keys[-1].type in our_constants.GENERIC_FRAGMENT_KEYS)
                 )
             )
         ):
@@ -7548,13 +7548,13 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+                    that.type == our_types.ReferenceTypes.MODEL_REFERENCE
                     and len(that.keys) > 1
                 )
             )
             or (
                 all(
-                    that.keys[i].type in aas_constants.FRAGMENT_KEYS
+                    that.keys[i].type in our_constants.FRAGMENT_KEYS
                     for i in range(
                         1,
                         len(that.keys)
@@ -7572,13 +7572,13 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+                    that.type == our_types.ReferenceTypes.MODEL_REFERENCE
                     and len(that.keys) > 1
                 )
             )
             or (
                 all(
-                    not (that.keys[i].type in aas_constants.GENERIC_FRAGMENT_KEYS)
+                    not (that.keys[i].type in our_constants.GENERIC_FRAGMENT_KEYS)
                     for i in range(
                         0,
                         len(that.keys) - 1
@@ -7597,15 +7597,15 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+                    that.type == our_types.ReferenceTypes.MODEL_REFERENCE
                     and len(that.keys) > 1
-                    and that.keys[-1].type == aas_types.KeyTypes.FRAGMENT_REFERENCE
+                    and that.keys[-1].type == our_types.KeyTypes.FRAGMENT_REFERENCE
                 )
             )
             or (
                 (
-                    that.keys[-2].type == aas_types.KeyTypes.FILE
-                    or that.keys[-2].type == aas_types.KeyTypes.BLOB
+                    that.keys[-2].type == our_types.KeyTypes.FILE
+                    or that.keys[-2].type == our_types.KeyTypes.BLOB
                 )
             )
         ):
@@ -7618,13 +7618,13 @@ class _Transformer(
         if not (
             not (
                 (
-                    that.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+                    that.type == our_types.ReferenceTypes.MODEL_REFERENCE
                     and len(that.keys) > 2
                 )
             )
             or (
                 all(
-                    not (that.keys[i].type == aas_types.KeyTypes.SUBMODEL_ELEMENT_LIST)
+                    not (that.keys[i].type == our_types.KeyTypes.SUBMODEL_ELEMENT_LIST)
                     or matches_xs_non_negative_integer(
                         that.keys[i + 1].value
                     )
@@ -7671,7 +7671,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_key(
             self,
-            that: aas_types.Key
+            that: our_types.Key
     ) -> Iterator[Error]:
         for error in verify_identifier(that.value):
             error.path._prepend(
@@ -7685,7 +7685,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_name_type(
             self,
-            that: aas_types.LangStringNameType
+            that: our_types.LangStringNameType
     ) -> Iterator[Error]:
         if not (len(that.text) <= 128):
             yield Error(
@@ -7713,7 +7713,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_text_type(
             self,
-            that: aas_types.LangStringTextType
+            that: our_types.LangStringTextType
     ) -> Iterator[Error]:
         if not (len(that.text) <= 1023):
             yield Error(
@@ -7741,7 +7741,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_environment(
             self,
-            that: aas_types.Environment
+            that: our_types.Environment
     ) -> Iterator[Error]:
         if not (
             not (that.concept_descriptions is not None)
@@ -7823,7 +7823,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_embedded_data_specification(
             self,
-            that: aas_types.EmbeddedDataSpecification
+            that: our_types.EmbeddedDataSpecification
     ) -> Iterator[Error]:
         for error in self.transform(that.data_specification):
             error.path._prepend(
@@ -7846,7 +7846,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_level_type(
             self,
-            that: aas_types.LevelType
+            that: our_types.LevelType
     ) -> Iterator[Error]:
         # No verification has been defined for LevelType.
         return
@@ -7858,7 +7858,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_value_reference_pair(
             self,
-            that: aas_types.ValueReferencePair
+            that: our_types.ValueReferencePair
     ) -> Iterator[Error]:
         for error in verify_value_type_iec_61360(that.value):
             error.path._prepend(
@@ -7881,7 +7881,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_value_list(
             self,
-            that: aas_types.ValueList
+            that: our_types.ValueList
     ) -> Iterator[Error]:
         if not (len(that.value_reference_pairs) >= 1):
             yield Error(
@@ -7907,7 +7907,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_preferred_name_type_iec_61360(
             self,
-            that: aas_types.LangStringPreferredNameTypeIEC61360
+            that: our_types.LangStringPreferredNameTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 255):
             yield Error(
@@ -7935,7 +7935,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_short_name_type_iec_61360(
             self,
-            that: aas_types.LangStringShortNameTypeIEC61360
+            that: our_types.LangStringShortNameTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 18):
             yield Error(
@@ -7963,7 +7963,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_definition_type_iec_61360(
             self,
-            that: aas_types.LangStringDefinitionTypeIEC61360
+            that: our_types.LangStringDefinitionTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 1023):
             yield Error(
@@ -7991,7 +7991,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_data_specification_iec_61360(
             self,
-            that: aas_types.DataSpecificationIEC61360
+            that: our_types.DataSpecificationIEC61360
     ) -> Iterator[Error]:
         if not (
             not ((
@@ -8008,7 +8008,7 @@ class _Transformer(
             not (
                 (
                     (that.data_type is not None)
-                    and (that.data_type in aas_constants.IEC_61360_DATA_TYPES_WITH_UNIT)
+                    and (that.data_type in our_constants.IEC_61360_DATA_TYPES_WITH_UNIT)
                 )
             )
             or (
@@ -8220,7 +8220,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

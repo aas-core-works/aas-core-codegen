@@ -13,7 +13,7 @@ const (
 	ModelTypeQueryCondition ModelType = iota
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -60,7 +60,7 @@ type IQueryCondition interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IQueryCondition]
+// Check whether the instance corresponds to [ourtypes.IQueryCondition]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

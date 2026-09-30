@@ -6,47 +6,47 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kSomeItem
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomeItem
+    == our::wstringification::MustModelTypeFromWstring(
       L"SomeItem"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomeItem
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomeItem
     )
     == L"SomeItem"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAnotherItem
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAnotherItem
+    == our::wstringification::MustModelTypeFromWstring(
       L"AnotherItem"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAnotherItem
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAnotherItem
     )
     == L"AnotherItem"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
@@ -54,13 +54,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -69,29 +69,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test Result round-trip") {
   REQUIRE(
-    aas::types::Result::kOk
-    == aas::wstringification::MustResultFromWstring(
+    our::types::Result::kOk
+    == our::wstringification::MustResultFromWstring(
       L"ok"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Result::kOk
+    our::wstringification::to_wstring(
+      our::types::Result::kOk
     )
     == L"ok"
   );
 
   REQUIRE(
-    aas::types::Result::kNotOk
-    == aas::wstringification::MustResultFromWstring(
+    our::types::Result::kNotOk
+    == our::wstringification::MustResultFromWstring(
       L"not-ok"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::Result::kNotOk
+    our::wstringification::to_wstring(
+      our::types::Result::kNotOk
     )
     == L"not-ok"
   );
@@ -99,13 +99,13 @@ TEST_CASE("Test Result round-trip") {
 
 TEST_CASE("Test failure on Result") {
   CHECK(
-    !aas::wstringification::ResultFromWstring(
+    !our::wstringification::ResultFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustResultFromWstring(
+    our::wstringification::MustResultFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected Result literal: Totally utterly invalid"

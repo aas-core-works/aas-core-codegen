@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedSomething[E any] struct {
-	instance aastypes.ISomething
+	instance ourtypes.ISomething
 	enhancement E
 }
 
 func (es *enhancedSomething[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSomething[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSomething[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
@@ -62,12 +62,12 @@ func (es *enhancedSomething[E]) SetNumber(
 }
 
 func (es *enhancedSomething[E]) Kind(
-) aastypes.Kind {
+) ourtypes.Kind {
 	return es.instance.Kind()
 }
 
 func (es *enhancedSomething[E]) SetKind(
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) {
 	es.instance.SetKind(value)
 }
@@ -95,12 +95,12 @@ func (es *enhancedSomething[E]) SetNumbers(
 }
 
 func (es *enhancedSomething[E]) Kinds(
-) []aastypes.Kind {
+) []ourtypes.Kind {
 	return es.instance.Kinds()
 }
 
 func (es *enhancedSomething[E]) SetKinds(
-	value []aastypes.Kind,
+	value []ourtypes.Kind,
 ) {
 	es.instance.SetKinds(value)
 }
@@ -139,12 +139,12 @@ func (es *enhancedSomething[E]) SetOptionalTexts(
 }
 
 func (es *enhancedSomething[E]) OptionalKind(
-) *aastypes.Kind {
+) *ourtypes.Kind {
 	return es.instance.OptionalKind()
 }
 
 func (es *enhancedSomething[E]) SetOptionalKind(
-	value *aastypes.Kind,
+	value *ourtypes.Kind,
 ) {
 	es.instance.SetOptionalKind(value)
 }
@@ -169,9 +169,9 @@ func (es *enhancedSomething[E]) setEnhancement(
 }
 
 func wrapSomething[E any](
-	that aastypes.ISomething,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomething) {
+	that ourtypes.ISomething,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomething) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -189,23 +189,23 @@ func wrapSomething[E any](
 }
 
 type enhancedCollection[E any] struct {
-	instance aastypes.ICollection
+	instance ourtypes.ICollection
 	enhancement E
 }
 
 func (ec *enhancedCollection[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ec.instance.ModelType()
 }
 
 func (ec *enhancedCollection[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ec.instance.DescendOnce(action)
 }
 
 func (ec *enhancedCollection[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ec.instance.Descend(action)
 }
@@ -244,12 +244,12 @@ func (ec *enhancedCollection[E]) SetFlags(
 }
 
 func (ec *enhancedCollection[E]) Directions(
-) map[aastypes.Direction]struct{} {
+) map[ourtypes.Direction]struct{} {
 	return ec.instance.Directions()
 }
 
 func (ec *enhancedCollection[E]) SetDirections(
-	value map[aastypes.Direction]struct{},
+	value map[ourtypes.Direction]struct{},
 ) {
 	ec.instance.SetDirections(value)
 }
@@ -277,12 +277,12 @@ func (ec *enhancedCollection[E]) SetOptionalTexts(
 }
 
 func (ec *enhancedCollection[E]) OptionalDirections(
-) map[aastypes.Direction]struct{} {
+) map[ourtypes.Direction]struct{} {
 	return ec.instance.OptionalDirections()
 }
 
 func (ec *enhancedCollection[E]) SetOptionalDirections(
-	value map[aastypes.Direction]struct{},
+	value map[ourtypes.Direction]struct{},
 ) {
 	ec.instance.SetOptionalDirections(value)
 }
@@ -307,9 +307,9 @@ func (ec *enhancedCollection[E]) setEnhancement(
 }
 
 func wrapCollection[E any](
-	that aastypes.ICollection,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ICollection) {
+	that ourtypes.ICollection,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ICollection) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -335,9 +335,9 @@ func wrapCollection[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -349,14 +349,14 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			factory,
 		)
-	case aastypes.ModelTypeCollection:
+	case ourtypes.ModelTypeCollection:
 		result = wrapCollection[E](
-			that.(aastypes.ICollection),
+			that.(ourtypes.ICollection),
 			factory,
 		)
 	default:
@@ -375,7 +375,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -388,7 +388,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

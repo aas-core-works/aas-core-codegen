@@ -51,12 +51,12 @@ def generate_implementation(
 
 #include <deque>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
 const std::filesystem::path& DetermineXmlDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "Xml";
 {I}}}
@@ -67,7 +67,7 @@ const std::filesystem::path& DetermineXmlDir() {{
         Stripped(
             f"""\
 const std::filesystem::path& DetermineDescentDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "Descent";
 {I}}}
@@ -78,7 +78,7 @@ const std::filesystem::path& DetermineDescentDir() {{
         Stripped(
             f"""\
 const std::filesystem::path& DetermineDescentOnceDir() {{
-{I}static aas::common::optional<std::filesystem::path> result;
+{I}static our::common::optional<std::filesystem::path> result;
 {I}if (!result.has_value()) {{
 {II}result = test::common::DetermineTestDataDir() / "DescentOnce";
 {I}}}
@@ -93,7 +93,7 @@ void AssertOrRerecordDescent(
 {I}const std::filesystem::path& trace_path
 ) {{
 {I}std::shared_ptr<
-{II}aas::types::IClass
+{II}our::types::IClass
 {I}> instance(
 {II}test::common::xmlization::MustDeserializeFile(xml_path)
 {I});
@@ -101,15 +101,15 @@ void AssertOrRerecordDescent(
 {I}std::deque<std::wstring> parts;
 
 {I}for (
-{II}const std::shared_ptr<aas::types::IClass>& something
-{II}: aas::iteration::Descent(instance)
+{II}const std::shared_ptr<our::types::IClass>& something
+{II}: our::iteration::Descent(instance)
 {I}) {{
 {II}parts.emplace_back(test::common::TraceMark(*something));
 {II}parts.push_back(L"\\n");
 {I}}}
 
 {I}test::common::AssertContentEqualsExpectedOrRecord(
-{II}aas::common::WstringToUtf8(
+{II}our::common::WstringToUtf8(
 {III}test::common::JoinWstrings(parts, L"")
 {II}),
 {II}trace_path
@@ -119,21 +119,21 @@ void AssertOrRerecordDescent(
         Stripped(
             f"""\
 void AssertOrRerecordDescentOnce(
-{I}const std::shared_ptr<aas::types::IClass>& instance,
+{I}const std::shared_ptr<our::types::IClass>& instance,
 {I}const std::filesystem::path& trace_path
 ) {{
 {I}std::deque<std::wstring> parts;
 
 {I}for (
-{II}const std::shared_ptr<aas::types::IClass>& something
-{II}: aas::iteration::DescentOnce(instance)
+{II}const std::shared_ptr<our::types::IClass>& something
+{II}: our::iteration::DescentOnce(instance)
 {I}) {{
 {II}parts.emplace_back(test::common::TraceMark(*something));
 {II}parts.push_back(L"\\n");
 {I}}}
 
 {I}test::common::AssertContentEqualsExpectedOrRecord(
-{II}aas::common::WstringToUtf8(
+{II}our::common::WstringToUtf8(
 {III}test::common::JoinWstrings(parts, L"")
 {II}),
 {II}trace_path
@@ -187,7 +187,7 @@ TEST_CASE("Test Descent over an {cls_name}") {{
                 f"""\
 TEST_CASE("Test DescentOnce over an {cls_name}") {{
 {I}const std::shared_ptr<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}> instance(
 {II}test::common::examples::{load_max}()
 {I});

@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -267,7 +267,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.INode INodeFrom(
+            public static Our.INode INodeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -301,7 +301,7 @@ namespace dummy
                         $"Unexpected model type for INode: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.INode INodeFrom
+            }  // public static Our.INode INodeFrom
 
             /// <summary>
             /// Deserialize an instance of IBranch by dispatching
@@ -310,7 +310,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IBranch IBranchFrom(
+            public static Our.IBranch IBranchFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -344,14 +344,14 @@ namespace dummy
                         $"Unexpected model type for IBranch: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IBranch IBranchFrom
+            }  // public static Our.IBranch IBranchFrom
 
             /// <summary>
             /// Deserialize an instance of Branch from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Branch BranchFrom(
+            internal static Our.Branch BranchFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -428,7 +428,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Branch(
+                return new Our.Branch(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -444,7 +444,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.ILeaf ILeafFrom(
+            public static Our.ILeaf ILeafFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -475,14 +475,14 @@ namespace dummy
                         $"Unexpected model type for ILeaf: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.ILeaf ILeafFrom
+            }  // public static Our.ILeaf ILeafFrom
 
             /// <summary>
             /// Deserialize an instance of Leaf from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Leaf LeafFrom(
+            internal static Our.Leaf LeafFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -571,7 +571,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Leaf(
+                return new Our.Leaf(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -588,7 +588,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Blossom BlossomFrom(
+            internal static Our.Blossom BlossomFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -689,7 +689,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Blossom(
+                return new Our.Blossom(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -709,7 +709,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -767,7 +767,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theSomeChoice
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -781,7 +781,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Container ContainerFrom(
+            internal static Our.Container ContainerFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -839,7 +839,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Container(
+                return new Our.Container(
                     theNode
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -908,7 +908,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.INode anInstance = Deserialize.INodeFrom(
+        /// Our.INode anInstance = Deserialize.INodeFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -923,10 +923,10 @@ namespace dummy
             /// representation of INode.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.INode INodeFrom(
+            public static Our.INode INodeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.INode result = DeserializeImplementation.INodeFrom(
+                Our.INode result = DeserializeImplementation.INodeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -947,10 +947,10 @@ namespace dummy
             /// representation of IBranch.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IBranch IBranchFrom(
+            public static Our.IBranch IBranchFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IBranch result = DeserializeImplementation.IBranchFrom(
+                Our.IBranch result = DeserializeImplementation.IBranchFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -970,10 +970,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Branch.
             /// </exception>
-            public static Aas.Branch BranchFrom(
+            public static Our.Branch BranchFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Branch result = DeserializeImplementation.BranchFrom(
+                Our.Branch result = DeserializeImplementation.BranchFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -994,10 +994,10 @@ namespace dummy
             /// representation of ILeaf.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.ILeaf ILeafFrom(
+            public static Our.ILeaf ILeafFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ILeaf result = DeserializeImplementation.ILeafFrom(
+                Our.ILeaf result = DeserializeImplementation.ILeafFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1017,10 +1017,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Leaf.
             /// </exception>
-            public static Aas.Leaf LeafFrom(
+            public static Our.Leaf LeafFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Leaf result = DeserializeImplementation.LeafFrom(
+                Our.Leaf result = DeserializeImplementation.LeafFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1040,10 +1040,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Blossom.
             /// </exception>
-            public static Aas.Blossom BlossomFrom(
+            public static Our.Blossom BlossomFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Blossom result = DeserializeImplementation.BlossomFrom(
+                Our.Blossom result = DeserializeImplementation.BlossomFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1063,10 +1063,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1086,10 +1086,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Container.
             /// </exception>
-            public static Aas.Container ContainerFrom(
+            public static Our.Container ContainerFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Container result = DeserializeImplementation.ContainerFrom(
+                Our.Container result = DeserializeImplementation.ContainerFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1126,7 +1126,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -1204,7 +1204,7 @@ namespace dummy
 
             private static readonly Serializer<long> Serialize_long = ToJsonValue;
 
-            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+            private static readonly Serializer<Our.IClass> Serialize_IClass = TransformIClass;
 
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
@@ -1238,7 +1238,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformBranch(
-                Aas.IBranch that
+                Our.IBranch that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1258,7 +1258,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformLeaf(
-                Aas.ILeaf that
+                Our.ILeaf that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1280,7 +1280,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformBlossom(
-                Aas.IBlossom that
+                Our.IBlossom that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1304,7 +1304,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1322,7 +1322,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformContainer(
-                Aas.IContainer that
+                Our.IContainer that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1341,7 +1341,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of INode:
         /// <code>
-        /// var anInstance = new Aas.INode(
+        /// var anInstance = new Our.INode(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -1358,7 +1358,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

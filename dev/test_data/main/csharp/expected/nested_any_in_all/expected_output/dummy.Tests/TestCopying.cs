@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
@@ -16,7 +16,7 @@ namespace dummy.Tests
     public class TestCopying
     {
         internal class DeepEqualiser
-            : Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+            : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
             /// <summary>Compare two byte spans for equal content.</summary>
             /// <remarks>
@@ -31,10 +31,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformLangString(
-                Aas.ILangString that,
-                Aas.IClass other)
+                Our.ILangString that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangString casted))
+                if (!(other is Our.LangString casted))
                 {
                     return false;
                 }
@@ -45,10 +45,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformLangStringSet(
-                Aas.ILangStringSet that,
-                Aas.IClass other)
+                Our.ILangStringSet that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringSet casted))
+                if (!(other is Our.LangStringSet casted))
                 {
                     return false;
                 }
@@ -64,10 +64,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformIecContent(
-                Aas.IIecContent that,
-                Aas.IClass other)
+                Our.IIecContent that,
+                Our.IClass other)
             {
-                if (!(other is Aas.IecContent casted))
+                if (!(other is Our.IecContent casted))
                 {
                     return false;
                 }
@@ -85,10 +85,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformOtherContent(
-                Aas.IOtherContent that,
-                Aas.IClass other)
+                Our.IOtherContent that,
+                Our.IClass other)
             {
-                if (!(other is Aas.OtherContent casted))
+                if (!(other is Our.OtherContent casted))
                 {
                     return false;
                 }
@@ -97,10 +97,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformSpecification(
-                Aas.ISpecification that,
-                Aas.IClass other)
+                Our.ISpecification that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Specification casted))
+                if (!(other is Our.Specification casted))
                 {
                     return false;
                 }
@@ -112,10 +112,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformSomething(
-                Aas.ISomething that,
-                Aas.IClass other)
+                Our.ISomething that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Something casted))
+                if (!(other is Our.Something casted))
                 {
                     return false;
                 }
@@ -144,43 +144,43 @@ namespace dummy.Tests
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
 
         private static bool LangStringShallowEquals(
-            Aas.LangString that,
-            Aas.LangString other)
+            Our.LangString that,
+            Our.LangString other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool LangStringSetShallowEquals(
-            Aas.LangStringSet that,
-            Aas.LangStringSet other)
+            Our.LangStringSet that,
+            Our.LangStringSet other)
         {
             return that.LangStrings == other.LangStrings;
         }
 
         private static bool IecContentShallowEquals(
-            Aas.IecContent that,
-            Aas.IecContent other)
+            Our.IecContent that,
+            Our.IecContent other)
         {
             return that.Definition == other.Definition;
         }
 
         private static bool OtherContentShallowEquals(
-            Aas.OtherContent that,
-            Aas.OtherContent other)
+            Our.OtherContent that,
+            Our.OtherContent other)
         {
             return true;
         }
 
         private static bool SpecificationShallowEquals(
-            Aas.Specification that,
-            Aas.Specification other)
+            Our.Specification that,
+            Our.Specification other)
         {
             return that.Content == other.Content;
         }
 
         private static bool SomethingShallowEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return (
                 that.DefaultLanguage == other.DefaultLanguage
@@ -189,43 +189,43 @@ namespace dummy.Tests
         }
 
         private static bool LangStringDeepEquals(
-            Aas.LangString that,
-            Aas.LangString other)
+            Our.LangString that,
+            Our.LangString other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringSetDeepEquals(
-            Aas.LangStringSet that,
-            Aas.LangStringSet other)
+            Our.LangStringSet that,
+            Our.LangStringSet other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool IecContentDeepEquals(
-            Aas.IecContent that,
-            Aas.IecContent other)
+            Our.IecContent that,
+            Our.IecContent other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool OtherContentDeepEquals(
-            Aas.OtherContent that,
-            Aas.OtherContent other)
+            Our.OtherContent that,
+            Our.OtherContent other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SpecificationDeepEquals(
-            Aas.Specification that,
-            Aas.Specification other)
+            Our.Specification that,
+            Our.Specification other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SomethingDeepEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -233,10 +233,10 @@ namespace dummy.Tests
         [Test]
         public void Test_LangString_shallow_copy()
         {
-            Aas.LangString instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangString());
+            Our.LangString instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangString());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringShallowEquals(
@@ -247,10 +247,10 @@ namespace dummy.Tests
         [Test]
         public void Test_LangString_deep_copy()
         {
-            Aas.LangString instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangString());
+            Our.LangString instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangString());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringDeepEquals(
@@ -261,10 +261,10 @@ namespace dummy.Tests
         [Test]
         public void Test_LangStringSet_shallow_copy()
         {
-            Aas.LangStringSet instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringSet());
+            Our.LangStringSet instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringSet());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringSetShallowEquals(
@@ -275,10 +275,10 @@ namespace dummy.Tests
         [Test]
         public void Test_LangStringSet_deep_copy()
         {
-            Aas.LangStringSet instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringSet());
+            Our.LangStringSet instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringSet());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringSetDeepEquals(
@@ -289,10 +289,10 @@ namespace dummy.Tests
         [Test]
         public void Test_IecContent_shallow_copy()
         {
-            Aas.IecContent instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalIecContent());
+            Our.IecContent instance = (
+                Our.Tests.CommonJsonization.LoadMaximalIecContent());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 IecContentShallowEquals(
@@ -303,10 +303,10 @@ namespace dummy.Tests
         [Test]
         public void Test_IecContent_deep_copy()
         {
-            Aas.IecContent instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalIecContent());
+            Our.IecContent instance = (
+                Our.Tests.CommonJsonization.LoadMaximalIecContent());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 IecContentDeepEquals(
@@ -317,10 +317,10 @@ namespace dummy.Tests
         [Test]
         public void Test_OtherContent_shallow_copy()
         {
-            Aas.OtherContent instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOtherContent());
+            Our.OtherContent instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOtherContent());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 OtherContentShallowEquals(
@@ -331,10 +331,10 @@ namespace dummy.Tests
         [Test]
         public void Test_OtherContent_deep_copy()
         {
-            Aas.OtherContent instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOtherContent());
+            Our.OtherContent instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOtherContent());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 OtherContentDeepEquals(
@@ -345,10 +345,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Specification_shallow_copy()
         {
-            Aas.Specification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecification());
+            Our.Specification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecification());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SpecificationShallowEquals(
@@ -359,10 +359,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Specification_deep_copy()
         {
-            Aas.Specification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecification());
+            Our.Specification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecification());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SpecificationDeepEquals(
@@ -373,10 +373,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_shallow_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SomethingShallowEquals(
@@ -387,10 +387,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_deep_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SomethingDeepEquals(

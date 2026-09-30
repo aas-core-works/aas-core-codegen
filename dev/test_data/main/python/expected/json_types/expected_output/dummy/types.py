@@ -57,7 +57,7 @@ JsonObject = Mapping[str, Any]
 
 
 class Class(abc.ABC):
-    """Represent the most general class of an AAS model."""
+    """Represent the most general class of the meta-model."""
     @abc.abstractmethod
     def descend_once(self) -> Iterator["Class"]:
         """Iterate over all the instances referenced from this one."""

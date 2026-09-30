@@ -22,7 +22,7 @@ def _generate_len_test(case: len_slicing_and_find_cases.LenCase) -> Stripped:
     return Stripped(
         f"""\
 test({name}, () => {{
-{I}expect(AasCommon.lenStr({text})).toStrictEqual({case.expected});
+{I}expect(OurCommon.lenStr({text})).toStrictEqual({case.expected});
 }});"""
     )
 
@@ -47,7 +47,7 @@ def _generate_slice_test(case: len_slicing_and_find_cases.SliceCase) -> Stripped
     return Stripped(
         f"""\
 test({name}, () => {{
-{I}expect(AasCommon.sliceStr({", ".join(args)})).toStrictEqual({expected});
+{I}expect(OurCommon.sliceStr({", ".join(args)})).toStrictEqual({expected});
 }});"""
     )
 
@@ -67,7 +67,7 @@ def _generate_find_test(case: len_slicing_and_find_cases.FindCase) -> Stripped:
     if case.start is not None:
         args.append(str(case.start))
 
-    call = f"AasCommon.findStr({', '.join(args)})"
+    call = f"OurCommon.findStr({', '.join(args)})"
 
     return Stripped(
         f"""\
@@ -99,7 +99,7 @@ def generate() -> str:
  */"""
         ),
         typescript_common.WARNING,
-        Stripped('import * as AasCommon from "../src/common";'),
+        Stripped('import * as OurCommon from "../src/common";'),
     ]  # type: List[Stripped]
 
     for len_case in len_slicing_and_find_cases.LEN_CASES:

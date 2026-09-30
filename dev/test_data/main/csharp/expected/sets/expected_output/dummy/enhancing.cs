@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
@@ -31,13 +31,13 @@ namespace dummy
         }
 
         public class EnhancedSomething<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISomething
+            : Enhanced<TEnhancement>, Our.ISomething
             where TEnhancement : class
         {
-            private readonly Aas.ISomething _instance;
+            private readonly Our.ISomething _instance;
 
             public EnhancedSomething(
-                Aas.ISomething instance,
+                Our.ISomething instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -118,17 +118,17 @@ namespace dummy
                 );
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSomething(_instance);
             }
@@ -156,13 +156,13 @@ namespace dummy
         }
 
         public class EnhancedCollection<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ICollection
+            : Enhanced<TEnhancement>, Our.ICollection
             where TEnhancement : class
         {
-            private readonly Aas.ICollection _instance;
+            private readonly Our.ICollection _instance;
 
             public EnhancedCollection(
-                Aas.ICollection instance,
+                Our.ICollection instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -216,7 +216,7 @@ namespace dummy
                 return _instance.OverOptionalTextsOrEmpty();
             }
 
-            public IEnumerable<Aas.Direction> OverOptionalDirectionsOrEmpty()
+            public IEnumerable<Our.Direction> OverOptionalDirectionsOrEmpty()
             {
                 return _instance.OverOptionalDirectionsOrEmpty();
             }
@@ -230,17 +230,17 @@ namespace dummy
                 );
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitCollection(_instance);
             }
@@ -268,20 +268,20 @@ namespace dummy
         }
 
         internal class Wrapper<TEnhancement>
-            : Aas.Visitation.AbstractTransformer<Aas.IClass>
+            : Our.Visitation.AbstractTransformer<Our.IClass>
             where TEnhancement : class
         {
-            private readonly System.Func<Aas.IClass, TEnhancement?> _enhancementFactory;
+            private readonly System.Func<Our.IClass, TEnhancement?> _enhancementFactory;
 
             internal Wrapper(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _enhancementFactory = enhancementFactory;
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -300,8 +300,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformCollection(
-                Aas.ICollection that
+            public override Our.IClass TransformCollection(
+                Our.ICollection that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -335,7 +335,7 @@ namespace dummy
             /// Enhancement, or <c>null</c> if <paramref name="that" />
             /// has not been wrapped yet.
             /// </returns>
-            public TEnhancement? Unwrap(Aas.IClass that)
+            public TEnhancement? Unwrap(Our.IClass that)
             {
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 var enhanced = that as Enhanced<TEnhancement>;
@@ -352,7 +352,7 @@ namespace dummy
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has not been wrapped yet
             /// </exception>
-            public TEnhancement MustUnwrap(Aas.IClass that)
+            public TEnhancement MustUnwrap(Our.IClass that)
             {
                 return Unwrap(that) ?? throw new System.ArgumentException(
                     $"Expected the instance to have been wrapped, but it was not: {that}"
@@ -377,7 +377,7 @@ namespace dummy
             /// the wrapping will continue recursively.</para>
             ///</param>
             public Enhancer(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -399,8 +399,8 @@ namespace dummy
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has been already wrapped
             /// </exception>
-            public Aas.IClass Wrap(
-                Aas.IClass that
+            public Our.IClass Wrap(
+                Our.IClass that
             )
             {
                 var wrapped = _wrapper.Transform(that);

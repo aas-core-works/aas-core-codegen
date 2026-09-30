@@ -154,7 +154,7 @@ class Transpiler(
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
         environment: intermediate_type_inference.Environment,
-        types_module: Optional[Identifier] = Identifier("aas_types"),
+        types_module: Optional[Identifier] = Identifier("our_types"),
     ) -> None:
         """
         Initialize with the given values.
@@ -523,12 +523,12 @@ not (
         .. code-block:: python
 
             def check(texts: AbstractSet[str], seen: Set[str]) -> bool:
-                reserved = set(aas_constants.RESERVED_TEXTS & seen)
+                reserved = set(our_constants.RESERVED_TEXTS & seen)
                 reserved.add("another")
 
                 unseen = set(texts - seen)
                 both = seen & texts
-                nested = seen - (set(texts & aas_constants.RESERVED_TEXTS))
+                nested = seen - (set(texts & our_constants.RESERVED_TEXTS))
                 ...
 
         The operators bind tighter than ``in``, so we do not parenthesize
@@ -789,7 +789,7 @@ not (
                 # We do not use the native ``int`` as it is more permissive than
                 # the other targets. See ``parse_safe_int`` in the generated
                 # common module.
-                return Stripped(f"aas_common.parse_safe_int({args[0]})"), None
+                return Stripped(f"our_common.parse_safe_int({args[0]})"), None
 
             elif (
                 func_type.func.kind

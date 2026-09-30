@@ -1831,7 +1831,7 @@ class _Fact:
         );
 
     Analogously, we generate ``((Aas.IChildB)parent).BOnly < 50`` in C#,
-    ``parent.(aastypes.IChildB).BOnly() < 50`` in Go and
+    ``parent.(ourtypes.IChildB).BOnly() < 50`` in Go and
     ``((IChildB) parent.get()).getBOnly() < 50`` in Java.
 
     **What a fact is.** A fact tells :attr:`what` we know about the value of
@@ -6188,10 +6188,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         #
         #     if parent == nil {
         #         return true
-        #     } else if !aastypes.IsChildB(parent) {
+        #     } else if !ourtypes.IsChildB(parent) {
         #         return parent.OptionalText() == nil
         #     } else {
-        #         return parent.(aastypes.IChildB).BOnly() > 0
+        #         return parent.(ourtypes.IChildB).BOnly() > 0
         #     }
         #
         # In contrast, the narrowing does not leak out of a branch:

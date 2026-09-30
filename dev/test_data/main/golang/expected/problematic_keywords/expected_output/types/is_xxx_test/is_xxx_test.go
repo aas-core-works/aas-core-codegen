@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",

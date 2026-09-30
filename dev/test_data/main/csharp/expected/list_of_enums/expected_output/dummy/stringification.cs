@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 
 using System.Collections.Generic;  // can't alias
@@ -12,11 +12,11 @@ namespace dummy
 {
     public static class Stringification
     {
-        private static readonly Dictionary<Aas.Result, string> ResultToString = (
-            new Dictionary<Aas.Result, string>()
+        private static readonly Dictionary<Our.Result, string> ResultToString = (
+            new Dictionary<Our.Result, string>()
             {
-                { Aas.Result.Ok, "ok" },
-                { Aas.Result.Fail, "fail" }
+                { Our.Result.Ok, "ok" },
+                { Our.Result.Fail, "fail" }
             });
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace dummy
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.Result? that)
+        public static string? ToString(Our.Result? that)
         {
             if (!that.HasValue)
             {
@@ -45,11 +45,11 @@ namespace dummy
         }
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-        private static readonly Dictionary<string, Aas.Result> _resultFromString = (
-            new Dictionary<string, Aas.Result>()
+        private static readonly Dictionary<string, Our.Result> _resultFromString = (
+            new Dictionary<string, Our.Result>()
             {
-                { "ok", Aas.Result.Ok },
-                { "fail", Aas.Result.Fail }
+                { "ok", Our.Result.Ok },
+                { "fail", Our.Result.Fail }
             });
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace dummy
         /// of a literal of <see cref="Result" />,
         /// return <c>null</c>.
         /// </remarks>
-        public static Aas.Result? ResultFromString(string text)
+        public static Our.Result? ResultFromString(string text)
         {
             if (_resultFromString.TryGetValue(text, out Result value))
             {

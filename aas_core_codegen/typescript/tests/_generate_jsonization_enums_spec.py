@@ -35,8 +35,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasJsonization from "../src/jsonization";
-import * as AasTypes from "../src/types";"""
+import * as OurJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";"""
         ),
     ]  # type: List[Stripped]
 
@@ -60,7 +60,7 @@ import * as AasTypes from "../src/types";"""
 test("{enum_name_typescript} deserializes {literal_name_typescript} OK", () => {{
 {I}const jsonable = {typescript_common.string_literal(literal.value)};
 
-{I}const literalOrError = AasJsonization.{deserialization_function}(
+{I}const literalOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 
@@ -68,7 +68,7 @@ test("{enum_name_typescript} deserializes {literal_name_typescript} OK", () => {
 {I}const parsedLiteral = literalOrError.mustValue();
 
 {I}expect(parsedLiteral).toStrictEqual(
-{II}AasTypes.{enum_name_typescript}.{literal_name_typescript}
+{II}OurTypes.{enum_name_typescript}.{literal_name_typescript}
 {I});
 }});"""
                 )
@@ -90,7 +90,7 @@ test("{enum_name_typescript} deserializes {literal_name_typescript} OK", () => {
 test("{enum_name_typescript} deserialization fail", () => {{
 {I}const jsonable = {typescript_common.string_literal(invalid_literal_value)};
 
-{I}const literalOrError = AasJsonization.{deserialization_function}(
+{I}const literalOrError = OurJsonization.{deserialization_function}(
 {II}jsonable
 {I});
 

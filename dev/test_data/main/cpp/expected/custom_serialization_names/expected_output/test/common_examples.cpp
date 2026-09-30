@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,32 +21,32 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::IQueryCondition
+  our::types::IQueryCondition
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IQueryCondition
+  our::types::IQueryCondition
 >::name = "IQueryCondition";
 
 std::shared_ptr<
-  aas::types::IQueryCondition
+  our::types::IQueryCondition
 > LoadQueryCondition(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IQueryCondition
+    our::types::IQueryCondition
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IQueryCondition
+      our::types::IQueryCondition
     >(
       abstract
     )
@@ -54,7 +54,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IQueryCondition from ",
         path.string()
       )
@@ -65,7 +65,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IQueryCondition
+  our::types::IQueryCondition
 > LoadMinQueryCondition() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -81,7 +81,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IQueryCondition
+  our::types::IQueryCondition
 > LoadMaxQueryCondition() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

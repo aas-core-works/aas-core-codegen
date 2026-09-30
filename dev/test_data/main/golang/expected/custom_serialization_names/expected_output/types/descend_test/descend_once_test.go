@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnceOnAnInstanceOfQueryCondition(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalQueryCondition()
+	instance := ourtesting.MustLoadMaximalQueryCondition()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"QueryCondition",
 		"maximal.json.trace",

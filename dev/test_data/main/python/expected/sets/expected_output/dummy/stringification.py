@@ -16,19 +16,19 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
-_KIND_FROM_STR: Mapping[str, aas_types.Kind] = {
-    'alpha': aas_types.Kind.ALPHA,
-    'beta': aas_types.Kind.BETA,
-    'gamma': aas_types.Kind.GAMMA,
+_KIND_FROM_STR: Mapping[str, our_types.Kind] = {
+    'alpha': our_types.Kind.ALPHA,
+    'beta': our_types.Kind.BETA,
+    'gamma': our_types.Kind.GAMMA,
 }
 
 
 def kind_from_str(
         text: str
-) -> Optional[aas_types.Kind]:
+) -> Optional[our_types.Kind]:
     """
     Parse :paramref:`text` as string representation
     of :py:class:`dummy.Kind`.
@@ -44,16 +44,16 @@ def kind_from_str(
     return _KIND_FROM_STR.get(text, None)
 
 
-_DIRECTION_FROM_STR: Mapping[str, aas_types.Direction] = {
-    'up': aas_types.Direction.NORTH,
-    'down': aas_types.Direction.SOUTH,
-    'right': aas_types.Direction.EAST,
+_DIRECTION_FROM_STR: Mapping[str, our_types.Direction] = {
+    'up': our_types.Direction.NORTH,
+    'down': our_types.Direction.SOUTH,
+    'right': our_types.Direction.EAST,
 }
 
 
 def direction_from_str(
         text: str
-) -> Optional[aas_types.Direction]:
+) -> Optional[our_types.Direction]:
     """
     Parse :paramref:`text` as string representation
     of :py:class:`dummy.Direction`.
@@ -69,15 +69,15 @@ def direction_from_str(
     return _DIRECTION_FROM_STR.get(text, None)
 
 
-_RANK_OF_DIRECTION: Final[Mapping[aas_types.Direction, int]] = {
-    aas_types.Direction.SOUTH: 0,  # 'down'
-    aas_types.Direction.EAST: 1,  # 'right'
-    aas_types.Direction.NORTH: 2,  # 'up'
+_RANK_OF_DIRECTION: Final[Mapping[our_types.Direction, int]] = {
+    our_types.Direction.SOUTH: 0,  # 'down'
+    our_types.Direction.EAST: 1,  # 'right'
+    our_types.Direction.NORTH: 2,  # 'up'
 }
 
 
 def rank_of_direction(
-        literal: aas_types.Direction
+        literal: our_types.Direction
 ) -> int:
     """
     Give out the rank of :paramref:`literal` in the serialization order.

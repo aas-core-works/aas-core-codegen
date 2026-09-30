@@ -7,19 +7,19 @@
 
 import * as path from "path";
 
-import * as AasJsonization from "../src/jsonization";
+import * as OurJsonization from "../src/jsonization";
 
 import * as TestCommon from "./common";
 
 function readExpectedJson(
     classJsonName: string,
     fileName: "minimal.json" | "maximal.json"
-): AasJsonization.JsonValue {
+): OurJsonization.JsonValue {
   const pth = path.join(TestCommon.TEST_DATA_DIR, "Json", "Expected", classJsonName, fileName);
   return TestCommon.readJsonFromFileSync(pth);
 }
 
-function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.JsonObject {
+function mustBeJsonObject(jsonable: OurJsonization.JsonValue): OurJsonization.JsonObject {
   if (
     typeof jsonable !== "object" ||
     jsonable === null ||
@@ -28,13 +28,13 @@ function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.Js
     throw new Error(`Expected a JSON object, but got: ${JSON.stringify(jsonable)}`);
   }
 
-  return <AasJsonization.JsonObject>jsonable;
+  return <OurJsonization.JsonObject>jsonable;
 }
 
 test("LangString deserialization fails on non-object", () => {
   const jsonable = "This is not a JSON object.";
 
-  const instanceOrError = AasJsonization.langStringFromJsonable(
+  const instanceOrError = OurJsonization.langStringFromJsonable(
     jsonable
   );
 
@@ -50,7 +50,7 @@ test("LangString deserialization fails with missing required property", () => {
   const jsonObject = { ...mustBeJsonObject(jsonable) };
   delete jsonObject["language"];
 
-  const instanceOrError = AasJsonization.langStringFromJsonable(
+  const instanceOrError = OurJsonization.langStringFromJsonable(
     jsonObject
   );
 
@@ -66,7 +66,7 @@ test("LangString deserialization fails with property type mismatch", () => {
   const jsonObject = { ...mustBeJsonObject(jsonable) };
   jsonObject["language"] = { definitely: "unexpected-object" };
 
-  const instanceOrError = AasJsonization.langStringFromJsonable(
+  const instanceOrError = OurJsonization.langStringFromJsonable(
     jsonObject
   );
 
@@ -90,11 +90,11 @@ test("Specification deserialization fails with invalid nested modelType", () => 
     throw new Error("Expected nested class JSON object to be present in maximal example.");
   }
 
-  const nestedObject = { ...<AasJsonization.JsonObject>nestedValue };
+  const nestedObject = { ...<OurJsonization.JsonObject>nestedValue };
   nestedObject["modelType"] = "DefinitelyNotAModelType";
   jsonObject["content"] = nestedObject;
 
-  const instanceOrError = AasJsonization.specificationFromJsonable(
+  const instanceOrError = OurJsonization.specificationFromJsonable(
     jsonObject
   );
 

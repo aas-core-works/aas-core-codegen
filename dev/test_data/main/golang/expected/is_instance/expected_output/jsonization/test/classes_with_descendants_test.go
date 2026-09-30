@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestElementRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLeaf()
+	instance := ourtesting.MustLoadMinimalLeaf()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Leaf: %v",
@@ -23,7 +23,7 @@ func TestElementRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Leaf>"
 
-	deserialized, deseriaErr := aasjsonization.ElementFromJsonable(
+	deserialized, deseriaErr := ourjsonization.ElementFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestElementRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -51,7 +51,7 @@ func TestElementRoundTripOKOverDescendant(t *testing.T) {
 func TestElementDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.ElementFromJsonable(
+	_, err := ourjsonization.ElementFromJsonable(
 		jsonable,
 	)
 
@@ -60,7 +60,7 @@ func TestElementDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -88,9 +88,9 @@ func TestElementDeserializationFail(t *testing.T) {
 }
 
 func TestContainerRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalOrderedContainer()
+	instance := ourtesting.MustLoadMinimalOrderedContainer()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal OrderedContainer: %v",
@@ -101,7 +101,7 @@ func TestContainerRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal OrderedContainer>"
 
-	deserialized, deseriaErr := aasjsonization.ContainerFromJsonable(
+	deserialized, deseriaErr := ourjsonization.ContainerFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -109,7 +109,7 @@ func TestContainerRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -129,7 +129,7 @@ func TestContainerRoundTripOKOverDescendant(t *testing.T) {
 func TestContainerDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.ContainerFromJsonable(
+	_, err := ourjsonization.ContainerFromJsonable(
 		jsonable,
 	)
 
@@ -138,7 +138,7 @@ func TestContainerDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

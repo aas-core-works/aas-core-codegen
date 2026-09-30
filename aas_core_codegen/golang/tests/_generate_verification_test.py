@@ -39,13 +39,13 @@ def _generate_test_runtime_range_for_enum(
         return Stripped(
             f"""\
 func {test_name}(t *testing.T) {{
-{I}var gotErr *aasverification.VerificationError
+{I}var gotErr *ourverification.VerificationError
 
 {I}// Any value should cause an error since {enum_name}
 {I}// specifies no literals.
 {I}{verify_function}(
 {II}42,
-{II}func (err *aasverification.VerificationError) bool {{
+{II}func (err *ourverification.VerificationError) bool {{
 {III}gotErr = err
 {III}return
 {II}}},
@@ -64,12 +64,12 @@ func {test_name}(t *testing.T) {{
         return Stripped(
             f"""\
 func {test_name}(t *testing.T) {{
-{I}var gotErr *aasverification.VerificationError
+{I}var gotErr *ourverification.VerificationError
 
 {I}// No error is expected on the first literal.
-{I}aasverification.{verify_function}(
-{II}aastypes.{enum_name}({first_literal_idx}),
-{II}func (err *aasverification.VerificationError) bool {{
+{I}ourverification.{verify_function}(
+{II}ourtypes.{enum_name}({first_literal_idx}),
+{II}func (err *ourverification.VerificationError) bool {{
 {III}gotErr = err
 {III}return false
 {II}}},
@@ -81,9 +81,9 @@ func {test_name}(t *testing.T) {{
 {I}}}
 
 {I}// No error is expected on the last literal.
-{I}aasverification.{verify_function}(
-{II}aastypes.{enum_name}({last_literal_idx}),
-{II}func (err *aasverification.VerificationError) bool {{
+{I}ourverification.{verify_function}(
+{II}ourtypes.{enum_name}({last_literal_idx}),
+{II}func (err *ourverification.VerificationError) bool {{
 {III}gotErr = err
 {III}return false
 {II}}},
@@ -96,9 +96,9 @@ func {test_name}(t *testing.T) {{
 
 {I}// An error is expected before the first literal.
 {I}gotErr = nil
-{I}aasverification.{verify_function}(
-{II}aastypes.{enum_name}({first_literal_idx} - 1),
-{II}func (err *aasverification.VerificationError) bool {{
+{I}ourverification.{verify_function}(
+{II}ourtypes.{enum_name}({first_literal_idx} - 1),
+{II}func (err *ourverification.VerificationError) bool {{
 {III}gotErr = err
 {III}return false
 {II}}},
@@ -111,9 +111,9 @@ func {test_name}(t *testing.T) {{
 
 {I}// An error is expected after the last literal.
 {I}gotErr = nil
-{I}aasverification.{verify_function}(
-{II}aastypes.{enum_name}({last_literal_idx} + 1),
-{II}func (err *aasverification.VerificationError) bool {{
+{I}ourverification.{verify_function}(
+{II}ourtypes.{enum_name}({last_literal_idx} + 1),
+{II}func (err *ourverification.VerificationError) bool {{
 {III}gotErr = err
 {III}return false
 {II}}},
@@ -143,9 +143,9 @@ def _generate_for_cls(cls: intermediate.ConcreteClass) -> List[Stripped]:
         Stripped(
             f"""\
 func {test_name}(t *testing.T) {{
-{I}pths := aastesting.FindFilesBySuffixRecursively(
+{I}pths := ourtesting.FindFilesBySuffixRecursively(
 {II}filepath.Join(
-{III}aastesting.TestDataDir,
+{III}ourtesting.TestDataDir,
 {III}"Json",
 {III}"Expected",
 {III}{model_type_literal},
@@ -155,11 +155,11 @@ func {test_name}(t *testing.T) {{
 {I}sort.Strings(pths)
 
 {I}for _, pth := range pths {{
-{II}jsonable := aastesting.MustReadJsonable(
+{II}jsonable := ourtesting.MustReadJsonable(
 {III}pth,
 {II})
 
-{II}deserialized, deseriaErr := aasjsonization.{deserialization_function}(
+{II}deserialized, deseriaErr := ourjsonization.{deserialization_function}(
 {III}jsonable,
 {II})
 {II}if deseriaErr != nil {{
@@ -170,10 +170,10 @@ func {test_name}(t *testing.T) {{
 {III}return
 {II}}}
 
-{II}var errors []*aasverification.VerificationError
-{II}aasverification.Verify(
+{II}var errors []*ourverification.VerificationError
+{II}ourverification.Verify(
 {III}deserialized,
-{III}func(veriErr *aasverification.VerificationError) (abort bool) {{
+{III}func(veriErr *ourverification.VerificationError) (abort bool) {{
 {IIII}errors = append(errors, veriErr)
 {IIII}return
 {III}}},
@@ -199,7 +199,7 @@ func {test_name}(t *testing.T) {{
             f"""\
 func {test_name}(t *testing.T) {{
 {I}pattern := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"Json",
 {II}"Unexpected",
 {II}"Invalid",
@@ -218,35 +218,35 @@ func {test_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, causeDir := range causeDirs {{
-{II}pths := aastesting.FindFilesBySuffixRecursively(
+{II}pths := ourtesting.FindFilesBySuffixRecursively(
 {III}causeDir,
 {III}".json",
 {II})
 {II}sort.Strings(pths)
 
 {II}for _, pth := range pths {{
-{III}jsonable := aastesting.MustReadJsonable(
+{III}jsonable := ourtesting.MustReadJsonable(
 {IIII}pth,
 {III})
 
-{III}relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+{III}relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 {III}if err != nil {{
 {IIII}panic(
 {IIIII}fmt.Sprintf(
 {IIIIII}"Failed to compute the relative path of %s to %s: %s",
-{IIIIII}aastesting.TestDataDir, pth, err.Error(),
+{IIIIII}ourtesting.TestDataDir, pth, err.Error(),
 {IIIII}),
 {IIII})
 {III}}}
 
 {III}expectedPth := filepath.Join(
-{IIII}aastesting.TestDataDir,
+{IIII}ourtesting.TestDataDir,
 {IIII}"VerificationError",
 {IIII}filepath.Dir(relPth),
 {IIII}filepath.Base(relPth)+".errors",
 {III})
 
-{III}deserialized, deseriaErr := aasjsonization.{deserialization_function}(
+{III}deserialized, deseriaErr := ourjsonization.{deserialization_function}(
 {IIII}jsonable,
 {III})
 {III}if deseriaErr != nil {{
@@ -257,10 +257,10 @@ func {test_name}(t *testing.T) {{
 {IIII}return
 {III}}}
 
-{III}var errors []*aasverification.VerificationError
-{III}aasverification.Verify(
+{III}var errors []*ourverification.VerificationError
+{III}ourverification.Verify(
 {IIII}deserialized,
-{IIII}func(err *aasverification.VerificationError) (abort bool) {{
+{IIII}func(err *ourverification.VerificationError) (abort bool) {{
 {IIIII}errors = append(errors, err)
 {IIIII}return
 {IIII}}},
@@ -305,10 +305,10 @@ import (
 {I}"sort"
 {I}"strings"
 {I}"testing"
-{I}aasjsonization "{repo_url}/jsonization"
-{I}aastesting "{repo_url}/aastesting"
-{I}aastypes "{repo_url}/types"
-{I}aasverification "{repo_url}/verification"
+{I}ourjsonization "{repo_url}/jsonization"
+{I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
+{I}ourverification "{repo_url}/verification"
 )"""
         ),
         Stripped(
@@ -317,13 +317,13 @@ import (
 // from `source`.
 func assertNoVerificationErrors(
 {I}t *testing.T,
-{I}instance aastypes.IClass,
+{I}instance ourtypes.IClass,
 {I}source string,
 ) (ok bool) {{
-{I}errors := make([]*aasverification.VerificationError, 0)
-{I}aasverification.Verify(
+{I}errors := make([]*ourverification.VerificationError, 0)
+{I}ourverification.Verify(
 {II}instance,
-{II}func(err *aasverification.VerificationError) (abort bool) {{
+{II}func(err *ourverification.VerificationError) (abort bool) {{
 {III}errors = append(errors, err)
 {III}return
 {II}}},
@@ -354,7 +354,7 @@ func assertNoVerificationErrors(
 {III})
 {II}}}
 
-{II}jsonable, seriaErr := aasjsonization.ToJsonable(instance)
+{II}jsonable, seriaErr := ourjsonization.ToJsonable(instance)
 {II}if seriaErr != nil {{
 {III}panic(
 {IIII}fmt.Sprintf(
@@ -384,10 +384,10 @@ func assertNoVerificationErrors(
         Stripped(
             f"""\
 // Assert that either the verification errors match the recorded ones at `pth`, if
-// [aastesting.RecordMode] is set, or re-record the verification errors at `pth`.
+// [ourtesting.RecordMode] is set, or re-record the verification errors at `pth`.
 func assertEqualsExpectedOrRerecordVerificationErrors(
 {I}t *testing.T,
-{I}errors []*aasverification.VerificationError,
+{I}errors []*ourverification.VerificationError,
 {I}source string,
 {I}expectedPth string,
 ) (ok bool) {{
@@ -413,7 +413,7 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 {I}// Add a newline for POSIX systems
 {I}got := strings.Replace(strings.Join(parts, ";\\n"), "\\r\\n", "\\n", -1) + "\\n"
 
-{I}if aastesting.RecordMode {{
+{I}if ourtesting.RecordMode {{
 {II}parent := filepath.Dir(expectedPth)
 {II}err := os.MkdirAll(parent, os.ModePerm)
 {II}if err != nil {{
@@ -438,7 +438,7 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 {IIII}"Failed to stat the file %s: %s; if the file does not exist, "+
 {IIIII}"you probably want to record the test data by "+
 {IIIII}"setting the environment variable %s",
-{IIII}expectedPth, err.Error(), aastesting.RecordModeEnvironmentVariableName,
+{IIII}expectedPth, err.Error(), ourtesting.RecordModeEnvironmentVariableName,
 {III})
 {III}return
 {II}}}

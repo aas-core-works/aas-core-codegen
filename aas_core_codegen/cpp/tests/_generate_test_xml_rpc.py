@@ -55,10 +55,10 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             f"""\
-namespace aas = {library_namespace};
-namespace common = aas::common;
-namespace xml_common = aas::xml_common;
-namespace xml_rpc = aas::xml_rpc;
+namespace our = {library_namespace};
+namespace common = our::common;
+namespace xml_common = our::xml_common;
+namespace xml_rpc = our::xml_rpc;
 
 namespace {{
 /**

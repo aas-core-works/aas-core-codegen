@@ -8,17 +8,17 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
   const std::shared_ptr<
-    aas::types::IAbstractDescendantWithoutNumbers
+    our::types::IAbstractDescendantWithoutNumbers
   > original_instance(
     test::common::examples::LoadMinAbstractDescendantWithoutNumbers()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -28,23 +28,23 @@ TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IAbstractDescendantWithoutNumbers: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -53,13 +53,13 @@ TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
   }
 
   std::shared_ptr<
-    aas::types::IAbstractWithoutNumbers
+    our::types::IAbstractWithoutNumbers
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IAbstractWithoutNumbers
+    our::types::IAbstractWithoutNumbers
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -80,13 +80,13 @@ TEST_CASE("Test the round-trip of an expected IAbstractWithoutNumbers") {
 
 TEST_CASE("Test the round-trip of an expected IParentWithoutNumbers") {
   const std::shared_ptr<
-    aas::types::IChildWithoutNumbers
+    our::types::IChildWithoutNumbers
   > original_instance(
     test::common::examples::LoadMinChildWithoutNumbers()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -96,23 +96,23 @@ TEST_CASE("Test the round-trip of an expected IParentWithoutNumbers") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IChildWithoutNumbers: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -121,13 +121,13 @@ TEST_CASE("Test the round-trip of an expected IParentWithoutNumbers") {
   }
 
   std::shared_ptr<
-    aas::types::IParentWithoutNumbers
+    our::types::IParentWithoutNumbers
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IParentWithoutNumbers
+    our::types::IParentWithoutNumbers
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss

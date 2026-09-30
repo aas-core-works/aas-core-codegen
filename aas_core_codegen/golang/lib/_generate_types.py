@@ -990,7 +990,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewAndPointTo(
+{private_prop_name}: ourcommon.NewAndPointTo(
 {I}{literal}
 )"""
                     )
@@ -1000,7 +1000,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewAndPointTo(
+{private_prop_name}: ourcommon.NewAndPointTo(
 {I}int64({literal})
 )"""
                     )
@@ -1010,7 +1010,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewAndPointTo(
+{private_prop_name}: ourcommon.NewAndPointTo(
 {I}float64({literal})
 )"""
                     )
@@ -1020,7 +1020,7 @@ def _generate_constructor(
                 struct_specs.append(
                     Stripped(
                         f"""\
-{private_prop_name}: aascommon.NewAndPointTo(
+{private_prop_name}: ourcommon.NewAndPointTo(
 {I}{literal}
 )"""
                     )
@@ -1035,7 +1035,7 @@ def _generate_constructor(
             struct_specs.append(
                 Stripped(
                     f"""\
-{private_prop_name}: aascommon.NewAndPointTo(
+{private_prop_name}: ourcommon.NewAndPointTo(
 {I}{literal}
 )"""
                 )
@@ -1403,7 +1403,7 @@ switch that.ModelType() {{
     return (
         Stripped(
             f"""\
-// Check whether the instance corresponds to [aastypes.{interface_name}]
+// Check whether the instance corresponds to [ourtypes.{interface_name}]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -2074,7 +2074,7 @@ package types"""
             _generate_definition_for_model_type(symbol_table=symbol_table),
             Stripped(
                 f"""\
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {{
 {I}// Return the concrete model type at run-time.
 {I}//
@@ -2178,8 +2178,8 @@ type IClass interface {{
     if golang_common.names_package(blocks, "strings"):
         import_lines.append(f'{I}"strings"')
 
-    if golang_common.names_package(blocks, "aascommon"):
-        import_lines.append(f"{I}aascommon {common_url_literal}")
+    if golang_common.names_package(blocks, "ourcommon"):
+        import_lines.append(f"{I}ourcommon {common_url_literal}")
 
     if len(import_lines) == 0:
         del blocks[import_index]

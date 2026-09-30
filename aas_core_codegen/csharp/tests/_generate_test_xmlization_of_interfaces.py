@@ -55,7 +55,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
 {{
 {I}// We load from JSON here just to jump-start the round trip.
 {I}// The round-trip goes then over XML.
-{I}var instance = Aas.Tests.CommonJsonization.LoadMaximal{implementer_cls_name_csharp}();
+{I}var instance = Our.Tests.CommonJsonization.LoadMaximal{implementer_cls_name_csharp}();
 
 {I}// The round-trip starts here.
 {I}var outputBuilder = new System.Text.StringBuilder();
@@ -70,7 +70,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
 {IIII}OmitXmlDeclaration = true
 {III}}});
 
-{II}Aas.Xmlization.Serialize.To(
+{II}Our.Xmlization.Serialize.To(
 {III}instance,
 {III}xmlWriter);
 {I}}}
@@ -84,7 +84,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
 {II}outputReader,
 {II}new System.Xml.XmlReaderSettings());
 
-{I}var anotherInstance = Aas.Xmlization.Deserialize.{interface_name_csharp}From(
+{I}var anotherInstance = Our.Xmlization.Deserialize.{interface_name_csharp}From(
 {II}xmlReader);
 
 {I}// Serialize back to XML
@@ -99,7 +99,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
 {IIII}OmitXmlDeclaration = true
 {III}}});
 
-{II}Aas.Xmlization.Serialize.To(
+{II}Our.Xmlization.Serialize.To(
 {III}anotherInstance,
 {III}anotherXmlWriter);
 {I}}}
@@ -115,7 +115,7 @@ public void Test_round_trip_{interface_name_csharp}_from_{implementer_cls_name_c
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

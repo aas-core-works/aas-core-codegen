@@ -40,8 +40,8 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasStringification from "../src/stringification";
-import * as AasTypes from "../src/types";
+import * as OurStringification from "../src/stringification";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
@@ -74,7 +74,7 @@ class EnumerationLiteral {{
  * @param expectedPath - to the golden file
  */
 function compareOrRecordValue(
-{I}value: boolean | number | string | null | EnumerationLiteral | AasTypes.Class,
+{I}value: boolean | number | string | null | EnumerationLiteral | OurTypes.Class,
 {I}expectedPath: string
 ): void {{
 {I}let got = "";
@@ -87,7 +87,7 @@ function compareOrRecordValue(
 {II}got = JSON.stringify(value);
 {I}}} else if (value instanceof EnumerationLiteral) {{
 {II}got = value.toString();
-{I}}} else if (value instanceof AasTypes.Class) {{
+{I}}} else if (value instanceof OurTypes.Class) {{
 {II}got = TestCommon.traceMark(value);
 {I}}} else {{
 {II}throw new Error(`We do not know how to represent the value ${{value}}`);
@@ -162,7 +162,7 @@ function compareOrRecordValue(
                     f"""\
 const value = new EnumerationLiteral(
 {I}{typescript_common.string_literal(typescript_naming.enum_name(result_enum.name))},
-{I}AasStringification.{enum_to_string_name}(
+{I}OurStringification.{enum_to_string_name}(
 {II}instance.{method_name_typescript}()
 {I})
 );"""

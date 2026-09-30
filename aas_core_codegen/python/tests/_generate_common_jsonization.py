@@ -30,7 +30,7 @@ def _generate_model_type_to_from_jsonable(
         )
 
         items.append(
-            Stripped(f"{repr(model_type)}:\n{I}aas_jsonization.{from_jsonable}")
+            Stripped(f"{repr(model_type)}:\n{I}our_jsonization.{from_jsonable}")
         )
 
     items_joined = ",\n".join(items)
@@ -39,7 +39,7 @@ def _generate_model_type_to_from_jsonable(
         f"""\
 _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
 {I}str,
-{I}Callable[[aas_jsonization.Jsonable], aas_types.Class]
+{I}Callable[[our_jsonization.Jsonable], our_types.Class]
 ] = {{
 {I}{indent_but_first_line(items_joined, I)}
 }}"""
@@ -54,7 +54,7 @@ def _generate_model_type_to_class(symbol_table: intermediate.SymbolTable) -> Str
         model_type = naming.json_model_type(cls.name)
         python_cls_name = python_naming.class_name(cls.name)
 
-        items.append(Stripped(f"{repr(model_type)}:\n{I}aas_types.{python_cls_name}"))
+        items.append(Stripped(f"{repr(model_type)}:\n{I}our_types.{python_cls_name}"))
 
     items_joined = ",\n".join(items)
 
@@ -62,7 +62,7 @@ def _generate_model_type_to_class(symbol_table: intermediate.SymbolTable) -> Str
         f"""\
 _MODEL_TYPE_TO_CLASS: Mapping[
 {I}str,
-{I}Type[aas_types.Class]
+{I}Type[our_types.Class]
 ] = {{
 {I}{indent_but_first_line(items_joined, I)}
 }}"""
@@ -108,9 +108,9 @@ else:
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.common as aas_common
-import {qualified_module_name}.jsonization as aas_jsonization
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.common as our_common
+import {qualified_module_name}.jsonization as our_jsonization
+import {qualified_module_name}.types as our_types"""
         ),
         Stripped(
             f'''\
@@ -122,12 +122,12 @@ class Difference:
 
 {I}#: Path in the expected JSON-able value which is different from
 {I}#: the obtained JSON-able value
-{I}path: Final[aas_jsonization.Path]
+{I}path: Final[our_jsonization.Path]
 
 {I}def __init__(self, message: str) -> None:
 {II}"""Initialize with the given message and empty path."""
 {II}self.message = message
-{II}self.path = aas_jsonization.Path()
+{II}self.path = our_jsonization.Path()
 
 {I}def __str__(self) -> str:
 {II}return f"#{{self.path}}: {{self.message}}"'''
@@ -135,8 +135,8 @@ class Difference:
         Stripped(
             f'''\
 def check_equal(
-{I}expected: aas_jsonization.Jsonable,
-{I}got: aas_jsonization.Jsonable,
+{I}expected: our_jsonization.Jsonable,
+{I}got: our_jsonization.Jsonable,
 ) -> Iterator[Difference]:
 {I}"""
 {I}Compare recursively two JSON-able values for equality.
@@ -163,7 +163,7 @@ def check_equal(
 
 {III}for i, (expected_item, got_item) in enumerate(zip(expected, got)):
 {IIII}for difference in check_equal(expected_item, got_item):
-{IIIII}difference.path._prepend(aas_jsonization.IndexSegment(expected, i))
+{IIIII}difference.path._prepend(our_jsonization.IndexSegment(expected, i))
 {IIIII}yield difference
 
 {I}elif isinstance(expected, collections.abc.Mapping):
@@ -198,11 +198,11 @@ def check_equal(
 
 {IIII}for difference in check_equal(expected_value, got_value):
 {IIIII}difference.path._prepend(
-{IIIIII}aas_jsonization.PropertySegment(expected, key)
+{IIIIII}our_jsonization.PropertySegment(expected, key)
 {IIIII})
 {IIIII}yield difference
 {I}else:
-{II}aas_common.assert_never(expected)'''
+{II}our_common.assert_never(expected)'''
         ),
         _generate_model_type_to_from_jsonable(symbol_table=symbol_table),
         _generate_model_type_to_class(symbol_table=symbol_table),
@@ -211,7 +211,7 @@ def check_equal(
 def must_load(
 {I}path: pathlib.Path,
 {I}model_type: str
-) -> aas_types.Class:
+) -> our_types.Class:
 {I}"""
 {I}Load an instance from ``path``.
 

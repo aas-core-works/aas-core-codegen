@@ -1,4 +1,4 @@
-def id_shorts_are_unique(referables: Iterable[aas_types.Referable]) -> bool:
+def id_shorts_are_unique(referables: Iterable[our_types.Referable]) -> bool:
     """
     Check that all :py:attr:`.types.Referable.id_short` are unique
     among :paramref:`referables`.

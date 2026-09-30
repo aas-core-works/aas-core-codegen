@@ -54,8 +54,8 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             f"""\
-namespace aas = {library_namespace};
-namespace verification = aas::verification;
+namespace our = {library_namespace};
+namespace verification = our::verification;
 
 namespace {{
 /**

@@ -6,61 +6,61 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kItem
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kItem
+    == our::stringification::MustModelTypeFromString(
       "Item"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kItem
+    our::stringification::to_string(
+      our::types::ModelType::kItem
     )
     == "Item"
   );
 
   REQUIRE(
-    aas::types::ModelType::kChildA
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kChildA
+    == our::stringification::MustModelTypeFromString(
       "ChildA"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kChildA
+    our::stringification::to_string(
+      our::types::ModelType::kChildA
     )
     == "ChildA"
   );
 
   REQUIRE(
-    aas::types::ModelType::kChildB
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kChildB
+    == our::stringification::MustModelTypeFromString(
       "ChildB"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kChildB
+    our::stringification::to_string(
+      our::types::ModelType::kChildB
     )
     == "ChildB"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSomething
+    == our::stringification::MustModelTypeFromString(
       "Something"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSomething
+    our::stringification::to_string(
+      our::types::ModelType::kSomething
     )
     == "Something"
   );
@@ -68,13 +68,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::stringification::ModelTypeFromString(
+    !our::stringification::ModelTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModelTypeFromString(
+    our::stringification::MustModelTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -83,29 +83,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test Kind round-trip") {
   REQUIRE(
-    aas::types::Kind::kAlpha
-    == aas::stringification::MustKindFromString(
+    our::types::Kind::kAlpha
+    == our::stringification::MustKindFromString(
       "alpha"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Kind::kAlpha
+    our::stringification::to_string(
+      our::types::Kind::kAlpha
     )
     == "alpha"
   );
 
   REQUIRE(
-    aas::types::Kind::kBeta
-    == aas::stringification::MustKindFromString(
+    our::types::Kind::kBeta
+    == our::stringification::MustKindFromString(
       "beta"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Kind::kBeta
+    our::stringification::to_string(
+      our::types::Kind::kBeta
     )
     == "beta"
   );
@@ -113,13 +113,13 @@ TEST_CASE("Test Kind round-trip") {
 
 TEST_CASE("Test failure on Kind") {
   CHECK(
-    !aas::stringification::KindFromString(
+    !our::stringification::KindFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustKindFromString(
+    our::stringification::MustKindFromString(
       "Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"

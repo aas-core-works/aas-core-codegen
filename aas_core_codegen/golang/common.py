@@ -199,10 +199,10 @@ def _assert_all_primitive_types_are_mapped() -> None:
 
 _assert_all_primitive_types_are_mapped()
 
-TYPES_PACKAGE = Identifier("aastypes")
-CONSTANTS_PACKAGE = Identifier("aasconstants")
-VERIFICATION_PACKAGE = Identifier("aasverification")
-COMMON_PACKAGE = Identifier("aascommon")
+TYPES_PACKAGE = Identifier("ourtypes")
+CONSTANTS_PACKAGE = Identifier("ourconstants")
+VERIFICATION_PACKAGE = Identifier("ourverification")
+COMMON_PACKAGE = Identifier("ourcommon")
 
 #: Maximal arity of a tuple for which we pre-generate a generic ``TupleN`` struct
 #: in :py:mod:`aas_core_codegen.golang.lib._generate_common`.
@@ -504,8 +504,8 @@ def names_package(blocks: Sequence[str], qualifier: str) -> bool:
     This decides whether that package is imported at all: an unused import does
     not compile in Go, and what a generated file names depends on the meta-model.
 
-    Mind that the qualifier has to stand on its own. ``aastesting.RecordMode``
-    names neither ``testing`` nor ``aas``.
+    Mind that the qualifier has to stand on its own. ``ourtesting.RecordMode``
+    names neither ``testing`` nor ``our``.
     """
     pattern = re.compile(r"(?<![\w.])" + re.escape(qualifier) + r"\.")
     return any(pattern.search(block) is not None for block in blocks)
@@ -559,13 +559,13 @@ def sorted_set_items_expr(
 
     primitive_type = intermediate.try_primitive_type(items)
     if primitive_type is intermediate.PrimitiveType.BOOL:
-        less = "aascommon.LessBool"
+        less = "ourcommon.LessBool"
 
     elif primitive_type is intermediate.PrimitiveType.INT:
-        less = "aascommon.LessOrdered[int64]"
+        less = "ourcommon.LessOrdered[int64]"
 
     elif primitive_type is intermediate.PrimitiveType.STR:
-        less = "aascommon.LessOrdered[string]"
+        less = "ourcommon.LessOrdered[string]"
 
     elif primitive_type is not None:
         raise AssertionError(
@@ -576,7 +576,7 @@ def sorted_set_items_expr(
     elif isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
         items.our_type, intermediate.Enumeration
     ):
-        less = "aasstringification." + golang_naming.function_name(
+        less = "ourstringification." + golang_naming.function_name(
             Identifier(f"less_by_rank_of_{items.our_type.name}")
         )
 
@@ -586,13 +586,13 @@ def sorted_set_items_expr(
             f"in intermediate._translate._verify_items_of_sets: {items}"
         )
 
-    single_line = f"aascommon.SortedKeys({set_expr}, {less})"
+    single_line = f"ourcommon.SortedKeys({set_expr}, {less})"
     if column + len(single_line) <= MAX_LINE_LENGTH:
         return Stripped(single_line)
 
     return Stripped(
         f"""\
-aascommon.SortedKeys(
+ourcommon.SortedKeys(
 {INDENT}{set_expr},
 {INDENT}{less},
 )"""

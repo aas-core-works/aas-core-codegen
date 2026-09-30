@@ -8,17 +8,17 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IElement") {
   const std::shared_ptr<
-    aas::types::ILeaf
+    our::types::ILeaf
   > original_instance(
     test::common::examples::LoadMinLeaf()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -28,23 +28,23 @@ TEST_CASE("Test the round-trip of an expected IElement") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of ILeaf: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -53,13 +53,13 @@ TEST_CASE("Test the round-trip of an expected IElement") {
   }
 
   std::shared_ptr<
-    aas::types::IElement
+    our::types::IElement
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IElement
+    our::types::IElement
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -80,13 +80,13 @@ TEST_CASE("Test the round-trip of an expected IElement") {
 
 TEST_CASE("Test the round-trip of an expected IContainer") {
   const std::shared_ptr<
-    aas::types::IOrderedContainer
+    our::types::IOrderedContainer
   > original_instance(
     test::common::examples::LoadMinOrderedContainer()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -96,23 +96,23 @@ TEST_CASE("Test the round-trip of an expected IContainer") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IOrderedContainer: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -121,13 +121,13 @@ TEST_CASE("Test the round-trip of an expected IContainer") {
   }
 
   std::shared_ptr<
-    aas::types::IContainer
+    our::types::IContainer
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IContainer
+    our::types::IContainer
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss

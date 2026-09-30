@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of LangString:
     /// <code>
-    /// var anInstance = new Aas.LangString(
+    /// var anInstance = new Our.LangString(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -58,8 +58,8 @@ namespace dummy
         }  // public static bool LangStringSetsHaveEnglish
 
         /// <summary>
-        /// Check that the <see cref="Aas.IecContent.Definition" /> is defined at least in English
-        /// for all the specifications whose content is an <see cref="Aas.IecContent" />.
+        /// Check that the <see cref="Our.IecContent.Definition" /> is defined at least in English
+        /// for all the specifications whose content is an <see cref="Our.IecContent" />.
         /// </summary>
         /// <remarks>
         /// This function tests an <c>any</c> nested in <c>all</c>, where the nested <c>any</c>
@@ -70,11 +70,11 @@ namespace dummy
         )
         {
             return specifications.All(
-                specification => !(specification.Content is Aas.IIecContent)
+                specification => !(specification.Content is Our.IIecContent)
                     || (
-                        (((Aas.IIecContent)specification.Content).Definition != null)
+                        (((Our.IIecContent)specification.Content).Definition != null)
                         && (
-                            ((Aas.IIecContent)specification.Content).Definition.Any(
+                            ((Our.IIecContent)specification.Content).Definition.Any(
                                 langString => Verification.IsEnglish(langString.Language))
                         )
                     ));
@@ -97,7 +97,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangString(
-                Aas.ILangString that
+                Our.ILangString that
             )
             {
                 // No verification has been defined for LangString.
@@ -106,7 +106,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringSet(
-                Aas.ILangStringSet that
+                Our.ILangStringSet that
             )
             {
                 int indexLangStrings = 0;
@@ -128,7 +128,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformIecContent(
-                Aas.IIecContent that
+                Our.IIecContent that
             )
             {
                 if (that.Definition != null)
@@ -153,7 +153,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformOtherContent(
-                Aas.IOtherContent that
+                Our.IOtherContent that
             )
             {
                 // No verification has been defined for OtherContent.
@@ -162,7 +162,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSpecification(
-                Aas.ISpecification that
+                Our.ISpecification that
             )
             {
                 foreach (var error in Verification.Verify(that.Content))
@@ -176,7 +176,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!(
@@ -251,7 +251,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {

@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Item`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Item(
+    an_instance = our_types.Item(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,19 +47,19 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def if_with_a_single_branch(
@@ -124,7 +124,7 @@ def if_with_pass(
 
 
 def if_in_default_of_switch(
-    kind: aas_types.Kind,
+    kind: our_types.Kind,
     number: int
 ) -> bool:
     """
@@ -134,17 +134,17 @@ def if_in_default_of_switch(
     a switch in turn.
     """
     # pylint: disable=all
-    if kind == aas_types.Kind.ALPHA:
+    if kind == our_types.Kind.ALPHA:
         return number < 10
     else:
         if number < -5:
-            if kind == aas_types.Kind.BETA:
+            if kind == our_types.Kind.BETA:
                 return False
     return True
 
 
 def if_with_non_null_in_condition(
-    item: aas_types.Item
+    item: our_types.Item
 ) -> bool:
     """Check the condition which guards an optional value itself."""
     # pylint: disable=all
@@ -199,14 +199,14 @@ def if_with_continue_in_for(
 
 
 def narrowing_in_body(
-    parent: Optional[aas_types.Parent]
+    parent: Optional[our_types.Parent]
 ) -> bool:
     """Check the narrowing in the body of a branch by its condition."""
     # pylint: disable=all
     if (
         (
             (parent is not None)
-            and isinstance(parent, aas_types.ChildA)
+            and isinstance(parent, our_types.ChildA)
         )
     ):
         return parent.a_only < 100
@@ -214,13 +214,13 @@ def narrowing_in_body(
 
 
 def narrowing_in_elif_and_else(
-    parent: Optional[aas_types.Parent]
+    parent: Optional[our_types.Parent]
 ) -> bool:
     """Check the narrowing by the negation of the previous conditions."""
     # pylint: disable=all
     if parent is None:
         return True
-    elif not isinstance(parent, aas_types.ChildB):
+    elif not isinstance(parent, our_types.ChildB):
         return (
             (
                 (parent.optional_text is None)
@@ -231,7 +231,7 @@ def narrowing_in_elif_and_else(
 
 
 def narrowing_after_early_return(
-    parent: Optional[aas_types.Parent]
+    parent: Optional[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after an if-statement whose branch always returns.
@@ -240,7 +240,7 @@ def narrowing_after_early_return(
     if (
         (
             (parent is None)
-            or (not isinstance(parent, aas_types.ChildB))
+            or (not isinstance(parent, our_types.ChildB))
         )
     ):
         return True
@@ -248,7 +248,7 @@ def narrowing_after_early_return(
 
 
 def narrowing_after_the_only_completing_branch(
-    parent: Optional[aas_types.Parent]
+    parent: Optional[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after an if-statement whose ``else`` always returns.
@@ -257,7 +257,7 @@ def narrowing_after_the_only_completing_branch(
     if (
         (
             (parent is not None)
-            and isinstance(parent, aas_types.ChildA)
+            and isinstance(parent, our_types.ChildA)
         )
     ):
         pass
@@ -267,14 +267,14 @@ def narrowing_after_the_only_completing_branch(
 
 
 def child_as_have_texts(
-    parents: List[aas_types.Parent]
+    parents: List[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after the ``continue`` and the early return in a loop.
     """
     # pylint: disable=all
     for parent in parents:
-        if not isinstance(parent, aas_types.ChildA):
+        if not isinstance(parent, our_types.ChildA):
             continue
         if parent.optional_text is None:
             return False
@@ -284,7 +284,7 @@ def child_as_have_texts(
 
 
 def texts_before_container_are_short(
-    parents: List[aas_types.Parent]
+    parents: List[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after the ``continue`` in a loop with a ``break``.
@@ -292,7 +292,7 @@ def texts_before_container_are_short(
     # pylint: disable=all
     total = 0
     for parent in parents:
-        if isinstance(parent, aas_types.Container):
+        if isinstance(parent, our_types.Container):
             break
         if parent.optional_text is None:
             continue
@@ -301,7 +301,7 @@ def texts_before_container_are_short(
 
 
 def text_or_default_is_short(
-    parent: aas_types.Parent
+    parent: our_types.Parent
 ) -> bool:
     """Check the narrowing by the value assigned in a branch."""
     # pylint: disable=all
@@ -312,8 +312,8 @@ def text_or_default_is_short(
 
 
 def last_child_a_is_small(
-    parent: aas_types.Parent,
-    parents: List[aas_types.Parent]
+    parent: our_types.Parent,
+    parents: List[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing of a variable to a class by the assigned value.
@@ -321,7 +321,7 @@ def last_child_a_is_small(
     # pylint: disable=all
     last = parent
     for other in parents:
-        if isinstance(other, aas_types.ChildA):
+        if isinstance(other, our_types.ChildA):
             last = other
             if last.a_only >= 1000:
                 return False
@@ -329,7 +329,7 @@ def last_child_a_is_small(
 
 
 def has_marker_in_tree(
-    parent: aas_types.Parent
+    parent: our_types.Parent
 ) -> bool:
     """
     Check the recursive chain of ``isinstance`` checks with early returns.
@@ -342,7 +342,7 @@ def has_marker_in_tree(
         )
     ):
         return True
-    if isinstance(parent, aas_types.Container):
+    if isinstance(parent, our_types.Container):
         return (
             (
                 (parent.children is not None)
@@ -357,14 +357,14 @@ def has_marker_in_tree(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_item(
             self,
-            that: aas_types.Item
+            that: our_types.Item
     ) -> Iterator[Error]:
         # No verification has been defined for Item.
         return
@@ -376,7 +376,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_child_a(
             self,
-            that: aas_types.ChildA
+            that: our_types.ChildA
     ) -> Iterator[Error]:
         # No verification has been defined for ChildA.
         return
@@ -388,7 +388,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_child_b(
             self,
-            that: aas_types.ChildB
+            that: our_types.ChildB
     ) -> Iterator[Error]:
         # No verification has been defined for ChildB.
         return
@@ -400,7 +400,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_container(
             self,
-            that: aas_types.Container
+            that: our_types.Container
     ) -> Iterator[Error]:
         if that.children is not None:
             for i, an_item in enumerate(that.children):
@@ -422,7 +422,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not if_with_continue_in_for(that.number):
             yield Error(
@@ -573,7 +573,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

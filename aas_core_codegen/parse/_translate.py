@@ -2651,7 +2651,7 @@ def _verify_symbol_table(
     # in names in the generated code.
     # noinspection SpellCheckingInspection
     reserved_type_names = {
-        "aas",
+        "our",
         "accept",
         "context",
         "class",

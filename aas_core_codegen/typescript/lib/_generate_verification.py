@@ -447,7 +447,7 @@ class _TranspilableVerificationTranspiler(typescript_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_name = typescript_naming.constant_name(node.identifier)
-            return Stripped(f"AasConstants.{constant_name}"), None
+            return Stripped(f"OurConstants.{constant_name}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(typescript_naming.function_name(node.identifier)), None
@@ -455,7 +455,7 @@ class _TranspilableVerificationTranspiler(typescript_transpilation.Transpiler):
         our_type = self._symbol_table.find_our_type(name=node.identifier)
         if isinstance(our_type, intermediate.Enumeration):
             return (
-                Stripped(f"AasTypes.{typescript_naming.enum_name(node.identifier)}"),
+                Stripped(f"OurTypes.{typescript_naming.enum_name(node.identifier)}"),
                 None,
             )
 
@@ -548,13 +548,13 @@ def _transpile_transpilable_verification(
         return_type = "void"
     else:
         return_type = typescript_common.generate_type(
-            type_annotation=verification.returns, types_module=Identifier("aas_types")
+            type_annotation=verification.returns, types_module=Identifier("our_types")
         )
 
     arg_defs = []  # type: List[Stripped]
     for arg in verification.arguments:
         arg_type = typescript_common.generate_type(
-            arg.type_annotation, types_module=Identifier("AasTypes")
+            arg.type_annotation, types_module=Identifier("OurTypes")
         )
         arg_name = typescript_naming.argument_name(arg.name)
         arg_defs.append(Stripped(f"{arg_name}: {arg_type}"))
@@ -626,7 +626,7 @@ class _InvariantTranspiler(typescript_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_name = typescript_naming.constant_name(node.identifier)
-            return Stripped(f"AasConstants.{constant_name}"), None
+            return Stripped(f"OurConstants.{constant_name}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(typescript_naming.function_name(node.identifier)), None
@@ -634,7 +634,7 @@ class _InvariantTranspiler(typescript_transpilation.Transpiler):
         our_type = self._symbol_table.find_our_type(name=node.identifier)
         if isinstance(our_type, intermediate.Enumeration):
             return (
-                Stripped(f"AasTypes.{typescript_naming.enum_name(node.identifier)}"),
+                Stripped(f"OurTypes.{typescript_naming.enum_name(node.identifier)}"),
                 None,
             )
 
@@ -1397,7 +1397,7 @@ if (context === true) {{
     writer.write(
         f"""\
 *{transform_name}(
-{maybe_disable_that_unused}{I}that: AasTypes.{cls_name},
+{maybe_disable_that_unused}{I}that: OurTypes.{cls_name},
 {maybe_disable_context_unused}{I}context: boolean
 ): IterableIterator<VerificationError> {{
 """
@@ -1453,7 +1453,7 @@ def _generate_verify_json_value(
  * @returns errors, if any
  */
 export function *verifyJsonValue(
-{I}value: AasTypes.JsonValue
+{I}value: OurTypes.JsonValue
 ): IterableIterator<VerificationError> {{
 {I}if (value === null || value === undefined) {{
 {II}yield new VerificationError(
@@ -1517,7 +1517,7 @@ export function *verifyJsonValue(
  * @returns errors, if any
  */
 export function *verifyJsonArray(
-{I}value: AasTypes.JsonArray
+{I}value: OurTypes.JsonArray
 ): IterableIterator<VerificationError> {{
 {I}if (!Array.isArray(value)) {{
 {II}yield new VerificationError(
@@ -1538,7 +1538,7 @@ export function *verifyJsonArray(
  * @returns errors, if any
  */
 export function *verifyJsonObject(
-{I}value: AasTypes.JsonObject
+{I}value: OurTypes.JsonObject
 ): IterableIterator<VerificationError> {{
 {I}if (
 {II}value === null
@@ -1590,7 +1590,7 @@ def _generate_transformer(
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
-{I}extends AasTypes.AbstractTransformerWithContext<
+{I}extends OurTypes.AbstractTransformerWithContext<
 {II}boolean, IterableIterator<VerificationError>
 {I}> {{
 """
@@ -1743,14 +1743,14 @@ def _generate_module_comment(
 Here is an example how to verify an instance of {{@link types.{cls_name}}}:
 
 ```ts
-import * as AasTypes from "{package_identifier}/types";
-import * as AasVerification from "{package_identifier}/verification";
+import * as OurTypes from "{package_identifier}/types";
+import * as OurVerification from "{package_identifier}/verification";
 
-const {an_instance_variable} = new AasTypes.{cls_name}(
+const {an_instance_variable} = new OurTypes.{cls_name}(
 {I}// ... some constructor arguments ...
 );
 
-for (const error of AasVerification.verify({an_instance_variable})) {{
+for (const error of OurVerification.verify({an_instance_variable})) {{
 {I}console.log(`${{error.message}} at: ${{error.path}}`);
 }}
 ```"""
@@ -1795,9 +1795,9 @@ def generate(
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasCommon from "./common";
-import * as AasConstants from "./constants";
-import * as AasTypes from "./types";"""
+import * as OurCommon from "./common";
+import * as OurConstants from "./constants";
+import * as OurTypes from "./types";"""
         ),
         Stripped(
             """\
@@ -1816,14 +1816,14 @@ export class PropertySegment {{
 {I}/**
 {I} * Instance containing the property
 {I} */
-{I}readonly instance: AasTypes.Class;
+{I}readonly instance: OurTypes.Class;
 
 {I}/**
 {I} * Name of the property
 {I} */
 {I}readonly name: string;
 
-{I}constructor(instance: AasTypes.Class, name: string) {{
+{I}constructor(instance: OurTypes.Class, name: string) {{
 {II}this.instance = instance;
 {II}this.name = name;
 {I}}}
@@ -2022,7 +2022,7 @@ export class VerificationError {{
  * @returns a stream of verification errors
  */
 export function *verify(
-  that: AasTypes.Class,
+  that: OurTypes.Class,
   recurse = true
 ): IterableIterator<VerificationError> {{
 {I}yield * VERIFIER.transformWithContext(that, recurse);

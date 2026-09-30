@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/aas-core-works/aas-core3.0-golang/aastesting"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourtesting "github.com/aas-core-works/aas-core3.0-golang/ourtesting"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
 func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
-	instance := aastesting.MustLoadMinimalExtension()
+	instance := ourtesting.MustLoadMinimalExtension()
 
-	if !aastypes.IsExtension(instance) {
+	if !ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be true on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -44,7 +44,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -52,7 +52,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -60,7 +60,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -68,7 +68,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -76,7 +76,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -84,7 +84,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -92,7 +92,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -100,7 +100,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -108,7 +108,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -116,7 +116,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -124,7 +124,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -132,7 +132,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -140,7 +140,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -148,7 +148,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -156,7 +156,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -164,7 +164,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -172,7 +172,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -180,7 +180,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -188,7 +188,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -196,7 +196,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -204,7 +204,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -212,7 +212,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -220,7 +220,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -228,7 +228,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -236,7 +236,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -244,7 +244,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -252,7 +252,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -260,7 +260,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -268,7 +268,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -276,7 +276,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -284,7 +284,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -292,7 +292,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -300,7 +300,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -308,7 +308,7 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IExtension with runtime type %T and with model type %v",
@@ -318,9 +318,9 @@ func TestIsXxxOnAnInstanceOfExtension(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAdministrativeInformation()
+	instance := ourtesting.MustLoadMinimalAdministrativeInformation()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -328,7 +328,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsAdministrativeInformation(instance) {
+	if !ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be true on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -336,7 +336,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -344,7 +344,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -352,7 +352,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -360,7 +360,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -368,7 +368,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -376,7 +376,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -384,7 +384,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -392,7 +392,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -400,7 +400,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -408,7 +408,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -416,7 +416,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -424,7 +424,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -432,7 +432,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -440,7 +440,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -448,7 +448,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -456,7 +456,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -464,7 +464,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -472,7 +472,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -480,7 +480,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -488,7 +488,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -496,7 +496,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -504,7 +504,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -512,7 +512,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -520,7 +520,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -528,7 +528,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -536,7 +536,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -544,7 +544,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -552,7 +552,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -560,7 +560,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -568,7 +568,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -576,7 +576,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -584,7 +584,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -592,7 +592,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -600,7 +600,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -608,7 +608,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -616,7 +616,7 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IAdministrativeInformation with runtime type %T and with model type %v",
@@ -626,9 +626,9 @@ func TestIsXxxOnAnInstanceOfAdministrativeInformation(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
-	instance := aastesting.MustLoadMinimalQualifier()
+	instance := ourtesting.MustLoadMinimalQualifier()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -636,7 +636,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -644,7 +644,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsQualifier(instance) {
+	if !ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be true on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -652,7 +652,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -660,7 +660,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -668,7 +668,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -676,7 +676,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -684,7 +684,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -692,7 +692,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -700,7 +700,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -708,7 +708,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -716,7 +716,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -724,7 +724,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -732,7 +732,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -740,7 +740,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -748,7 +748,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -756,7 +756,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -764,7 +764,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -772,7 +772,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -780,7 +780,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -788,7 +788,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -796,7 +796,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -804,7 +804,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -812,7 +812,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -820,7 +820,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -828,7 +828,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -836,7 +836,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -844,7 +844,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -852,7 +852,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -860,7 +860,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -868,7 +868,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -876,7 +876,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -884,7 +884,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -892,7 +892,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -900,7 +900,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -908,7 +908,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -916,7 +916,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -924,7 +924,7 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IQualifier with runtime type %T and with model type %v",
@@ -934,9 +934,9 @@ func TestIsXxxOnAnInstanceOfQualifier(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAssetAdministrationShell()
+	instance := ourtesting.MustLoadMinimalAssetAdministrationShell()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -944,7 +944,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -952,7 +952,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -960,7 +960,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsAssetAdministrationShell(instance) {
+	if !ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be true on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -968,7 +968,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -976,7 +976,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -984,7 +984,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -992,7 +992,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1000,7 +1000,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1008,7 +1008,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1016,7 +1016,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1024,7 +1024,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1032,7 +1032,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1040,7 +1040,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1048,7 +1048,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1056,7 +1056,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1064,7 +1064,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1072,7 +1072,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1080,7 +1080,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1088,7 +1088,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1096,7 +1096,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1104,7 +1104,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1112,7 +1112,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1120,7 +1120,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1128,7 +1128,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1136,7 +1136,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1144,7 +1144,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1152,7 +1152,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1160,7 +1160,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1168,7 +1168,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1176,7 +1176,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1184,7 +1184,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1192,7 +1192,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1200,7 +1200,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1208,7 +1208,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1216,7 +1216,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1224,7 +1224,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1232,7 +1232,7 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IAssetAdministrationShell with runtime type %T and with model type %v",
@@ -1242,9 +1242,9 @@ func TestIsXxxOnAnInstanceOfAssetAdministrationShell(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAssetInformation()
+	instance := ourtesting.MustLoadMinimalAssetInformation()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1252,7 +1252,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1260,7 +1260,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1268,7 +1268,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1276,7 +1276,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsAssetInformation(instance) {
+	if !ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be true on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1284,7 +1284,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1292,7 +1292,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1300,7 +1300,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1308,7 +1308,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1316,7 +1316,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1324,7 +1324,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1332,7 +1332,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1340,7 +1340,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1348,7 +1348,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1356,7 +1356,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1364,7 +1364,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1372,7 +1372,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1380,7 +1380,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1388,7 +1388,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1396,7 +1396,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1404,7 +1404,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1412,7 +1412,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1420,7 +1420,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1428,7 +1428,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1436,7 +1436,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1444,7 +1444,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1452,7 +1452,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1460,7 +1460,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1468,7 +1468,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1476,7 +1476,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1484,7 +1484,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1492,7 +1492,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1500,7 +1500,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1508,7 +1508,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1516,7 +1516,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1524,7 +1524,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1532,7 +1532,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1540,7 +1540,7 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IAssetInformation with runtime type %T and with model type %v",
@@ -1550,9 +1550,9 @@ func TestIsXxxOnAnInstanceOfAssetInformation(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
-	instance := aastesting.MustLoadMinimalResource()
+	instance := ourtesting.MustLoadMinimalResource()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1560,7 +1560,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1568,7 +1568,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1576,7 +1576,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1584,7 +1584,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1592,7 +1592,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsResource(instance) {
+	if !ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be true on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1600,7 +1600,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1608,7 +1608,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1616,7 +1616,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1624,7 +1624,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1632,7 +1632,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1640,7 +1640,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1648,7 +1648,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1656,7 +1656,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1664,7 +1664,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1672,7 +1672,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1680,7 +1680,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1688,7 +1688,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1696,7 +1696,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1704,7 +1704,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1712,7 +1712,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1720,7 +1720,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1728,7 +1728,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1736,7 +1736,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1744,7 +1744,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1752,7 +1752,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1760,7 +1760,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1768,7 +1768,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1776,7 +1776,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1784,7 +1784,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1792,7 +1792,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1800,7 +1800,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1808,7 +1808,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1816,7 +1816,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1824,7 +1824,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1832,7 +1832,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1840,7 +1840,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1848,7 +1848,7 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IResource with runtime type %T and with model type %v",
@@ -1858,9 +1858,9 @@ func TestIsXxxOnAnInstanceOfResource(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSpecificAssetID()
+	instance := ourtesting.MustLoadMinimalSpecificAssetID()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1868,7 +1868,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1876,7 +1876,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1884,7 +1884,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1892,7 +1892,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1900,7 +1900,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1908,7 +1908,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSpecificAssetID(instance) {
+	if !ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be true on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1916,7 +1916,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1924,7 +1924,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1932,7 +1932,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1940,7 +1940,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1948,7 +1948,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1956,7 +1956,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1964,7 +1964,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1972,7 +1972,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1980,7 +1980,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1988,7 +1988,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -1996,7 +1996,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2004,7 +2004,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2012,7 +2012,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2020,7 +2020,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2028,7 +2028,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2036,7 +2036,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2044,7 +2044,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2052,7 +2052,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2060,7 +2060,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2068,7 +2068,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2076,7 +2076,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2084,7 +2084,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2092,7 +2092,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2100,7 +2100,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2108,7 +2108,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2116,7 +2116,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2124,7 +2124,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2132,7 +2132,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2140,7 +2140,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2148,7 +2148,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2156,7 +2156,7 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ISpecificAssetID with runtime type %T and with model type %v",
@@ -2166,9 +2166,9 @@ func TestIsXxxOnAnInstanceOfSpecificAssetID(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodel()
+	instance := ourtesting.MustLoadMinimalSubmodel()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2176,7 +2176,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2184,7 +2184,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2192,7 +2192,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2200,7 +2200,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2208,7 +2208,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2216,7 +2216,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2224,7 +2224,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSubmodel(instance) {
+	if !ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be true on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2232,7 +2232,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2240,7 +2240,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2248,7 +2248,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2256,7 +2256,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2264,7 +2264,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2272,7 +2272,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2280,7 +2280,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2288,7 +2288,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2296,7 +2296,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2304,7 +2304,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2312,7 +2312,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2320,7 +2320,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2328,7 +2328,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2336,7 +2336,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2344,7 +2344,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2352,7 +2352,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2360,7 +2360,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2368,7 +2368,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2376,7 +2376,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2384,7 +2384,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2392,7 +2392,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2400,7 +2400,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2408,7 +2408,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2416,7 +2416,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2424,7 +2424,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2432,7 +2432,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2440,7 +2440,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2448,7 +2448,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2456,7 +2456,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2464,7 +2464,7 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ISubmodel with runtime type %T and with model type %v",
@@ -2474,9 +2474,9 @@ func TestIsXxxOnAnInstanceOfSubmodel(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRelationshipElement()
+	instance := ourtesting.MustLoadMinimalRelationshipElement()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2484,7 +2484,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2492,7 +2492,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2500,7 +2500,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2508,7 +2508,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2516,7 +2516,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2524,7 +2524,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2532,7 +2532,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2540,7 +2540,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsRelationshipElement(instance) {
+	if !ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be true on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2548,7 +2548,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2556,7 +2556,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2564,7 +2564,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2572,7 +2572,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2580,7 +2580,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2588,7 +2588,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2596,7 +2596,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2604,7 +2604,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2612,7 +2612,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2620,7 +2620,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2628,7 +2628,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2636,7 +2636,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2644,7 +2644,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2652,7 +2652,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2660,7 +2660,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2668,7 +2668,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2676,7 +2676,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2684,7 +2684,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2692,7 +2692,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2700,7 +2700,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2708,7 +2708,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2716,7 +2716,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2724,7 +2724,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2732,7 +2732,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2740,7 +2740,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2748,7 +2748,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2756,7 +2756,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2764,7 +2764,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2772,7 +2772,7 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IRelationshipElement with runtime type %T and with model type %v",
@@ -2782,9 +2782,9 @@ func TestIsXxxOnAnInstanceOfRelationshipElement(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodelElementList()
+	instance := ourtesting.MustLoadMinimalSubmodelElementList()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2792,7 +2792,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2800,7 +2800,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2808,7 +2808,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2816,7 +2816,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2824,7 +2824,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2832,7 +2832,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2840,7 +2840,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2848,7 +2848,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2856,7 +2856,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSubmodelElementList(instance) {
+	if !ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be true on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2864,7 +2864,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2872,7 +2872,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2880,7 +2880,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2888,7 +2888,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2896,7 +2896,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2904,7 +2904,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2912,7 +2912,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2920,7 +2920,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2928,7 +2928,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2936,7 +2936,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2944,7 +2944,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2952,7 +2952,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2960,7 +2960,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2968,7 +2968,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2976,7 +2976,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2984,7 +2984,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -2992,7 +2992,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3000,7 +3000,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3008,7 +3008,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3016,7 +3016,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3024,7 +3024,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3032,7 +3032,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3040,7 +3040,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3048,7 +3048,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3056,7 +3056,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3064,7 +3064,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3072,7 +3072,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3080,7 +3080,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ISubmodelElementList with runtime type %T and with model type %v",
@@ -3090,9 +3090,9 @@ func TestIsXxxOnAnInstanceOfSubmodelElementList(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSubmodelElementCollection()
+	instance := ourtesting.MustLoadMinimalSubmodelElementCollection()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3100,7 +3100,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3108,7 +3108,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3116,7 +3116,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3124,7 +3124,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3132,7 +3132,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3140,7 +3140,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3148,7 +3148,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3156,7 +3156,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3164,7 +3164,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3172,7 +3172,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSubmodelElementCollection(instance) {
+	if !ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be true on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3180,7 +3180,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3188,7 +3188,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3196,7 +3196,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3204,7 +3204,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3212,7 +3212,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3220,7 +3220,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3228,7 +3228,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3236,7 +3236,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3244,7 +3244,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3252,7 +3252,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3260,7 +3260,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3268,7 +3268,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3276,7 +3276,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3284,7 +3284,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3292,7 +3292,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3300,7 +3300,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3308,7 +3308,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3316,7 +3316,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3324,7 +3324,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3332,7 +3332,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3340,7 +3340,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3348,7 +3348,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3356,7 +3356,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3364,7 +3364,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3372,7 +3372,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3380,7 +3380,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3388,7 +3388,7 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ISubmodelElementCollection with runtime type %T and with model type %v",
@@ -3398,9 +3398,9 @@ func TestIsXxxOnAnInstanceOfSubmodelElementCollection(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
-	instance := aastesting.MustLoadMinimalProperty()
+	instance := ourtesting.MustLoadMinimalProperty()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3408,7 +3408,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3416,7 +3416,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3424,7 +3424,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3432,7 +3432,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3440,7 +3440,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3448,7 +3448,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3456,7 +3456,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3464,7 +3464,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3472,7 +3472,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3480,7 +3480,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3488,7 +3488,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsProperty(instance) {
+	if !ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be true on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3496,7 +3496,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3504,7 +3504,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3512,7 +3512,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3520,7 +3520,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3528,7 +3528,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3536,7 +3536,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3544,7 +3544,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3552,7 +3552,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3560,7 +3560,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3568,7 +3568,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3576,7 +3576,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3584,7 +3584,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3592,7 +3592,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3600,7 +3600,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3608,7 +3608,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3616,7 +3616,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3624,7 +3624,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3632,7 +3632,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3640,7 +3640,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3648,7 +3648,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3656,7 +3656,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3664,7 +3664,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3672,7 +3672,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3680,7 +3680,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3688,7 +3688,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3696,7 +3696,7 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IProperty with runtime type %T and with model type %v",
@@ -3706,9 +3706,9 @@ func TestIsXxxOnAnInstanceOfProperty(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMultiLanguageProperty()
+	instance := ourtesting.MustLoadMinimalMultiLanguageProperty()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3716,7 +3716,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3724,7 +3724,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3732,7 +3732,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3740,7 +3740,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3748,7 +3748,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3756,7 +3756,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3764,7 +3764,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3772,7 +3772,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3780,7 +3780,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3788,7 +3788,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3796,7 +3796,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3804,7 +3804,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMultiLanguageProperty(instance) {
+	if !ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be true on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3812,7 +3812,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3820,7 +3820,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3828,7 +3828,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3836,7 +3836,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3844,7 +3844,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3852,7 +3852,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3860,7 +3860,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3868,7 +3868,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3876,7 +3876,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3884,7 +3884,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3892,7 +3892,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3900,7 +3900,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3908,7 +3908,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3916,7 +3916,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3924,7 +3924,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3932,7 +3932,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3940,7 +3940,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3948,7 +3948,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3956,7 +3956,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3964,7 +3964,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3972,7 +3972,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3980,7 +3980,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3988,7 +3988,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -3996,7 +3996,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -4004,7 +4004,7 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IMultiLanguageProperty with runtime type %T and with model type %v",
@@ -4014,9 +4014,9 @@ func TestIsXxxOnAnInstanceOfMultiLanguageProperty(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
-	instance := aastesting.MustLoadMinimalRange()
+	instance := ourtesting.MustLoadMinimalRange()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4024,7 +4024,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4032,7 +4032,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4040,7 +4040,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4048,7 +4048,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4056,7 +4056,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4064,7 +4064,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4072,7 +4072,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4080,7 +4080,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4088,7 +4088,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4096,7 +4096,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4104,7 +4104,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4112,7 +4112,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4120,7 +4120,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsRange(instance) {
+	if !ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be true on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4128,7 +4128,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4136,7 +4136,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4144,7 +4144,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4152,7 +4152,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4160,7 +4160,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4168,7 +4168,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4176,7 +4176,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4184,7 +4184,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4192,7 +4192,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4200,7 +4200,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4208,7 +4208,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4216,7 +4216,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4224,7 +4224,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4232,7 +4232,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4240,7 +4240,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4248,7 +4248,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4256,7 +4256,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4264,7 +4264,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4272,7 +4272,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4280,7 +4280,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4288,7 +4288,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4296,7 +4296,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4304,7 +4304,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4312,7 +4312,7 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IRange with runtime type %T and with model type %v",
@@ -4322,9 +4322,9 @@ func TestIsXxxOnAnInstanceOfRange(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
-	instance := aastesting.MustLoadMinimalReferenceElement()
+	instance := ourtesting.MustLoadMinimalReferenceElement()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4332,7 +4332,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4340,7 +4340,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4348,7 +4348,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4356,7 +4356,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4364,7 +4364,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4372,7 +4372,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4380,7 +4380,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4388,7 +4388,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4396,7 +4396,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4404,7 +4404,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4412,7 +4412,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4420,7 +4420,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4428,7 +4428,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4436,7 +4436,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsReferenceElement(instance) {
+	if !ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be true on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4444,7 +4444,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4452,7 +4452,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4460,7 +4460,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4468,7 +4468,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4476,7 +4476,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4484,7 +4484,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4492,7 +4492,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4500,7 +4500,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4508,7 +4508,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4516,7 +4516,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4524,7 +4524,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4532,7 +4532,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4540,7 +4540,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4548,7 +4548,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4556,7 +4556,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4564,7 +4564,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4572,7 +4572,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4580,7 +4580,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4588,7 +4588,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4596,7 +4596,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4604,7 +4604,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4612,7 +4612,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4620,7 +4620,7 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IReferenceElement with runtime type %T and with model type %v",
@@ -4630,9 +4630,9 @@ func TestIsXxxOnAnInstanceOfReferenceElement(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBlob()
+	instance := ourtesting.MustLoadMinimalBlob()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4640,7 +4640,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4648,7 +4648,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4656,7 +4656,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4664,7 +4664,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4672,7 +4672,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4680,7 +4680,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4688,7 +4688,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4696,7 +4696,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4704,7 +4704,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4712,7 +4712,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4720,7 +4720,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4728,7 +4728,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4736,7 +4736,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4744,7 +4744,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4752,7 +4752,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsBlob(instance) {
+	if !ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be true on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4760,7 +4760,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4768,7 +4768,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4776,7 +4776,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4784,7 +4784,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4792,7 +4792,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4800,7 +4800,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4808,7 +4808,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4816,7 +4816,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4824,7 +4824,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4832,7 +4832,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4840,7 +4840,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4848,7 +4848,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4856,7 +4856,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4864,7 +4864,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4872,7 +4872,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4880,7 +4880,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4888,7 +4888,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4896,7 +4896,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4904,7 +4904,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4912,7 +4912,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4920,7 +4920,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4928,7 +4928,7 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IBlob with runtime type %T and with model type %v",
@@ -4938,9 +4938,9 @@ func TestIsXxxOnAnInstanceOfBlob(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
-	instance := aastesting.MustLoadMinimalFile()
+	instance := ourtesting.MustLoadMinimalFile()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4948,7 +4948,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4956,7 +4956,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4964,7 +4964,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4972,7 +4972,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4980,7 +4980,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4988,7 +4988,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -4996,7 +4996,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5004,7 +5004,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5012,7 +5012,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5020,7 +5020,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5028,7 +5028,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5036,7 +5036,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5044,7 +5044,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5052,7 +5052,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5060,7 +5060,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5068,7 +5068,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsFile(instance) {
+	if !ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be true on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5076,7 +5076,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5084,7 +5084,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5092,7 +5092,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5100,7 +5100,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5108,7 +5108,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5116,7 +5116,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5124,7 +5124,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5132,7 +5132,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5140,7 +5140,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5148,7 +5148,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5156,7 +5156,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5164,7 +5164,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5172,7 +5172,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5180,7 +5180,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5188,7 +5188,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5196,7 +5196,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5204,7 +5204,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5212,7 +5212,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5220,7 +5220,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5228,7 +5228,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5236,7 +5236,7 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IFile with runtime type %T and with model type %v",
@@ -5246,9 +5246,9 @@ func TestIsXxxOnAnInstanceOfFile(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAnnotatedRelationshipElement()
+	instance := ourtesting.MustLoadMinimalAnnotatedRelationshipElement()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5256,7 +5256,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5264,7 +5264,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5272,7 +5272,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5280,7 +5280,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5288,7 +5288,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5296,7 +5296,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5304,7 +5304,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5312,7 +5312,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsRelationshipElement(instance) {
+	if !ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be true on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5320,7 +5320,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5328,7 +5328,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5336,7 +5336,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5344,7 +5344,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5352,7 +5352,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5360,7 +5360,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5368,7 +5368,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5376,7 +5376,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5384,7 +5384,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsAnnotatedRelationshipElement(instance) {
+	if !ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be true on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5392,7 +5392,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5400,7 +5400,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5408,7 +5408,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5416,7 +5416,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5424,7 +5424,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5432,7 +5432,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5440,7 +5440,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5448,7 +5448,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5456,7 +5456,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5464,7 +5464,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5472,7 +5472,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5480,7 +5480,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5488,7 +5488,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5496,7 +5496,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5504,7 +5504,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5512,7 +5512,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5520,7 +5520,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5528,7 +5528,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5536,7 +5536,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5544,7 +5544,7 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IAnnotatedRelationshipElement with runtime type %T and with model type %v",
@@ -5554,9 +5554,9 @@ func TestIsXxxOnAnInstanceOfAnnotatedRelationshipElement(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
-	instance := aastesting.MustLoadMinimalEntity()
+	instance := ourtesting.MustLoadMinimalEntity()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5564,7 +5564,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5572,7 +5572,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5580,7 +5580,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5588,7 +5588,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5596,7 +5596,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5604,7 +5604,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5612,7 +5612,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5620,7 +5620,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5628,7 +5628,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5636,7 +5636,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5644,7 +5644,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5652,7 +5652,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5660,7 +5660,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5668,7 +5668,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5676,7 +5676,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5684,7 +5684,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5692,7 +5692,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5700,7 +5700,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsEntity(instance) {
+	if !ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be true on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5708,7 +5708,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5716,7 +5716,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5724,7 +5724,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5732,7 +5732,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5740,7 +5740,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5748,7 +5748,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5756,7 +5756,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5764,7 +5764,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5772,7 +5772,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5780,7 +5780,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5788,7 +5788,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5796,7 +5796,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5804,7 +5804,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5812,7 +5812,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5820,7 +5820,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5828,7 +5828,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5836,7 +5836,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5844,7 +5844,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5852,7 +5852,7 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IEntity with runtime type %T and with model type %v",
@@ -5862,9 +5862,9 @@ func TestIsXxxOnAnInstanceOfEntity(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
-	instance := aastesting.MustLoadMinimalEventPayload()
+	instance := ourtesting.MustLoadMinimalEventPayload()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5872,7 +5872,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5880,7 +5880,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5888,7 +5888,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5896,7 +5896,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5904,7 +5904,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5912,7 +5912,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5920,7 +5920,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5928,7 +5928,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5936,7 +5936,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5944,7 +5944,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5952,7 +5952,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5960,7 +5960,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5968,7 +5968,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5976,7 +5976,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5984,7 +5984,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -5992,7 +5992,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6000,7 +6000,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6008,7 +6008,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6016,7 +6016,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsEventPayload(instance) {
+	if !ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be true on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6024,7 +6024,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6032,7 +6032,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6040,7 +6040,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6048,7 +6048,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6056,7 +6056,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6064,7 +6064,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6072,7 +6072,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6080,7 +6080,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6088,7 +6088,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6096,7 +6096,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6104,7 +6104,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6112,7 +6112,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6120,7 +6120,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6128,7 +6128,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6136,7 +6136,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6144,7 +6144,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6152,7 +6152,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6160,7 +6160,7 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IEventPayload with runtime type %T and with model type %v",
@@ -6170,9 +6170,9 @@ func TestIsXxxOnAnInstanceOfEventPayload(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBasicEventElement()
+	instance := ourtesting.MustLoadMinimalBasicEventElement()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6180,7 +6180,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6188,7 +6188,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6196,7 +6196,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6204,7 +6204,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6212,7 +6212,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6220,7 +6220,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6228,7 +6228,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6236,7 +6236,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6244,7 +6244,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6252,7 +6252,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6260,7 +6260,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6268,7 +6268,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6276,7 +6276,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6284,7 +6284,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6292,7 +6292,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6300,7 +6300,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6308,7 +6308,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6316,7 +6316,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6324,7 +6324,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6332,7 +6332,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsBasicEventElement(instance) {
+	if !ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be true on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6340,7 +6340,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6348,7 +6348,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6356,7 +6356,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6364,7 +6364,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6372,7 +6372,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6380,7 +6380,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6388,7 +6388,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6396,7 +6396,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6404,7 +6404,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6412,7 +6412,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6420,7 +6420,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6428,7 +6428,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6436,7 +6436,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6444,7 +6444,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6452,7 +6452,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6460,7 +6460,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6468,7 +6468,7 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IBasicEventElement with runtime type %T and with model type %v",
@@ -6478,9 +6478,9 @@ func TestIsXxxOnAnInstanceOfBasicEventElement(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
-	instance := aastesting.MustLoadMinimalOperation()
+	instance := ourtesting.MustLoadMinimalOperation()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6488,7 +6488,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6496,7 +6496,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6504,7 +6504,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6512,7 +6512,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6520,7 +6520,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6528,7 +6528,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6536,7 +6536,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6544,7 +6544,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6552,7 +6552,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6560,7 +6560,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6568,7 +6568,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6576,7 +6576,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6584,7 +6584,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6592,7 +6592,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6600,7 +6600,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6608,7 +6608,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6616,7 +6616,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6624,7 +6624,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6632,7 +6632,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6640,7 +6640,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6648,7 +6648,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsOperation(instance) {
+	if !ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be true on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6656,7 +6656,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6664,7 +6664,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6672,7 +6672,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6680,7 +6680,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6688,7 +6688,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6696,7 +6696,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6704,7 +6704,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6712,7 +6712,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6720,7 +6720,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6728,7 +6728,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6736,7 +6736,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6744,7 +6744,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6752,7 +6752,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6760,7 +6760,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6768,7 +6768,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6776,7 +6776,7 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IOperation with runtime type %T and with model type %v",
@@ -6786,9 +6786,9 @@ func TestIsXxxOnAnInstanceOfOperation(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
-	instance := aastesting.MustLoadMinimalOperationVariable()
+	instance := ourtesting.MustLoadMinimalOperationVariable()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6796,7 +6796,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6804,7 +6804,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6812,7 +6812,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6820,7 +6820,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6828,7 +6828,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6836,7 +6836,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6844,7 +6844,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6852,7 +6852,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6860,7 +6860,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6868,7 +6868,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6876,7 +6876,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6884,7 +6884,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6892,7 +6892,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6900,7 +6900,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6908,7 +6908,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6916,7 +6916,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6924,7 +6924,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6932,7 +6932,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6940,7 +6940,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6948,7 +6948,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6956,7 +6956,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6964,7 +6964,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsOperationVariable(instance) {
+	if !ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be true on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6972,7 +6972,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6980,7 +6980,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6988,7 +6988,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -6996,7 +6996,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7004,7 +7004,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7012,7 +7012,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7020,7 +7020,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7028,7 +7028,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7036,7 +7036,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7044,7 +7044,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7052,7 +7052,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7060,7 +7060,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7068,7 +7068,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7076,7 +7076,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7084,7 +7084,7 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IOperationVariable with runtime type %T and with model type %v",
@@ -7094,9 +7094,9 @@ func TestIsXxxOnAnInstanceOfOperationVariable(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
-	instance := aastesting.MustLoadMinimalCapability()
+	instance := ourtesting.MustLoadMinimalCapability()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7104,7 +7104,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7112,7 +7112,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7120,7 +7120,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7128,7 +7128,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7136,7 +7136,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7144,7 +7144,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7152,7 +7152,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7160,7 +7160,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7168,7 +7168,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7176,7 +7176,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7184,7 +7184,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7192,7 +7192,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7200,7 +7200,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7208,7 +7208,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7216,7 +7216,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7224,7 +7224,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7232,7 +7232,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7240,7 +7240,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7248,7 +7248,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7256,7 +7256,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7264,7 +7264,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7272,7 +7272,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7280,7 +7280,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsCapability(instance) {
+	if !ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be true on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7288,7 +7288,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7296,7 +7296,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7304,7 +7304,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7312,7 +7312,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7320,7 +7320,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7328,7 +7328,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7336,7 +7336,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7344,7 +7344,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7352,7 +7352,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7360,7 +7360,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7368,7 +7368,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7376,7 +7376,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7384,7 +7384,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7392,7 +7392,7 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ICapability with runtime type %T and with model type %v",
@@ -7402,9 +7402,9 @@ func TestIsXxxOnAnInstanceOfCapability(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
-	instance := aastesting.MustLoadMinimalConceptDescription()
+	instance := ourtesting.MustLoadMinimalConceptDescription()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7412,7 +7412,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7420,7 +7420,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7428,7 +7428,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7436,7 +7436,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7444,7 +7444,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7452,7 +7452,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7460,7 +7460,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7468,7 +7468,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7476,7 +7476,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7484,7 +7484,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7492,7 +7492,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7500,7 +7500,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7508,7 +7508,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7516,7 +7516,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7524,7 +7524,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7532,7 +7532,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7540,7 +7540,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7548,7 +7548,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7556,7 +7556,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7564,7 +7564,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7572,7 +7572,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7580,7 +7580,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7588,7 +7588,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7596,7 +7596,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsConceptDescription(instance) {
+	if !ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be true on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7604,7 +7604,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7612,7 +7612,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7620,7 +7620,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7628,7 +7628,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7636,7 +7636,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7644,7 +7644,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7652,7 +7652,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7660,7 +7660,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7668,7 +7668,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7676,7 +7676,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7684,7 +7684,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7692,7 +7692,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7700,7 +7700,7 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IConceptDescription with runtime type %T and with model type %v",
@@ -7710,9 +7710,9 @@ func TestIsXxxOnAnInstanceOfConceptDescription(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
-	instance := aastesting.MustLoadMinimalReference()
+	instance := ourtesting.MustLoadMinimalReference()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7720,7 +7720,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7728,7 +7728,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7736,7 +7736,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7744,7 +7744,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7752,7 +7752,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7760,7 +7760,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7768,7 +7768,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7776,7 +7776,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7784,7 +7784,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7792,7 +7792,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7800,7 +7800,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7808,7 +7808,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7816,7 +7816,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7824,7 +7824,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7832,7 +7832,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7840,7 +7840,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7848,7 +7848,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7856,7 +7856,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7864,7 +7864,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7872,7 +7872,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7880,7 +7880,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7888,7 +7888,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7896,7 +7896,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7904,7 +7904,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7912,7 +7912,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsReference(instance) {
+	if !ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be true on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7920,7 +7920,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7928,7 +7928,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7936,7 +7936,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7944,7 +7944,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7952,7 +7952,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7960,7 +7960,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7968,7 +7968,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7976,7 +7976,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7984,7 +7984,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -7992,7 +7992,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -8000,7 +8000,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -8008,7 +8008,7 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IReference with runtime type %T and with model type %v",
@@ -8018,9 +8018,9 @@ func TestIsXxxOnAnInstanceOfReference(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
-	instance := aastesting.MustLoadMinimalKey()
+	instance := ourtesting.MustLoadMinimalKey()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8028,7 +8028,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8036,7 +8036,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8044,7 +8044,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8052,7 +8052,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8060,7 +8060,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8068,7 +8068,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8076,7 +8076,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8084,7 +8084,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8092,7 +8092,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8100,7 +8100,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8108,7 +8108,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8116,7 +8116,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8124,7 +8124,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8132,7 +8132,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8140,7 +8140,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8148,7 +8148,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8156,7 +8156,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8164,7 +8164,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8172,7 +8172,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8180,7 +8180,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8188,7 +8188,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8196,7 +8196,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8204,7 +8204,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8212,7 +8212,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8220,7 +8220,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8228,7 +8228,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsKey(instance) {
+	if !ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be true on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8236,7 +8236,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8244,7 +8244,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8252,7 +8252,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8260,7 +8260,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8268,7 +8268,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8276,7 +8276,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8284,7 +8284,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8292,7 +8292,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8300,7 +8300,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8308,7 +8308,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8316,7 +8316,7 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IKey with runtime type %T and with model type %v",
@@ -8326,9 +8326,9 @@ func TestIsXxxOnAnInstanceOfKey(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringNameType()
+	instance := ourtesting.MustLoadMinimalLangStringNameType()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8336,7 +8336,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8344,7 +8344,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8352,7 +8352,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8360,7 +8360,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8368,7 +8368,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8376,7 +8376,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8384,7 +8384,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8392,7 +8392,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8400,7 +8400,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8408,7 +8408,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8416,7 +8416,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8424,7 +8424,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8432,7 +8432,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8440,7 +8440,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8448,7 +8448,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8456,7 +8456,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8464,7 +8464,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8472,7 +8472,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8480,7 +8480,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8488,7 +8488,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8496,7 +8496,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8504,7 +8504,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8512,7 +8512,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8520,7 +8520,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8528,7 +8528,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8536,7 +8536,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8544,7 +8544,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringNameType(instance) {
+	if !ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be true on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8552,7 +8552,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8560,7 +8560,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8568,7 +8568,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8576,7 +8576,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8584,7 +8584,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8592,7 +8592,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8600,7 +8600,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8608,7 +8608,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8616,7 +8616,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8624,7 +8624,7 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILangStringNameType with runtime type %T and with model type %v",
@@ -8634,9 +8634,9 @@ func TestIsXxxOnAnInstanceOfLangStringNameType(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringTextType()
+	instance := ourtesting.MustLoadMinimalLangStringTextType()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8644,7 +8644,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8652,7 +8652,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8660,7 +8660,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8668,7 +8668,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8676,7 +8676,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8684,7 +8684,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8692,7 +8692,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8700,7 +8700,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8708,7 +8708,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8716,7 +8716,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8724,7 +8724,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8732,7 +8732,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8740,7 +8740,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8748,7 +8748,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8756,7 +8756,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8764,7 +8764,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8772,7 +8772,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8780,7 +8780,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8788,7 +8788,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8796,7 +8796,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8804,7 +8804,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8812,7 +8812,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8820,7 +8820,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8828,7 +8828,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8836,7 +8836,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8844,7 +8844,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8852,7 +8852,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8860,7 +8860,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringTextType(instance) {
+	if !ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be true on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8868,7 +8868,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8876,7 +8876,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8884,7 +8884,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8892,7 +8892,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8900,7 +8900,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8908,7 +8908,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8916,7 +8916,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8924,7 +8924,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8932,7 +8932,7 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILangStringTextType with runtime type %T and with model type %v",
@@ -8942,9 +8942,9 @@ func TestIsXxxOnAnInstanceOfLangStringTextType(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
-	instance := aastesting.MustLoadMinimalEnvironment()
+	instance := ourtesting.MustLoadMinimalEnvironment()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8952,7 +8952,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8960,7 +8960,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8968,7 +8968,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8976,7 +8976,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8984,7 +8984,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -8992,7 +8992,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9000,7 +9000,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9008,7 +9008,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9016,7 +9016,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9024,7 +9024,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9032,7 +9032,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9040,7 +9040,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9048,7 +9048,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9056,7 +9056,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9064,7 +9064,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9072,7 +9072,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9080,7 +9080,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9088,7 +9088,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9096,7 +9096,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9104,7 +9104,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9112,7 +9112,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9120,7 +9120,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9128,7 +9128,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9136,7 +9136,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9144,7 +9144,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9152,7 +9152,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9160,7 +9160,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9168,7 +9168,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9176,7 +9176,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsEnvironment(instance) {
+	if !ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be true on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9184,7 +9184,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9192,7 +9192,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9200,7 +9200,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9208,7 +9208,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9216,7 +9216,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9224,7 +9224,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9232,7 +9232,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9240,7 +9240,7 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IEnvironment with runtime type %T and with model type %v",
@@ -9250,9 +9250,9 @@ func TestIsXxxOnAnInstanceOfEnvironment(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
-	instance := aastesting.MustLoadMinimalEmbeddedDataSpecification()
+	instance := ourtesting.MustLoadMinimalEmbeddedDataSpecification()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9260,7 +9260,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9268,7 +9268,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9276,7 +9276,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9284,7 +9284,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9292,7 +9292,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9300,7 +9300,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9308,7 +9308,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9316,7 +9316,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9324,7 +9324,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9332,7 +9332,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9340,7 +9340,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9348,7 +9348,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9356,7 +9356,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9364,7 +9364,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9372,7 +9372,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9380,7 +9380,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9388,7 +9388,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9396,7 +9396,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9404,7 +9404,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9412,7 +9412,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9420,7 +9420,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9428,7 +9428,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9436,7 +9436,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9444,7 +9444,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9452,7 +9452,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9460,7 +9460,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9468,7 +9468,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9476,7 +9476,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9484,7 +9484,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9492,7 +9492,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsEmbeddedDataSpecification(instance) {
+	if !ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be true on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9500,7 +9500,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9508,7 +9508,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9516,7 +9516,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9524,7 +9524,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9532,7 +9532,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9540,7 +9540,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9548,7 +9548,7 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IEmbeddedDataSpecification with runtime type %T and with model type %v",
@@ -9558,9 +9558,9 @@ func TestIsXxxOnAnInstanceOfEmbeddedDataSpecification(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLevelType()
+	instance := ourtesting.MustLoadMinimalLevelType()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9568,7 +9568,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9576,7 +9576,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9584,7 +9584,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9592,7 +9592,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9600,7 +9600,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9608,7 +9608,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9616,7 +9616,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9624,7 +9624,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9632,7 +9632,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9640,7 +9640,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9648,7 +9648,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9656,7 +9656,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9664,7 +9664,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9672,7 +9672,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9680,7 +9680,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9688,7 +9688,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9696,7 +9696,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9704,7 +9704,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9712,7 +9712,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9720,7 +9720,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9728,7 +9728,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9736,7 +9736,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9744,7 +9744,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9752,7 +9752,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9760,7 +9760,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9768,7 +9768,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9776,7 +9776,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9784,7 +9784,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9792,7 +9792,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9800,7 +9800,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9808,7 +9808,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLevelType(instance) {
+	if !ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be true on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9816,7 +9816,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9824,7 +9824,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9832,7 +9832,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9840,7 +9840,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9848,7 +9848,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9856,7 +9856,7 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILevelType with runtime type %T and with model type %v",
@@ -9866,9 +9866,9 @@ func TestIsXxxOnAnInstanceOfLevelType(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
-	instance := aastesting.MustLoadMinimalValueReferencePair()
+	instance := ourtesting.MustLoadMinimalValueReferencePair()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9876,7 +9876,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9884,7 +9884,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9892,7 +9892,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9900,7 +9900,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9908,7 +9908,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9916,7 +9916,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9924,7 +9924,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9932,7 +9932,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9940,7 +9940,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9948,7 +9948,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9956,7 +9956,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9964,7 +9964,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9972,7 +9972,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9980,7 +9980,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9988,7 +9988,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -9996,7 +9996,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10004,7 +10004,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10012,7 +10012,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10020,7 +10020,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10028,7 +10028,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10036,7 +10036,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10044,7 +10044,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10052,7 +10052,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10060,7 +10060,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10068,7 +10068,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10076,7 +10076,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10084,7 +10084,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10092,7 +10092,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10100,7 +10100,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10108,7 +10108,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10116,7 +10116,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10124,7 +10124,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsValueReferencePair(instance) {
+	if !ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be true on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10132,7 +10132,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10140,7 +10140,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10148,7 +10148,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10156,7 +10156,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10164,7 +10164,7 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IValueReferencePair with runtime type %T and with model type %v",
@@ -10174,9 +10174,9 @@ func TestIsXxxOnAnInstanceOfValueReferencePair(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
-	instance := aastesting.MustLoadMinimalValueList()
+	instance := ourtesting.MustLoadMinimalValueList()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10184,7 +10184,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10192,7 +10192,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10200,7 +10200,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10208,7 +10208,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10216,7 +10216,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10224,7 +10224,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10232,7 +10232,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10240,7 +10240,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10248,7 +10248,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10256,7 +10256,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10264,7 +10264,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10272,7 +10272,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10280,7 +10280,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10288,7 +10288,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10296,7 +10296,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10304,7 +10304,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10312,7 +10312,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10320,7 +10320,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10328,7 +10328,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10336,7 +10336,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10344,7 +10344,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10352,7 +10352,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10360,7 +10360,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10368,7 +10368,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10376,7 +10376,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10384,7 +10384,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10392,7 +10392,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10400,7 +10400,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10408,7 +10408,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10416,7 +10416,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10424,7 +10424,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10432,7 +10432,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10440,7 +10440,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsValueList(instance) {
+	if !ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be true on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10448,7 +10448,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10456,7 +10456,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10464,7 +10464,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10472,7 +10472,7 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of IValueList with runtime type %T and with model type %v",
@@ -10482,9 +10482,9 @@ func TestIsXxxOnAnInstanceOfValueList(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringPreferredNameTypeIEC61360()
+	instance := ourtesting.MustLoadMinimalLangStringPreferredNameTypeIEC61360()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10492,7 +10492,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10500,7 +10500,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10508,7 +10508,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10516,7 +10516,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10524,7 +10524,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10532,7 +10532,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10540,7 +10540,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10548,7 +10548,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10556,7 +10556,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10564,7 +10564,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10572,7 +10572,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10580,7 +10580,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10588,7 +10588,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10596,7 +10596,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10604,7 +10604,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10612,7 +10612,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10620,7 +10620,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10628,7 +10628,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10636,7 +10636,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10644,7 +10644,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10652,7 +10652,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10660,7 +10660,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10668,7 +10668,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10676,7 +10676,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10684,7 +10684,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10692,7 +10692,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10700,7 +10700,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10708,7 +10708,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10716,7 +10716,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10724,7 +10724,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10732,7 +10732,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10740,7 +10740,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10748,7 +10748,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10756,7 +10756,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if !ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be true on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10764,7 +10764,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10772,7 +10772,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10780,7 +10780,7 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILangStringPreferredNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10790,9 +10790,9 @@ func TestIsXxxOnAnInstanceOfLangStringPreferredNameTypeIEC61360(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringShortNameTypeIEC61360()
+	instance := ourtesting.MustLoadMinimalLangStringShortNameTypeIEC61360()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10800,7 +10800,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10808,7 +10808,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10816,7 +10816,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10824,7 +10824,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10832,7 +10832,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10840,7 +10840,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10848,7 +10848,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10856,7 +10856,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10864,7 +10864,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10872,7 +10872,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10880,7 +10880,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10888,7 +10888,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10896,7 +10896,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10904,7 +10904,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10912,7 +10912,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10920,7 +10920,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10928,7 +10928,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10936,7 +10936,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10944,7 +10944,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10952,7 +10952,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10960,7 +10960,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10968,7 +10968,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10976,7 +10976,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10984,7 +10984,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -10992,7 +10992,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11000,7 +11000,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11008,7 +11008,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11016,7 +11016,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11024,7 +11024,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11032,7 +11032,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11040,7 +11040,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11048,7 +11048,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11056,7 +11056,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11064,7 +11064,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11072,7 +11072,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if !ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be true on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11080,7 +11080,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11088,7 +11088,7 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILangStringShortNameTypeIEC61360 with runtime type %T and with model type %v",
@@ -11098,9 +11098,9 @@ func TestIsXxxOnAnInstanceOfLangStringShortNameTypeIEC61360(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringDefinitionTypeIEC61360()
+	instance := ourtesting.MustLoadMinimalLangStringDefinitionTypeIEC61360()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11108,7 +11108,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11116,7 +11116,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11124,7 +11124,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11132,7 +11132,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11140,7 +11140,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11148,7 +11148,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11156,7 +11156,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11164,7 +11164,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11172,7 +11172,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11180,7 +11180,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11188,7 +11188,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11196,7 +11196,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11204,7 +11204,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11212,7 +11212,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11220,7 +11220,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11228,7 +11228,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11236,7 +11236,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11244,7 +11244,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11252,7 +11252,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11260,7 +11260,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11268,7 +11268,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11276,7 +11276,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11284,7 +11284,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11292,7 +11292,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11300,7 +11300,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11308,7 +11308,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11316,7 +11316,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11324,7 +11324,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11332,7 +11332,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11340,7 +11340,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11348,7 +11348,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11356,7 +11356,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11364,7 +11364,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11372,7 +11372,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11380,7 +11380,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11388,7 +11388,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if !ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be true on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11396,7 +11396,7 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsDataSpecificationIEC61360(instance) {
+	if ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be false on an instance " +
 			"of ILangStringDefinitionTypeIEC61360 with runtime type %T and with model type %v",
@@ -11406,9 +11406,9 @@ func TestIsXxxOnAnInstanceOfLangStringDefinitionTypeIEC61360(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
-	instance := aastesting.MustLoadMinimalDataSpecificationIEC61360()
+	instance := ourtesting.MustLoadMinimalDataSpecificationIEC61360()
 
-	if aastypes.IsExtension(instance) {
+	if ourtypes.IsExtension(instance) {
 		t.Errorf(
 			"Expected IsExtension to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11416,7 +11416,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAdministrativeInformation(instance) {
+	if ourtypes.IsAdministrativeInformation(instance) {
 		t.Errorf(
 			"Expected IsAdministrativeInformation to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11424,7 +11424,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsQualifier(instance) {
+	if ourtypes.IsQualifier(instance) {
 		t.Errorf(
 			"Expected IsQualifier to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11432,7 +11432,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetAdministrationShell(instance) {
+	if ourtypes.IsAssetAdministrationShell(instance) {
 		t.Errorf(
 			"Expected IsAssetAdministrationShell to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11440,7 +11440,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAssetInformation(instance) {
+	if ourtypes.IsAssetInformation(instance) {
 		t.Errorf(
 			"Expected IsAssetInformation to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11448,7 +11448,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsResource(instance) {
+	if ourtypes.IsResource(instance) {
 		t.Errorf(
 			"Expected IsResource to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11456,7 +11456,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecificAssetID(instance) {
+	if ourtypes.IsSpecificAssetID(instance) {
 		t.Errorf(
 			"Expected IsSpecificAssetID to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11464,7 +11464,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodel(instance) {
+	if ourtypes.IsSubmodel(instance) {
 		t.Errorf(
 			"Expected IsSubmodel to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11472,7 +11472,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRelationshipElement(instance) {
+	if ourtypes.IsRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsRelationshipElement to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11480,7 +11480,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementList(instance) {
+	if ourtypes.IsSubmodelElementList(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementList to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11488,7 +11488,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSubmodelElementCollection(instance) {
+	if ourtypes.IsSubmodelElementCollection(instance) {
 		t.Errorf(
 			"Expected IsSubmodelElementCollection to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11496,7 +11496,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsProperty(instance) {
+	if ourtypes.IsProperty(instance) {
 		t.Errorf(
 			"Expected IsProperty to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11504,7 +11504,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMultiLanguageProperty(instance) {
+	if ourtypes.IsMultiLanguageProperty(instance) {
 		t.Errorf(
 			"Expected IsMultiLanguageProperty to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11512,7 +11512,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsRange(instance) {
+	if ourtypes.IsRange(instance) {
 		t.Errorf(
 			"Expected IsRange to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11520,7 +11520,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReferenceElement(instance) {
+	if ourtypes.IsReferenceElement(instance) {
 		t.Errorf(
 			"Expected IsReferenceElement to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11528,7 +11528,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlob(instance) {
+	if ourtypes.IsBlob(instance) {
 		t.Errorf(
 			"Expected IsBlob to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11536,7 +11536,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsFile(instance) {
+	if ourtypes.IsFile(instance) {
 		t.Errorf(
 			"Expected IsFile to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11544,7 +11544,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAnnotatedRelationshipElement(instance) {
+	if ourtypes.IsAnnotatedRelationshipElement(instance) {
 		t.Errorf(
 			"Expected IsAnnotatedRelationshipElement to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11552,7 +11552,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEntity(instance) {
+	if ourtypes.IsEntity(instance) {
 		t.Errorf(
 			"Expected IsEntity to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11560,7 +11560,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEventPayload(instance) {
+	if ourtypes.IsEventPayload(instance) {
 		t.Errorf(
 			"Expected IsEventPayload to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11568,7 +11568,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBasicEventElement(instance) {
+	if ourtypes.IsBasicEventElement(instance) {
 		t.Errorf(
 			"Expected IsBasicEventElement to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11576,7 +11576,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperation(instance) {
+	if ourtypes.IsOperation(instance) {
 		t.Errorf(
 			"Expected IsOperation to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11584,7 +11584,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOperationVariable(instance) {
+	if ourtypes.IsOperationVariable(instance) {
 		t.Errorf(
 			"Expected IsOperationVariable to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11592,7 +11592,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsCapability(instance) {
+	if ourtypes.IsCapability(instance) {
 		t.Errorf(
 			"Expected IsCapability to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11600,7 +11600,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsConceptDescription(instance) {
+	if ourtypes.IsConceptDescription(instance) {
 		t.Errorf(
 			"Expected IsConceptDescription to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11608,7 +11608,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsReference(instance) {
+	if ourtypes.IsReference(instance) {
 		t.Errorf(
 			"Expected IsReference to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11616,7 +11616,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsKey(instance) {
+	if ourtypes.IsKey(instance) {
 		t.Errorf(
 			"Expected IsKey to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11624,7 +11624,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringNameType(instance) {
+	if ourtypes.IsLangStringNameType(instance) {
 		t.Errorf(
 			"Expected IsLangStringNameType to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11632,7 +11632,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringTextType(instance) {
+	if ourtypes.IsLangStringTextType(instance) {
 		t.Errorf(
 			"Expected IsLangStringTextType to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11640,7 +11640,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEnvironment(instance) {
+	if ourtypes.IsEnvironment(instance) {
 		t.Errorf(
 			"Expected IsEnvironment to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11648,7 +11648,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsEmbeddedDataSpecification(instance) {
+	if ourtypes.IsEmbeddedDataSpecification(instance) {
 		t.Errorf(
 			"Expected IsEmbeddedDataSpecification to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11656,7 +11656,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLevelType(instance) {
+	if ourtypes.IsLevelType(instance) {
 		t.Errorf(
 			"Expected IsLevelType to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11664,7 +11664,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueReferencePair(instance) {
+	if ourtypes.IsValueReferencePair(instance) {
 		t.Errorf(
 			"Expected IsValueReferencePair to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11672,7 +11672,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsValueList(instance) {
+	if ourtypes.IsValueList(instance) {
 		t.Errorf(
 			"Expected IsValueList to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11680,7 +11680,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringPreferredNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringPreferredNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringPreferredNameTypeIEC61360 to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11688,7 +11688,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringShortNameTypeIEC61360(instance) {
+	if ourtypes.IsLangStringShortNameTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringShortNameTypeIEC61360 to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11696,7 +11696,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringDefinitionTypeIEC61360(instance) {
+	if ourtypes.IsLangStringDefinitionTypeIEC61360(instance) {
 		t.Errorf(
 			"Expected IsLangStringDefinitionTypeIEC61360 to be false on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",
@@ -11704,7 +11704,7 @@ func TestIsXxxOnAnInstanceOfDataSpecificationIEC61360(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsDataSpecificationIEC61360(instance) {
+	if !ourtypes.IsDataSpecificationIEC61360(instance) {
 		t.Errorf(
 			"Expected IsDataSpecificationIEC61360 to be true on an instance " +
 			"of IDataSpecificationIEC61360 with runtime type %T and with model type %v",

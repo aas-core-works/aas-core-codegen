@@ -6,537 +6,537 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kExtension
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kExtension
+    == our::stringification::MustModelTypeFromString(
       "Extension"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kExtension
+    our::stringification::to_string(
+      our::types::ModelType::kExtension
     )
     == "Extension"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAdministrativeInformation
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kAdministrativeInformation
+    == our::stringification::MustModelTypeFromString(
       "AdministrativeInformation"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kAdministrativeInformation
+    our::stringification::to_string(
+      our::types::ModelType::kAdministrativeInformation
     )
     == "AdministrativeInformation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kQualifier
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kQualifier
+    == our::stringification::MustModelTypeFromString(
       "Qualifier"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kQualifier
+    our::stringification::to_string(
+      our::types::ModelType::kQualifier
     )
     == "Qualifier"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAssetAdministrationShell
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kAssetAdministrationShell
+    == our::stringification::MustModelTypeFromString(
       "AssetAdministrationShell"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kAssetAdministrationShell
+    our::stringification::to_string(
+      our::types::ModelType::kAssetAdministrationShell
     )
     == "AssetAdministrationShell"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAssetInformation
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kAssetInformation
+    == our::stringification::MustModelTypeFromString(
       "AssetInformation"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kAssetInformation
+    our::stringification::to_string(
+      our::types::ModelType::kAssetInformation
     )
     == "AssetInformation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kResource
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kResource
+    == our::stringification::MustModelTypeFromString(
       "Resource"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kResource
+    our::stringification::to_string(
+      our::types::ModelType::kResource
     )
     == "Resource"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSpecificAssetId
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSpecificAssetId
+    == our::stringification::MustModelTypeFromString(
       "SpecificAssetId"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSpecificAssetId
+    our::stringification::to_string(
+      our::types::ModelType::kSpecificAssetId
     )
     == "SpecificAssetId"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodel
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSubmodel
+    == our::stringification::MustModelTypeFromString(
       "Submodel"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSubmodel
+    our::stringification::to_string(
+      our::types::ModelType::kSubmodel
     )
     == "Submodel"
   );
 
   REQUIRE(
-    aas::types::ModelType::kRelationshipElement
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kRelationshipElement
+    == our::stringification::MustModelTypeFromString(
       "RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kRelationshipElement
+    our::stringification::to_string(
+      our::types::ModelType::kRelationshipElement
     )
     == "RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodelElementList
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSubmodelElementList
+    == our::stringification::MustModelTypeFromString(
       "SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSubmodelElementList
+    our::stringification::to_string(
+      our::types::ModelType::kSubmodelElementList
     )
     == "SubmodelElementList"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSubmodelElementCollection
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kSubmodelElementCollection
+    == our::stringification::MustModelTypeFromString(
       "SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kSubmodelElementCollection
+    our::stringification::to_string(
+      our::types::ModelType::kSubmodelElementCollection
     )
     == "SubmodelElementCollection"
   );
 
   REQUIRE(
-    aas::types::ModelType::kProperty
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kProperty
+    == our::stringification::MustModelTypeFromString(
       "Property"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kProperty
+    our::stringification::to_string(
+      our::types::ModelType::kProperty
     )
     == "Property"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMultiLanguageProperty
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kMultiLanguageProperty
+    == our::stringification::MustModelTypeFromString(
       "MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kMultiLanguageProperty
+    our::stringification::to_string(
+      our::types::ModelType::kMultiLanguageProperty
     )
     == "MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::ModelType::kRange
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kRange
+    == our::stringification::MustModelTypeFromString(
       "Range"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kRange
+    our::stringification::to_string(
+      our::types::ModelType::kRange
     )
     == "Range"
   );
 
   REQUIRE(
-    aas::types::ModelType::kReferenceElement
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kReferenceElement
+    == our::stringification::MustModelTypeFromString(
       "ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kReferenceElement
+    our::stringification::to_string(
+      our::types::ModelType::kReferenceElement
     )
     == "ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBlob
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kBlob
+    == our::stringification::MustModelTypeFromString(
       "Blob"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kBlob
+    our::stringification::to_string(
+      our::types::ModelType::kBlob
     )
     == "Blob"
   );
 
   REQUIRE(
-    aas::types::ModelType::kFile
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kFile
+    == our::stringification::MustModelTypeFromString(
       "File"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kFile
+    our::stringification::to_string(
+      our::types::ModelType::kFile
     )
     == "File"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAnnotatedRelationshipElement
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kAnnotatedRelationshipElement
+    == our::stringification::MustModelTypeFromString(
       "AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kAnnotatedRelationshipElement
+    our::stringification::to_string(
+      our::types::ModelType::kAnnotatedRelationshipElement
     )
     == "AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEntity
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kEntity
+    == our::stringification::MustModelTypeFromString(
       "Entity"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kEntity
+    our::stringification::to_string(
+      our::types::ModelType::kEntity
     )
     == "Entity"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEventPayload
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kEventPayload
+    == our::stringification::MustModelTypeFromString(
       "EventPayload"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kEventPayload
+    our::stringification::to_string(
+      our::types::ModelType::kEventPayload
     )
     == "EventPayload"
   );
 
   REQUIRE(
-    aas::types::ModelType::kBasicEventElement
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kBasicEventElement
+    == our::stringification::MustModelTypeFromString(
       "BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kBasicEventElement
+    our::stringification::to_string(
+      our::types::ModelType::kBasicEventElement
     )
     == "BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOperation
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kOperation
+    == our::stringification::MustModelTypeFromString(
       "Operation"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kOperation
+    our::stringification::to_string(
+      our::types::ModelType::kOperation
     )
     == "Operation"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOperationVariable
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kOperationVariable
+    == our::stringification::MustModelTypeFromString(
       "OperationVariable"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kOperationVariable
+    our::stringification::to_string(
+      our::types::ModelType::kOperationVariable
     )
     == "OperationVariable"
   );
 
   REQUIRE(
-    aas::types::ModelType::kCapability
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kCapability
+    == our::stringification::MustModelTypeFromString(
       "Capability"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kCapability
+    our::stringification::to_string(
+      our::types::ModelType::kCapability
     )
     == "Capability"
   );
 
   REQUIRE(
-    aas::types::ModelType::kConceptDescription
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kConceptDescription
+    == our::stringification::MustModelTypeFromString(
       "ConceptDescription"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kConceptDescription
+    our::stringification::to_string(
+      our::types::ModelType::kConceptDescription
     )
     == "ConceptDescription"
   );
 
   REQUIRE(
-    aas::types::ModelType::kReference
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kReference
+    == our::stringification::MustModelTypeFromString(
       "Reference"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kReference
+    our::stringification::to_string(
+      our::types::ModelType::kReference
     )
     == "Reference"
   );
 
   REQUIRE(
-    aas::types::ModelType::kKey
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kKey
+    == our::stringification::MustModelTypeFromString(
       "Key"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kKey
+    our::stringification::to_string(
+      our::types::ModelType::kKey
     )
     == "Key"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringNameType
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLangStringNameType
+    == our::stringification::MustModelTypeFromString(
       "LangStringNameType"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLangStringNameType
+    our::stringification::to_string(
+      our::types::ModelType::kLangStringNameType
     )
     == "LangStringNameType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringTextType
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLangStringTextType
+    == our::stringification::MustModelTypeFromString(
       "LangStringTextType"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLangStringTextType
+    our::stringification::to_string(
+      our::types::ModelType::kLangStringTextType
     )
     == "LangStringTextType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEnvironment
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kEnvironment
+    == our::stringification::MustModelTypeFromString(
       "Environment"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kEnvironment
+    our::stringification::to_string(
+      our::types::ModelType::kEnvironment
     )
     == "Environment"
   );
 
   REQUIRE(
-    aas::types::ModelType::kEmbeddedDataSpecification
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kEmbeddedDataSpecification
+    == our::stringification::MustModelTypeFromString(
       "EmbeddedDataSpecification"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kEmbeddedDataSpecification
+    our::stringification::to_string(
+      our::types::ModelType::kEmbeddedDataSpecification
     )
     == "EmbeddedDataSpecification"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLevelType
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLevelType
+    == our::stringification::MustModelTypeFromString(
       "LevelType"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLevelType
+    our::stringification::to_string(
+      our::types::ModelType::kLevelType
     )
     == "LevelType"
   );
 
   REQUIRE(
-    aas::types::ModelType::kValueReferencePair
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kValueReferencePair
+    == our::stringification::MustModelTypeFromString(
       "ValueReferencePair"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kValueReferencePair
+    our::stringification::to_string(
+      our::types::ModelType::kValueReferencePair
     )
     == "ValueReferencePair"
   );
 
   REQUIRE(
-    aas::types::ModelType::kValueList
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kValueList
+    == our::stringification::MustModelTypeFromString(
       "ValueList"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kValueList
+    our::stringification::to_string(
+      our::types::ModelType::kValueList
     )
     == "ValueList"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringPreferredNameTypeIec61360
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLangStringPreferredNameTypeIec61360
+    == our::stringification::MustModelTypeFromString(
       "LangStringPreferredNameTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLangStringPreferredNameTypeIec61360
+    our::stringification::to_string(
+      our::types::ModelType::kLangStringPreferredNameTypeIec61360
     )
     == "LangStringPreferredNameTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringShortNameTypeIec61360
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLangStringShortNameTypeIec61360
+    == our::stringification::MustModelTypeFromString(
       "LangStringShortNameTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLangStringShortNameTypeIec61360
+    our::stringification::to_string(
+      our::types::ModelType::kLangStringShortNameTypeIec61360
     )
     == "LangStringShortNameTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLangStringDefinitionTypeIec61360
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kLangStringDefinitionTypeIec61360
+    == our::stringification::MustModelTypeFromString(
       "LangStringDefinitionTypeIec61360"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kLangStringDefinitionTypeIec61360
+    our::stringification::to_string(
+      our::types::ModelType::kLangStringDefinitionTypeIec61360
     )
     == "LangStringDefinitionTypeIec61360"
   );
 
   REQUIRE(
-    aas::types::ModelType::kDataSpecificationIec61360
-    == aas::stringification::MustModelTypeFromString(
+    our::types::ModelType::kDataSpecificationIec61360
+    == our::stringification::MustModelTypeFromString(
       "DataSpecificationIec61360"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModelType::kDataSpecificationIec61360
+    our::stringification::to_string(
+      our::types::ModelType::kDataSpecificationIec61360
     )
     == "DataSpecificationIec61360"
   );
@@ -544,13 +544,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::stringification::ModelTypeFromString(
+    !our::stringification::ModelTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModelTypeFromString(
+    our::stringification::MustModelTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"
@@ -559,29 +559,29 @@ TEST_CASE("Test failure on ModelType") {
 
 TEST_CASE("Test ModellingKind round-trip") {
   REQUIRE(
-    aas::types::ModellingKind::kTemplate
-    == aas::stringification::MustModellingKindFromString(
+    our::types::ModellingKind::kTemplate
+    == our::stringification::MustModellingKindFromString(
       "Template"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModellingKind::kTemplate
+    our::stringification::to_string(
+      our::types::ModellingKind::kTemplate
     )
     == "Template"
   );
 
   REQUIRE(
-    aas::types::ModellingKind::kInstance
-    == aas::stringification::MustModellingKindFromString(
+    our::types::ModellingKind::kInstance
+    == our::stringification::MustModellingKindFromString(
       "Instance"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ModellingKind::kInstance
+    our::stringification::to_string(
+      our::types::ModellingKind::kInstance
     )
     == "Instance"
   );
@@ -589,13 +589,13 @@ TEST_CASE("Test ModellingKind round-trip") {
 
 TEST_CASE("Test failure on ModellingKind") {
   CHECK(
-    !aas::stringification::ModellingKindFromString(
+    !our::stringification::ModellingKindFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustModellingKindFromString(
+    our::stringification::MustModellingKindFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ModellingKind literal: Totally utterly invalid"
@@ -604,43 +604,43 @@ TEST_CASE("Test failure on ModellingKind") {
 
 TEST_CASE("Test QualifierKind round-trip") {
   REQUIRE(
-    aas::types::QualifierKind::kValueQualifier
-    == aas::stringification::MustQualifierKindFromString(
+    our::types::QualifierKind::kValueQualifier
+    == our::stringification::MustQualifierKindFromString(
       "ValueQualifier"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::QualifierKind::kValueQualifier
+    our::stringification::to_string(
+      our::types::QualifierKind::kValueQualifier
     )
     == "ValueQualifier"
   );
 
   REQUIRE(
-    aas::types::QualifierKind::kConceptQualifier
-    == aas::stringification::MustQualifierKindFromString(
+    our::types::QualifierKind::kConceptQualifier
+    == our::stringification::MustQualifierKindFromString(
       "ConceptQualifier"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::QualifierKind::kConceptQualifier
+    our::stringification::to_string(
+      our::types::QualifierKind::kConceptQualifier
     )
     == "ConceptQualifier"
   );
 
   REQUIRE(
-    aas::types::QualifierKind::kTemplateQualifier
-    == aas::stringification::MustQualifierKindFromString(
+    our::types::QualifierKind::kTemplateQualifier
+    == our::stringification::MustQualifierKindFromString(
       "TemplateQualifier"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::QualifierKind::kTemplateQualifier
+    our::stringification::to_string(
+      our::types::QualifierKind::kTemplateQualifier
     )
     == "TemplateQualifier"
   );
@@ -648,13 +648,13 @@ TEST_CASE("Test QualifierKind round-trip") {
 
 TEST_CASE("Test failure on QualifierKind") {
   CHECK(
-    !aas::stringification::QualifierKindFromString(
+    !our::stringification::QualifierKindFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustQualifierKindFromString(
+    our::stringification::MustQualifierKindFromString(
       "Totally utterly invalid"
     ),
     "Unexpected QualifierKind literal: Totally utterly invalid"
@@ -663,43 +663,43 @@ TEST_CASE("Test failure on QualifierKind") {
 
 TEST_CASE("Test AssetKind round-trip") {
   REQUIRE(
-    aas::types::AssetKind::kType
-    == aas::stringification::MustAssetKindFromString(
+    our::types::AssetKind::kType
+    == our::stringification::MustAssetKindFromString(
       "Type"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AssetKind::kType
+    our::stringification::to_string(
+      our::types::AssetKind::kType
     )
     == "Type"
   );
 
   REQUIRE(
-    aas::types::AssetKind::kInstance
-    == aas::stringification::MustAssetKindFromString(
+    our::types::AssetKind::kInstance
+    == our::stringification::MustAssetKindFromString(
       "Instance"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AssetKind::kInstance
+    our::stringification::to_string(
+      our::types::AssetKind::kInstance
     )
     == "Instance"
   );
 
   REQUIRE(
-    aas::types::AssetKind::kNotApplicable
-    == aas::stringification::MustAssetKindFromString(
+    our::types::AssetKind::kNotApplicable
+    == our::stringification::MustAssetKindFromString(
       "NotApplicable"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AssetKind::kNotApplicable
+    our::stringification::to_string(
+      our::types::AssetKind::kNotApplicable
     )
     == "NotApplicable"
   );
@@ -707,13 +707,13 @@ TEST_CASE("Test AssetKind round-trip") {
 
 TEST_CASE("Test failure on AssetKind") {
   CHECK(
-    !aas::stringification::AssetKindFromString(
+    !our::stringification::AssetKindFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustAssetKindFromString(
+    our::stringification::MustAssetKindFromString(
       "Totally utterly invalid"
     ),
     "Unexpected AssetKind literal: Totally utterly invalid"
@@ -722,239 +722,239 @@ TEST_CASE("Test failure on AssetKind") {
 
 TEST_CASE("Test AasSubmodelElements round-trip") {
   REQUIRE(
-    aas::types::AasSubmodelElements::kAnnotatedRelationshipElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kAnnotatedRelationshipElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kAnnotatedRelationshipElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kAnnotatedRelationshipElement
     )
     == "AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kBasicEventElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kBasicEventElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kBasicEventElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kBasicEventElement
     )
     == "BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kBlob
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kBlob
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Blob"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kBlob
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kBlob
     )
     == "Blob"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kCapability
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kCapability
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Capability"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kCapability
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kCapability
     )
     == "Capability"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kDataElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kDataElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "DataElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kDataElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kDataElement
     )
     == "DataElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kEntity
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kEntity
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Entity"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kEntity
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kEntity
     )
     == "Entity"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kEventElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kEventElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "EventElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kEventElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kEventElement
     )
     == "EventElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kFile
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kFile
+    == our::stringification::MustAasSubmodelElementsFromString(
       "File"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kFile
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kFile
     )
     == "File"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kMultiLanguageProperty
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kMultiLanguageProperty
+    == our::stringification::MustAasSubmodelElementsFromString(
       "MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kMultiLanguageProperty
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kMultiLanguageProperty
     )
     == "MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kOperation
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kOperation
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Operation"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kOperation
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kOperation
     )
     == "Operation"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kProperty
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kProperty
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Property"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kProperty
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kProperty
     )
     == "Property"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kRange
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kRange
+    == our::stringification::MustAasSubmodelElementsFromString(
       "Range"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kRange
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kRange
     )
     == "Range"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kReferenceElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kReferenceElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kReferenceElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kReferenceElement
     )
     == "ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kRelationshipElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kRelationshipElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kRelationshipElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kRelationshipElement
     )
     == "RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElement
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kSubmodelElement
+    == our::stringification::MustAasSubmodelElementsFromString(
       "SubmodelElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kSubmodelElement
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kSubmodelElement
     )
     == "SubmodelElement"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElementList
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kSubmodelElementList
+    == our::stringification::MustAasSubmodelElementsFromString(
       "SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kSubmodelElementList
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kSubmodelElementList
     )
     == "SubmodelElementList"
   );
 
   REQUIRE(
-    aas::types::AasSubmodelElements::kSubmodelElementCollection
-    == aas::stringification::MustAasSubmodelElementsFromString(
+    our::types::AasSubmodelElements::kSubmodelElementCollection
+    == our::stringification::MustAasSubmodelElementsFromString(
       "SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::AasSubmodelElements::kSubmodelElementCollection
+    our::stringification::to_string(
+      our::types::AasSubmodelElements::kSubmodelElementCollection
     )
     == "SubmodelElementCollection"
   );
@@ -962,13 +962,13 @@ TEST_CASE("Test AasSubmodelElements round-trip") {
 
 TEST_CASE("Test failure on AasSubmodelElements") {
   CHECK(
-    !aas::stringification::AasSubmodelElementsFromString(
+    !our::stringification::AasSubmodelElementsFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustAasSubmodelElementsFromString(
+    our::stringification::MustAasSubmodelElementsFromString(
       "Totally utterly invalid"
     ),
     "Unexpected AasSubmodelElements literal: Totally utterly invalid"
@@ -977,29 +977,29 @@ TEST_CASE("Test failure on AasSubmodelElements") {
 
 TEST_CASE("Test EntityType round-trip") {
   REQUIRE(
-    aas::types::EntityType::kCoManagedEntity
-    == aas::stringification::MustEntityTypeFromString(
+    our::types::EntityType::kCoManagedEntity
+    == our::stringification::MustEntityTypeFromString(
       "CoManagedEntity"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::EntityType::kCoManagedEntity
+    our::stringification::to_string(
+      our::types::EntityType::kCoManagedEntity
     )
     == "CoManagedEntity"
   );
 
   REQUIRE(
-    aas::types::EntityType::kSelfManagedEntity
-    == aas::stringification::MustEntityTypeFromString(
+    our::types::EntityType::kSelfManagedEntity
+    == our::stringification::MustEntityTypeFromString(
       "SelfManagedEntity"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::EntityType::kSelfManagedEntity
+    our::stringification::to_string(
+      our::types::EntityType::kSelfManagedEntity
     )
     == "SelfManagedEntity"
   );
@@ -1007,13 +1007,13 @@ TEST_CASE("Test EntityType round-trip") {
 
 TEST_CASE("Test failure on EntityType") {
   CHECK(
-    !aas::stringification::EntityTypeFromString(
+    !our::stringification::EntityTypeFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustEntityTypeFromString(
+    our::stringification::MustEntityTypeFromString(
       "Totally utterly invalid"
     ),
     "Unexpected EntityType literal: Totally utterly invalid"
@@ -1022,29 +1022,29 @@ TEST_CASE("Test failure on EntityType") {
 
 TEST_CASE("Test Direction round-trip") {
   REQUIRE(
-    aas::types::Direction::kInput
-    == aas::stringification::MustDirectionFromString(
+    our::types::Direction::kInput
+    == our::stringification::MustDirectionFromString(
       "input"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Direction::kInput
+    our::stringification::to_string(
+      our::types::Direction::kInput
     )
     == "input"
   );
 
   REQUIRE(
-    aas::types::Direction::kOutput
-    == aas::stringification::MustDirectionFromString(
+    our::types::Direction::kOutput
+    == our::stringification::MustDirectionFromString(
       "output"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::Direction::kOutput
+    our::stringification::to_string(
+      our::types::Direction::kOutput
     )
     == "output"
   );
@@ -1052,13 +1052,13 @@ TEST_CASE("Test Direction round-trip") {
 
 TEST_CASE("Test failure on Direction") {
   CHECK(
-    !aas::stringification::DirectionFromString(
+    !our::stringification::DirectionFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustDirectionFromString(
+    our::stringification::MustDirectionFromString(
       "Totally utterly invalid"
     ),
     "Unexpected Direction literal: Totally utterly invalid"
@@ -1067,29 +1067,29 @@ TEST_CASE("Test failure on Direction") {
 
 TEST_CASE("Test StateOfEvent round-trip") {
   REQUIRE(
-    aas::types::StateOfEvent::kOn
-    == aas::stringification::MustStateOfEventFromString(
+    our::types::StateOfEvent::kOn
+    == our::stringification::MustStateOfEventFromString(
       "on"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::StateOfEvent::kOn
+    our::stringification::to_string(
+      our::types::StateOfEvent::kOn
     )
     == "on"
   );
 
   REQUIRE(
-    aas::types::StateOfEvent::kOff
-    == aas::stringification::MustStateOfEventFromString(
+    our::types::StateOfEvent::kOff
+    == our::stringification::MustStateOfEventFromString(
       "off"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::StateOfEvent::kOff
+    our::stringification::to_string(
+      our::types::StateOfEvent::kOff
     )
     == "off"
   );
@@ -1097,13 +1097,13 @@ TEST_CASE("Test StateOfEvent round-trip") {
 
 TEST_CASE("Test failure on StateOfEvent") {
   CHECK(
-    !aas::stringification::StateOfEventFromString(
+    !our::stringification::StateOfEventFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustStateOfEventFromString(
+    our::stringification::MustStateOfEventFromString(
       "Totally utterly invalid"
     ),
     "Unexpected StateOfEvent literal: Totally utterly invalid"
@@ -1112,29 +1112,29 @@ TEST_CASE("Test failure on StateOfEvent") {
 
 TEST_CASE("Test ReferenceTypes round-trip") {
   REQUIRE(
-    aas::types::ReferenceTypes::kExternalReference
-    == aas::stringification::MustReferenceTypesFromString(
+    our::types::ReferenceTypes::kExternalReference
+    == our::stringification::MustReferenceTypesFromString(
       "ExternalReference"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ReferenceTypes::kExternalReference
+    our::stringification::to_string(
+      our::types::ReferenceTypes::kExternalReference
     )
     == "ExternalReference"
   );
 
   REQUIRE(
-    aas::types::ReferenceTypes::kModelReference
-    == aas::stringification::MustReferenceTypesFromString(
+    our::types::ReferenceTypes::kModelReference
+    == our::stringification::MustReferenceTypesFromString(
       "ModelReference"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::ReferenceTypes::kModelReference
+    our::stringification::to_string(
+      our::types::ReferenceTypes::kModelReference
     )
     == "ModelReference"
   );
@@ -1142,13 +1142,13 @@ TEST_CASE("Test ReferenceTypes round-trip") {
 
 TEST_CASE("Test failure on ReferenceTypes") {
   CHECK(
-    !aas::stringification::ReferenceTypesFromString(
+    !our::stringification::ReferenceTypesFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustReferenceTypesFromString(
+    our::stringification::MustReferenceTypesFromString(
       "Totally utterly invalid"
     ),
     "Unexpected ReferenceTypes literal: Totally utterly invalid"
@@ -1157,337 +1157,337 @@ TEST_CASE("Test failure on ReferenceTypes") {
 
 TEST_CASE("Test KeyTypes round-trip") {
   REQUIRE(
-    aas::types::KeyTypes::kAnnotatedRelationshipElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kAnnotatedRelationshipElement
+    == our::stringification::MustKeyTypesFromString(
       "AnnotatedRelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kAnnotatedRelationshipElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kAnnotatedRelationshipElement
     )
     == "AnnotatedRelationshipElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kAssetAdministrationShell
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kAssetAdministrationShell
+    == our::stringification::MustKeyTypesFromString(
       "AssetAdministrationShell"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kAssetAdministrationShell
+    our::stringification::to_string(
+      our::types::KeyTypes::kAssetAdministrationShell
     )
     == "AssetAdministrationShell"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kBasicEventElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kBasicEventElement
+    == our::stringification::MustKeyTypesFromString(
       "BasicEventElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kBasicEventElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kBasicEventElement
     )
     == "BasicEventElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kBlob
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kBlob
+    == our::stringification::MustKeyTypesFromString(
       "Blob"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kBlob
+    our::stringification::to_string(
+      our::types::KeyTypes::kBlob
     )
     == "Blob"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kCapability
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kCapability
+    == our::stringification::MustKeyTypesFromString(
       "Capability"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kCapability
+    our::stringification::to_string(
+      our::types::KeyTypes::kCapability
     )
     == "Capability"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kConceptDescription
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kConceptDescription
+    == our::stringification::MustKeyTypesFromString(
       "ConceptDescription"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kConceptDescription
+    our::stringification::to_string(
+      our::types::KeyTypes::kConceptDescription
     )
     == "ConceptDescription"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kDataElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kDataElement
+    == our::stringification::MustKeyTypesFromString(
       "DataElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kDataElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kDataElement
     )
     == "DataElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kEntity
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kEntity
+    == our::stringification::MustKeyTypesFromString(
       "Entity"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kEntity
+    our::stringification::to_string(
+      our::types::KeyTypes::kEntity
     )
     == "Entity"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kEventElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kEventElement
+    == our::stringification::MustKeyTypesFromString(
       "EventElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kEventElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kEventElement
     )
     == "EventElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kFile
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kFile
+    == our::stringification::MustKeyTypesFromString(
       "File"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kFile
+    our::stringification::to_string(
+      our::types::KeyTypes::kFile
     )
     == "File"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kFragmentReference
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kFragmentReference
+    == our::stringification::MustKeyTypesFromString(
       "FragmentReference"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kFragmentReference
+    our::stringification::to_string(
+      our::types::KeyTypes::kFragmentReference
     )
     == "FragmentReference"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kGlobalReference
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kGlobalReference
+    == our::stringification::MustKeyTypesFromString(
       "GlobalReference"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kGlobalReference
+    our::stringification::to_string(
+      our::types::KeyTypes::kGlobalReference
     )
     == "GlobalReference"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kIdentifiable
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kIdentifiable
+    == our::stringification::MustKeyTypesFromString(
       "Identifiable"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kIdentifiable
+    our::stringification::to_string(
+      our::types::KeyTypes::kIdentifiable
     )
     == "Identifiable"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kMultiLanguageProperty
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kMultiLanguageProperty
+    == our::stringification::MustKeyTypesFromString(
       "MultiLanguageProperty"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kMultiLanguageProperty
+    our::stringification::to_string(
+      our::types::KeyTypes::kMultiLanguageProperty
     )
     == "MultiLanguageProperty"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kOperation
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kOperation
+    == our::stringification::MustKeyTypesFromString(
       "Operation"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kOperation
+    our::stringification::to_string(
+      our::types::KeyTypes::kOperation
     )
     == "Operation"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kProperty
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kProperty
+    == our::stringification::MustKeyTypesFromString(
       "Property"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kProperty
+    our::stringification::to_string(
+      our::types::KeyTypes::kProperty
     )
     == "Property"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kRange
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kRange
+    == our::stringification::MustKeyTypesFromString(
       "Range"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kRange
+    our::stringification::to_string(
+      our::types::KeyTypes::kRange
     )
     == "Range"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kReferable
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kReferable
+    == our::stringification::MustKeyTypesFromString(
       "Referable"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kReferable
+    our::stringification::to_string(
+      our::types::KeyTypes::kReferable
     )
     == "Referable"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kReferenceElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kReferenceElement
+    == our::stringification::MustKeyTypesFromString(
       "ReferenceElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kReferenceElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kReferenceElement
     )
     == "ReferenceElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kRelationshipElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kRelationshipElement
+    == our::stringification::MustKeyTypesFromString(
       "RelationshipElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kRelationshipElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kRelationshipElement
     )
     == "RelationshipElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodel
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kSubmodel
+    == our::stringification::MustKeyTypesFromString(
       "Submodel"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kSubmodel
+    our::stringification::to_string(
+      our::types::KeyTypes::kSubmodel
     )
     == "Submodel"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElement
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kSubmodelElement
+    == our::stringification::MustKeyTypesFromString(
       "SubmodelElement"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kSubmodelElement
+    our::stringification::to_string(
+      our::types::KeyTypes::kSubmodelElement
     )
     == "SubmodelElement"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElementCollection
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kSubmodelElementCollection
+    == our::stringification::MustKeyTypesFromString(
       "SubmodelElementCollection"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kSubmodelElementCollection
+    our::stringification::to_string(
+      our::types::KeyTypes::kSubmodelElementCollection
     )
     == "SubmodelElementCollection"
   );
 
   REQUIRE(
-    aas::types::KeyTypes::kSubmodelElementList
-    == aas::stringification::MustKeyTypesFromString(
+    our::types::KeyTypes::kSubmodelElementList
+    == our::stringification::MustKeyTypesFromString(
       "SubmodelElementList"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::KeyTypes::kSubmodelElementList
+    our::stringification::to_string(
+      our::types::KeyTypes::kSubmodelElementList
     )
     == "SubmodelElementList"
   );
@@ -1495,13 +1495,13 @@ TEST_CASE("Test KeyTypes round-trip") {
 
 TEST_CASE("Test failure on KeyTypes") {
   CHECK(
-    !aas::stringification::KeyTypesFromString(
+    !our::stringification::KeyTypesFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustKeyTypesFromString(
+    our::stringification::MustKeyTypesFromString(
       "Totally utterly invalid"
     ),
     "Unexpected KeyTypes literal: Totally utterly invalid"
@@ -1510,421 +1510,421 @@ TEST_CASE("Test failure on KeyTypes") {
 
 TEST_CASE("Test DataTypeDefXsd round-trip") {
   REQUIRE(
-    aas::types::DataTypeDefXsd::kAnyUri
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kAnyUri
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:anyURI"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kAnyUri
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kAnyUri
     )
     == "xs:anyURI"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kBase64Binary
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kBase64Binary
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:base64Binary"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kBase64Binary
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kBase64Binary
     )
     == "xs:base64Binary"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kBoolean
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kBoolean
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:boolean"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kBoolean
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kBoolean
     )
     == "xs:boolean"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kByte
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kByte
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:byte"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kByte
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kByte
     )
     == "xs:byte"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDate
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kDate
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:date"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kDate
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kDate
     )
     == "xs:date"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDateTime
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kDateTime
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:dateTime"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kDateTime
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kDateTime
     )
     == "xs:dateTime"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDecimal
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kDecimal
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:decimal"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kDecimal
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kDecimal
     )
     == "xs:decimal"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDouble
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kDouble
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:double"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kDouble
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kDouble
     )
     == "xs:double"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kDuration
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kDuration
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:duration"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kDuration
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kDuration
     )
     == "xs:duration"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kFloat
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kFloat
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:float"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kFloat
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kFloat
     )
     == "xs:float"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGDay
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kGDay
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:gDay"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kGDay
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kGDay
     )
     == "xs:gDay"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGMonth
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kGMonth
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:gMonth"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kGMonth
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kGMonth
     )
     == "xs:gMonth"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGMonthDay
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kGMonthDay
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:gMonthDay"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kGMonthDay
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kGMonthDay
     )
     == "xs:gMonthDay"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGYear
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kGYear
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:gYear"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kGYear
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kGYear
     )
     == "xs:gYear"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kGYearMonth
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kGYearMonth
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:gYearMonth"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kGYearMonth
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kGYearMonth
     )
     == "xs:gYearMonth"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kHexBinary
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kHexBinary
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:hexBinary"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kHexBinary
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kHexBinary
     )
     == "xs:hexBinary"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kInt
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kInt
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:int"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kInt
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kInt
     )
     == "xs:int"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kInteger
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kInteger
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:integer"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kInteger
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kInteger
     )
     == "xs:integer"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kLong
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kLong
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:long"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kLong
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kLong
     )
     == "xs:long"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNegativeInteger
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kNegativeInteger
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:negativeInteger"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kNegativeInteger
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kNegativeInteger
     )
     == "xs:negativeInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNonNegativeInteger
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kNonNegativeInteger
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:nonNegativeInteger"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kNonNegativeInteger
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kNonNegativeInteger
     )
     == "xs:nonNegativeInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kNonPositiveInteger
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kNonPositiveInteger
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:nonPositiveInteger"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kNonPositiveInteger
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kNonPositiveInteger
     )
     == "xs:nonPositiveInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kPositiveInteger
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kPositiveInteger
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:positiveInteger"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kPositiveInteger
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kPositiveInteger
     )
     == "xs:positiveInteger"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kShort
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kShort
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:short"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kShort
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kShort
     )
     == "xs:short"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kString
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kString
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:string"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kString
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kString
     )
     == "xs:string"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kTime
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kTime
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:time"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kTime
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kTime
     )
     == "xs:time"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedByte
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kUnsignedByte
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:unsignedByte"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kUnsignedByte
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kUnsignedByte
     )
     == "xs:unsignedByte"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedInt
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kUnsignedInt
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:unsignedInt"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kUnsignedInt
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kUnsignedInt
     )
     == "xs:unsignedInt"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedLong
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kUnsignedLong
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:unsignedLong"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kUnsignedLong
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kUnsignedLong
     )
     == "xs:unsignedLong"
   );
 
   REQUIRE(
-    aas::types::DataTypeDefXsd::kUnsignedShort
-    == aas::stringification::MustDataTypeDefXsdFromString(
+    our::types::DataTypeDefXsd::kUnsignedShort
+    == our::stringification::MustDataTypeDefXsdFromString(
       "xs:unsignedShort"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeDefXsd::kUnsignedShort
+    our::stringification::to_string(
+      our::types::DataTypeDefXsd::kUnsignedShort
     )
     == "xs:unsignedShort"
   );
@@ -1932,13 +1932,13 @@ TEST_CASE("Test DataTypeDefXsd round-trip") {
 
 TEST_CASE("Test failure on DataTypeDefXsd") {
   CHECK(
-    !aas::stringification::DataTypeDefXsdFromString(
+    !our::stringification::DataTypeDefXsdFromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustDataTypeDefXsdFromString(
+    our::stringification::MustDataTypeDefXsdFromString(
       "Totally utterly invalid"
     ),
     "Unexpected DataTypeDefXsd literal: Totally utterly invalid"
@@ -1947,267 +1947,267 @@ TEST_CASE("Test failure on DataTypeDefXsd") {
 
 TEST_CASE("Test DataTypeIec61360 round-trip") {
   REQUIRE(
-    aas::types::DataTypeIec61360::kDate
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kDate
+    == our::stringification::MustDataTypeIec61360FromString(
       "DATE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kDate
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kDate
     )
     == "DATE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kString
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kString
+    == our::stringification::MustDataTypeIec61360FromString(
       "STRING"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kString
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kString
     )
     == "STRING"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kStringTranslatable
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kStringTranslatable
+    == our::stringification::MustDataTypeIec61360FromString(
       "STRING_TRANSLATABLE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kStringTranslatable
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kStringTranslatable
     )
     == "STRING_TRANSLATABLE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerMeasure
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kIntegerMeasure
+    == our::stringification::MustDataTypeIec61360FromString(
       "INTEGER_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kIntegerMeasure
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kIntegerMeasure
     )
     == "INTEGER_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerCount
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kIntegerCount
+    == our::stringification::MustDataTypeIec61360FromString(
       "INTEGER_COUNT"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kIntegerCount
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kIntegerCount
     )
     == "INTEGER_COUNT"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIntegerCurrency
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kIntegerCurrency
+    == our::stringification::MustDataTypeIec61360FromString(
       "INTEGER_CURRENCY"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kIntegerCurrency
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kIntegerCurrency
     )
     == "INTEGER_CURRENCY"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealMeasure
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kRealMeasure
+    == our::stringification::MustDataTypeIec61360FromString(
       "REAL_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kRealMeasure
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kRealMeasure
     )
     == "REAL_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealCount
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kRealCount
+    == our::stringification::MustDataTypeIec61360FromString(
       "REAL_COUNT"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kRealCount
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kRealCount
     )
     == "REAL_COUNT"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRealCurrency
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kRealCurrency
+    == our::stringification::MustDataTypeIec61360FromString(
       "REAL_CURRENCY"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kRealCurrency
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kRealCurrency
     )
     == "REAL_CURRENCY"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kBoolean
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kBoolean
+    == our::stringification::MustDataTypeIec61360FromString(
       "BOOLEAN"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kBoolean
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kBoolean
     )
     == "BOOLEAN"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIri
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kIri
+    == our::stringification::MustDataTypeIec61360FromString(
       "IRI"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kIri
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kIri
     )
     == "IRI"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kIrdi
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kIrdi
+    == our::stringification::MustDataTypeIec61360FromString(
       "IRDI"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kIrdi
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kIrdi
     )
     == "IRDI"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRational
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kRational
+    == our::stringification::MustDataTypeIec61360FromString(
       "RATIONAL"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kRational
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kRational
     )
     == "RATIONAL"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kRationalMeasure
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kRationalMeasure
+    == our::stringification::MustDataTypeIec61360FromString(
       "RATIONAL_MEASURE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kRationalMeasure
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kRationalMeasure
     )
     == "RATIONAL_MEASURE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kTime
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kTime
+    == our::stringification::MustDataTypeIec61360FromString(
       "TIME"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kTime
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kTime
     )
     == "TIME"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kTimestamp
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kTimestamp
+    == our::stringification::MustDataTypeIec61360FromString(
       "TIMESTAMP"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kTimestamp
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kTimestamp
     )
     == "TIMESTAMP"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kFile
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kFile
+    == our::stringification::MustDataTypeIec61360FromString(
       "FILE"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kFile
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kFile
     )
     == "FILE"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kHtml
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kHtml
+    == our::stringification::MustDataTypeIec61360FromString(
       "HTML"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kHtml
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kHtml
     )
     == "HTML"
   );
 
   REQUIRE(
-    aas::types::DataTypeIec61360::kBlob
-    == aas::stringification::MustDataTypeIec61360FromString(
+    our::types::DataTypeIec61360::kBlob
+    == our::stringification::MustDataTypeIec61360FromString(
       "BLOB"
     )
   );
 
   REQUIRE(
-    aas::stringification::to_string(
-      aas::types::DataTypeIec61360::kBlob
+    our::stringification::to_string(
+      our::types::DataTypeIec61360::kBlob
     )
     == "BLOB"
   );
@@ -2215,13 +2215,13 @@ TEST_CASE("Test DataTypeIec61360 round-trip") {
 
 TEST_CASE("Test failure on DataTypeIec61360") {
   CHECK(
-    !aas::stringification::DataTypeIec61360FromString(
+    !our::stringification::DataTypeIec61360FromString(
       "Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::stringification::MustDataTypeIec61360FromString(
+    our::stringification::MustDataTypeIec61360FromString(
       "Totally utterly invalid"
     ),
     "Unexpected DataTypeIec61360 literal: Totally utterly invalid"
