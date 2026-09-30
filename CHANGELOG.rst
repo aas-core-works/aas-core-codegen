@@ -3,6 +3,12 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.27rc2 (2026-10-01)
+======================
+We pre-release with the fixes needed for V3.2 of the AAS meta-model,
+especially the API structures from Part 2, which surfaced after
+0.0.27rc1.
+
 0.0.27rc1 (2026-09-30)
 ======================
 We pre-release so that we can test aas-core-codegen with V3.2 of the
