@@ -283,7 +283,7 @@ func NumbersAreAllSmall(
 		)
 }
 
-// Check the intersection of a local set with a constant set.
+// Check the intersection of a constant set with a local set.
 func AtMostOneTextIsReserved(
 	texts []string,
 ) bool {
@@ -291,8 +291,8 @@ func AtMostOneTextIsReserved(
 	AddTexts(texts, seen)
 	reserved :=
 		aascommon.SetIntersection(
-			seen,
 			aasconstants.ReservedTexts,
+			seen,
 		)
 	return len(reserved) <= 1
 }

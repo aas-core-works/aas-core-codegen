@@ -1962,7 +1962,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check the intersection of a local set with a constant set.</paragraph>',
+        summary='<paragraph>Check the intersection of a constant set with a local set.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,

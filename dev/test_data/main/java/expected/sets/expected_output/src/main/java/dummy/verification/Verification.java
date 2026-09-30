@@ -242,14 +242,14 @@ public class Verification {
   }
 
   /**
-   * Check the intersection of a local set with a constant set.
+   * Check the intersection of a constant set with a local set.
    */
   public static Boolean atMostOneTextIsReserved(
     List<String> texts) {
     Set<String> seen = new HashSet<String>();
     addTexts(texts, seen);
     var reserved = (
-        SetHelpers.intersection(seen, Constants.reservedTexts));
+        SetHelpers.intersection(Constants.reservedTexts, seen));
     return reserved.size() <= 1;
   }
 

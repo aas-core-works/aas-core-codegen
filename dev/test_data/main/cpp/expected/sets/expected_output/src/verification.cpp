@@ -284,8 +284,8 @@ bool AtMostOneTextIsReserved(
   );
   auto reserved = (
     common::Intersection(
-      seen,
-      constants::kReservedTexts
+      constants::kReservedTexts,
+      seen
     )
   );
   return reserved.size() <= 1;

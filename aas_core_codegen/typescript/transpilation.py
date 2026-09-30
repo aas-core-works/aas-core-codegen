@@ -826,7 +826,9 @@ AasCommon.at(
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
-            if member_type.method is intermediate_type_inference.STR_FIND:
+            kind = member_type.method.kind
+
+            if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
                 # NOTE (mristin):
                 # We do not use the native ``indexOf`` as it counts the UTF-16 code
                 # units instead of the characters, and does not count a negative
@@ -837,7 +839,7 @@ AasCommon.at(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
                 # NOTE (mristin):
                 # TypeScript has no native equivalent of the Python ``str.lstrip``
                 # with the given characters. See ``lstrip`` in the generated
@@ -848,32 +850,36 @@ AasCommon.at(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.SET_ADD:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 return Stripped(f"{instance}.add({args[0]})"), None
 
-            if (
-                member_type.method is intermediate_type_inference.SET_INTERSECTION
-                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
             ):
                 # NOTE (mristin):
                 # See ``setIntersection`` and ``setDifference`` in the generated
                 # common module, which give a new set as Python does.
-                function_name = (
-                    "setIntersection"
-                    if member_type.method
-                    is intermediate_type_inference.SET_INTERSECTION
-                    else "setDifference"
-                )
+                function_name: str
+                if (
+                    kind
+                    is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                ):
+                    function_name = "setIntersection"
+                elif (
+                    kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
+                ):
+                    function_name = "setDifference"
+                else:
+                    assert_never(kind)
+
                 return (
                     Stripped(f"AasCommon.{function_name}({instance}, {args[0]})"),
                     None,
                 )
 
-            return None, Error(
-                node.original_node,
-                f"The handling of the built-in method {member_type.method.name!r} "
-                f"has not been implemented",
-            )
+            else:
+                assert_never(kind)
 
         method_name = typescript_naming.method_name(node.member.name)
 

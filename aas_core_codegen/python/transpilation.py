@@ -485,12 +485,60 @@ not (
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_builtin_method_call(
         node: parse_tree.MethodCall,
-        method: intermediate_type_inference.BuiltinMethod,
+        method_type: intermediate_type_inference.BuiltinMethodTypeAnnotation,
         instance: Stripped,
         args: Sequence[Stripped],
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """Transpile the call to a built-in method on the transpiled ``instance``."""
-        if method is intermediate_type_inference.STR_FIND:
+        """
+        Transpile the call to a built-in method on the transpiled ``instance``.
+
+        We transpile ``intersection`` and ``difference`` to the operators ``&``
+        and ``-``, respectively. We generate the constant sets, the read-only
+        set arguments and the ``Final[...]`` local sets as ``AbstractSet``, which
+        has neither ``intersection`` nor
+        ``difference``. Its operators give a new ``set`` at runtime, but mypy
+        types the result as an ``AbstractSet``, while the meta-model can mutate
+        the new set. Hence, we convert the result to a ``set`` if the receiver is
+        read-only (see
+        :attr:`intermediate_type_inference.BuiltinMethodTypeAnnotation.read_only_receiver`).
+        This copies only the result, so the complexity of the operation stays
+        the same.
+
+        For example, the meta-model:
+
+        .. code-block:: python
+
+            @verification
+            def check(texts: AbstractSet[str], seen: Set[str]) -> bool:
+                reserved = Reserved_texts.intersection(seen)
+                reserved.add("another")
+
+                unseen = texts.difference(seen)
+                both = seen.intersection(texts)
+                nested = seen.difference(texts.intersection(Reserved_texts))
+                ...
+
+        is transpiled to:
+
+        .. code-block:: python
+
+            def check(texts: AbstractSet[str], seen: Set[str]) -> bool:
+                reserved = set(aas_constants.RESERVED_TEXTS & seen)
+                reserved.add("another")
+
+                unseen = set(texts - seen)
+                both = seen & texts
+                nested = seen - (set(texts & aas_constants.RESERVED_TEXTS))
+                ...
+
+        The operators bind tighter than ``in``, so we do not parenthesize
+        the result. However, we parenthesize the operands which are neither a name,
+        nor a member, nor a function call, since ``a - b & c`` would be
+        ``(a - b) & c``.
+        """
+        kind = method_type.method.kind
+
+        if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
             if not isinstance(
                 node.member.instance,
                 (parse_tree.Name, parse_tree.Member, parse_tree.Slice),
@@ -503,7 +551,7 @@ not (
             # specifications.
             return Stripped(f"{instance}.find({', '.join(args)})"), None
 
-        if method is intermediate_type_inference.STR_LSTRIP:
+        elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
             if not isinstance(
                 node.member.instance,
                 (
@@ -521,25 +569,48 @@ not (
             # specifications.
             return Stripped(f"{instance}.lstrip({args[0]})"), None
 
-        if method is intermediate_type_inference.SET_ADD:
-            return Stripped(f"{instance}.add({args[0]})"), None
-
-        if (
-            method is intermediate_type_inference.SET_INTERSECTION
-            or method is intermediate_type_inference.SET_DIFFERENCE
-        ):
+        elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
             if not isinstance(
                 node.member.instance, (parse_tree.Name, parse_tree.Member)
             ):
                 instance = Stripped(f"({instance})")
 
-            return Stripped(f"{instance}.{method.name}({args[0]})"), None
+            return Stripped(f"{instance}.add({args[0]})"), None
 
-        return None, Error(
-            node.original_node,
-            f"The handling of the built-in method {method.name!r} has not "
-            f"been implemented",
-        )
+        elif (
+            kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+            or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
+        ):
+            no_parentheses_types_in_this_context = (
+                parse_tree.Name,
+                parse_tree.Member,
+                parse_tree.FunctionCall,
+            )
+
+            if not isinstance(
+                node.member.instance, no_parentheses_types_in_this_context
+            ):
+                instance = Stripped(f"({instance})")
+
+            arg = args[0]
+            if not isinstance(node.args[0], no_parentheses_types_in_this_context):
+                arg = Stripped(f"({arg})")
+
+            operator: str
+            if kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION:
+                operator = "&"
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE:
+                operator = "-"
+            else:
+                assert_never(kind)
+
+            if method_type.read_only_receiver:
+                return Stripped(f"set({instance} {operator} {arg})"), None
+
+            return Stripped(f"{instance} {operator} {arg}"), None
+
+        else:
+            assert_never(kind)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
@@ -575,7 +646,7 @@ not (
         ):
             return self._transform_builtin_method_call(
                 node=node,
-                method=member_type.method,
+                method_type=member_type,
                 instance=instance,
                 args=args,
             )

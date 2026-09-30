@@ -860,7 +860,9 @@ class Transpiler(
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
-            if member_type.method is intermediate_type_inference.STR_FIND:
+            kind = member_type.method.kind
+
+            if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
                 # NOTE (mristin):
                 # We do not use the native ``indexOf`` as it counts the UTF-16
                 # code units instead of the characters, and does not count
@@ -871,7 +873,7 @@ class Transpiler(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
                 # NOTE (mristin):
                 # Java has no native ``lstrip`` with a set of characters. See
                 # ``StringHelpers.lstrip`` in the generated common package.
@@ -880,7 +882,7 @@ class Transpiler(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.SET_ADD:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 item, error = self._transform_as_set_member(
                     node=node.args[0], set_node=node.member.instance
                 )
@@ -890,24 +892,32 @@ class Transpiler(
                 assert item is not None
                 return Stripped(f"{instance}.add({item})"), None
 
-            if (
-                member_type.method is intermediate_type_inference.SET_INTERSECTION
-                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
             ):
                 # NOTE (mristin):
                 # See ``SetHelpers`` in the generated common package.
+                helper_name: str
+                if (
+                    kind
+                    is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                ):
+                    helper_name = "intersection"
+                elif (
+                    kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
+                ):
+                    helper_name = "difference"
+                else:
+                    assert_never(kind)
+
                 return (
-                    Stripped(
-                        f"SetHelpers.{member_type.method.name}({instance}, {args[0]})"
-                    ),
+                    Stripped(f"SetHelpers.{helper_name}({instance}, {args[0]})"),
                     None,
                 )
 
-            return None, Error(
-                node.original_node,
-                f"The handling of the built-in method {member_type.method.name!r} "
-                f"has not been implemented",
-            )
+            else:
+                assert_never(kind)
 
         if not isinstance(node.member.instance, (parse_tree.Name, parse_tree.Member)):
             instance = Stripped(f"({instance})")

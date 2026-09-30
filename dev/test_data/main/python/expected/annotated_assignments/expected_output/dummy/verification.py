@@ -359,7 +359,7 @@ def final_locals_are_consistent(
     all_texts: Final[Sequence[str]] = texts
     seen: Set[str] = set()
     seen.add(text)
-    reserved_seen: Final[AbstractSet[str]] = seen.intersection(aas_constants.RESERVED_TEXTS)
+    reserved_seen: Final[AbstractSet[str]] = seen & aas_constants.RESERVED_TEXTS
     pair: Final[Tuple[str, int]] = (text, number)
     base: Final[aas_types.Parent] = parent
     if (
