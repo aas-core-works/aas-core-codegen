@@ -2441,6 +2441,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # of a loop.
         self._loop_variable_set = set()  # type: Set[Identifier]
 
+        # NOTE (mristin):
+        # We keep track of the variables assigned in the bodies of the enclosing
+        # for-loops. If such a variable is not visible when we read it, the read
+        # comes before the assignment in the body. In Python, the read would
+        # observe the value of the previous iteration, while the targets declare
+        # the variable anew in each iteration. We use this set only to explain
+        # the error to the user.
+        self._assigned_in_loop_body_set = set()  # type: Set[Identifier]
+
         self.type_map = dict()
         self.downcast_map = dict()
         self.errors = []
@@ -4395,6 +4404,19 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
+            if node.identifier in self._assigned_in_loop_body_set:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The variable {node.identifier!r} is read here before it "
+                        f"is assigned in the body of the for-loop. While Python "
+                        f"keeps the value of the previous iteration, the other "
+                        f"targets define the variable anew in each iteration. "
+                        f"Please define the variable before the for-loop.",
+                    )
+                )
+                return None
+
             self.errors.append(
                 Error(
                     node.original_node,
@@ -6052,9 +6074,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # Mypy analyzes the body repeatedly until the types stabilize. Since
         # the assignments only ever remove the facts here, a single pass over
         # the assignments gives the same result.
+        assigned_in_loop_body_set_before = self._assigned_in_loop_body_set
+        self._assigned_in_loop_body_set = set(assigned_in_loop_body_set_before)
+
         for stmt in node.body:
             for some_node in parse_tree.over_nodes(stmt):
                 if isinstance(some_node, parse_tree.Assignment):
+                    if isinstance(some_node.target, parse_tree.Name):
+                        self._assigned_in_loop_body_set.add(some_node.target.identifier)
+
                     target_path, _ = _dependencies(some_node.target)
                     self._facts = [
                         fact
@@ -6072,6 +6100,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
         finally:
             self._loop_variable_set.remove(loop_variable)
+            self._assigned_in_loop_body_set = assigned_in_loop_body_set_before
 
             # NOTE (mristin):
             # The body might not be executed at all, and we already removed all
