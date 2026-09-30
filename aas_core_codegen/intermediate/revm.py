@@ -368,7 +368,7 @@ class _Translator(parse_retree.Transformer[_Node]):
         if node.quantifier is not None:
             if node.quantifier.non_greedy:
                 raise AssertionError(
-                    "(mristin, 2024-06-04) Only non-greedy quantifiers are currently "
+                    "(mristin) Only non-greedy quantifiers are currently "
                     "translated to a program for a RegEx virtual machine. We did not "
                     "cover non-greedy quantifiers for simplicity, as we currently have "
                     "no meta-model where they are required. The presence of non-greedy "
@@ -498,7 +498,7 @@ class _Translator(parse_retree.Transformer[_Node]):
 
     def transform_regex(self, node: parse_retree.Regex) -> _Node:
         non_anchored_exception_message = (
-            "(mristin, 2024-05-31): We expect all the patterns which need "
+            "(mristin): We expect all the patterns which need "
             "to be transpiled to instructions of the RegEx virtual machine "
             "to be anchored at the start (``^``) and at the end (``$``). Please "
             "consider re-writing your pattern with putting a prefix ``^.*`` if you "
@@ -565,7 +565,7 @@ class _Translator(parse_retree.Transformer[_Node]):
         check_for_non_greedy_quantifiers.visit(node)
         if check_for_non_greedy_quantifiers.has_non_greedy_quantifiers:
             raise NotImplementedError(
-                "(mristin, 2024-05-31): We did not implement the transpilation of "
+                "(mristin): We did not implement the transpilation of "
                 "non-greedy quantifiers to instructions of a RegEx virtual machine "
                 "as this is more complex than the transpilation of the greedy ones. "
                 "If you need this feature, please contact the developers."

@@ -5603,7 +5603,7 @@ def _verify_patterns_anchored_at_start_and_end(
                 errors.append(
                     Error(
                         verification.parsed.node,
-                        f"(mristin, 2024-05-31): We expect all the patterns to be "
+                        f"(mristin): We expect all the patterns to be "
                         f"anchored at the start (``^``) and at the end (``$``) for "
                         f"inter-operability with different regex engines, *e.g.*, XSD "
                         f"engines. Please consider re-writing your pattern with "

@@ -84,7 +84,7 @@ def generate_type(
 
     If ``types_package`` is specified, it is prepended to all our types.
 
-    (mristin, 2023-06-01): We do not handle all the type annotations from
+    (mristin): We do not handle all the type annotations from
     :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
     YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
     If we do not know how to generate the type in Go, we return an error message.
@@ -203,7 +203,7 @@ def generate_type(
 
     else:
         return None, (
-            f"(mristin, 2023-06-01): We do not handle "
+            f"(mristin): We do not handle "
             f"the type annotation {type_annotation} from "
             "aas_core_codegen.intermediate.type_inference as that was, "
             "at this time point, YAGNI (*e.g.*, verification functions, "

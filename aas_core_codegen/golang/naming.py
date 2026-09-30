@@ -590,7 +590,7 @@ def receiver_name(
 
     if receiver is None:
         raise AssertionError(
-            f"(mristin, 2023-03-31): "
+            f"(mristin): "
             f"No receiver name could be found for the class name {cls_name!r}. "
             f"Please contact the developers to extend the logic to add more potential "
             f"receiver names."

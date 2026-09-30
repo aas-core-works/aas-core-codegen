@@ -1,0 +1,3 @@
+Failed to verify the intermediate symbol table for generation of Java code based on <path to meta_model.py>:
+* At line 13 and column 2: Naming collision(s) in Java code for our type 'Something'
+    At line 16 and column 2: Java method 'somethingToUrl' corresponding to the meta-model method 'something_to_URL' collides with the Java property 'somethingToUrl' corresponding to the meta-model property 'something_to_url'

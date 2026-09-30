@@ -1531,7 +1531,7 @@ def _generate_read_as_sequence(cls: intermediate.ConcreteClass) -> Stripped:
                 for prop in cls.properties
             )
     ), (
-        "(mristin, 2022-10-11) We assume that the properties and constructor arguments "
+        "(mristin) We assume that the properties and constructor arguments "
         "are identical at this point. If this is not the case, we have to re-write the "
         "logic substantially! Please contact the developers if you see this."
     )
