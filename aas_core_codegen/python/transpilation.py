@@ -683,7 +683,10 @@ not (
         elif isinstance(
             func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
         ):
-            if func_type.func.name == "len":
+            if (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LEN
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -691,7 +694,10 @@ not (
 
                 return Stripped(f"len({args[0]})"), None
 
-            elif func_type.func.name == "abs":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.ABS
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -699,7 +705,10 @@ not (
 
                 return Stripped(f"abs({args[0]})"), None
 
-            elif func_type.func.name == "int":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.INT
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -711,7 +720,10 @@ not (
                 # common module.
                 return Stripped(f"aas_common.parse_safe_int({args[0]})"), None
 
-            elif func_type.func.name == "set":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.SET
+            ):
                 assert len(args) == 0, (
                     f"Expected no arguments, but got: {args}; "
                     f"this should have been caught before."
@@ -720,11 +732,7 @@ not (
                 return Stripped("set()"), None
 
             else:
-                return None, Error(
-                    node.original_node,
-                    f"The handling of the built-in function {node.name!r} has not "
-                    f"been implemented",
-                )
+                assert_never(func_type.func.kind)
         else:
             assert_never(func_type)
 

@@ -1055,7 +1055,10 @@ AasCommon.at(
         elif isinstance(
             func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
         ):
-            if func_type.func.name == "len":
+            if (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LEN
+            ):
                 assert len(node.args) == 1, (
                     f"Expected exactly one argument, but got: {node.args}; "
                     f"this should have been caught before."
@@ -1063,7 +1066,10 @@ AasCommon.at(
 
                 return self._generate_len(node.args[0])
 
-            elif func_type.func.name == "abs":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.ABS
+            ):
                 assert len(node.args) == 1, (
                     f"Expected exactly one argument, but got: {node.args}; "
                     f"this should have been caught before."
@@ -1081,7 +1087,10 @@ AasCommon.at(
 
                 return Stripped(f"Math.abs({arg})"), None
 
-            elif func_type.func.name == "set":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.SET
+            ):
                 set_type, error_message = generate_type(
                     self.type_map[node], types_module=self._types_module
                 )
@@ -1090,7 +1099,10 @@ AasCommon.at(
 
                 return Stripped(f"new {set_type}()"), None
 
-            elif func_type.func.name == "int":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.INT
+            ):
                 assert len(node.args) == 1, (
                     f"Expected exactly one argument, but got: {node.args}; "
                     f"this should have been caught before."
@@ -1114,11 +1126,7 @@ AasCommon.at(
                 return Stripped(f"AasCommon.parseSafeInt({arg})"), None
 
             else:
-                return None, Error(
-                    node.original_node,
-                    f"The handling of the built-in function {node.name!r} has not "
-                    f"been implemented",
-                )
+                assert_never(func_type.func.kind)
         else:
             assert_never(func_type)
 

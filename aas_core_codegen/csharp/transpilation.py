@@ -1013,7 +1013,10 @@ class Transpiler(
         elif isinstance(
             func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
         ):
-            if func_type.func.name == "len":
+            if (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LEN
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1101,7 +1104,10 @@ class Transpiler(
                         errors,
                     )
 
-            elif func_type.func.name == "abs":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.ABS
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1113,7 +1119,10 @@ class Transpiler(
 
                 return Stripped(f"System.Math.Abs({arg})"), None
 
-            elif func_type.func.name == "int":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.INT
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1128,7 +1137,10 @@ class Transpiler(
                     None,
                 )
 
-            elif func_type.func.name == "set":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.SET
+            ):
                 set_type, error_message = generate_type(self.type_map[node])
                 if error_message is not None:
                     return None, Error(node.original_node, error_message)
@@ -1136,11 +1148,7 @@ class Transpiler(
                 return Stripped(f"new {set_type}()"), None
 
             else:
-                return None, Error(
-                    node.original_node,
-                    f"The handling of the built-in function {node.name!r} has not "
-                    f"been implemented",
-                )
+                assert_never(func_type.func.kind)
         else:
             assert_never(func_type)
 
