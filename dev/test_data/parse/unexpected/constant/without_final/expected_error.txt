@@ -1,0 +1,1 @@
+The constant 'Something' is read-only, so please annotate it as ``Final[...]``, *e.g.*, ``Something: Final[str] = ...``

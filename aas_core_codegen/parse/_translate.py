@@ -110,6 +110,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("match", "re"),
             ("Enum", "enum"),
             ("Annotated", "typing"),
+            ("Final", "typing"),
             ("List", "typing"),
             ("Optional", "typing"),
             ("Sequence", "typing"),
@@ -756,7 +757,44 @@ def _ann_assign_to_constant(
             Error(node.value, "Unexpected constant definition without a value"),
         )
 
-    type_annotation, error = _type_annotation(node=node.annotation, atok=atok)
+    # NOTE (mristin):
+    # The constants are read-only, so we require them to be annotated as
+    # ``Final[...]``, and unwrap the ``Final`` here, as it is not a type.
+    if isinstance(node.annotation, ast.Name) and node.annotation.id == "Final":
+        return (
+            None,
+            Error(
+                node.annotation,
+                f"Expected the type of the constant {node.target.id!r} "
+                f"as a subscript of ``Final[...]``, *e.g.*, "
+                f"``{node.target.id}: Final[str] = constant_str(...)``, "
+                f"but got a bare ``Final``",
+            ),
+        )
+
+    if not (
+        isinstance(node.annotation, ast.Subscript)
+        and isinstance(node.annotation.value, ast.Name)
+        and node.annotation.value.id == "Final"
+    ):
+        return (
+            None,
+            Error(
+                node.annotation,
+                f"The constant {node.target.id!r} is read-only, so please annotate "
+                f"it as ``Final[...]``, *e.g.*, "
+                f"``{node.target.id}: Final[{atok.get_text(node.annotation)}] "
+                f"= ...``",
+            ),
+        )
+
+    final_index_node, error = _subscript_index_node(node=node.annotation, atok=atok)
+    if error is not None:
+        return None, error
+
+    assert final_index_node is not None
+
+    type_annotation, error = _type_annotation(node=final_index_node, atok=atok)
     if error is not None:
         return None, error
 
@@ -789,8 +827,9 @@ def _ann_assign_to_constant(
                     node.annotation,
                     f"The constant set {node.target.id!r} is immutable, but "
                     f"``Set[...]`` declares a mutable set. Please declare it "
-                    f"as ``AbstractSet[...]``, *e.g.*, "
-                    f"``{node.target.id}: AbstractSet[...] = constant_set(...)``.",
+                    f"as ``Final[AbstractSet[...]]``, *e.g.*, "
+                    f"``{node.target.id}: Final[AbstractSet[...]] "
+                    f"= constant_set(...)``.",
                 ),
             )
 

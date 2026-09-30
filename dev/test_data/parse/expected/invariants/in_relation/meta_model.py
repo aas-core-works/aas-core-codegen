@@ -1,4 +1,6 @@
-Some_set: AbstractSet[str] = constant_set(values=["some literal", "another literal"])
+Some_set: Final[AbstractSet[str]] = constant_set(
+    values=["some literal", "another literal"]
+)
 
 
 @invariant(

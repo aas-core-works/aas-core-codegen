@@ -4168,7 +4168,7 @@ class Item(DBC):
         self.name = name
 
 
-Reserved_texts: AbstractSet[str] = constant_set(values=["reserved"])
+Reserved_texts: Final[AbstractSet[str]] = constant_set(values=["reserved"])
 
 
 @verification

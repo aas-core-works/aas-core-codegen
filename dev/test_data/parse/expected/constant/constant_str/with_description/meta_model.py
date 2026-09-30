@@ -1,4 +1,6 @@
-Something: str = constant_str(value="some value", description="Represent something.")
+Something: Final[str] = constant_str(
+    value="some value", description="Represent something."
+)
 
 
 __version__ = "dummy"

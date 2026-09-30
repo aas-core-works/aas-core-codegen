@@ -1,4 +1,4 @@
-Some_set: AbstractSet[str] = constant_set(
+Some_set: Final[AbstractSet[str]] = constant_set(
     values=[
         "Hello",
         "World",
@@ -6,7 +6,7 @@ Some_set: AbstractSet[str] = constant_set(
     ]
 )
 
-Another_set: AbstractSet[str] = constant_set(
+Another_set: Final[AbstractSet[str]] = constant_set(
     values=[
         "Hello",
         "World",

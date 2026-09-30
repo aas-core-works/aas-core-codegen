@@ -1,0 +1,1 @@
+Expected the type of the constant 'Something' as a subscript of ``Final[...]``, *e.g.*, ``Something: Final[str] = constant_str(...)``, but got a bare ``Final``

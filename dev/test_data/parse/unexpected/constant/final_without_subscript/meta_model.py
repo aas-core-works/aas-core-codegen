@@ -1,4 +1,7 @@
-Something: Final[str] = constant_str(
+from typing import Final
+
+
+Something: Final = constant_str(
     value="some value",
 )
 
