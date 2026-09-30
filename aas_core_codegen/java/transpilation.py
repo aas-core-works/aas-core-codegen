@@ -1016,7 +1016,10 @@ class Transpiler(
         elif isinstance(
             func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
         ):
-            if func_type.func.name == "len":
+            if (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LEN
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1091,7 +1094,10 @@ class Transpiler(
                         errors,
                     )
 
-            elif func_type.func.name == "abs":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.ABS
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1114,7 +1120,10 @@ class Transpiler(
 
                 return Stripped(f"Math.abs({arg})"), None
 
-            elif func_type.func.name == "int":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.INT
+            ):
                 assert len(args) == 1, (
                     f"Expected exactly one argument, but got: {args}; "
                     f"this should have been caught before."
@@ -1128,7 +1137,10 @@ class Transpiler(
                 # the generated common package.
                 return Stripped(f"StringHelpers.parseSafeInt({args[0]})"), None
 
-            elif func_type.func.name == "set":
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.SET
+            ):
                 set_type = self.type_map[node]
                 assert isinstance(
                     set_type, intermediate_type_inference.SetTypeAnnotation
@@ -1144,11 +1156,7 @@ class Transpiler(
                 return Stripped(f"new HashSet<{item_type}>()"), None
 
             else:
-                return None, Error(
-                    node.original_node,
-                    f"The handling of the built-in function {node.name!r} has not "
-                    f"been implemented",
-                )
+                assert_never(func_type.func.kind)
         else:
             assert_never(func_type)
 

@@ -190,8 +190,41 @@ class VerificationTypeAnnotation(FunctionTypeAnnotation):
         return self.func.name
 
 
+@enum.unique
+class BuiltinFunctionKind(enum.Enum):
+    """
+    Enumerate the built-in functions which we understand.
+
+    The value is the name of the function in the meta-model.
+
+    We dispatch on the kind, not on the name, so that mypy can check that
+    the dispatch is exhaustive. For example:
+
+    .. code-block:: python
+
+        if func.kind is BuiltinFunctionKind.LEN:
+            ...
+        elif func.kind is BuiltinFunctionKind.ABS:
+            ...
+        elif func.kind is BuiltinFunctionKind.INT:
+            ...
+        elif func.kind is BuiltinFunctionKind.SET:
+            ...
+        else:
+            assert_never(func.kind)
+    """
+
+    LEN = "len"
+    ABS = "abs"
+    INT = "int"
+    SET = "set"
+
+
 class BuiltinFunction:
     """Represent a built-in function."""
+
+    #: Kind of the built-in function, which we dispatch on
+    kind: Final[BuiltinFunctionKind]
 
     #: Name of the built-in function
     name: Final[Identifier]
@@ -202,9 +235,12 @@ class BuiltinFunction:
     #: on the arguments and is inferred at the call site (*e.g.*, ``abs``).
     returns: Final[Optional["TypeAnnotationUnion"]]
 
-    def __init__(self, name: Identifier, returns: Optional["TypeAnnotationUnion"]):
+    def __init__(
+        self, kind: BuiltinFunctionKind, returns: Optional["TypeAnnotationUnion"]
+    ):
         """Initialize with the given values."""
-        self.name = name
+        self.kind = kind
+        self.name = Identifier(kind.value)
         self.returns = returns
 
 
@@ -2511,7 +2547,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         return (
             isinstance(func_type, BuiltinFunctionTypeAnnotation)
-            and func_type.func.name == "len"
+            and func_type.func.kind is BuiltinFunctionKind.LEN
         )
 
     def _asserted_min_length(
@@ -3912,7 +3948,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
 
             elif isinstance(func_type, BuiltinFunctionTypeAnnotation):
-                if func_type.func.name == "set":
+                if func_type.func.kind is BuiltinFunctionKind.SET:
                     self.errors.append(
                         Error(
                             node.original_node,
@@ -3995,7 +4031,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # known to be a sequence and a mapping, respectively.
         if (
             isinstance(func_type, BuiltinFunctionTypeAnnotation)
-            and func_type.func.name == "len"
+            and func_type.func.kind is BuiltinFunctionKind.LEN
             and len(arg_types) == 1
         ):
             arg_type = arg_types[0]
@@ -4058,7 +4094,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if (
             isinstance(func_type, BuiltinFunctionTypeAnnotation)
-            and func_type.func.name == "abs"
+            and func_type.func.kind is BuiltinFunctionKind.ABS
             and len(arg_types) == 1
         ):
             arg_type = arg_types[0]
@@ -4078,7 +4114,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if (
             isinstance(func_type, BuiltinFunctionTypeAnnotation)
-            and func_type.func.name == "int"
+            and func_type.func.kind is BuiltinFunctionKind.INT
             and len(arg_types) == 1
         ):
             arg_type = arg_types[0]
@@ -6135,7 +6171,7 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
     mapping: MutableMapping[Identifier, "TypeAnnotationUnion"] = {
         Identifier("len"): BuiltinFunctionTypeAnnotation(
             func=BuiltinFunction(
-                name=Identifier("len"),
+                kind=BuiltinFunctionKind.LEN,
                 returns=PrimitiveTypeAnnotation(PrimitiveType.LENGTH),
             )
         ),
@@ -6143,7 +6179,7 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         # The return type of ``abs`` depends on the argument, so it is inferred
         # at the call site.
         Identifier("abs"): BuiltinFunctionTypeAnnotation(
-            func=BuiltinFunction(name=Identifier("abs"), returns=None)
+            func=BuiltinFunction(kind=BuiltinFunctionKind.ABS, returns=None)
         ),
         # NOTE (mristin):
         # We support ``int`` only to parse a string. The transpiled code is
@@ -6155,7 +6191,7 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         # to check the text before it calls ``int``.
         Identifier("int"): BuiltinFunctionTypeAnnotation(
             func=BuiltinFunction(
-                name=Identifier("int"),
+                kind=BuiltinFunctionKind.INT,
                 returns=PrimitiveTypeAnnotation(PrimitiveType.INT),
             )
         ),
@@ -6166,7 +6202,7 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
     # initializes, *e.g.*, ``x: Set[str] = set()``, see
     # :py:meth:`_Inferrer.transform_assignment`.
     mapping[Identifier("set")] = BuiltinFunctionTypeAnnotation(
-        func=BuiltinFunction(name=Identifier("set"), returns=None)
+        func=BuiltinFunction(kind=BuiltinFunctionKind.SET, returns=None)
     )
 
     for constant in symbol_table.constants:
