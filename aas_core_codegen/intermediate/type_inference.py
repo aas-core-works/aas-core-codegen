@@ -1669,6 +1669,17 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_assert(self, node: parse_tree.Assert) -> str:
+        condition = self.transform(node.condition)
+
+        if node.message is not None:
+            result = f"assert {condition}, {self.transform(node.message)}"
+        else:
+            result = f"assert {condition}"
+
+        self.representation_map[node] = result
+        return result
+
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement
     ) -> str:
@@ -6329,6 +6340,41 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if not success:
             return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_assert(
+        self, node: parse_tree.Assert
+    ) -> Optional["TypeAnnotationUnion"]:
+        condition_type = self.transform(node.condition)
+        if condition_type is None:
+            return None
+
+        if try_primitive_type(condition_type) is not PrimitiveType.BOOL:
+            # NOTE (mristin):
+            # We refuse the conditions which rely on Python's truthiness, such
+            # as ``assert some_list``, since the targets do not share it.
+            self.errors.append(
+                Error(
+                    node.condition.original_node,
+                    f"Expected the condition of the assertion to be "
+                    f"a boolean, but got: {condition_type}",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The message is evaluated only if the condition does not hold, so we
+        # infer it before we assume the condition.
+        if node.message is not None and self.transform(node.message) is None:
+            return None
+
+        # NOTE (mristin):
+        # The execution continues only if the condition holds. This is what
+        # narrows ``x`` after ``assert x is not None``, the same as mypy does.
+        self._facts = self._facts + self._implied_facts(node.condition)
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result

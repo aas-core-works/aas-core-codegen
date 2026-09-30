@@ -1953,12 +1953,26 @@ def generate_implementation(
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
+    # NOTE (mristin):
+    # The failed assertions throw ``std::logic_error``.
+    stdexcept_include = (
+        """
+
+#pragma warning(push, 0)
+#include <stdexcept>
+#pragma warning(pop)"""
+        if intermediate_uses.assert_statements_in(
+            [method for cls in symbol_table.classes for method in cls.methods]
+        )
+        else ""
+    )
+
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/constants.hpp"
-#include "{include_prefix_path}/types.hpp"'''
+#include "{include_prefix_path}/types.hpp"{stdexcept_include}"""
         ),
         cpp_common.generate_namespace_opening(namespace),
     ]  # type: List[Stripped]

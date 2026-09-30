@@ -1,5 +1,6 @@
 """Transpile meta-model Python code to C++ code."""
 import abc
+import ast
 import io
 import textwrap
 from typing import (
@@ -57,7 +58,10 @@ def _determine_which_to_wstring(
     if isinstance(type_annotation, intermediate_type_inference.PrimitiveTypeAnnotation):
         if type_annotation.a_type is intermediate_type_inference.PrimitiveType.STR:
             return None
-        elif type_annotation.a_type is intermediate_type_inference.PrimitiveType.INT:
+        elif type_annotation.a_type in (
+            intermediate_type_inference.PrimitiveType.INT,
+            intermediate_type_inference.PrimitiveType.LENGTH,
+        ):
             return "std::to_wstring"
         elif type_annotation.a_type is intermediate_type_inference.PrimitiveType.FLOAT:
             return "std::to_wstring"
@@ -3128,6 +3132,76 @@ for (
         self, node: parse_tree.Break
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("break;"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_assert(
+        self, node: parse_tree.Assert
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We transpile the negation of the condition as a ``not`` so that
+        # the operand is parenthesized the same way as elsewhere.
+        negation, error = self.transform_not(
+            parse_tree.Not(
+                operand=node.condition, original_node=node.condition.original_node
+            )
+        )
+        if error is not None:
+            errors.append(error)
+
+        # NOTE (mristin):
+        # The exceptions of the standard library expect a narrow string, which
+        # we encode in UTF-8. We convert only the f-strings at run time, since
+        # they are transpiled as wide strings.
+        what = None  # type: Optional[Stripped]
+        if node.message is None:
+            what = cpp_common.string_literal(
+                f"Assertion failed: {ast.unparse(node.condition.original_node)}"
+            )
+        elif isinstance(node.message, parse_tree.Constant):
+            assert isinstance(node.message.value, str)
+            what = cpp_common.string_literal(node.message.value)
+        else:
+            message, error = self.transform(node.message)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert message is not None
+                what = Stripped(
+                    f"""\
+common::WstringToUtf8(
+{I}{indent_but_first_line(message, I)}
+)"""
+                )
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the assertion", errors
+            )
+
+        assert negation is not None
+        assert what is not None
+
+        if "\n" in negation:
+            header = f"""\
+if (
+{I}{indent_but_first_line(negation, I)}
+)"""
+        else:
+            header = f"if ({negation})"
+
+        return (
+            Stripped(
+                f"""\
+{header} {{
+{I}throw std::logic_error(
+{II}{indent_but_first_line(what, II)}
+{I});
+}}"""
+            ),
+            None,
+        )
 
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement

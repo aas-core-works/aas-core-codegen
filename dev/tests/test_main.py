@@ -274,6 +274,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="arithmetic"
         )
 
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="assert_statements",
+        )
+
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="assignment_targets"
@@ -497,6 +503,12 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="arithmetic"
         )
 
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="assert_statements",
+        )
+
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="assignment_targets"
@@ -696,6 +708,12 @@ class Test_golang(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="arithmetic"
+        )
+
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="assert_statements",
         )
 
     def test_expected_assignment_targets(self) -> None:
@@ -899,6 +917,12 @@ class Test_java(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="arithmetic"
+        )
+
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="assert_statements",
         )
 
     def test_expected_assignment_targets(self) -> None:
@@ -1105,6 +1129,12 @@ class Test_jsonschema(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="arithmetic"
+        )
+
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="assert_statements",
         )
 
     def test_expected_assignment_targets(self) -> None:
@@ -1322,6 +1352,12 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="arithmetic"
         )
 
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="assert_statements",
+        )
+
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="assignment_targets"
@@ -1515,6 +1551,12 @@ class Test_typescript(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="arithmetic"
+        )
+
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="assert_statements",
         )
 
     def test_expected_assignment_targets(self) -> None:
@@ -1728,6 +1770,12 @@ class Test_xsd(_TestCase):
     def test_expected_arithmetic(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="arithmetic"
+        )
+
+    def test_expected_assert_statements(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="assert_statements",
         )
 
     def test_expected_assignment_targets(self) -> None:

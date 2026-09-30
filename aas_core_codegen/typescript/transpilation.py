@@ -1,5 +1,6 @@
 """Transpile meta-model Python code to TypeScript code."""
 import abc
+import ast
 import io
 import textwrap
 from typing import (
@@ -1156,7 +1157,7 @@ OurCommon.at(
         elif isinstance(node.value, float):
             return typescript_common.numeric_literal(node.value), None
         elif isinstance(node.value, str):
-            return typescript_common.string_literal(node.value), None
+            return Stripped(typescript_common.string_literal(node.value)), None
         elif isinstance(node.value, bytes):
             literal, multiline = typescript_common.bytes_literal(node.value)
 
@@ -2020,6 +2021,63 @@ for (
         self, node: parse_tree.Break
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("break;"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_assert(
+        self, node: parse_tree.Assert
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        # NOTE (mristin):
+        # We transpile the negation of the condition as a ``not`` so that
+        # the operand is parenthesized the same way as elsewhere.
+        negation, error = self.transform_not(
+            parse_tree.Not(
+                operand=node.condition, original_node=node.condition.original_node
+            )
+        )
+        if error is not None:
+            errors.append(error)
+
+        message = None  # type: Optional[Stripped]
+        if node.message is None:
+            message = Stripped(
+                typescript_common.string_literal(
+                    f"Assertion failed: {ast.unparse(node.condition.original_node)}"
+                )
+            )
+        else:
+            message, error = self.transform(node.message)
+            if error is not None:
+                errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the assertion", errors
+            )
+
+        assert negation is not None
+        assert message is not None
+
+        if "\n" in negation:
+            header = f"""\
+if (
+{I}{indent_but_first_line(negation, I)}
+)"""
+        else:
+            header = f"if ({negation})"
+
+        return (
+            Stripped(
+                f"""\
+{header} {{
+{I}throw new Error(
+{II}{indent_but_first_line(message, II)}
+{I});
+}}"""
+            ),
+            None,
+        )
 
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement

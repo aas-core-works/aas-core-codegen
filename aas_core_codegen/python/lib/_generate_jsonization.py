@@ -1432,7 +1432,7 @@ pass"""
     keys = [Stripped("'modelType'")]  # type: List[Stripped]
 
     for prop in cls.properties:
-        keys.append(python_common.string_literal(prop.json_name))
+        keys.append(Stripped(python_common.string_literal(prop.json_name)))
 
         variable = variable_by_prop_name[prop.name]
         parser = _parser_name(prop.type_annotation)

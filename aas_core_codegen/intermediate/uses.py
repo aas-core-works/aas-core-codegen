@@ -133,6 +133,34 @@ def modulo(symbol_table: _types.SymbolTable) -> bool:
     )
 
 
+def assert_statements_in(
+    functions: Sequence[Union[_types.Verification, _types.Method]],
+) -> bool:
+    """
+    Check whether the bodies of the ``functions`` contain ``assert`` statements.
+
+    The C++ generator uses this check to include ``<stdexcept>`` only where
+    it is needed.
+    """
+    for function in functions:
+        body = ()  # type: Sequence[parse_tree.Node]
+        if isinstance(function, _types.TranspilableVerification):
+            body = function.parsed.body
+        elif isinstance(function, _types.UnderstoodMethod):
+            body = function.body
+        else:
+            pass
+
+        if any(
+            isinstance(node, parse_tree.Assert)
+            for stmt in body
+            for node in parse_tree.over_nodes(stmt)
+        ):
+            return True
+
+    return False
+
+
 def abs_call(symbol_table: _types.SymbolTable) -> bool:
     """
     Check whether the meta-model calls the built-in ``abs`` in transpilable code.
