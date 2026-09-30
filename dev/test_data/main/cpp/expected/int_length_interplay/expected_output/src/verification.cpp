@@ -57,23 +57,20 @@ bool NoNumberIsSeven(
 ) {
   for (int64_t i = 0; i < count; ++i) {
     int64_t number = numbers.at(i);
-    switch (number) {
-      case 7:
-        return false;
+    if (number == 7) {
+      return false;
     }
     int64_t mirrored = (
       numbers.at(static_cast<int64_t>(numbers.size() - (1)) - i)
     );
-    switch (mirrored) {
-      case 7:
-        return false;
+    if (mirrored == 7) {
+      return false;
     }
     int64_t rotated = (
       numbers.at(common::FloorMod(i + (1), static_cast<int64_t>(numbers.size())))
     );
-    switch (rotated) {
-      case 7:
-        return false;
+    if (rotated == 7) {
+      return false;
     }
   }
   return true;
@@ -85,9 +82,8 @@ bool NoSevenFrom(
 ) {
   for (int64_t i = start; i < static_cast<int64_t>(numbers.size()); ++i) {
     int64_t number = numbers.at(i);
-    switch (number) {
-      case 7:
-        return false;
+    if (number == 7) {
+      return false;
     }
   }
   return (

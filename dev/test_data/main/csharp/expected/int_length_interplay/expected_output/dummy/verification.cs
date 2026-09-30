@@ -62,23 +62,20 @@ namespace dummy
             for (long i = 0; i < count; i++)
             {
                 long number = numbers[checked((int)i)];
-                switch (number)
+                if (number == 7)
                 {
-                    case 7:
-                        return false;
+                    return false;
                 }
                 long mirrored = numbers[checked((int)((numbers.Count - 1) - i))];
-                switch (mirrored)
+                if (mirrored == 7)
                 {
-                    case 7:
-                        return false;
+                    return false;
                 }
                 long rotated = (
                     numbers[checked((int)(Common.FloorMod(i + 1, numbers.Count)))]);
-                switch (rotated)
+                if (rotated == 7)
                 {
-                    case 7:
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -95,10 +92,9 @@ namespace dummy
             for (long i = start; i < numbers.Count; i++)
             {
                 long number = numbers[checked((int)i)];
-                switch (number)
+                if (number == 7)
                 {
-                    case 7:
-                        return false;
+                    return false;
                 }
             }
             return Enumerable.Range(

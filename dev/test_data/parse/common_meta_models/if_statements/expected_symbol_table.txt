@@ -554,6 +554,32 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
+          description='Empty text requires the flag or the number zero',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='lone_if_on_length',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='text',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='flag',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='number',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...),
+        Invariant(
           description='Number must be consistent with the kind',
           body=textwrap.dedent("""\
             FunctionCall(
@@ -1188,6 +1214,21 @@ UnverifiedSymbolTable(
                         original_node=...),
                       original_node=...),
                     original_node=...)],
+                original_node=...),
+              SwitchCase(
+                labels=[
+                  Member(
+                    instance=Name(
+                      identifier='Kind',
+                      original_node=...),
+                    name='Gamma',
+                    original_node=...)],
+                body=[
+                  Return(
+                    value=Constant(
+                      value=True,
+                      original_node=...),
+                    original_node=...)],
                 original_node=...)],
             default=[
               If(
@@ -1203,19 +1244,21 @@ UnverifiedSymbolTable(
                         original_node=...),
                       original_node=...),
                     body=[
-                      Switch(
-                        subject=Name(
-                          identifier='kind',
-                          original_node=...),
-                        cases=[
-                          SwitchCase(
-                            labels=[
-                              Member(
+                      If(
+                        branches=[
+                          IfBranch(
+                            condition=Comparison(
+                              left=Name(
+                                identifier='kind',
+                                original_node=...),
+                              op='EQ',
+                              right=Member(
                                 instance=Name(
                                   identifier='Kind',
                                   original_node=...),
                                 name='Beta',
-                                original_node=...)],
+                                original_node=...),
+                              original_node=...),
                             body=[
                               Return(
                                 value=Constant(
@@ -1228,6 +1271,90 @@ UnverifiedSymbolTable(
                     original_node=...)],
                 default=None,
                 original_node=...)],
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=Constant(
+              value=True,
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
+    UnderstoodMethod(
+      name='lone_if_on_length',
+      verification=True,
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...),
+        Argument(
+          name='flag',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='bool',
+            node=...),
+          default=None,
+          node=...),
+        Argument(
+          name='number',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='int',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      non_mutating=False,
+      body=[
+        textwrap.dedent("""\
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Name(
+                        identifier='text',
+                        original_node=...)],
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...),
+                body=[
+                  Return(
+                    value=Or(
+                      values=[
+                        Name(
+                          identifier='flag',
+                          original_node=...),
+                        Comparison(
+                          left=Name(
+                            identifier='number',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
+                            value=0,
+                            original_node=...),
+                          original_node=...)],
+                      original_node=...),
+                    original_node=...)],
+                original_node=...)],
+            default=None,
             original_node=...)"""),
         textwrap.dedent("""\
           Return(

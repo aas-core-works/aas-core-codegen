@@ -190,12 +190,14 @@ export class VerificationError {
 }
 
 /**
- * Check the switch with a single case and no default.
+ * Check the switch with no default.
  */
-export function switchOnEnumWithASingleCase(
+export function switchOnEnumWithoutDefault(
   kind: OurTypes.Kind
 ): boolean {
   switch (kind) {
+    case OurTypes.Kind.Alpha:
+      return true;
     case OurTypes.Kind.Delta:
       return false;
   }
@@ -333,6 +335,10 @@ export function switchOnInt(
 
 /**
  * Check the nested switches, including an `elif` on another subject.
+ *
+ * @remarks
+ *
+ * The lone `if`'s are if-statements, not switches.
  */
 export function nestedSwitches(
   kind: OurTypes.Kind,
@@ -343,19 +349,19 @@ export function nestedSwitches(
       switch (number) {
         case 0:
           return true;
+        case 5:
+          return false;
         default:
           return number > 10;
       }
     case OurTypes.Kind.Beta:
-      switch (number) {
-        case 1:
-          return false;
+      if (number == 1) {
+        return false;
       }
       break;
     default:
-      switch (number) {
-        case 2:
-          return false;
+      if (number == 2) {
+        return false;
       }
       break;
   }
@@ -374,6 +380,9 @@ export function switchWithReassignedInt(
   switch (kind) {
     case OurTypes.Kind.Beta:
       result = number;
+      break;
+    case OurTypes.Kind.Gamma:
+      result = 1;
       break;
   }
   return result < 1000;
@@ -450,7 +459,7 @@ class Verifier
       )
     }
 
-    if (!switchOnEnumWithASingleCase(that.kind)) {
+    if (!switchOnEnumWithoutDefault(that.kind)) {
       yield new VerificationError(
         "Kind must not be delta"
       )

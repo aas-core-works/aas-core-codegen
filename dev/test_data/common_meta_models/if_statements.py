@@ -103,13 +103,29 @@ def if_in_default_of_switch(kind: Kind, number: int) -> bool:
     Check the ``elif`` which does not compare the subject of the switch.
 
     The ``elif`` becomes an if-statement in the default of the switch, and nests
-    a switch in turn.
+    a lone ``if`` in turn, which is an if-statement as well.
     """
     if kind == Kind.Alpha:
         return number < 10
+    elif kind == Kind.Gamma:
+        return True
     elif number < -5:
         if kind == Kind.Beta:
             return False
+
+    return True
+
+
+@verification
+def lone_if_on_length(text: str, flag: bool, number: int) -> bool:
+    """
+    Check the lone ``if`` which compares against a constant.
+
+    The lone ``if`` is not a switch, so its subject needs not be an enumeration,
+    a string or an integer.
+    """
+    if len(text) == 0:
+        return flag or number == 0
 
     return True
 
@@ -312,6 +328,10 @@ def has_marker_in_tree(parent: Parent) -> bool:
 @invariant(
     lambda self: if_in_default_of_switch(self.kind, self.number),
     "Number must be consistent with the kind",
+)
+@invariant(
+    lambda self: lone_if_on_length(self.text, self.flag, self.number),
+    "Empty text requires the flag or the number zero",
 )
 @invariant(
     lambda self: if_with_non_null_in_condition(self.item),

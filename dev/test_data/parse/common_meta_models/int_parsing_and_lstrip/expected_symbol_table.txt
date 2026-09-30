@@ -742,22 +742,24 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Slice(
-              collection=Name(
-                identifier='text',
-                original_node=...),
-              start=None,
-              end=Constant(
-                value=1,
-                original_node=...),
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Slice(
+                    collection=Name(
+                      identifier='text',
+                      original_node=...),
+                    start=None,
+                    end=Constant(
+                      value=1,
+                      original_node=...),
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value='-',
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Or(

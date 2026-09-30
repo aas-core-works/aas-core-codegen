@@ -1193,6 +1193,10 @@ class _ParseSwitch(_Parse):
     followed by a nested ``if``, an ``elif`` which does not compare the same subject
     becomes a nested switch or a nested if-statement in the default.
 
+    A switch needs at least two labels in the whole chain. Otherwise, the chain
+    merely tests a condition, *e.g.*, ``if len(items) == 0:``, and we parse it as
+    an if-statement.
+
     The ``if``'s which do not compare a subject against constants are parsed
     by :py:class:`_ParseIf`.
 
@@ -1203,7 +1207,24 @@ class _ParseSwitch(_Parse):
     """
 
     def matches(self, node: ast.AST) -> bool:
-        return isinstance(node, ast.If) and _match_switch_test(node.test) is not None
+        if not isinstance(node, ast.If):
+            return False
+
+        match = _match_switch_test(node.test)
+        if match is None:
+            return False
+
+        subject_node, label_nodes = match
+        if len(label_nodes) >= 2:
+            return True
+
+        if not (len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)):
+            return False
+
+        next_match = _match_switch_test(node.orelse[0].test)
+        return next_match is not None and ast.dump(next_match[0]) == ast.dump(
+            subject_node
+        )
 
     # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:

@@ -317,10 +317,8 @@ public class Verification {
     List<IItem> items) {
     for (var item : items) {
         for (var text : item.getTexts()) {
-            switch (text) {
-                case "" -> {
-                    return false;
-                }
+            if (Objects.equals(text, "")) {
+                return false;
             }
         }
     }

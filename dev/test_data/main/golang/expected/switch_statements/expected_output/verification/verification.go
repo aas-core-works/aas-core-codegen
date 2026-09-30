@@ -45,11 +45,13 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
-// Check the switch with a single case and no default.
-func SwitchOnEnumWithASingleCase(
+// Check the switch with no default.
+func SwitchOnEnumWithoutDefault(
 	kind ourtypes.Kind,
 ) bool {
 	switch kind {
+	case ourtypes.KindAlpha:
+		return true
 	case ourtypes.KindDelta:
 		return false
 	}
@@ -158,6 +160,8 @@ func SwitchOnInt(
 }
 
 // Check the nested switches, including an `elif` on another subject.
+//
+// The lone `if`'s are if-statements, not switches.
 func NestedSwitches(
 	kind ourtypes.Kind,
 	number int64,
@@ -167,17 +171,17 @@ func NestedSwitches(
 		switch number {
 		case 0:
 			return true
+		case 5:
+			return false
 		default:
 			return number > 10
 		}
 	case ourtypes.KindBeta:
-		switch number {
-		case 1:
+		if number == 1 {
 			return false
 		}
 	default:
-		switch number {
-		case 2:
+		if number == 2 {
 			return false
 		}
 	}
@@ -194,6 +198,8 @@ func SwitchWithReassignedInt(
 	switch kind {
 	case ourtypes.KindBeta:
 		result = number
+	case ourtypes.KindGamma:
+		result = 1
 	}
 	return result < 1000
 }
@@ -305,7 +311,7 @@ func VerifySomething(
 		}
 	}
 
-	if !SwitchOnEnumWithASingleCase(that.Kind()) {
+	if !SwitchOnEnumWithoutDefault(that.Kind()) {
 		abort = onError(
 			newVerificationError(
 				"Kind must not be delta",),

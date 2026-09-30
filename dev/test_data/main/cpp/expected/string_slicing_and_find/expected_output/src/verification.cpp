@@ -43,9 +43,8 @@ bool DateBeforeTimeIsLongEnough(
   const std::wstring& text
 ) {
   int64_t position = common::FindStr(text, L"T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     common::LenStr(common::SliceStr(text, 0, position)) == 10
@@ -56,9 +55,8 @@ bool TimeAfterDateIsLongEnough(
   const std::wstring& text
 ) {
   int64_t position = common::FindStr(text, L"T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     common::LenStr(common::SliceStr(text, position + (1))) == 8
@@ -69,14 +67,12 @@ bool MonthIsSeptember(
   const std::wstring& text
 ) {
   int64_t first = common::FindStr(text, L"-");
-  switch (first) {
-    case -1:
-      return true;
+  if (first == -1) {
+    return true;
   }
   int64_t second = common::FindStr(text, L"-", first + (1));
-  switch (second) {
-    case -1:
-      return false;
+  if (second == -1) {
+    return false;
   }
   return (
     common::SliceStr(text, first + (1), second) == L"09"
@@ -87,9 +83,8 @@ bool SecondsFollowColon(
   const std::wstring& text
 ) {
   int64_t position = common::FindStr(text, L"T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     (

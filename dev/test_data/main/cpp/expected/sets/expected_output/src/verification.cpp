@@ -57,10 +57,9 @@ bool NumbersAreUniqueBetweenZeros(
 ) {
   std::unordered_set<int64_t> seen = std::unordered_set<int64_t>();
   for (int64_t number : numbers) {
-    switch (number) {
-      case 0:
-        seen = std::unordered_set<int64_t>();
-        continue;
+    if (number == 0) {
+      seen = std::unordered_set<int64_t>();
+      continue;
     }
     if (seen.find(number) != seen.end()) {
       return false;

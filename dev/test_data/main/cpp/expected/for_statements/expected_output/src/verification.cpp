@@ -52,9 +52,8 @@ bool NoNumberIsZero(
   const std::vector<int64_t>& numbers
 ) {
   for (int64_t number : numbers) {
-    switch (number) {
-      case 0:
-        return false;
+    if (number == 0) {
+      return false;
     }
   }
   return true;
@@ -65,9 +64,8 @@ bool NoNumberIsMinusOne(
 ) {
   for (size_t i = 0; i < numbers.size(); ++i) {
     int64_t number = numbers.at(i);
-    switch (number) {
-      case -1:
-        return false;
+    if (number == -1) {
+      return false;
     }
   }
   return true;
@@ -77,9 +75,8 @@ bool NoNumberAfterTheFirstIsOne(
   const std::vector<int64_t>& numbers
 ) {
   for (size_t i = 1; i < numbers.size(); ++i) {
-    switch (numbers.at(i)) {
-      case 1:
-        return false;
+    if (numbers.at(i) == 1) {
+      return false;
     }
   }
   return true;
@@ -131,17 +128,12 @@ bool AlphaHasNoNegativeNumbers(
   types::Kind kind,
   const std::vector<int64_t>& numbers
 ) {
-  switch (kind) {
-    case types::Kind::kAlpha:
-      for (int64_t number : numbers) {
-        switch (number) {
-          case -2:
-            return false;
-        }
+  if (kind == types::Kind::kAlpha) {
+    for (int64_t number : numbers) {
+      if (number == -2) {
+        return false;
       }
-      break;
-    default:
-      break;
+    }
   }
   return true;
 }
@@ -151,9 +143,8 @@ bool SumOfOddNumbersIsSmall(
 ) {
   int64_t total = 0;
   for (int64_t number : numbers) {
-    switch (common::FloorMod(number, 2)) {
-      case 0:
-        continue;
+    if (common::FloorMod(number, 2) == 0) {
+      continue;
     }
     total = total + number;
   }
@@ -236,10 +227,8 @@ bool TextsBeforeStopAreFew(
         if (item->texts().at(i) == L"stop") {
           break;
         }
-      } else {
-        if (common::LenStr(item->texts().at(i)) > 10) {
-          break;
-        }
+      } else if (common::LenStr(item->texts().at(i)) > 10) {
+        break;
       }
       count = count + (1);
     }

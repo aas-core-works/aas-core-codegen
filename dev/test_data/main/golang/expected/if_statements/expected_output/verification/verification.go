@@ -97,7 +97,7 @@ func IfWithPass(
 // Check the `elif` which does not compare the subject of the switch.
 //
 // The `elif` becomes an if-statement in the default of the switch, and nests
-// a switch in turn.
+// a lone `if` in turn, which is an if-statement as well.
 func IfInDefaultOfSwitch(
 	kind ourtypes.Kind,
 	number int64,
@@ -105,13 +105,30 @@ func IfInDefaultOfSwitch(
 	switch kind {
 	case ourtypes.KindAlpha:
 		return number < 10
+	case ourtypes.KindGamma:
+		return true
 	default:
 		if number < -5 {
-			switch kind {
-			case ourtypes.KindBeta:
+			if kind == ourtypes.KindBeta {
 				return false
 			}
 		}
+	}
+	return true
+}
+
+// Check the lone `if` which compares against a constant.
+//
+// The lone `if` is not a switch, so its subject needs not be an enumeration,
+// a string or an integer.
+func LoneIfOnLength(
+	text string,
+	flag bool,
+	number int64,
+) bool {
+	if ourcommon.LenStr(text) == 0 {
+		return flag ||
+			number == 0
 	}
 	return true
 }
@@ -423,6 +440,21 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Optional text of the item must be at most 5 characters long",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		LoneIfOnLength(
+			that.Text(),
+			that.Flag(),
+			that.Number(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Empty text requires the flag or the number zero",),
 		)
 		if abort {
 			return

@@ -39,10 +39,9 @@ namespace dummy
         )
         {
             long position = Common.StringHelpers.Find(text, "T");
-            switch (position)
+            if (position == -1)
             {
-                case -1:
-                    return true;
+                return true;
             }
             return (
                 Common.StringHelpers.Len(Common.StringHelpers.Slice(text, 0, position)) == 10);
@@ -56,10 +55,9 @@ namespace dummy
         )
         {
             long position = Common.StringHelpers.Find(text, "T");
-            switch (position)
+            if (position == -1)
             {
-                case -1:
-                    return true;
+                return true;
             }
             return (
                 Common.StringHelpers.Len(Common.StringHelpers.Slice(text, position + 1)) == 8);
@@ -73,16 +71,14 @@ namespace dummy
         )
         {
             long first = Common.StringHelpers.Find(text, "-");
-            switch (first)
+            if (first == -1)
             {
-                case -1:
-                    return true;
+                return true;
             }
             long second = Common.StringHelpers.Find(text, "-", first + 1);
-            switch (second)
+            if (second == -1)
             {
-                case -1:
-                    return false;
+                return false;
             }
             return (
                 Common.StringHelpers.Slice(text, first + 1, second) == "09");
@@ -96,10 +92,9 @@ namespace dummy
         )
         {
             long position = Common.StringHelpers.Find(text, "T");
-            switch (position)
+            if (position == -1)
             {
-                case -1:
-                    return true;
+                return true;
             }
             return Common.StringHelpers.Len(text) < 10
             || (

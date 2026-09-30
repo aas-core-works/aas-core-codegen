@@ -2144,16 +2144,18 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...),
                 body=[
-                  Switch(
-                    subject=Name(
-                      identifier='text',
-                      original_node=...),
-                    cases=[
-                      SwitchCase(
-                        labels=[
-                          Constant(
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=Name(
+                            identifier='text',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
                             value='',
-                            original_node=...)],
+                            original_node=...),
+                          original_node=...),
                         body=[
                           Return(
                             value=Constant(

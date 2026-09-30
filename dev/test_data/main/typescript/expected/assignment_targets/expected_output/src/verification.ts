@@ -500,9 +500,8 @@ export function textsAreNotEmpty(
 ): boolean {
   for (const item of items) {
     for (const text of item.texts) {
-      switch (text) {
-        case "":
-          return false;
+      if (text == "") {
+        return false;
       }
     }
   }

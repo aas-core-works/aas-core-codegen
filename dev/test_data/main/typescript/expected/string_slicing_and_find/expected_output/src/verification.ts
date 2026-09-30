@@ -196,9 +196,8 @@ export function dateBeforeTimeIsLongEnough(
   text: string
 ): boolean {
   const position = OurCommon.findStr(text, "T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     OurCommon.lenStr(OurCommon.sliceStr(text, 0, position)) == 10);
@@ -211,9 +210,8 @@ export function timeAfterDateIsLongEnough(
   text: string
 ): boolean {
   const position = OurCommon.findStr(text, "T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     OurCommon.lenStr(OurCommon.sliceStr(text, position + 1)) == 8);
@@ -226,14 +224,12 @@ export function monthIsSeptember(
   text: string
 ): boolean {
   const first = OurCommon.findStr(text, "-");
-  switch (first) {
-    case -1:
-      return true;
+  if (first == -1) {
+    return true;
   }
   const second = OurCommon.findStr(text, "-", first + 1);
-  switch (second) {
-    case -1:
-      return false;
+  if (second == -1) {
+    return false;
   }
   return (
     OurCommon.sliceStr(text, first + 1, second) == "09");
@@ -246,9 +242,8 @@ export function secondsFollowColon(
   text: string
 ): boolean {
   const position = OurCommon.findStr(text, "T");
-  switch (position) {
-    case -1:
-      return true;
+  if (position == -1) {
+    return true;
   }
   return (
     OurCommon.lenStr(text) < 10

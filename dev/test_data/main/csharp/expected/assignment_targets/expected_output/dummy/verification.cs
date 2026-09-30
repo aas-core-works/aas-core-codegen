@@ -377,10 +377,9 @@ namespace dummy
             {
                 foreach (var text in item.Texts)
                 {
-                    switch (text)
+                    if (text == "")
                     {
-                        case "":
-                            return false;
+                        return false;
                     }
                 }
             }

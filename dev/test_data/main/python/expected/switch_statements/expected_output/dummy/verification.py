@@ -62,12 +62,14 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
-def switch_on_enum_with_a_single_case(
+def switch_on_enum_without_default(
     kind: our_types.Kind
 ) -> bool:
-    """Check the switch with a single case and no default."""
+    """Check the switch with no default."""
     # pylint: disable=all
-    if kind == our_types.Kind.DELTA:
+    if kind == our_types.Kind.ALPHA:
+        return True
+    elif kind == our_types.Kind.DELTA:
         return False
     return True
 
@@ -176,11 +178,15 @@ def nested_switches(
 ) -> bool:
     """
     Check the nested switches, including an ``elif`` on another subject.
+
+    The lone ``if``'s are if-statements, not switches.
     """
     # pylint: disable=all
     if kind == our_types.Kind.ALPHA:
         if number == 0:
             return True
+        elif number == 5:
+            return False
         else:
             return number > 10
     elif kind == our_types.Kind.BETA:
@@ -204,6 +210,8 @@ def switch_with_reassigned_int(
     result = 0
     if kind == our_types.Kind.BETA:
         result = number
+    elif kind == our_types.Kind.GAMMA:
+        result = 1
     return result < 1000
 
 
@@ -267,7 +275,7 @@ class _Transformer(
                 'Kind must be neither beta nor gamma'
             )
 
-        if not switch_on_enum_with_a_single_case(that.kind):
+        if not switch_on_enum_without_default(that.kind):
             yield Error(
                 'Kind must not be delta'
             )

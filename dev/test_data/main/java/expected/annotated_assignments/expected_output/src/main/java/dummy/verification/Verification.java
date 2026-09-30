@@ -334,10 +334,8 @@ public class Verification {
         return false;
     }
     for (var item : allTexts) {
-        switch (item) {
-            case "forbidden" -> {
-                return false;
-            }
+        if (Objects.equals(item, "forbidden")) {
+            return false;
         }
     }
     if (

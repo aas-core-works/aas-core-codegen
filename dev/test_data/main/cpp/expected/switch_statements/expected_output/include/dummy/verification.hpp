@@ -214,8 +214,8 @@ class RecursiveVerification : public IVerification {
 
 // region Verification functions
 
-/// \brief Check the switch with a single case and no default.
-bool SwitchOnEnumWithASingleCase(
+/// \brief Check the switch with no default.
+bool SwitchOnEnumWithoutDefault(
   types::Kind kind
 );
 
@@ -256,6 +256,8 @@ bool SwitchOnInt(
 );
 
 /// \brief Check the nested switches, including an `elif` on another subject.
+///
+/// The lone `if`'s are if-statements, not switches.
 bool NestedSwitches(
   types::Kind kind,
   int64_t number

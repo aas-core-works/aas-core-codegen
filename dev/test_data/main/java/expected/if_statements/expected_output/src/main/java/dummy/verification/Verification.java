@@ -89,7 +89,7 @@ public class Verification {
    * Check the {@code elif} which does not compare the subject of the switch.
    *
    * <p>The {@code elif} becomes an if-statement in the default of the switch, and nests
-   * a switch in turn.
+   * a lone {@code if} in turn, which is an if-statement as well.
    */
   public static Boolean ifInDefaultOfSwitch(
     Kind kind,
@@ -98,15 +98,33 @@ public class Verification {
         case ALPHA -> {
             return number < 10;
         }
+        case GAMMA -> {
+            return true;
+        }
         default -> {
             if (number < -5) {
-                switch (kind) {
-                    case BETA -> {
-                        return false;
-                    }
+                if (kind == Kind.BETA) {
+                    return false;
                 }
             }
         }
+    }
+    return true;
+  }
+
+  /**
+   * Check the lone {@code if} which compares against a constant.
+   *
+   * <p>The lone {@code if} is not a switch, so its subject needs not be an enumeration,
+   * a string or an integer.
+   */
+  public static Boolean loneIfOnLength(
+    String text,
+    Boolean flag,
+    Long number) {
+    if (StringHelpers.len(text) == 0) {
+        return flag
+        || number == 0;
     }
     return true;
   }
@@ -412,6 +430,14 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Optional text of the item must be at most 5 characters long")));
+      }
+
+      if (!(
+        loneIfOnLength(that.getText(), that.getFlag(), that.getNumber()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Empty text requires the flag or the number zero")));
       }
 
       if (!(

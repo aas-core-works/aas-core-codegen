@@ -10,6 +10,8 @@ class Kind(Enum):
 def some_func(text: str) -> bool:
     if text in ():
         return False
+    elif text == "a":
+        return True
 
     return True
 

@@ -270,17 +270,16 @@ export function isXsLong(
     OurCommon.parseSafeInt(OurCommon.sliceStr(digits, 0, 10)));
   const tail = (
     OurCommon.parseSafeInt(OurCommon.sliceStr(digits, 10)));
-  switch (OurCommon.sliceStr(text, 0, 1)) {
-    case "-":
-      return (
-        head < 9223372036
-        || (
-          (
-            head == 9223372036
-            && tail <= 854775808
-          )
+  if (OurCommon.sliceStr(text, 0, 1) == "-") {
+    return (
+      head < 9223372036
+      || (
+        (
+          head == 9223372036
+          && tail <= 854775808
         )
-      );
+      )
+    );
   }
   return (
     head < 9223372036

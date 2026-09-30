@@ -60,11 +60,10 @@ namespace dummy
             HashSet<long> seen = new HashSet<long>();
             foreach (var number in numbers)
             {
-                switch (number)
+                if (number == 0)
                 {
-                    case 0:
-                        seen = new HashSet<long>();
-                        continue;
+                    seen = new HashSet<long>();
+                    continue;
                 }
                 if (seen.Contains(number))
                 {

@@ -30,11 +30,14 @@ import dummy.visitation.AbstractTransformer;
 
 public class Verification {
   /**
-   * Check the switch with a single case and no default.
+   * Check the switch with no default.
    */
-  public static Boolean switchOnEnumWithASingleCase(
+  public static Boolean switchOnEnumWithoutDefault(
     Kind kind) {
     switch (kind) {
+        case ALPHA -> {
+            return true;
+        }
         case DELTA -> {
             return false;
         }
@@ -166,6 +169,8 @@ public class Verification {
 
   /**
    * Check the nested switches, including an {@code elif} on another subject.
+   *
+   * <p>The lone {@code if}'s are if-statements, not switches.
    */
   public static Boolean nestedSwitches(
     Kind kind,
@@ -174,6 +179,8 @@ public class Verification {
         case ALPHA -> {
             if (number == 0) {
                 return true;
+            } else if (number == 5) {
+                return false;
             } else {
                 return number > 10;
             }
@@ -203,6 +210,9 @@ public class Verification {
     switch (kind) {
         case BETA -> {
             result = number;
+        }
+        case GAMMA -> {
+            result = 1;
         }
     }
     return result < 1000;
@@ -302,7 +312,7 @@ public class Verification {
             "Kind must be neither beta nor gamma")));
       }
 
-      if (!switchOnEnumWithASingleCase(that.getKind())) {
+      if (!switchOnEnumWithoutDefault(that.getKind())) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +

@@ -72,8 +72,7 @@ func NumbersAreUniqueBetweenZeros(
 ) bool {
 	var seen map[int64]struct{} = make(map[int64]struct{})
 	for _, number := range numbers {
-		switch number {
-		case 0:
+		if number == 0 {
 			seen = make(map[int64]struct{})
 			continue
 		}

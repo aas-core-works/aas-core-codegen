@@ -3315,19 +3315,21 @@ UnverifiedSymbolTable(
                       original_node=...),
                     annotation=None,
                     original_node=...),
-                  Switch(
-                    subject=Member(
-                      instance=Name(
-                        identifier='current',
-                        original_node=...),
-                      name='a_only',
-                      original_node=...),
-                    cases=[
-                      SwitchCase(
-                        labels=[
-                          Constant(
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=Member(
+                            instance=Name(
+                              identifier='current',
+                              original_node=...),
+                            name='a_only',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
                             value=13,
-                            original_node=...)],
+                            original_node=...),
+                          original_node=...),
                         body=[
                           Return(
                             value=Constant(
@@ -3444,19 +3446,21 @@ UnverifiedSymbolTable(
                       original_node=...)],
                   original_node=...),
                 body=[
-                  Switch(
-                    subject=Member(
-                      instance=Name(
-                        identifier='optional_member',
-                        original_node=...),
-                      name='b_only',
-                      original_node=...),
-                    cases=[
-                      SwitchCase(
-                        labels=[
-                          Constant(
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=Member(
+                            instance=Name(
+                              identifier='optional_member',
+                              original_node=...),
+                            name='b_only',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
                             value=13,
-                            original_node=...)],
+                            original_node=...),
+                          original_node=...),
                         body=[
                           Return(
                             value=Constant(
@@ -3976,16 +3980,18 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Name(
-                  identifier='item',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='item',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value='forbidden',
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(

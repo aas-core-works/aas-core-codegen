@@ -66,19 +66,16 @@ func NoNumberIsSeven(
 ) bool {
 	for i := int64(0); i < count; i++ {
 		number := numbers[i]
-		switch number {
-		case 7:
+		if number == 7 {
 			return false
 		}
 		mirrored := numbers[int64(len(numbers) - 1) - i]
-		switch mirrored {
-		case 7:
+		if mirrored == 7 {
 			return false
 		}
 		rotated :=
 			numbers[ourcommon.FloorMod(i + 1, int64(len(numbers)))]
-		switch rotated {
-		case 7:
+		if rotated == 7 {
 			return false
 		}
 	}
@@ -92,8 +89,7 @@ func NoSevenFrom(
 ) bool {
 	for i := start; i < int64(len(numbers)); i++ {
 		number := numbers[i]
-		switch number {
-		case 7:
+		if number == 7 {
 			return false
 		}
 	}

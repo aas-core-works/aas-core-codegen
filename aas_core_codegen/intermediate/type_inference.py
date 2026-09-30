@@ -3482,6 +3482,34 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if not success:
             return None
 
+        # NOTE (mristin):
+        # We compare the constrained primitives by their constrainees. A length can
+        # be compared with an integer, as the targets widen the length. The other
+        # types have to be assignable in either direction, *e.g.*, an instance of
+        # a class to an instance of its descendant.
+        left_primitive_type = try_primitive_type(left_type)
+        right_primitive_type = try_primitive_type(right_type)
+
+        if left_primitive_type is not None and right_primitive_type is not None:
+            comparable = left_primitive_type is right_primitive_type or {
+                left_primitive_type,
+                right_primitive_type,
+            } == {PrimitiveType.INT, PrimitiveType.LENGTH}
+        else:
+            comparable = _assignable(
+                target_type=left_type, value_type=right_type
+            ) or _assignable(target_type=right_type, value_type=left_type)
+
+        if not comparable:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"Expected the operands of the comparison to be of "
+                    f"comparable types, but got: {left_type} and {right_type}",
+                )
+            )
+            return None
+
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
         return result

@@ -11,6 +11,8 @@ def some_func(kind: Kind) -> bool:
     x = True
     if kind == Kind.Alpha:
         return False
+    elif kind == Kind.Beta:
+        return False
     else:
         return True
 

@@ -10,6 +10,8 @@ class Kind(Enum):
 def some_func(number: int) -> bool:
     if number == True:
         return False
+    elif number == 1:
+        return True
 
     return True
 

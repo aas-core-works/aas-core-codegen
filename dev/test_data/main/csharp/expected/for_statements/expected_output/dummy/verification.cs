@@ -54,10 +54,9 @@ namespace dummy
         {
             foreach (var number in numbers)
             {
-                switch (number)
+                if (number == 0)
                 {
-                    case 0:
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -73,10 +72,9 @@ namespace dummy
             for (int i = 0; i < numbers.Count; i++)
             {
                 long number = numbers[i];
-                switch (number)
+                if (number == -1)
                 {
-                    case -1:
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -91,10 +89,9 @@ namespace dummy
         {
             for (int i = 1; i < numbers.Count; i++)
             {
-                switch (numbers[i])
+                if (numbers[i] == 1)
                 {
-                    case 1:
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -127,10 +124,9 @@ namespace dummy
                 var texts = item.Texts;
                 foreach (var text in texts)
                 {
-                    switch (text)
+                    if (text == "")
                     {
-                        case "":
-                            return false;
+                        return false;
                     }
                 }
             }
@@ -146,18 +142,16 @@ namespace dummy
         {
             foreach (var x in texts)
             {
-                switch (x)
+                if (x == "thirteen")
                 {
-                    case "thirteen":
-                        return false;
+                    return false;
                 }
             }
             foreach (var x in texts)
             {
-                switch (x)
+                if (x == "unlucky")
                 {
-                    case "unlucky":
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -171,18 +165,15 @@ namespace dummy
             List<long> numbers
         )
         {
-            switch (kind)
+            if (kind == Kind.Alpha)
             {
-                case Kind.Alpha:
-                    foreach (var number in numbers)
+                foreach (var number in numbers)
+                {
+                    if (number == -2)
                     {
-                        switch (number)
-                        {
-                            case -2:
-                                return false;
-                        }
+                        return false;
                     }
-                    break;
+                }
             }
             return true;
         }  // public static bool AlphaHasNoNegativeNumbers
@@ -197,10 +188,9 @@ namespace dummy
             long total = 0;
             foreach (var number in numbers)
             {
-                switch (Common.FloorMod(number, 2))
+                if ((Common.FloorMod(number, 2)) == (0))
                 {
-                    case 0:
-                        continue;
+                    continue;
                 }
                 total = total + number;
             }
@@ -311,12 +301,9 @@ namespace dummy
                             break;
                         }
                     }
-                    else
+                    else if (Common.StringHelpers.Len(item.Texts[i]) > 10)
                     {
-                        if (Common.StringHelpers.Len(item.Texts[i]) > 10)
-                        {
-                            break;
-                        }
+                        break;
                     }
                     count = count + 1;
                 }

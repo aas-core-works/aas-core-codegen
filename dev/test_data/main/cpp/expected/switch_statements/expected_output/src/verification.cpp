@@ -39,10 +39,12 @@ Error::Error(
 
 // region Verification functions
 
-bool SwitchOnEnumWithASingleCase(
+bool SwitchOnEnumWithoutDefault(
   types::Kind kind
 ) {
   switch (kind) {
+    case types::Kind::kAlpha:
+      return true;
     case types::Kind::kDelta:
       return false;
     default:
@@ -163,19 +165,19 @@ bool NestedSwitches(
       switch (number) {
         case 0:
           return true;
+        case 5:
+          return false;
         default:
           return number > 10;
       }
     case types::Kind::kBeta:
-      switch (number) {
-        case 1:
-          return false;
+      if (number == 1) {
+        return false;
       }
       break;
     default:
-      switch (number) {
-        case 2:
-          return false;
+      if (number == 2) {
+        return false;
       }
       break;
   }
@@ -190,6 +192,9 @@ bool SwitchWithReassignedInt(
   switch (kind) {
     case types::Kind::kBeta:
       result = number;
+      break;
+    case types::Kind::kGamma:
+      result = 1;
       break;
     default:
       break;
@@ -345,7 +350,7 @@ bool Something_9(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return verification::SwitchOnEnumWithASingleCase(
+  return verification::SwitchOnEnumWithoutDefault(
     that->kind()
   );
 }

@@ -809,6 +809,8 @@ class Other_kind(Enum):
 def some_func(kind: Optional[Kind]) -> bool:
     if kind == Kind.Alpha:
         return False
+    elif kind == Kind.Beta:
+        return True
 
     return True
 
@@ -840,6 +842,8 @@ class Other_kind(Enum):
 def some_func(flag: bool) -> bool:
     if flag == 1:
         return False
+    elif flag == 0:
+        return True
 
     return True
 
@@ -871,6 +875,8 @@ class Other_kind(Enum):
 def some_func(kind: Kind) -> bool:
     if kind == Other_kind.Alpha:
         return False
+    elif kind == Kind.Beta:
+        return True
 
     return True
 
@@ -933,6 +939,8 @@ class Other_kind(Enum):
 def some_func(text: str) -> bool:
     if text == 1:
         return False
+    elif text == "beta":
+        return True
 
     return True
 
@@ -964,6 +972,8 @@ class Other_kind(Enum):
 def some_func(kind: Kind) -> bool:
     if kind == "alpha":
         return False
+    elif kind == Kind.Beta:
+        return True
 
     return True
 
@@ -977,6 +987,121 @@ __xml_namespace__ = "https://dummy.com"
             expected_joined_message=(
                 "Expected the label to be a literal of the enumeration "
                 "'Kind', the type of the subject of the switch, but got: str"
+            ),
+        )
+
+    def test_comparison_of_length_with_constant(self) -> None:
+        source = """\
+@invariant(lambda self: len(self) > 0, "At least one character")
+class Non_empty_string(str, DBC):
+    pass
+
+
+@verification
+def some_func(text: str, name: Non_empty_string) -> bool:
+    if len(text) == 0:
+        return False
+
+    return name == text
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.execute(source=source)
+
+    def test_comparison_of_str_with_int_fails(self) -> None:
+        source = """\
+@verification
+def some_func(text: str) -> bool:
+    if text == 1:
+        return False
+
+    return True
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operands of the comparison to be of comparable "
+                "types, but got: str and int"
+            ),
+        )
+
+    def test_comparison_of_bool_with_int_fails(self) -> None:
+        source = """\
+@verification
+def some_func(flag: bool) -> bool:
+    return flag == 1
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operands of the comparison to be of comparable "
+                "types, but got: bool and int"
+            ),
+        )
+
+    def test_comparison_of_different_enumerations_fails(self) -> None:
+        source = """\
+class Kind(Enum):
+    Alpha = "alpha"
+
+
+class Other_kind(Enum):
+    Alpha = "alpha"
+
+
+@verification
+def some_func(kind: Kind) -> bool:
+    if kind == Other_kind.Alpha:
+        return False
+
+    return True
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operands of the comparison to be of comparable "
+                "types, but got: Kind and Other_kind"
+            ),
+        )
+
+    def test_comparison_of_enumeration_with_str_fails(self) -> None:
+        source = """\
+class Kind(Enum):
+    Alpha = "alpha"
+
+
+@verification
+def some_func(kind: Kind) -> bool:
+    return kind != "alpha"
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operands of the comparison to be of comparable "
+                "types, but got: Kind and str"
             ),
         )
 
