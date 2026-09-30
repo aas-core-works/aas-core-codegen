@@ -1,4 +1,31 @@
-Failed to smoke-transpile what we could without snippets to C# based on <meta_model.py>:
-* At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
-    At line 9 and column 26: Failed to transpile the comparison
-      At line 9 and column 26: We do not know how to compute the length on type Value
+Failed to smoke-generate C++ based on <meta_model.py>:
+* Failed to generate src/verification.cpp based on <meta_model.py>:
+  * At line 9 and column 2: Failed to transpile the invariants of 'Something'
+      At line 9 and column 3: Failed to infer the types in the invariant
+        At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value
+Failed to smoke-generate C# based on <meta_model.py>:
+* Failed to generate dummy/verification.cs based on <meta_model.py>:
+  * At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+      At line 9 and column 3: Failed to infer the types in the invariant
+        At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value
+Failed to smoke-generate Go based on <meta_model.py>:
+* Failed to generate verification/verification.go based on <meta_model.py>:
+  * At line 9 and column 2: Failed to generate the verification for the class 'Something'
+      At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+        At line 9 and column 3: Failed to infer the types in the invariant
+          At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value
+Failed to smoke-generate Java based on <meta_model.py>:
+* Failed to generate src/main/java/dummy/verification based on <meta_model.py>:
+  * At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+      At line 9 and column 3: Failed to infer the types in the invariant
+        At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value
+Failed to smoke-generate Python based on <meta_model.py>:
+* Failed to generate dummy/verification.py based on <meta_model.py>:
+  * At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+      At line 9 and column 3: Failed to infer the types in the invariant
+        At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value
+Failed to smoke-generate TypeScript based on <meta_model.py>:
+* Failed to generate src/verification.ts based on <meta_model.py>:
+  * At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+      At line 9 and column 3: Failed to infer the types in the invariant
+        At line 9 and column 30: Expected the argument of ``len`` to be a string, a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, since we know how to compute the length only of these types in all the target languages, but got: Value

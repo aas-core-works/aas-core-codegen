@@ -1318,7 +1318,7 @@ def _sort_by_tags_and_names_in_place(root: ET.Element) -> None:
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate(
+def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -1641,7 +1641,7 @@ def _generate(
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    code, errors = _generate(
+    code, errors = generate(
         symbol_table=context.symbol_table, spec_impls=context.spec_impls
     )
 

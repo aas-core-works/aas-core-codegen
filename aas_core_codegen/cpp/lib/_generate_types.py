@@ -360,6 +360,71 @@ def _verify_structure_name_collisions(
     return errors
 
 
+@ensure(lambda result: not (result is not None) or (len(result) >= 1))
+def _verify_that_property_enum_literals_do_not_collide(
+    symbol_table: intermediate.SymbolTable,
+) -> Optional[List[Error]]:
+    """Check that the literal names for the properties do not collied within a class."""
+    errors = []  # type: List[Error]
+
+    # NOTE (mristin):
+    # We use getter name as string representation for the enum ``Property``, so we have
+    # to make sure that there are no conflicts.
+    literal_name_to_getter_and_prop = (
+        dict()
+    )  # type: Dict[str, Tuple[str, intermediate.Property]]
+
+    for cls in symbol_table.classes:
+        observed_literal_names = dict()  # type: Dict[str, str]
+        for prop in cls.properties:
+            literal_name = cpp_naming.enum_literal_name(prop.name)
+
+            conflicting_property_name = observed_literal_names.get(literal_name, None)
+
+            if conflicting_property_name is not None:
+                errors.append(
+                    Error(
+                        cls.parsed.node,
+                        f"The property {prop.name!r} and "
+                        f"the property {conflicting_property_name!r} conflict in "
+                        f"the C++ Property literal name {literal_name!r} "
+                        f"in class {cls.name!r}",
+                    )
+                )
+                continue
+
+            getter = cpp_naming.getter_name(prop.name)
+
+            another_getter_and_prop = literal_name_to_getter_and_prop.get(
+                literal_name, None
+            )
+            if another_getter_and_prop is not None:
+                another_getter, another_prop = another_getter_and_prop
+
+                if another_getter != getter:
+                    errors.append(
+                        Error(
+                            cls.parsed.node,
+                            f"The property {prop.name!r} from class {cls.name!r} and "
+                            f"the property {another_prop.name!r} "
+                            f"from class {another_prop.specified_for.name!r} "
+                            f"have differing getter names, "
+                            f"{getter!r} and {another_getter!r}, respectively, "
+                            f"for the literal in C++ enum Property {literal_name!r}",
+                        )
+                    )
+                    continue
+            else:
+                literal_name_to_getter_and_prop[literal_name] = (getter, prop)
+
+            observed_literal_names[literal_name] = prop.name
+
+    if len(errors) > 0:
+        return errors
+
+    return None
+
+
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
     """Represent a verified symbol table which can be used for code generation."""
 
@@ -374,7 +439,7 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
 def verify(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
-    """Verify that Golang code can be generated from the ``symbol_table``."""
+    """Verify that C++ code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
 
     structure_name_collisions = _verify_structure_name_collisions(
@@ -382,6 +447,13 @@ def verify(
     )
 
     errors.extend(structure_name_collisions)
+
+    property_enum_literal_collisions = (
+        _verify_that_property_enum_literals_do_not_collide(symbol_table=symbol_table)
+    )
+
+    if property_enum_literal_collisions is not None:
+        errors.extend(property_enum_literal_collisions)
 
     if len(errors) > 0:
         return None, errors
