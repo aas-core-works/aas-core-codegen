@@ -299,6 +299,23 @@ export function switchOnStr(
 }
 
 /**
+ * Check the switch on the length of a string.
+ */
+export function switchOnLength(
+  text: string
+): boolean {
+  switch (OurCommon.lenStr(text)) {
+    case 2:
+      return false;
+    case 3:
+    case 30:
+      return false;
+    default:
+      return true;
+  }
+}
+
+/**
  * Check the switch on a constrained primitive.
  */
 export function switchOnConstrainedStr(
@@ -421,6 +438,12 @@ class Verifier
     if (!switchOnConstrainedStr(that.name)) {
       yield new VerificationError(
         "Name must not be forbidden"
+      )
+    }
+
+    if (!switchOnLength(that.text)) {
+      yield new VerificationError(
+        "Text must have neither two, three nor thirty characters"
       )
     }
 

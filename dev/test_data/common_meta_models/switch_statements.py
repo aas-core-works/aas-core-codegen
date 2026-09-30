@@ -88,6 +88,17 @@ def switch_on_str(text: str) -> bool:
 
 
 @verification
+def switch_on_length(text: str) -> bool:
+    """Check the switch on the length of a string."""
+    if len(text) == 2:
+        return False
+    elif len(text) in (3, 30):
+        return False
+    else:
+        return True
+
+
+@verification
 def switch_on_constrained_str(text: Non_empty_string) -> bool:
     """Check the switch on a constrained primitive."""
     if text in ("forbidden", "banned"):
@@ -168,6 +179,10 @@ def switch_with_reassigned_int(kind: Kind, number: int) -> bool:
     "Text must be long enough for the kind",
 )
 @invariant(lambda self: switch_on_str(self.text), "Text must be acceptable")
+@invariant(
+    lambda self: switch_on_length(self.text),
+    "Text must have neither two, three nor thirty characters",
+)
 @invariant(
     lambda self: switch_on_constrained_str(self.name),
     "Name must not be forbidden",

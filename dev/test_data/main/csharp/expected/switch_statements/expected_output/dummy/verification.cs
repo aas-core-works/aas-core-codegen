@@ -155,6 +155,25 @@ namespace dummy
         }  // public static bool SwitchOnStr
 
         /// <summary>
+        /// Check the switch on the length of a string.
+        /// </summary>
+        public static bool SwitchOnLength(
+            string text
+        )
+        {
+            switch (Common.StringHelpers.Len(text))
+            {
+                case 2:
+                    return false;
+                case 3:
+                case 30:
+                    return false;
+                default:
+                    return true;
+            }
+        }  // public static bool SwitchOnLength
+
+        /// <summary>
         /// Check the switch on a constrained primitive.
         /// </summary>
         public static bool SwitchOnConstrainedStr(
@@ -309,6 +328,13 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Name must not be forbidden");
+                }
+
+                if (!Verification.SwitchOnLength(that.Text))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Text must have neither two, three nor thirty characters");
                 }
 
                 if (!Verification.SwitchOnStr(that.Text))

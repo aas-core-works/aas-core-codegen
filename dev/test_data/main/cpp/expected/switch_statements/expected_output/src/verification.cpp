@@ -129,6 +129,20 @@ bool SwitchOnStr(
   }
 }
 
+bool SwitchOnLength(
+  const std::wstring& text
+) {
+  switch (common::LenStr(text)) {
+    case 2:
+      return false;
+    case 3:
+    case 30:
+      return false;
+    default:
+      return true;
+  }
+}
+
 bool SwitchOnConstrainedStr(
   const std::wstring& text
 ) {
@@ -294,12 +308,23 @@ bool Something_4(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return verification::SwitchOnStr(
+  return verification::SwitchOnLength(
     that->text()
   );
 }
 
 bool Something_5(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::SwitchOnStr(
+    that->text()
+  );
+}
+
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -311,7 +336,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -322,7 +347,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -333,7 +358,7 @@ bool Something_7(
   );
 }
 
-bool Something_8(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -344,7 +369,7 @@ bool Something_8(
   );
 }
 
-bool Something_9(
+bool Something_10(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -389,26 +414,30 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         },
         {
           &Something_4,
-          L"Text must be acceptable"
+          L"Text must have neither two, three nor thirty characters"
         },
         {
           &Something_5,
-          L"Text must be long enough for the kind"
+          L"Text must be acceptable"
         },
         {
           &Something_6,
-          L"Kind must not be gamma"
+          L"Text must be long enough for the kind"
         },
         {
           &Something_7,
-          L"Kind must be alpha, beta or gamma"
+          L"Kind must not be gamma"
         },
         {
           &Something_8,
-          L"Kind must be neither beta nor gamma"
+          L"Kind must be alpha, beta or gamma"
         },
         {
           &Something_9,
+          L"Kind must be neither beta nor gamma"
+        },
+        {
+          &Something_10,
           L"Kind must not be delta"
         }
       };

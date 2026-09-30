@@ -272,6 +272,21 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Something',
           parsed=...),
         Invariant(
+          description='Text must have neither two, three nor thirty characters',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='switch_on_length',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='text',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Text must be acceptable',
           body=textwrap.dedent("""\
             FunctionCall(
@@ -551,6 +566,33 @@ SymbolTable(
         parsed=...),
       description=DescriptionOfSignature(
         summary='<paragraph>Check the switch on a string.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='switch_on_length',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the switch on the length of a string.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
