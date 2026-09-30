@@ -12,7 +12,12 @@ namespace dummy
     /// </summary>
     public static class Constants
     {
-
+        public static readonly HashSet<string> ReservedTexts = (
+            new HashSet<string>()
+            {
+                "reserved",
+                "forbidden"
+            });
     }  // public static class Constants
 }  // namespace dummy
 

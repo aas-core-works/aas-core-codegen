@@ -336,6 +336,9 @@ class ISomething
   /// \brief Check a declaration from a method returning an optional.
   virtual bool TextIsNotBye() const = 0;
 
+  /// \brief Check the immutable variables declared in a method.
+  virtual bool TextsAreShort() const = 0;
+
   /// \brief Check a declaration of a class from a method returning an optional.
   virtual bool FirstChildBIsNotFortyTwo() const = 0;
 
@@ -717,6 +720,8 @@ class Something
   > FirstChildBOrNone() const override;
 
   bool TextIsNotBye() const override;
+
+  bool TextsAreShort() const override;
 
   bool FirstChildBIsNotFortyTwo() const override;
 

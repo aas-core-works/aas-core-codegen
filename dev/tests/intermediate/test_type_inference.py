@@ -4157,6 +4157,173 @@ def some_func(parent: Parent) -> bool:
             ),
         )
 
+    def test_reassigned_final_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Final[int] = number
+    x = 0
+    return x > 0
+""",
+            expected_message=(
+                "The variable 'x' is declared as ``Final[...]``, so it can not be "
+                "re-assigned."
+            ),
+        )
+
+    def test_list_in_final_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: Sequence[int]) -> bool:
+    x: Final[List[int]] = numbers
+    return True
+""",
+            expected_message=(
+                "A variable declared as ``Final[...]`` is immutable, but ``List[...]`` is"
+                " mutable. Please declare it as ``Sequence[...]`` instead."
+            ),
+        )
+
+    def test_set_in_final_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Final[Set[int]] = set()
+    return True
+""",
+            expected_message=(
+                "A variable declared as ``Final[...]`` is immutable, but ``Set[...]`` is "
+                "mutable. Please declare it as ``AbstractSet[...]`` instead."
+            ),
+        )
+
+    def test_nested_list_in_final_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: Sequence[int]) -> bool:
+    x: Final[Optional[Tuple[List[int], int]]] = None
+    return True
+""",
+            expected_message=(
+                "A variable declared as ``Final[...]`` is immutable, but ``List[...]`` is"
+                " mutable. Please declare it as ``Sequence[...]`` instead."
+            ),
+        )
+
+    def test_bare_final_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Final = number
+    return True
+""",
+            expected_message=(
+                "Please specify the type of the variable 'x' as a subscript of "
+                "``Final[...]``, *e.g.*, ``x: Final[int] = ...``, since the targets need "
+                "to declare it with the type."
+            ),
+        )
+
+    def test_nested_final_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Optional[Final[int]] = number
+    return True
+""",
+            expected_message=(
+                "We support ``Final[...]`` only as the outermost type annotation of a "
+                "variable, *e.g.*, ``x: Final[Optional[int]] = ...``."
+            ),
+        )
+
+    def test_final_in_loop_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: Sequence[int]) -> bool:
+    for number in numbers:
+        x: Final[int] = number
+    return True
+""",
+            expected_message=(
+                "The variable 'x' can not be declared as ``Final[...]`` in the body of a "
+                "for-loop, as mypy refuses it. Please declare it without ``Final[...]``, "
+                "or move it out of the loop."
+            ),
+        )
+
+    def test_assignment_to_property_of_final_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(child: Mutable[Child_a]) -> bool:
+    x: Final[Child_a] = child
+    x.a_only = 1
+    return True
+""",
+            expected_message=(
+                "We can not assign to the property 'a_only' of x, since the variable 'x' "
+                "is declared as ``Final[...]``."
+            ),
+        )
+
+    def test_assignment_to_item_of_final_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: List[int]) -> bool:
+    x: Final[Sequence[int]] = numbers
+    x[0] = 1
+    return True
+""",
+            expected_message=(
+                "We can not assign to an item of the list of x, since the variable 'x' is"
+                " declared as ``Final[...]``."
+            ),
+        )
+
+    def test_add_to_final_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    x: Final[AbstractSet[int]] = set()
+    x.add(1)
+    return True
+""",
+            expected_message=(
+                "The ``add`` mutates the set, but the variable 'x' is declared as "
+                "``Final[...]``."
+            ),
+        )
+
+    def test_final_variable_passed_as_mutable_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def mutate(numbers: List[int]) -> bool:
+    numbers[0] = 1
+    return True
+
+
+@verification
+def some_func(numbers: List[int]) -> bool:
+    x: Final[Sequence[int]] = numbers
+    return mutate(x)
+""",
+            expected_message=(
+                "The argument 'numbers' of the verification function 'mutate' is mutable,"
+                " but the variable 'x' is declared as ``Final[...]``."
+            ),
+        )
+
 
 _SET_PRELUDE: Final[
     str

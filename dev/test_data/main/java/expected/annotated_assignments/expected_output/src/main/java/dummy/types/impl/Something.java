@@ -426,6 +426,21 @@ public class Something implements ISomething {
   }
 
   /**
+   * Check the immutable variables declared in a method.
+   */
+  @Override
+  public Boolean textsAreShort() {
+    final List<String> ownTexts = this.getTexts();
+    final long limit = 20;
+    for (var ownText : ownTexts) {
+        if (StringHelpers.len(ownText) > limit) {
+            return false;
+        }
+    }
+    return true;
+  }
+
+  /**
    * Check a declaration of a class from a method returning an optional.
    */
   @Override

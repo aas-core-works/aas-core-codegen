@@ -500,6 +500,17 @@ bool Something::TextIsNotBye() const {
   );
 }
 
+bool Something::TextsAreShort() const {
+  const std::vector<std::wstring>& own_texts = this->texts();
+  const int64_t limit = 20;
+  for (const std::wstring& own_text : own_texts) {
+    if (static_cast<int64_t>(common::LenStr(own_text)) > limit) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool Something::FirstChildBIsNotFortyTwo() const {
   common::optional<std::shared_ptr<IChildB> > first = this->FirstChildBOrNone();
   return (

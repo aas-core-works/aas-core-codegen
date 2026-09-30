@@ -3,6 +3,8 @@ Check the transpilation of the variables declared with type annotations.
 
 We also check ``None`` as a literal: assigned to the optional variables, passed as
 an optional argument and returned from a method returning an optional.
+
+We also check the immutable variables declared as ``Final[...]``.
 """
 
 
@@ -12,6 +14,7 @@ an optional argument and returned from a method returning an optional.
 
 import abc
 import enum
+import sys
 from typing import (
     Generic,
     Iterator,
@@ -19,8 +22,14 @@ from typing import (
     TypeVar,
     List,
     Tuple,
-    Union
+    Union,
+    Sequence
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Final
+else:
+    from typing_extensions import Final
 
 
 T = TypeVar("T")
@@ -472,6 +481,16 @@ class Something(Class):
                 (short is None)
                 or short != 'bye'
             ))
+
+    def texts_are_short(self) -> bool:
+        """Check the immutable variables declared in a method."""
+        # pylint: disable=all
+        own_texts: Final[Sequence[str]] = self.texts
+        limit: Final[int] = 20
+        for own_text in own_texts:
+            if len(own_text) > limit:
+                return False
+        return True
 
     def first_child_b_is_not_forty_two(self) -> bool:
         """

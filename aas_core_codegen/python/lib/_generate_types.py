@@ -1969,14 +1969,14 @@ def generate(
         if len(symbol_table.named_unions) == 0:
             typing_imports.append(Identifier("Union"))
 
-    set_imports = python_common.typing_imports_for_sets(
-        [
-            method
-            for cls in symbol_table.classes
-            for method in cls.methods
-            if method.specified_for is cls
-        ]
-    )
+    specified_methods = [
+        method
+        for cls in symbol_table.classes
+        for method in cls.methods
+        if method.specified_for is cls
+    ]  # type: List[intermediate.Method]
+
+    set_imports = python_common.typing_imports_for_sets(specified_methods)
 
     # NOTE (mristin):
     # The set properties and the corresponding arguments of the constructors are
@@ -1993,6 +1993,23 @@ def generate(
 
     typing_imports.extend(set_imports)
 
+    # NOTE (mristin):
+    # We spell out the final local lists as ``Final[Sequence[...]]``, so we need to
+    # import ``Final`` and ``Sequence`` only if the methods declare them.
+    final_annotations = [
+        annotation
+        for method in specified_methods
+        for annotation in intermediate.local_declaration_annotations(method)
+        if intermediate_type_inference.is_final_annotation(annotation)
+    ]  # type: List[parse_tree.Expression]
+
+    if Identifier("Sequence") not in typing_imports and any(
+        isinstance(node, parse_tree.Name) and node.identifier == "Sequence"
+        for annotation in final_annotations
+        for node in parse_tree.over_nodes(annotation)
+    ):
+        typing_imports.append(Identifier("Sequence"))
+
     typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
 
     # NOTE (mristin):
@@ -2007,26 +2024,36 @@ def generate(
         for node in parse_tree.over_nodes(body_node)
     )
 
-    if methods_call_int:
-        imports = Stripped(
-            f"""\
-import abc
-import enum
-from typing import (
-{typing_imports_joined}
-)
+    maybe_import_sys = "\nimport sys" if len(final_annotations) > 0 else ""
 
-import {qualified_module_name}.common as aas_common"""
-        )
-    else:
-        imports = Stripped(
+    import_blocks = [
+        Stripped(
             f"""\
 import abc
-import enum
+import enum{maybe_import_sys}
 from typing import (
 {typing_imports_joined}
 )"""
         )
+    ]  # type: List[Stripped]
+
+    if len(final_annotations) > 0:
+        import_blocks.append(
+            Stripped(
+                f"""\
+if sys.version_info >= (3, 8):
+{I}from typing import Final
+else:
+{I}from typing_extensions import Final"""
+            )
+        )
+
+    if methods_call_int:
+        import_blocks.append(
+            Stripped(f"import {qualified_module_name}.common as aas_common")
+        )
+
+    imports = Stripped("\n\n".join(import_blocks))
 
     blocks.extend(
         [

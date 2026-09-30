@@ -27,6 +27,9 @@ struct HashBytes {
   std::size_t operator()(const std::vector<std::uint8_t>& bytes) const;
 };
 
+/// \brief List the texts which must not be used.
+extern const std::unordered_set<std::wstring> kReservedTexts;
+
 }  // namespace common
 /**@}*/
 

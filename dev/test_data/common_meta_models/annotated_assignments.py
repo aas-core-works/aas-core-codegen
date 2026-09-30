@@ -3,9 +3,11 @@ Check the transpilation of the variables declared with type annotations.
 
 We also check ``None`` as a literal: assigned to the optional variables, passed as
 an optional argument and returned from a method returning an optional.
+
+We also check the immutable variables declared as ``Final[...]``.
 """
 from enum import Enum
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import AbstractSet, Final, List, Optional, Sequence, Set, Tuple, Union
 
 from icontract import DBC, invariant
 
@@ -283,6 +285,51 @@ def wrap_into_member(something: Mutable["Something"], item: Mutable[Item]) -> bo
     return True
 
 
+Reserved_texts: Final[AbstractSet[str]] = constant_set(
+    values=["reserved", "forbidden"],
+    description="""List the texts which must not be used.""",
+)
+
+
+@verification
+def final_locals_are_consistent(
+    text: str,
+    number: int,
+    texts: Sequence[str],
+    optional_text: Optional[str],
+    parent: Parent,
+) -> bool:
+    """Check the immutable variables declared as ``Final[...]``."""
+    limit: Final[int] = 1000
+    label: Final[str] = text
+    maybe_text: Final[Optional[str]] = optional_text
+    all_texts: Final[Sequence[str]] = texts
+
+    seen: Set[str] = set()
+    seen.add(text)
+    reserved_seen: Final[AbstractSet[str]] = seen.intersection(Reserved_texts)
+
+    pair: Final[Tuple[str, int]] = (text, number)
+    base: Final[Parent] = parent
+
+    if len(reserved_seen) > 0 or len(label) > limit:
+        return False
+
+    for item in all_texts:
+        if item == "forbidden":
+            return False
+
+    if maybe_text is not None and len(maybe_text) > limit:
+        return False
+
+    # NOTE (mristin):
+    # A final variable is narrowed just as any other variable.
+    if isinstance(base, Child_a) and base.a_only == 77:
+        return False
+
+    return pair[1] != 17
+
+
 @verification
 def text_is_short(text: Optional[str]) -> bool:
     """Check the optional text passed on as ``None`` from other functions."""
@@ -348,6 +395,13 @@ def none_is_short_and_text_is_short(text: str) -> bool:
     "Optional member as Child_a must not have an unlucky a_only",
 )
 @invariant(
+    lambda self: final_locals_are_consistent(
+        self.text, self.number, self.texts, self.optional_text, self.parent
+    ),
+    "Text must not be reserved, texts must not be forbidden, "
+    "parent as Child_a must not have a_only of 77, and number must not be 17",
+)
+@invariant(
     lambda self: none_is_short_and_text_is_short(self.text),
     "Text must be at most 10 characters long",
 )
@@ -362,6 +416,10 @@ def none_is_short_and_text_is_short(text: str) -> bool:
 @invariant(
     lambda self: self.text_is_not_bye(),
     "Text must not be bye",
+)
+@invariant(
+    lambda self: self.texts_are_short(),
+    "Texts must be at most 20 characters long",
 )
 @invariant(
     lambda self: self.first_child_b_is_not_forty_two(),
@@ -440,6 +498,17 @@ class Something(DBC):
         """Check a declaration from a method returning an optional."""
         short: Optional[str] = self.text_or_none(3)
         return short is None or short != "bye"
+
+    @non_mutating
+    def texts_are_short(self) -> bool:
+        """Check the immutable variables declared in a method."""
+        own_texts: Final[Sequence[str]] = self.texts
+        limit: Final[int] = 20
+        for own_text in own_texts:
+            if len(own_text) > limit:
+                return False
+
+        return True
 
     @non_mutating
     def first_child_b_is_not_forty_two(self) -> bool:

@@ -503,6 +503,59 @@ export function wrapIntoMember(
 }
 
 /**
+ * Check the immutable variables declared as `Final[...]`.
+ */
+export function finalLocalsAreConsistent(
+  text: string,
+  number: number,
+  texts: Array<string>,
+  optionalText: string | null,
+  parent: AasTypes.IParent
+): boolean {
+  const limit = 1000;
+  const label: string = text;
+  const maybeText: string | null = optionalText;
+  const allTexts: Array<string> = texts;
+  const seen: Set<string> = new Set<string>();
+  seen.add(text);
+  const reservedSeen: Set<string> = (
+    AasCommon.setIntersection(seen, AasConstants.RESERVED_TEXTS));
+  const pair: [string, number] = [text, number];
+  const base: AasTypes.IParent = parent;
+  if (
+    (
+      reservedSeen.size > 0
+      || AasCommon.lenStr(label) > limit
+    )
+  ) {
+    return false;
+  }
+  for (const item of allTexts) {
+    switch (item) {
+      case "forbidden":
+        return false;
+    }
+  }
+  if (
+    (
+      (maybeText !== null)
+      && AasCommon.lenStr(maybeText) > limit
+    )
+  ) {
+    return false;
+  }
+  if (
+    (
+      AasTypes.isChildA(base)
+      && (base as AasTypes.ChildA).aOnly == 77
+    )
+  ) {
+    return false;
+  }
+  return pair[1] != 17;
+}
+
+/**
  * Check the optional text passed on as `None` from other functions.
  */
 export function textIsShort(
@@ -570,6 +623,12 @@ class Verifier
       )
     }
 
+    if (!that.textsAreShort()) {
+      yield new VerificationError(
+        "Texts must be at most 20 characters long"
+      )
+    }
+
     if (!that.textIsNotBye()) {
       yield new VerificationError(
         "Text must not be bye"
@@ -591,6 +650,22 @@ class Verifier
     if (!noneIsShortAndTextIsShort(that.text)) {
       yield new VerificationError(
         "Text must be at most 10 characters long"
+      )
+    }
+
+    if (!(
+      finalLocalsAreConsistent(
+        that.text,
+        that.number,
+        that.texts,
+        that.optionalText,
+        that.parent
+      )
+    )) {
+      yield new VerificationError(
+        "Text must not be reserved, texts must not be forbidden, " +
+        "parent as Child_a must not have a_only of 77, and number " +
+        "must not be 17"
       )
     }
 

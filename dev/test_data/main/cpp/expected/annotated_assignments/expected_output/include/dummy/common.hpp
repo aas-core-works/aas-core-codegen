@@ -10212,6 +10212,64 @@ int64_t FindStr(
   int64_t start
 );
 
+/**
+ * \brief Give a new set of the items which are both in \p that and
+ * in \p other.
+ *
+ * \param that set to be intersected
+ * \param other set to intersect with
+ * \return new set with the common items
+ */
+template<typename SetT>
+SetT Intersection(
+  const SetT& that,
+  const SetT& other
+) {
+  SetT result;
+  for (const auto& item : that) {
+    if (other.find(item) != other.end()) {
+      result.insert(item);
+    }
+  }
+  return result;
+}
+
+/**
+ * \brief Give a new set of the items which are in \p that, but not
+ * in \p other.
+ *
+ * \param that set to be subtracted from
+ * \param other set of the items to be left out
+ * \return new set with the remaining items
+ */
+template<typename SetT>
+SetT Difference(
+  const SetT& that,
+  const SetT& other
+) {
+  SetT result;
+  for (const auto& item : that) {
+    if (other.find(item) == other.end()) {
+      result.insert(item);
+    }
+  }
+  return result;
+}
+
+/**
+ * \brief Hash an enumeration literal by its underlying value.
+ *
+ * C++11 does not specialize std::hash for the enumerations, while C++14 does.
+ * We use this hasher for all the sets of enumeration literals so that
+ * the SDK stays C++11-compatible.
+ */
+struct EnumHash {
+  template<typename T>
+  std::size_t operator()(T that) const {
+    return static_cast<std::size_t>(that);
+  }
+};
+
 }  // namespace common
 /**@}*/
 

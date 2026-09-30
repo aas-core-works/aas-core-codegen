@@ -365,6 +365,62 @@ namespace dummy
         }  // public static bool WrapIntoMember
 
         /// <summary>
+        /// Check the immutable variables declared as <c>Final[...]</c>.
+        /// </summary>
+        public static bool FinalLocalsAreConsistent(
+            string text,
+            long number,
+            List<string> texts,
+            string? optionalText,
+            IParent parent
+        )
+        {
+            long limit = 1000;
+            string label = text;
+            string? maybeText = optionalText;
+            List<string> allTexts = texts;
+            HashSet<string> seen = new HashSet<string>();
+            seen.Add(text);
+            HashSet<string> reservedSeen = (
+                new HashSet<string>(seen.Intersect(Aas.Constants.ReservedTexts)));
+            (string, long) pair = (
+                text,
+                number
+            );
+            Aas.IParent basE = parent;
+            if (
+                reservedSeen.Count > 0
+                || Common.StringHelpers.Len(label) > limit
+            )
+            {
+                return false;
+            }
+            foreach (var item in allTexts)
+            {
+                switch (item)
+                {
+                    case "forbidden":
+                        return false;
+                }
+            }
+            if (
+                (maybeText != null)
+                && Common.StringHelpers.Len(maybeText) > limit
+            )
+            {
+                return false;
+            }
+            if (
+                basE is Aas.IChildA
+                && ((Aas.IChildA)basE).AOnly == 77
+            )
+            {
+                return false;
+            }
+            return pair.Item2 != 17;
+        }  // public static bool FinalLocalsAreConsistent
+
+        /// <summary>
         /// Check the optional text passed on as <c>None</c> from other functions.
         /// </summary>
         public static bool TextIsShort(
@@ -445,6 +501,13 @@ namespace dummy
                         "The first parent as Child_b must not have b_only of 42");
                 }
 
+                if (!that.TextsAreShort())
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Texts must be at most 20 characters long");
+                }
+
                 if (!that.TextIsNotBye())
                 {
                     yield return new Reporting.Error(
@@ -471,6 +534,21 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Text must be at most 10 characters long");
+                }
+
+                if (!(
+                    Verification.FinalLocalsAreConsistent(
+                        that.Text,
+                        that.Number,
+                        that.Texts,
+                        that.OptionalText,
+                        that.Parent)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Text must not be reserved, texts must not be forbidden, " +
+                        "parent as Child_a must not have a_only of 77, and number " +
+                        "must not be 17");
                 }
 
                 if (!Verification.MemberIsLucky(that.OptionalMember))

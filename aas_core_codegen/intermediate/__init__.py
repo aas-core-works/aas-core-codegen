@@ -91,6 +91,7 @@ uses_int = _types.uses_int
 uses_set_operations = _types.uses_set_operations
 uses_sets = _types.uses_sets
 declares_local_set = _types.declares_local_set
+local_declaration_annotations = _types.local_declaration_annotations
 
 NumericPlace = _types.NumericPlace
 numeric_places = _types.numeric_places

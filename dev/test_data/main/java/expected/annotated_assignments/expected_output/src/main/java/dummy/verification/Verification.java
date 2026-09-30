@@ -307,6 +307,55 @@ public class Verification {
   }
 
   /**
+   * Check the immutable variables declared as {@code Final[...]}.
+   */
+  public static Boolean finalLocalsAreConsistent(
+    String text,
+    Long number,
+    List<String> texts,
+    Optional<String> optionalText,
+    IParent parent) {
+    final long limit = 1000;
+    final String label = text;
+    final Optional<String> maybeText = optionalText;
+    final List<String> allTexts = texts;
+    Set<String> seen = new HashSet<String>();
+    seen.add(text);
+    final Set<String> reservedSeen = (
+        SetHelpers.intersection(seen, Constants.reservedTexts));
+    final Tuple2<String, Long> pair = new Tuple2<>(
+      text,
+      number);
+    final IParent base = parent;
+    if (
+        reservedSeen.size() > 0
+        || StringHelpers.len(label) > limit
+    ) {
+        return false;
+    }
+    for (var item : allTexts) {
+        switch (item) {
+            case "forbidden" -> {
+                return false;
+            }
+        }
+    }
+    if (
+        (maybeText.isPresent())
+        && StringHelpers.len(maybeText.get()) > limit
+    ) {
+        return false;
+    }
+    if (
+        base instanceof IChildA
+        && ((IChildA) base).getAOnly() == 77
+    ) {
+        return false;
+    }
+    return pair.item2() != 17;
+  }
+
+  /**
    * Check the optional text passed on as {@code None} from other functions.
    */
   public static Boolean textIsShort(
@@ -388,6 +437,13 @@ public class Verification {
             "The first parent as Child_b must not have b_only of 42")));
       }
 
+      if (!that.textsAreShort()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Texts must be at most 20 characters long")));
+      }
+
       if (!that.textIsNotBye()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(
@@ -415,6 +471,21 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Text must be at most 10 characters long")));
+      }
+
+      if (!(
+        finalLocalsAreConsistent(
+            that.getText(),
+            that.getNumber(),
+            that.getTexts(),
+            that.getOptionalText(),
+            that.getParent()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Text must not be reserved, texts must not be forbidden, " +
+            "parent as Child_a must not have a_only of 77, and number " +
+            "must not be 17")));
       }
 
       if (!memberIsLucky(that.getOptionalMember())) {

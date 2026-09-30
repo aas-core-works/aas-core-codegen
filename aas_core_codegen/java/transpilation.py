@@ -1953,6 +1953,15 @@ class Transpiler(
                     # We infer the type of the local variable with ``var``, which
                     # is available since Java 10.
                     target = Stripped(f"var {target}")
+
+                # NOTE (mristin):
+                # A variable declared as ``Final[...]`` is never re-assigned.
+                if (
+                    target is not None
+                    and node.annotation is not None
+                    and intermediate_type_inference.is_final_annotation(node.annotation)
+                ):
+                    target = Stripped(f"final {target}")
             else:
                 target, error = self.transform(node=node.target)
                 if error is not None:
