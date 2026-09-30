@@ -2079,6 +2079,15 @@ TypeAnnotationUnion = Union[
 ]
 
 
+def is_final_annotation(annotation: parse_tree.Expression) -> bool:
+    """Check that ``annotation`` declares a variable as ``Final[...]``."""
+    return (
+        isinstance(annotation, parse_tree.Index)
+        and isinstance(annotation.collection, parse_tree.Name)
+        and annotation.collection.identifier == "Final"
+    )
+
+
 def _can_be_mutated(type_annotation: "TypeAnnotationUnion") -> bool:
     """
     Check whether a value of ``type_annotation`` can be mutated in place.
@@ -2230,6 +2239,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # explain the errors. We remove them as we leave their scope, see
         # :py:meth:`_transform_in_new_scope`.
         self._read_only_reason_by_name = dict()  # type: MutableMapping[Identifier, str]
+
+        # NOTE (mristin):
+        # We keep track of the variables declared as ``Final[...]``, so that we
+        # refuse to re-assign or to mutate them. We remove them as we leave their
+        # scope, see :py:meth:`_transform_in_new_scope`.
+        self._final_name_set = set()  # type: Set[Identifier]
 
         # NOTE (mristin):
         # We need to keep track of what we know about the values of the expressions
@@ -2385,6 +2400,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 environment.mapping[identifier], SetTypeAnnotation
             ):
                 return f"the constant set {identifier!r} is immutable"
+
+            if identifier in self._final_name_set:
+                return f"the variable {identifier!r} is declared as ``Final[...]``"
 
             definition_reason = self._read_only_reason_by_name.get(identifier, None)
             if definition_reason is not None:
@@ -4845,7 +4863,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self._facts = facts
 
     def _resolve_annotation(
-        self, node: parse_tree.Expression
+        self, node: parse_tree.Expression, read_only: bool
     ) -> Optional["TypeAnnotationUnion"]:
         """
         Resolve the type annotation of a variable declaration.
@@ -4853,6 +4871,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         We resolve the primitive types, our types, including the named unions,
         and ``Optional``, ``List``, ``Sequence``, ``Set`` and ``Tuple`` of them. We refuse
         inline ``Union[...]``, as the targets need a named type to represent a union.
+
+        If ``read_only`` is set, the annotation is beneath ``Final[...]``, and we
+        require the read-only spelling of the containers, ``Sequence[...]`` and
+        ``AbstractSet[...]``, so that mypy also refuses to mutate them.
 
         Record the error, if any, and return ``None`` on failure.
         """
@@ -4867,6 +4889,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             node.collection, parse_tree.Name
         ):
             generic = node.collection.identifier
+
+            if generic == "Final":
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        "We support ``Final[...]`` only as the outermost type "
+                        "annotation of a variable, *e.g.*, "
+                        "``x: Final[Optional[int]] = ...``.",
+                    )
+                )
+                return None
 
             if generic == "Union":
                 self.errors.append(
@@ -4886,7 +4919,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
             if generic == "Optional":
-                value = self._resolve_annotation(node.index)
+                value = self._resolve_annotation(node.index, read_only)
                 if value is None:
                     return None
 
@@ -4905,14 +4938,26 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # NOTE (mristin):
             # The ``Sequence`` marks a read-only list in the arguments. The variables
             # are read-only if their values are, so both denote the same list here.
+            if read_only and generic in ("List", "Set"):
+                read_only_generic = "Sequence" if generic == "List" else "AbstractSet"
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"A variable declared as ``Final[...]`` is immutable, "
+                        f"but ``{generic}[...]`` is mutable. Please declare it "
+                        f"as ``{read_only_generic}[...]`` instead.",
+                    )
+                )
+                return None
+
             if generic in ("List", "Sequence"):
-                items = self._resolve_annotation(node.index)
+                items = self._resolve_annotation(node.index, read_only)
                 if items is None:
                     return None
 
                 return ListTypeAnnotation(items=items)
 
-            if generic == "AbstractSet":
+            if generic == "AbstractSet" and not read_only:
                 self.errors.append(
                     Error(
                         node.original_node,
@@ -4926,8 +4971,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
-            if generic == "Set":
-                set_items = self._resolve_annotation(node.index)
+            if generic in ("Set", "AbstractSet"):
+                set_items = self._resolve_annotation(node.index, read_only)
                 if set_items is None:
                     return None
 
@@ -4947,7 +4992,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
                 tuple_items = []  # type: List[TypeAnnotationUnion]
                 for item_node in item_nodes:
-                    item = self._resolve_annotation(item_node)
+                    item = self._resolve_annotation(item_node, read_only)
                     if item is None:
                         return None
 
@@ -5047,6 +5092,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
     ) -> Optional["TypeAnnotationUnion"]:
         is_new_variable = False
 
+        is_final = node.annotation is not None and is_final_annotation(node.annotation)
+
         target_type: Optional[TypeAnnotationUnion]
 
         if isinstance(node.target, parse_tree.Name):
@@ -5081,12 +5128,49 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                     return None
 
+                if (
+                    isinstance(node.annotation, parse_tree.Name)
+                    and node.annotation.identifier == "Final"
+                ):
+                    self.errors.append(
+                        Error(
+                            node.annotation.original_node,
+                            f"Please specify the type of the variable "
+                            f"{node.target.identifier!r} as a subscript of "
+                            f"``Final[...]``, *e.g.*, "
+                            f"``{node.target.identifier}: Final[int] = ...``, "
+                            f"since the targets need to declare it with the type.",
+                        )
+                    )
+                    return None
+
+                if is_final and len(self._loop_variable_set) > 0:
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"The variable {node.target.identifier!r} can not be "
+                            f"declared as ``Final[...]`` in the body of a for-loop, "
+                            f"as mypy refuses it. Please declare it without "
+                            f"``Final[...]``, or move it out of the loop.",
+                        )
+                    )
+                    return None
+
                 # NOTE (mristin):
                 # The declared type is the type of the variable, while the type of
                 # the value only needs to be assignable to it. For example,
                 # ``x: Optional[Parent] = None`` declares ``x`` as
                 # ``Optional[Parent]``, so that we can re-assign it later.
-                target_type = self._resolve_annotation(node.annotation)
+                if is_final:
+                    assert isinstance(node.annotation, parse_tree.Index)
+                    target_type = self._resolve_annotation(
+                        node.annotation.index, read_only=True
+                    )
+                else:
+                    target_type = self._resolve_annotation(
+                        node.annotation, read_only=False
+                    )
+
                 if target_type is None:
                     return None
 
@@ -5094,6 +5178,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             elif target_type is None:
                 is_new_variable = True
+
+            elif node.target.identifier in self._final_name_set:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The variable {node.target.identifier!r} is declared "
+                        f"as ``Final[...]``, so it can not be re-assigned.",
+                    )
+                )
+                return None
         elif isinstance(node.target, parse_tree.Member):
             target_type = self._transform_as_target(node.target)
             if target_type is None:
@@ -5391,7 +5485,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             ):
                 return None
 
-            if _can_be_mutated(variable_type):
+            if is_final:
+                # NOTE (mristin):
+                # A final variable is read-only regardless of its value, and
+                # the read-only-ness is deep, as for the read-only arguments.
+                self._final_name_set.add(node.target.identifier)
+
+            elif _can_be_mutated(variable_type):
                 # NOTE (mristin):
                 # An optional set declared with ``None`` is mutable, since it can
                 # later be assigned only a new set, see :py:func:`_check_sets`.
@@ -5600,6 +5700,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
 
             self._mutable_name_set.difference_update(scope_environment.mapping.keys())
+            self._final_name_set.difference_update(scope_environment.mapping.keys())
             for identifier in scope_environment.mapping:
                 self._read_only_reason_by_name.pop(identifier, None)
 

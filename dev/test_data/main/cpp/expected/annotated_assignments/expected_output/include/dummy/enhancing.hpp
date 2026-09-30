@@ -612,6 +612,10 @@ class EnhancedSomething
     return instance_->TextIsNotBye();
   }
 
+  bool TextsAreShort() const override {
+    return instance_->TextsAreShort();
+  }
+
   bool FirstChildBIsNotFortyTwo() const override {
     return instance_->FirstChildBIsNotFortyTwo();
   }

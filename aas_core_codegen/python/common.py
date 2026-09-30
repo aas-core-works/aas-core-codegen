@@ -26,6 +26,7 @@ from aas_core_codegen.common import (
     indent_but_first_line,
 )
 from aas_core_codegen.python import naming as python_naming
+from aas_core_codegen.parse import tree as parse_tree
 
 
 class StringQuoting(enum.Enum):
@@ -617,8 +618,9 @@ def typing_imports_for_sets(
     """
     List the generic types from ``typing`` needed by the sets in ``functions``.
 
-    We need ``AbstractSet`` for the read-only set arguments, and ``Set`` for
-    the mutable set arguments and for the declarations of the local sets. We list
+    We need ``AbstractSet`` for the read-only set arguments and the final local
+    sets, and ``Set`` for the mutable set arguments and for the declarations of
+    the other local sets. We list
     them only if needed so that the imports are never unused.
     """
     uses_abstract_set = False
@@ -635,8 +637,16 @@ def typing_imports_for_sets(
                 else:
                     uses_abstract_set = True
 
-        if intermediate.declares_local_set(function):
-            uses_set = True
+        # NOTE (mristin):
+        # A local set is declared either as ``Set[...]``, or as
+        # ``Final[AbstractSet[...]]``, and we spell it out the same.
+        for annotation in intermediate.local_declaration_annotations(function):
+            for node in parse_tree.over_nodes(annotation):
+                if isinstance(node, parse_tree.Name):
+                    if node.identifier == "Set":
+                        uses_set = True
+                    elif node.identifier == "AbstractSet":
+                        uses_abstract_set = True
 
     result = []  # type: List[Identifier]
     if uses_abstract_set:

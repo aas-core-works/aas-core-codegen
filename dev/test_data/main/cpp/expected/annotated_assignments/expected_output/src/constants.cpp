@@ -18,6 +18,11 @@ std::size_t HashBytes::operator()(
   return result;
 }
 
+const std::unordered_set<std::wstring> kReservedTexts = {
+  L"reserved",
+  L"forbidden"
+};
+
 }  // namespace constants
 }  // namespace dummy
 

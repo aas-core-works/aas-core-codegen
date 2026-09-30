@@ -36,12 +36,17 @@ from aas_core_codegen.python import (
 def generate_type(
     type_annotation: intermediate_type_inference.TypeAnnotationUnion,
     types_module: Optional[Identifier],
+    read_only: bool,
 ) -> Tuple[Optional[Stripped], Optional[str]]:
     """
     Generate the Python type for the given type annotation.
 
     If ``types_module`` is specified, it is prepended to all our types. Otherwise,
     we quote our types, as they might be declared later in the types module.
+
+    If ``read_only`` is set, we spell out the lists and the sets as ``Sequence``
+    and ``AbstractSet``, respectively, *e.g.*, for the variables declared as
+    ``Final[...]``.
 
     We handle only the type annotations which can be declared for the variables.
     Otherwise, we return an error message.
@@ -97,15 +102,16 @@ def generate_type(
                 else type_annotation.items
             ),
             types_module=types_module,
+            read_only=read_only,
         )
         if error_message is not None:
             return None, error_message
 
         generic: str
         if isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
-            generic = "List"
+            generic = "Sequence" if read_only else "List"
         elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
-            generic = "Set"
+            generic = "AbstractSet" if read_only else "Set"
         else:
             generic = "Optional"
 
@@ -115,7 +121,7 @@ def generate_type(
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
             item_type, error_message = generate_type(
-                type_annotation=item, types_module=types_module
+                type_annotation=item, types_module=types_module, read_only=read_only
             )
             if error_message is not None:
                 return None, error_message
@@ -1264,12 +1270,17 @@ range(
             # NOTE (mristin):
             # We keep the annotation so that mypy knows the declared type, *e.g.*,
             # for a variable initialized with ``None``.
+            is_final = intermediate_type_inference.is_final_annotation(node.annotation)
+
             declared_type, error_message = generate_type(
                 type_annotation=self.type_map[node.target],
                 types_module=self._types_module,
+                read_only=is_final,
             )
             if error_message is not None:
                 errors.append(Error(node.annotation.original_node, error_message))
+            elif is_final:
+                target = Stripped(f"{target}: Final[{declared_type}]")
             else:
                 target = Stripped(f"{target}: {declared_type}")
 

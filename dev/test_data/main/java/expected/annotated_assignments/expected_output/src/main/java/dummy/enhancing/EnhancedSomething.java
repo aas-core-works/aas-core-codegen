@@ -237,6 +237,10 @@ public class EnhancedSomething<EnhancementT>
     return instance.textIsNotBye();
   }
 
+  public Boolean textsAreShort() {
+    return instance.textsAreShort();
+  }
+
   public Boolean firstChildBIsNotFortyTwo() {
     return instance.firstChildBIsNotFortyTwo();
   }

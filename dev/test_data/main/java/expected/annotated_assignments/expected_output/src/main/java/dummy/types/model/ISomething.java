@@ -118,6 +118,11 @@ public interface ISomething extends IClass {
   Boolean textIsNotBye();
 
   /**
+   * Check the immutable variables declared in a method.
+   */
+  Boolean textsAreShort();
+
+  /**
    * Check a declaration of a class from a method returning an optional.
    */
   Boolean firstChildBIsNotFortyTwo();

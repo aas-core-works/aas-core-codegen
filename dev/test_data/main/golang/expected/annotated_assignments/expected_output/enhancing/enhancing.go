@@ -490,6 +490,10 @@ func (s *enhancedSomething[E]) TextIsNotBye() bool {
 	return s.instance.TextIsNotBye()
 }
 
+func (s *enhancedSomething[E]) TextsAreShort() bool {
+	return s.instance.TextsAreShort()
+}
+
 func (s *enhancedSomething[E]) FirstChildBIsNotFortyTwo() bool {
 	return s.instance.FirstChildBIsNotFortyTwo()
 }

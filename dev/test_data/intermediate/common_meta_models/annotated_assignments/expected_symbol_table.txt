@@ -1138,6 +1138,113 @@ SymbolTable(
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
+          name='texts_are_short',
+          visibility='PUBLIC',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check the immutable variables declared in a method.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Something',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Assignment(
+                target=Name(
+                  identifier='own_texts',
+                  original_node=...),
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='texts',
+                  original_node=...),
+                annotation=Index(
+                  collection=Name(
+                    identifier='Final',
+                    original_node=...),
+                  index=Index(
+                    collection=Name(
+                      identifier='Sequence',
+                      original_node=...),
+                    index=Name(
+                      identifier='str',
+                      original_node=...),
+                    original_node=...),
+                  original_node=...),
+                original_node=...)"""),
+            textwrap.dedent("""\
+              Assignment(
+                target=Name(
+                  identifier='limit',
+                  original_node=...),
+                value=Constant(
+                  value=20,
+                  original_node=...),
+                annotation=Index(
+                  collection=Name(
+                    identifier='Final',
+                    original_node=...),
+                  index=Name(
+                    identifier='int',
+                    original_node=...),
+                  original_node=...),
+                original_node=...)"""),
+            textwrap.dedent("""\
+              For(
+                generator=ForEach(
+                  variable=Name(
+                    identifier='own_text',
+                    original_node=...),
+                  iteration=Name(
+                    identifier='own_texts',
+                    original_node=...),
+                  original_node=...),
+                body=[
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=FunctionCall(
+                            name='len',
+                            args=[
+                              Name(
+                                identifier='own_text',
+                                original_node=...)],
+                            original_node=...),
+                          op='GT',
+                          right=Name(
+                            identifier='limit',
+                            original_node=...),
+                          original_node=...),
+                        body=[
+                          Return(
+                            value=Constant(
+                              value=False,
+                              original_node=...),
+                            original_node=...)],
+                        original_node=...)],
+                    default=None,
+                    original_node=...)],
+                original_node=...)"""),
+            textwrap.dedent("""\
+              Return(
+                value=Constant(
+                  value=True,
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...),
+        UnderstoodMethod(
           name='first_child_b_is_not_forty_two',
           visibility='PUBLIC',
           arguments=[],
@@ -1534,6 +1641,20 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Something',
           parsed=...),
         Invariant(
+          description='Texts must be at most 20 characters long',
+          body=textwrap.dedent("""\
+            MethodCall(
+              member=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='texts_are_short',
+                original_node=...),
+              args=[],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Text must not be bye',
           body=textwrap.dedent("""\
             MethodCall(
@@ -1604,6 +1725,45 @@ SymbolTable(
                     identifier='self',
                     original_node=...),
                   name='text',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Text must not be reserved, texts must not be forbidden, parent as Child_a must not have a_only of 77, and number must not be 17',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='final_locals_are_consistent',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='text',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='number',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='texts',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_text',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='parent',
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
@@ -1893,7 +2053,26 @@ SymbolTable(
   named_unions=[
     'Reference to our type Parent_or_item',
     'Reference to our type Wide_union'],
-  constants=[],
+  constants=[
+    ConstantSetOfPrimitives(
+      name='Reserved_texts',
+      a_type='STR',
+      literals=[
+        PrimitiveSetLiteral(
+          value='reserved',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='forbidden',
+          a_type='STR',
+          parsed=...)],
+      literal_value_set=...,
+      subsets=[],
+      description=DescriptionOfConstant(
+        summary='<paragraph>List the texts which must not be used.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...)],
   constants_by_name=...,
   verification_functions=[
     TranspilableVerification(
@@ -2377,6 +2556,69 @@ SymbolTable(
       parsed=...,
       arguments_by_name=...),
     TranspilableVerification(
+      name='final_locals_are_consistent',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='number',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='texts',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='optional_text',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='parent',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Parent',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the immutable variables declared as <literal>Final[...]</literal>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
       name='text_is_short',
       visibility='PUBLIC',
       arguments=[
@@ -2439,7 +2681,8 @@ SymbolTable(
       remarks=[
         textwrap.dedent("""\
           <paragraph>We also check <literal>None</literal> as a literal: assigned to the optional variables, passed as
-          an optional argument and returned from a method returning an optional.</paragraph>""")],
+          an optional argument and returned from a method returning an optional.</paragraph>"""),
+        '<paragraph>We also check the immutable variables declared as <literal>Final[...]</literal>.</paragraph>'],
       constraints_by_identifier=[],
       parsed=...),
     version='dummy',

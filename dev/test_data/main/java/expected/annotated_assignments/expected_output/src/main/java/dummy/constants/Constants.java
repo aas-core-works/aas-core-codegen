@@ -28,7 +28,10 @@ class _ImmutableCollector {
  * Provide constant values of the meta-model.
  */
 public class Constants {
-
+    public static final Set<String> reservedTexts = Stream.of(
+            "reserved",
+            "forbidden"
+    ).collect(_ImmutableCollector.toImmutableSet());
 }
 
 /*

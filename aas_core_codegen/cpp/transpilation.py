@@ -2622,11 +2622,20 @@ common::{qualifier_function}<{variable_type_cpp}>(
 
             assert declared_type is not None
 
+            # NOTE (mristin):
+            # A variable declared as ``Final[...]`` is neither re-assigned nor
+            # mutated, so we can declare it as ``const``.
+            maybe_const = (
+                "const "
+                if intermediate_type_inference.is_final_annotation(node.annotation)
+                else ""
+            )
+
             if (
                 declaration is cpp_aliasing.Declaration.DEFAULT
                 or declaration is cpp_aliasing.Declaration.COPY
             ):
-                maybe_definition_prefix = f"{declared_type} "
+                maybe_definition_prefix = f"{maybe_const}{declared_type} "
             elif declaration is cpp_aliasing.Declaration.CONST_REF:
                 maybe_definition_prefix = f"const {declared_type}& "
             elif declaration is cpp_aliasing.Declaration.MUT_REF:

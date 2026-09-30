@@ -625,6 +625,11 @@ namespace dummy
         public bool TextIsNotBye();
 
         /// <summary>
+        /// Check the immutable variables declared in a method.
+        /// </summary>
+        public bool TextsAreShort();
+
+        /// <summary>
         /// Check a declaration of a class from a method returning an optional.
         /// </summary>
         public bool FirstChildBIsNotFortyTwo();
@@ -786,6 +791,23 @@ namespace dummy
             string? shorT = this.TextOrNone(3);
             return (shorT == null)
             || shorT != "bye";
+        }
+
+        /// <summary>
+        /// Check the immutable variables declared in a method.
+        /// </summary>
+        public bool TextsAreShort()
+        {
+            List<string> ownTexts = this.Texts;
+            long limit = 20;
+            foreach (var ownText in ownTexts)
+            {
+                if (Common.StringHelpers.Len(ownText) > limit)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

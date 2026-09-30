@@ -364,6 +364,67 @@ bool WrapIntoMember(
   return true;
 }
 
+bool FinalLocalsAreConsistent(
+  const std::wstring& text,
+  int64_t number,
+  const std::vector<std::wstring>& texts,
+  const common::optional<std::wstring>& optional_text,
+  const std::shared_ptr<types::IParent>& parent
+) {
+  const int64_t limit = 1000;
+  const std::wstring label = text;
+  const common::optional<std::wstring> maybe_text = optional_text;
+  const std::vector<std::wstring>& all_texts = texts;
+  std::unordered_set<std::wstring> seen = std::unordered_set<std::wstring>();
+  seen.insert(text);
+  const std::unordered_set<std::wstring> reserved_seen = (
+    common::Intersection(
+      seen,
+      constants::kReservedTexts
+    )
+  );
+  const std::tuple<
+    std::wstring,
+    int64_t
+  > pair = (
+    std::make_tuple(
+      text,
+      number
+    )
+  );
+  const std::shared_ptr<types::IParent> base = parent;
+  if (
+    (
+      reserved_seen.size() > 0
+      || static_cast<int64_t>(common::LenStr(label)) > limit
+    )
+  ) {
+    return false;
+  }
+  for (const std::wstring& item : all_texts) {
+    if (item == L"forbidden") {
+      return false;
+    }
+  }
+  if (
+    (
+      (maybe_text.has_value())
+      && static_cast<int64_t>(common::LenStr((*maybe_text))) > limit
+    )
+  ) {
+    return false;
+  }
+  if (
+    (
+      types::IsChildA(*base)
+      && std::dynamic_pointer_cast<types::IChildA>(base)->a_only() == 77
+    )
+  ) {
+    return false;
+  }
+  return std::get<1>(pair) != 17;
+}
+
 bool TextIsShort(
   const common::optional<std::wstring>& text
 ) {
@@ -445,10 +506,19 @@ bool Something_1(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return that->TextIsNotBye();
+  return that->TextsAreShort();
 }
 
 bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return that->TextIsNotBye();
+}
+
+bool Something_3(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -459,7 +529,7 @@ bool Something_2(
   ) != 666;
 }
 
-bool Something_3(
+bool Something_4(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -470,7 +540,7 @@ bool Something_3(
   ) != L"forbidden";
 }
 
-bool Something_4(
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -481,7 +551,22 @@ bool Something_4(
   );
 }
 
-bool Something_5(
+bool Something_6(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::FinalLocalsAreConsistent(
+    that->text(),
+    that->number(),
+    that->texts(),
+    that->optional_text(),
+    that->parent()
+  );
+}
+
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -492,7 +577,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -504,7 +589,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -517,7 +602,7 @@ bool Something_7(
   );
 }
 
-bool Something_8(
+bool Something_10(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -529,7 +614,7 @@ bool Something_8(
   );
 }
 
-bool Something_9(
+bool Something_11(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -540,7 +625,7 @@ bool Something_9(
   );
 }
 
-bool Something_10(
+bool Something_12(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -551,7 +636,7 @@ bool Something_10(
   );
 }
 
-bool Something_11(
+bool Something_13(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -563,7 +648,7 @@ bool Something_11(
   );
 }
 
-bool Something_12(
+bool Something_14(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -576,7 +661,7 @@ bool Something_12(
   );
 }
 
-bool Something_13(
+bool Something_15(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -588,7 +673,7 @@ bool Something_13(
   );
 }
 
-bool Something_14(
+bool Something_16(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -599,7 +684,7 @@ bool Something_14(
   );
 }
 
-bool Something_15(
+bool Something_17(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -611,7 +696,7 @@ bool Something_15(
   );
 }
 
-bool Something_16(
+bool Something_18(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -622,7 +707,7 @@ bool Something_16(
   );
 }
 
-bool Something_17(
+bool Something_19(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -655,73 +740,83 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         },
         {
           &Something_1,
-          L"Text must not be bye"
+          L"Texts must be at most 20 characters long"
         },
         {
           &Something_2,
-          L"Number must not be 666"
+          L"Text must not be bye"
         },
         {
           &Something_3,
-          L"Optional text or the default must not be forbidden"
+          L"Number must not be 666"
         },
         {
           &Something_4,
-          L"Text must be at most 10 characters long"
+          L"Optional text or the default must not be forbidden"
         },
         {
           &Something_5,
-          L"Optional member as Child_a must not have an unlucky a_only"
+          L"Text must be at most 10 characters long"
         },
         {
           &Something_6,
+          L"Text must not be reserved, texts must not be forbidden, "
+          L"parent as Child_a must not have a_only of 77, and number "
+          L"must not be 17"
+        },
+        {
+          &Something_7,
+          L"Optional member as Child_a must not have an unlucky a_only"
+        },
+        {
+          &Something_8,
           L"Item must have a name, and parent must not have an unlucky "
           L"number"
         },
         {
-          &Something_7,
+          &Something_9,
           L"Optional parent must not have a forbidden text, and number "
           L"must be small"
         },
         {
-          &Something_8,
+          &Something_10,
           L"Texts must be few"
         },
         {
-          &Something_9,
+          &Something_11,
           L"Optional data must be small"
         },
         {
-          &Something_10,
+          &Something_12,
           L"Code must not be reserved and must be short"
         },
         {
-          &Something_11,
+          &Something_13,
           L"Kind and optional kind must not both be beta"
         },
         {
-          &Something_12,
+          &Something_14,
           L"Text must not be bad with the flag, and text and number "
           L"must be small"
         },
         {
-          &Something_13,
+          &Something_15,
           L"Number must be at most one thousand and optional text short"
         },
         {
-          &Something_14,
+          &Something_16,
           L"Parent as Child_a must have a_only above minus one thousand"
         },
         {
-          &Something_15,
+          &Something_17,
           L"The last parent as Child_b must have a non-zero b_only"
         },
         {
-          &Something_16,
+          &Something_18,
           L"Optional text must not be forbidden unless long"
         },
         {
-          &Something_17,
+          &Something_19,
           L"The first parent as Child_a must have a small a_only"
         }
       };

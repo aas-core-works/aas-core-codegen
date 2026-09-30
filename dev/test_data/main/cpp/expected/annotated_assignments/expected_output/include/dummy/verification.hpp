@@ -11,6 +11,7 @@
 
 #pragma warning(push, 0)
 #include <set>
+#include <unordered_set>
 #pragma warning(pop)
 
 namespace dummy {
@@ -302,6 +303,15 @@ bool MemberIsLucky(
 bool WrapIntoMember(
   const std::shared_ptr<types::ISomething>& something,
   const std::shared_ptr<types::IItem>& item
+);
+
+/// \brief Check the immutable variables declared as `Final[...]`.
+bool FinalLocalsAreConsistent(
+  const std::wstring& text,
+  int64_t number,
+  const std::vector<std::wstring>& texts,
+  const common::optional<std::wstring>& optional_text,
+  const std::shared_ptr<types::IParent>& parent
 );
 
 /// \brief Check the optional text passed on as `None` from other functions.

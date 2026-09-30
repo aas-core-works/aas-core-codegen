@@ -377,6 +377,11 @@ namespace dummy
                 return _instance.TextIsNotBye();
             }
 
+            public bool TextsAreShort()
+            {
+                return _instance.TextsAreShort();
+            }
+
             public bool FirstChildBIsNotFortyTwo()
             {
                 return _instance.FirstChildBIsNotFortyTwo();

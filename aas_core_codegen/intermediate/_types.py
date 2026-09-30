@@ -4313,13 +4313,15 @@ def uses_lstrip(symbol_table: SymbolTable) -> bool:
     )
 
 
-def declares_local_set(function: Union[Verification, Method]) -> bool:
+def local_declaration_annotations(
+    function: Union[Verification, Method]
+) -> List[parse_tree.Expression]:
     """
-    Check whether the body of the ``function`` declares a local set.
+    List the type annotations of the local declarations in the ``function``.
 
-    A local set is declared with a type annotation, *e.g.*,
+    A local declaration is an assignment with a type annotation, *e.g.*,
     ``x: Set[str] = set()``. The implementation-specific functions have no body
-    that we know of, so they declare no local sets.
+    that we know of, so they declare no locals.
     """
     body = None  # type: Optional[Sequence[parse_tree.Node]]
     if isinstance(function, TranspilableVerification):
@@ -4330,18 +4332,28 @@ def declares_local_set(function: Union[Verification, Method]) -> bool:
         pass
 
     if body is None:
-        return False
+        return []
 
-    return any(
-        isinstance(node, parse_tree.Assignment)
-        and node.annotation is not None
-        and any(
-            isinstance(annotation_node, parse_tree.Name)
-            and annotation_node.identifier == "Set"
-            for annotation_node in parse_tree.over_nodes(node.annotation)
-        )
+    return [
+        node.annotation
         for body_node in body
         for node in parse_tree.over_nodes(body_node)
+        if isinstance(node, parse_tree.Assignment) and node.annotation is not None
+    ]
+
+
+def declares_local_set(function: Union[Verification, Method]) -> bool:
+    """
+    Check whether the body of the ``function`` declares a local set.
+
+    A local set is declared with a type annotation, *e.g.*, ``x: Set[str] = set()``
+    or ``x: Final[AbstractSet[str]] = a.intersection(b)``.
+    """
+    return any(
+        isinstance(annotation_node, parse_tree.Name)
+        and annotation_node.identifier in ("Set", "AbstractSet")
+        for annotation in local_declaration_annotations(function)
+        for annotation_node in parse_tree.over_nodes(annotation)
     )
 
 

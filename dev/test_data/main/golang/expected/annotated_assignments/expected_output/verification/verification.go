@@ -13,6 +13,7 @@ package verification
 import (
 	"fmt"
 	aascommon "github.com/dummy-works/dummy/common"
+	aasconstants "github.com/dummy-works/dummy/constants"
 	aasreporting "github.com/dummy-works/dummy/reporting"
 	aastypes "github.com/dummy-works/dummy/types"
 )
@@ -304,6 +305,55 @@ func WrapIntoMember(
 	return true
 }
 
+// Check the immutable variables declared as `Final[...]`.
+func FinalLocalsAreConsistent(
+	text string,
+	number int64,
+	texts []string,
+	optionalText *string,
+	parent aastypes.IParent,
+) bool {
+	var limit int64 = int64(1000)
+	var label string = text
+	var maybeText *string = optionalText
+	var allTexts []string = texts
+	var seen map[string]struct{} = make(map[string]struct{})
+	seen[text] = struct{}{}
+	var reservedSeen map[string]struct{} =
+		aascommon.SetIntersection(
+			seen,
+			aasconstants.ReservedTexts,
+		)
+	var pair aascommon.Tuple2[string, int64] =
+		aascommon.Tuple2[string, int64]{
+			text,
+			number,
+		}
+	var base aastypes.IParent = parent
+	if (
+		len(reservedSeen) > 0 ||
+		int64(aascommon.LenStr(label)) > limit) {
+		return false
+	}
+	for _, item := range allTexts {
+		switch item {
+		case "forbidden":
+			return false
+		}
+	}
+	if (
+		(maybeText != nil) &&
+		int64(aascommon.LenStr(*maybeText)) > limit) {
+		return false
+	}
+	if (
+		aastypes.IsChildA(base) &&
+		base.(aastypes.IChildA).AOnly() == 77) {
+		return false
+	}
+	return pair.Item2 != 17
+}
+
 // Check the optional text passed on as `None` from other functions.
 func TextIsShort(
 	text *string,
@@ -393,6 +443,16 @@ func VerifySomething(
 		}
 	}
 
+	if !that.TextsAreShort() {
+		abort = onError(
+			newVerificationError(
+				"Texts must be at most 20 characters long",),
+		)
+		if abort {
+			return
+		}
+	}
+
 	if !that.TextIsNotBye() {
 		abort = onError(
 			newVerificationError(
@@ -427,6 +487,26 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Text must be at most 10 characters long",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		FinalLocalsAreConsistent(
+			that.Text(),
+			that.Number(),
+			that.Texts(),
+			that.OptionalText(),
+			that.Parent(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Text must not be reserved, texts must not be forbidden, " +
+				"parent as Child_a must not have a_only of 77, and number " +
+				"must not be 17",
+			),
 		)
 		if abort {
 			return

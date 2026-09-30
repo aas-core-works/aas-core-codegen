@@ -27,6 +27,7 @@ import re
 import struct
 import sys
 from typing import (
+    AbstractSet,
     Any,
     Callable,
     Iterable,
@@ -343,6 +344,51 @@ def wrap_into_member(
     return True
 
 
+def final_locals_are_consistent(
+    text: str,
+    number: int,
+    texts: List[str],
+    optional_text: Optional[str],
+    parent: aas_types.Parent
+) -> bool:
+    """Check the immutable variables declared as ``Final[...]``."""
+    # pylint: disable=all
+    limit: Final[int] = 1000
+    label: Final[str] = text
+    maybe_text: Final[Optional[str]] = optional_text
+    all_texts: Final[Sequence[str]] = texts
+    seen: Set[str] = set()
+    seen.add(text)
+    reserved_seen: Final[AbstractSet[str]] = seen.intersection(aas_constants.RESERVED_TEXTS)
+    pair: Final[Tuple[str, int]] = (text, number)
+    base: Final[aas_types.Parent] = parent
+    if (
+        (
+            len(reserved_seen) > 0
+            or len(label) > limit
+        )
+    ):
+        return False
+    for item in all_texts:
+        if item == 'forbidden':
+            return False
+    if (
+        (
+            (maybe_text is not None)
+            and len(maybe_text) > limit
+        )
+    ):
+        return False
+    if (
+        (
+            isinstance(base, aas_types.ChildA)
+            and base.a_only == 77
+        )
+    ):
+        return False
+    return pair[1] != 17
+
+
 def text_is_short(
     text: Optional[str]
 ) -> bool:
@@ -420,6 +466,11 @@ class _Transformer(
                 'The first parent as Child_b must not have b_only of 42'
             )
 
+        if not that.texts_are_short():
+            yield Error(
+                'Texts must be at most 20 characters long'
+            )
+
         if not that.text_is_not_bye():
             yield Error(
                 'Text must not be bye'
@@ -438,6 +489,21 @@ class _Transformer(
         if not none_is_short_and_text_is_short(that.text):
             yield Error(
                 'Text must be at most 10 characters long'
+            )
+
+        if not (
+            final_locals_are_consistent(
+                that.text,
+                that.number,
+                that.texts,
+                that.optional_text,
+                that.parent
+            )
+        ):
+            yield Error(
+                'Text must not be reserved, texts must not be forbidden, ' +
+                'parent as Child_a must not have a_only of 77, and number ' +
+                'must not be 17'
             )
 
         if not member_is_lucky(that.optional_member):
