@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ChildA": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "aOnly": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "ChildA"
+            }
+          },
+          "required": [
+            "aOnly"
+          ]
+        }
+      ]
+    },
+    "ChildB": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Parent"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "ChildB"
+            }
+          }
+        }
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "ChildA",
+        "ChildB"
+      ]
+    },
+    "Parent": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "number",
+        "modelType"
+      ]
+    },
+    "Parent_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ChildA"
+        },
+        {
+          "$ref": "#/definitions/ChildB"
+        }
+      ]
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent": {
+          "$ref": "#/definitions/Parent_choice"
+        },
+        "optionalText": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "number",
+        "text",
+        "texts",
+        "parent"
+      ]
+    }
+  }
+}

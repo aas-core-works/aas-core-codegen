@@ -875,6 +875,47 @@ class If(Statement):
         visitor.visit_if(self)
 
 
+class Assert(Statement):
+    """
+    Represent an ``assert`` statement with an optional message.
+
+    The message is either a string literal or an f-string.
+    """
+
+    #: Condition which needs to hold
+    condition: Expression
+
+    #: Message reported if the condition does not hold
+    message: Optional[Union[Constant, JoinedStr]]
+
+    # fmt: off
+    @require(
+        lambda message:
+        message is None
+        or isinstance(message, JoinedStr)
+        or isinstance(message.value, str)
+    )
+    # fmt: on
+    def __init__(
+        self,
+        condition: Expression,
+        message: Optional[Union[Constant, JoinedStr]],
+        original_node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        Statement.__init__(self, original_node=original_node)
+        self.condition = condition
+        self.message = message
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_assert(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_assert(self)
+
+
 class ExpressionStatement(Statement):
     """
     Represent a call whose result, if any, is discarded.
@@ -902,7 +943,7 @@ class ExpressionStatement(Statement):
 
 
 StatementUnion = Union[
-    Assignment, Return, Switch, For, Continue, Break, If, ExpressionStatement
+    Assignment, Return, Switch, For, Continue, Break, If, Assert, ExpressionStatement
 ]
 
 
@@ -1137,6 +1178,13 @@ class Visitor(DBC):
             for stmt in node.default:
                 self.visit(stmt)
 
+    def visit_assert(self, node: Assert) -> None:
+        """Visit an ``assert`` statement."""
+        self.visit(node.condition)
+
+        if node.message is not None:
+            self.visit(node.message)
+
     def visit_expression_statement(self, node: ExpressionStatement) -> None:
         """Visit a call whose result is discarded."""
         self.visit(node.expression)
@@ -1317,6 +1365,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_if(self, node: If) -> T:
         """Transform an if-statement into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_assert(self, node: Assert) -> T:
+        """Transform an ``assert`` statement into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -1751,6 +1804,19 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_assert(self, node: Assert) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("condition", self.transform(node.condition)),
+                stringify.Property(
+                    "message",
+                    self.transform(node.message) if node.message is not None else None,
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_expression_statement(
         self, node: ExpressionStatement
     ) -> stringify.Entity:
@@ -1911,6 +1977,10 @@ class RestrictedTransformer(Transformer[T]):
 
     def transform_if(self, node: If) -> T:
         """Transform an if-statement into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_assert(self, node: Assert) -> T:
+        """Transform an ``assert`` statement into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_expression_statement(self, node: ExpressionStatement) -> T:
@@ -2112,6 +2182,12 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         if node.default is not None:
             for stmt in node.default:
                 yield from self.transform(stmt)
+
+    def transform_assert(self, node: Assert) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.condition)
+        if node.message is not None:
+            yield from self.transform(node.message)
 
     def transform_expression_statement(
         self, node: ExpressionStatement

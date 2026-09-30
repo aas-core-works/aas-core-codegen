@@ -282,7 +282,7 @@ def string_literal(
     text: str,
     without_enclosing: bool = False,
     in_backticks: bool = False,
-) -> Stripped:
+) -> str:
     """
     Generate a string literal from the ``text``.
 
@@ -329,8 +329,12 @@ def string_literal(
 
     escaped = "".join(escaped_chars)
 
+    # NOTE (mristin):
+    # Without the enclosing, the result is a fragment of a literal which might begin
+    # or end with whitespace, *e.g.*, a part of a template literal. Hence, we return
+    # a plain string.
     if without_enclosing:
-        return Stripped(escaped)
+        return escaped
     else:
         if not in_backticks:
             return Stripped(f'"{escaped}"')

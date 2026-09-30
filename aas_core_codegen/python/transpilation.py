@@ -1645,6 +1645,42 @@ range(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped("break"), None
 
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_assert(
+        self, node: parse_tree.Assert
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        condition, error = self.transform(node.condition)
+        if error is not None:
+            errors.append(error)
+
+        message = None  # type: Optional[Stripped]
+        if node.message is not None:
+            message, error = self.transform(node.message)
+            if error is not None:
+                errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the assertion", errors
+            )
+
+        assert condition is not None
+
+        if "\n" in condition:
+            condition = Stripped(
+                f"""\
+(
+{I}{indent_but_first_line(condition, I)}
+)"""
+            )
+
+        if message is None:
+            return Stripped(f"assert {condition}"), None
+
+        return Stripped(f"assert {condition}, {message}"), None
+
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement
     ) -> Tuple[Optional[Stripped], Optional[Error]]:

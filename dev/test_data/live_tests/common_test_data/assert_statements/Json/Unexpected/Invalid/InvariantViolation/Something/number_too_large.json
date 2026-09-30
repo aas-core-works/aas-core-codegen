@@ -1,0 +1,9 @@
+{
+  "number": 1000,
+  "text": "",
+  "texts": [],
+  "parent": {
+    "number": 0,
+    "modelType": "ChildB"
+  }
+}

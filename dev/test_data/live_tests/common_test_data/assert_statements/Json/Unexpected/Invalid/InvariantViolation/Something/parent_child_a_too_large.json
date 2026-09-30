@@ -1,0 +1,10 @@
+{
+  "number": 0,
+  "text": "",
+  "texts": [],
+  "parent": {
+    "number": 0,
+    "aOnly": 100,
+    "modelType": "ChildA"
+  }
+}

@@ -1141,6 +1141,7 @@ def _parse_block(
                 tree.Continue,
                 tree.Break,
                 tree.If,
+                tree.Assert,
                 tree.ExpressionStatement,
             ),
         ):
@@ -1474,6 +1475,61 @@ class _ParseIf(_Parse):
         )
 
 
+class _ParseAssert(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Assert)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.Assert)
+
+        if isinstance(node.test, ast.Tuple):
+            return None, Error(
+                node.test,
+                "The condition of the assertion is a tuple which always holds; "
+                "did you put the message in parentheses together with the condition?",
+            )
+
+        condition, error = ast_node_to_our_node(node.test)
+        if error is not None:
+            return None, error
+
+        assert condition is not None
+        if not isinstance(condition, tree.Expression):
+            return None, Error(
+                node.test,
+                f"Expected the condition of the assertion to be an expression, "
+                f"but got: {ast.unparse(node.test)}",
+            )
+
+        message = None  # type: Optional[Union[tree.Constant, tree.JoinedStr]]
+        if node.msg is not None:
+            message_node, error = ast_node_to_our_node(node.msg)
+            if error is not None:
+                return None, error
+
+            assert message_node is not None
+            if not (
+                isinstance(message_node, tree.JoinedStr)
+                or (
+                    isinstance(message_node, tree.Constant)
+                    and isinstance(message_node.value, str)
+                )
+            ):
+                return None, Error(
+                    node.msg,
+                    f"Expected the message of the assertion to be a string literal "
+                    f"or an f-string, but got: {ast.unparse(node.msg)}",
+                )
+
+            message = message_node
+
+        return (
+            tree.Assert(condition=condition, message=message, original_node=node),
+            None,
+        )
+
+
 _CHAIN_OF_RULES = [
     _ParseComparison(),
     _ParseIsIn(),
@@ -1503,6 +1559,7 @@ _CHAIN_OF_RULES = [
     _ParseContinue(),
     _ParseBreak(),
     _ParseIf(),
+    _ParseAssert(),
 ]  # type: Sequence[_Parse]
 
 

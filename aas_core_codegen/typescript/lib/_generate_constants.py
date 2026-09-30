@@ -106,7 +106,7 @@ def _generate_constant_primitive(
 
     elif constant.a_type is intermediate.PrimitiveType.STR:
         assert isinstance(constant.value, str)
-        literal = typescript_common.string_literal(constant.value)
+        literal = Stripped(typescript_common.string_literal(constant.value))
 
         writer.write(f"export const {constant_name} = {literal};")
 

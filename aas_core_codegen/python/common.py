@@ -100,7 +100,7 @@ def string_literal(
     quoting: Optional[StringQuoting] = None,
     without_enclosing: bool = False,
     duplicate_curly_brackets: bool = False,
-) -> Stripped:
+) -> str:
     """
     Generate a string literal from the ``text``.
 
@@ -150,8 +150,12 @@ def string_literal(
 
     escaped = "".join(mapping.get(character, character) for character in text)
 
+    # NOTE (mristin):
+    # Without the enclosing, the result is a fragment of a literal which might begin
+    # or end with whitespace, *e.g.*, a part of an f-string. Hence, we return
+    # a plain string.
     if without_enclosing:
-        return Stripped(escaped)
+        return escaped
     else:
         return Stripped(f"{enclosing}{escaped}{enclosing}")
 

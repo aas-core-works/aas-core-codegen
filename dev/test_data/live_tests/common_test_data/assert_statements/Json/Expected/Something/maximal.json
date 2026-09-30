@@ -1,0 +1,15 @@
+{
+  "number": -5,
+  "text": "hello",
+  "texts": [
+    "hello",
+    "world",
+    "hello"
+  ],
+  "parent": {
+    "number": 1,
+    "aOnly": 99,
+    "modelType": "ChildA"
+  },
+  "optionalText": "short"
+}

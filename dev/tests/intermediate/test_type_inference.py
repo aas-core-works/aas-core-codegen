@@ -2546,6 +2546,83 @@ def some_func(number: int) -> bool:
         )
 
 
+class Test_assert_statement(unittest.TestCase):
+    def test_narrowing_after_assertion(self) -> None:
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    assert text is not None, "Expected a text, but got none"
+    return len(text) > 0"""
+            )
+        )
+
+    def test_non_boolean_condition_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: str) -> bool:
+    assert len(text)
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the condition of the assertion to be a boolean, "
+                "but got: length"
+            ),
+        )
+
+    def test_optional_condition_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(flag: Optional[bool]) -> bool:
+    assert flag
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the condition of the assertion to be a boolean, "
+                "but got: Optional[bool]"
+            ),
+        )
+
+    def test_message_is_not_narrowed_by_condition_fails(self) -> None:
+        # NOTE (mristin):
+        # The message is evaluated only if the condition does not hold.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    assert text is not None, f"Unexpected text of length {len(text)}"
+    return True"""
+            ),
+            expected_joined_message=(
+                "Expected the argument of ``len`` to be a non-None, but got: "
+                "Optional[str]. Please check for ``is not None`` first."
+            ),
+        )
+
+    def test_narrowing_does_not_leak_out_of_branch_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(text: Optional[str], flag: bool) -> bool:
+    if flag:
+        assert text is not None
+
+    return len(text) > 0"""
+            ),
+            expected_joined_message=(
+                "Expected the argument of ``len`` to be a non-None, but got: "
+                "Optional[str]. Please check for ``is not None`` first."
+            ),
+        )
+
+
 class Test_narrowing_in_statements(unittest.TestCase):
     @staticmethod
     def source_with_verification(verification: str) -> str:

@@ -3352,6 +3352,11 @@ def generate_implementation(
     if intermediate_uses.abs_call(symbol_table):
         std_includes.extend(["<cmath>", "<cstdlib>"])
 
+    # NOTE (mristin):
+    # The failed assertions throw ``std::logic_error``.
+    if intermediate_uses.assert_statements_in(symbol_table.verification_functions):
+        std_includes.append("<stdexcept>")
+
     std_includes_joined = "\n".join(
         f"#include {std_include}" for std_include in sorted(std_includes)
     )

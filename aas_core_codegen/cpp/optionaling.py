@@ -828,6 +828,19 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         self.is_optional_map[node] = False
         return None
 
+    def transform_assert(self, node: parse_tree.Assert) -> Optional[Error]:
+        error = self.transform(node.condition)
+        if error is not None:
+            return error
+
+        if node.message is not None:
+            error = self.transform(node.message)
+            if error is not None:
+                return error
+
+        self.is_optional_map[node] = False
+        return None
+
     def transform_expression_statement(
         self, node: parse_tree.ExpressionStatement
     ) -> Optional[Error]:
