@@ -11,10 +11,10 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aasstringification "github.com/dummy-works/dummy/stringification"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourstringification "github.com/dummy-works/dummy/stringification"
+	ourtypes "github.com/dummy-works/dummy/types"
 	xmlcommon "github.com/dummy-works/dummy/internal/xmlcommon"
 )
 
@@ -96,10 +96,10 @@ func unexpectedItemElement(local string, expectedLocal string) error {
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -128,7 +128,7 @@ func readListOf[T any](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -241,7 +241,7 @@ func concludeProperty(
 	if valueErr != nil {
 		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: local},
+				&ourreporting.NameSegment{Name: local},
 			)
 		}
 		err = valueErr
@@ -350,7 +350,7 @@ func readAtV6_Result(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (value aastypes.Result,
+) (value ourtypes.Result,
 	next xml.Token,
 	err error,
 ) {
@@ -381,7 +381,7 @@ func readTuple2[T1 any, T2 any](
 		aCurrent xml.Token,
 		aLocal string,
 	) (T2, xml.Token, error),
-) (result aascommon.Tuple2[T1, T2], next xml.Token, err error) {
+) (result ourcommon.Tuple2[T1, T2], next xml.Token, err error) {
 	var item1 T1
 	item1, current, err = xmlcommon.ReadElementDispatched(
 		decoder, current, readItem1,
@@ -389,7 +389,7 @@ func readTuple2[T1 any, T2 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -402,13 +402,13 @@ func readTuple2[T1 any, T2 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
 	}
 
-	result = aascommon.Tuple2[T1, T2]{
+	result = ourcommon.Tuple2[T1, T2]{
 		Item1: item1,
 		Item2: item2,
 	}
@@ -455,7 +455,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 		aCurrent xml.Token,
 		aLocal string,
 	) (T6, xml.Token, error),
-) (result aascommon.Tuple6[T1, T2, T3, T4, T5, T6], next xml.Token, err error) {
+) (result ourcommon.Tuple6[T1, T2, T3, T4, T5, T6], next xml.Token, err error) {
 	var item1 T1
 	item1, current, err = xmlcommon.ReadElementDispatched(
 		decoder, current, readItem1,
@@ -463,7 +463,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -476,7 +476,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
@@ -489,7 +489,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 2},
+				&ourreporting.IndexSegment{Index: 2},
 			)
 		}
 		return
@@ -502,7 +502,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 3},
+				&ourreporting.IndexSegment{Index: 3},
 			)
 		}
 		return
@@ -515,7 +515,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 4},
+				&ourreporting.IndexSegment{Index: 4},
 			)
 		}
 		return
@@ -528,13 +528,13 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 5},
+				&ourreporting.IndexSegment{Index: 5},
 			)
 		}
 		return
 	}
 
-	result = aascommon.Tuple6[T1, T2, T3, T4, T5, T6]{
+	result = ourcommon.Tuple6[T1, T2, T3, T4, T5, T6]{
 		Item1: item1,
 		Item2: item2,
 		Item3: item3,
@@ -547,7 +547,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.Result].
+// [ourtypes.Result].
 //
 // Any comment tokens are skipped.
 //
@@ -558,7 +558,7 @@ func readTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 func readTextAs_Result(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.Result,
+) (value ourtypes.Result,
 	next xml.Token,
 	err error,
 ) {
@@ -569,7 +569,7 @@ func readTextAs_Result(
 	}
 
 	var ok bool
-	value, ok = aasstringification.ResultFromString(text)
+	value, ok = ourstringification.ResultFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -583,7 +583,7 @@ func readTextAs_Result(
 	return
 }
 
-// De-serialize an instance of [aastypes.IAbstractItem] based on the `local` name
+// De-serialize an instance of [ourtypes.IAbstractItem] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -592,7 +592,7 @@ func readAbstractItemDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IAbstractItem,
+) (instance ourtypes.IAbstractItem,
 	next xml.Token,
 	err error,
 ) {
@@ -607,16 +607,16 @@ func readAbstractItemDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISomeItem]
+// De-serialize the instance of [ourtypes.ISomeItem]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISomeItem].
+// of [ourtypes.ISomeItem].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSomeItemAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISomeItem,
+) (instance ourtypes.ISomeItem,
 	next xml.Token,
 	err error,
 ) {
@@ -665,13 +665,13 @@ func readSomeItemAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSomeItem(
+	instance = ourtypes.NewSomeItem(
 		theName,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ISomeItem] based on the `local` name
+// De-serialize an instance of [ourtypes.ISomeItem] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -680,7 +680,7 @@ func readSomeItemDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ISomeItem,
+) (instance ourtypes.ISomeItem,
 	next xml.Token,
 	err error,
 ) {
@@ -693,16 +693,16 @@ func readSomeItemDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAnotherItem]
+// De-serialize the instance of [ourtypes.IAnotherItem]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAnotherItem].
+// of [ourtypes.IAnotherItem].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAnotherItemAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAnotherItem,
+) (instance ourtypes.IAnotherItem,
 	next xml.Token,
 	err error,
 ) {
@@ -751,29 +751,29 @@ func readAnotherItemAsSequence(
 		return
 	}
 
-	instance = aastypes.NewAnotherItem(
+	instance = ourtypes.NewAnotherItem(
 		theSerialNumber,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.ISomething]
+// De-serialize the instance of [ourtypes.ISomething]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISomething].
+// of [ourtypes.ISomething].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSomethingAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISomething,
+) (instance ourtypes.ISomething,
 	next xml.Token,
 	err error,
 ) {
-	var thePair aascommon.Tuple2[string, int64]
-	var theItems aascommon.Tuple2[aastypes.IAbstractItem, aastypes.IAbstractItem]
-	var theTricky aascommon.Tuple6[int64, aastypes.ISomeItem, aastypes.IAbstractItem, aastypes.ISomeItem, int64, aastypes.Result]
-	var theOptionalPair *aascommon.Tuple2[string, aastypes.IAbstractItem]
+	var thePair ourcommon.Tuple2[string, int64]
+	var theItems ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem]
+	var theTricky ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result]
+	var theOptionalPair *ourcommon.Tuple2[string, ourtypes.IAbstractItem]
 
 	foundPair := false
 	foundItems := false
@@ -872,7 +872,7 @@ func readSomethingAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSomething(
+	instance = ourtypes.NewSomething(
 		thePair,
 		theItems,
 		theTricky,
@@ -881,7 +881,7 @@ func readSomethingAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -890,7 +890,7 @@ func readClassDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 	next xml.Token,
 	err error,
 ) {
@@ -912,12 +912,12 @@ func readClassDispatched(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 	decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {
+) (instance ourtypes.IClass, err error) {
 	var current xml.Token
 	current, err = xmlcommon.ReadNext(decoder, nil)
 	if err != nil {
@@ -1032,7 +1032,7 @@ func writeList[T any](
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
 				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			return
@@ -1050,7 +1050,7 @@ func writeList[T any](
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -1065,7 +1065,7 @@ func finishProperty(
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: getter},
+				&ourreporting.NameSegment{Name: getter},
 			)
 		}
 		return err
@@ -1083,13 +1083,13 @@ func finishProperty(
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 	encoder *xml.Encoder,
 	that T,
 ) error {
@@ -1179,7 +1179,7 @@ func writeAtV5_long(
 // Do not flush.
 func writeAtV6_Result(
 	encoder *xml.Encoder,
-	value aastypes.Result,
+	value ourtypes.Result,
 ) error {
 	return xmlcommon.WriteElement(
 		encoder, "v6", value, writeAsText_Result,
@@ -1195,7 +1195,7 @@ func writeAtV6_Result(
 // arity 2, whichever mix of scalar and instance items it holds.
 func writeTuple2[T1 any, T2 any](
 	encoder *xml.Encoder,
-	that aascommon.Tuple2[T1, T2],
+	that ourcommon.Tuple2[T1, T2],
 	writeItem1 func(encoder *xml.Encoder, value T1) error,
 	writeItem2 func(encoder *xml.Encoder, value T2) error,
 ) (err error) {
@@ -1203,7 +1203,7 @@ func writeTuple2[T1 any, T2 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -1213,7 +1213,7 @@ func writeTuple2[T1 any, T2 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
@@ -1231,7 +1231,7 @@ func writeTuple2[T1 any, T2 any](
 // arity 6, whichever mix of scalar and instance items it holds.
 func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	encoder *xml.Encoder,
-	that aascommon.Tuple6[T1, T2, T3, T4, T5, T6],
+	that ourcommon.Tuple6[T1, T2, T3, T4, T5, T6],
 	writeItem1 func(encoder *xml.Encoder, value T1) error,
 	writeItem2 func(encoder *xml.Encoder, value T2) error,
 	writeItem3 func(encoder *xml.Encoder, value T3) error,
@@ -1243,7 +1243,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -1253,7 +1253,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
@@ -1263,7 +1263,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 2},
+				&ourreporting.IndexSegment{Index: 2},
 			)
 		}
 		return
@@ -1273,7 +1273,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 3},
+				&ourreporting.IndexSegment{Index: 3},
 			)
 		}
 		return
@@ -1283,7 +1283,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 4},
+				&ourreporting.IndexSegment{Index: 4},
 			)
 		}
 		return
@@ -1293,7 +1293,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 5},
+				&ourreporting.IndexSegment{Index: 5},
 			)
 		}
 		return
@@ -1307,7 +1307,7 @@ func writeTuple6[T1 any, T2 any, T3 any, T4 any, T5 any, T6 any](
 // Do not flush.
 func writeTupleOf2_string_long(
 	encoder *xml.Encoder,
-	that aascommon.Tuple2[string, int64],
+	that ourcommon.Tuple2[string, int64],
 ) error {
 	return writeTuple2(
 		encoder, that, writeAtV1_string, writeAtV2_long,
@@ -1319,13 +1319,13 @@ func writeTupleOf2_string_long(
 // Do not flush.
 func writeTupleOf2_IAbstractItem_IAbstractItem(
 	encoder *xml.Encoder,
-	that aascommon.Tuple2[aastypes.IAbstractItem, aastypes.IAbstractItem],
+	that ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
 ) error {
 	return writeTuple2(
 		encoder,
 		that,
-		writeInstance[aastypes.IAbstractItem],
-		writeInstance[aastypes.IAbstractItem],
+		writeInstance[ourtypes.IAbstractItem],
+		writeInstance[ourtypes.IAbstractItem],
 	)
 }
 
@@ -1334,15 +1334,15 @@ func writeTupleOf2_IAbstractItem_IAbstractItem(
 // Do not flush.
 func writeTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
 	encoder *xml.Encoder,
-	that aascommon.Tuple6[int64, aastypes.ISomeItem, aastypes.IAbstractItem, aastypes.ISomeItem, int64, aastypes.Result],
+	that ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
 ) error {
 	return writeTuple6(
 		encoder,
 		that,
 		writeAtV1_long,
-		writeInstance[aastypes.ISomeItem],
-		writeInstance[aastypes.IAbstractItem],
-		writeInstance[aastypes.ISomeItem],
+		writeInstance[ourtypes.ISomeItem],
+		writeInstance[ourtypes.IAbstractItem],
+		writeInstance[ourtypes.ISomeItem],
 		writeAtV5_long,
 		writeAtV6_Result,
 	)
@@ -1353,23 +1353,23 @@ func writeTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
 // Do not flush.
 func writeTupleOf2_string_IAbstractItem(
 	encoder *xml.Encoder,
-	that aascommon.Tuple2[string, aastypes.IAbstractItem],
+	that ourcommon.Tuple2[string, ourtypes.IAbstractItem],
 ) error {
 	return writeTuple2(
-		encoder, that, writeAtV1_string, writeInstance[aastypes.IAbstractItem],
+		encoder, that, writeAtV1_string, writeInstance[ourtypes.IAbstractItem],
 	)
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.Result]
+// of [ourtypes.Result]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_Result(
 	encoder *xml.Encoder,
-	value aastypes.Result,
+	value ourtypes.Result,
 ) (err error) {
-	text, ok := aasstringification.ResultToString(
+	text, ok := ourstringification.ResultToString(
 		value,
 	)
 	if !ok {
@@ -1387,7 +1387,7 @@ func writeAsText_Result(
 }
 
 // Serialize the instance
-// of [aastypes.ISomeItem]
+// of [ourtypes.ISomeItem]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1396,7 +1396,7 @@ func writeAsText_Result(
 // Do not flush.
 func writeSomeItemAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISomeItem,
+	that ourtypes.ISomeItem,
 ) (err error) {
 	err = finishProperty(
 		"Name()",
@@ -1412,7 +1412,7 @@ func writeSomeItemAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IAnotherItem]
+// of [ourtypes.IAnotherItem]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1421,7 +1421,7 @@ func writeSomeItemAsSequence(
 // Do not flush.
 func writeAnotherItemAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAnotherItem,
+	that ourtypes.IAnotherItem,
 ) (err error) {
 	err = finishProperty(
 		"SerialNumber()",
@@ -1437,7 +1437,7 @@ func writeAnotherItemAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ISomething]
+// of [ourtypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1446,7 +1446,7 @@ func writeAnotherItemAsSequence(
 // Do not flush.
 func writeSomethingAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (err error) {
 	err = finishProperty(
 		"Pair()",
@@ -1505,32 +1505,32 @@ func writeSomethingAsSequence(
 // to [Namespace].
 func writeClass(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeSomeItem:
+	case ourtypes.ModelTypeSomeItem:
 		err = writeClassElement(
 			encoder,
 			"someItem",
 			withNamespace,
-			that.(aastypes.ISomeItem),
+			that.(ourtypes.ISomeItem),
 			writeSomeItemAsSequence,
 		)
-	case aastypes.ModelTypeAnotherItem:
+	case ourtypes.ModelTypeAnotherItem:
 		err = writeClassElement(
 			encoder,
 			"anotherItem",
 			withNamespace,
-			that.(aastypes.IAnotherItem),
+			that.(ourtypes.IAnotherItem),
 			writeAnotherItemAsSequence,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		err = writeClassElement(
 			encoder,
 			"something",
 			withNamespace,
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			writeSomethingAsSequence,
 		)
 	default:
@@ -1550,7 +1550,7 @@ func writeClass(
 // to [Namespace].
 func Marshal(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	err = writeClass(encoder, that, withNamespace)

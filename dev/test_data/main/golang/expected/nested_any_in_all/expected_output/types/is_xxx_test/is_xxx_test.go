@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangString()
+	instance := ourtesting.MustLoadMinimalLangString()
 
-	if !aastypes.IsLangString(instance) {
+	if !ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be true on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringSet(instance) {
+	if ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be false on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsIecContent(instance) {
+	if ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be false on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOtherContent(instance) {
+	if ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be false on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -44,7 +44,7 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecification(instance) {
+	if ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be false on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -52,7 +52,7 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ILangString with runtime type %T and with model type %v",
@@ -62,9 +62,9 @@ func TestIsXxxOnAnInstanceOfLangString(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLangStringSet()
+	instance := ourtesting.MustLoadMinimalLangStringSet()
 
-	if aastypes.IsLangString(instance) {
+	if ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be false on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -72,7 +72,7 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLangStringSet(instance) {
+	if !ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be true on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -80,7 +80,7 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsIecContent(instance) {
+	if ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be false on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -88,7 +88,7 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOtherContent(instance) {
+	if ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be false on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -96,7 +96,7 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecification(instance) {
+	if ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be false on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -104,7 +104,7 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ILangStringSet with runtime type %T and with model type %v",
@@ -114,9 +114,9 @@ func TestIsXxxOnAnInstanceOfLangStringSet(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
-	instance := aastesting.MustLoadMinimalIecContent()
+	instance := ourtesting.MustLoadMinimalIecContent()
 
-	if aastypes.IsLangString(instance) {
+	if ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be false on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -124,7 +124,7 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringSet(instance) {
+	if ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be false on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -132,7 +132,7 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsIecContent(instance) {
+	if !ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be true on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -140,7 +140,7 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOtherContent(instance) {
+	if ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be false on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -148,7 +148,7 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecification(instance) {
+	if ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be false on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -156,7 +156,7 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IIecContent with runtime type %T and with model type %v",
@@ -166,9 +166,9 @@ func TestIsXxxOnAnInstanceOfIecContent(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
-	instance := aastesting.MustLoadMinimalOtherContent()
+	instance := ourtesting.MustLoadMinimalOtherContent()
 
-	if aastypes.IsLangString(instance) {
+	if ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be false on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -176,7 +176,7 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringSet(instance) {
+	if ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be false on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -184,7 +184,7 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsIecContent(instance) {
+	if ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be false on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -192,7 +192,7 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsOtherContent(instance) {
+	if !ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be true on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -200,7 +200,7 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecification(instance) {
+	if ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be false on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -208,7 +208,7 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IOtherContent with runtime type %T and with model type %v",
@@ -218,9 +218,9 @@ func TestIsXxxOnAnInstanceOfOtherContent(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSpecification()
+	instance := ourtesting.MustLoadMinimalSpecification()
 
-	if aastypes.IsLangString(instance) {
+	if ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be false on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -228,7 +228,7 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringSet(instance) {
+	if ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be false on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -236,7 +236,7 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsIecContent(instance) {
+	if ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be false on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -244,7 +244,7 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOtherContent(instance) {
+	if ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be false on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -252,7 +252,7 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSpecification(instance) {
+	if !ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be true on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -260,7 +260,7 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ISpecification with runtime type %T and with model type %v",
@@ -270,9 +270,9 @@ func TestIsXxxOnAnInstanceOfSpecification(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if aastypes.IsLangString(instance) {
+	if ourtypes.IsLangString(instance) {
 		t.Errorf(
 			"Expected IsLangString to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -280,7 +280,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLangStringSet(instance) {
+	if ourtypes.IsLangStringSet(instance) {
 		t.Errorf(
 			"Expected IsLangStringSet to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -288,7 +288,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsIecContent(instance) {
+	if ourtypes.IsIecContent(instance) {
 		t.Errorf(
 			"Expected IsIecContent to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -296,7 +296,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOtherContent(instance) {
+	if ourtypes.IsOtherContent(instance) {
 		t.Errorf(
 			"Expected IsOtherContent to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -304,7 +304,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSpecification(instance) {
+	if ourtypes.IsSpecification(instance) {
 		t.Errorf(
 			"Expected IsSpecification to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -312,7 +312,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",

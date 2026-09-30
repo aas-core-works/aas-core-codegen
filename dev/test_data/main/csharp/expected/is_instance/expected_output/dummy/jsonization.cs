@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -359,7 +359,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IElement IElementFrom(
+            public static Our.IElement IElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -393,14 +393,14 @@ namespace dummy
                         $"Unexpected model type for IElement: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IElement IElementFrom
+            }  // public static Our.IElement IElementFrom
 
             /// <summary>
             /// Deserialize an instance of Leaf from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Leaf LeafFrom(
+            internal static Our.Leaf LeafFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -477,7 +477,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Leaf(
+                return new Our.Leaf(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -493,7 +493,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IContainer IContainerFrom(
+            public static Our.IContainer IContainerFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -524,14 +524,14 @@ namespace dummy
                         $"Unexpected model type for IContainer: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IContainer IContainerFrom
+            }  // public static Our.IContainer IContainerFrom
 
             /// <summary>
             /// Deserialize an instance of OrderedContainer from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.OrderedContainer OrderedContainerFrom(
+            internal static Our.OrderedContainer OrderedContainerFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -620,7 +620,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.OrderedContainer(
+                return new Our.OrderedContainer(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -637,7 +637,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.UnorderedContainer UnorderedContainerFrom(
+            internal static Our.UnorderedContainer UnorderedContainerFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -714,7 +714,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.UnorderedContainer(
+                return new Our.UnorderedContainer(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -728,7 +728,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.GlobalAttribute GlobalAttributeFrom(
+            internal static Our.GlobalAttribute GlobalAttributeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -793,7 +793,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.GlobalAttribute(
+                return new Our.GlobalAttribute(
                     theKind
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -804,7 +804,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LocalAttribute LocalAttributeFrom(
+            internal static Our.LocalAttribute LocalAttributeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -869,7 +869,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LocalAttribute(
+                return new Our.LocalAttribute(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -882,7 +882,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.AttributeItem AttributeItemFrom(
+            public static Our.AttributeItem AttributeItemFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -909,23 +909,23 @@ namespace dummy
                     {
                         case "GlobalAttribute":
                         {
-                            Aas.GlobalAttribute instance = GlobalAttributeFrom(
+                            Our.GlobalAttribute instance = GlobalAttributeFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.AttributeItem.FromGlobalAttribute(instance);
+                            return Our.AttributeItem.FromGlobalAttribute(instance);
                         }
                         case "LocalAttribute":
                         {
-                            Aas.LocalAttribute instance = LocalAttributeFrom(
+                            Our.LocalAttribute instance = LocalAttributeFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.AttributeItem.FromLocalAttribute(instance);
+                            return Our.AttributeItem.FromLocalAttribute(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -938,14 +938,14 @@ namespace dummy
                     "Could not determine the concrete type of the union AttributeItem " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.AttributeItem AttributeItemFrom
+            }  // public static Our.AttributeItem AttributeItemFrom
 
             /// <summary>
             /// Deserialize an instance of AttributeOperand from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AttributeOperand AttributeOperandFrom(
+            internal static Our.AttributeOperand AttributeOperandFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1010,7 +1010,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.AttributeOperand(
+                return new Our.AttributeOperand(
                     theAttribute
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1021,7 +1021,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.StringLiteral StringLiteralFrom(
+            internal static Our.StringLiteral StringLiteralFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1086,7 +1086,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StringLiteral(
+                return new Our.StringLiteral(
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1097,7 +1097,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.NumberLiteral NumberLiteralFrom(
+            internal static Our.NumberLiteral NumberLiteralFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1162,7 +1162,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.NumberLiteral(
+                return new Our.NumberLiteral(
                     theNumber
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -1175,7 +1175,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.StringValue StringValueFrom(
+            public static Our.StringValue StringValueFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1202,23 +1202,23 @@ namespace dummy
                     {
                         case "StringLiteral":
                         {
-                            Aas.StringLiteral instance = StringLiteralFrom(
+                            Our.StringLiteral instance = StringLiteralFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.StringValue.FromStringLiteral(instance);
+                            return Our.StringValue.FromStringLiteral(instance);
                         }
                         case "AttributeOperand":
                         {
-                            Aas.AttributeOperand instance = AttributeOperandFrom(
+                            Our.AttributeOperand instance = AttributeOperandFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.StringValue.FromAttributeOperand(instance);
+                            return Our.StringValue.FromAttributeOperand(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -1231,7 +1231,7 @@ namespace dummy
                     "Could not determine the concrete type of the union StringValue " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.StringValue StringValueFrom
+            }  // public static Our.StringValue StringValueFrom
 
             /// <summary>
             /// Deserialize an instance of Value by dispatching
@@ -1240,7 +1240,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.Value ValueFrom(
+            public static Our.Value ValueFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1267,33 +1267,33 @@ namespace dummy
                     {
                         case "StringLiteral":
                         {
-                            Aas.StringLiteral instance = StringLiteralFrom(
+                            Our.StringLiteral instance = StringLiteralFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.Value.FromStringLiteral(instance);
+                            return Our.Value.FromStringLiteral(instance);
                         }
                         case "AttributeOperand":
                         {
-                            Aas.AttributeOperand instance = AttributeOperandFrom(
+                            Our.AttributeOperand instance = AttributeOperandFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.Value.FromAttributeOperand(instance);
+                            return Our.Value.FromAttributeOperand(instance);
                         }
                         case "NumberLiteral":
                         {
-                            Aas.NumberLiteral instance = NumberLiteralFrom(
+                            Our.NumberLiteral instance = NumberLiteralFrom(
                                 node, out error);
                             if (error != null)
                             {
                                 return default!;
                             }
-                            return Aas.Value.FromNumberLiteral(instance);
+                            return Our.Value.FromNumberLiteral(instance);
                         }
                         default:
                             error = new Reporting.Error(
@@ -1306,14 +1306,14 @@ namespace dummy
                     "Could not determine the concrete type of the union Value " +
                     "from the given JSON object; none of its implementers matched");
                 return default!;
-            }  // public static Aas.Value ValueFrom
+            }  // public static Our.Value ValueFrom
 
             /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1388,7 +1388,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theRoot
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1461,7 +1461,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.IElement anInstance = Deserialize.IElementFrom(
+        /// Our.IElement anInstance = Deserialize.IElementFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -1476,10 +1476,10 @@ namespace dummy
             /// representation of IElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IElement IElementFrom(
+            public static Our.IElement IElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IElement result = DeserializeImplementation.IElementFrom(
+                Our.IElement result = DeserializeImplementation.IElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1499,10 +1499,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Leaf.
             /// </exception>
-            public static Aas.Leaf LeafFrom(
+            public static Our.Leaf LeafFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Leaf result = DeserializeImplementation.LeafFrom(
+                Our.Leaf result = DeserializeImplementation.LeafFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1523,10 +1523,10 @@ namespace dummy
             /// representation of IContainer.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IContainer IContainerFrom(
+            public static Our.IContainer IContainerFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IContainer result = DeserializeImplementation.IContainerFrom(
+                Our.IContainer result = DeserializeImplementation.IContainerFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1546,10 +1546,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of OrderedContainer.
             /// </exception>
-            public static Aas.OrderedContainer OrderedContainerFrom(
+            public static Our.OrderedContainer OrderedContainerFrom(
                 Nodes.JsonNode node)
             {
-                Aas.OrderedContainer result = DeserializeImplementation.OrderedContainerFrom(
+                Our.OrderedContainer result = DeserializeImplementation.OrderedContainerFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1569,10 +1569,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of UnorderedContainer.
             /// </exception>
-            public static Aas.UnorderedContainer UnorderedContainerFrom(
+            public static Our.UnorderedContainer UnorderedContainerFrom(
                 Nodes.JsonNode node)
             {
-                Aas.UnorderedContainer result = DeserializeImplementation.UnorderedContainerFrom(
+                Our.UnorderedContainer result = DeserializeImplementation.UnorderedContainerFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1592,10 +1592,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of GlobalAttribute.
             /// </exception>
-            public static Aas.GlobalAttribute GlobalAttributeFrom(
+            public static Our.GlobalAttribute GlobalAttributeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.GlobalAttribute result = DeserializeImplementation.GlobalAttributeFrom(
+                Our.GlobalAttribute result = DeserializeImplementation.GlobalAttributeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1615,10 +1615,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LocalAttribute.
             /// </exception>
-            public static Aas.LocalAttribute LocalAttributeFrom(
+            public static Our.LocalAttribute LocalAttributeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LocalAttribute result = DeserializeImplementation.LocalAttributeFrom(
+                Our.LocalAttribute result = DeserializeImplementation.LocalAttributeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1638,10 +1638,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AttributeItem.
             /// </exception>
-            public static Aas.AttributeItem AttributeItemFrom(
+            public static Our.AttributeItem AttributeItemFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AttributeItem result = DeserializeImplementation.AttributeItemFrom(
+                Our.AttributeItem result = DeserializeImplementation.AttributeItemFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1661,10 +1661,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AttributeOperand.
             /// </exception>
-            public static Aas.AttributeOperand AttributeOperandFrom(
+            public static Our.AttributeOperand AttributeOperandFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AttributeOperand result = DeserializeImplementation.AttributeOperandFrom(
+                Our.AttributeOperand result = DeserializeImplementation.AttributeOperandFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1684,10 +1684,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StringLiteral.
             /// </exception>
-            public static Aas.StringLiteral StringLiteralFrom(
+            public static Our.StringLiteral StringLiteralFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StringLiteral result = DeserializeImplementation.StringLiteralFrom(
+                Our.StringLiteral result = DeserializeImplementation.StringLiteralFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1707,10 +1707,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of NumberLiteral.
             /// </exception>
-            public static Aas.NumberLiteral NumberLiteralFrom(
+            public static Our.NumberLiteral NumberLiteralFrom(
                 Nodes.JsonNode node)
             {
-                Aas.NumberLiteral result = DeserializeImplementation.NumberLiteralFrom(
+                Our.NumberLiteral result = DeserializeImplementation.NumberLiteralFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1730,10 +1730,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StringValue.
             /// </exception>
-            public static Aas.StringValue StringValueFrom(
+            public static Our.StringValue StringValueFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StringValue result = DeserializeImplementation.StringValueFrom(
+                Our.StringValue result = DeserializeImplementation.StringValueFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1753,10 +1753,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Value.
             /// </exception>
-            public static Aas.Value ValueFrom(
+            public static Our.Value ValueFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Value result = DeserializeImplementation.ValueFrom(
+                Our.Value result = DeserializeImplementation.ValueFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1776,10 +1776,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1816,7 +1816,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -1872,16 +1872,16 @@ namespace dummy
             /// Serialize the named union <paramref name="that" /> into a JSON object.
             /// </summary>
             /// <remarks>
-            /// A named union is not an <see cref="Aas.IClass" />, so it can not be
+            /// A named union is not an <see cref="Our.IClass" />, so it can not be
             /// dispatched by <see cref="TransformIClass" />. Dispatching over the
-            /// common, non-generic <see cref="Aas.IUnion" /> means we need only this one
+            /// common, non-generic <see cref="Our.IUnion" /> means we need only this one
             /// serializer for *all* named unions, and not one per union.
             ///
             /// Should a named union ever be allowed to flatten primitive or enumeration
             /// alternatives, only the body of this method has to change (to dispatch on
             /// the underlying value's kind) -- every call site stays the same.
             /// </remarks>
-            private static Nodes.JsonObject TransformIUnion(Aas.IUnion that)
+            private static Nodes.JsonObject TransformIUnion(Our.IUnion that)
             {
                 return TransformIClass(that.Underlying);
             }
@@ -1967,11 +1967,11 @@ namespace dummy
 
             private static readonly Serializer<bool> Serialize_bool = ToJsonValue;
 
-            private static readonly Serializer<Aas.IUnion> Serialize_IUnion = TransformIUnion;
+            private static readonly Serializer<Our.IUnion> Serialize_IUnion = TransformIUnion;
 
             private static readonly Serializer<double> Serialize_double = ToJsonValue;
 
-            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+            private static readonly Serializer<Our.IClass> Serialize_IClass = TransformIClass;
 
             /// <summary>
             /// Set the property <paramref name="jsonName" /> of
@@ -2005,7 +2005,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformLeaf(
-                Aas.ILeaf that
+                Our.ILeaf that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2020,7 +2020,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformOrderedContainer(
-                Aas.IOrderedContainer that
+                Our.IOrderedContainer that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2042,7 +2042,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformUnorderedContainer(
-                Aas.IUnorderedContainer that
+                Our.IUnorderedContainer that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2062,7 +2062,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformGlobalAttribute(
-                Aas.IGlobalAttribute that
+                Our.IGlobalAttribute that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2075,7 +2075,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformLocalAttribute(
-                Aas.ILocalAttribute that
+                Our.ILocalAttribute that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2088,7 +2088,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformAttributeOperand(
-                Aas.IAttributeOperand that
+                Our.IAttributeOperand that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2101,7 +2101,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformStringLiteral(
-                Aas.IStringLiteral that
+                Our.IStringLiteral that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2114,7 +2114,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformNumberLiteral(
-                Aas.INumberLiteral that
+                Our.INumberLiteral that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2127,7 +2127,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -2158,7 +2158,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of IElement:
         /// <code>
-        /// var anInstance = new Aas.IElement(
+        /// var anInstance = new Our.IElement(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -2175,7 +2175,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

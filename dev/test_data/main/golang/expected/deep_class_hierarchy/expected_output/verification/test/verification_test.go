@@ -11,23 +11,23 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
-	aasverification "github.com/dummy-works/dummy/verification"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
+	ourverification "github.com/dummy-works/dummy/verification"
 )
 
 // Assert that there are no verification errors in the `instance` de-serialized
 // from `source`.
 func assertNoVerificationErrors(
 	t *testing.T,
-	instance aastypes.IClass,
+	instance ourtypes.IClass,
 	source string,
 ) (ok bool) {
-	errors := make([]*aasverification.VerificationError, 0)
-	aasverification.Verify(
+	errors := make([]*ourverification.VerificationError, 0)
+	ourverification.Verify(
 		instance,
-		func(err *aasverification.VerificationError) (abort bool) {
+		func(err *ourverification.VerificationError) (abort bool) {
 			errors = append(errors, err)
 			return
 		},
@@ -58,7 +58,7 @@ func assertNoVerificationErrors(
 			)
 		}
 
-		jsonable, seriaErr := aasjsonization.ToJsonable(instance)
+		jsonable, seriaErr := ourjsonization.ToJsonable(instance)
 		if seriaErr != nil {
 			panic(
 				fmt.Sprintf(
@@ -86,10 +86,10 @@ func assertNoVerificationErrors(
 }
 
 // Assert that either the verification errors match the recorded ones at `pth`, if
-// [aastesting.RecordMode] is set, or re-record the verification errors at `pth`.
+// [ourtesting.RecordMode] is set, or re-record the verification errors at `pth`.
 func assertEqualsExpectedOrRerecordVerificationErrors(
 	t *testing.T,
-	errors []*aasverification.VerificationError,
+	errors []*ourverification.VerificationError,
 	source string,
 	expectedPth string,
 ) (ok bool) {
@@ -115,7 +115,7 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 	// Add a newline for POSIX systems
 	got := strings.Replace(strings.Join(parts, ";\n"), "\r\n", "\n", -1) + "\n"
 
-	if aastesting.RecordMode {
+	if ourtesting.RecordMode {
 		parent := filepath.Dir(expectedPth)
 		err := os.MkdirAll(parent, os.ModePerm)
 		if err != nil {
@@ -140,7 +140,7 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 				"Failed to stat the file %s: %s; if the file does not exist, "+
 					"you probably want to record the test data by "+
 					"setting the environment variable %s",
-				expectedPth, err.Error(), aastesting.RecordModeEnvironmentVariableName,
+				expectedPth, err.Error(), ourtesting.RecordModeEnvironmentVariableName,
 			)
 			return
 		}
@@ -169,9 +169,9 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 }
 
 func TestBranchOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Branch",
@@ -181,11 +181,11 @@ func TestBranchOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.BranchFromJsonable(
+		deserialized, deseriaErr := ourjsonization.BranchFromJsonable(
 			jsonable,
 		)
 		if deseriaErr != nil {
@@ -196,10 +196,10 @@ func TestBranchOK(t *testing.T) {
 			return
 		}
 
-		var errors []*aasverification.VerificationError
-		aasverification.Verify(
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
 			deserialized,
-			func(veriErr *aasverification.VerificationError) (abort bool) {
+			func(veriErr *ourverification.VerificationError) (abort bool) {
 				errors = append(errors, veriErr)
 				return
 			},
@@ -218,7 +218,7 @@ func TestBranchOK(t *testing.T) {
 
 func TestBranchFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Invalid",
@@ -237,35 +237,35 @@ func TestBranchFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"VerificationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".errors",
 			)
 
-			deserialized, deseriaErr := aasjsonization.BranchFromJsonable(
+			deserialized, deseriaErr := ourjsonization.BranchFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {
@@ -276,10 +276,10 @@ func TestBranchFail(t *testing.T) {
 				return
 			}
 
-			var errors []*aasverification.VerificationError
-			aasverification.Verify(
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
 				deserialized,
-				func(err *aasverification.VerificationError) (abort bool) {
+				func(err *ourverification.VerificationError) (abort bool) {
 					errors = append(errors, err)
 					return
 				},
@@ -299,9 +299,9 @@ func TestBranchFail(t *testing.T) {
 }
 
 func TestLeafOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Leaf",
@@ -311,11 +311,11 @@ func TestLeafOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.LeafFromJsonable(
+		deserialized, deseriaErr := ourjsonization.LeafFromJsonable(
 			jsonable,
 		)
 		if deseriaErr != nil {
@@ -326,10 +326,10 @@ func TestLeafOK(t *testing.T) {
 			return
 		}
 
-		var errors []*aasverification.VerificationError
-		aasverification.Verify(
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
 			deserialized,
-			func(veriErr *aasverification.VerificationError) (abort bool) {
+			func(veriErr *ourverification.VerificationError) (abort bool) {
 				errors = append(errors, veriErr)
 				return
 			},
@@ -348,7 +348,7 @@ func TestLeafOK(t *testing.T) {
 
 func TestLeafFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Invalid",
@@ -367,35 +367,35 @@ func TestLeafFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"VerificationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".errors",
 			)
 
-			deserialized, deseriaErr := aasjsonization.LeafFromJsonable(
+			deserialized, deseriaErr := ourjsonization.LeafFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {
@@ -406,10 +406,10 @@ func TestLeafFail(t *testing.T) {
 				return
 			}
 
-			var errors []*aasverification.VerificationError
-			aasverification.Verify(
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
 				deserialized,
-				func(err *aasverification.VerificationError) (abort bool) {
+				func(err *ourverification.VerificationError) (abort bool) {
 					errors = append(errors, err)
 					return
 				},
@@ -429,9 +429,9 @@ func TestLeafFail(t *testing.T) {
 }
 
 func TestBlossomOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Blossom",
@@ -441,11 +441,11 @@ func TestBlossomOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.BlossomFromJsonable(
+		deserialized, deseriaErr := ourjsonization.BlossomFromJsonable(
 			jsonable,
 		)
 		if deseriaErr != nil {
@@ -456,10 +456,10 @@ func TestBlossomOK(t *testing.T) {
 			return
 		}
 
-		var errors []*aasverification.VerificationError
-		aasverification.Verify(
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
 			deserialized,
-			func(veriErr *aasverification.VerificationError) (abort bool) {
+			func(veriErr *ourverification.VerificationError) (abort bool) {
 				errors = append(errors, veriErr)
 				return
 			},
@@ -478,7 +478,7 @@ func TestBlossomOK(t *testing.T) {
 
 func TestBlossomFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Invalid",
@@ -497,35 +497,35 @@ func TestBlossomFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"VerificationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".errors",
 			)
 
-			deserialized, deseriaErr := aasjsonization.BlossomFromJsonable(
+			deserialized, deseriaErr := ourjsonization.BlossomFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {
@@ -536,10 +536,10 @@ func TestBlossomFail(t *testing.T) {
 				return
 			}
 
-			var errors []*aasverification.VerificationError
-			aasverification.Verify(
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
 				deserialized,
-				func(err *aasverification.VerificationError) (abort bool) {
+				func(err *ourverification.VerificationError) (abort bool) {
 					errors = append(errors, err)
 					return
 				},
@@ -559,9 +559,9 @@ func TestBlossomFail(t *testing.T) {
 }
 
 func TestSomethingOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Something",
@@ -571,11 +571,11 @@ func TestSomethingOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.SomethingFromJsonable(
+		deserialized, deseriaErr := ourjsonization.SomethingFromJsonable(
 			jsonable,
 		)
 		if deseriaErr != nil {
@@ -586,10 +586,10 @@ func TestSomethingOK(t *testing.T) {
 			return
 		}
 
-		var errors []*aasverification.VerificationError
-		aasverification.Verify(
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
 			deserialized,
-			func(veriErr *aasverification.VerificationError) (abort bool) {
+			func(veriErr *ourverification.VerificationError) (abort bool) {
 				errors = append(errors, veriErr)
 				return
 			},
@@ -608,7 +608,7 @@ func TestSomethingOK(t *testing.T) {
 
 func TestSomethingFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Invalid",
@@ -627,35 +627,35 @@ func TestSomethingFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"VerificationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".errors",
 			)
 
-			deserialized, deseriaErr := aasjsonization.SomethingFromJsonable(
+			deserialized, deseriaErr := ourjsonization.SomethingFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {
@@ -666,10 +666,10 @@ func TestSomethingFail(t *testing.T) {
 				return
 			}
 
-			var errors []*aasverification.VerificationError
-			aasverification.Verify(
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
 				deserialized,
-				func(err *aasverification.VerificationError) (abort bool) {
+				func(err *ourverification.VerificationError) (abort bool) {
 					errors = append(errors, err)
 					return
 				},
@@ -689,9 +689,9 @@ func TestSomethingFail(t *testing.T) {
 }
 
 func TestContainerOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Json",
 			"Expected",
 			"Container",
@@ -701,11 +701,11 @@ func TestContainerOK(t *testing.T) {
 	sort.Strings(pths)
 
 	for _, pth := range pths {
-		jsonable := aastesting.MustReadJsonable(
+		jsonable := ourtesting.MustReadJsonable(
 			pth,
 		)
 
-		deserialized, deseriaErr := aasjsonization.ContainerFromJsonable(
+		deserialized, deseriaErr := ourjsonization.ContainerFromJsonable(
 			jsonable,
 		)
 		if deseriaErr != nil {
@@ -716,10 +716,10 @@ func TestContainerOK(t *testing.T) {
 			return
 		}
 
-		var errors []*aasverification.VerificationError
-		aasverification.Verify(
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
 			deserialized,
-			func(veriErr *aasverification.VerificationError) (abort bool) {
+			func(veriErr *ourverification.VerificationError) (abort bool) {
 				errors = append(errors, veriErr)
 				return
 			},
@@ -738,7 +738,7 @@ func TestContainerOK(t *testing.T) {
 
 func TestContainerFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Json",
 		"Unexpected",
 		"Invalid",
@@ -757,35 +757,35 @@ func TestContainerFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".json",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			jsonable := aastesting.MustReadJsonable(
+			jsonable := ourtesting.MustReadJsonable(
 				pth,
 			)
 
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"VerificationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".errors",
 			)
 
-			deserialized, deseriaErr := aasjsonization.ContainerFromJsonable(
+			deserialized, deseriaErr := ourjsonization.ContainerFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {
@@ -796,10 +796,10 @@ func TestContainerFail(t *testing.T) {
 				return
 			}
 
-			var errors []*aasverification.VerificationError
-			aasverification.Verify(
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
 				deserialized,
-				func(err *aasverification.VerificationError) (abort bool) {
+				func(err *ourverification.VerificationError) (abort bool) {
 					errors = append(errors, err)
 					return
 				},

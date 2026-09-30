@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Item`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Item(
+    an_instance = our_types.Item(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,19 +47,19 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def first_text_is_not_empty(
@@ -122,7 +122,7 @@ def sum_is_small(
 
 
 def no_item_has_an_empty_text(
-    items: List[aas_types.Item]
+    items: List[our_types.Item]
 ) -> bool:
     """Check the nested for-each loops."""
     # pylint: disable=all
@@ -149,12 +149,12 @@ def is_neither_thirteen_nor_unlucky(
 
 
 def alpha_has_no_negative_numbers(
-    kind: aas_types.Kind,
+    kind: our_types.Kind,
     numbers: List[int]
 ) -> bool:
     """Check the for-each in a switch branch."""
     # pylint: disable=all
-    if kind == aas_types.Kind.ALPHA:
+    if kind == our_types.Kind.ALPHA:
         for number in numbers:
             if number == -2:
                 return False
@@ -177,7 +177,7 @@ def sum_of_odd_numbers_is_small(
 
 
 def items_are_few_and_texts_expected(
-    items: List[aas_types.Item]
+    items: List[our_types.Item]
 ) -> bool:
     """
     Check the continue in all the branches of a switch in a nested for-range.
@@ -243,8 +243,8 @@ def weights_before_end_are_small(
 
 
 def texts_before_stop_are_few(
-    kind: aas_types.Kind,
-    items: List[aas_types.Item]
+    kind: our_types.Kind,
+    items: List[our_types.Item]
 ) -> bool:
     """
     Check the break in the nested branches of a switch in a nested for-range.
@@ -253,7 +253,7 @@ def texts_before_stop_are_few(
     count = 0
     for item in items:
         for i in range(0, len(item.texts)):
-            if kind == aas_types.Kind.ALPHA:
+            if kind == our_types.Kind.ALPHA:
                 if item.texts[i] == 'stop':
                     break
             else:
@@ -264,14 +264,14 @@ def texts_before_stop_are_few(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_item(
             self,
-            that: aas_types.Item
+            that: our_types.Item
     ) -> Iterator[Error]:
         # No verification has been defined for Item.
         return
@@ -283,7 +283,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not texts_before_stop_are_few(that.kind, that.items):
             yield Error(
@@ -376,7 +376,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

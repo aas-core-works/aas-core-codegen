@@ -12,21 +12,21 @@ package verification
 
 import (
 	"fmt"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -41,17 +41,17 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
-// Verify `that` instance of [aastypes.IQueryCondition].
+// Verify `that` instance of [ourtypes.IQueryCondition].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyQueryCondition(
-	that aastypes.IQueryCondition,
+	that ourtypes.IQueryCondition,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -68,14 +68,14 @@ func VerifyQueryCondition(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeQueryCondition:
+	case ourtypes.ModelTypeQueryCondition:
 		abort = VerifyQueryCondition(
-			that.(aastypes.IQueryCondition),
+			that.(ourtypes.IQueryCondition),
 			onError,
 		)
 	default:

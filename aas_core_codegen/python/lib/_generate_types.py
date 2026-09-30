@@ -2051,7 +2051,7 @@ else:
 
     if methods_call_int:
         import_blocks.append(
-            Stripped(f"import {qualified_module_name}.common as aas_common")
+            Stripped(f"import {qualified_module_name}.common as our_common")
         )
 
     imports = Stripped("\n\n".join(import_blocks))
@@ -2069,7 +2069,7 @@ ContextT = TypeVar("ContextT")"""
             Stripped(
                 f"""\
 class Class(abc.ABC):
-{I}\"\"\"Represent the most general class of an AAS model.\"\"\"
+{I}\"\"\"Represent the most general class of the meta-model.\"\"\"
 {I}@abc.abstractmethod
 {I}def descend_once(self) -> Iterator["Class"]:
 {II}\"\"\"Iterate over all the instances referenced from this one.\"\"\"

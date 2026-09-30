@@ -6,8 +6,8 @@ package enhancing
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -23,8 +23,8 @@ type enhanced[E any] interface {
 // a generic helper that both unwraps and re-wraps without knowing the
 // concrete union type.
 type selfUnion[T any] interface {
-	Underlying() aastypes.IClass
-	WithUnderlying(aastypes.IClass) T
+	Underlying() ourtypes.IClass
+	WithUnderlying(ourtypes.IClass) T
 }
 
 // Wrap the underlying instance of `that` union recursively with the
@@ -32,7 +32,7 @@ type selfUnion[T any] interface {
 // same concrete union type as `that`.
 func wrapUnion[E any, T selfUnion[T]](
 	that T,
-	factory func(aastypes.IClass) (E, bool),
+	factory func(ourtypes.IClass) (E, bool),
 ) T {
 	return that.WithUnderlying(
 		Wrap[E](
@@ -43,23 +43,23 @@ func wrapUnion[E any, T selfUnion[T]](
 }
 
 type enhancedStructuralFirst[E any] struct {
-	instance aastypes.IStructuralFirst
+	instance ourtypes.IStructuralFirst
 	enhancement E
 }
 
 func (esf *enhancedStructuralFirst[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return esf.instance.ModelType()
 }
 
 func (esf *enhancedStructuralFirst[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return esf.instance.DescendOnce(action)
 }
 
 func (esf *enhancedStructuralFirst[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return esf.instance.Descend(action)
 }
@@ -87,9 +87,9 @@ func (esf *enhancedStructuralFirst[E]) setEnhancement(
 }
 
 func wrapStructuralFirst[E any](
-	that aastypes.IStructuralFirst,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IStructuralFirst) {
+	that ourtypes.IStructuralFirst,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IStructuralFirst) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -107,23 +107,23 @@ func wrapStructuralFirst[E any](
 }
 
 type enhancedStructuralSecond[E any] struct {
-	instance aastypes.IStructuralSecond
+	instance ourtypes.IStructuralSecond
 	enhancement E
 }
 
 func (ess *enhancedStructuralSecond[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ess.instance.ModelType()
 }
 
 func (ess *enhancedStructuralSecond[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ess.instance.DescendOnce(action)
 }
 
 func (ess *enhancedStructuralSecond[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ess.instance.Descend(action)
 }
@@ -151,9 +151,9 @@ func (ess *enhancedStructuralSecond[E]) setEnhancement(
 }
 
 func wrapStructuralSecond[E any](
-	that aastypes.IStructuralSecond,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IStructuralSecond) {
+	that ourtypes.IStructuralSecond,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IStructuralSecond) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -171,23 +171,23 @@ func wrapStructuralSecond[E any](
 }
 
 type enhancedMixedAbstractDescendantOne[E any] struct {
-	instance aastypes.IMixedAbstractDescendantOne
+	instance ourtypes.IMixedAbstractDescendantOne
 	enhancement E
 }
 
 func (emado *enhancedMixedAbstractDescendantOne[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emado.instance.ModelType()
 }
 
 func (emado *enhancedMixedAbstractDescendantOne[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emado.instance.DescendOnce(action)
 }
 
 func (emado *enhancedMixedAbstractDescendantOne[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emado.instance.Descend(action)
 }
@@ -215,9 +215,9 @@ func (emado *enhancedMixedAbstractDescendantOne[E]) setEnhancement(
 }
 
 func wrapMixedAbstractDescendantOne[E any](
-	that aastypes.IMixedAbstractDescendantOne,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMixedAbstractDescendantOne) {
+	that ourtypes.IMixedAbstractDescendantOne,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMixedAbstractDescendantOne) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -235,23 +235,23 @@ func wrapMixedAbstractDescendantOne[E any](
 }
 
 type enhancedMixedAbstractDescendantTwo[E any] struct {
-	instance aastypes.IMixedAbstractDescendantTwo
+	instance ourtypes.IMixedAbstractDescendantTwo
 	enhancement E
 }
 
 func (emadt *enhancedMixedAbstractDescendantTwo[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emadt.instance.ModelType()
 }
 
 func (emadt *enhancedMixedAbstractDescendantTwo[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emadt.instance.DescendOnce(action)
 }
 
 func (emadt *enhancedMixedAbstractDescendantTwo[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emadt.instance.Descend(action)
 }
@@ -279,9 +279,9 @@ func (emadt *enhancedMixedAbstractDescendantTwo[E]) setEnhancement(
 }
 
 func wrapMixedAbstractDescendantTwo[E any](
-	that aastypes.IMixedAbstractDescendantTwo,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMixedAbstractDescendantTwo) {
+	that ourtypes.IMixedAbstractDescendantTwo,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMixedAbstractDescendantTwo) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -299,23 +299,23 @@ func wrapMixedAbstractDescendantTwo[E any](
 }
 
 type enhancedMixedConcreteWithDescendants[E any] struct {
-	instance aastypes.IMixedConcreteWithDescendants
+	instance ourtypes.IMixedConcreteWithDescendants
 	enhancement E
 }
 
 func (emcwd *enhancedMixedConcreteWithDescendants[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emcwd.instance.ModelType()
 }
 
 func (emcwd *enhancedMixedConcreteWithDescendants[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emcwd.instance.DescendOnce(action)
 }
 
 func (emcwd *enhancedMixedConcreteWithDescendants[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emcwd.instance.Descend(action)
 }
@@ -343,9 +343,9 @@ func (emcwd *enhancedMixedConcreteWithDescendants[E]) setEnhancement(
 }
 
 func wrapMixedConcreteWithDescendants[E any](
-	that aastypes.IMixedConcreteWithDescendants,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMixedConcreteWithDescendants) {
+	that ourtypes.IMixedConcreteWithDescendants,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMixedConcreteWithDescendants) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -363,23 +363,23 @@ func wrapMixedConcreteWithDescendants[E any](
 }
 
 type enhancedMixedConcreteWithDescendantsChild[E any] struct {
-	instance aastypes.IMixedConcreteWithDescendantsChild
+	instance ourtypes.IMixedConcreteWithDescendantsChild
 	enhancement E
 }
 
 func (emcwdc *enhancedMixedConcreteWithDescendantsChild[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emcwdc.instance.ModelType()
 }
 
 func (emcwdc *enhancedMixedConcreteWithDescendantsChild[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emcwdc.instance.DescendOnce(action)
 }
 
 func (emcwdc *enhancedMixedConcreteWithDescendantsChild[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emcwdc.instance.Descend(action)
 }
@@ -418,9 +418,9 @@ func (emcwdc *enhancedMixedConcreteWithDescendantsChild[E]) setEnhancement(
 }
 
 func wrapMixedConcreteWithDescendantsChild[E any](
-	that aastypes.IMixedConcreteWithDescendantsChild,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMixedConcreteWithDescendantsChild) {
+	that ourtypes.IMixedConcreteWithDescendantsChild,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMixedConcreteWithDescendantsChild) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -438,23 +438,23 @@ func wrapMixedConcreteWithDescendantsChild[E any](
 }
 
 type enhancedMixedConcreteLeaf[E any] struct {
-	instance aastypes.IMixedConcreteLeaf
+	instance ourtypes.IMixedConcreteLeaf
 	enhancement E
 }
 
 func (emcl *enhancedMixedConcreteLeaf[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emcl.instance.ModelType()
 }
 
 func (emcl *enhancedMixedConcreteLeaf[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emcl.instance.DescendOnce(action)
 }
 
 func (emcl *enhancedMixedConcreteLeaf[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emcl.instance.Descend(action)
 }
@@ -482,9 +482,9 @@ func (emcl *enhancedMixedConcreteLeaf[E]) setEnhancement(
 }
 
 func wrapMixedConcreteLeaf[E any](
-	that aastypes.IMixedConcreteLeaf,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMixedConcreteLeaf) {
+	that ourtypes.IMixedConcreteLeaf,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMixedConcreteLeaf) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -502,23 +502,23 @@ func wrapMixedConcreteLeaf[E any](
 }
 
 type enhancedModelTypedFirst[E any] struct {
-	instance aastypes.IModelTypedFirst
+	instance ourtypes.IModelTypedFirst
 	enhancement E
 }
 
 func (emtf *enhancedModelTypedFirst[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emtf.instance.ModelType()
 }
 
 func (emtf *enhancedModelTypedFirst[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emtf.instance.DescendOnce(action)
 }
 
 func (emtf *enhancedModelTypedFirst[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emtf.instance.Descend(action)
 }
@@ -546,9 +546,9 @@ func (emtf *enhancedModelTypedFirst[E]) setEnhancement(
 }
 
 func wrapModelTypedFirst[E any](
-	that aastypes.IModelTypedFirst,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IModelTypedFirst) {
+	that ourtypes.IModelTypedFirst,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IModelTypedFirst) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -566,23 +566,23 @@ func wrapModelTypedFirst[E any](
 }
 
 type enhancedModelTypedSecond[E any] struct {
-	instance aastypes.IModelTypedSecond
+	instance ourtypes.IModelTypedSecond
 	enhancement E
 }
 
 func (emts *enhancedModelTypedSecond[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emts.instance.ModelType()
 }
 
 func (emts *enhancedModelTypedSecond[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emts.instance.DescendOnce(action)
 }
 
 func (emts *enhancedModelTypedSecond[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emts.instance.Descend(action)
 }
@@ -610,9 +610,9 @@ func (emts *enhancedModelTypedSecond[E]) setEnhancement(
 }
 
 func wrapModelTypedSecond[E any](
-	that aastypes.IModelTypedSecond,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IModelTypedSecond) {
+	that ourtypes.IModelTypedSecond,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IModelTypedSecond) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -630,144 +630,144 @@ func wrapModelTypedSecond[E any](
 }
 
 type enhancedSomething[E any] struct {
-	instance aastypes.ISomething
+	instance ourtypes.ISomething
 	enhancement E
 }
 
 func (es *enhancedSomething[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSomething[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSomething[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
 
 func (es *enhancedSomething[E]) StructuralProperty(
-) *aastypes.StructuralUnion {
+) *ourtypes.StructuralUnion {
 	return es.instance.StructuralProperty()
 }
 
 func (es *enhancedSomething[E]) SetStructuralProperty(
-	value *aastypes.StructuralUnion,
+	value *ourtypes.StructuralUnion,
 ) {
 	es.instance.SetStructuralProperty(value)
 }
 
 func (es *enhancedSomething[E]) MixedProperty(
-) *aastypes.MixedUnion {
+) *ourtypes.MixedUnion {
 	return es.instance.MixedProperty()
 }
 
 func (es *enhancedSomething[E]) SetMixedProperty(
-	value *aastypes.MixedUnion,
+	value *ourtypes.MixedUnion,
 ) {
 	es.instance.SetMixedProperty(value)
 }
 
 func (es *enhancedSomething[E]) ModelTypedProperty(
-) *aastypes.ModelTypedUnion {
+) *ourtypes.ModelTypedUnion {
 	return es.instance.ModelTypedProperty()
 }
 
 func (es *enhancedSomething[E]) SetModelTypedProperty(
-	value *aastypes.ModelTypedUnion,
+	value *ourtypes.ModelTypedUnion,
 ) {
 	es.instance.SetModelTypedProperty(value)
 }
 
 func (es *enhancedSomething[E]) ListStructuralProperty(
-) []*aastypes.StructuralUnion {
+) []*ourtypes.StructuralUnion {
 	return es.instance.ListStructuralProperty()
 }
 
 func (es *enhancedSomething[E]) SetListStructuralProperty(
-	value []*aastypes.StructuralUnion,
+	value []*ourtypes.StructuralUnion,
 ) {
 	es.instance.SetListStructuralProperty(value)
 }
 
 func (es *enhancedSomething[E]) ListMixedProperty(
-) []*aastypes.MixedUnion {
+) []*ourtypes.MixedUnion {
 	return es.instance.ListMixedProperty()
 }
 
 func (es *enhancedSomething[E]) SetListMixedProperty(
-	value []*aastypes.MixedUnion,
+	value []*ourtypes.MixedUnion,
 ) {
 	es.instance.SetListMixedProperty(value)
 }
 
 func (es *enhancedSomething[E]) ListModelTypedProperty(
-) []*aastypes.ModelTypedUnion {
+) []*ourtypes.ModelTypedUnion {
 	return es.instance.ListModelTypedProperty()
 }
 
 func (es *enhancedSomething[E]) SetListModelTypedProperty(
-	value []*aastypes.ModelTypedUnion,
+	value []*ourtypes.ModelTypedUnion,
 ) {
 	es.instance.SetListModelTypedProperty(value)
 }
 
 func (es *enhancedSomething[E]) TupleProperty(
-) aascommon.Tuple3[*aastypes.StructuralUnion, *aastypes.MixedUnion, *aastypes.ModelTypedUnion] {
+) ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion] {
 	return es.instance.TupleProperty()
 }
 
 func (es *enhancedSomething[E]) SetTupleProperty(
-	value aascommon.Tuple3[*aastypes.StructuralUnion, *aastypes.MixedUnion, *aastypes.ModelTypedUnion],
+	value ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
 ) {
 	es.instance.SetTupleProperty(value)
 }
 
 func (es *enhancedSomething[E]) OptionalStructuralProperty(
-) *aastypes.StructuralUnion {
+) *ourtypes.StructuralUnion {
 	return es.instance.OptionalStructuralProperty()
 }
 
 func (es *enhancedSomething[E]) SetOptionalStructuralProperty(
-	value *aastypes.StructuralUnion,
+	value *ourtypes.StructuralUnion,
 ) {
 	es.instance.SetOptionalStructuralProperty(value)
 }
 
 func (es *enhancedSomething[E]) OptionalMixedProperty(
-) *aastypes.MixedUnion {
+) *ourtypes.MixedUnion {
 	return es.instance.OptionalMixedProperty()
 }
 
 func (es *enhancedSomething[E]) SetOptionalMixedProperty(
-	value *aastypes.MixedUnion,
+	value *ourtypes.MixedUnion,
 ) {
 	es.instance.SetOptionalMixedProperty(value)
 }
 
 func (es *enhancedSomething[E]) OptionalModelTypedProperty(
-) *aastypes.ModelTypedUnion {
+) *ourtypes.ModelTypedUnion {
 	return es.instance.OptionalModelTypedProperty()
 }
 
 func (es *enhancedSomething[E]) SetOptionalModelTypedProperty(
-	value *aastypes.ModelTypedUnion,
+	value *ourtypes.ModelTypedUnion,
 ) {
 	es.instance.SetOptionalModelTypedProperty(value)
 }
 
 func (es *enhancedSomething[E]) OptionalListOverlappingProperty(
-) []*aastypes.OverlappingUnion {
+) []*ourtypes.OverlappingUnion {
 	return es.instance.OptionalListOverlappingProperty()
 }
 
 func (es *enhancedSomething[E]) SetOptionalListOverlappingProperty(
-	value []*aastypes.OverlappingUnion,
+	value []*ourtypes.OverlappingUnion,
 ) {
 	es.instance.SetOptionalListOverlappingProperty(value)
 }
@@ -784,9 +784,9 @@ func (es *enhancedSomething[E]) setEnhancement(
 }
 
 func wrapSomething[E any](
-	that aastypes.ISomething,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomething) {
+	that ourtypes.ISomething,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomething) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -900,9 +900,9 @@ func wrapSomething[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -914,54 +914,54 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeStructuralFirst:
+	case ourtypes.ModelTypeStructuralFirst:
 		result = wrapStructuralFirst[E](
-			that.(aastypes.IStructuralFirst),
+			that.(ourtypes.IStructuralFirst),
 			factory,
 		)
-	case aastypes.ModelTypeStructuralSecond:
+	case ourtypes.ModelTypeStructuralSecond:
 		result = wrapStructuralSecond[E](
-			that.(aastypes.IStructuralSecond),
+			that.(ourtypes.IStructuralSecond),
 			factory,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantOne:
+	case ourtypes.ModelTypeMixedAbstractDescendantOne:
 		result = wrapMixedAbstractDescendantOne[E](
-			that.(aastypes.IMixedAbstractDescendantOne),
+			that.(ourtypes.IMixedAbstractDescendantOne),
 			factory,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantTwo:
+	case ourtypes.ModelTypeMixedAbstractDescendantTwo:
 		result = wrapMixedAbstractDescendantTwo[E](
-			that.(aastypes.IMixedAbstractDescendantTwo),
+			that.(ourtypes.IMixedAbstractDescendantTwo),
 			factory,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendants:
+	case ourtypes.ModelTypeMixedConcreteWithDescendants:
 		result = wrapMixedConcreteWithDescendants[E](
-			that.(aastypes.IMixedConcreteWithDescendants),
+			that.(ourtypes.IMixedConcreteWithDescendants),
 			factory,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendantsChild:
+	case ourtypes.ModelTypeMixedConcreteWithDescendantsChild:
 		result = wrapMixedConcreteWithDescendantsChild[E](
-			that.(aastypes.IMixedConcreteWithDescendantsChild),
+			that.(ourtypes.IMixedConcreteWithDescendantsChild),
 			factory,
 		)
-	case aastypes.ModelTypeMixedConcreteLeaf:
+	case ourtypes.ModelTypeMixedConcreteLeaf:
 		result = wrapMixedConcreteLeaf[E](
-			that.(aastypes.IMixedConcreteLeaf),
+			that.(ourtypes.IMixedConcreteLeaf),
 			factory,
 		)
-	case aastypes.ModelTypeModelTypedFirst:
+	case ourtypes.ModelTypeModelTypedFirst:
 		result = wrapModelTypedFirst[E](
-			that.(aastypes.IModelTypedFirst),
+			that.(ourtypes.IModelTypedFirst),
 			factory,
 		)
-	case aastypes.ModelTypeModelTypedSecond:
+	case ourtypes.ModelTypeModelTypedSecond:
 		result = wrapModelTypedSecond[E](
-			that.(aastypes.IModelTypedSecond),
+			that.(ourtypes.IModelTypedSecond),
 			factory,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			factory,
 		)
 	default:
@@ -980,7 +980,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -993,7 +993,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of StructuralFirst:
     /// <code>
-    /// var anInstance = new Aas.StructuralFirst(
+    /// var anInstance = new Our.StructuralFirst(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -48,7 +48,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformStructuralFirst(
-                Aas.IStructuralFirst that
+                Our.IStructuralFirst that
             )
             {
                 if (!(Common.StringHelpers.Len(that.UniqueToFirst) > 0))
@@ -61,7 +61,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformStructuralSecond(
-                Aas.IStructuralSecond that
+                Our.IStructuralSecond that
             )
             {
                 if (!(Common.StringHelpers.Len(that.UniqueToSecond) > 0))
@@ -74,7 +74,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMixedAbstractDescendantOne(
-                Aas.IMixedAbstractDescendantOne that
+                Our.IMixedAbstractDescendantOne that
             )
             {
                 if (!(
@@ -88,7 +88,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMixedAbstractDescendantTwo(
-                Aas.IMixedAbstractDescendantTwo that
+                Our.IMixedAbstractDescendantTwo that
             )
             {
                 if (!(
@@ -102,7 +102,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMixedConcreteWithDescendants(
-                Aas.IMixedConcreteWithDescendants that
+                Our.IMixedConcreteWithDescendants that
             )
             {
                 if (!(
@@ -116,7 +116,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMixedConcreteWithDescendantsChild(
-                Aas.IMixedConcreteWithDescendantsChild that
+                Our.IMixedConcreteWithDescendantsChild that
             )
             {
                 if (!(
@@ -138,7 +138,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMixedConcreteLeaf(
-                Aas.IMixedConcreteLeaf that
+                Our.IMixedConcreteLeaf that
             )
             {
                 if (!(
@@ -152,7 +152,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformModelTypedFirst(
-                Aas.IModelTypedFirst that
+                Our.IModelTypedFirst that
             )
             {
                 if (!(Common.StringHelpers.Len(that.SomeProperty) > 0))
@@ -165,7 +165,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformModelTypedSecond(
-                Aas.IModelTypedSecond that
+                Our.IModelTypedSecond that
             )
             {
                 if (!(Common.StringHelpers.Len(that.SomeProperty) > 0))
@@ -178,7 +178,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 foreach (var error in Verification.Verify(that.StructuralProperty))
@@ -344,7 +344,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -352,7 +352,7 @@ namespace dummy
             }
         }
 
-        public static IEnumerable<Reporting.Error> Verify(Aas.IUnion that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IUnion that)
         {
             foreach (var error in Verify(that.Underlying))
             {

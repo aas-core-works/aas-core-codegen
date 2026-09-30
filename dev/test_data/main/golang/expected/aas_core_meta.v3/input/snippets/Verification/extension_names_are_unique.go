@@ -1,6 +1,6 @@
-// Check that all [aastypes.IExtension.Name] are unique among
+// Check that all [ourtypes.IExtension.Name] are unique among
 // `extensions`.
-func ExtensionNamesAreUnique[E aastypes.IExtension](
+func ExtensionNamesAreUnique[E ourtypes.IExtension](
 	extensions []E) bool {
 	nameSet := make(map[string]struct{})
 

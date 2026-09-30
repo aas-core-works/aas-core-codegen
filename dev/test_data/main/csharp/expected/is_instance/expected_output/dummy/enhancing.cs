@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
@@ -31,13 +31,13 @@ namespace dummy
         }
 
         public class EnhancedLeaf<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILeaf
+            : Enhanced<TEnhancement>, Our.ILeaf
             where TEnhancement : class
         {
-            private readonly Aas.ILeaf _instance;
+            private readonly Our.ILeaf _instance;
 
             public EnhancedLeaf(
-                Aas.ILeaf instance,
+                Our.ILeaf instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -56,17 +56,17 @@ namespace dummy
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLeaf(_instance);
             }
@@ -94,13 +94,13 @@ namespace dummy
         }
 
         public class EnhancedOrderedContainer<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IOrderedContainer
+            : Enhanced<TEnhancement>, Our.IOrderedContainer
             where TEnhancement : class
         {
-            private readonly Aas.IOrderedContainer _instance;
+            private readonly Our.IOrderedContainer _instance;
 
             public EnhancedOrderedContainer(
-                Aas.IOrderedContainer instance,
+                Our.IOrderedContainer instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -125,17 +125,17 @@ namespace dummy
                 set => _instance.IsSorted = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitOrderedContainer(_instance);
             }
@@ -163,13 +163,13 @@ namespace dummy
         }
 
         public class EnhancedUnorderedContainer<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IUnorderedContainer
+            : Enhanced<TEnhancement>, Our.IUnorderedContainer
             where TEnhancement : class
         {
-            private readonly Aas.IUnorderedContainer _instance;
+            private readonly Our.IUnorderedContainer _instance;
 
             public EnhancedUnorderedContainer(
-                Aas.IUnorderedContainer instance,
+                Our.IUnorderedContainer instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -188,17 +188,17 @@ namespace dummy
                 set => _instance.Children = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitUnorderedContainer(_instance);
             }
@@ -226,13 +226,13 @@ namespace dummy
         }
 
         public class EnhancedGlobalAttribute<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IGlobalAttribute
+            : Enhanced<TEnhancement>, Our.IGlobalAttribute
             where TEnhancement : class
         {
-            private readonly Aas.IGlobalAttribute _instance;
+            private readonly Our.IGlobalAttribute _instance;
 
             public EnhancedGlobalAttribute(
-                Aas.IGlobalAttribute instance,
+                Our.IGlobalAttribute instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -245,17 +245,17 @@ namespace dummy
                 set => _instance.Kind = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitGlobalAttribute(_instance);
             }
@@ -283,13 +283,13 @@ namespace dummy
         }
 
         public class EnhancedLocalAttribute<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILocalAttribute
+            : Enhanced<TEnhancement>, Our.ILocalAttribute
             where TEnhancement : class
         {
-            private readonly Aas.ILocalAttribute _instance;
+            private readonly Our.ILocalAttribute _instance;
 
             public EnhancedLocalAttribute(
-                Aas.ILocalAttribute instance,
+                Our.ILocalAttribute instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -302,17 +302,17 @@ namespace dummy
                 set => _instance.Name = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLocalAttribute(_instance);
             }
@@ -340,13 +340,13 @@ namespace dummy
         }
 
         public class EnhancedAttributeOperand<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IAttributeOperand
+            : Enhanced<TEnhancement>, Our.IAttributeOperand
             where TEnhancement : class
         {
-            private readonly Aas.IAttributeOperand _instance;
+            private readonly Our.IAttributeOperand _instance;
 
             public EnhancedAttributeOperand(
-                Aas.IAttributeOperand instance,
+                Our.IAttributeOperand instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -359,17 +359,17 @@ namespace dummy
                 set => _instance.Attribute = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitAttributeOperand(_instance);
             }
@@ -397,13 +397,13 @@ namespace dummy
         }
 
         public class EnhancedStringLiteral<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IStringLiteral
+            : Enhanced<TEnhancement>, Our.IStringLiteral
             where TEnhancement : class
         {
-            private readonly Aas.IStringLiteral _instance;
+            private readonly Our.IStringLiteral _instance;
 
             public EnhancedStringLiteral(
-                Aas.IStringLiteral instance,
+                Our.IStringLiteral instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -416,17 +416,17 @@ namespace dummy
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitStringLiteral(_instance);
             }
@@ -454,13 +454,13 @@ namespace dummy
         }
 
         public class EnhancedNumberLiteral<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.INumberLiteral
+            : Enhanced<TEnhancement>, Our.INumberLiteral
             where TEnhancement : class
         {
-            private readonly Aas.INumberLiteral _instance;
+            private readonly Our.INumberLiteral _instance;
 
             public EnhancedNumberLiteral(
-                Aas.INumberLiteral instance,
+                Our.INumberLiteral instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -473,17 +473,17 @@ namespace dummy
                 set => _instance.Number = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitNumberLiteral(_instance);
             }
@@ -511,13 +511,13 @@ namespace dummy
         }
 
         public class EnhancedSomething<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISomething
+            : Enhanced<TEnhancement>, Our.ISomething
             where TEnhancement : class
         {
-            private readonly Aas.ISomething _instance;
+            private readonly Our.ISomething _instance;
 
             public EnhancedSomething(
-                Aas.ISomething instance,
+                Our.ISomething instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -548,17 +548,17 @@ namespace dummy
                 set => _instance.Values = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSomething(_instance);
             }
@@ -586,20 +586,20 @@ namespace dummy
         }
 
         internal class Wrapper<TEnhancement>
-            : Aas.Visitation.AbstractTransformer<Aas.IClass>
+            : Our.Visitation.AbstractTransformer<Our.IClass>
             where TEnhancement : class
         {
-            private readonly System.Func<Aas.IClass, TEnhancement?> _enhancementFactory;
+            private readonly System.Func<Our.IClass, TEnhancement?> _enhancementFactory;
 
             internal Wrapper(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _enhancementFactory = enhancementFactory;
             }
 
-            public override Aas.IClass TransformLeaf(
-                Aas.ILeaf that
+            public override Our.IClass TransformLeaf(
+                Our.ILeaf that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -618,8 +618,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformOrderedContainer(
-                Aas.IOrderedContainer that
+            public override Our.IClass TransformOrderedContainer(
+                Our.IOrderedContainer that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -635,7 +635,7 @@ namespace dummy
                         (item) => {
                             var transformed = Transform(item);
                             return (
-                                transformed as Aas.IElement
+                                transformed as Our.IElement
                             ) ?? throw new System.InvalidOperationException(
                                 "Expected the transformed item to be a IElement, " +
                                 $"but got: {transformed}"
@@ -653,8 +653,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformUnorderedContainer(
-                Aas.IUnorderedContainer that
+            public override Our.IClass TransformUnorderedContainer(
+                Our.IUnorderedContainer that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -670,7 +670,7 @@ namespace dummy
                         (item) => {
                             var transformed = Transform(item);
                             return (
-                                transformed as Aas.IElement
+                                transformed as Our.IElement
                             ) ?? throw new System.InvalidOperationException(
                                 "Expected the transformed item to be a IElement, " +
                                 $"but got: {transformed}"
@@ -688,8 +688,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformGlobalAttribute(
-                Aas.IGlobalAttribute that
+            public override Our.IClass TransformGlobalAttribute(
+                Our.IGlobalAttribute that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -708,8 +708,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformLocalAttribute(
-                Aas.ILocalAttribute that
+            public override Our.IClass TransformLocalAttribute(
+                Our.ILocalAttribute that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -728,8 +728,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformAttributeOperand(
-                Aas.IAttributeOperand that
+            public override Our.IClass TransformAttributeOperand(
+                Our.IAttributeOperand that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -750,8 +750,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformStringLiteral(
-                Aas.IStringLiteral that
+            public override Our.IClass TransformStringLiteral(
+                Our.IStringLiteral that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -770,8 +770,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformNumberLiteral(
-                Aas.INumberLiteral that
+            public override Our.IClass TransformNumberLiteral(
+                Our.INumberLiteral that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -790,8 +790,8 @@ namespace dummy
                     );
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -805,7 +805,7 @@ namespace dummy
                     that.Root
                 );
                 var castedRoot = (
-                    transformedRoot as Aas.IElement
+                    transformedRoot as Our.IElement
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IElement, " +
                     $"but got: {transformedRoot}"
@@ -818,7 +818,7 @@ namespace dummy
                         that.OptionalElement
                     );
                     var castedOptionalElement = (
-                        transformedOptionalElement as Aas.IElement
+                        transformedOptionalElement as Our.IElement
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IElement, " +
                         $"but got: {transformedOptionalElement}"
@@ -842,7 +842,7 @@ namespace dummy
                     );
             }
 
-            private T Transform<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+            private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
             {
                 return that.WithUnderlying(
                     Transform(that.Underlying));
@@ -863,7 +863,7 @@ namespace dummy
             /// Enhancement, or <c>null</c> if <paramref name="that" />
             /// has not been wrapped yet.
             /// </returns>
-            public TEnhancement? Unwrap(Aas.IClass that)
+            public TEnhancement? Unwrap(Our.IClass that)
             {
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 var enhanced = that as Enhanced<TEnhancement>;
@@ -880,7 +880,7 @@ namespace dummy
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has not been wrapped yet
             /// </exception>
-            public TEnhancement MustUnwrap(Aas.IClass that)
+            public TEnhancement MustUnwrap(Our.IClass that)
             {
                 return Unwrap(that) ?? throw new System.ArgumentException(
                     $"Expected the instance to have been wrapped, but it was not: {that}"
@@ -905,7 +905,7 @@ namespace dummy
             /// the wrapping will continue recursively.</para>
             ///</param>
             public Enhancer(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -927,8 +927,8 @@ namespace dummy
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has been already wrapped
             /// </exception>
-            public Aas.IClass Wrap(
-                Aas.IClass that
+            public Our.IClass Wrap(
+                Our.IClass that
             )
             {
                 var wrapped = _wrapper.Transform(that);

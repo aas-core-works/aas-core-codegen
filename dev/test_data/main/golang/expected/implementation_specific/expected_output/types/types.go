@@ -15,7 +15,7 @@ const (
 	ModelTypeContainer
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -72,7 +72,7 @@ type IItem interface {
 	Describe() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IItem]
+// Check whether the instance corresponds to [ourtypes.IItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -115,7 +115,7 @@ type IBox interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IBox]
+// Check whether the instance corresponds to [ourtypes.IBox]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -248,7 +248,7 @@ type IBag interface {
 	Describe() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IBag]
+// Check whether the instance corresponds to [ourtypes.IBag]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -356,7 +356,7 @@ type IContainer interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IContainer]
+// Check whether the instance corresponds to [ourtypes.IContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

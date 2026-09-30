@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -33,9 +33,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -169,7 +169,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -179,7 +179,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -345,7 +345,7 @@ def _str_from_jsonable(
 
 def item_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Item:
+) -> our_types.Item:
     """
     Parse an instance of :py:class:`.types.Item` from the JSON-able
     structure :paramref:`jsonable`.
@@ -363,7 +363,7 @@ def item_from_jsonable(
 
 def box_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Box:
+) -> our_types.Box:
     """
     Parse an instance of :py:class:`.types.Box` from the JSON-able
     structure :paramref:`jsonable`.
@@ -413,7 +413,7 @@ def box_from_jsonable(
             "The required property 'size' is missing"
         )
 
-    return aas_types.Box(
+    return our_types.Box(
         the_label,
         the_size
     )
@@ -423,7 +423,7 @@ def box_from_jsonable(
 #: :py:class:`.types.Item`, by its model type
 _ITEM_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Item]
+    _Parser[our_types.Item]
 ] = {
     'Box': box_from_jsonable,
 }
@@ -510,7 +510,7 @@ def _int_to_jsonable(
 
 
 def _box_to_jsonable(
-    that: aas_types.Box
+    that: our_types.Box
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -531,7 +531,7 @@ def _box_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -550,12 +550,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

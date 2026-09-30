@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
@@ -16,7 +16,7 @@ namespace dummy.Tests
     public class TestCopying
     {
         internal class DeepEqualiser
-            : Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+            : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
             /// <summary>Compare two byte spans for equal content.</summary>
             /// <remarks>
@@ -31,10 +31,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformBranch(
-                Aas.IBranch that,
-                Aas.IClass other)
+                Our.IBranch that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Branch casted))
+                if (!(other is Our.Branch casted))
                 {
                     return false;
                 }
@@ -45,10 +45,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformLeaf(
-                Aas.ILeaf that,
-                Aas.IClass other)
+                Our.ILeaf that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Leaf casted))
+                if (!(other is Our.Leaf casted))
                 {
                     return false;
                 }
@@ -60,10 +60,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformBlossom(
-                Aas.IBlossom that,
-                Aas.IClass other)
+                Our.IBlossom that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Blossom casted))
+                if (!(other is Our.Blossom casted))
                 {
                     return false;
                 }
@@ -76,10 +76,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformSomething(
-                Aas.ISomething that,
-                Aas.IClass other)
+                Our.ISomething that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Something casted))
+                if (!(other is Our.Something casted))
                 {
                     return false;
                 }
@@ -94,10 +94,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformContainer(
-                Aas.IContainer that,
-                Aas.IClass other)
+                Our.IContainer that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Container casted))
+                if (!(other is Our.Container casted))
                 {
                     return false;
                 }
@@ -115,8 +115,8 @@ namespace dummy.Tests
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
 
         private static bool BranchShallowEquals(
-            Aas.Branch that,
-            Aas.Branch other)
+            Our.Branch that,
+            Our.Branch other)
         {
             return (
                 that.Identifier == other.Identifier
@@ -124,8 +124,8 @@ namespace dummy.Tests
         }
 
         private static bool LeafShallowEquals(
-            Aas.Leaf that,
-            Aas.Leaf other)
+            Our.Leaf that,
+            Our.Leaf other)
         {
             return (
                 that.Identifier == other.Identifier
@@ -134,8 +134,8 @@ namespace dummy.Tests
         }
 
         private static bool BlossomShallowEquals(
-            Aas.Blossom that,
-            Aas.Blossom other)
+            Our.Blossom that,
+            Our.Blossom other)
         {
             return (
                 that.Identifier == other.Identifier
@@ -145,8 +145,8 @@ namespace dummy.Tests
         }
 
         private static bool SomethingShallowEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return (
                 that.SomeChoice == other.SomeChoice
@@ -154,43 +154,43 @@ namespace dummy.Tests
         }
 
         private static bool ContainerShallowEquals(
-            Aas.Container that,
-            Aas.Container other)
+            Our.Container that,
+            Our.Container other)
         {
             return that.Node == other.Node && that.Something == other.Something;
         }
 
         private static bool BranchDeepEquals(
-            Aas.Branch that,
-            Aas.Branch other)
+            Our.Branch that,
+            Our.Branch other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LeafDeepEquals(
-            Aas.Leaf that,
-            Aas.Leaf other)
+            Our.Leaf that,
+            Our.Leaf other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool BlossomDeepEquals(
-            Aas.Blossom that,
-            Aas.Blossom other)
+            Our.Blossom that,
+            Our.Blossom other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SomethingDeepEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ContainerDeepEquals(
-            Aas.Container that,
-            Aas.Container other)
+            Our.Container that,
+            Our.Container other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -198,10 +198,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Branch_shallow_copy()
         {
-            Aas.Branch instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBranch());
+            Our.Branch instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBranch());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 BranchShallowEquals(
@@ -212,10 +212,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Branch_deep_copy()
         {
-            Aas.Branch instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBranch());
+            Our.Branch instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBranch());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 BranchDeepEquals(
@@ -226,10 +226,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Leaf_shallow_copy()
         {
-            Aas.Leaf instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLeaf());
+            Our.Leaf instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLeaf());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LeafShallowEquals(
@@ -240,10 +240,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Leaf_deep_copy()
         {
-            Aas.Leaf instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLeaf());
+            Our.Leaf instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLeaf());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LeafDeepEquals(
@@ -254,10 +254,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Blossom_shallow_copy()
         {
-            Aas.Blossom instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlossom());
+            Our.Blossom instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlossom());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 BlossomShallowEquals(
@@ -268,10 +268,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Blossom_deep_copy()
         {
-            Aas.Blossom instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlossom());
+            Our.Blossom instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlossom());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 BlossomDeepEquals(
@@ -282,10 +282,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_shallow_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SomethingShallowEquals(
@@ -296,10 +296,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_deep_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SomethingDeepEquals(
@@ -310,10 +310,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Container_shallow_copy()
         {
-            Aas.Container instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+            Our.Container instance = (
+                Our.Tests.CommonJsonization.LoadMaximalContainer());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ContainerShallowEquals(
@@ -324,10 +324,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Container_deep_copy()
         {
-            Aas.Container instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalContainer());
+            Our.Container instance = (
+                Our.Tests.CommonJsonization.LoadMaximalContainer());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ContainerDeepEquals(

@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,72 +21,72 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::IAbstractDescendantWithoutNumbers
+  our::types::IAbstractDescendantWithoutNumbers
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IAbstractDescendantWithoutNumbers
+  our::types::IAbstractDescendantWithoutNumbers
 >::name = "IAbstractDescendantWithoutNumbers";
 
 template<>
 struct StaticTypeName<
-  aas::types::IParentWithoutNumbers
+  our::types::IParentWithoutNumbers
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IParentWithoutNumbers
+  our::types::IParentWithoutNumbers
 >::name = "IParentWithoutNumbers";
 
 template<>
 struct StaticTypeName<
-  aas::types::IChildWithoutNumbers
+  our::types::IChildWithoutNumbers
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IChildWithoutNumbers
+  our::types::IChildWithoutNumbers
 >::name = "IChildWithoutNumbers";
 
 template<>
 struct StaticTypeName<
-  aas::types::IWithNumber
+  our::types::IWithNumber
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IWithNumber
+  our::types::IWithNumber
 >::name = "IWithNumber";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 >::name = "ISomething";
 
 std::shared_ptr<
-  aas::types::IAbstractDescendantWithoutNumbers
+  our::types::IAbstractDescendantWithoutNumbers
 > LoadAbstractDescendantWithoutNumbers(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IAbstractDescendantWithoutNumbers
+    our::types::IAbstractDescendantWithoutNumbers
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IAbstractDescendantWithoutNumbers
+      our::types::IAbstractDescendantWithoutNumbers
     >(
       abstract
     )
@@ -94,7 +94,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IAbstractDescendantWithoutNumbers from ",
         path.string()
       )
@@ -105,7 +105,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IAbstractDescendantWithoutNumbers
+  our::types::IAbstractDescendantWithoutNumbers
 > LoadMinAbstractDescendantWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -121,7 +121,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IAbstractDescendantWithoutNumbers
+  our::types::IAbstractDescendantWithoutNumbers
 > LoadMaxAbstractDescendantWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -137,23 +137,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IParentWithoutNumbers
+  our::types::IParentWithoutNumbers
 > LoadParentWithoutNumbers(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IParentWithoutNumbers
+    our::types::IParentWithoutNumbers
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IParentWithoutNumbers
+      our::types::IParentWithoutNumbers
     >(
       abstract
     )
@@ -161,7 +161,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IParentWithoutNumbers from ",
         path.string()
       )
@@ -172,7 +172,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IParentWithoutNumbers
+  our::types::IParentWithoutNumbers
 > LoadMinParentWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -188,7 +188,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IParentWithoutNumbers
+  our::types::IParentWithoutNumbers
 > LoadMaxParentWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -204,23 +204,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IChildWithoutNumbers
+  our::types::IChildWithoutNumbers
 > LoadChildWithoutNumbers(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IChildWithoutNumbers
+    our::types::IChildWithoutNumbers
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IChildWithoutNumbers
+      our::types::IChildWithoutNumbers
     >(
       abstract
     )
@@ -228,7 +228,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IChildWithoutNumbers from ",
         path.string()
       )
@@ -239,7 +239,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IChildWithoutNumbers
+  our::types::IChildWithoutNumbers
 > LoadMinChildWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -255,7 +255,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IChildWithoutNumbers
+  our::types::IChildWithoutNumbers
 > LoadMaxChildWithoutNumbers() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -271,23 +271,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IWithNumber
+  our::types::IWithNumber
 > LoadWithNumber(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IWithNumber
+    our::types::IWithNumber
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IWithNumber
+      our::types::IWithNumber
     >(
       abstract
     )
@@ -295,7 +295,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IWithNumber from ",
         path.string()
       )
@@ -306,7 +306,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IWithNumber
+  our::types::IWithNumber
 > LoadMinWithNumber() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -322,7 +322,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IWithNumber
+  our::types::IWithNumber
 > LoadMaxWithNumber() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -338,23 +338,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadSomething(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISomething
+      our::types::ISomething
     >(
       abstract
     )
@@ -362,7 +362,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISomething from ",
         path.string()
       )
@@ -373,7 +373,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMinSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -389,7 +389,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMaxSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Item`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Item(
+    an_instance = our_types.Item(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,23 +47,23 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def set_text(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """Check the assignment to a property."""
@@ -73,7 +73,7 @@ def set_text(
 
 
 def set_maybe_text(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """Check the assignment of a value to an optional property."""
@@ -83,20 +83,20 @@ def set_maybe_text(
 
 
 def copy_maybe_text_and_set_maybe_kind(
-    item: aas_types.Item,
-    other: aas_types.Item
+    item: our_types.Item,
+    other: our_types.Item
 ) -> bool:
     """
     Check the assignment of an optional value, and of an enumeration literal.
     """
     # pylint: disable=all
     item.maybe_text = other.maybe_text
-    item.maybe_kind = aas_types.Kind.ALPHA
+    item.maybe_kind = our_types.Kind.ALPHA
     return True
 
 
 def set_text_through_alias(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """
@@ -109,7 +109,7 @@ def set_text_through_alias(
 
 
 def set_texts(
-    item: aas_types.Item,
+    item: our_types.Item,
     texts: List[str]
 ) -> bool:
     """Check the assignment of a copy of a list to a property."""
@@ -119,7 +119,7 @@ def set_texts(
 
 
 def set_first_and_last_text(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """
@@ -132,7 +132,7 @@ def set_first_and_last_text(
 
 
 def set_text_through_list_alias(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """
@@ -156,7 +156,7 @@ def set_numbers(
 
 
 def set_nested_text(
-    items: List[aas_types.Item],
+    items: List[our_types.Item],
     text: str
 ) -> bool:
     """Check the assignment to the items of a list nested in a list."""
@@ -167,8 +167,8 @@ def set_nested_text(
 
 
 def replace_first_item(
-    items: List[aas_types.Item],
-    item: aas_types.Item
+    items: List[our_types.Item],
+    item: our_types.Item
 ) -> bool:
     """Check the assignment of an object to an item of a list."""
     # pylint: disable=all
@@ -177,7 +177,7 @@ def replace_first_item(
 
 
 def set_texts_in_loops(
-    items: List[aas_types.Item],
+    items: List[our_types.Item],
     text: str
 ) -> bool:
     """
@@ -203,7 +203,7 @@ def fill_texts(
 
 
 def fill_texts_of_item(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """Check passing a property as a mutable list argument."""
@@ -212,7 +212,7 @@ def fill_texts_of_item(
 
 
 def fill_texts_through_alias(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """
@@ -233,7 +233,7 @@ def fill_texts_of_argument(
 
 
 def rename(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """Check the mutation of an object argument."""
@@ -243,7 +243,7 @@ def rename(
 
 
 def rename_all(
-    items: List[aas_types.Item],
+    items: List[our_types.Item],
     text: str
 ) -> bool:
     """Check passing the loop variable as a mutable object argument."""
@@ -266,8 +266,8 @@ def set_first_texts_of_lists(
 
 
 def set_first_texts_in_sibling_loops(
-    items: List[aas_types.Item],
-    others: List[aas_types.Item],
+    items: List[our_types.Item],
+    others: List[our_types.Item],
     text: str
 ) -> bool:
     """
@@ -284,7 +284,7 @@ def set_first_texts_in_sibling_loops(
 
 
 def text_copy_is_independent(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """
@@ -309,7 +309,7 @@ def number_copy_is_independent(
 
 
 def set_maybe_texts(
-    item: aas_types.Item,
+    item: our_types.Item,
     texts: List[str]
 ) -> bool:
     """
@@ -321,8 +321,8 @@ def set_maybe_texts(
 
 
 def set_maybe_item(
-    something: aas_types.Something,
-    item: aas_types.Item
+    something: our_types.Something,
+    item: our_types.Item
 ) -> bool:
     """Check the assignment of an object to an optional property."""
     # pylint: disable=all
@@ -331,8 +331,8 @@ def set_maybe_item(
 
 
 def set_text_of_rebound_alias(
-    item: aas_types.Item,
-    other: aas_types.Item,
+    item: our_types.Item,
+    other: our_types.Item,
     text: str
 ) -> bool:
     """Check the re-assignment of a local alias of an object."""
@@ -344,7 +344,7 @@ def set_text_of_rebound_alias(
 
 
 def first_text_through_alias_is(
-    item: aas_types.Item,
+    item: our_types.Item,
     text: str
 ) -> bool:
     """Check the read-only alias of a list property."""
@@ -354,7 +354,7 @@ def first_text_through_alias_is(
 
 
 def texts_are_not_empty(
-    items: List[aas_types.Item]
+    items: List[our_types.Item]
 ) -> bool:
     """Check that no text is empty through a read-only list argument."""
     # pylint: disable=all
@@ -366,14 +366,14 @@ def texts_are_not_empty(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_item(
             self,
-            that: aas_types.Item
+            that: our_types.Item
     ) -> Iterator[Error]:
         # No verification has been defined for Item.
         return
@@ -385,7 +385,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not texts_are_not_empty(that.items):
             yield Error(
@@ -423,7 +423,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

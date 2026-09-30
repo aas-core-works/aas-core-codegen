@@ -191,7 +191,7 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             """\
 /// <summary>
-/// Do &amp; drink <see cref="Aas.Something" />.
+/// Do &amp; drink <see cref="Our.Something" />.
 /// </summary>""",
             comment_code,
         )
@@ -211,7 +211,7 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             """\
 /// <summary>
-/// Do &amp; drink <see cref="Aas.ISomething" />.
+/// Do &amp; drink <see cref="Our.ISomething" />.
 /// </summary>""",
             comment_code,
         )
@@ -230,7 +230,7 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             """\
 /// <summary>
-/// Do &amp; drink <see cref="Aas.Something" />.
+/// Do &amp; drink <see cref="Our.Something" />.
 /// </summary>""",
             comment_code,
         )

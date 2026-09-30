@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
@@ -11,7 +11,7 @@ using System.Collections.Generic;  // can't alias
 namespace dummy
 {
     /// <summary>
-    /// Represent a general class of an AAS model.
+    /// Represent a general class of the meta-model.
     /// </summary>
     public interface IClass
     {
@@ -79,17 +79,17 @@ namespace dummy
         public Color? Color { get; set; }
 
         /// <summary>
-        /// Return the <see cref="Aas.Box.Color" /> if set, or the default otherwise.
+        /// Return the <see cref="Our.Box.Color" /> if set, or the default otherwise.
         /// </summary>
         public Color ColorOrDefault();
 
         /// <summary>
-        /// Return the <see cref="Aas.Box.Color" />, or the <paramref name="fallback" /> if not set.
+        /// Return the <see cref="Our.Box.Color" />, or the <paramref name="fallback" /> if not set.
         /// </summary>
         public Color ResolveColor(Color? fallback);
 
         /// <summary>
-        /// Set the <see cref="Aas.Box.Label" /> to <paramref name="newLabel" />.
+        /// Set the <see cref="Our.Box.Label" /> to <paramref name="newLabel" />.
         /// </summary>
         public void Relabel(string newLabel);
     }
@@ -113,7 +113,7 @@ namespace dummy
         /// </summary>
         public Color ColorOrDefault()
         {
-            return Color ?? Aas.Color.Red;
+            return Color ?? Our.Color.Red;
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace dummy
         /// </summary>
         public Color ResolveColor(Color? fallback)
         {
-            return Color ?? fallback ?? Aas.Color.Red;
+            return Color ?? fallback ?? Our.Color.Red;
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 def id_shorts_of_variables_are_unique(
-    input_variables: Optional[List[aas_types.OperationVariable]],
-    output_variables: Optional[List[aas_types.OperationVariable]],
-    inoutput_variables: Optional[List[aas_types.OperationVariable]],
+    input_variables: Optional[List[our_types.OperationVariable]],
+    output_variables: Optional[List[our_types.OperationVariable]],
+    inoutput_variables: Optional[List[our_types.OperationVariable]],
 ) -> bool:
     """
     Check that the :py:attr:`.types.Referable.id_short`'s among all the

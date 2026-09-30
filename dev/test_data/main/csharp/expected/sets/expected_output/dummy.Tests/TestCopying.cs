@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
@@ -16,7 +16,7 @@ namespace dummy.Tests
     public class TestCopying
     {
         internal class DeepEqualiser
-            : Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+            : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
             /// <summary>Compare two byte spans for equal content.</summary>
             /// <remarks>
@@ -31,10 +31,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformSomething(
-                Aas.ISomething that,
-                Aas.IClass other)
+                Our.ISomething that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Something casted))
+                if (!(other is Our.Something casted))
                 {
                     return false;
                 }
@@ -63,10 +63,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformCollection(
-                Aas.ICollection that,
-                Aas.IClass other)
+                Our.ICollection that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Collection casted))
+                if (!(other is Our.Collection casted))
                 {
                     return false;
                 }
@@ -89,8 +89,8 @@ namespace dummy.Tests
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
 
         private static bool SomethingShallowEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return (
                 that.Text == other.Text
@@ -106,8 +106,8 @@ namespace dummy.Tests
         }
 
         private static bool CollectionShallowEquals(
-            Aas.Collection that,
-            Aas.Collection other)
+            Our.Collection that,
+            Our.Collection other)
         {
             return (
                 that.Texts == other.Texts
@@ -120,15 +120,15 @@ namespace dummy.Tests
         }
 
         private static bool SomethingDeepEquals(
-            Aas.Something that,
-            Aas.Something other)
+            Our.Something that,
+            Our.Something other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool CollectionDeepEquals(
-            Aas.Collection that,
-            Aas.Collection other)
+            Our.Collection that,
+            Our.Collection other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -136,10 +136,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_shallow_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SomethingShallowEquals(
@@ -150,10 +150,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_deep_copy()
         {
-            Aas.Something instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething());
+            Our.Something instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSomething());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SomethingDeepEquals(
@@ -164,10 +164,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Collection_shallow_copy()
         {
-            Aas.Collection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+            Our.Collection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCollection());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 CollectionShallowEquals(
@@ -178,10 +178,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Collection_deep_copy()
         {
-            Aas.Collection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCollection());
+            Our.Collection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCollection());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 CollectionDeepEquals(

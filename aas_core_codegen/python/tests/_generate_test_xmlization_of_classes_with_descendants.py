@@ -63,16 +63,16 @@ def {test_method_name}(self) -> None:
 
 {III}# region From iterparse
 {III}iterator = ET.iterparse(source=io.StringIO(text), events=["start", "end"])
-{III}got_from_iterparse = aas_xmlization.{from_iterparse}(iterator)
+{III}got_from_iterparse = our_xmlization.{from_iterparse}(iterator)
 
-{III}et_from_iterparse = ET.fromstring(aas_xmlization.to_str(got_from_iterparse))
+{III}et_from_iterparse = ET.fromstring(our_xmlization.to_str(got_from_iterparse))
 {III}tests.common_xmlization.remove_redundant_whitespace(et_from_iterparse)
 {III}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_iterparse)
 {III}# endregion
 
 {III}# region From stream
-{III}got_from_stream = aas_xmlization.{from_stream}(io.StringIO(text))
-{III}et_from_stream = ET.fromstring(aas_xmlization.to_str(got_from_stream))
+{III}got_from_stream = our_xmlization.{from_stream}(io.StringIO(text))
+{III}et_from_stream = ET.fromstring(our_xmlization.to_str(got_from_stream))
 {III}tests.common_xmlization.remove_redundant_whitespace(et_from_stream)
 {III}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_stream)
 {III}# endregion
@@ -82,15 +82,15 @@ def {test_method_name}(self) -> None:
 {IIII}path = pathlib.Path(tmp_dir) / "something.xml"
 {IIII}path.write_text(text, encoding="utf-8")
 
-{IIII}got_from_file = aas_xmlization.{from_file}(path)
-{III}et_from_file = ET.fromstring(aas_xmlization.to_str(got_from_file))
+{IIII}got_from_file = our_xmlization.{from_file}(path)
+{III}et_from_file = ET.fromstring(our_xmlization.to_str(got_from_file))
 {III}tests.common_xmlization.remove_redundant_whitespace(et_from_file)
 {III}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_file)
 {III}# endregion
 
 {III}# region From string
-{III}got_from_str = aas_xmlization.{from_str}(text)
-{III}et_from_str = ET.fromstring(aas_xmlization.to_str(got_from_str))
+{III}got_from_str = our_xmlization.{from_str}(text)
+{III}et_from_str = ET.fromstring(our_xmlization.to_str(got_from_str))
 {III}tests.common_xmlization.remove_redundant_whitespace(et_from_str)
 {III}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_str)
 {III}# endregion"""
@@ -145,7 +145,7 @@ import xml.etree.ElementTree as ET"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.xmlization as aas_xmlization"""
+import {qualified_module_name}.xmlization as our_xmlization"""
         ),
         Stripped(
             """\

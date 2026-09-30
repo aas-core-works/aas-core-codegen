@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 
 using System.Collections.Generic;  // can't alias
@@ -12,11 +12,11 @@ namespace dummy
 {
     public static class Stringification
     {
-        private static readonly Dictionary<Aas.Color, string> ColorToString = (
-            new Dictionary<Aas.Color, string>()
+        private static readonly Dictionary<Our.Color, string> ColorToString = (
+            new Dictionary<Our.Color, string>()
             {
-                { Aas.Color.Red, "Red" },
-                { Aas.Color.Green, "Green" }
+                { Our.Color.Red, "Red" },
+                { Our.Color.Green, "Green" }
             });
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace dummy
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.Color? that)
+        public static string? ToString(Our.Color? that)
         {
             if (!that.HasValue)
             {
@@ -45,11 +45,11 @@ namespace dummy
         }
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-        private static readonly Dictionary<string, Aas.Color> _colorFromString = (
-            new Dictionary<string, Aas.Color>()
+        private static readonly Dictionary<string, Our.Color> _colorFromString = (
+            new Dictionary<string, Our.Color>()
             {
-                { "Red", Aas.Color.Red },
-                { "Green", Aas.Color.Green }
+                { "Red", Our.Color.Red },
+                { "Green", Our.Color.Green }
             });
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace dummy
         /// of a literal of <see cref="Color" />,
         /// return <c>null</c>.
         /// </remarks>
-        public static Aas.Color? ColorFromString(string text)
+        public static Our.Color? ColorFromString(string text)
         {
             if (_colorFromString.TryGetValue(text, out Color value))
             {

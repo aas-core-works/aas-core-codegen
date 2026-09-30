@@ -1,4 +1,4 @@
-def extension_names_are_unique(extensions: Iterable[aas_types.Extension]) -> bool:
+def extension_names_are_unique(extensions: Iterable[our_types.Extension]) -> bool:
     """
     Check that all :py:attr:`.types.Extension.name` are unique
     among :paramref:`extensions`.

@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 
 namespace dummy
 {
     /// <summary>
-    /// Allow for making shallow and deep copies of AAS model instances.
+    /// Allow for making shallow and deep copies of model instances.
     /// </summary>
     public static class Copying
     {
@@ -29,7 +29,7 @@ namespace dummy
         /// </remarks>.
         /// <param name="that">to be copied in a shallow manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Shallow<T>(T that) where T : Aas.IClass
+        public static T Shallow<T>(T that) where T : Our.IClass
         {
             return (T)ShallowCopierInstance.Transform(that);
         }
@@ -39,46 +39,46 @@ namespace dummy
         /// </summary>
         /// <param name="that">to be deeply copied in a recursive manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Deep<T>(T that) where T : Aas.IClass
+        public static T Deep<T>(T that) where T : Our.IClass
         {
             return (T)DeepCopierInstance.Transform(that);
         }
 
-        public static T Deep<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+        public static T Deep<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
         {
             return that.WithUnderlying(
                 Deep(that.Underlying));
         }
 
         /// <summary>Dispatch the making of shallow copies.</summary>
-        internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+        internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
-            public override Aas.IClass TransformItem(
-                Aas.IItem that
+            public override Our.IClass TransformItem(
+                Our.IItem that
             )
             {
-                return new Aas.Item(that.Name);
+                return new Our.Item(that.Name);
             }
 
-            public override Aas.IClass TransformChildA(
-                Aas.IChildA that
+            public override Our.IClass TransformChildA(
+                Our.IChildA that
             )
             {
-                return new Aas.ChildA(that.AOnly, that.OptionalText);
+                return new Our.ChildA(that.AOnly, that.OptionalText);
             }
 
-            public override Aas.IClass TransformChildB(
-                Aas.IChildB that
+            public override Our.IClass TransformChildB(
+                Our.IChildB that
             )
             {
-                return new Aas.ChildB(that.BOnly, that.OptionalText);
+                return new Our.ChildB(that.BOnly, that.OptionalText);
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
-                return new Aas.Something(
+                return new Our.Something(
                     that.Text,
                     that.Number,
                     that.Flag,
@@ -98,38 +98,38 @@ namespace dummy
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
-        internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass TransformItem(
-                Aas.IItem that
+        internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
+        {    public override Our.IClass TransformItem(
+                Our.IItem that
             )
             {
-                return new Aas.Item(
+                return new Our.Item(
                     that.Name
                 );
             }
 
-            public override Aas.IClass TransformChildA(
-                Aas.IChildA that
+            public override Our.IClass TransformChildA(
+                Our.IChildA that
             )
             {
-                return new Aas.ChildA(
+                return new Our.ChildA(
                     that.AOnly,
                     that.OptionalText
                 );
             }
 
-            public override Aas.IClass TransformChildB(
-                Aas.IChildB that
+            public override Our.IClass TransformChildB(
+                Our.IChildB that
             )
             {
-                return new Aas.ChildB(
+                return new Our.ChildB(
                     that.BOnly,
                     that.OptionalText
                 );
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
                 var theParents = new List<IParent>(
@@ -149,7 +149,7 @@ namespace dummy
                         that.OptionalTexts);
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     that.Text,
                     that.Number,
                     that.Flag,

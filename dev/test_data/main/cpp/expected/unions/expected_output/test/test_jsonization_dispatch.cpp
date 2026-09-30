@@ -10,42 +10,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test the round-trip of an expected IMixedConcreteWithDescendants") {
   const std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendantsChild
+    our::types::IMixedConcreteWithDescendantsChild
   > concrete_instance(
     test::common::examples::LoadMinMixedConcreteWithDescendantsChild()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IMixedConcreteWithDescendants
+      our::types::IMixedConcreteWithDescendants
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::MixedConcreteWithDescendantsFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::MixedConcreteWithDescendantsFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IMixedConcreteWithDescendants "
         "from a minimal IMixedConcreteWithDescendantsChild: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -57,7 +57,7 @@ TEST_CASE("Test the round-trip of an expected IMixedConcreteWithDescendants") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IMixedConcreteWithDescendants "
         "over a minimal IMixedConcreteWithDescendantsChild: ",
         *patch_message

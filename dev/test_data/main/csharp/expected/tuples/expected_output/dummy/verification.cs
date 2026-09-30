@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of IAbstractItem:
     /// <code>
-    /// var anInstance = new Aas.IAbstractItem(
+    /// var anInstance = new Our.IAbstractItem(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -54,8 +54,8 @@ namespace dummy
             internal static readonly HashSet<int> ForResult = new HashSet<int>
             {
 
-                (int)Aas.Result.Ok,
-                (int)Aas.Result.NotOk
+                (int)Our.Result.Ok,
+                (int)Our.Result.NotOk
             };
         }  // internal static class EnumValueSet
 
@@ -68,7 +68,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomeItem(
-                Aas.ISomeItem that
+                Our.ISomeItem that
             )
             {
                 // No verification has been defined for SomeItem.
@@ -77,7 +77,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAnotherItem(
-                Aas.IAnotherItem that
+                Our.IAnotherItem that
             )
             {
                 // No verification has been defined for AnotherItem.
@@ -86,7 +86,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!(that.Pair.Item2 > 0))
@@ -206,7 +206,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -232,7 +232,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyResult(
-            Aas.Result that)
+            Our.Result that)
         {
             if (!EnumValueSet.ForResult.Contains(
                 (int)that))

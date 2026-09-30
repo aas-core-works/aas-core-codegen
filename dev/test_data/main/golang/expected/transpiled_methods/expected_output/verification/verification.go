@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,13 +42,13 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check calling the methods which mutate the instance and the arguments.
 func ResetAndCheck(
-	item aastypes.IItem,
-	other aastypes.IItem,
+	item ourtypes.IItem,
+	other ourtypes.IItem,
 	numbers []int64,
 ) bool {
 	item.Reset()
@@ -58,14 +58,14 @@ func ResetAndCheck(
 		item.IsEmpty()
 }
 
-// Verify `that` instance of [aastypes.IFirst].
+// Verify `that` instance of [ourtypes.IFirst].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyFirst(
-	that aastypes.IFirst,
+	that ourtypes.IFirst,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -126,7 +126,7 @@ func VerifyFirst(
 			*that.Kind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Kind",
 					},
 				)
@@ -141,14 +141,14 @@ func VerifyFirst(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISecond].
+// Verify `that` instance of [ourtypes.ISecond].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySecond(
-	that aastypes.ISecond,
+	that ourtypes.ISecond,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -193,7 +193,7 @@ func VerifySecond(
 		}
 	}
 
-	if !(aascommon.LenStr(that.Prefix()) <= 3) {
+	if !(ourcommon.LenStr(that.Prefix()) <= 3) {
 		abort = onError(
 			newVerificationError(
 				"Prefix is at most three long.",),
@@ -219,7 +219,7 @@ func VerifySecond(
 			*that.Kind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Kind",
 					},
 				)
@@ -242,14 +242,14 @@ func VerifySecond(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindBeta {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindBeta {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -270,19 +270,19 @@ func VerifyKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeFirst:
+	case ourtypes.ModelTypeFirst:
 		abort = VerifyFirst(
-			that.(aastypes.IFirst),
+			that.(ourtypes.IFirst),
 			onError,
 		)
-	case aastypes.ModelTypeSecond:
+	case ourtypes.ModelTypeSecond:
 		abort = VerifySecond(
-			that.(aastypes.ISecond),
+			that.(ourtypes.ISecond),
 			onError,
 		)
 	default:

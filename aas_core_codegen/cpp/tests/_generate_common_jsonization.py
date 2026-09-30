@@ -126,7 +126,7 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             f"""\
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             """\
@@ -144,7 +144,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {{
 {II}result = nlohmann::json::parse(ifs);
 {I}}} catch (nlohmann::json::parse_error& exception) {{
 {II}throw std::runtime_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to read JSON from ",
 {IIII}path.string(),
 {IIII}": ",
@@ -155,7 +155,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {{
 
 {I}if (ifs.bad()) {{
 {II}throw std::runtime_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to read JSON from ",
 {IIII}path.string(),
 {IIII}"; the bad bit of the file stream is set"
@@ -165,7 +165,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {{
 
 {I}if (ifs.fail()) {{
 {II}throw std::runtime_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to read JSON from ",
 {IIII}path.string(),
 {IIII}"; the fail bit of the file stream is set"
@@ -175,7 +175,7 @@ nlohmann::json MustReadJson(const std::filesystem::path& path) {{
 
 {I}if (!ifs.eof()) {{
 {II}throw std::runtime_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to read JSON from ",
 {IIII}path.string(),
 {IIII}"; the EOF bit is not set meaning that we did not parse all the content"
@@ -196,7 +196,7 @@ std::optional<std::string> CompareJsons(
 
 {I}if (!patch.is_array()) {{
 {II}throw std::logic_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Expected the patch to be an array, but got ",
 {IIII}patch.type_name()
 {III})

@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLeaf()
+	instance := ourtesting.MustLoadMinimalLeaf()
 
-	if !aastypes.IsLeaf(instance) {
+	if !ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be true on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -44,7 +44,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -52,7 +52,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -60,7 +60,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -68,7 +68,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -76,7 +76,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -86,9 +86,9 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
-	instance := aastesting.MustLoadMinimalOrderedContainer()
+	instance := ourtesting.MustLoadMinimalOrderedContainer()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -96,7 +96,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsOrderedContainer(instance) {
+	if !ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be true on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -104,7 +104,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -112,7 +112,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -120,7 +120,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -128,7 +128,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -136,7 +136,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -144,7 +144,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -152,7 +152,7 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IOrderedContainer with runtime type %T and with model type %v",
@@ -162,9 +162,9 @@ func TestIsXxxOnAnInstanceOfOrderedContainer(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
-	instance := aastesting.MustLoadMinimalUnorderedContainer()
+	instance := ourtesting.MustLoadMinimalUnorderedContainer()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -172,7 +172,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -180,7 +180,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsUnorderedContainer(instance) {
+	if !ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be true on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -188,7 +188,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -196,7 +196,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -204,7 +204,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -212,7 +212,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -220,7 +220,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -228,7 +228,7 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IUnorderedContainer with runtime type %T and with model type %v",
@@ -238,9 +238,9 @@ func TestIsXxxOnAnInstanceOfUnorderedContainer(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
-	instance := aastesting.MustLoadMinimalGlobalAttribute()
+	instance := ourtesting.MustLoadMinimalGlobalAttribute()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -248,7 +248,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -256,7 +256,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -264,7 +264,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsGlobalAttribute(instance) {
+	if !ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be true on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -272,7 +272,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -280,7 +280,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -288,7 +288,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -296,7 +296,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -304,7 +304,7 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IGlobalAttribute with runtime type %T and with model type %v",
@@ -314,9 +314,9 @@ func TestIsXxxOnAnInstanceOfGlobalAttribute(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLocalAttribute()
+	instance := ourtesting.MustLoadMinimalLocalAttribute()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -324,7 +324,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -332,7 +332,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -340,7 +340,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -348,7 +348,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLocalAttribute(instance) {
+	if !ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be true on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -356,7 +356,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -364,7 +364,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -372,7 +372,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -380,7 +380,7 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ILocalAttribute with runtime type %T and with model type %v",
@@ -390,9 +390,9 @@ func TestIsXxxOnAnInstanceOfLocalAttribute(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
-	instance := aastesting.MustLoadMinimalAttributeOperand()
+	instance := ourtesting.MustLoadMinimalAttributeOperand()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -400,7 +400,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -408,7 +408,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -416,7 +416,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -424,7 +424,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -432,7 +432,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsAttributeOperand(instance) {
+	if !ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be true on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -440,7 +440,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -448,7 +448,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -456,7 +456,7 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IAttributeOperand with runtime type %T and with model type %v",
@@ -466,9 +466,9 @@ func TestIsXxxOnAnInstanceOfAttributeOperand(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
-	instance := aastesting.MustLoadMinimalStringLiteral()
+	instance := ourtesting.MustLoadMinimalStringLiteral()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -476,7 +476,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -484,7 +484,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -492,7 +492,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -500,7 +500,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -508,7 +508,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -516,7 +516,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsStringLiteral(instance) {
+	if !ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be true on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -524,7 +524,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -532,7 +532,7 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IStringLiteral with runtime type %T and with model type %v",
@@ -542,9 +542,9 @@ func TestIsXxxOnAnInstanceOfStringLiteral(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
-	instance := aastesting.MustLoadMinimalNumberLiteral()
+	instance := ourtesting.MustLoadMinimalNumberLiteral()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -552,7 +552,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -560,7 +560,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -568,7 +568,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -576,7 +576,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -584,7 +584,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -592,7 +592,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -600,7 +600,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsNumberLiteral(instance) {
+	if !ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be true on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -608,7 +608,7 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of INumberLiteral with runtime type %T and with model type %v",
@@ -618,9 +618,9 @@ func TestIsXxxOnAnInstanceOfNumberLiteral(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -628,7 +628,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsOrderedContainer(instance) {
+	if ourtypes.IsOrderedContainer(instance) {
 		t.Errorf(
 			"Expected IsOrderedContainer to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -636,7 +636,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsUnorderedContainer(instance) {
+	if ourtypes.IsUnorderedContainer(instance) {
 		t.Errorf(
 			"Expected IsUnorderedContainer to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -644,7 +644,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsGlobalAttribute(instance) {
+	if ourtypes.IsGlobalAttribute(instance) {
 		t.Errorf(
 			"Expected IsGlobalAttribute to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -652,7 +652,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLocalAttribute(instance) {
+	if ourtypes.IsLocalAttribute(instance) {
 		t.Errorf(
 			"Expected IsLocalAttribute to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -660,7 +660,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsAttributeOperand(instance) {
+	if ourtypes.IsAttributeOperand(instance) {
 		t.Errorf(
 			"Expected IsAttributeOperand to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -668,7 +668,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStringLiteral(instance) {
+	if ourtypes.IsStringLiteral(instance) {
 		t.Errorf(
 			"Expected IsStringLiteral to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -676,7 +676,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsNumberLiteral(instance) {
+	if ourtypes.IsNumberLiteral(instance) {
 		t.Errorf(
 			"Expected IsNumberLiteral to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -684,7 +684,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",

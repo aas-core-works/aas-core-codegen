@@ -253,7 +253,7 @@ def _generate_constant_set_of_enumeration_literals(
             constant.enumeration.name, literal.name
         )
 
-        literal_codes.append(f"aastypes.{literal_name}: struct{{}}{{}}")
+        literal_codes.append(f"ourtypes.{literal_name}: struct{{}}{{}}")
 
     constant_name = golang_naming.constant_name(constant.name)
 
@@ -261,7 +261,7 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer.write(
         f"""\
-var {constant_name} = map[aastypes.{enum_name}]struct{{}} {{
+var {constant_name} = map[ourtypes.{enum_name}]struct{{}} {{
 {I}{indent_but_first_line(literals_joined, I)},
 }}"""
     )
@@ -283,7 +283,7 @@ def generate(
     """Generate code to define the constants of the meta-model."""
     errors = []  # type: List[Error]
 
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
         Stripped(
@@ -332,8 +332,8 @@ package constants"""
     blocks.append(golang_common.WARNING)
 
     import_lines = []  # type: List[str]
-    if golang_common.names_package(blocks, "aastypes"):
-        import_lines.append(f"{I}aastypes {aastypes_url_literal}")
+    if golang_common.names_package(blocks, "ourtypes"):
+        import_lines.append(f"{I}ourtypes {ourtypes_url_literal}")
 
     if len(import_lines) == 0:
         del blocks[import_index]

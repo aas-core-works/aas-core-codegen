@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -414,7 +414,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Kind KindFrom(
+            internal static Our.Kind KindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -424,7 +424,7 @@ namespace dummy
                     return default!;
                 }
 
-                Aas.Kind? result = Stringification.KindFromString(text);
+                Our.Kind? result = Stringification.KindFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -440,7 +440,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Direction DirectionFrom(
+            internal static Our.Direction DirectionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -450,7 +450,7 @@ namespace dummy
                     return default!;
                 }
 
-                Aas.Direction? result = Stringification.DirectionFromString(text);
+                Our.Direction? result = Stringification.DirectionFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -466,7 +466,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Something SomethingFrom(
+            internal static Our.Something SomethingFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -606,7 +606,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -640,7 +640,7 @@ namespace dummy
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Collection CollectionFrom(
+            internal static Our.Collection CollectionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -744,7 +744,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Collection(
+                return new Our.Collection(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -824,7 +824,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.Something anInstance = Deserialize.SomethingFrom(
+        /// Our.Something anInstance = Deserialize.SomethingFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -838,10 +838,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Kind.
             /// </exception>
-            public static Aas.Kind KindFrom(
+            public static Our.Kind KindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Kind result = DeserializeImplementation.KindFrom(
+                Our.Kind result = DeserializeImplementation.KindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -861,10 +861,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Direction.
             /// </exception>
-            public static Aas.Direction DirectionFrom(
+            public static Our.Direction DirectionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Direction result = DeserializeImplementation.DirectionFrom(
+                Our.Direction result = DeserializeImplementation.DirectionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -884,10 +884,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Something result = DeserializeImplementation.SomethingFrom(
+                Our.Something result = DeserializeImplementation.SomethingFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -907,10 +907,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Collection.
             /// </exception>
-            public static Aas.Collection CollectionFrom(
+            public static Our.Collection CollectionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Collection result = DeserializeImplementation.CollectionFrom(
+                Our.Collection result = DeserializeImplementation.CollectionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -947,7 +947,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -1178,7 +1178,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1223,7 +1223,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformCollection(
-                Aas.ICollection that
+                Our.ICollection that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -1273,7 +1273,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of Something:
         /// <code>
-        /// var anInstance = new Aas.Something(
+        /// var anInstance = new Our.Something(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -1290,7 +1290,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {
@@ -1312,7 +1312,7 @@ namespace dummy
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue KindToJsonValue(Aas.Kind that)
+            public static Nodes.JsonValue KindToJsonValue(Our.Kind that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -1329,7 +1329,7 @@ namespace dummy
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue DirectionToJsonValue(Aas.Direction that)
+            public static Nodes.JsonValue DirectionToJsonValue(Our.Direction that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)

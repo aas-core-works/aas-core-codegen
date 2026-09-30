@@ -12,7 +12,7 @@ import aas_core.aas3_0.visitation.IVisitorWithContext;
 import java.lang.Iterable;
 
 /**
- * Represent a general class of an AAS model.
+ * Represent a general class of the meta-model.
  */
 public interface IClass {
   /**

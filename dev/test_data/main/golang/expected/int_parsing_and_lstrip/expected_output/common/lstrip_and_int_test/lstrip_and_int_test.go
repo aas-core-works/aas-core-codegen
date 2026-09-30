@@ -6,7 +6,7 @@ package common_lstrip_and_int_test
 import (
 	"strings"
 	"testing"
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // The transpiled `str.lstrip` follows the Python implementation, since Python is
@@ -14,7 +14,7 @@ import (
 // (runes).
 //
 // The built-in `int` is transpiled to
-// aascommon.ParseSafeInt, which is stricter than
+// ourcommon.ParseSafeInt, which is stricter than
 // the Python `int`. It accepts only an optional sign followed by the ASCII digits,
 // and only the safe integers, i.e., the integers within -(2^53 - 1) and 2^53 - 1.
 // Otherwise, it panics.
@@ -75,7 +75,7 @@ func TestParseSafeInt(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		got := aascommon.ParseSafeInt(c.text)
+		got := ourcommon.ParseSafeInt(c.text)
 		if got != c.expected {
 			t.Errorf(
 				"Expected ParseSafeInt(%q) to be %d, but got %d",
@@ -93,7 +93,7 @@ func mustPanicOnParseSafeInt(t *testing.T, text string) {
 		}
 	}()
 
-	aascommon.ParseSafeInt(text)
+	ourcommon.ParseSafeInt(text)
 }
 
 // Test that parsing the texts which are not safe integers panics.

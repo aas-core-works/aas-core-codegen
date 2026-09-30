@@ -8,9 +8,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasXmlization from "../src/xmlization";
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
+import * as OurXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
 
 import * as TestCommon from "./common";
 
@@ -31,11 +31,11 @@ test("SomeItem XML round-trip OK", () => {
   for (const pth of pths) {
     const text = fs.readFileSync(pth, "utf-8");
 
-    const instanceOrError = AasXmlization.fromXmlString(text);
+    const instanceOrError = OurXmlization.fromXmlString(text);
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    const casted = AasTypes.asSomeItem(instance);
+    const casted = OurTypes.asSomeItem(instance);
     if (casted === null) {
       throw new Error(
         `Expected instance of SomeItem in ${pth}, ` +
@@ -43,9 +43,9 @@ test("SomeItem XML round-trip OK", () => {
       );
     }
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-    const roundTripText = AasXmlization.toXmlString(casted);
+    const roundTripText = OurXmlization.toXmlString(casted);
     expect(roundTripText.length).toBeGreaterThan(0);
   }
 });
@@ -80,7 +80,7 @@ test("SomeItem XML deserialization fail", () => {
 
     for (const pth of pths) {
       const text = fs.readFileSync(pth, "utf-8");
-      const instanceOrError = AasXmlization.fromXmlString(text);
+      const instanceOrError = OurXmlization.fromXmlString(text);
       expect(instanceOrError.error).not.toBeNull();
     }
   }
@@ -103,11 +103,11 @@ test("AnotherItem XML round-trip OK", () => {
   for (const pth of pths) {
     const text = fs.readFileSync(pth, "utf-8");
 
-    const instanceOrError = AasXmlization.fromXmlString(text);
+    const instanceOrError = OurXmlization.fromXmlString(text);
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    const casted = AasTypes.asAnotherItem(instance);
+    const casted = OurTypes.asAnotherItem(instance);
     if (casted === null) {
       throw new Error(
         `Expected instance of AnotherItem in ${pth}, ` +
@@ -115,9 +115,9 @@ test("AnotherItem XML round-trip OK", () => {
       );
     }
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-    const roundTripText = AasXmlization.toXmlString(casted);
+    const roundTripText = OurXmlization.toXmlString(casted);
     expect(roundTripText.length).toBeGreaterThan(0);
   }
 });
@@ -152,7 +152,7 @@ test("AnotherItem XML deserialization fail", () => {
 
     for (const pth of pths) {
       const text = fs.readFileSync(pth, "utf-8");
-      const instanceOrError = AasXmlization.fromXmlString(text);
+      const instanceOrError = OurXmlization.fromXmlString(text);
       expect(instanceOrError.error).not.toBeNull();
     }
   }
@@ -175,11 +175,11 @@ test("Simple XML round-trip OK", () => {
   for (const pth of pths) {
     const text = fs.readFileSync(pth, "utf-8");
 
-    const instanceOrError = AasXmlization.fromXmlString(text);
+    const instanceOrError = OurXmlization.fromXmlString(text);
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    const casted = AasTypes.asSimple(instance);
+    const casted = OurTypes.asSimple(instance);
     if (casted === null) {
       throw new Error(
         `Expected instance of Simple in ${pth}, ` +
@@ -187,9 +187,9 @@ test("Simple XML round-trip OK", () => {
       );
     }
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-    const roundTripText = AasXmlization.toXmlString(casted);
+    const roundTripText = OurXmlization.toXmlString(casted);
     expect(roundTripText.length).toBeGreaterThan(0);
   }
 });
@@ -224,7 +224,7 @@ test("Simple XML deserialization fail", () => {
 
     for (const pth of pths) {
       const text = fs.readFileSync(pth, "utf-8");
-      const instanceOrError = AasXmlization.fromXmlString(text);
+      const instanceOrError = OurXmlization.fromXmlString(text);
       expect(instanceOrError.error).not.toBeNull();
     }
   }
@@ -247,11 +247,11 @@ test("Something XML round-trip OK", () => {
   for (const pth of pths) {
     const text = fs.readFileSync(pth, "utf-8");
 
-    const instanceOrError = AasXmlization.fromXmlString(text);
+    const instanceOrError = OurXmlization.fromXmlString(text);
     expect(instanceOrError.error).toBeNull();
     const instance = instanceOrError.mustValue();
 
-    const casted = AasTypes.asSomething(instance);
+    const casted = OurTypes.asSomething(instance);
     if (casted === null) {
       throw new Error(
         `Expected instance of Something in ${pth}, ` +
@@ -259,9 +259,9 @@ test("Something XML round-trip OK", () => {
       );
     }
 
-    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-    const roundTripText = AasXmlization.toXmlString(casted);
+    const roundTripText = OurXmlization.toXmlString(casted);
     expect(roundTripText.length).toBeGreaterThan(0);
   }
 });
@@ -296,7 +296,7 @@ test("Something XML deserialization fail", () => {
 
     for (const pth of pths) {
       const text = fs.readFileSync(pth, "utf-8");
-      const instanceOrError = AasXmlization.fromXmlString(text);
+      const instanceOrError = OurXmlization.fromXmlString(text);
       expect(instanceOrError.error).not.toBeNull();
     }
   }

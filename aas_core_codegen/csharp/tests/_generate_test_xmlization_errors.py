@@ -43,6 +43,9 @@ def generate(
 
     cls_name_csharp = csharp_naming.class_name(concrete_cls.name)
 
+    # NOTE (mristin):
+    # Forgetting to call ``MoveToContent`` is a very common mistake of the users,
+    # see https://github.com/aas-core-works/aas-core3.0-csharp/issues/24.
     blocks = [
         Stripped(
             f"""\
@@ -50,7 +53,7 @@ def generate(
 public void Test_error_on_unexpected_declaration()
 {{
 {I}string path = Path.Combine(
-{II}Aas.Tests.Common.TestDataDir,
+{II}Our.Tests.Common.TestDataDir,
 {II}"Xml",
 {II}"Expected",
 {II}{csharp_common.string_literal(cls_name_xml)},
@@ -79,17 +82,16 @@ public void Test_error_on_unexpected_declaration()
 {II}stringReader);
 
 {I}// We intentionally do not call `MoveToContent` to test the error message.
-{I}// This is a very common situation, see:
-{I}// https://github.com/aas-core-works/aas-core3.0-csharp/issues/24
+{I}// This is a very common situation.
 
 {I}string? message = null;
 
 {I}try
 {I}{{
-{II}Aas.Xmlization.Deserialize.{from_name}(
+{II}Our.Xmlization.Deserialize.{from_name}(
 {III}xmlReader);
 {I}}}
-{I}catch (Aas.Xmlization.Exception exception)
+{I}catch (Our.Xmlization.Exception exception)
 {I}{{
 {II}message = exception.Message;
 {I}}}
@@ -130,7 +132,7 @@ public void Test_error_on_unexpected_declaration()
 public void Test_error_on_duplicate_property()
 {{
 {I}string path = Path.Combine(
-{II}Aas.Tests.Common.TestDataDir,
+{II}Our.Tests.Common.TestDataDir,
 {II}"Xml",
 {II}"Expected",
 {II}{csharp_common.string_literal(duplicate_cls_name_xml)},
@@ -187,10 +189,10 @@ public void Test_error_on_duplicate_property()
 
 {I}try
 {I}{{
-{II}Aas.Xmlization.Deserialize.{duplicate_from_name}(
+{II}Our.Xmlization.Deserialize.{duplicate_from_name}(
 {III}xmlReader);
 {I}}}
-{I}catch (Aas.Xmlization.Exception exception)
+{I}catch (Our.Xmlization.Exception exception)
 {I}{{
 {II}message = exception.Message;
 {I}}}
@@ -210,7 +212,7 @@ public void Test_error_on_duplicate_property()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Path = System.IO.Path;
 

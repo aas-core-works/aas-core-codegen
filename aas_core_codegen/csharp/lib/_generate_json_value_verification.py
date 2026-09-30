@@ -241,7 +241,7 @@ namespace {namespace}
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     using_directives.append(

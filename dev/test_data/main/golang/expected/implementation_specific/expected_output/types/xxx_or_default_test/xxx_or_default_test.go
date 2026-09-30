@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	aasstringification "github.com/dummy-works/dummy/stringification"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourstringification "github.com/dummy-works/dummy/stringification"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent explicitly a literal of an enumeration.
@@ -69,8 +69,8 @@ func stringify(value interface{}) (got string) {
 				got = fmt.Sprintf("%d byte(s)", len(casted))
 			case *enumerationLiteral:
 				got = casted.String()
-			case aastypes.IClass:
-				got = aastesting.TraceMark(casted)
+			case ourtypes.IClass:
+				got = ourtesting.TraceMark(casted)
 			default:
 				panic(
 					fmt.Sprintf(
@@ -88,10 +88,10 @@ func stringify(value interface{}) (got string) {
 // Represent `value` such that we can immediately check whether it is the default value
 // or the set one.
 //
-// We compare it against the recorded golden file, if not [aastesting.RecordMode].
+// We compare it against the recorded golden file, if not [ourtesting.RecordMode].
 // If there are differences, a `message` is set.
 //
-// Otherwise, when [aastesting.RecordMode] is set, we re-record the golden file.
+// Otherwise, when [ourtesting.RecordMode] is set, we re-record the golden file.
 func compareOrRerecordValue(
 	value interface{},
 	expectedPath string,
@@ -102,7 +102,7 @@ func compareOrRerecordValue(
 	// Add a new line for POSIX systems.
 	got += "\n"
 
-	if aastesting.RecordMode {
+	if ourtesting.RecordMode {
 		parent := filepath.Dir(expectedPath)
 		err := os.MkdirAll(parent, os.ModePerm)
 		if err != nil {
@@ -152,17 +152,17 @@ func compareOrRerecordValue(
 }
 
 func TestBoxColorOrDefaultOnMinimal(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBox()
+	instance := ourtesting.MustLoadMinimalBox()
 
 	value := &enumerationLiteral{
 		enumerationName: "Color",
-		literalName: aasstringification.MustColorToString(
+		literalName: ourstringification.MustColorToString(
 			instance.ColorOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Box",
 		"ColorOrDefault.on_minimal.txt",
@@ -179,17 +179,17 @@ func TestBoxColorOrDefaultOnMinimal(t *testing.T) {
 }
 
 func TestBoxColorOrDefaultOnMaximal(t *testing.T) {
-	instance := aastesting.MustLoadMaximalBox()
+	instance := ourtesting.MustLoadMaximalBox()
 
 	value := &enumerationLiteral{
 		enumerationName: "Color",
-		literalName: aasstringification.MustColorToString(
+		literalName: ourstringification.MustColorToString(
 			instance.ColorOrDefault(),
 		),
 	}
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"XxxOrDefault",
 		"Box",
 		"ColorOrDefault.on_maximal.txt",

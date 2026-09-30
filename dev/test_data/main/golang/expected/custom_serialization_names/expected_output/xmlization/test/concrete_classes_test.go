@@ -12,15 +12,15 @@ import (
 	"strings"
 	"testing"
 	"encoding/xml"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
-	aasxmlization "github.com/dummy-works/dummy/xmlization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
+	ourxmlization "github.com/dummy-works/dummy/xmlization"
 )
 
 func TestQueryConditionRoundTripOK(t *testing.T) {
-	pths := aastesting.FindFilesBySuffixRecursively(
+	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
-			aastesting.TestDataDir,
+			ourtesting.TestDataDir,
 			"Xml",
 			"Expected",
 			"queryCondition",
@@ -39,13 +39,13 @@ func TestQueryConditionRoundTripOK(t *testing.T) {
 
 		decoder := xml.NewDecoder(strings.NewReader(text))
 
-		deserialized, deseriaErr := aasxmlization.Unmarshal(decoder)
+		deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
 		ok := assertNoDeserializationError(t, deseriaErr, pth)
 		if !ok {
 			return
 		}
 
-		if _, ok := deserialized.(aastypes.IQueryCondition); !ok {
+		if _, ok := deserialized.(ourtypes.IQueryCondition); !ok {
 			t.Fatalf(
 				"Expected an instance of IQueryCondition, "+
 					"but got %T: %v",
@@ -58,7 +58,7 @@ func TestQueryConditionRoundTripOK(t *testing.T) {
 		encoder := xml.NewEncoder(buf)
 		encoder.Indent("", "\t")
 
-		seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+		seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 		ok = assertNoSerializationError(t, seriaErr, pth)
 		if !ok {
 			return
@@ -80,7 +80,7 @@ func TestQueryConditionRoundTripOK(t *testing.T) {
 
 func TestQueryConditionDeserializationFail(t *testing.T) {
 	pattern := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Xml",
 		"Unexpected",
 		"Unserializable",
@@ -99,25 +99,25 @@ func TestQueryConditionDeserializationFail(t *testing.T) {
 	}
 
 	for _, causeDir := range causeDirs {
-		pths := aastesting.FindFilesBySuffixRecursively(
+		pths := ourtesting.FindFilesBySuffixRecursively(
 			causeDir,
 			".xml",
 		)
 		sort.Strings(pths)
 
 		for _, pth := range pths {
-			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 			if err != nil {
 				panic(
 					fmt.Sprintf(
 						"Failed to compute the relative path of %s to %s: %s",
-						aastesting.TestDataDir, pth, err.Error(),
+						ourtesting.TestDataDir, pth, err.Error(),
 					),
 				)
 			}
 
 			expectedPth := filepath.Join(
-				aastesting.TestDataDir,
+				ourtesting.TestDataDir,
 				"DeserializationError",
 				filepath.Dir(relPth),
 				filepath.Base(relPth)+".error",
@@ -132,7 +132,7 @@ func TestQueryConditionDeserializationFail(t *testing.T) {
 
 			decoder := xml.NewDecoder(strings.NewReader(text))
 
-			_, deseriaErr := aasxmlization.Unmarshal(decoder)
+			_, deseriaErr := ourxmlization.Unmarshal(decoder)
 			ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				t, deseriaErr, pth, expectedPth,
 			)

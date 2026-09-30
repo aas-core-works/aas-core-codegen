@@ -51,7 +51,7 @@ public void Test_LStrip_{i}()
 {{
 {I}Assert.AreEqual(
 {II}{csharp_common.string_literal(expected)},
-{II}Aas.Common.StringHelpers.LStrip(
+{II}Our.Common.StringHelpers.LStrip(
 {III}{csharp_common.string_literal(text)},
 {III}{csharp_common.string_literal(chars)}));
 }}"""
@@ -68,7 +68,7 @@ public void Test_ParseSafeInt_{i}()
 {{
 {I}Assert.AreEqual(
 {II}{expected_int}L,
-{II}Aas.Common.ParseSafeInt({csharp_common.string_literal(text)}));
+{II}Our.Common.ParseSafeInt({csharp_common.string_literal(text)}));
 }}"""
                 )
             )
@@ -81,7 +81,7 @@ public void Test_ParseSafeInt_{i}()
 public void Test_ParseSafeInt_invalid_{i}()
 {{
 {I}Assert.Throws<System.ArgumentException>(
-{II}() => Aas.Common.ParseSafeInt(
+{II}() => Our.Common.ParseSafeInt(
 {III}{csharp_common.string_literal(text)}));
 }}"""
                 )
@@ -92,7 +92,7 @@ public void Test_ParseSafeInt_invalid_{i}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

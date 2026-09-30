@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.SomeItem`
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.SomeItem(
+    an_instance = our_types.SomeItem(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,30 +47,30 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_some_item(
             self,
-            that: aas_types.SomeItem
+            that: our_types.SomeItem
     ) -> Iterator[Error]:
         # No verification has been defined for SomeItem.
         return
@@ -82,7 +82,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_another_item(
             self,
-            that: aas_types.AnotherItem
+            that: our_types.AnotherItem
     ) -> Iterator[Error]:
         # No verification has been defined for AnotherItem.
         return
@@ -94,7 +94,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_simple(
             self,
-            that: aas_types.Simple
+            that: our_types.Simple
     ) -> Iterator[Error]:
         # No verification has been defined for Simple.
         return
@@ -106,7 +106,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         for error in self.transform(that.item):
             error.path._prepend(
@@ -154,7 +154,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

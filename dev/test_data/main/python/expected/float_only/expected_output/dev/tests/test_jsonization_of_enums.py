@@ -11,7 +11,7 @@
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 class TestRoundTrips(unittest.TestCase):

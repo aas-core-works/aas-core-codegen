@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Item`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Item(
+    an_instance = our_types.Item(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,19 +47,19 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def text_is_short(
@@ -109,7 +109,7 @@ def number_is_small(
 
 
 def item_has_name(
-    item: Optional[aas_types.Item]
+    item: Optional[our_types.Item]
 ) -> bool:
     """Check the optional instance argument."""
     # pylint: disable=all
@@ -133,19 +133,19 @@ def texts_are_few(
 
 
 def kind_is_not_gamma(
-    kind: Optional[aas_types.Kind]
+    kind: Optional[our_types.Kind]
 ) -> bool:
     """Check the optional enumeration argument."""
     # pylint: disable=all
     return (
         (
             (kind is None)
-            or kind != aas_types.Kind.GAMMA
+            or kind != our_types.Kind.GAMMA
         ))
 
 
 def note_is_short(
-    item: aas_types.Item
+    item: our_types.Item
 ) -> bool:
     """Check the local variable holding an optional property."""
     # pylint: disable=all
@@ -158,14 +158,14 @@ def note_is_short(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_item(
             self,
-            that: aas_types.Item
+            that: our_types.Item
     ) -> Iterator[Error]:
         # No verification has been defined for Item.
         return
@@ -177,7 +177,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not note_is_short(that.item):
             yield Error(
@@ -238,7 +238,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

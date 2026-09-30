@@ -23,7 +23,7 @@ The other SDKs test against the very same cases.
 
 import unittest
 
-import dummy.common as aas_common
+import dummy.common as our_common
 
 
 class Test_lstrip_and_int(unittest.TestCase):
@@ -126,132 +126,132 @@ class Test_lstrip_and_int(unittest.TestCase):
     def test_int_0(self) -> None:
         self.assertEqual(
             0,
-            aas_common.parse_safe_int('0')
+            our_common.parse_safe_int('0')
         )
 
     def test_int_1(self) -> None:
         self.assertEqual(
             0,
-            aas_common.parse_safe_int('-0')
+            our_common.parse_safe_int('-0')
         )
 
     def test_int_2(self) -> None:
         self.assertEqual(
             7,
-            aas_common.parse_safe_int('+7')
+            our_common.parse_safe_int('+7')
         )
 
     def test_int_3(self) -> None:
         self.assertEqual(
             42,
-            aas_common.parse_safe_int('42')
+            our_common.parse_safe_int('42')
         )
 
     def test_int_4(self) -> None:
         self.assertEqual(
             -42,
-            aas_common.parse_safe_int('-42')
+            our_common.parse_safe_int('-42')
         )
 
     def test_int_5(self) -> None:
         self.assertEqual(
             7,
-            aas_common.parse_safe_int('0007')
+            our_common.parse_safe_int('0007')
         )
 
     def test_int_6(self) -> None:
         self.assertEqual(
             -42,
-            aas_common.parse_safe_int('-0042')
+            our_common.parse_safe_int('-0042')
         )
 
     def test_int_7(self) -> None:
         self.assertEqual(
             1,
-            aas_common.parse_safe_int('0000000000000000000000000000001')
+            our_common.parse_safe_int('0000000000000000000000000000001')
         )
 
     def test_int_8(self) -> None:
         self.assertEqual(
             9007199254740991,
-            aas_common.parse_safe_int('9007199254740991')
+            our_common.parse_safe_int('9007199254740991')
         )
 
     def test_int_9(self) -> None:
         self.assertEqual(
             -9007199254740991,
-            aas_common.parse_safe_int('-9007199254740991')
+            our_common.parse_safe_int('-9007199254740991')
         )
 
     def test_int_10(self) -> None:
         self.assertEqual(
             9007199254740991,
-            aas_common.parse_safe_int('+0009007199254740991')
+            our_common.parse_safe_int('+0009007199254740991')
         )
 
     def test_int_invalid_0(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('')
+            our_common.parse_safe_int('')
 
     def test_int_invalid_1(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('+')
+            our_common.parse_safe_int('+')
 
     def test_int_invalid_2(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('-')
+            our_common.parse_safe_int('-')
 
     def test_int_invalid_3(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('+-1')
+            our_common.parse_safe_int('+-1')
 
     def test_int_invalid_4(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int(' 1')
+            our_common.parse_safe_int(' 1')
 
     def test_int_invalid_5(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('1 ')
+            our_common.parse_safe_int('1 ')
 
     def test_int_invalid_6(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('1_0')
+            our_common.parse_safe_int('1_0')
 
     def test_int_invalid_7(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('1.0')
+            our_common.parse_safe_int('1.0')
 
     def test_int_invalid_8(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('1e3')
+            our_common.parse_safe_int('1e3')
 
     def test_int_invalid_9(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('0x10')
+            our_common.parse_safe_int('0x10')
 
     def test_int_invalid_10(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('٥')
+            our_common.parse_safe_int('٥')
 
     def test_int_invalid_11(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('１')
+            our_common.parse_safe_int('１')
 
     def test_int_invalid_12(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('9007199254740992')
+            our_common.parse_safe_int('9007199254740992')
 
     def test_int_invalid_13(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('-9007199254740992')
+            our_common.parse_safe_int('-9007199254740992')
 
     def test_int_invalid_14(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('9223372036854775807')
+            our_common.parse_safe_int('9223372036854775807')
 
     def test_int_invalid_15(self) -> None:
         with self.assertRaises(ValueError):
-            aas_common.parse_safe_int('999999999999999999999999999999')
+            our_common.parse_safe_int('999999999999999999999999999999')
 
 
 if __name__ == "__main__":

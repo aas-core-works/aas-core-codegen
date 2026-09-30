@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 
 using System.Collections.Generic;  // can't alias
@@ -12,13 +12,13 @@ namespace dummy
 {
     public static class Stringification
     {
-        private static readonly Dictionary<Aas.Kind, string> KindToString = (
-            new Dictionary<Aas.Kind, string>()
+        private static readonly Dictionary<Our.Kind, string> KindToString = (
+            new Dictionary<Our.Kind, string>()
             {
-                { Aas.Kind.Alpha, "alpha" },
-                { Aas.Kind.Beta, "beta" },
-                { Aas.Kind.Gamma, "gamma" },
-                { Aas.Kind.Delta, "delta" }
+                { Our.Kind.Alpha, "alpha" },
+                { Our.Kind.Beta, "beta" },
+                { Our.Kind.Gamma, "gamma" },
+                { Our.Kind.Delta, "delta" }
             });
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace dummy
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.Kind? that)
+        public static string? ToString(Our.Kind? that)
         {
             if (!that.HasValue)
             {
@@ -47,13 +47,13 @@ namespace dummy
         }
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-        private static readonly Dictionary<string, Aas.Kind> _kindFromString = (
-            new Dictionary<string, Aas.Kind>()
+        private static readonly Dictionary<string, Our.Kind> _kindFromString = (
+            new Dictionary<string, Our.Kind>()
             {
-                { "alpha", Aas.Kind.Alpha },
-                { "beta", Aas.Kind.Beta },
-                { "gamma", Aas.Kind.Gamma },
-                { "delta", Aas.Kind.Delta }
+                { "alpha", Our.Kind.Alpha },
+                { "beta", Our.Kind.Beta },
+                { "gamma", Our.Kind.Gamma },
+                { "delta", Our.Kind.Delta }
             });
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace dummy
         /// of a literal of <see cref="Kind" />,
         /// return <c>null</c>.
         /// </remarks>
-        public static Aas.Kind? KindFromString(string text)
+        public static Our.Kind? KindFromString(string text)
         {
             if (_kindFromString.TryGetValue(text, out Kind value))
             {

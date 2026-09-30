@@ -10,10 +10,10 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 const std::filesystem::path& DetermineLogDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "XxxOrDefault";
   }
@@ -23,7 +23,7 @@ const std::filesystem::path& DetermineLogDir() {
 
 TEST_CASE("Test ValueTypeOrDefault on a min. Extension") {
   const std::shared_ptr<
-    aas::types::IExtension
+    our::types::IExtension
   > instance(
     test::common::examples::LoadMinExtension()
   );
@@ -34,7 +34,7 @@ TEST_CASE("Test ValueTypeOrDefault on a min. Extension") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->ValueTypeOrDefault()
     )
   );
@@ -47,7 +47,7 @@ TEST_CASE("Test ValueTypeOrDefault on a min. Extension") {
 
 TEST_CASE("Test ValueTypeOrDefault on a max. Extension") {
   const std::shared_ptr<
-    aas::types::IExtension
+    our::types::IExtension
   > instance(
     test::common::examples::LoadMaxExtension()
   );
@@ -58,7 +58,7 @@ TEST_CASE("Test ValueTypeOrDefault on a max. Extension") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->ValueTypeOrDefault()
     )
   );
@@ -71,7 +71,7 @@ TEST_CASE("Test ValueTypeOrDefault on a max. Extension") {
 
 TEST_CASE("Test KindOrDefault on a min. Qualifier") {
   const std::shared_ptr<
-    aas::types::IQualifier
+    our::types::IQualifier
   > instance(
     test::common::examples::LoadMinQualifier()
   );
@@ -82,7 +82,7 @@ TEST_CASE("Test KindOrDefault on a min. Qualifier") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->KindOrDefault()
     )
   );
@@ -95,7 +95,7 @@ TEST_CASE("Test KindOrDefault on a min. Qualifier") {
 
 TEST_CASE("Test KindOrDefault on a max. Qualifier") {
   const std::shared_ptr<
-    aas::types::IQualifier
+    our::types::IQualifier
   > instance(
     test::common::examples::LoadMaxQualifier()
   );
@@ -106,7 +106,7 @@ TEST_CASE("Test KindOrDefault on a max. Qualifier") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->KindOrDefault()
     )
   );
@@ -119,7 +119,7 @@ TEST_CASE("Test KindOrDefault on a max. Qualifier") {
 
 TEST_CASE("Test KindOrDefault on a min. Submodel") {
   const std::shared_ptr<
-    aas::types::ISubmodel
+    our::types::ISubmodel
   > instance(
     test::common::examples::LoadMinSubmodel()
   );
@@ -130,7 +130,7 @@ TEST_CASE("Test KindOrDefault on a min. Submodel") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->KindOrDefault()
     )
   );
@@ -143,7 +143,7 @@ TEST_CASE("Test KindOrDefault on a min. Submodel") {
 
 TEST_CASE("Test KindOrDefault on a max. Submodel") {
   const std::shared_ptr<
-    aas::types::ISubmodel
+    our::types::ISubmodel
   > instance(
     test::common::examples::LoadMaxSubmodel()
   );
@@ -154,7 +154,7 @@ TEST_CASE("Test KindOrDefault on a max. Submodel") {
   );
 
   const std::string serialized(
-    aas::stringification::to_string(
+    our::stringification::to_string(
       instance->KindOrDefault()
     )
   );
@@ -167,7 +167,7 @@ TEST_CASE("Test KindOrDefault on a max. Submodel") {
 
 TEST_CASE("Test OrderRelevantOrDefault on a min. SubmodelElementList") {
   const std::shared_ptr<
-    aas::types::ISubmodelElementList
+    our::types::ISubmodelElementList
   > instance(
     test::common::examples::LoadMinSubmodelElementList()
   );
@@ -191,7 +191,7 @@ TEST_CASE("Test OrderRelevantOrDefault on a min. SubmodelElementList") {
 
 TEST_CASE("Test OrderRelevantOrDefault on a max. SubmodelElementList") {
   const std::shared_ptr<
-    aas::types::ISubmodelElementList
+    our::types::ISubmodelElementList
   > instance(
     test::common::examples::LoadMaxSubmodelElementList()
   );
@@ -215,7 +215,7 @@ TEST_CASE("Test OrderRelevantOrDefault on a max. SubmodelElementList") {
 
 TEST_CASE("Test CategoryOrDefault on a min. Property") {
   const std::shared_ptr<
-    aas::types::IProperty
+    our::types::IProperty
   > instance(
     test::common::examples::LoadMinProperty()
   );
@@ -226,7 +226,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Property") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -239,7 +239,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Property") {
 
 TEST_CASE("Test CategoryOrDefault on a max. Property") {
   const std::shared_ptr<
-    aas::types::IProperty
+    our::types::IProperty
   > instance(
     test::common::examples::LoadMaxProperty()
   );
@@ -250,7 +250,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Property") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -263,7 +263,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Property") {
 
 TEST_CASE("Test CategoryOrDefault on a min. MultiLanguageProperty") {
   const std::shared_ptr<
-    aas::types::IMultiLanguageProperty
+    our::types::IMultiLanguageProperty
   > instance(
     test::common::examples::LoadMinMultiLanguageProperty()
   );
@@ -274,7 +274,7 @@ TEST_CASE("Test CategoryOrDefault on a min. MultiLanguageProperty") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -287,7 +287,7 @@ TEST_CASE("Test CategoryOrDefault on a min. MultiLanguageProperty") {
 
 TEST_CASE("Test CategoryOrDefault on a max. MultiLanguageProperty") {
   const std::shared_ptr<
-    aas::types::IMultiLanguageProperty
+    our::types::IMultiLanguageProperty
   > instance(
     test::common::examples::LoadMaxMultiLanguageProperty()
   );
@@ -298,7 +298,7 @@ TEST_CASE("Test CategoryOrDefault on a max. MultiLanguageProperty") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -311,7 +311,7 @@ TEST_CASE("Test CategoryOrDefault on a max. MultiLanguageProperty") {
 
 TEST_CASE("Test CategoryOrDefault on a min. Range") {
   const std::shared_ptr<
-    aas::types::IRange
+    our::types::IRange
   > instance(
     test::common::examples::LoadMinRange()
   );
@@ -322,7 +322,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Range") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -335,7 +335,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Range") {
 
 TEST_CASE("Test CategoryOrDefault on a max. Range") {
   const std::shared_ptr<
-    aas::types::IRange
+    our::types::IRange
   > instance(
     test::common::examples::LoadMaxRange()
   );
@@ -346,7 +346,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Range") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -359,7 +359,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Range") {
 
 TEST_CASE("Test CategoryOrDefault on a min. ReferenceElement") {
   const std::shared_ptr<
-    aas::types::IReferenceElement
+    our::types::IReferenceElement
   > instance(
     test::common::examples::LoadMinReferenceElement()
   );
@@ -370,7 +370,7 @@ TEST_CASE("Test CategoryOrDefault on a min. ReferenceElement") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -383,7 +383,7 @@ TEST_CASE("Test CategoryOrDefault on a min. ReferenceElement") {
 
 TEST_CASE("Test CategoryOrDefault on a max. ReferenceElement") {
   const std::shared_ptr<
-    aas::types::IReferenceElement
+    our::types::IReferenceElement
   > instance(
     test::common::examples::LoadMaxReferenceElement()
   );
@@ -394,7 +394,7 @@ TEST_CASE("Test CategoryOrDefault on a max. ReferenceElement") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -407,7 +407,7 @@ TEST_CASE("Test CategoryOrDefault on a max. ReferenceElement") {
 
 TEST_CASE("Test CategoryOrDefault on a min. Blob") {
   const std::shared_ptr<
-    aas::types::IBlob
+    our::types::IBlob
   > instance(
     test::common::examples::LoadMinBlob()
   );
@@ -418,7 +418,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Blob") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -431,7 +431,7 @@ TEST_CASE("Test CategoryOrDefault on a min. Blob") {
 
 TEST_CASE("Test CategoryOrDefault on a max. Blob") {
   const std::shared_ptr<
-    aas::types::IBlob
+    our::types::IBlob
   > instance(
     test::common::examples::LoadMaxBlob()
   );
@@ -442,7 +442,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Blob") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -455,7 +455,7 @@ TEST_CASE("Test CategoryOrDefault on a max. Blob") {
 
 TEST_CASE("Test CategoryOrDefault on a min. File") {
   const std::shared_ptr<
-    aas::types::IFile
+    our::types::IFile
   > instance(
     test::common::examples::LoadMinFile()
   );
@@ -466,7 +466,7 @@ TEST_CASE("Test CategoryOrDefault on a min. File") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );
@@ -479,7 +479,7 @@ TEST_CASE("Test CategoryOrDefault on a min. File") {
 
 TEST_CASE("Test CategoryOrDefault on a max. File") {
   const std::shared_ptr<
-    aas::types::IFile
+    our::types::IFile
   > instance(
     test::common::examples::LoadMaxFile()
   );
@@ -490,7 +490,7 @@ TEST_CASE("Test CategoryOrDefault on a max. File") {
   );
 
   const std::string serialized(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       instance->CategoryOrDefault()
     )
   );

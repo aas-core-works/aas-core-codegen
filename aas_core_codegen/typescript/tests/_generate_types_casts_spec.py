@@ -34,7 +34,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasTypes from "../src/types";
+import * as OurTypes from "../src/types";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
     ]  # type: List[Stripped]
@@ -72,10 +72,10 @@ const {instance_var} =
                     Stripped(
                         f"""\
 expect(
-{I}AasTypes.{is_function_name}({instance_var})
+{I}OurTypes.{is_function_name}({instance_var})
 ).toStrictEqual(true);
 expect(
-{I}AasTypes.{as_function_name}({instance_var})
+{I}OurTypes.{as_function_name}({instance_var})
 ).toStrictEqual({instance_var});"""
                     )
                 )
@@ -84,10 +84,10 @@ expect(
                     Stripped(
                         f"""\
 expect(
-{I}AasTypes.{is_function_name}({instance_var})
+{I}OurTypes.{is_function_name}({instance_var})
 ).toStrictEqual(false);
 expect(
-{I}AasTypes.{as_function_name}({instance_var})
+{I}OurTypes.{as_function_name}({instance_var})
 ).toBeNull();"""
                     )
                 )

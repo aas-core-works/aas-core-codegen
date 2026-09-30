@@ -11,8 +11,8 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 	xmlcommon "github.com/dummy-works/dummy/internal/xmlcommon"
 )
 
@@ -94,10 +94,10 @@ func unexpectedItemElement(local string, expectedLocal string) error {
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -126,7 +126,7 @@ func readListOf[T any](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -239,7 +239,7 @@ func concludeProperty(
 	if valueErr != nil {
 		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: local},
+				&ourreporting.NameSegment{Name: local},
 			)
 		}
 		err = valueErr
@@ -260,7 +260,7 @@ func concludeProperty(
 	return
 }
 
-// De-serialize an instance of [aastypes.IElement] based on the `local` name
+// De-serialize an instance of [ourtypes.IElement] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -269,7 +269,7 @@ func readElementDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IElement,
+) (instance ourtypes.IElement,
 	next xml.Token,
 	err error,
 ) {
@@ -286,16 +286,16 @@ func readElementDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILeaf]
+// De-serialize the instance of [ourtypes.ILeaf]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILeaf].
+// of [ourtypes.ILeaf].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLeafAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILeaf,
+) (instance ourtypes.ILeaf,
 	next xml.Token,
 	err error,
 ) {
@@ -360,28 +360,28 @@ func readLeafAsSequence(
 		return
 	}
 
-	instance = aastypes.NewLeaf(
+	instance = ourtypes.NewLeaf(
 		theIdentifier,
 		theText,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IOrderedContainer]
+// De-serialize the instance of [ourtypes.IOrderedContainer]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IOrderedContainer].
+// of [ourtypes.IOrderedContainer].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readOrderedContainerAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IOrderedContainer,
+) (instance ourtypes.IOrderedContainer,
 	next xml.Token,
 	err error,
 ) {
 	var theIdentifier string
-	var theChildren []aastypes.IElement
+	var theChildren []ourtypes.IElement
 	var theIsSorted bool
 
 	foundIdentifier := false
@@ -457,7 +457,7 @@ func readOrderedContainerAsSequence(
 		return
 	}
 
-	instance = aastypes.NewOrderedContainer(
+	instance = ourtypes.NewOrderedContainer(
 		theIdentifier,
 		theChildren,
 		theIsSorted,
@@ -465,21 +465,21 @@ func readOrderedContainerAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IUnorderedContainer]
+// De-serialize the instance of [ourtypes.IUnorderedContainer]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IUnorderedContainer].
+// of [ourtypes.IUnorderedContainer].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readUnorderedContainerAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IUnorderedContainer,
+) (instance ourtypes.IUnorderedContainer,
 	next xml.Token,
 	err error,
 ) {
 	var theIdentifier string
-	var theChildren []aastypes.IElement
+	var theChildren []ourtypes.IElement
 
 	foundIdentifier := false
 	foundChildren := false
@@ -539,23 +539,23 @@ func readUnorderedContainerAsSequence(
 		return
 	}
 
-	instance = aastypes.NewUnorderedContainer(
+	instance = ourtypes.NewUnorderedContainer(
 		theIdentifier,
 		theChildren,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IGlobalAttribute]
+// De-serialize the instance of [ourtypes.IGlobalAttribute]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IGlobalAttribute].
+// of [ourtypes.IGlobalAttribute].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readGlobalAttributeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IGlobalAttribute,
+) (instance ourtypes.IGlobalAttribute,
 	next xml.Token,
 	err error,
 ) {
@@ -604,22 +604,22 @@ func readGlobalAttributeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewGlobalAttribute(
+	instance = ourtypes.NewGlobalAttribute(
 		theKind,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.ILocalAttribute]
+// De-serialize the instance of [ourtypes.ILocalAttribute]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILocalAttribute].
+// of [ourtypes.ILocalAttribute].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLocalAttributeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILocalAttribute,
+) (instance ourtypes.ILocalAttribute,
 	next xml.Token,
 	err error,
 ) {
@@ -668,13 +668,13 @@ func readLocalAttributeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewLocalAttribute(
+	instance = ourtypes.NewLocalAttribute(
 		theName,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.AttributeItem] based on the `local` name
+// De-serialize an instance of [ourtypes.AttributeItem] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -683,22 +683,22 @@ func readAttributeItemDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.AttributeItem,
+) (instance *ourtypes.AttributeItem,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "globalAttribute":
-		var casted aastypes.IGlobalAttribute
+		var casted ourtypes.IGlobalAttribute
 		casted, next, err = readGlobalAttributeAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewAttributeItemFromGlobalAttribute(casted)
+			instance = ourtypes.NewAttributeItemFromGlobalAttribute(casted)
 		}
 	case "localAttribute":
-		var casted aastypes.ILocalAttribute
+		var casted ourtypes.ILocalAttribute
 		casted, next, err = readLocalAttributeAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewAttributeItemFromLocalAttribute(casted)
+			instance = ourtypes.NewAttributeItemFromLocalAttribute(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union AttributeItem")
@@ -706,20 +706,20 @@ func readAttributeItemDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAttributeOperand]
+// De-serialize the instance of [ourtypes.IAttributeOperand]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAttributeOperand].
+// of [ourtypes.IAttributeOperand].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAttributeOperandAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAttributeOperand,
+) (instance ourtypes.IAttributeOperand,
 	next xml.Token,
 	err error,
 ) {
-	var theAttribute *aastypes.AttributeItem
+	var theAttribute *ourtypes.AttributeItem
 
 	foundAttribute := false
 
@@ -764,22 +764,22 @@ func readAttributeOperandAsSequence(
 		return
 	}
 
-	instance = aastypes.NewAttributeOperand(
+	instance = ourtypes.NewAttributeOperand(
 		theAttribute,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IStringLiteral]
+// De-serialize the instance of [ourtypes.IStringLiteral]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IStringLiteral].
+// of [ourtypes.IStringLiteral].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readStringLiteralAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IStringLiteral,
+) (instance ourtypes.IStringLiteral,
 	next xml.Token,
 	err error,
 ) {
@@ -828,22 +828,22 @@ func readStringLiteralAsSequence(
 		return
 	}
 
-	instance = aastypes.NewStringLiteral(
+	instance = ourtypes.NewStringLiteral(
 		theText,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.INumberLiteral]
+// De-serialize the instance of [ourtypes.INumberLiteral]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.INumberLiteral].
+// of [ourtypes.INumberLiteral].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readNumberLiteralAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.INumberLiteral,
+) (instance ourtypes.INumberLiteral,
 	next xml.Token,
 	err error,
 ) {
@@ -892,13 +892,13 @@ func readNumberLiteralAsSequence(
 		return
 	}
 
-	instance = aastypes.NewNumberLiteral(
+	instance = ourtypes.NewNumberLiteral(
 		theNumber,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.Value] based on the `local` name
+// De-serialize an instance of [ourtypes.Value] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -907,28 +907,28 @@ func readValueDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.Value,
+) (instance *ourtypes.Value,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "stringLiteral":
-		var casted aastypes.IStringLiteral
+		var casted ourtypes.IStringLiteral
 		casted, next, err = readStringLiteralAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewValueFromStringLiteral(casted)
+			instance = ourtypes.NewValueFromStringLiteral(casted)
 		}
 	case "attributeOperand":
-		var casted aastypes.IAttributeOperand
+		var casted ourtypes.IAttributeOperand
 		casted, next, err = readAttributeOperandAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewValueFromAttributeOperand(casted)
+			instance = ourtypes.NewValueFromAttributeOperand(casted)
 		}
 	case "numberLiteral":
-		var casted aastypes.INumberLiteral
+		var casted ourtypes.INumberLiteral
 		casted, next, err = readNumberLiteralAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewValueFromNumberLiteral(casted)
+			instance = ourtypes.NewValueFromNumberLiteral(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union Value")
@@ -936,23 +936,23 @@ func readValueDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISomething]
+// De-serialize the instance of [ourtypes.ISomething]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISomething].
+// of [ourtypes.ISomething].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSomethingAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISomething,
+) (instance ourtypes.ISomething,
 	next xml.Token,
 	err error,
 ) {
-	var theRoot aastypes.IElement
-	var theOptionalElement aastypes.IElement
-	var theValue *aastypes.Value
-	var theValues []*aastypes.Value
+	var theRoot ourtypes.IElement
+	var theOptionalElement ourtypes.IElement
+	var theValue *ourtypes.Value
+	var theValues []*ourtypes.Value
 
 	foundRoot := false
 	foundOptionalElement := false
@@ -1037,7 +1037,7 @@ func readSomethingAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSomething(
+	instance = ourtypes.NewSomething(
 		theRoot,
 		theValue,
 		theValues,
@@ -1046,7 +1046,7 @@ func readSomethingAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1055,7 +1055,7 @@ func readClassDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 	next xml.Token,
 	err error,
 ) {
@@ -1089,12 +1089,12 @@ func readClassDispatched(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 	decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {
+) (instance ourtypes.IClass, err error) {
 	var current xml.Token
 	current, err = xmlcommon.ReadNext(decoder, nil)
 	if err != nil {
@@ -1209,7 +1209,7 @@ func writeList[T any](
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
 				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			return
@@ -1227,7 +1227,7 @@ func writeList[T any](
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -1242,7 +1242,7 @@ func finishProperty(
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: getter},
+				&ourreporting.NameSegment{Name: getter},
 			)
 		}
 		return err
@@ -1260,13 +1260,13 @@ func finishProperty(
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 	encoder *xml.Encoder,
 	that T,
 ) error {
@@ -1306,14 +1306,14 @@ func writeClassElement[T any](
 // Constrain a generic type to a named union, giving access to its
 // underlying instance for serialization.
 type namedUnion interface {
-	Underlying() aastypes.IClass
+	Underlying() ourtypes.IClass
 }
 
 // Write the named union `that` as the XML element of its underlying instance.
 //
 // Do not flush.
 //
-// A named union is deliberately not an [aastypes.IClass], so [writeInstance] can not
+// A named union is deliberately not an [ourtypes.IClass], so [writeInstance] can not
 // serve it; this writer narrows through the [namedUnion] constraint instead, and one
 // generic writer thus covers every named union.
 //
@@ -1330,10 +1330,10 @@ func writeUnion[T namedUnion](
 // Do not flush.
 func writeListOf_IElement(
 	encoder *xml.Encoder,
-	list []aastypes.IElement,
+	list []ourtypes.IElement,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IElement],
+		encoder, list, writeInstance[ourtypes.IElement],
 	)
 }
 
@@ -1342,15 +1342,15 @@ func writeListOf_IElement(
 // Do not flush.
 func writeListOf_Value(
 	encoder *xml.Encoder,
-	list []*aastypes.Value,
+	list []*ourtypes.Value,
 ) error {
 	return writeList(
-		encoder, list, writeUnion[*aastypes.Value],
+		encoder, list, writeUnion[*ourtypes.Value],
 	)
 }
 
 // Serialize the instance
-// of [aastypes.ILeaf]
+// of [ourtypes.ILeaf]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1359,7 +1359,7 @@ func writeListOf_Value(
 // Do not flush.
 func writeLeafAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILeaf,
+	that ourtypes.ILeaf,
 ) (err error) {
 	err = finishProperty(
 		"Identifier()",
@@ -1385,7 +1385,7 @@ func writeLeafAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IOrderedContainer]
+// of [ourtypes.IOrderedContainer]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1394,7 +1394,7 @@ func writeLeafAsSequence(
 // Do not flush.
 func writeOrderedContainerAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IOrderedContainer,
+	that ourtypes.IOrderedContainer,
 ) (err error) {
 	err = finishProperty(
 		"Identifier()",
@@ -1430,7 +1430,7 @@ func writeOrderedContainerAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IUnorderedContainer]
+// of [ourtypes.IUnorderedContainer]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1439,7 +1439,7 @@ func writeOrderedContainerAsSequence(
 // Do not flush.
 func writeUnorderedContainerAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IUnorderedContainer,
+	that ourtypes.IUnorderedContainer,
 ) (err error) {
 	err = finishProperty(
 		"Identifier()",
@@ -1465,7 +1465,7 @@ func writeUnorderedContainerAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IGlobalAttribute]
+// of [ourtypes.IGlobalAttribute]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1474,7 +1474,7 @@ func writeUnorderedContainerAsSequence(
 // Do not flush.
 func writeGlobalAttributeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IGlobalAttribute,
+	that ourtypes.IGlobalAttribute,
 ) (err error) {
 	err = finishProperty(
 		"Kind()",
@@ -1490,7 +1490,7 @@ func writeGlobalAttributeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ILocalAttribute]
+// of [ourtypes.ILocalAttribute]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1499,7 +1499,7 @@ func writeGlobalAttributeAsSequence(
 // Do not flush.
 func writeLocalAttributeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILocalAttribute,
+	that ourtypes.ILocalAttribute,
 ) (err error) {
 	err = finishProperty(
 		"Name()",
@@ -1515,7 +1515,7 @@ func writeLocalAttributeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IAttributeOperand]
+// of [ourtypes.IAttributeOperand]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1524,12 +1524,12 @@ func writeLocalAttributeAsSequence(
 // Do not flush.
 func writeAttributeOperandAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAttributeOperand,
+	that ourtypes.IAttributeOperand,
 ) (err error) {
 	err = finishProperty(
 		"Attribute()",
 		xmlcommon.WriteElement(
-			encoder, "attribute", that.Attribute(), writeUnion[*aastypes.AttributeItem],
+			encoder, "attribute", that.Attribute(), writeUnion[*ourtypes.AttributeItem],
 		),
 	)
 	if err != nil {
@@ -1540,7 +1540,7 @@ func writeAttributeOperandAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IStringLiteral]
+// of [ourtypes.IStringLiteral]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1549,7 +1549,7 @@ func writeAttributeOperandAsSequence(
 // Do not flush.
 func writeStringLiteralAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IStringLiteral,
+	that ourtypes.IStringLiteral,
 ) (err error) {
 	err = finishProperty(
 		"Text()",
@@ -1565,7 +1565,7 @@ func writeStringLiteralAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.INumberLiteral]
+// of [ourtypes.INumberLiteral]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1574,7 +1574,7 @@ func writeStringLiteralAsSequence(
 // Do not flush.
 func writeNumberLiteralAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.INumberLiteral,
+	that ourtypes.INumberLiteral,
 ) (err error) {
 	err = finishProperty(
 		"Number()",
@@ -1590,7 +1590,7 @@ func writeNumberLiteralAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ISomething]
+// of [ourtypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1599,12 +1599,12 @@ func writeNumberLiteralAsSequence(
 // Do not flush.
 func writeSomethingAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (err error) {
 	err = finishProperty(
 		"Root()",
 		xmlcommon.WriteElement(
-			encoder, "root", that.Root(), writeInstance[aastypes.IElement],
+			encoder, "root", that.Root(), writeInstance[ourtypes.IElement],
 		),
 	)
 	if err != nil {
@@ -1617,7 +1617,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"optionalElement",
 			that.OptionalElement(),
-			writeInstance[aastypes.IElement],
+			writeInstance[ourtypes.IElement],
 		),
 	)
 	if err != nil {
@@ -1627,7 +1627,7 @@ func writeSomethingAsSequence(
 	err = finishProperty(
 		"Value()",
 		xmlcommon.WriteElement(
-			encoder, "value", that.Value(), writeUnion[*aastypes.Value],
+			encoder, "value", that.Value(), writeUnion[*ourtypes.Value],
 		),
 	)
 	if err != nil {
@@ -1655,76 +1655,76 @@ func writeSomethingAsSequence(
 // to [Namespace].
 func writeClass(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeLeaf:
+	case ourtypes.ModelTypeLeaf:
 		err = writeClassElement(
-			encoder, "leaf", withNamespace, that.(aastypes.ILeaf), writeLeafAsSequence,
+			encoder, "leaf", withNamespace, that.(ourtypes.ILeaf), writeLeafAsSequence,
 		)
-	case aastypes.ModelTypeOrderedContainer:
+	case ourtypes.ModelTypeOrderedContainer:
 		err = writeClassElement(
 			encoder,
 			"orderedContainer",
 			withNamespace,
-			that.(aastypes.IOrderedContainer),
+			that.(ourtypes.IOrderedContainer),
 			writeOrderedContainerAsSequence,
 		)
-	case aastypes.ModelTypeUnorderedContainer:
+	case ourtypes.ModelTypeUnorderedContainer:
 		err = writeClassElement(
 			encoder,
 			"unorderedContainer",
 			withNamespace,
-			that.(aastypes.IUnorderedContainer),
+			that.(ourtypes.IUnorderedContainer),
 			writeUnorderedContainerAsSequence,
 		)
-	case aastypes.ModelTypeGlobalAttribute:
+	case ourtypes.ModelTypeGlobalAttribute:
 		err = writeClassElement(
 			encoder,
 			"globalAttribute",
 			withNamespace,
-			that.(aastypes.IGlobalAttribute),
+			that.(ourtypes.IGlobalAttribute),
 			writeGlobalAttributeAsSequence,
 		)
-	case aastypes.ModelTypeLocalAttribute:
+	case ourtypes.ModelTypeLocalAttribute:
 		err = writeClassElement(
 			encoder,
 			"localAttribute",
 			withNamespace,
-			that.(aastypes.ILocalAttribute),
+			that.(ourtypes.ILocalAttribute),
 			writeLocalAttributeAsSequence,
 		)
-	case aastypes.ModelTypeAttributeOperand:
+	case ourtypes.ModelTypeAttributeOperand:
 		err = writeClassElement(
 			encoder,
 			"attributeOperand",
 			withNamespace,
-			that.(aastypes.IAttributeOperand),
+			that.(ourtypes.IAttributeOperand),
 			writeAttributeOperandAsSequence,
 		)
-	case aastypes.ModelTypeStringLiteral:
+	case ourtypes.ModelTypeStringLiteral:
 		err = writeClassElement(
 			encoder,
 			"stringLiteral",
 			withNamespace,
-			that.(aastypes.IStringLiteral),
+			that.(ourtypes.IStringLiteral),
 			writeStringLiteralAsSequence,
 		)
-	case aastypes.ModelTypeNumberLiteral:
+	case ourtypes.ModelTypeNumberLiteral:
 		err = writeClassElement(
 			encoder,
 			"numberLiteral",
 			withNamespace,
-			that.(aastypes.INumberLiteral),
+			that.(ourtypes.INumberLiteral),
 			writeNumberLiteralAsSequence,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		err = writeClassElement(
 			encoder,
 			"something",
 			withNamespace,
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			writeSomethingAsSequence,
 		)
 	default:
@@ -1744,7 +1744,7 @@ func writeClass(
 // to [Namespace].
 func Marshal(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	err = writeClass(encoder, that, withNamespace)

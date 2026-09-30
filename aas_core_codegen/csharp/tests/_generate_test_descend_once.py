@@ -40,12 +40,12 @@ private static void CompareOrRerecordTrace(
 {I}var writer = new System.IO.StringWriter();
 {I}foreach (var descendant in instance.DescendOnce())
 {I}{{
-{II}writer.WriteLine(Aas.Tests.Common.Trace(descendant));
+{II}writer.WriteLine(Our.Tests.Common.Trace(descendant));
 {I}}}
 
 {I}string got = writer.ToString();
 
-{I}if (Aas.Tests.Common.RecordMode)
+{I}if (Our.Tests.Common.RecordMode)
 {I}{{
 {II}string? parent = Path.GetDirectoryName(expectedPath);
 {II}if (parent != null)
@@ -65,7 +65,7 @@ private static void CompareOrRerecordTrace(
 {III}throw new System.IO.FileNotFoundException(
 {IIII}$"The file with the recorded trace does not exist: {{expectedPath}}; " +
 {IIII}"maybe you want to set the environment " +
-{IIII}$"variable {{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?");
+{IIII}$"variable {{Our.Tests.Common.RecordModeEnvironmentVariableName}}?");
 {II}}}
 
 {II}string expected = System.IO.File.ReadAllText(expectedPath);
@@ -88,13 +88,13 @@ private static void CompareOrRerecordTrace(
 [Test]
 public void Test_{cls_name_csharp}()
 {{
-{I}Aas.{cls_name_csharp} instance = (
-{II}Aas.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
+{I}Our.{cls_name_csharp} instance = (
+{II}Our.Tests.CommonJsonization.LoadMaximal{cls_name_csharp}());
 
 {I}CompareOrRerecordTrace(
 {II}instance,
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"DescendOnce",
 {III}{csharp_common.string_literal(cls_name_json)},
 {III}"maximal.json.trace"));
@@ -107,7 +107,7 @@ public void Test_{cls_name_csharp}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;

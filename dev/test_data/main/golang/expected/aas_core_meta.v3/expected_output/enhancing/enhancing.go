@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 )
 
 type enhanced[E any] interface {
@@ -18,45 +18,45 @@ type enhanced[E any] interface {
 }
 
 type enhancedExtension[E any] struct {
-	instance aastypes.IExtension
+	instance ourtypes.IExtension
 	enhancement E
 }
 
 func (ee *enhancedExtension[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ee.instance.ModelType()
 }
 
 func (ee *enhancedExtension[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ee.instance.DescendOnce(action)
 }
 
 func (ee *enhancedExtension[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ee.instance.Descend(action)
 }
 
 func (ee *enhancedExtension[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ee.instance.SemanticID()
 }
 
 func (ee *enhancedExtension[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ee.instance.SetSemanticID(value)
 }
 
 func (ee *enhancedExtension[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ee.instance.SupplementalSemanticIDs()
 }
 
 func (ee *enhancedExtension[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ee.instance.SetSupplementalSemanticIDs(value)
 }
@@ -73,12 +73,12 @@ func (ee *enhancedExtension[E]) SetName(
 }
 
 func (ee *enhancedExtension[E]) ValueType(
-) *aastypes.DataTypeDefXSD {
+) *ourtypes.DataTypeDefXSD {
 	return ee.instance.ValueType()
 }
 
 func (ee *enhancedExtension[E]) SetValueType(
-	value *aastypes.DataTypeDefXSD,
+	value *ourtypes.DataTypeDefXSD,
 ) {
 	ee.instance.SetValueType(value)
 }
@@ -95,17 +95,17 @@ func (ee *enhancedExtension[E]) SetValue(
 }
 
 func (ee *enhancedExtension[E]) RefersTo(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ee.instance.RefersTo()
 }
 
 func (ee *enhancedExtension[E]) SetRefersTo(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ee.instance.SetRefersTo(value)
 }
 
-func (e *enhancedExtension[E]) ValueTypeOrDefault() aastypes.DataTypeDefXSD {
+func (e *enhancedExtension[E]) ValueTypeOrDefault() ourtypes.DataTypeDefXSD {
 	return e.instance.ValueTypeOrDefault()
 }
 
@@ -121,9 +121,9 @@ func (ee *enhancedExtension[E]) setEnhancement(
 }
 
 func wrapExtension[E any](
-	that aastypes.IExtension,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IExtension) {
+	that ourtypes.IExtension,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IExtension) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -143,7 +143,7 @@ func wrapExtension[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -154,7 +154,7 @@ func wrapExtension[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -165,7 +165,7 @@ func wrapExtension[E any](
 			theRefersTo[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -173,34 +173,34 @@ func wrapExtension[E any](
 }
 
 type enhancedAdministrativeInformation[E any] struct {
-	instance aastypes.IAdministrativeInformation
+	instance ourtypes.IAdministrativeInformation
 	enhancement E
 }
 
 func (eai *enhancedAdministrativeInformation[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eai.instance.ModelType()
 }
 
 func (eai *enhancedAdministrativeInformation[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eai.instance.DescendOnce(action)
 }
 
 func (eai *enhancedAdministrativeInformation[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eai.instance.Descend(action)
 }
 
 func (eai *enhancedAdministrativeInformation[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return eai.instance.EmbeddedDataSpecifications()
 }
 
 func (eai *enhancedAdministrativeInformation[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	eai.instance.SetEmbeddedDataSpecifications(value)
 }
@@ -228,12 +228,12 @@ func (eai *enhancedAdministrativeInformation[E]) SetRevision(
 }
 
 func (eai *enhancedAdministrativeInformation[E]) Creator(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eai.instance.Creator()
 }
 
 func (eai *enhancedAdministrativeInformation[E]) SetCreator(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eai.instance.SetCreator(value)
 }
@@ -261,9 +261,9 @@ func (eai *enhancedAdministrativeInformation[E]) setEnhancement(
 }
 
 func wrapAdministrativeInformation[E any](
-	that aastypes.IAdministrativeInformation,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IAdministrativeInformation) {
+	that ourtypes.IAdministrativeInformation,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IAdministrativeInformation) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -284,7 +284,7 @@ func wrapAdministrativeInformation[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -294,7 +294,7 @@ func wrapAdministrativeInformation[E any](
 			Wrap[E](
 				theCreator,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -302,56 +302,56 @@ func wrapAdministrativeInformation[E any](
 }
 
 type enhancedQualifier[E any] struct {
-	instance aastypes.IQualifier
+	instance ourtypes.IQualifier
 	enhancement E
 }
 
 func (eq *enhancedQualifier[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eq.instance.ModelType()
 }
 
 func (eq *enhancedQualifier[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eq.instance.DescendOnce(action)
 }
 
 func (eq *enhancedQualifier[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eq.instance.Descend(action)
 }
 
 func (eq *enhancedQualifier[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eq.instance.SemanticID()
 }
 
 func (eq *enhancedQualifier[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eq.instance.SetSemanticID(value)
 }
 
 func (eq *enhancedQualifier[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return eq.instance.SupplementalSemanticIDs()
 }
 
 func (eq *enhancedQualifier[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	eq.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (eq *enhancedQualifier[E]) Kind(
-) *aastypes.QualifierKind {
+) *ourtypes.QualifierKind {
 	return eq.instance.Kind()
 }
 
 func (eq *enhancedQualifier[E]) SetKind(
-	value *aastypes.QualifierKind,
+	value *ourtypes.QualifierKind,
 ) {
 	eq.instance.SetKind(value)
 }
@@ -368,12 +368,12 @@ func (eq *enhancedQualifier[E]) SetType(
 }
 
 func (eq *enhancedQualifier[E]) ValueType(
-) aastypes.DataTypeDefXSD {
+) ourtypes.DataTypeDefXSD {
 	return eq.instance.ValueType()
 }
 
 func (eq *enhancedQualifier[E]) SetValueType(
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) {
 	eq.instance.SetValueType(value)
 }
@@ -390,17 +390,17 @@ func (eq *enhancedQualifier[E]) SetValue(
 }
 
 func (eq *enhancedQualifier[E]) ValueID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eq.instance.ValueID()
 }
 
 func (eq *enhancedQualifier[E]) SetValueID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eq.instance.SetValueID(value)
 }
 
-func (q *enhancedQualifier[E]) KindOrDefault() aastypes.QualifierKind {
+func (q *enhancedQualifier[E]) KindOrDefault() ourtypes.QualifierKind {
 	return q.instance.KindOrDefault()
 }
 
@@ -416,9 +416,9 @@ func (eq *enhancedQualifier[E]) setEnhancement(
 }
 
 func wrapQualifier[E any](
-	that aastypes.IQualifier,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IQualifier) {
+	that ourtypes.IQualifier,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IQualifier) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -438,7 +438,7 @@ func wrapQualifier[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -449,7 +449,7 @@ func wrapQualifier[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -459,7 +459,7 @@ func wrapQualifier[E any](
 			Wrap[E](
 				theValueID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -467,34 +467,34 @@ func wrapQualifier[E any](
 }
 
 type enhancedAssetAdministrationShell[E any] struct {
-	instance aastypes.IAssetAdministrationShell
+	instance ourtypes.IAssetAdministrationShell
 	enhancement E
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eaas.instance.ModelType()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eaas.instance.DescendOnce(action)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eaas.instance.Descend(action)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return eaas.instance.Extensions()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	eaas.instance.SetExtensions(value)
 }
@@ -522,34 +522,34 @@ func (eaas *enhancedAssetAdministrationShell[E]) SetIDShort(
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return eaas.instance.DisplayName()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	eaas.instance.SetDisplayName(value)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return eaas.instance.Description()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	eaas.instance.SetDescription(value)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) Administration(
-) aastypes.IAdministrativeInformation {
+) ourtypes.IAdministrativeInformation {
 	return eaas.instance.Administration()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetAdministration(
-	value aastypes.IAdministrativeInformation,
+	value ourtypes.IAdministrativeInformation,
 ) {
 	eaas.instance.SetAdministration(value)
 }
@@ -566,45 +566,45 @@ func (eaas *enhancedAssetAdministrationShell[E]) SetID(
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return eaas.instance.EmbeddedDataSpecifications()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	eaas.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) DerivedFrom(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eaas.instance.DerivedFrom()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetDerivedFrom(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eaas.instance.SetDerivedFrom(value)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) AssetInformation(
-) aastypes.IAssetInformation {
+) ourtypes.IAssetInformation {
 	return eaas.instance.AssetInformation()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetAssetInformation(
-	value aastypes.IAssetInformation,
+	value ourtypes.IAssetInformation,
 ) {
 	eaas.instance.SetAssetInformation(value)
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) Submodels(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return eaas.instance.Submodels()
 }
 
 func (eaas *enhancedAssetAdministrationShell[E]) SetSubmodels(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	eaas.instance.SetSubmodels(value)
 }
@@ -621,9 +621,9 @@ func (eaas *enhancedAssetAdministrationShell[E]) setEnhancement(
 }
 
 func wrapAssetAdministrationShell[E any](
-	that aastypes.IAssetAdministrationShell,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IAssetAdministrationShell) {
+	that ourtypes.IAssetAdministrationShell,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IAssetAdministrationShell) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -644,7 +644,7 @@ func wrapAssetAdministrationShell[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -655,7 +655,7 @@ func wrapAssetAdministrationShell[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -666,7 +666,7 @@ func wrapAssetAdministrationShell[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -676,7 +676,7 @@ func wrapAssetAdministrationShell[E any](
 			Wrap[E](
 				theAdministration,
 				factory,
-			).(aastypes.IAdministrativeInformation),
+			).(ourtypes.IAdministrativeInformation),
 		)
 	}
 
@@ -687,7 +687,7 @@ func wrapAssetAdministrationShell[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -697,7 +697,7 @@ func wrapAssetAdministrationShell[E any](
 			Wrap[E](
 				theDerivedFrom,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -706,7 +706,7 @@ func wrapAssetAdministrationShell[E any](
 		Wrap[E](
 			theAssetInformation,
 			factory,
-		).(aastypes.IAssetInformation),
+		).(ourtypes.IAssetInformation),
 	)
 
 	theSubmodels := that.Submodels()
@@ -716,7 +716,7 @@ func wrapAssetAdministrationShell[E any](
 			theSubmodels[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -724,34 +724,34 @@ func wrapAssetAdministrationShell[E any](
 }
 
 type enhancedAssetInformation[E any] struct {
-	instance aastypes.IAssetInformation
+	instance ourtypes.IAssetInformation
 	enhancement E
 }
 
 func (eai *enhancedAssetInformation[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eai.instance.ModelType()
 }
 
 func (eai *enhancedAssetInformation[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eai.instance.DescendOnce(action)
 }
 
 func (eai *enhancedAssetInformation[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eai.instance.Descend(action)
 }
 
 func (eai *enhancedAssetInformation[E]) AssetKind(
-) aastypes.AssetKind {
+) ourtypes.AssetKind {
 	return eai.instance.AssetKind()
 }
 
 func (eai *enhancedAssetInformation[E]) SetAssetKind(
-	value aastypes.AssetKind,
+	value ourtypes.AssetKind,
 ) {
 	eai.instance.SetAssetKind(value)
 }
@@ -768,12 +768,12 @@ func (eai *enhancedAssetInformation[E]) SetGlobalAssetID(
 }
 
 func (eai *enhancedAssetInformation[E]) SpecificAssetIDs(
-) []aastypes.ISpecificAssetID {
+) []ourtypes.ISpecificAssetID {
 	return eai.instance.SpecificAssetIDs()
 }
 
 func (eai *enhancedAssetInformation[E]) SetSpecificAssetIDs(
-	value []aastypes.ISpecificAssetID,
+	value []ourtypes.ISpecificAssetID,
 ) {
 	eai.instance.SetSpecificAssetIDs(value)
 }
@@ -790,12 +790,12 @@ func (eai *enhancedAssetInformation[E]) SetAssetType(
 }
 
 func (eai *enhancedAssetInformation[E]) DefaultThumbnail(
-) aastypes.IResource {
+) ourtypes.IResource {
 	return eai.instance.DefaultThumbnail()
 }
 
 func (eai *enhancedAssetInformation[E]) SetDefaultThumbnail(
-	value aastypes.IResource,
+	value ourtypes.IResource,
 ) {
 	eai.instance.SetDefaultThumbnail(value)
 }
@@ -812,9 +812,9 @@ func (eai *enhancedAssetInformation[E]) setEnhancement(
 }
 
 func wrapAssetInformation[E any](
-	that aastypes.IAssetInformation,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IAssetInformation) {
+	that ourtypes.IAssetInformation,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IAssetInformation) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -835,7 +835,7 @@ func wrapAssetInformation[E any](
 			theSpecificAssetIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISpecificAssetID)
+			).(ourtypes.ISpecificAssetID)
 		}
 	}
 
@@ -845,7 +845,7 @@ func wrapAssetInformation[E any](
 			Wrap[E](
 				theDefaultThumbnail,
 				factory,
-			).(aastypes.IResource),
+			).(ourtypes.IResource),
 		)
 	}
 
@@ -853,23 +853,23 @@ func wrapAssetInformation[E any](
 }
 
 type enhancedResource[E any] struct {
-	instance aastypes.IResource
+	instance ourtypes.IResource
 	enhancement E
 }
 
 func (er *enhancedResource[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return er.instance.ModelType()
 }
 
 func (er *enhancedResource[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return er.instance.DescendOnce(action)
 }
 
 func (er *enhancedResource[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return er.instance.Descend(action)
 }
@@ -908,9 +908,9 @@ func (er *enhancedResource[E]) setEnhancement(
 }
 
 func wrapResource[E any](
-	that aastypes.IResource,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IResource) {
+	that ourtypes.IResource,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IResource) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -928,45 +928,45 @@ func wrapResource[E any](
 }
 
 type enhancedSpecificAssetID[E any] struct {
-	instance aastypes.ISpecificAssetID
+	instance ourtypes.ISpecificAssetID
 	enhancement E
 }
 
 func (esai *enhancedSpecificAssetID[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return esai.instance.ModelType()
 }
 
 func (esai *enhancedSpecificAssetID[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return esai.instance.DescendOnce(action)
 }
 
 func (esai *enhancedSpecificAssetID[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return esai.instance.Descend(action)
 }
 
 func (esai *enhancedSpecificAssetID[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return esai.instance.SemanticID()
 }
 
 func (esai *enhancedSpecificAssetID[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	esai.instance.SetSemanticID(value)
 }
 
 func (esai *enhancedSpecificAssetID[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return esai.instance.SupplementalSemanticIDs()
 }
 
 func (esai *enhancedSpecificAssetID[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	esai.instance.SetSupplementalSemanticIDs(value)
 }
@@ -994,12 +994,12 @@ func (esai *enhancedSpecificAssetID[E]) SetValue(
 }
 
 func (esai *enhancedSpecificAssetID[E]) ExternalSubjectID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return esai.instance.ExternalSubjectID()
 }
 
 func (esai *enhancedSpecificAssetID[E]) SetExternalSubjectID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	esai.instance.SetExternalSubjectID(value)
 }
@@ -1016,9 +1016,9 @@ func (esai *enhancedSpecificAssetID[E]) setEnhancement(
 }
 
 func wrapSpecificAssetID[E any](
-	that aastypes.ISpecificAssetID,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISpecificAssetID) {
+	that ourtypes.ISpecificAssetID,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISpecificAssetID) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -1038,7 +1038,7 @@ func wrapSpecificAssetID[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1049,7 +1049,7 @@ func wrapSpecificAssetID[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -1059,7 +1059,7 @@ func wrapSpecificAssetID[E any](
 			Wrap[E](
 				theExternalSubjectID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1067,34 +1067,34 @@ func wrapSpecificAssetID[E any](
 }
 
 type enhancedSubmodel[E any] struct {
-	instance aastypes.ISubmodel
+	instance ourtypes.ISubmodel
 	enhancement E
 }
 
 func (es *enhancedSubmodel[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSubmodel[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSubmodel[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
 
 func (es *enhancedSubmodel[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return es.instance.Extensions()
 }
 
 func (es *enhancedSubmodel[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	es.instance.SetExtensions(value)
 }
@@ -1122,34 +1122,34 @@ func (es *enhancedSubmodel[E]) SetIDShort(
 }
 
 func (es *enhancedSubmodel[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return es.instance.DisplayName()
 }
 
 func (es *enhancedSubmodel[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	es.instance.SetDisplayName(value)
 }
 
 func (es *enhancedSubmodel[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return es.instance.Description()
 }
 
 func (es *enhancedSubmodel[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	es.instance.SetDescription(value)
 }
 
 func (es *enhancedSubmodel[E]) Administration(
-) aastypes.IAdministrativeInformation {
+) ourtypes.IAdministrativeInformation {
 	return es.instance.Administration()
 }
 
 func (es *enhancedSubmodel[E]) SetAdministration(
-	value aastypes.IAdministrativeInformation,
+	value ourtypes.IAdministrativeInformation,
 ) {
 	es.instance.SetAdministration(value)
 }
@@ -1166,72 +1166,72 @@ func (es *enhancedSubmodel[E]) SetID(
 }
 
 func (es *enhancedSubmodel[E]) Kind(
-) *aastypes.ModellingKind {
+) *ourtypes.ModellingKind {
 	return es.instance.Kind()
 }
 
 func (es *enhancedSubmodel[E]) SetKind(
-	value *aastypes.ModellingKind,
+	value *ourtypes.ModellingKind,
 ) {
 	es.instance.SetKind(value)
 }
 
 func (es *enhancedSubmodel[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return es.instance.SemanticID()
 }
 
 func (es *enhancedSubmodel[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	es.instance.SetSemanticID(value)
 }
 
 func (es *enhancedSubmodel[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return es.instance.SupplementalSemanticIDs()
 }
 
 func (es *enhancedSubmodel[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	es.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (es *enhancedSubmodel[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return es.instance.Qualifiers()
 }
 
 func (es *enhancedSubmodel[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	es.instance.SetQualifiers(value)
 }
 
 func (es *enhancedSubmodel[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return es.instance.EmbeddedDataSpecifications()
 }
 
 func (es *enhancedSubmodel[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	es.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (es *enhancedSubmodel[E]) SubmodelElements(
-) []aastypes.ISubmodelElement {
+) []ourtypes.ISubmodelElement {
 	return es.instance.SubmodelElements()
 }
 
 func (es *enhancedSubmodel[E]) SetSubmodelElements(
-	value []aastypes.ISubmodelElement,
+	value []ourtypes.ISubmodelElement,
 ) {
 	es.instance.SetSubmodelElements(value)
 }
 
-func (s *enhancedSubmodel[E]) KindOrDefault() aastypes.ModellingKind {
+func (s *enhancedSubmodel[E]) KindOrDefault() ourtypes.ModellingKind {
 	return s.instance.KindOrDefault()
 }
 
@@ -1247,9 +1247,9 @@ func (es *enhancedSubmodel[E]) setEnhancement(
 }
 
 func wrapSubmodel[E any](
-	that aastypes.ISubmodel,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISubmodel) {
+	that ourtypes.ISubmodel,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISubmodel) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -1270,7 +1270,7 @@ func wrapSubmodel[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -1281,7 +1281,7 @@ func wrapSubmodel[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -1292,7 +1292,7 @@ func wrapSubmodel[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -1302,7 +1302,7 @@ func wrapSubmodel[E any](
 			Wrap[E](
 				theAdministration,
 				factory,
-			).(aastypes.IAdministrativeInformation),
+			).(ourtypes.IAdministrativeInformation),
 		)
 	}
 
@@ -1312,7 +1312,7 @@ func wrapSubmodel[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1323,7 +1323,7 @@ func wrapSubmodel[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -1334,7 +1334,7 @@ func wrapSubmodel[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -1345,7 +1345,7 @@ func wrapSubmodel[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -1356,7 +1356,7 @@ func wrapSubmodel[E any](
 			theSubmodelElements[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISubmodelElement)
+			).(ourtypes.ISubmodelElement)
 		}
 	}
 
@@ -1364,34 +1364,34 @@ func wrapSubmodel[E any](
 }
 
 type enhancedRelationshipElement[E any] struct {
-	instance aastypes.IRelationshipElement
+	instance ourtypes.IRelationshipElement
 	enhancement E
 }
 
 func (ere *enhancedRelationshipElement[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ere.instance.ModelType()
 }
 
 func (ere *enhancedRelationshipElement[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ere.instance.DescendOnce(action)
 }
 
 func (ere *enhancedRelationshipElement[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ere.instance.Descend(action)
 }
 
 func (ere *enhancedRelationshipElement[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ere.instance.Extensions()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ere.instance.SetExtensions(value)
 }
@@ -1419,89 +1419,89 @@ func (ere *enhancedRelationshipElement[E]) SetIDShort(
 }
 
 func (ere *enhancedRelationshipElement[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ere.instance.DisplayName()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ere.instance.SetDisplayName(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ere.instance.Description()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ere.instance.SetDescription(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ere.instance.SemanticID()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ere.instance.SetSemanticID(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ere.instance.SupplementalSemanticIDs()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ere.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ere.instance.Qualifiers()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ere.instance.SetQualifiers(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ere.instance.EmbeddedDataSpecifications()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ere.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) First(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ere.instance.First()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetFirst(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ere.instance.SetFirst(value)
 }
 
 func (ere *enhancedRelationshipElement[E]) Second(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ere.instance.Second()
 }
 
 func (ere *enhancedRelationshipElement[E]) SetSecond(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ere.instance.SetSecond(value)
 }
@@ -1518,9 +1518,9 @@ func (ere *enhancedRelationshipElement[E]) setEnhancement(
 }
 
 func wrapRelationshipElement[E any](
-	that aastypes.IRelationshipElement,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IRelationshipElement) {
+	that ourtypes.IRelationshipElement,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IRelationshipElement) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -1541,7 +1541,7 @@ func wrapRelationshipElement[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -1552,7 +1552,7 @@ func wrapRelationshipElement[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -1563,7 +1563,7 @@ func wrapRelationshipElement[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -1573,7 +1573,7 @@ func wrapRelationshipElement[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1584,7 +1584,7 @@ func wrapRelationshipElement[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -1595,7 +1595,7 @@ func wrapRelationshipElement[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -1606,7 +1606,7 @@ func wrapRelationshipElement[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -1615,7 +1615,7 @@ func wrapRelationshipElement[E any](
 		Wrap[E](
 			theFirst,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theSecond := that.Second()
@@ -1623,41 +1623,41 @@ func wrapRelationshipElement[E any](
 		Wrap[E](
 			theSecond,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	return
 }
 
 type enhancedSubmodelElementList[E any] struct {
-	instance aastypes.ISubmodelElementList
+	instance ourtypes.ISubmodelElementList
 	enhancement E
 }
 
 func (esel *enhancedSubmodelElementList[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return esel.instance.ModelType()
 }
 
 func (esel *enhancedSubmodelElementList[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return esel.instance.DescendOnce(action)
 }
 
 func (esel *enhancedSubmodelElementList[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return esel.instance.Descend(action)
 }
 
 func (esel *enhancedSubmodelElementList[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return esel.instance.Extensions()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	esel.instance.SetExtensions(value)
 }
@@ -1685,67 +1685,67 @@ func (esel *enhancedSubmodelElementList[E]) SetIDShort(
 }
 
 func (esel *enhancedSubmodelElementList[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return esel.instance.DisplayName()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	esel.instance.SetDisplayName(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return esel.instance.Description()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	esel.instance.SetDescription(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return esel.instance.SemanticID()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	esel.instance.SetSemanticID(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return esel.instance.SupplementalSemanticIDs()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	esel.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return esel.instance.Qualifiers()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	esel.instance.SetQualifiers(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return esel.instance.EmbeddedDataSpecifications()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	esel.instance.SetEmbeddedDataSpecifications(value)
 }
@@ -1762,45 +1762,45 @@ func (esel *enhancedSubmodelElementList[E]) SetOrderRelevant(
 }
 
 func (esel *enhancedSubmodelElementList[E]) SemanticIDListElement(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return esel.instance.SemanticIDListElement()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetSemanticIDListElement(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	esel.instance.SetSemanticIDListElement(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) TypeValueListElement(
-) aastypes.AASSubmodelElements {
+) ourtypes.AASSubmodelElements {
 	return esel.instance.TypeValueListElement()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetTypeValueListElement(
-	value aastypes.AASSubmodelElements,
+	value ourtypes.AASSubmodelElements,
 ) {
 	esel.instance.SetTypeValueListElement(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) ValueTypeListElement(
-) *aastypes.DataTypeDefXSD {
+) *ourtypes.DataTypeDefXSD {
 	return esel.instance.ValueTypeListElement()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetValueTypeListElement(
-	value *aastypes.DataTypeDefXSD,
+	value *ourtypes.DataTypeDefXSD,
 ) {
 	esel.instance.SetValueTypeListElement(value)
 }
 
 func (esel *enhancedSubmodelElementList[E]) Value(
-) []aastypes.ISubmodelElement {
+) []ourtypes.ISubmodelElement {
 	return esel.instance.Value()
 }
 
 func (esel *enhancedSubmodelElementList[E]) SetValue(
-	value []aastypes.ISubmodelElement,
+	value []ourtypes.ISubmodelElement,
 ) {
 	esel.instance.SetValue(value)
 }
@@ -1821,9 +1821,9 @@ func (esel *enhancedSubmodelElementList[E]) setEnhancement(
 }
 
 func wrapSubmodelElementList[E any](
-	that aastypes.ISubmodelElementList,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISubmodelElementList) {
+	that ourtypes.ISubmodelElementList,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISubmodelElementList) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -1844,7 +1844,7 @@ func wrapSubmodelElementList[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -1855,7 +1855,7 @@ func wrapSubmodelElementList[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -1866,7 +1866,7 @@ func wrapSubmodelElementList[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -1876,7 +1876,7 @@ func wrapSubmodelElementList[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1887,7 +1887,7 @@ func wrapSubmodelElementList[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -1898,7 +1898,7 @@ func wrapSubmodelElementList[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -1909,7 +1909,7 @@ func wrapSubmodelElementList[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -1919,7 +1919,7 @@ func wrapSubmodelElementList[E any](
 			Wrap[E](
 				theSemanticIDListElement,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -1930,7 +1930,7 @@ func wrapSubmodelElementList[E any](
 			theValue[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISubmodelElement)
+			).(ourtypes.ISubmodelElement)
 		}
 	}
 
@@ -1938,34 +1938,34 @@ func wrapSubmodelElementList[E any](
 }
 
 type enhancedSubmodelElementCollection[E any] struct {
-	instance aastypes.ISubmodelElementCollection
+	instance ourtypes.ISubmodelElementCollection
 	enhancement E
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return esec.instance.ModelType()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return esec.instance.DescendOnce(action)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return esec.instance.Descend(action)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return esec.instance.Extensions()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	esec.instance.SetExtensions(value)
 }
@@ -1993,78 +1993,78 @@ func (esec *enhancedSubmodelElementCollection[E]) SetIDShort(
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return esec.instance.DisplayName()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	esec.instance.SetDisplayName(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return esec.instance.Description()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	esec.instance.SetDescription(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return esec.instance.SemanticID()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	esec.instance.SetSemanticID(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return esec.instance.SupplementalSemanticIDs()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	esec.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return esec.instance.Qualifiers()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	esec.instance.SetQualifiers(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return esec.instance.EmbeddedDataSpecifications()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	esec.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) Value(
-) []aastypes.ISubmodelElement {
+) []ourtypes.ISubmodelElement {
 	return esec.instance.Value()
 }
 
 func (esec *enhancedSubmodelElementCollection[E]) SetValue(
-	value []aastypes.ISubmodelElement,
+	value []ourtypes.ISubmodelElement,
 ) {
 	esec.instance.SetValue(value)
 }
@@ -2081,9 +2081,9 @@ func (esec *enhancedSubmodelElementCollection[E]) setEnhancement(
 }
 
 func wrapSubmodelElementCollection[E any](
-	that aastypes.ISubmodelElementCollection,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISubmodelElementCollection) {
+	that ourtypes.ISubmodelElementCollection,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISubmodelElementCollection) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -2104,7 +2104,7 @@ func wrapSubmodelElementCollection[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -2115,7 +2115,7 @@ func wrapSubmodelElementCollection[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -2126,7 +2126,7 @@ func wrapSubmodelElementCollection[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -2136,7 +2136,7 @@ func wrapSubmodelElementCollection[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2147,7 +2147,7 @@ func wrapSubmodelElementCollection[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -2158,7 +2158,7 @@ func wrapSubmodelElementCollection[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -2169,7 +2169,7 @@ func wrapSubmodelElementCollection[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -2180,7 +2180,7 @@ func wrapSubmodelElementCollection[E any](
 			theValue[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISubmodelElement)
+			).(ourtypes.ISubmodelElement)
 		}
 	}
 
@@ -2188,34 +2188,34 @@ func wrapSubmodelElementCollection[E any](
 }
 
 type enhancedProperty[E any] struct {
-	instance aastypes.IProperty
+	instance ourtypes.IProperty
 	enhancement E
 }
 
 func (ep *enhancedProperty[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ep.instance.ModelType()
 }
 
 func (ep *enhancedProperty[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ep.instance.DescendOnce(action)
 }
 
 func (ep *enhancedProperty[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ep.instance.Descend(action)
 }
 
 func (ep *enhancedProperty[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ep.instance.Extensions()
 }
 
 func (ep *enhancedProperty[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ep.instance.SetExtensions(value)
 }
@@ -2243,78 +2243,78 @@ func (ep *enhancedProperty[E]) SetIDShort(
 }
 
 func (ep *enhancedProperty[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ep.instance.DisplayName()
 }
 
 func (ep *enhancedProperty[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ep.instance.SetDisplayName(value)
 }
 
 func (ep *enhancedProperty[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ep.instance.Description()
 }
 
 func (ep *enhancedProperty[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ep.instance.SetDescription(value)
 }
 
 func (ep *enhancedProperty[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ep.instance.SemanticID()
 }
 
 func (ep *enhancedProperty[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ep.instance.SetSemanticID(value)
 }
 
 func (ep *enhancedProperty[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ep.instance.SupplementalSemanticIDs()
 }
 
 func (ep *enhancedProperty[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ep.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ep *enhancedProperty[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ep.instance.Qualifiers()
 }
 
 func (ep *enhancedProperty[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ep.instance.SetQualifiers(value)
 }
 
 func (ep *enhancedProperty[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ep.instance.EmbeddedDataSpecifications()
 }
 
 func (ep *enhancedProperty[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ep.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ep *enhancedProperty[E]) ValueType(
-) aastypes.DataTypeDefXSD {
+) ourtypes.DataTypeDefXSD {
 	return ep.instance.ValueType()
 }
 
 func (ep *enhancedProperty[E]) SetValueType(
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) {
 	ep.instance.SetValueType(value)
 }
@@ -2331,12 +2331,12 @@ func (ep *enhancedProperty[E]) SetValue(
 }
 
 func (ep *enhancedProperty[E]) ValueID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ep.instance.ValueID()
 }
 
 func (ep *enhancedProperty[E]) SetValueID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ep.instance.SetValueID(value)
 }
@@ -2357,9 +2357,9 @@ func (ep *enhancedProperty[E]) setEnhancement(
 }
 
 func wrapProperty[E any](
-	that aastypes.IProperty,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IProperty) {
+	that ourtypes.IProperty,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IProperty) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -2380,7 +2380,7 @@ func wrapProperty[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -2391,7 +2391,7 @@ func wrapProperty[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -2402,7 +2402,7 @@ func wrapProperty[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -2412,7 +2412,7 @@ func wrapProperty[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2423,7 +2423,7 @@ func wrapProperty[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -2434,7 +2434,7 @@ func wrapProperty[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -2445,7 +2445,7 @@ func wrapProperty[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -2455,7 +2455,7 @@ func wrapProperty[E any](
 			Wrap[E](
 				theValueID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2463,34 +2463,34 @@ func wrapProperty[E any](
 }
 
 type enhancedMultiLanguageProperty[E any] struct {
-	instance aastypes.IMultiLanguageProperty
+	instance ourtypes.IMultiLanguageProperty
 	enhancement E
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return emlp.instance.ModelType()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return emlp.instance.DescendOnce(action)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return emlp.instance.Descend(action)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return emlp.instance.Extensions()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	emlp.instance.SetExtensions(value)
 }
@@ -2518,89 +2518,89 @@ func (emlp *enhancedMultiLanguageProperty[E]) SetIDShort(
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return emlp.instance.DisplayName()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	emlp.instance.SetDisplayName(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return emlp.instance.Description()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	emlp.instance.SetDescription(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return emlp.instance.SemanticID()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	emlp.instance.SetSemanticID(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return emlp.instance.SupplementalSemanticIDs()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	emlp.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return emlp.instance.Qualifiers()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	emlp.instance.SetQualifiers(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return emlp.instance.EmbeddedDataSpecifications()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	emlp.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) Value(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return emlp.instance.Value()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetValue(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	emlp.instance.SetValue(value)
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) ValueID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return emlp.instance.ValueID()
 }
 
 func (emlp *enhancedMultiLanguageProperty[E]) SetValueID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	emlp.instance.SetValueID(value)
 }
@@ -2621,9 +2621,9 @@ func (emlp *enhancedMultiLanguageProperty[E]) setEnhancement(
 }
 
 func wrapMultiLanguageProperty[E any](
-	that aastypes.IMultiLanguageProperty,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IMultiLanguageProperty) {
+	that ourtypes.IMultiLanguageProperty,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IMultiLanguageProperty) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -2644,7 +2644,7 @@ func wrapMultiLanguageProperty[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -2655,7 +2655,7 @@ func wrapMultiLanguageProperty[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -2666,7 +2666,7 @@ func wrapMultiLanguageProperty[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -2676,7 +2676,7 @@ func wrapMultiLanguageProperty[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2687,7 +2687,7 @@ func wrapMultiLanguageProperty[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -2698,7 +2698,7 @@ func wrapMultiLanguageProperty[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -2709,7 +2709,7 @@ func wrapMultiLanguageProperty[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -2720,7 +2720,7 @@ func wrapMultiLanguageProperty[E any](
 			theValue[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -2730,7 +2730,7 @@ func wrapMultiLanguageProperty[E any](
 			Wrap[E](
 				theValueID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2738,34 +2738,34 @@ func wrapMultiLanguageProperty[E any](
 }
 
 type enhancedRange[E any] struct {
-	instance aastypes.IRange
+	instance ourtypes.IRange
 	enhancement E
 }
 
 func (er *enhancedRange[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return er.instance.ModelType()
 }
 
 func (er *enhancedRange[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return er.instance.DescendOnce(action)
 }
 
 func (er *enhancedRange[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return er.instance.Descend(action)
 }
 
 func (er *enhancedRange[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return er.instance.Extensions()
 }
 
 func (er *enhancedRange[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	er.instance.SetExtensions(value)
 }
@@ -2793,78 +2793,78 @@ func (er *enhancedRange[E]) SetIDShort(
 }
 
 func (er *enhancedRange[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return er.instance.DisplayName()
 }
 
 func (er *enhancedRange[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	er.instance.SetDisplayName(value)
 }
 
 func (er *enhancedRange[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return er.instance.Description()
 }
 
 func (er *enhancedRange[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	er.instance.SetDescription(value)
 }
 
 func (er *enhancedRange[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return er.instance.SemanticID()
 }
 
 func (er *enhancedRange[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	er.instance.SetSemanticID(value)
 }
 
 func (er *enhancedRange[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return er.instance.SupplementalSemanticIDs()
 }
 
 func (er *enhancedRange[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	er.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (er *enhancedRange[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return er.instance.Qualifiers()
 }
 
 func (er *enhancedRange[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	er.instance.SetQualifiers(value)
 }
 
 func (er *enhancedRange[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return er.instance.EmbeddedDataSpecifications()
 }
 
 func (er *enhancedRange[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	er.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (er *enhancedRange[E]) ValueType(
-) aastypes.DataTypeDefXSD {
+) ourtypes.DataTypeDefXSD {
 	return er.instance.ValueType()
 }
 
 func (er *enhancedRange[E]) SetValueType(
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) {
 	er.instance.SetValueType(value)
 }
@@ -2907,9 +2907,9 @@ func (er *enhancedRange[E]) setEnhancement(
 }
 
 func wrapRange[E any](
-	that aastypes.IRange,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IRange) {
+	that ourtypes.IRange,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IRange) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -2930,7 +2930,7 @@ func wrapRange[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -2941,7 +2941,7 @@ func wrapRange[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -2952,7 +2952,7 @@ func wrapRange[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -2962,7 +2962,7 @@ func wrapRange[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -2973,7 +2973,7 @@ func wrapRange[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -2984,7 +2984,7 @@ func wrapRange[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -2995,7 +2995,7 @@ func wrapRange[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -3003,34 +3003,34 @@ func wrapRange[E any](
 }
 
 type enhancedReferenceElement[E any] struct {
-	instance aastypes.IReferenceElement
+	instance ourtypes.IReferenceElement
 	enhancement E
 }
 
 func (ere *enhancedReferenceElement[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ere.instance.ModelType()
 }
 
 func (ere *enhancedReferenceElement[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ere.instance.DescendOnce(action)
 }
 
 func (ere *enhancedReferenceElement[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ere.instance.Descend(action)
 }
 
 func (ere *enhancedReferenceElement[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ere.instance.Extensions()
 }
 
 func (ere *enhancedReferenceElement[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ere.instance.SetExtensions(value)
 }
@@ -3058,78 +3058,78 @@ func (ere *enhancedReferenceElement[E]) SetIDShort(
 }
 
 func (ere *enhancedReferenceElement[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ere.instance.DisplayName()
 }
 
 func (ere *enhancedReferenceElement[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ere.instance.SetDisplayName(value)
 }
 
 func (ere *enhancedReferenceElement[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ere.instance.Description()
 }
 
 func (ere *enhancedReferenceElement[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ere.instance.SetDescription(value)
 }
 
 func (ere *enhancedReferenceElement[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ere.instance.SemanticID()
 }
 
 func (ere *enhancedReferenceElement[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ere.instance.SetSemanticID(value)
 }
 
 func (ere *enhancedReferenceElement[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ere.instance.SupplementalSemanticIDs()
 }
 
 func (ere *enhancedReferenceElement[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ere.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ere *enhancedReferenceElement[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ere.instance.Qualifiers()
 }
 
 func (ere *enhancedReferenceElement[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ere.instance.SetQualifiers(value)
 }
 
 func (ere *enhancedReferenceElement[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ere.instance.EmbeddedDataSpecifications()
 }
 
 func (ere *enhancedReferenceElement[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ere.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ere *enhancedReferenceElement[E]) Value(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ere.instance.Value()
 }
 
 func (ere *enhancedReferenceElement[E]) SetValue(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ere.instance.SetValue(value)
 }
@@ -3150,9 +3150,9 @@ func (ere *enhancedReferenceElement[E]) setEnhancement(
 }
 
 func wrapReferenceElement[E any](
-	that aastypes.IReferenceElement,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IReferenceElement) {
+	that ourtypes.IReferenceElement,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IReferenceElement) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -3173,7 +3173,7 @@ func wrapReferenceElement[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -3184,7 +3184,7 @@ func wrapReferenceElement[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -3195,7 +3195,7 @@ func wrapReferenceElement[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -3205,7 +3205,7 @@ func wrapReferenceElement[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -3216,7 +3216,7 @@ func wrapReferenceElement[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -3227,7 +3227,7 @@ func wrapReferenceElement[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -3238,7 +3238,7 @@ func wrapReferenceElement[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -3248,7 +3248,7 @@ func wrapReferenceElement[E any](
 			Wrap[E](
 				theValue,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -3256,34 +3256,34 @@ func wrapReferenceElement[E any](
 }
 
 type enhancedBlob[E any] struct {
-	instance aastypes.IBlob
+	instance ourtypes.IBlob
 	enhancement E
 }
 
 func (eb *enhancedBlob[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eb.instance.ModelType()
 }
 
 func (eb *enhancedBlob[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eb.instance.DescendOnce(action)
 }
 
 func (eb *enhancedBlob[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eb.instance.Descend(action)
 }
 
 func (eb *enhancedBlob[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return eb.instance.Extensions()
 }
 
 func (eb *enhancedBlob[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	eb.instance.SetExtensions(value)
 }
@@ -3311,67 +3311,67 @@ func (eb *enhancedBlob[E]) SetIDShort(
 }
 
 func (eb *enhancedBlob[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return eb.instance.DisplayName()
 }
 
 func (eb *enhancedBlob[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	eb.instance.SetDisplayName(value)
 }
 
 func (eb *enhancedBlob[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return eb.instance.Description()
 }
 
 func (eb *enhancedBlob[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	eb.instance.SetDescription(value)
 }
 
 func (eb *enhancedBlob[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eb.instance.SemanticID()
 }
 
 func (eb *enhancedBlob[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eb.instance.SetSemanticID(value)
 }
 
 func (eb *enhancedBlob[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return eb.instance.SupplementalSemanticIDs()
 }
 
 func (eb *enhancedBlob[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	eb.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (eb *enhancedBlob[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return eb.instance.Qualifiers()
 }
 
 func (eb *enhancedBlob[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	eb.instance.SetQualifiers(value)
 }
 
 func (eb *enhancedBlob[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return eb.instance.EmbeddedDataSpecifications()
 }
 
 func (eb *enhancedBlob[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	eb.instance.SetEmbeddedDataSpecifications(value)
 }
@@ -3414,9 +3414,9 @@ func (eb *enhancedBlob[E]) setEnhancement(
 }
 
 func wrapBlob[E any](
-	that aastypes.IBlob,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IBlob) {
+	that ourtypes.IBlob,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IBlob) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -3437,7 +3437,7 @@ func wrapBlob[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -3448,7 +3448,7 @@ func wrapBlob[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -3459,7 +3459,7 @@ func wrapBlob[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -3469,7 +3469,7 @@ func wrapBlob[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -3480,7 +3480,7 @@ func wrapBlob[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -3491,7 +3491,7 @@ func wrapBlob[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -3502,7 +3502,7 @@ func wrapBlob[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -3510,34 +3510,34 @@ func wrapBlob[E any](
 }
 
 type enhancedFile[E any] struct {
-	instance aastypes.IFile
+	instance ourtypes.IFile
 	enhancement E
 }
 
 func (ef *enhancedFile[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ef.instance.ModelType()
 }
 
 func (ef *enhancedFile[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ef.instance.DescendOnce(action)
 }
 
 func (ef *enhancedFile[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ef.instance.Descend(action)
 }
 
 func (ef *enhancedFile[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ef.instance.Extensions()
 }
 
 func (ef *enhancedFile[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ef.instance.SetExtensions(value)
 }
@@ -3565,67 +3565,67 @@ func (ef *enhancedFile[E]) SetIDShort(
 }
 
 func (ef *enhancedFile[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ef.instance.DisplayName()
 }
 
 func (ef *enhancedFile[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ef.instance.SetDisplayName(value)
 }
 
 func (ef *enhancedFile[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ef.instance.Description()
 }
 
 func (ef *enhancedFile[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ef.instance.SetDescription(value)
 }
 
 func (ef *enhancedFile[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ef.instance.SemanticID()
 }
 
 func (ef *enhancedFile[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ef.instance.SetSemanticID(value)
 }
 
 func (ef *enhancedFile[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ef.instance.SupplementalSemanticIDs()
 }
 
 func (ef *enhancedFile[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ef.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ef *enhancedFile[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ef.instance.Qualifiers()
 }
 
 func (ef *enhancedFile[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ef.instance.SetQualifiers(value)
 }
 
 func (ef *enhancedFile[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ef.instance.EmbeddedDataSpecifications()
 }
 
 func (ef *enhancedFile[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ef.instance.SetEmbeddedDataSpecifications(value)
 }
@@ -3668,9 +3668,9 @@ func (ef *enhancedFile[E]) setEnhancement(
 }
 
 func wrapFile[E any](
-	that aastypes.IFile,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IFile) {
+	that ourtypes.IFile,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IFile) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -3691,7 +3691,7 @@ func wrapFile[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -3702,7 +3702,7 @@ func wrapFile[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -3713,7 +3713,7 @@ func wrapFile[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -3723,7 +3723,7 @@ func wrapFile[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -3734,7 +3734,7 @@ func wrapFile[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -3745,7 +3745,7 @@ func wrapFile[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -3756,7 +3756,7 @@ func wrapFile[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -3764,34 +3764,34 @@ func wrapFile[E any](
 }
 
 type enhancedAnnotatedRelationshipElement[E any] struct {
-	instance aastypes.IAnnotatedRelationshipElement
+	instance ourtypes.IAnnotatedRelationshipElement
 	enhancement E
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eare.instance.ModelType()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eare.instance.DescendOnce(action)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eare.instance.Descend(action)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return eare.instance.Extensions()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	eare.instance.SetExtensions(value)
 }
@@ -3819,100 +3819,100 @@ func (eare *enhancedAnnotatedRelationshipElement[E]) SetIDShort(
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return eare.instance.DisplayName()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	eare.instance.SetDisplayName(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return eare.instance.Description()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	eare.instance.SetDescription(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eare.instance.SemanticID()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eare.instance.SetSemanticID(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return eare.instance.SupplementalSemanticIDs()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	eare.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return eare.instance.Qualifiers()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	eare.instance.SetQualifiers(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return eare.instance.EmbeddedDataSpecifications()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	eare.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) First(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eare.instance.First()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetFirst(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eare.instance.SetFirst(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Second(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eare.instance.Second()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetSecond(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eare.instance.SetSecond(value)
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) Annotations(
-) []aastypes.IDataElement {
+) []ourtypes.IDataElement {
 	return eare.instance.Annotations()
 }
 
 func (eare *enhancedAnnotatedRelationshipElement[E]) SetAnnotations(
-	value []aastypes.IDataElement,
+	value []ourtypes.IDataElement,
 ) {
 	eare.instance.SetAnnotations(value)
 }
@@ -3929,9 +3929,9 @@ func (eare *enhancedAnnotatedRelationshipElement[E]) setEnhancement(
 }
 
 func wrapAnnotatedRelationshipElement[E any](
-	that aastypes.IAnnotatedRelationshipElement,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IAnnotatedRelationshipElement) {
+	that ourtypes.IAnnotatedRelationshipElement,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IAnnotatedRelationshipElement) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -3952,7 +3952,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -3963,7 +3963,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -3974,7 +3974,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -3984,7 +3984,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -3995,7 +3995,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -4006,7 +4006,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -4017,7 +4017,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -4026,7 +4026,7 @@ func wrapAnnotatedRelationshipElement[E any](
 		Wrap[E](
 			theFirst,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theSecond := that.Second()
@@ -4034,7 +4034,7 @@ func wrapAnnotatedRelationshipElement[E any](
 		Wrap[E](
 			theSecond,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theAnnotations := that.Annotations()
@@ -4044,7 +4044,7 @@ func wrapAnnotatedRelationshipElement[E any](
 			theAnnotations[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IDataElement)
+			).(ourtypes.IDataElement)
 		}
 	}
 
@@ -4052,34 +4052,34 @@ func wrapAnnotatedRelationshipElement[E any](
 }
 
 type enhancedEntity[E any] struct {
-	instance aastypes.IEntity
+	instance ourtypes.IEntity
 	enhancement E
 }
 
 func (ee *enhancedEntity[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ee.instance.ModelType()
 }
 
 func (ee *enhancedEntity[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ee.instance.DescendOnce(action)
 }
 
 func (ee *enhancedEntity[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ee.instance.Descend(action)
 }
 
 func (ee *enhancedEntity[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ee.instance.Extensions()
 }
 
 func (ee *enhancedEntity[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ee.instance.SetExtensions(value)
 }
@@ -4107,89 +4107,89 @@ func (ee *enhancedEntity[E]) SetIDShort(
 }
 
 func (ee *enhancedEntity[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ee.instance.DisplayName()
 }
 
 func (ee *enhancedEntity[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ee.instance.SetDisplayName(value)
 }
 
 func (ee *enhancedEntity[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ee.instance.Description()
 }
 
 func (ee *enhancedEntity[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ee.instance.SetDescription(value)
 }
 
 func (ee *enhancedEntity[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ee.instance.SemanticID()
 }
 
 func (ee *enhancedEntity[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ee.instance.SetSemanticID(value)
 }
 
 func (ee *enhancedEntity[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ee.instance.SupplementalSemanticIDs()
 }
 
 func (ee *enhancedEntity[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ee.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ee *enhancedEntity[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ee.instance.Qualifiers()
 }
 
 func (ee *enhancedEntity[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ee.instance.SetQualifiers(value)
 }
 
 func (ee *enhancedEntity[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ee.instance.EmbeddedDataSpecifications()
 }
 
 func (ee *enhancedEntity[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ee.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ee *enhancedEntity[E]) Statements(
-) []aastypes.ISubmodelElement {
+) []ourtypes.ISubmodelElement {
 	return ee.instance.Statements()
 }
 
 func (ee *enhancedEntity[E]) SetStatements(
-	value []aastypes.ISubmodelElement,
+	value []ourtypes.ISubmodelElement,
 ) {
 	ee.instance.SetStatements(value)
 }
 
 func (ee *enhancedEntity[E]) EntityType(
-) aastypes.EntityType {
+) ourtypes.EntityType {
 	return ee.instance.EntityType()
 }
 
 func (ee *enhancedEntity[E]) SetEntityType(
-	value aastypes.EntityType,
+	value ourtypes.EntityType,
 ) {
 	ee.instance.SetEntityType(value)
 }
@@ -4206,12 +4206,12 @@ func (ee *enhancedEntity[E]) SetGlobalAssetID(
 }
 
 func (ee *enhancedEntity[E]) SpecificAssetIDs(
-) []aastypes.ISpecificAssetID {
+) []ourtypes.ISpecificAssetID {
 	return ee.instance.SpecificAssetIDs()
 }
 
 func (ee *enhancedEntity[E]) SetSpecificAssetIDs(
-	value []aastypes.ISpecificAssetID,
+	value []ourtypes.ISpecificAssetID,
 ) {
 	ee.instance.SetSpecificAssetIDs(value)
 }
@@ -4228,9 +4228,9 @@ func (ee *enhancedEntity[E]) setEnhancement(
 }
 
 func wrapEntity[E any](
-	that aastypes.IEntity,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IEntity) {
+	that ourtypes.IEntity,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IEntity) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -4251,7 +4251,7 @@ func wrapEntity[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -4262,7 +4262,7 @@ func wrapEntity[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -4273,7 +4273,7 @@ func wrapEntity[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -4283,7 +4283,7 @@ func wrapEntity[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4294,7 +4294,7 @@ func wrapEntity[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -4305,7 +4305,7 @@ func wrapEntity[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -4316,7 +4316,7 @@ func wrapEntity[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -4327,7 +4327,7 @@ func wrapEntity[E any](
 			theStatements[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISubmodelElement)
+			).(ourtypes.ISubmodelElement)
 		}
 	}
 
@@ -4338,7 +4338,7 @@ func wrapEntity[E any](
 			theSpecificAssetIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISpecificAssetID)
+			).(ourtypes.ISpecificAssetID)
 		}
 	}
 
@@ -4346,67 +4346,67 @@ func wrapEntity[E any](
 }
 
 type enhancedEventPayload[E any] struct {
-	instance aastypes.IEventPayload
+	instance ourtypes.IEventPayload
 	enhancement E
 }
 
 func (eep *enhancedEventPayload[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eep.instance.ModelType()
 }
 
 func (eep *enhancedEventPayload[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eep.instance.DescendOnce(action)
 }
 
 func (eep *enhancedEventPayload[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eep.instance.Descend(action)
 }
 
 func (eep *enhancedEventPayload[E]) Source(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eep.instance.Source()
 }
 
 func (eep *enhancedEventPayload[E]) SetSource(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eep.instance.SetSource(value)
 }
 
 func (eep *enhancedEventPayload[E]) SourceSemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eep.instance.SourceSemanticID()
 }
 
 func (eep *enhancedEventPayload[E]) SetSourceSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eep.instance.SetSourceSemanticID(value)
 }
 
 func (eep *enhancedEventPayload[E]) ObservableReference(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eep.instance.ObservableReference()
 }
 
 func (eep *enhancedEventPayload[E]) SetObservableReference(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eep.instance.SetObservableReference(value)
 }
 
 func (eep *enhancedEventPayload[E]) ObservableSemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eep.instance.ObservableSemanticID()
 }
 
 func (eep *enhancedEventPayload[E]) SetObservableSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eep.instance.SetObservableSemanticID(value)
 }
@@ -4423,12 +4423,12 @@ func (eep *enhancedEventPayload[E]) SetTopic(
 }
 
 func (eep *enhancedEventPayload[E]) SubjectID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eep.instance.SubjectID()
 }
 
 func (eep *enhancedEventPayload[E]) SetSubjectID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eep.instance.SetSubjectID(value)
 }
@@ -4467,9 +4467,9 @@ func (eep *enhancedEventPayload[E]) setEnhancement(
 }
 
 func wrapEventPayload[E any](
-	that aastypes.IEventPayload,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IEventPayload) {
+	that ourtypes.IEventPayload,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IEventPayload) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -4488,7 +4488,7 @@ func wrapEventPayload[E any](
 		Wrap[E](
 			theSource,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theSourceSemanticID := that.SourceSemanticID()
@@ -4497,7 +4497,7 @@ func wrapEventPayload[E any](
 			Wrap[E](
 				theSourceSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4506,7 +4506,7 @@ func wrapEventPayload[E any](
 		Wrap[E](
 			theObservableReference,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theObservableSemanticID := that.ObservableSemanticID()
@@ -4515,7 +4515,7 @@ func wrapEventPayload[E any](
 			Wrap[E](
 				theObservableSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4525,7 +4525,7 @@ func wrapEventPayload[E any](
 			Wrap[E](
 				theSubjectID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4533,34 +4533,34 @@ func wrapEventPayload[E any](
 }
 
 type enhancedBasicEventElement[E any] struct {
-	instance aastypes.IBasicEventElement
+	instance ourtypes.IBasicEventElement
 	enhancement E
 }
 
 func (ebee *enhancedBasicEventElement[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ebee.instance.ModelType()
 }
 
 func (ebee *enhancedBasicEventElement[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ebee.instance.DescendOnce(action)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ebee.instance.Descend(action)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ebee.instance.Extensions()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ebee.instance.SetExtensions(value)
 }
@@ -4588,100 +4588,100 @@ func (ebee *enhancedBasicEventElement[E]) SetIDShort(
 }
 
 func (ebee *enhancedBasicEventElement[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ebee.instance.DisplayName()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ebee.instance.SetDisplayName(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ebee.instance.Description()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ebee.instance.SetDescription(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ebee.instance.SemanticID()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ebee.instance.SetSemanticID(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ebee.instance.SupplementalSemanticIDs()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ebee.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ebee.instance.Qualifiers()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ebee.instance.SetQualifiers(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ebee.instance.EmbeddedDataSpecifications()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ebee.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Observed(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ebee.instance.Observed()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetObserved(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ebee.instance.SetObserved(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) Direction(
-) aastypes.Direction {
+) ourtypes.Direction {
 	return ebee.instance.Direction()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetDirection(
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) {
 	ebee.instance.SetDirection(value)
 }
 
 func (ebee *enhancedBasicEventElement[E]) State(
-) aastypes.StateOfEvent {
+) ourtypes.StateOfEvent {
 	return ebee.instance.State()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetState(
-	value aastypes.StateOfEvent,
+	value ourtypes.StateOfEvent,
 ) {
 	ebee.instance.SetState(value)
 }
@@ -4698,12 +4698,12 @@ func (ebee *enhancedBasicEventElement[E]) SetMessageTopic(
 }
 
 func (ebee *enhancedBasicEventElement[E]) MessageBroker(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ebee.instance.MessageBroker()
 }
 
 func (ebee *enhancedBasicEventElement[E]) SetMessageBroker(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ebee.instance.SetMessageBroker(value)
 }
@@ -4753,9 +4753,9 @@ func (ebee *enhancedBasicEventElement[E]) setEnhancement(
 }
 
 func wrapBasicEventElement[E any](
-	that aastypes.IBasicEventElement,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IBasicEventElement) {
+	that ourtypes.IBasicEventElement,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IBasicEventElement) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -4776,7 +4776,7 @@ func wrapBasicEventElement[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -4787,7 +4787,7 @@ func wrapBasicEventElement[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -4798,7 +4798,7 @@ func wrapBasicEventElement[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -4808,7 +4808,7 @@ func wrapBasicEventElement[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4819,7 +4819,7 @@ func wrapBasicEventElement[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -4830,7 +4830,7 @@ func wrapBasicEventElement[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -4841,7 +4841,7 @@ func wrapBasicEventElement[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -4850,7 +4850,7 @@ func wrapBasicEventElement[E any](
 		Wrap[E](
 			theObserved,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theMessageBroker := that.MessageBroker()
@@ -4859,7 +4859,7 @@ func wrapBasicEventElement[E any](
 			Wrap[E](
 				theMessageBroker,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -4867,34 +4867,34 @@ func wrapBasicEventElement[E any](
 }
 
 type enhancedOperation[E any] struct {
-	instance aastypes.IOperation
+	instance ourtypes.IOperation
 	enhancement E
 }
 
 func (eo *enhancedOperation[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eo.instance.ModelType()
 }
 
 func (eo *enhancedOperation[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eo.instance.DescendOnce(action)
 }
 
 func (eo *enhancedOperation[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eo.instance.Descend(action)
 }
 
 func (eo *enhancedOperation[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return eo.instance.Extensions()
 }
 
 func (eo *enhancedOperation[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	eo.instance.SetExtensions(value)
 }
@@ -4922,100 +4922,100 @@ func (eo *enhancedOperation[E]) SetIDShort(
 }
 
 func (eo *enhancedOperation[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return eo.instance.DisplayName()
 }
 
 func (eo *enhancedOperation[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	eo.instance.SetDisplayName(value)
 }
 
 func (eo *enhancedOperation[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return eo.instance.Description()
 }
 
 func (eo *enhancedOperation[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	eo.instance.SetDescription(value)
 }
 
 func (eo *enhancedOperation[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eo.instance.SemanticID()
 }
 
 func (eo *enhancedOperation[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eo.instance.SetSemanticID(value)
 }
 
 func (eo *enhancedOperation[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return eo.instance.SupplementalSemanticIDs()
 }
 
 func (eo *enhancedOperation[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	eo.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (eo *enhancedOperation[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return eo.instance.Qualifiers()
 }
 
 func (eo *enhancedOperation[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	eo.instance.SetQualifiers(value)
 }
 
 func (eo *enhancedOperation[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return eo.instance.EmbeddedDataSpecifications()
 }
 
 func (eo *enhancedOperation[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	eo.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (eo *enhancedOperation[E]) InputVariables(
-) []aastypes.IOperationVariable {
+) []ourtypes.IOperationVariable {
 	return eo.instance.InputVariables()
 }
 
 func (eo *enhancedOperation[E]) SetInputVariables(
-	value []aastypes.IOperationVariable,
+	value []ourtypes.IOperationVariable,
 ) {
 	eo.instance.SetInputVariables(value)
 }
 
 func (eo *enhancedOperation[E]) OutputVariables(
-) []aastypes.IOperationVariable {
+) []ourtypes.IOperationVariable {
 	return eo.instance.OutputVariables()
 }
 
 func (eo *enhancedOperation[E]) SetOutputVariables(
-	value []aastypes.IOperationVariable,
+	value []ourtypes.IOperationVariable,
 ) {
 	eo.instance.SetOutputVariables(value)
 }
 
 func (eo *enhancedOperation[E]) InoutputVariables(
-) []aastypes.IOperationVariable {
+) []ourtypes.IOperationVariable {
 	return eo.instance.InoutputVariables()
 }
 
 func (eo *enhancedOperation[E]) SetInoutputVariables(
-	value []aastypes.IOperationVariable,
+	value []ourtypes.IOperationVariable,
 ) {
 	eo.instance.SetInoutputVariables(value)
 }
@@ -5032,9 +5032,9 @@ func (eo *enhancedOperation[E]) setEnhancement(
 }
 
 func wrapOperation[E any](
-	that aastypes.IOperation,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IOperation) {
+	that ourtypes.IOperation,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IOperation) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5055,7 +5055,7 @@ func wrapOperation[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -5066,7 +5066,7 @@ func wrapOperation[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -5077,7 +5077,7 @@ func wrapOperation[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -5087,7 +5087,7 @@ func wrapOperation[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -5098,7 +5098,7 @@ func wrapOperation[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -5109,7 +5109,7 @@ func wrapOperation[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -5120,7 +5120,7 @@ func wrapOperation[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -5131,7 +5131,7 @@ func wrapOperation[E any](
 			theInputVariables[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IOperationVariable)
+			).(ourtypes.IOperationVariable)
 		}
 	}
 
@@ -5142,7 +5142,7 @@ func wrapOperation[E any](
 			theOutputVariables[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IOperationVariable)
+			).(ourtypes.IOperationVariable)
 		}
 	}
 
@@ -5153,7 +5153,7 @@ func wrapOperation[E any](
 			theInoutputVariables[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IOperationVariable)
+			).(ourtypes.IOperationVariable)
 		}
 	}
 
@@ -5161,34 +5161,34 @@ func wrapOperation[E any](
 }
 
 type enhancedOperationVariable[E any] struct {
-	instance aastypes.IOperationVariable
+	instance ourtypes.IOperationVariable
 	enhancement E
 }
 
 func (eov *enhancedOperationVariable[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eov.instance.ModelType()
 }
 
 func (eov *enhancedOperationVariable[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eov.instance.DescendOnce(action)
 }
 
 func (eov *enhancedOperationVariable[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eov.instance.Descend(action)
 }
 
 func (eov *enhancedOperationVariable[E]) Value(
-) aastypes.ISubmodelElement {
+) ourtypes.ISubmodelElement {
 	return eov.instance.Value()
 }
 
 func (eov *enhancedOperationVariable[E]) SetValue(
-	value aastypes.ISubmodelElement,
+	value ourtypes.ISubmodelElement,
 ) {
 	eov.instance.SetValue(value)
 }
@@ -5205,9 +5205,9 @@ func (eov *enhancedOperationVariable[E]) setEnhancement(
 }
 
 func wrapOperationVariable[E any](
-	that aastypes.IOperationVariable,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IOperationVariable) {
+	that ourtypes.IOperationVariable,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IOperationVariable) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5226,41 +5226,41 @@ func wrapOperationVariable[E any](
 		Wrap[E](
 			theValue,
 			factory,
-		).(aastypes.ISubmodelElement),
+		).(ourtypes.ISubmodelElement),
 	)
 
 	return
 }
 
 type enhancedCapability[E any] struct {
-	instance aastypes.ICapability
+	instance ourtypes.ICapability
 	enhancement E
 }
 
 func (ec *enhancedCapability[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ec.instance.ModelType()
 }
 
 func (ec *enhancedCapability[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ec.instance.DescendOnce(action)
 }
 
 func (ec *enhancedCapability[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ec.instance.Descend(action)
 }
 
 func (ec *enhancedCapability[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ec.instance.Extensions()
 }
 
 func (ec *enhancedCapability[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ec.instance.SetExtensions(value)
 }
@@ -5288,67 +5288,67 @@ func (ec *enhancedCapability[E]) SetIDShort(
 }
 
 func (ec *enhancedCapability[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ec.instance.DisplayName()
 }
 
 func (ec *enhancedCapability[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ec.instance.SetDisplayName(value)
 }
 
 func (ec *enhancedCapability[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ec.instance.Description()
 }
 
 func (ec *enhancedCapability[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ec.instance.SetDescription(value)
 }
 
 func (ec *enhancedCapability[E]) SemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return ec.instance.SemanticID()
 }
 
 func (ec *enhancedCapability[E]) SetSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	ec.instance.SetSemanticID(value)
 }
 
 func (ec *enhancedCapability[E]) SupplementalSemanticIDs(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ec.instance.SupplementalSemanticIDs()
 }
 
 func (ec *enhancedCapability[E]) SetSupplementalSemanticIDs(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ec.instance.SetSupplementalSemanticIDs(value)
 }
 
 func (ec *enhancedCapability[E]) Qualifiers(
-) []aastypes.IQualifier {
+) []ourtypes.IQualifier {
 	return ec.instance.Qualifiers()
 }
 
 func (ec *enhancedCapability[E]) SetQualifiers(
-	value []aastypes.IQualifier,
+	value []ourtypes.IQualifier,
 ) {
 	ec.instance.SetQualifiers(value)
 }
 
 func (ec *enhancedCapability[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ec.instance.EmbeddedDataSpecifications()
 }
 
 func (ec *enhancedCapability[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ec.instance.SetEmbeddedDataSpecifications(value)
 }
@@ -5365,9 +5365,9 @@ func (ec *enhancedCapability[E]) setEnhancement(
 }
 
 func wrapCapability[E any](
-	that aastypes.ICapability,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ICapability) {
+	that ourtypes.ICapability,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ICapability) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5388,7 +5388,7 @@ func wrapCapability[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -5399,7 +5399,7 @@ func wrapCapability[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -5410,7 +5410,7 @@ func wrapCapability[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -5420,7 +5420,7 @@ func wrapCapability[E any](
 			Wrap[E](
 				theSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -5431,7 +5431,7 @@ func wrapCapability[E any](
 			theSupplementalSemanticIDs[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -5442,7 +5442,7 @@ func wrapCapability[E any](
 			theQualifiers[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IQualifier)
+			).(ourtypes.IQualifier)
 		}
 	}
 
@@ -5453,7 +5453,7 @@ func wrapCapability[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -5461,34 +5461,34 @@ func wrapCapability[E any](
 }
 
 type enhancedConceptDescription[E any] struct {
-	instance aastypes.IConceptDescription
+	instance ourtypes.IConceptDescription
 	enhancement E
 }
 
 func (ecd *enhancedConceptDescription[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ecd.instance.ModelType()
 }
 
 func (ecd *enhancedConceptDescription[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ecd.instance.DescendOnce(action)
 }
 
 func (ecd *enhancedConceptDescription[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ecd.instance.Descend(action)
 }
 
 func (ecd *enhancedConceptDescription[E]) Extensions(
-) []aastypes.IExtension {
+) []ourtypes.IExtension {
 	return ecd.instance.Extensions()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetExtensions(
-	value []aastypes.IExtension,
+	value []ourtypes.IExtension,
 ) {
 	ecd.instance.SetExtensions(value)
 }
@@ -5516,34 +5516,34 @@ func (ecd *enhancedConceptDescription[E]) SetIDShort(
 }
 
 func (ecd *enhancedConceptDescription[E]) DisplayName(
-) []aastypes.ILangStringNameType {
+) []ourtypes.ILangStringNameType {
 	return ecd.instance.DisplayName()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetDisplayName(
-	value []aastypes.ILangStringNameType,
+	value []ourtypes.ILangStringNameType,
 ) {
 	ecd.instance.SetDisplayName(value)
 }
 
 func (ecd *enhancedConceptDescription[E]) Description(
-) []aastypes.ILangStringTextType {
+) []ourtypes.ILangStringTextType {
 	return ecd.instance.Description()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetDescription(
-	value []aastypes.ILangStringTextType,
+	value []ourtypes.ILangStringTextType,
 ) {
 	ecd.instance.SetDescription(value)
 }
 
 func (ecd *enhancedConceptDescription[E]) Administration(
-) aastypes.IAdministrativeInformation {
+) ourtypes.IAdministrativeInformation {
 	return ecd.instance.Administration()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetAdministration(
-	value aastypes.IAdministrativeInformation,
+	value ourtypes.IAdministrativeInformation,
 ) {
 	ecd.instance.SetAdministration(value)
 }
@@ -5560,23 +5560,23 @@ func (ecd *enhancedConceptDescription[E]) SetID(
 }
 
 func (ecd *enhancedConceptDescription[E]) EmbeddedDataSpecifications(
-) []aastypes.IEmbeddedDataSpecification {
+) []ourtypes.IEmbeddedDataSpecification {
 	return ecd.instance.EmbeddedDataSpecifications()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetEmbeddedDataSpecifications(
-	value []aastypes.IEmbeddedDataSpecification,
+	value []ourtypes.IEmbeddedDataSpecification,
 ) {
 	ecd.instance.SetEmbeddedDataSpecifications(value)
 }
 
 func (ecd *enhancedConceptDescription[E]) IsCaseOf(
-) []aastypes.IReference {
+) []ourtypes.IReference {
 	return ecd.instance.IsCaseOf()
 }
 
 func (ecd *enhancedConceptDescription[E]) SetIsCaseOf(
-	value []aastypes.IReference,
+	value []ourtypes.IReference,
 ) {
 	ecd.instance.SetIsCaseOf(value)
 }
@@ -5593,9 +5593,9 @@ func (ecd *enhancedConceptDescription[E]) setEnhancement(
 }
 
 func wrapConceptDescription[E any](
-	that aastypes.IConceptDescription,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IConceptDescription) {
+	that ourtypes.IConceptDescription,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IConceptDescription) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5616,7 +5616,7 @@ func wrapConceptDescription[E any](
 			theExtensions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IExtension)
+			).(ourtypes.IExtension)
 		}
 	}
 
@@ -5627,7 +5627,7 @@ func wrapConceptDescription[E any](
 			theDisplayName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringNameType)
+			).(ourtypes.ILangStringNameType)
 		}
 	}
 
@@ -5638,7 +5638,7 @@ func wrapConceptDescription[E any](
 			theDescription[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringTextType)
+			).(ourtypes.ILangStringTextType)
 		}
 	}
 
@@ -5648,7 +5648,7 @@ func wrapConceptDescription[E any](
 			Wrap[E](
 				theAdministration,
 				factory,
-			).(aastypes.IAdministrativeInformation),
+			).(ourtypes.IAdministrativeInformation),
 		)
 	}
 
@@ -5659,7 +5659,7 @@ func wrapConceptDescription[E any](
 			theEmbeddedDataSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IEmbeddedDataSpecification)
+			).(ourtypes.IEmbeddedDataSpecification)
 		}
 	}
 
@@ -5670,7 +5670,7 @@ func wrapConceptDescription[E any](
 			theIsCaseOf[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IReference)
+			).(ourtypes.IReference)
 		}
 	}
 
@@ -5678,56 +5678,56 @@ func wrapConceptDescription[E any](
 }
 
 type enhancedReference[E any] struct {
-	instance aastypes.IReference
+	instance ourtypes.IReference
 	enhancement E
 }
 
 func (er *enhancedReference[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return er.instance.ModelType()
 }
 
 func (er *enhancedReference[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return er.instance.DescendOnce(action)
 }
 
 func (er *enhancedReference[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return er.instance.Descend(action)
 }
 
 func (er *enhancedReference[E]) Type(
-) aastypes.ReferenceTypes {
+) ourtypes.ReferenceTypes {
 	return er.instance.Type()
 }
 
 func (er *enhancedReference[E]) SetType(
-	value aastypes.ReferenceTypes,
+	value ourtypes.ReferenceTypes,
 ) {
 	er.instance.SetType(value)
 }
 
 func (er *enhancedReference[E]) ReferredSemanticID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return er.instance.ReferredSemanticID()
 }
 
 func (er *enhancedReference[E]) SetReferredSemanticID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	er.instance.SetReferredSemanticID(value)
 }
 
 func (er *enhancedReference[E]) Keys(
-) []aastypes.IKey {
+) []ourtypes.IKey {
 	return er.instance.Keys()
 }
 
 func (er *enhancedReference[E]) SetKeys(
-	value []aastypes.IKey,
+	value []ourtypes.IKey,
 ) {
 	er.instance.SetKeys(value)
 }
@@ -5744,9 +5744,9 @@ func (er *enhancedReference[E]) setEnhancement(
 }
 
 func wrapReference[E any](
-	that aastypes.IReference,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IReference) {
+	that ourtypes.IReference,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IReference) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5766,7 +5766,7 @@ func wrapReference[E any](
 			Wrap[E](
 				theReferredSemanticID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -5776,41 +5776,41 @@ func wrapReference[E any](
 		theKeys[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.IKey)
+		).(ourtypes.IKey)
 	}
 
 	return
 }
 
 type enhancedKey[E any] struct {
-	instance aastypes.IKey
+	instance ourtypes.IKey
 	enhancement E
 }
 
 func (ek *enhancedKey[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ek.instance.ModelType()
 }
 
 func (ek *enhancedKey[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ek.instance.DescendOnce(action)
 }
 
 func (ek *enhancedKey[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ek.instance.Descend(action)
 }
 
 func (ek *enhancedKey[E]) Type(
-) aastypes.KeyTypes {
+) ourtypes.KeyTypes {
 	return ek.instance.Type()
 }
 
 func (ek *enhancedKey[E]) SetType(
-	value aastypes.KeyTypes,
+	value ourtypes.KeyTypes,
 ) {
 	ek.instance.SetType(value)
 }
@@ -5838,9 +5838,9 @@ func (ek *enhancedKey[E]) setEnhancement(
 }
 
 func wrapKey[E any](
-	that aastypes.IKey,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IKey) {
+	that ourtypes.IKey,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IKey) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5858,23 +5858,23 @@ func wrapKey[E any](
 }
 
 type enhancedLangStringNameType[E any] struct {
-	instance aastypes.ILangStringNameType
+	instance ourtypes.ILangStringNameType
 	enhancement E
 }
 
 func (elsnt *enhancedLangStringNameType[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elsnt.instance.ModelType()
 }
 
 func (elsnt *enhancedLangStringNameType[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elsnt.instance.DescendOnce(action)
 }
 
 func (elsnt *enhancedLangStringNameType[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elsnt.instance.Descend(action)
 }
@@ -5913,9 +5913,9 @@ func (elsnt *enhancedLangStringNameType[E]) setEnhancement(
 }
 
 func wrapLangStringNameType[E any](
-	that aastypes.ILangStringNameType,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringNameType) {
+	that ourtypes.ILangStringNameType,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringNameType) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -5933,23 +5933,23 @@ func wrapLangStringNameType[E any](
 }
 
 type enhancedLangStringTextType[E any] struct {
-	instance aastypes.ILangStringTextType
+	instance ourtypes.ILangStringTextType
 	enhancement E
 }
 
 func (elstt *enhancedLangStringTextType[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elstt.instance.ModelType()
 }
 
 func (elstt *enhancedLangStringTextType[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elstt.instance.DescendOnce(action)
 }
 
 func (elstt *enhancedLangStringTextType[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elstt.instance.Descend(action)
 }
@@ -5988,9 +5988,9 @@ func (elstt *enhancedLangStringTextType[E]) setEnhancement(
 }
 
 func wrapLangStringTextType[E any](
-	that aastypes.ILangStringTextType,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringTextType) {
+	that ourtypes.ILangStringTextType,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringTextType) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6008,56 +6008,56 @@ func wrapLangStringTextType[E any](
 }
 
 type enhancedEnvironment[E any] struct {
-	instance aastypes.IEnvironment
+	instance ourtypes.IEnvironment
 	enhancement E
 }
 
 func (ee *enhancedEnvironment[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ee.instance.ModelType()
 }
 
 func (ee *enhancedEnvironment[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ee.instance.DescendOnce(action)
 }
 
 func (ee *enhancedEnvironment[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ee.instance.Descend(action)
 }
 
 func (ee *enhancedEnvironment[E]) AssetAdministrationShells(
-) []aastypes.IAssetAdministrationShell {
+) []ourtypes.IAssetAdministrationShell {
 	return ee.instance.AssetAdministrationShells()
 }
 
 func (ee *enhancedEnvironment[E]) SetAssetAdministrationShells(
-	value []aastypes.IAssetAdministrationShell,
+	value []ourtypes.IAssetAdministrationShell,
 ) {
 	ee.instance.SetAssetAdministrationShells(value)
 }
 
 func (ee *enhancedEnvironment[E]) Submodels(
-) []aastypes.ISubmodel {
+) []ourtypes.ISubmodel {
 	return ee.instance.Submodels()
 }
 
 func (ee *enhancedEnvironment[E]) SetSubmodels(
-	value []aastypes.ISubmodel,
+	value []ourtypes.ISubmodel,
 ) {
 	ee.instance.SetSubmodels(value)
 }
 
 func (ee *enhancedEnvironment[E]) ConceptDescriptions(
-) []aastypes.IConceptDescription {
+) []ourtypes.IConceptDescription {
 	return ee.instance.ConceptDescriptions()
 }
 
 func (ee *enhancedEnvironment[E]) SetConceptDescriptions(
-	value []aastypes.IConceptDescription,
+	value []ourtypes.IConceptDescription,
 ) {
 	ee.instance.SetConceptDescriptions(value)
 }
@@ -6074,9 +6074,9 @@ func (ee *enhancedEnvironment[E]) setEnhancement(
 }
 
 func wrapEnvironment[E any](
-	that aastypes.IEnvironment,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IEnvironment) {
+	that ourtypes.IEnvironment,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IEnvironment) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6097,7 +6097,7 @@ func wrapEnvironment[E any](
 			theAssetAdministrationShells[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IAssetAdministrationShell)
+			).(ourtypes.IAssetAdministrationShell)
 		}
 	}
 
@@ -6108,7 +6108,7 @@ func wrapEnvironment[E any](
 			theSubmodels[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISubmodel)
+			).(ourtypes.ISubmodel)
 		}
 	}
 
@@ -6119,7 +6119,7 @@ func wrapEnvironment[E any](
 			theConceptDescriptions[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.IConceptDescription)
+			).(ourtypes.IConceptDescription)
 		}
 	}
 
@@ -6127,45 +6127,45 @@ func wrapEnvironment[E any](
 }
 
 type enhancedEmbeddedDataSpecification[E any] struct {
-	instance aastypes.IEmbeddedDataSpecification
+	instance ourtypes.IEmbeddedDataSpecification
 	enhancement E
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eeds.instance.ModelType()
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eeds.instance.DescendOnce(action)
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eeds.instance.Descend(action)
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) DataSpecification(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return eeds.instance.DataSpecification()
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) SetDataSpecification(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	eeds.instance.SetDataSpecification(value)
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) DataSpecificationContent(
-) aastypes.IDataSpecificationContent {
+) ourtypes.IDataSpecificationContent {
 	return eeds.instance.DataSpecificationContent()
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) SetDataSpecificationContent(
-	value aastypes.IDataSpecificationContent,
+	value ourtypes.IDataSpecificationContent,
 ) {
 	eeds.instance.SetDataSpecificationContent(value)
 }
@@ -6182,9 +6182,9 @@ func (eeds *enhancedEmbeddedDataSpecification[E]) setEnhancement(
 }
 
 func wrapEmbeddedDataSpecification[E any](
-	that aastypes.IEmbeddedDataSpecification,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IEmbeddedDataSpecification) {
+	that ourtypes.IEmbeddedDataSpecification,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IEmbeddedDataSpecification) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6203,7 +6203,7 @@ func wrapEmbeddedDataSpecification[E any](
 		Wrap[E](
 			theDataSpecification,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	theDataSpecificationContent := that.DataSpecificationContent()
@@ -6211,30 +6211,30 @@ func wrapEmbeddedDataSpecification[E any](
 		Wrap[E](
 			theDataSpecificationContent,
 			factory,
-		).(aastypes.IDataSpecificationContent),
+		).(ourtypes.IDataSpecificationContent),
 	)
 
 	return
 }
 
 type enhancedLevelType[E any] struct {
-	instance aastypes.ILevelType
+	instance ourtypes.ILevelType
 	enhancement E
 }
 
 func (elt *enhancedLevelType[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elt.instance.ModelType()
 }
 
 func (elt *enhancedLevelType[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elt.instance.DescendOnce(action)
 }
 
 func (elt *enhancedLevelType[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elt.instance.Descend(action)
 }
@@ -6295,9 +6295,9 @@ func (elt *enhancedLevelType[E]) setEnhancement(
 }
 
 func wrapLevelType[E any](
-	that aastypes.ILevelType,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILevelType) {
+	that ourtypes.ILevelType,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILevelType) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6315,23 +6315,23 @@ func wrapLevelType[E any](
 }
 
 type enhancedValueReferencePair[E any] struct {
-	instance aastypes.IValueReferencePair
+	instance ourtypes.IValueReferencePair
 	enhancement E
 }
 
 func (evrp *enhancedValueReferencePair[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return evrp.instance.ModelType()
 }
 
 func (evrp *enhancedValueReferencePair[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return evrp.instance.DescendOnce(action)
 }
 
 func (evrp *enhancedValueReferencePair[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return evrp.instance.Descend(action)
 }
@@ -6348,12 +6348,12 @@ func (evrp *enhancedValueReferencePair[E]) SetValue(
 }
 
 func (evrp *enhancedValueReferencePair[E]) ValueID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return evrp.instance.ValueID()
 }
 
 func (evrp *enhancedValueReferencePair[E]) SetValueID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	evrp.instance.SetValueID(value)
 }
@@ -6370,9 +6370,9 @@ func (evrp *enhancedValueReferencePair[E]) setEnhancement(
 }
 
 func wrapValueReferencePair[E any](
-	that aastypes.IValueReferencePair,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IValueReferencePair) {
+	that ourtypes.IValueReferencePair,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IValueReferencePair) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6391,41 +6391,41 @@ func wrapValueReferencePair[E any](
 		Wrap[E](
 			theValueID,
 			factory,
-		).(aastypes.IReference),
+		).(ourtypes.IReference),
 	)
 
 	return
 }
 
 type enhancedValueList[E any] struct {
-	instance aastypes.IValueList
+	instance ourtypes.IValueList
 	enhancement E
 }
 
 func (evl *enhancedValueList[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return evl.instance.ModelType()
 }
 
 func (evl *enhancedValueList[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return evl.instance.DescendOnce(action)
 }
 
 func (evl *enhancedValueList[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return evl.instance.Descend(action)
 }
 
 func (evl *enhancedValueList[E]) ValueReferencePairs(
-) []aastypes.IValueReferencePair {
+) []ourtypes.IValueReferencePair {
 	return evl.instance.ValueReferencePairs()
 }
 
 func (evl *enhancedValueList[E]) SetValueReferencePairs(
-	value []aastypes.IValueReferencePair,
+	value []ourtypes.IValueReferencePair,
 ) {
 	evl.instance.SetValueReferencePairs(value)
 }
@@ -6442,9 +6442,9 @@ func (evl *enhancedValueList[E]) setEnhancement(
 }
 
 func wrapValueList[E any](
-	that aastypes.IValueList,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IValueList) {
+	that ourtypes.IValueList,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IValueList) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6464,30 +6464,30 @@ func wrapValueList[E any](
 		theValueReferencePairs[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.IValueReferencePair)
+		).(ourtypes.IValueReferencePair)
 	}
 
 	return
 }
 
 type enhancedLangStringPreferredNameTypeIEC61360[E any] struct {
-	instance aastypes.ILangStringPreferredNameTypeIEC61360
+	instance ourtypes.ILangStringPreferredNameTypeIEC61360
 	enhancement E
 }
 
 func (elspnti6 *enhancedLangStringPreferredNameTypeIEC61360[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elspnti6.instance.ModelType()
 }
 
 func (elspnti6 *enhancedLangStringPreferredNameTypeIEC61360[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elspnti6.instance.DescendOnce(action)
 }
 
 func (elspnti6 *enhancedLangStringPreferredNameTypeIEC61360[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elspnti6.instance.Descend(action)
 }
@@ -6526,9 +6526,9 @@ func (elspnti6 *enhancedLangStringPreferredNameTypeIEC61360[E]) setEnhancement(
 }
 
 func wrapLangStringPreferredNameTypeIEC61360[E any](
-	that aastypes.ILangStringPreferredNameTypeIEC61360,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringPreferredNameTypeIEC61360) {
+	that ourtypes.ILangStringPreferredNameTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringPreferredNameTypeIEC61360) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6546,23 +6546,23 @@ func wrapLangStringPreferredNameTypeIEC61360[E any](
 }
 
 type enhancedLangStringShortNameTypeIEC61360[E any] struct {
-	instance aastypes.ILangStringShortNameTypeIEC61360
+	instance ourtypes.ILangStringShortNameTypeIEC61360
 	enhancement E
 }
 
 func (elssnti6 *enhancedLangStringShortNameTypeIEC61360[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elssnti6.instance.ModelType()
 }
 
 func (elssnti6 *enhancedLangStringShortNameTypeIEC61360[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elssnti6.instance.DescendOnce(action)
 }
 
 func (elssnti6 *enhancedLangStringShortNameTypeIEC61360[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elssnti6.instance.Descend(action)
 }
@@ -6601,9 +6601,9 @@ func (elssnti6 *enhancedLangStringShortNameTypeIEC61360[E]) setEnhancement(
 }
 
 func wrapLangStringShortNameTypeIEC61360[E any](
-	that aastypes.ILangStringShortNameTypeIEC61360,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringShortNameTypeIEC61360) {
+	that ourtypes.ILangStringShortNameTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringShortNameTypeIEC61360) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6621,23 +6621,23 @@ func wrapLangStringShortNameTypeIEC61360[E any](
 }
 
 type enhancedLangStringDefinitionTypeIEC61360[E any] struct {
-	instance aastypes.ILangStringDefinitionTypeIEC61360
+	instance ourtypes.ILangStringDefinitionTypeIEC61360
 	enhancement E
 }
 
 func (elsdti6 *enhancedLangStringDefinitionTypeIEC61360[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elsdti6.instance.ModelType()
 }
 
 func (elsdti6 *enhancedLangStringDefinitionTypeIEC61360[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elsdti6.instance.DescendOnce(action)
 }
 
 func (elsdti6 *enhancedLangStringDefinitionTypeIEC61360[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elsdti6.instance.Descend(action)
 }
@@ -6676,9 +6676,9 @@ func (elsdti6 *enhancedLangStringDefinitionTypeIEC61360[E]) setEnhancement(
 }
 
 func wrapLangStringDefinitionTypeIEC61360[E any](
-	that aastypes.ILangStringDefinitionTypeIEC61360,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringDefinitionTypeIEC61360) {
+	that ourtypes.ILangStringDefinitionTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringDefinitionTypeIEC61360) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6696,45 +6696,45 @@ func wrapLangStringDefinitionTypeIEC61360[E any](
 }
 
 type enhancedDataSpecificationIEC61360[E any] struct {
-	instance aastypes.IDataSpecificationIEC61360
+	instance ourtypes.IDataSpecificationIEC61360
 	enhancement E
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return edsi6.instance.ModelType()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return edsi6.instance.DescendOnce(action)
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return edsi6.instance.Descend(action)
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) PreferredName(
-) []aastypes.ILangStringPreferredNameTypeIEC61360 {
+) []ourtypes.ILangStringPreferredNameTypeIEC61360 {
 	return edsi6.instance.PreferredName()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetPreferredName(
-	value []aastypes.ILangStringPreferredNameTypeIEC61360,
+	value []ourtypes.ILangStringPreferredNameTypeIEC61360,
 ) {
 	edsi6.instance.SetPreferredName(value)
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) ShortName(
-) []aastypes.ILangStringShortNameTypeIEC61360 {
+) []ourtypes.ILangStringShortNameTypeIEC61360 {
 	return edsi6.instance.ShortName()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetShortName(
-	value []aastypes.ILangStringShortNameTypeIEC61360,
+	value []ourtypes.ILangStringShortNameTypeIEC61360,
 ) {
 	edsi6.instance.SetShortName(value)
 }
@@ -6751,12 +6751,12 @@ func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetUnit(
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) UnitID(
-) aastypes.IReference {
+) ourtypes.IReference {
 	return edsi6.instance.UnitID()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetUnitID(
-	value aastypes.IReference,
+	value ourtypes.IReference,
 ) {
 	edsi6.instance.SetUnitID(value)
 }
@@ -6784,23 +6784,23 @@ func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetSymbol(
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) DataType(
-) *aastypes.DataTypeIEC61360 {
+) *ourtypes.DataTypeIEC61360 {
 	return edsi6.instance.DataType()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetDataType(
-	value *aastypes.DataTypeIEC61360,
+	value *ourtypes.DataTypeIEC61360,
 ) {
 	edsi6.instance.SetDataType(value)
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) Definition(
-) []aastypes.ILangStringDefinitionTypeIEC61360 {
+) []ourtypes.ILangStringDefinitionTypeIEC61360 {
 	return edsi6.instance.Definition()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetDefinition(
-	value []aastypes.ILangStringDefinitionTypeIEC61360,
+	value []ourtypes.ILangStringDefinitionTypeIEC61360,
 ) {
 	edsi6.instance.SetDefinition(value)
 }
@@ -6817,12 +6817,12 @@ func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetValueFormat(
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) ValueList(
-) aastypes.IValueList {
+) ourtypes.IValueList {
 	return edsi6.instance.ValueList()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetValueList(
-	value aastypes.IValueList,
+	value ourtypes.IValueList,
 ) {
 	edsi6.instance.SetValueList(value)
 }
@@ -6839,12 +6839,12 @@ func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetValue(
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) LevelType(
-) aastypes.ILevelType {
+) ourtypes.ILevelType {
 	return edsi6.instance.LevelType()
 }
 
 func (edsi6 *enhancedDataSpecificationIEC61360[E]) SetLevelType(
-	value aastypes.ILevelType,
+	value ourtypes.ILevelType,
 ) {
 	edsi6.instance.SetLevelType(value)
 }
@@ -6861,9 +6861,9 @@ func (edsi6 *enhancedDataSpecificationIEC61360[E]) setEnhancement(
 }
 
 func wrapDataSpecificationIEC61360[E any](
-	that aastypes.IDataSpecificationIEC61360,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IDataSpecificationIEC61360) {
+	that ourtypes.IDataSpecificationIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IDataSpecificationIEC61360) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -6883,7 +6883,7 @@ func wrapDataSpecificationIEC61360[E any](
 		thePreferredName[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.ILangStringPreferredNameTypeIEC61360)
+		).(ourtypes.ILangStringPreferredNameTypeIEC61360)
 	}
 
 	theShortName := that.ShortName()
@@ -6893,7 +6893,7 @@ func wrapDataSpecificationIEC61360[E any](
 			theShortName[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringShortNameTypeIEC61360)
+			).(ourtypes.ILangStringShortNameTypeIEC61360)
 		}
 	}
 
@@ -6903,7 +6903,7 @@ func wrapDataSpecificationIEC61360[E any](
 			Wrap[E](
 				theUnitID,
 				factory,
-			).(aastypes.IReference),
+			).(ourtypes.IReference),
 		)
 	}
 
@@ -6914,7 +6914,7 @@ func wrapDataSpecificationIEC61360[E any](
 			theDefinition[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangStringDefinitionTypeIEC61360)
+			).(ourtypes.ILangStringDefinitionTypeIEC61360)
 		}
 	}
 
@@ -6924,7 +6924,7 @@ func wrapDataSpecificationIEC61360[E any](
 			Wrap[E](
 				theValueList,
 				factory,
-			).(aastypes.IValueList),
+			).(ourtypes.IValueList),
 		)
 	}
 
@@ -6934,7 +6934,7 @@ func wrapDataSpecificationIEC61360[E any](
 			Wrap[E](
 				theLevelType,
 				factory,
-			).(aastypes.ILevelType),
+			).(ourtypes.ILevelType),
 		)
 	}
 
@@ -6950,9 +6950,9 @@ func wrapDataSpecificationIEC61360[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -6964,194 +6964,194 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeExtension:
+	case ourtypes.ModelTypeExtension:
 		result = wrapExtension[E](
-			that.(aastypes.IExtension),
+			that.(ourtypes.IExtension),
 			factory,
 		)
-	case aastypes.ModelTypeAdministrativeInformation:
+	case ourtypes.ModelTypeAdministrativeInformation:
 		result = wrapAdministrativeInformation[E](
-			that.(aastypes.IAdministrativeInformation),
+			that.(ourtypes.IAdministrativeInformation),
 			factory,
 		)
-	case aastypes.ModelTypeQualifier:
+	case ourtypes.ModelTypeQualifier:
 		result = wrapQualifier[E](
-			that.(aastypes.IQualifier),
+			that.(ourtypes.IQualifier),
 			factory,
 		)
-	case aastypes.ModelTypeAssetAdministrationShell:
+	case ourtypes.ModelTypeAssetAdministrationShell:
 		result = wrapAssetAdministrationShell[E](
-			that.(aastypes.IAssetAdministrationShell),
+			that.(ourtypes.IAssetAdministrationShell),
 			factory,
 		)
-	case aastypes.ModelTypeAssetInformation:
+	case ourtypes.ModelTypeAssetInformation:
 		result = wrapAssetInformation[E](
-			that.(aastypes.IAssetInformation),
+			that.(ourtypes.IAssetInformation),
 			factory,
 		)
-	case aastypes.ModelTypeResource:
+	case ourtypes.ModelTypeResource:
 		result = wrapResource[E](
-			that.(aastypes.IResource),
+			that.(ourtypes.IResource),
 			factory,
 		)
-	case aastypes.ModelTypeSpecificAssetID:
+	case ourtypes.ModelTypeSpecificAssetID:
 		result = wrapSpecificAssetID[E](
-			that.(aastypes.ISpecificAssetID),
+			that.(ourtypes.ISpecificAssetID),
 			factory,
 		)
-	case aastypes.ModelTypeSubmodel:
+	case ourtypes.ModelTypeSubmodel:
 		result = wrapSubmodel[E](
-			that.(aastypes.ISubmodel),
+			that.(ourtypes.ISubmodel),
 			factory,
 		)
-	case aastypes.ModelTypeRelationshipElement:
+	case ourtypes.ModelTypeRelationshipElement:
 		result = wrapRelationshipElement[E](
-			that.(aastypes.IRelationshipElement),
+			that.(ourtypes.IRelationshipElement),
 			factory,
 		)
-	case aastypes.ModelTypeSubmodelElementList:
+	case ourtypes.ModelTypeSubmodelElementList:
 		result = wrapSubmodelElementList[E](
-			that.(aastypes.ISubmodelElementList),
+			that.(ourtypes.ISubmodelElementList),
 			factory,
 		)
-	case aastypes.ModelTypeSubmodelElementCollection:
+	case ourtypes.ModelTypeSubmodelElementCollection:
 		result = wrapSubmodelElementCollection[E](
-			that.(aastypes.ISubmodelElementCollection),
+			that.(ourtypes.ISubmodelElementCollection),
 			factory,
 		)
-	case aastypes.ModelTypeProperty:
+	case ourtypes.ModelTypeProperty:
 		result = wrapProperty[E](
-			that.(aastypes.IProperty),
+			that.(ourtypes.IProperty),
 			factory,
 		)
-	case aastypes.ModelTypeMultiLanguageProperty:
+	case ourtypes.ModelTypeMultiLanguageProperty:
 		result = wrapMultiLanguageProperty[E](
-			that.(aastypes.IMultiLanguageProperty),
+			that.(ourtypes.IMultiLanguageProperty),
 			factory,
 		)
-	case aastypes.ModelTypeRange:
+	case ourtypes.ModelTypeRange:
 		result = wrapRange[E](
-			that.(aastypes.IRange),
+			that.(ourtypes.IRange),
 			factory,
 		)
-	case aastypes.ModelTypeReferenceElement:
+	case ourtypes.ModelTypeReferenceElement:
 		result = wrapReferenceElement[E](
-			that.(aastypes.IReferenceElement),
+			that.(ourtypes.IReferenceElement),
 			factory,
 		)
-	case aastypes.ModelTypeBlob:
+	case ourtypes.ModelTypeBlob:
 		result = wrapBlob[E](
-			that.(aastypes.IBlob),
+			that.(ourtypes.IBlob),
 			factory,
 		)
-	case aastypes.ModelTypeFile:
+	case ourtypes.ModelTypeFile:
 		result = wrapFile[E](
-			that.(aastypes.IFile),
+			that.(ourtypes.IFile),
 			factory,
 		)
-	case aastypes.ModelTypeAnnotatedRelationshipElement:
+	case ourtypes.ModelTypeAnnotatedRelationshipElement:
 		result = wrapAnnotatedRelationshipElement[E](
-			that.(aastypes.IAnnotatedRelationshipElement),
+			that.(ourtypes.IAnnotatedRelationshipElement),
 			factory,
 		)
-	case aastypes.ModelTypeEntity:
+	case ourtypes.ModelTypeEntity:
 		result = wrapEntity[E](
-			that.(aastypes.IEntity),
+			that.(ourtypes.IEntity),
 			factory,
 		)
-	case aastypes.ModelTypeEventPayload:
+	case ourtypes.ModelTypeEventPayload:
 		result = wrapEventPayload[E](
-			that.(aastypes.IEventPayload),
+			that.(ourtypes.IEventPayload),
 			factory,
 		)
-	case aastypes.ModelTypeBasicEventElement:
+	case ourtypes.ModelTypeBasicEventElement:
 		result = wrapBasicEventElement[E](
-			that.(aastypes.IBasicEventElement),
+			that.(ourtypes.IBasicEventElement),
 			factory,
 		)
-	case aastypes.ModelTypeOperation:
+	case ourtypes.ModelTypeOperation:
 		result = wrapOperation[E](
-			that.(aastypes.IOperation),
+			that.(ourtypes.IOperation),
 			factory,
 		)
-	case aastypes.ModelTypeOperationVariable:
+	case ourtypes.ModelTypeOperationVariable:
 		result = wrapOperationVariable[E](
-			that.(aastypes.IOperationVariable),
+			that.(ourtypes.IOperationVariable),
 			factory,
 		)
-	case aastypes.ModelTypeCapability:
+	case ourtypes.ModelTypeCapability:
 		result = wrapCapability[E](
-			that.(aastypes.ICapability),
+			that.(ourtypes.ICapability),
 			factory,
 		)
-	case aastypes.ModelTypeConceptDescription:
+	case ourtypes.ModelTypeConceptDescription:
 		result = wrapConceptDescription[E](
-			that.(aastypes.IConceptDescription),
+			that.(ourtypes.IConceptDescription),
 			factory,
 		)
-	case aastypes.ModelTypeReference:
+	case ourtypes.ModelTypeReference:
 		result = wrapReference[E](
-			that.(aastypes.IReference),
+			that.(ourtypes.IReference),
 			factory,
 		)
-	case aastypes.ModelTypeKey:
+	case ourtypes.ModelTypeKey:
 		result = wrapKey[E](
-			that.(aastypes.IKey),
+			that.(ourtypes.IKey),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringNameType:
+	case ourtypes.ModelTypeLangStringNameType:
 		result = wrapLangStringNameType[E](
-			that.(aastypes.ILangStringNameType),
+			that.(ourtypes.ILangStringNameType),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringTextType:
+	case ourtypes.ModelTypeLangStringTextType:
 		result = wrapLangStringTextType[E](
-			that.(aastypes.ILangStringTextType),
+			that.(ourtypes.ILangStringTextType),
 			factory,
 		)
-	case aastypes.ModelTypeEnvironment:
+	case ourtypes.ModelTypeEnvironment:
 		result = wrapEnvironment[E](
-			that.(aastypes.IEnvironment),
+			that.(ourtypes.IEnvironment),
 			factory,
 		)
-	case aastypes.ModelTypeEmbeddedDataSpecification:
+	case ourtypes.ModelTypeEmbeddedDataSpecification:
 		result = wrapEmbeddedDataSpecification[E](
-			that.(aastypes.IEmbeddedDataSpecification),
+			that.(ourtypes.IEmbeddedDataSpecification),
 			factory,
 		)
-	case aastypes.ModelTypeLevelType:
+	case ourtypes.ModelTypeLevelType:
 		result = wrapLevelType[E](
-			that.(aastypes.ILevelType),
+			that.(ourtypes.ILevelType),
 			factory,
 		)
-	case aastypes.ModelTypeValueReferencePair:
+	case ourtypes.ModelTypeValueReferencePair:
 		result = wrapValueReferencePair[E](
-			that.(aastypes.IValueReferencePair),
+			that.(ourtypes.IValueReferencePair),
 			factory,
 		)
-	case aastypes.ModelTypeValueList:
+	case ourtypes.ModelTypeValueList:
 		result = wrapValueList[E](
-			that.(aastypes.IValueList),
+			that.(ourtypes.IValueList),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringPreferredNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringPreferredNameTypeIEC61360:
 		result = wrapLangStringPreferredNameTypeIEC61360[E](
-			that.(aastypes.ILangStringPreferredNameTypeIEC61360),
+			that.(ourtypes.ILangStringPreferredNameTypeIEC61360),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringShortNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringShortNameTypeIEC61360:
 		result = wrapLangStringShortNameTypeIEC61360[E](
-			that.(aastypes.ILangStringShortNameTypeIEC61360),
+			that.(ourtypes.ILangStringShortNameTypeIEC61360),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringDefinitionTypeIEC61360:
+	case ourtypes.ModelTypeLangStringDefinitionTypeIEC61360:
 		result = wrapLangStringDefinitionTypeIEC61360[E](
-			that.(aastypes.ILangStringDefinitionTypeIEC61360),
+			that.(ourtypes.ILangStringDefinitionTypeIEC61360),
 			factory,
 		)
-	case aastypes.ModelTypeDataSpecificationIEC61360:
+	case ourtypes.ModelTypeDataSpecificationIEC61360:
 		result = wrapDataSpecificationIEC61360[E](
-			that.(aastypes.IDataSpecificationIEC61360),
+			that.(ourtypes.IDataSpecificationIEC61360),
 			factory,
 		)
 	default:
@@ -7170,7 +7170,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -7183,7 +7183,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

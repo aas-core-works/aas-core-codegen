@@ -49,7 +49,7 @@ private static string SerializeToString(Nodes.JsonNode? that)
 {III}OmitXmlDeclaration = true
 {II}}}))
 {I}{{
-{II}Aas.XmlRpc.SerializeValue(that, writer);
+{II}Our.XmlRpc.SerializeValue(that, writer);
 {I}}}
 {I}return builder.ToString();
 }}"""
@@ -58,12 +58,12 @@ private static string SerializeToString(Nodes.JsonNode? that)
             f"""\
 private static Nodes.JsonNode? DeserializeFromString(
 {I}string text,
-{I}out Aas.Reporting.Error? error)
+{I}out Our.Reporting.Error? error)
 {{
 {I}using var stringReader = new System.IO.StringReader(text);
 {I}using var xmlReader = System.Xml.XmlReader.Create(stringReader);
 {I}xmlReader.MoveToContent();
-{I}return Aas.XmlRpc.DeserializeValue(xmlReader, out error);
+{I}return Our.XmlRpc.DeserializeValue(xmlReader, out error);
 }}"""
         ),
         Stripped(
@@ -77,7 +77,7 @@ public void Test_round_trip_boolean()
 {II}string text = SerializeToString(original);
 
 {II}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{III}text, out Aas.Reporting.Error? error);
+{III}text, out Our.Reporting.Error? error);
 
 {II}Assert.IsNull(error);
 {II}Assert.IsNotNull(roundTripped);
@@ -101,7 +101,7 @@ public void Test_round_trip_double()
 {II}string text = SerializeToString(original);
 
 {II}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{III}text, out Aas.Reporting.Error? error);
+{III}text, out Our.Reporting.Error? error);
 
 {II}Assert.IsNull(error);
 {II}Assert.IsNotNull(roundTripped);
@@ -130,7 +130,7 @@ public void Test_round_trip_string()
 {II}string text = SerializeToString(original);
 
 {II}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{III}text, out Aas.Reporting.Error? error);
+{III}text, out Our.Reporting.Error? error);
 
 {II}Assert.IsNull(error);
 {II}Assert.IsNotNull(roundTripped);
@@ -149,7 +149,7 @@ public void Test_round_trip_empty_array()
 {I}string text = SerializeToString(original);
 
 {I}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error);
 {I}Assert.IsNotNull(roundTripped);
@@ -176,7 +176,7 @@ public void Test_round_trip_nested_array()
 {I}string text = SerializeToString(original);
 
 {I}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error);
 {I}Assert.IsNotNull(roundTripped);
@@ -194,7 +194,7 @@ public void Test_round_trip_empty_object()
 {I}string text = SerializeToString(original);
 
 {I}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error);
 {I}Assert.IsNotNull(roundTripped);
@@ -223,7 +223,7 @@ public void Test_round_trip_nested_object()
 {I}string text = SerializeToString(original);
 
 {I}Nodes.JsonNode? roundTripped = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error);
 {I}Assert.IsNotNull(roundTripped);
@@ -237,12 +237,12 @@ public void Test_round_trip_nested_object()
 [Test]
 public void Test_serialize_rejects_null()
 {{
-{I}Aas.SerializationException? caught = null;
+{I}Our.SerializationException? caught = null;
 {I}try
 {I}{{
 {II}SerializeToString(null);
 {I}}}
-{I}catch (Aas.SerializationException exception)
+{I}catch (Our.SerializationException exception)
 {I}{{
 {II}caught = exception;
 {I}}}
@@ -260,12 +260,12 @@ public void Test_serialize_reports_index_on_nested_invalid_value()
 {II}Nodes.JsonValue.Create(2.0),
 {II}null);
 
-{I}Aas.SerializationException? caught = null;
+{I}Our.SerializationException? caught = null;
 {I}try
 {I}{{
 {II}SerializeToString(original);
 {I}}}
-{I}catch (Aas.SerializationException exception)
+{I}catch (Our.SerializationException exception)
 {I}{{
 {II}caught = exception;
 {I}}}
@@ -288,7 +288,7 @@ public void Test_deserialize_reports_path_on_nested_error()
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(result);
 {I}Assert.IsNotNull(error);
@@ -299,7 +299,7 @@ public void Test_deserialize_reports_path_on_nested_error()
 {I}// a ``<data>`` element is a ``<value>`` element.
 {I}Assert.AreEqual(
 {II}"array/data/*[1]",
-{II}Aas.Reporting.GenerateRelativeXPath(error!.PathSegments));
+{II}Our.Reporting.GenerateRelativeXPath(error!.PathSegments));
 }}"""
         ),
         Stripped(
@@ -310,7 +310,7 @@ public void Test_deserialize_rejects_unexpected_element()
 {I}string text = "<value><nil/></value>";
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(result);
 {I}Assert.IsNotNull(error);
@@ -327,7 +327,7 @@ public void Test_deserialize_rejects_non_strict_boolean_lexical_form()
 {I}string text = "<value><boolean>true</boolean></value>";
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(result);
 {I}Assert.IsNotNull(error);
@@ -355,7 +355,7 @@ public void Test_deserialize_rejects_repeated_member_key()
 {I}// would silently accept a document which says two different things
 {I}// about the same key.
 {I}DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNotNull(error);
 }}"""
@@ -373,12 +373,12 @@ public void Test_serialize_rejects_non_finite_number()
 {II}double.PositiveInfinity, double.NegativeInfinity, double.NaN
 {I}}})
 {I}{{
-{II}Aas.SerializationException? caught = null;
+{II}Our.SerializationException? caught = null;
 {II}try
 {II}{{
 {III}SerializeToString(Nodes.JsonValue.Create(value));
 {II}}}
-{II}catch (Aas.SerializationException exception)
+{II}catch (Our.SerializationException exception)
 {II}{{
 {III}caught = exception;
 {II}}}
@@ -403,7 +403,7 @@ public void Test_deserialize_rejects_non_finite_number()
 {III}+ "</value>");
 
 {II}DeserializeFromString(
-{III}text, out Aas.Reporting.Error? error);
+{III}text, out Our.Reporting.Error? error);
 
 {II}Assert.IsNotNull(error, $"Unexpectedly accepted <double>{{numeral}}</double>");
 {I}}}
@@ -423,7 +423,7 @@ public void Test_deserialize_collapses_the_whitespace_of_a_boolean_and_a_double(
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? booleanResult = DeserializeFromString(
-{II}booleanText, out Aas.Reporting.Error? booleanError);
+{II}booleanText, out Our.Reporting.Error? booleanError);
 
 {I}Assert.IsNull(booleanError);
 {I}Assert.IsNotNull(booleanResult);
@@ -435,7 +435,7 @@ public void Test_deserialize_collapses_the_whitespace_of_a_boolean_and_a_double(
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? doubleResult = DeserializeFromString(
-{II}doubleText, out Aas.Reporting.Error? doubleError);
+{II}doubleText, out Our.Reporting.Error? doubleError);
 
 {I}Assert.IsNull(doubleError);
 {I}Assert.IsNotNull(doubleResult);
@@ -456,7 +456,7 @@ public void Test_deserialize_preserves_the_whitespace_of_a_string()
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error);
 {I}Assert.IsNotNull(result);
@@ -494,7 +494,7 @@ public void Test_deserialize_reads_a_pretty_printed_document()
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(error, $"Unexpected cause: {{error?.Cause}}");
 {I}Assert.IsNotNull(result);
@@ -517,7 +517,7 @@ public void Test_deserialize_rejects_an_element_within_a_namespace()
 {II}+ "</value>");
 
 {I}Nodes.JsonNode? result = DeserializeFromString(
-{II}text, out Aas.Reporting.Error? error);
+{II}text, out Our.Reporting.Error? error);
 
 {I}Assert.IsNull(result);
 {I}Assert.IsNotNull(error);
@@ -533,7 +533,7 @@ public void Test_deserialize_rejects_an_element_within_a_namespace()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Nodes = System.Text.Json.Nodes;
 

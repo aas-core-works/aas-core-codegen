@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;
@@ -18,12 +18,12 @@ namespace dummy.Tests
     public class TestJsonizationOfConcreteClasses
     {
         private static void AssertSerializeDeserializeEqualsOriginal(
-            Nodes.JsonNode originalNode, Aas.IClass instance, string path)
+            Nodes.JsonNode originalNode, Our.IClass instance, string path)
         {
             Nodes.JsonObject? serialized = null;
             try
             {
-                serialized = Aas.Jsonization.Serialize.ToJsonObject(instance);
+                serialized = Our.Jsonization.Serialize.ToJsonObject(instance);
             }
             catch (System.Exception exception)
             {
@@ -41,7 +41,7 @@ namespace dummy.Tests
             }
             else
             {
-                Aas.Tests.CommonJson.CheckJsonNodesEqual(
+                Our.Tests.CommonJson.CheckJsonNodesEqual(
                     originalNode,
                     serialized,
                     out Reporting.Error? inequalityError);
@@ -57,7 +57,7 @@ namespace dummy.Tests
         }
 
         private static void AssertEqualsExpectedOrRerecordDeserializationException(
-            Aas.Jsonization.Exception? exception,
+            Our.Jsonization.Exception? exception,
             string path)
         {
             if (exception == null)
@@ -70,7 +70,7 @@ namespace dummy.Tests
             {
                 string exceptionPath = path + ".exception";
                 string got = exception.Message;
-                if (Aas.Tests.Common.RecordMode)
+                if (Our.Tests.Common.RecordMode)
                 {
                     System.IO.File.WriteAllText(exceptionPath, got);
                 }
@@ -81,7 +81,7 @@ namespace dummy.Tests
                         throw new System.IO.FileNotFoundException(
                             $"The file with the recorded exception does not exist: {exceptionPath}; " +
                             "maybe you want to set the environment " +
-                            $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                            $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                     }
 
                     string expected = System.IO.File.ReadAllText(exceptionPath);
@@ -98,7 +98,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "Leaf"
@@ -109,13 +109,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.LeafFrom(
+                var instance = Our.Jsonization.Deserialize.LeafFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -129,13 +129,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.LeafFrom(
+                var _ = Our.Jsonization.Deserialize.LeafFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -161,7 +161,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -188,15 +188,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.LeafFrom(
+                        var _ = Our.Jsonization.Deserialize.LeafFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -214,7 +214,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -241,13 +241,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.LeafFrom(
+                    var instance = Our.Jsonization.Deserialize.LeafFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -258,7 +258,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "OrderedContainer"
@@ -269,13 +269,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+                var instance = Our.Jsonization.Deserialize.OrderedContainerFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -289,13 +289,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+                var _ = Our.Jsonization.Deserialize.OrderedContainerFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -321,7 +321,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -348,15 +348,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+                        var _ = Our.Jsonization.Deserialize.OrderedContainerFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -374,7 +374,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -401,13 +401,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.OrderedContainerFrom(
+                    var instance = Our.Jsonization.Deserialize.OrderedContainerFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -418,7 +418,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "UnorderedContainer"
@@ -429,13 +429,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+                var instance = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -449,13 +449,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+                var _ = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -481,7 +481,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -508,15 +508,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+                        var _ = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -534,7 +534,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -561,13 +561,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.UnorderedContainerFrom(
+                    var instance = Our.Jsonization.Deserialize.UnorderedContainerFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -578,7 +578,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "GlobalAttribute"
@@ -589,13 +589,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+                var instance = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -609,13 +609,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+                var _ = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -641,7 +641,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -668,15 +668,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+                        var _ = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -694,7 +694,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -721,13 +721,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.GlobalAttributeFrom(
+                    var instance = Our.Jsonization.Deserialize.GlobalAttributeFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -738,7 +738,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "LocalAttribute"
@@ -749,13 +749,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+                var instance = Our.Jsonization.Deserialize.LocalAttributeFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -769,13 +769,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+                var _ = Our.Jsonization.Deserialize.LocalAttributeFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -801,7 +801,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -828,15 +828,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+                        var _ = Our.Jsonization.Deserialize.LocalAttributeFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -854,7 +854,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -881,13 +881,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.LocalAttributeFrom(
+                    var instance = Our.Jsonization.Deserialize.LocalAttributeFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -898,7 +898,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "AttributeOperand"
@@ -909,13 +909,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+                var instance = Our.Jsonization.Deserialize.AttributeOperandFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -929,13 +929,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+                var _ = Our.Jsonization.Deserialize.AttributeOperandFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -961,7 +961,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -988,15 +988,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+                        var _ = Our.Jsonization.Deserialize.AttributeOperandFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -1014,7 +1014,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -1041,13 +1041,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.AttributeOperandFrom(
+                    var instance = Our.Jsonization.Deserialize.AttributeOperandFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -1058,7 +1058,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "StringLiteral"
@@ -1069,13 +1069,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.StringLiteralFrom(
+                var instance = Our.Jsonization.Deserialize.StringLiteralFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -1089,13 +1089,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.StringLiteralFrom(
+                var _ = Our.Jsonization.Deserialize.StringLiteralFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -1121,7 +1121,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -1148,15 +1148,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.StringLiteralFrom(
+                        var _ = Our.Jsonization.Deserialize.StringLiteralFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -1174,7 +1174,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -1201,13 +1201,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.StringLiteralFrom(
+                    var instance = Our.Jsonization.Deserialize.StringLiteralFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -1218,7 +1218,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "NumberLiteral"
@@ -1229,13 +1229,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+                var instance = Our.Jsonization.Deserialize.NumberLiteralFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -1249,13 +1249,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+                var _ = Our.Jsonization.Deserialize.NumberLiteralFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -1281,7 +1281,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -1308,15 +1308,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+                        var _ = Our.Jsonization.Deserialize.NumberLiteralFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -1334,7 +1334,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -1361,13 +1361,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+                    var instance = Our.Jsonization.Deserialize.NumberLiteralFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -1378,7 +1378,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     "Something"
@@ -1389,13 +1389,13 @@ namespace dummy.Tests
 
             foreach (var path in paths)
             {
-                var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+                var instance = Our.Jsonization.Deserialize.SomethingFrom(
                     node);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     node, instance, path);
@@ -1409,13 +1409,13 @@ namespace dummy.Tests
                 ?? throw new System.InvalidOperationException(
                     "Unexpected failure of the node creation");
 
-            Aas.Jsonization.Exception? exception = null;
+            Our.Jsonization.Exception? exception = null;
             try
             {
-                var _ = Aas.Jsonization.Deserialize.SomethingFrom(
+                var _ = Our.Jsonization.Deserialize.SomethingFrom(
                     node);
             }
-            catch (Aas.Jsonization.Exception observedException)
+            catch (Our.Jsonization.Exception observedException)
             {
                 exception = observedException;
             }
@@ -1441,7 +1441,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Unserializable"
@@ -1468,15 +1468,15 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    Aas.Jsonization.Exception? exception = null;
+                    Our.Jsonization.Exception? exception = null;
                     try
                     {
-                        var _ = Aas.Jsonization.Deserialize.SomethingFrom(
+                        var _ = Our.Jsonization.Deserialize.SomethingFrom(
                             node);
                     }
-                    catch (Aas.Jsonization.Exception observedException)
+                    catch (Our.Jsonization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -1494,7 +1494,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Json",
                         "Unexpected",
                         "Invalid"
@@ -1521,13 +1521,13 @@ namespace dummy.Tests
 
                 foreach (var path in paths)
                 {
-                    var node = Aas.Tests.CommonJson.ReadFromFile(path);
+                    var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-                    var instance = Aas.Jsonization.Deserialize.SomethingFrom(
+                    var instance = Our.Jsonization.Deserialize.SomethingFrom(
                         node);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -1540,7 +1540,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Json",
                     "Expected",
                     modelType),
@@ -1552,7 +1552,7 @@ namespace dummy.Tests
                 paths,
                 $"Expected at least one recorded example of {modelType}, but got none");
 
-            return Aas.Tests.CommonJson.ReadFromFile(paths[0]);
+            return Our.Tests.CommonJson.ReadFromFile(paths[0]);
         }
 
         [Test]
@@ -1563,17 +1563,17 @@ namespace dummy.Tests
                 var node = LoadTheFirstExpected(
                     "NumberLiteral");
 
-                var instance = Aas.Jsonization.Deserialize.NumberLiteralFrom(
+                var instance = Our.Jsonization.Deserialize.NumberLiteralFrom(
                     node);
 
                 instance.Number = value;
 
-                Aas.Jsonization.SerializationException? exception = null;
+                Our.Jsonization.SerializationException? exception = null;
                 try
                 {
-                    var _ = Aas.Jsonization.Serialize.ToJsonObject(instance);
+                    var _ = Our.Jsonization.Serialize.ToJsonObject(instance);
                 }
-                catch (Aas.Jsonization.SerializationException observedException)
+                catch (Our.Jsonization.SerializationException observedException)
                 {
                     exception = observedException;
                 }

@@ -8,17 +8,17 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 TEST_CASE("Test the round-trip of an expected IHasSemantics") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > original_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -28,23 +28,23 @@ TEST_CASE("Test the round-trip of an expected IHasSemantics") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -53,13 +53,13 @@ TEST_CASE("Test the round-trip of an expected IHasSemantics") {
   }
 
   std::shared_ptr<
-    aas::types::IHasSemantics
+    our::types::IHasSemantics
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IHasSemantics
+    our::types::IHasSemantics
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -80,13 +80,13 @@ TEST_CASE("Test the round-trip of an expected IHasSemantics") {
 
 TEST_CASE("Test the round-trip of an expected IHasExtensions") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > original_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -96,23 +96,23 @@ TEST_CASE("Test the round-trip of an expected IHasExtensions") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -121,13 +121,13 @@ TEST_CASE("Test the round-trip of an expected IHasExtensions") {
   }
 
   std::shared_ptr<
-    aas::types::IHasExtensions
+    our::types::IHasExtensions
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IHasExtensions
+    our::types::IHasExtensions
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -148,13 +148,13 @@ TEST_CASE("Test the round-trip of an expected IHasExtensions") {
 
 TEST_CASE("Test the round-trip of an expected IReferable") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > original_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -164,23 +164,23 @@ TEST_CASE("Test the round-trip of an expected IReferable") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -189,13 +189,13 @@ TEST_CASE("Test the round-trip of an expected IReferable") {
   }
 
   std::shared_ptr<
-    aas::types::IReferable
+    our::types::IReferable
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IReferable
+    our::types::IReferable
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -216,13 +216,13 @@ TEST_CASE("Test the round-trip of an expected IReferable") {
 
 TEST_CASE("Test the round-trip of an expected IIdentifiable") {
   const std::shared_ptr<
-    aas::types::IAssetAdministrationShell
+    our::types::IAssetAdministrationShell
   > original_instance(
     test::common::examples::LoadMinAssetAdministrationShell()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -232,23 +232,23 @@ TEST_CASE("Test the round-trip of an expected IIdentifiable") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IAssetAdministrationShell: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -257,13 +257,13 @@ TEST_CASE("Test the round-trip of an expected IIdentifiable") {
   }
 
   std::shared_ptr<
-    aas::types::IIdentifiable
+    our::types::IIdentifiable
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IIdentifiable
+    our::types::IIdentifiable
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -284,13 +284,13 @@ TEST_CASE("Test the round-trip of an expected IIdentifiable") {
 
 TEST_CASE("Test the round-trip of an expected IHasKind") {
   const std::shared_ptr<
-    aas::types::ISubmodel
+    our::types::ISubmodel
   > original_instance(
     test::common::examples::LoadMinSubmodel()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -300,23 +300,23 @@ TEST_CASE("Test the round-trip of an expected IHasKind") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of ISubmodel: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -325,13 +325,13 @@ TEST_CASE("Test the round-trip of an expected IHasKind") {
   }
 
   std::shared_ptr<
-    aas::types::IHasKind
+    our::types::IHasKind
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IHasKind
+    our::types::IHasKind
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -352,13 +352,13 @@ TEST_CASE("Test the round-trip of an expected IHasKind") {
 
 TEST_CASE("Test the round-trip of an expected IHasDataSpecification") {
   const std::shared_ptr<
-    aas::types::IAdministrativeInformation
+    our::types::IAdministrativeInformation
   > original_instance(
     test::common::examples::LoadMinAdministrativeInformation()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -368,23 +368,23 @@ TEST_CASE("Test the round-trip of an expected IHasDataSpecification") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IAdministrativeInformation: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -393,13 +393,13 @@ TEST_CASE("Test the round-trip of an expected IHasDataSpecification") {
   }
 
   std::shared_ptr<
-    aas::types::IHasDataSpecification
+    our::types::IHasDataSpecification
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IHasDataSpecification
+    our::types::IHasDataSpecification
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -420,13 +420,13 @@ TEST_CASE("Test the round-trip of an expected IHasDataSpecification") {
 
 TEST_CASE("Test the round-trip of an expected IQualifiable") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > original_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -436,23 +436,23 @@ TEST_CASE("Test the round-trip of an expected IQualifiable") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -461,13 +461,13 @@ TEST_CASE("Test the round-trip of an expected IQualifiable") {
   }
 
   std::shared_ptr<
-    aas::types::IQualifiable
+    our::types::IQualifiable
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IQualifiable
+    our::types::IQualifiable
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -488,13 +488,13 @@ TEST_CASE("Test the round-trip of an expected IQualifiable") {
 
 TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > original_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -504,23 +504,23 @@ TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -529,13 +529,13 @@ TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
   }
 
   std::shared_ptr<
-    aas::types::ISubmodelElement
+    our::types::ISubmodelElement
   > abstract = std::dynamic_pointer_cast<
-    aas::types::ISubmodelElement
+    our::types::ISubmodelElement
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -556,13 +556,13 @@ TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
 
 TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
   const std::shared_ptr<
-    aas::types::IAnnotatedRelationshipElement
+    our::types::IAnnotatedRelationshipElement
   > original_instance(
     test::common::examples::LoadMinAnnotatedRelationshipElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -572,23 +572,23 @@ TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IAnnotatedRelationshipElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -597,13 +597,13 @@ TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
   }
 
   std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -624,13 +624,13 @@ TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
 
 TEST_CASE("Test the round-trip of an expected IDataElement") {
   const std::shared_ptr<
-    aas::types::IBlob
+    our::types::IBlob
   > original_instance(
     test::common::examples::LoadMinBlob()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -640,23 +640,23 @@ TEST_CASE("Test the round-trip of an expected IDataElement") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IBlob: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -665,13 +665,13 @@ TEST_CASE("Test the round-trip of an expected IDataElement") {
   }
 
   std::shared_ptr<
-    aas::types::IDataElement
+    our::types::IDataElement
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IDataElement
+    our::types::IDataElement
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -692,13 +692,13 @@ TEST_CASE("Test the round-trip of an expected IDataElement") {
 
 TEST_CASE("Test the round-trip of an expected IEventElement") {
   const std::shared_ptr<
-    aas::types::IBasicEventElement
+    our::types::IBasicEventElement
   > original_instance(
     test::common::examples::LoadMinBasicEventElement()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -708,23 +708,23 @@ TEST_CASE("Test the round-trip of an expected IEventElement") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IBasicEventElement: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -733,13 +733,13 @@ TEST_CASE("Test the round-trip of an expected IEventElement") {
   }
 
   std::shared_ptr<
-    aas::types::IEventElement
+    our::types::IEventElement
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IEventElement
+    our::types::IEventElement
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -760,13 +760,13 @@ TEST_CASE("Test the round-trip of an expected IEventElement") {
 
 TEST_CASE("Test the round-trip of an expected IAbstractLangString") {
   const std::shared_ptr<
-    aas::types::ILangStringDefinitionTypeIec61360
+    our::types::ILangStringDefinitionTypeIec61360
   > original_instance(
     test::common::examples::LoadMinLangStringDefinitionTypeIec61360()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -776,23 +776,23 @@ TEST_CASE("Test the round-trip of an expected IAbstractLangString") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of ILangStringDefinitionTypeIec61360: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -801,13 +801,13 @@ TEST_CASE("Test the round-trip of an expected IAbstractLangString") {
   }
 
   std::shared_ptr<
-    aas::types::IAbstractLangString
+    our::types::IAbstractLangString
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IAbstractLangString
+    our::types::IAbstractLangString
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss
@@ -828,13 +828,13 @@ TEST_CASE("Test the round-trip of an expected IAbstractLangString") {
 
 TEST_CASE("Test the round-trip of an expected IDataSpecificationContent") {
   const std::shared_ptr<
-    aas::types::IDataSpecificationIec61360
+    our::types::IDataSpecificationIec61360
   > original_instance(
     test::common::examples::LoadMinDataSpecificationIec61360()
   );
 
   std::stringstream ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *original_instance,
     {},
     ss
@@ -844,23 +844,23 @@ TEST_CASE("Test the round-trip of an expected IDataSpecificationContent") {
 
   ss.seekp(0);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ss
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make the round-trip Serialize-Deserialize "
         "a minimal instance of IDataSpecificationIec61360: ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )
@@ -869,13 +869,13 @@ TEST_CASE("Test the round-trip of an expected IDataSpecificationContent") {
   }
 
   std::shared_ptr<
-    aas::types::IDataSpecificationContent
+    our::types::IDataSpecificationContent
   > abstract = std::dynamic_pointer_cast<
-    aas::types::IDataSpecificationContent
+    our::types::IDataSpecificationContent
   >(deserialized.value());
 
   std::stringstream another_ss;
-  aas::xmlization::Serialize(
+  our::xmlization::Serialize(
     *abstract,
     {},
     another_ss

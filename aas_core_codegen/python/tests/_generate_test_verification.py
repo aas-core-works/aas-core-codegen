@@ -47,9 +47,9 @@ def {method_name}(self) -> None:
 {II}with path.open("rt") as fid:
 {III}jsonable = json.load(fid)
 
-{II}instance = aas_jsonization.{from_jsonable}(jsonable)
+{II}instance = our_jsonization.{from_jsonable}(jsonable)
 
-{II}errors = list(aas_verification.verify(instance))
+{II}errors = list(our_verification.verify(instance))
 
 {II}if len(errors) > 0:
 {III}self.fail(
@@ -113,9 +113,9 @@ def {method_name}(self) -> None:
 {III}with path.open("rt") as fid:
 {IIII}jsonable = json.load(fid)
 
-{III}instance = aas_jsonization.{from_jsonable}(jsonable)
+{III}instance = our_jsonization.{from_jsonable}(jsonable)
 
-{III}errors = list(aas_verification.verify(instance))
+{III}errors = list(our_verification.verify(instance))
 
 {III}if len(errors) == 0:
 {IIII}self.fail(
@@ -165,8 +165,8 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.jsonization as aas_jsonization
-import {qualified_module_name}.verification as aas_verification"""
+import {qualified_module_name}.jsonization as our_jsonization
+import {qualified_module_name}.verification as our_verification"""
         ),
         Stripped("import tests.common"),
         _generate_test_verification_of_valid_instances(symbol_table=symbol_table),

@@ -1,12 +1,12 @@
 /// <summary>
 /// Check that all <paramref name="elements" /> have the identical
-/// <see cref="Aas.IHasSemantics.SemanticId" />'s.
+/// <see cref="Our.IHasSemantics.SemanticId" />'s.
 /// </summary>
 public static bool SubmodelElementsHaveIdenticalSemanticIds(
-    IEnumerable<Aas.ISubmodelElement> elements
+    IEnumerable<Our.ISubmodelElement> elements
 )
 {
-        Aas.IReference? thatSemanticId = null;
+        Our.IReference? thatSemanticId = null;
 
         foreach (var element in elements)
         {

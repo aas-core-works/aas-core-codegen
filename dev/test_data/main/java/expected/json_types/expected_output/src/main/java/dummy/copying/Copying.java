@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Allow for making shallow and deep copies of AAS model instances.
+ * Allow for making shallow and deep copies of model instances.
  */
 public class Copying
 {

@@ -12,7 +12,7 @@ import json
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 import tests.common
@@ -37,11 +37,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.element_from_jsonable(
+                instance = our_jsonization.element_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,
@@ -66,11 +66,11 @@ class TestRoundTrips(unittest.TestCase):
                 with path.open("rt") as fid:
                     original_jsonable = json.load(fid)
 
-                instance = aas_jsonization.container_from_jsonable(
+                instance = our_jsonization.container_from_jsonable(
                     original_jsonable
                 )
 
-                another_jsonable = aas_jsonization.to_jsonable(instance)
+                another_jsonable = our_jsonization.to_jsonable(instance)
 
                 mismatch = tests.common_jsonization.check_equal(
                     original_jsonable,

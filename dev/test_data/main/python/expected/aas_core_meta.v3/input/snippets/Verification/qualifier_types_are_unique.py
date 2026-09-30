@@ -1,4 +1,4 @@
-def qualifier_types_are_unique(qualifiers: Iterable[aas_types.Qualifier]) -> bool:
+def qualifier_types_are_unique(qualifiers: Iterable[our_types.Qualifier]) -> bool:
     """
     Check that there are no duplicate
     :py:attr:`.types.Qualifier.type`'s

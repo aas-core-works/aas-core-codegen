@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Nodes = System.Text.Json.Nodes;
 
@@ -21,10 +21,10 @@ namespace dummy.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.ColorFrom(
+            var parsed = Our.Jsonization.Deserialize.ColorFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.ColorToJsonValue(
+            var serialized = Our.Jsonization.Serialize.ColorToJsonValue(
                 parsed);
 
             Assert.AreEqual(

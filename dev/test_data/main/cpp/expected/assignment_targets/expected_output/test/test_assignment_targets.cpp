@@ -25,13 +25,13 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
-std::shared_ptr<aas::types::IItem> NewItem(
+std::shared_ptr<our::types::IItem> NewItem(
   std::wstring text,
   std::vector<std::wstring> texts
 ) {
-  return std::make_shared<aas::types::Item>(
+  return std::make_shared<our::types::Item>(
     std::move(text),
     std::move(texts)
   );
@@ -39,40 +39,40 @@ std::shared_ptr<aas::types::IItem> NewItem(
 
 TEST_CASE("Test SetText") {
   auto item = NewItem(L"a", {L"b"});
-  aas::verification::SetText(item, L"x");
+  our::verification::SetText(item, L"x");
   REQUIRE(item->text() == L"x");
 }
 
 TEST_CASE("Test SetMaybeText") {
   auto item = NewItem(L"a", {});
-  aas::verification::SetMaybeText(item, L"x");
+  our::verification::SetMaybeText(item, L"x");
   REQUIRE(item->maybe_text().has_value());
   REQUIRE(*(item->maybe_text()) == L"x");
 }
 
 TEST_CASE("Test CopyMaybeTextAndSetMaybeKind") {
-  std::shared_ptr<aas::types::IItem> item = std::make_shared<aas::types::Item>(
+  std::shared_ptr<our::types::IItem> item = std::make_shared<our::types::Item>(
     L"a",
     std::vector<std::wstring>(),
     std::wstring(L"old")
   );
   auto other = NewItem(L"b", {});
-  aas::verification::CopyMaybeTextAndSetMaybeKind(item, other);
+  our::verification::CopyMaybeTextAndSetMaybeKind(item, other);
   REQUIRE(!item->maybe_text().has_value());
   REQUIRE(item->maybe_kind().has_value());
-  REQUIRE(*(item->maybe_kind()) == aas::types::Kind::kAlpha);
+  REQUIRE(*(item->maybe_kind()) == our::types::Kind::kAlpha);
 }
 
 TEST_CASE("Test SetTextThroughAlias") {
   auto item = NewItem(L"a", {});
-  aas::verification::SetTextThroughAlias(item, L"x");
+  our::verification::SetTextThroughAlias(item, L"x");
   REQUIRE(item->text() == L"x");
 }
 
 TEST_CASE("Test SetTexts") {
   auto item = NewItem(L"a", {L"b"});
   std::vector<std::wstring> texts{L"x", L"y"};
-  aas::verification::SetTexts(item, texts);
+  our::verification::SetTexts(item, texts);
 
   // NOTE (mristin):
   // The stored list is a copy, so its changes do not affect the property.
@@ -82,57 +82,57 @@ TEST_CASE("Test SetTexts") {
 
 TEST_CASE("Test SetFirstAndLastText") {
   auto item = NewItem(L"a", {L"a", L"b", L"c"});
-  aas::verification::SetFirstAndLastText(item, L"x");
+  our::verification::SetFirstAndLastText(item, L"x");
   REQUIRE(item->texts() == std::vector<std::wstring>{L"x", L"b", L"x"});
 }
 
 TEST_CASE("Test SetTextThroughListAlias") {
   auto item = NewItem(L"a", {L"a", L"b", L"c"});
-  aas::verification::SetTextThroughListAlias(item, L"x");
+  our::verification::SetTextThroughListAlias(item, L"x");
   REQUIRE(item->texts() == std::vector<std::wstring>{L"a", L"x", L"c"});
 }
 
 TEST_CASE("Test SetNumbers") {
   std::vector<int64_t> numbers{1, 2, 3, 4};
-  aas::verification::SetNumbers(numbers, 10);
+  our::verification::SetNumbers(numbers, 10);
   REQUIRE(numbers == std::vector<int64_t>{10, 2, 5, 4});
 }
 
 TEST_CASE("Test SetNumbers with an index out of range") {
   std::vector<int64_t> numbers{1};
   REQUIRE_THROWS_AS(
-    aas::verification::SetNumbers(numbers, 10),
+    our::verification::SetNumbers(numbers, 10),
     std::out_of_range
   );
 }
 
 TEST_CASE("Test SetNestedText") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {L"a", L"b"}),
     NewItem(L"b", {L"c"})
   };
-  aas::verification::SetNestedText(items, L"x");
+  our::verification::SetNestedText(items, L"x");
   REQUIRE(items[0]->texts() == std::vector<std::wstring>{L"a", L"x"});
   REQUIRE(items[1]->text() == L"x");
 }
 
 TEST_CASE("Test ReplaceFirstItem") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {}),
     NewItem(L"b", {})
   };
   auto item = NewItem(L"c", {});
-  aas::verification::ReplaceFirstItem(items, item);
+  our::verification::ReplaceFirstItem(items, item);
   REQUIRE(items[0] == item);
   REQUIRE(items.size() == 2);
 }
 
 TEST_CASE("Test SetTextsInLoops") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {L"a"}),
     NewItem(L"b", {L"b", L"c"})
   };
-  aas::verification::SetTextsInLoops(items, L"x");
+  our::verification::SetTextsInLoops(items, L"x");
   for (const auto& item : items) {
     REQUIRE(item->text() == L"x");
     REQUIRE(item->texts()[0] == L"x");
@@ -141,28 +141,28 @@ TEST_CASE("Test SetTextsInLoops") {
 
 TEST_CASE("Test FillTextsOfItem") {
   auto item = NewItem(L"a", {L"a", L"b"});
-  REQUIRE(aas::verification::FillTextsOfItem(item, L"x"));
+  REQUIRE(our::verification::FillTextsOfItem(item, L"x"));
   REQUIRE(item->texts() == std::vector<std::wstring>{L"x", L"x"});
 }
 
 TEST_CASE("Test FillTextsThroughAlias") {
   auto item = NewItem(L"a", {L"a", L"b"});
-  REQUIRE(aas::verification::FillTextsThroughAlias(item, L"x"));
+  REQUIRE(our::verification::FillTextsThroughAlias(item, L"x"));
   REQUIRE(item->texts() == std::vector<std::wstring>{L"x", L"x"});
 }
 
 TEST_CASE("Test FillTextsOfArgument") {
   std::vector<std::wstring> texts{L"a", L"b"};
-  REQUIRE(aas::verification::FillTextsOfArgument(texts, L"x"));
+  REQUIRE(our::verification::FillTextsOfArgument(texts, L"x"));
   REQUIRE(texts == std::vector<std::wstring>{L"x", L"x"});
 }
 
 TEST_CASE("Test RenameAll") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {}),
     NewItem(L"b", {})
   };
-  REQUIRE(aas::verification::RenameAll(items, L"x"));
+  REQUIRE(our::verification::RenameAll(items, L"x"));
   for (const auto& item : items) {
     REQUIRE(item->text() == L"x");
   }
@@ -173,39 +173,39 @@ TEST_CASE("Test SetFirstTextsOfLists") {
     {L"a", L"b"},
     {L"c"}
   };
-  aas::verification::SetFirstTextsOfLists(lists, L"x");
+  our::verification::SetFirstTextsOfLists(lists, L"x");
   REQUIRE(lists[0] == std::vector<std::wstring>{L"x", L"b"});
   REQUIRE(lists[1] == std::vector<std::wstring>{L"x"});
 }
 
 TEST_CASE("Test SetFirstTextsInSiblingLoops") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {L"a"})
   };
-  std::vector<std::shared_ptr<aas::types::IItem> > others{
+  std::vector<std::shared_ptr<our::types::IItem> > others{
     NewItem(L"b", {L"b", L"c"})
   };
-  aas::verification::SetFirstTextsInSiblingLoops(items, others, L"x");
+  our::verification::SetFirstTextsInSiblingLoops(items, others, L"x");
   REQUIRE(items[0]->texts() == std::vector<std::wstring>{L"x"});
   REQUIRE(others[0]->texts() == std::vector<std::wstring>{L"x", L"c"});
 }
 
 TEST_CASE("Test TextCopyIsIndependent") {
   auto item = NewItem(L"a", {});
-  REQUIRE(aas::verification::TextCopyIsIndependent(item, L"x"));
+  REQUIRE(our::verification::TextCopyIsIndependent(item, L"x"));
   REQUIRE(item->text() == L"x");
 }
 
 TEST_CASE("Test NumberCopyIsIndependent") {
   std::vector<int64_t> numbers{1, 2};
-  REQUIRE(aas::verification::NumberCopyIsIndependent(numbers));
+  REQUIRE(our::verification::NumberCopyIsIndependent(numbers));
   REQUIRE(numbers[0] == 2);
 }
 
 TEST_CASE("Test SetMaybeTexts") {
   auto item = NewItem(L"a", {});
   std::vector<std::wstring> texts{L"x", L"y"};
-  aas::verification::SetMaybeTexts(item, texts);
+  our::verification::SetMaybeTexts(item, texts);
 
   // NOTE (mristin):
   // The stored list is a copy, so its changes do not affect the property.
@@ -217,12 +217,12 @@ TEST_CASE("Test SetMaybeTexts") {
 }
 
 TEST_CASE("Test SetMaybeItem") {
-  std::shared_ptr<aas::types::ISomething> something =
-    std::make_shared<aas::types::Something>(
-      std::vector<std::shared_ptr<aas::types::IItem> >()
+  std::shared_ptr<our::types::ISomething> something =
+    std::make_shared<our::types::Something>(
+      std::vector<std::shared_ptr<our::types::IItem> >()
     );
   auto item = NewItem(L"a", {});
-  aas::verification::SetMaybeItem(something, item);
+  our::verification::SetMaybeItem(something, item);
   REQUIRE(something->maybe_item().has_value());
   REQUIRE(*(something->maybe_item()) == item);
 }
@@ -230,25 +230,25 @@ TEST_CASE("Test SetMaybeItem") {
 TEST_CASE("Test SetTextOfReboundAlias") {
   auto item = NewItem(L"a", {});
   auto other = NewItem(L"b", {});
-  aas::verification::SetTextOfReboundAlias(item, other, L"x");
+  our::verification::SetTextOfReboundAlias(item, other, L"x");
   REQUIRE(item->text() == L"a");
   REQUIRE(other->text() == L"x");
 }
 
 TEST_CASE("Test FirstTextThroughAliasIs") {
   auto item = NewItem(L"a", {L"x"});
-  REQUIRE(aas::verification::FirstTextThroughAliasIs(item, L"x"));
-  REQUIRE(!aas::verification::FirstTextThroughAliasIs(item, L"y"));
+  REQUIRE(our::verification::FirstTextThroughAliasIs(item, L"x"));
+  REQUIRE(!our::verification::FirstTextThroughAliasIs(item, L"y"));
 }
 
 TEST_CASE("Test TextsAreNotEmpty") {
-  std::vector<std::shared_ptr<aas::types::IItem> > items{
+  std::vector<std::shared_ptr<our::types::IItem> > items{
     NewItem(L"a", {L"b"})
   };
-  REQUIRE(aas::verification::TextsAreNotEmpty(items));
+  REQUIRE(our::verification::TextsAreNotEmpty(items));
 
   items.push_back(NewItem(L"c", {L"d", L""}));
-  REQUIRE(!aas::verification::TextsAreNotEmpty(items));
+  REQUIRE(!our::verification::TextsAreNotEmpty(items));
 }
 
 // This code has been automatically generated by aas-core-codegen.

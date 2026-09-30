@@ -1,33 +1,33 @@
 // NOTE (mristin):
-// The literals of AasTypes.AasSubmodelElements are consecutive integers starting
+// The literals of OurTypes.AasSubmodelElements are consecutive integers starting
 // at 0, so we index into an array instead of looking the check up in a map.
 const AAS_SUBMODEL_ELEMENTS_TO_IS: ReadonlyArray<
-  (that: AasTypes.Class) => boolean
+  (that: OurTypes.Class) => boolean
 > = [
-  AasTypes.isAnnotatedRelationshipElement,
-  AasTypes.isBasicEventElement,
-  AasTypes.isBlob,
-  AasTypes.isCapability,
-  AasTypes.isDataElement,
-  AasTypes.isEntity,
-  AasTypes.isEventElement,
-  AasTypes.isFile,
-  AasTypes.isMultiLanguageProperty,
-  AasTypes.isOperation,
-  AasTypes.isProperty,
-  AasTypes.isRange,
-  AasTypes.isReferenceElement,
-  AasTypes.isRelationshipElement,
-  AasTypes.isSubmodelElement,
-  AasTypes.isSubmodelElementList,
-  AasTypes.isSubmodelElementCollection
+  OurTypes.isAnnotatedRelationshipElement,
+  OurTypes.isBasicEventElement,
+  OurTypes.isBlob,
+  OurTypes.isCapability,
+  OurTypes.isDataElement,
+  OurTypes.isEntity,
+  OurTypes.isEventElement,
+  OurTypes.isFile,
+  OurTypes.isMultiLanguageProperty,
+  OurTypes.isOperation,
+  OurTypes.isProperty,
+  OurTypes.isRange,
+  OurTypes.isReferenceElement,
+  OurTypes.isRelationshipElement,
+  OurTypes.isSubmodelElement,
+  OurTypes.isSubmodelElementList,
+  OurTypes.isSubmodelElementCollection
 ];
 
 function assertAllTypesCoveredInAasSubmodelElementsToIs() {
-  for (const literal of AasTypes.overAasSubmodelElements()) {
+  for (const literal of OurTypes.overAasSubmodelElements()) {
     if (AAS_SUBMODEL_ELEMENTS_TO_IS[literal] === undefined) {
       throw new Error(
-        `The enumeration literal ${literal} of AasTypes.AasSubmodelElements ` +
+        `The enumeration literal ${literal} of OurTypes.AasSubmodelElements ` +
           "is not covered in AAS_SUBMODEL_ELEMENTS_TO_IS"
       );
     }
@@ -44,8 +44,8 @@ assertAllTypesCoveredInAasSubmodelElementsToIs();
  * @returns `true` if `element` corresponds to `expectedType`
  */
 export function submodelElementIsOfType(
-  element: AasTypes.ISubmodelElement,
-  expectedType: AasTypes.AasSubmodelElements
+  element: OurTypes.ISubmodelElement,
+  expectedType: OurTypes.AasSubmodelElements
 ): boolean {
   const isFunc = AAS_SUBMODEL_ELEMENTS_TO_IS[expectedType];
   return isFunc(element);

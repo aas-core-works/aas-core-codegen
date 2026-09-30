@@ -29,7 +29,7 @@ def _generate_method_delegation(
     """Generate the delegated method to ``instance``."""
     returns = (
         golang_common.generate_type(
-            method.returns, types_package=Identifier("aastypes")
+            method.returns, types_package=Identifier("ourtypes")
         )
         if method.returns is not None
         else None
@@ -40,7 +40,7 @@ def _generate_method_delegation(
     arg_types_names = [
         (
             golang_common.generate_type(
-                arg.type_annotation, types_package=Identifier("aastypes")
+                arg.type_annotation, types_package=Identifier("ourtypes")
             ),
             golang_naming.argument_name(arg.name),
         )
@@ -100,21 +100,21 @@ def _generate_enhanced_struct_and_its_methods(
         Stripped(
             f"""\
 type {enhanced_struct_name}[E any] struct {{
-{I}instance aastypes.{interface_name}
+{I}instance ourtypes.{interface_name}
 {I}enhancement E
 }}"""
         ),
         Stripped(
             f"""\
 func ({receiver} *{enhanced_struct_name}[E]) {model_type_getter}(
-) aastypes.{model_type_enum} {{
+) ourtypes.{model_type_enum} {{
 {I}return {receiver}.instance.{model_type_getter}()
 }}"""
         ),
         Stripped(
             f"""\
 func ({receiver} *{enhanced_struct_name}[E]) DescendOnce(
-{I}action func(aastypes.IClass)bool,
+{I}action func(ourtypes.IClass)bool,
 ) bool {{
 {I}return {receiver}.instance.DescendOnce(action)
 }}"""
@@ -122,7 +122,7 @@ func ({receiver} *{enhanced_struct_name}[E]) DescendOnce(
         Stripped(
             f"""\
 func ({receiver} *{enhanced_struct_name}[E]) Descend(
-{I}action func(aastypes.IClass) bool,
+{I}action func(ourtypes.IClass) bool,
 ) bool {{
 {I}return {receiver}.instance.Descend(action)
 }}"""
@@ -131,7 +131,7 @@ func ({receiver} *{enhanced_struct_name}[E]) Descend(
 
     for prop in cls.properties:
         prop_type = golang_common.generate_type(
-            type_annotation=prop.type_annotation, types_package=Identifier("aastypes")
+            type_annotation=prop.type_annotation, types_package=Identifier("ourtypes")
         )
 
         getter_name = golang_naming.getter_name(prop.name)
@@ -233,7 +233,7 @@ that.{prop_setter_name}(
 {I}Wrap[E](
 {II}{prop_var},
 {II}factory,
-{I}).(aastypes.{prop_interface_name}),
+{I}).(ourtypes.{prop_interface_name}),
 )"""
                 )
 
@@ -288,7 +288,7 @@ for i, v := range {prop_var} {{
 {I}{prop_var}[i] = Wrap[E](
 {II}v,
 {II}factory,
-{I}).(aastypes.{items_interface_name})
+{I}).(ourtypes.{items_interface_name})
 }}"""
                     )
 
@@ -376,7 +376,7 @@ for i, v := range {prop_var} {{
 {prop_var}.Item{i + 1} = Wrap[E](
 {I}{prop_var}.Item{i + 1},
 {I}factory,
-).(aastypes.{item_interface_name})"""
+).(ourtypes.{item_interface_name})"""
                         )
                     )
 
@@ -479,9 +479,9 @@ if shouldEnhance {{
     return Stripped(
         f"""\
 func {function_name}[E any](
-{I}that aastypes.{interface_name},
-{I}factory func(aastypes.IClass) (E, bool),
-) (result aastypes.{interface_name}) {{
+{I}that ourtypes.{interface_name},
+{I}factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.{interface_name}) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
     )
@@ -491,7 +491,7 @@ def _generate_self_union_and_wrap_union() -> Stripped:
     """
     Generate the ``selfUnion`` constraint and the ``wrapUnion`` helper.
 
-    A named union is not itself an ``aastypes.IClass``, so it can not be
+    A named union is not itself an ``ourtypes.IClass``, so it can not be
     passed to ``Wrap[E]`` directly, and its underlying instance has to be
     unwrapped, enhanced and re-wrapped. Go has no method overloading (unlike
     C#/Java), so this can not be a same-named overload of ``Wrap`` -- but,
@@ -499,11 +499,11 @@ def _generate_self_union_and_wrap_union() -> Stripped:
     special-case here in the first place, so a single small generic helper
     covers every named union directly, with ``T`` self-bounded via
     ``selfUnion[T]`` so the result comes back as the caller's own concrete
-    union type (e.g. ``*aastypes.StructuralUnion``), with no type assertion
+    union type (e.g. ``*ourtypes.StructuralUnion``), with no type assertion
     needed at any property/list-item/tuple-item call site -- unlike the
-    class-typed sibling call sites, which do need a ``.(aastypes.IXxx)``
+    class-typed sibling call sites, which do need a ``.(ourtypes.IXxx)``
     type assertion, since ``Wrap[E]`` itself is generic only over ``E`` and
-    always returns the common ``aastypes.IClass``.
+    always returns the common ``ourtypes.IClass``.
 
     Should a named union ever be allowed to flatten primitive or enumeration
     alternatives, only the body of ``wrapUnion`` has to change (to dispatch
@@ -516,8 +516,8 @@ def _generate_self_union_and_wrap_union() -> Stripped:
 // a generic helper that both unwraps and re-wraps without knowing the
 // concrete union type.
 type selfUnion[T any] interface {{
-{I}Underlying() aastypes.IClass
-{I}WithUnderlying(aastypes.IClass) T
+{I}Underlying() ourtypes.IClass
+{I}WithUnderlying(ourtypes.IClass) T
 }}
 
 // Wrap the underlying instance of `that` union recursively with the
@@ -525,7 +525,7 @@ type selfUnion[T any] interface {{
 // same concrete union type as `that`.
 func wrapUnion[E any, T selfUnion[T]](
 {I}that T,
-{I}factory func(aastypes.IClass) (E, bool),
+{I}factory func(ourtypes.IClass) (E, bool),
 ) T {{
 {I}return that.WithUnderlying(
 {II}Wrap[E](
@@ -569,9 +569,9 @@ if ok {{
         case_blocks.append(
             Stripped(
                 f"""\
-case aastypes.{literal}:
+case ourtypes.{literal}:
 {I}result = {wrap_function}[E](
-{II}that.(aastypes.{interface_name}),
+{II}that.(ourtypes.{interface_name}),
 {II}factory,
 {I})"""
             )
@@ -615,9 +615,9 @@ switch that.{model_type_getter}() {{
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-{I}that aastypes.IClass,
-{I}factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {{
+{I}that ourtypes.IClass,
+{I}factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
     )
@@ -642,9 +642,9 @@ def generate(
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code for enhancing model classes."""
-    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+    ourcommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
         Stripped(
@@ -681,7 +681,7 @@ type enhanced[E any] interface {{
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {{
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {{
 {I}var enh enhanced[E]
 {I}enh, ok = that.(enhanced[E])
 {I}if !ok {{
@@ -696,7 +696,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {{
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {{
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {{
 {I}var ok bool
 {I}enhancement, ok = Unwrap[E](that)
 {I}if !ok {{
@@ -720,10 +720,10 @@ func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {{
     if golang_common.names_package(blocks, "fmt"):
         import_lines.append(f'{I}"fmt"')
 
-    if golang_common.names_package(blocks, "aascommon"):
-        import_lines.append(f"{I}aascommon {aascommon_url_literal}")
+    if golang_common.names_package(blocks, "ourcommon"):
+        import_lines.append(f"{I}ourcommon {ourcommon_url_literal}")
 
-    import_lines.append(f"{I}aastypes {aastypes_url_literal}")
+    import_lines.append(f"{I}ourtypes {ourtypes_url_literal}")
 
     blocks[import_index] = Stripped("import (\n" + "\n".join(import_lines) + "\n)")
 

@@ -54,10 +54,10 @@ const DOUBLE_RE = new RegExp(
  */
 export function parseValueContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonValue, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonValue, DeserializationError> {{
 {I}const startTagOrError = readNextOpenTagInNoNamespace(cursor);
 {I}if (startTagOrError.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {III}null, startTagOrError.error
 {II});
 {I}}}
@@ -70,7 +70,7 @@ export function parseValueContent(
 {II}// The element which is no discriminator at all gets no step of its own:
 {II}// it is that very element which does not belong here, so naming it in
 {II}// the path as well as in the message would say nothing more.
-{II}return newDeserializationError<AasTypes.JsonValue>(
+{II}return newDeserializationError<OurTypes.JsonValue>(
 {III}`Expected a discriminator element (one of 'boolean', 'double', ` +
 {IIII}`'string', 'array' or 'struct'), but got: '${{localName}}'`
 {II});
@@ -100,7 +100,7 @@ export function parseValueContent(
  */
 function parserForDiscriminator(
 {I}localName: string
-): ContentParser<AasTypes.JsonValue> | null {{
+): ContentParser<OurTypes.JsonValue> | null {{
 {I}switch (localName) {{
 {II}case "boolean":
 {III}return parseBooleanContent;
@@ -131,24 +131,24 @@ function parserForDiscriminator(
  */
 function parseBooleanContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonValue, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonValue, DeserializationError> {{
 {I}// NOTE (mristin):
 {I}// `whiteSpace` is fixed to `collapse` for every atomic XSD type but
 {I}// a string, so a pretty-printed `<boolean>` has to be read as well.
 {I}const text = collapseWhitespace(parseTextContent(cursor));
 
 {I}if (text === "1") {{
-{II}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {III}true, null
 {II});
 {I}}}
 {I}if (text === "0") {{
-{II}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {III}false, null
 {II});
 {I}}}
 
-{I}return newDeserializationError<AasTypes.JsonValue>(
+{I}return newDeserializationError<OurTypes.JsonValue>(
 {II}`Expected '0' or '1' as the text of a 'boolean' element, ` +
 {III}`but got: '${{text}}'`
 {I});
@@ -164,7 +164,7 @@ function parseBooleanContent(
  */
 function parseDoubleContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonValue, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonValue, DeserializationError> {{
 {I}// NOTE (mristin):
 {I}// See the note in `parseBooleanContent` on why the whitespace is
 {I}// collapsed here.
@@ -181,7 +181,7 @@ function parseDoubleContent(
 {I}// a JSON number, and JSON knows neither an infinity nor a not-a-number,
 {I}// so there is no JSON-able value for such a text to parse into.
 {I}if (!DOUBLE_RE.test(text)) {{
-{II}return newDeserializationError<AasTypes.JsonValue>(
+{II}return newDeserializationError<OurTypes.JsonValue>(
 {III}`Expected a number as the text of a 'double' element, ` +
 {IIII}`but got: '${{text}}'`
 {II});
@@ -193,14 +193,14 @@ function parseDoubleContent(
 {I}// A literal too large for a `number` gives an infinity, which is no
 {I}// JSON-able value either, so it is refused rather than rounded.
 {I}if (!Number.isFinite(value)) {{
-{II}return newDeserializationError<AasTypes.JsonValue>(
+{II}return newDeserializationError<OurTypes.JsonValue>(
 {III}`Expected a number representable as a JSON-able value as the text ` +
 {IIII}`of a 'double' element, but got a value which rounds to ` +
 {IIII}`an infinity: '${{text}}'`
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+{I}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {II}value, null
 {I});
 }}"""
@@ -219,8 +219,8 @@ function parseDoubleContent(
  */
 function parseStringContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonValue, DeserializationError> {{
-{I}return new AasCommon.Either<AasTypes.JsonValue, DeserializationError>(
+): OurCommon.Either<OurTypes.JsonValue, DeserializationError> {{
+{I}return new OurCommon.Either<OurTypes.JsonValue, DeserializationError>(
 {II}parseTextContent(cursor), null
 {I});
 }}"""
@@ -240,8 +240,8 @@ function parseStringContent(
  */
 function parseDataContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonArray, DeserializationError> {{
-{I}const items = new Array<AasTypes.JsonValue>();
+): OurCommon.Either<OurTypes.JsonArray, DeserializationError> {{
+{I}const items = new Array<OurTypes.JsonValue>();
 
 {I}// eslint-disable-next-line no-constant-condition
 {I}while (true) {{
@@ -255,7 +255,7 @@ function parseDataContent(
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(items.length));
 {III}itemOrError.error.path.prepend(new ElementSegment("data"));
-{III}return new AasCommon.Either<AasTypes.JsonArray, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.JsonArray, DeserializationError>(
 {IIII}null, itemOrError.error
 {III});
 {II}}}
@@ -263,7 +263,7 @@ function parseDataContent(
 {II}items.push(itemOrError.mustValue());
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonArray, DeserializationError>(
+{I}return new OurCommon.Either<OurTypes.JsonArray, DeserializationError>(
 {II}items, null
 {I});
 }}"""
@@ -281,7 +281,7 @@ function parseDataContent(
  */
 export function parseArrayBody(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonArray, DeserializationError> {{
+): OurCommon.Either<OurTypes.JsonArray, DeserializationError> {{
 {I}return parseNamedElementInNoNamespace(cursor, "data", parseDataContent);
 }}"""
         ),
@@ -299,8 +299,8 @@ export function parseArrayBody(
  */
 export function parseStructBody(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.JsonObject, DeserializationError> {{
-{I}const members: AasTypes.JsonObject = {{}};
+): OurCommon.Either<OurTypes.JsonObject, DeserializationError> {{
+{I}const members: OurTypes.JsonObject = {{}};
 
 {I}// eslint-disable-next-line no-constant-condition
 {I}while (true) {{
@@ -314,7 +314,7 @@ export function parseStructBody(
 {III}cursor, "member", parseMemberContent
 {II});
 {II}if (memberOrError.error !== null) {{
-{III}return new AasCommon.Either<AasTypes.JsonObject, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.JsonObject, DeserializationError>(
 {IIII}null, memberOrError.error
 {III});
 {II}}}
@@ -331,7 +331,7 @@ export function parseStructBody(
 {IIII}"The member occurred more than once"
 {III});
 {III}error.path.prepend(new KeySegment(key));
-{III}return new AasCommon.Either<AasTypes.JsonObject, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.JsonObject, DeserializationError>(
 {IIII}null, error
 {III});
 {II}}}
@@ -339,7 +339,7 @@ export function parseStructBody(
 {II}members[key] = value;
 {I}}}
 
-{I}return new AasCommon.Either<AasTypes.JsonObject, DeserializationError>(
+{I}return new OurCommon.Either<OurTypes.JsonObject, DeserializationError>(
 {II}members, null
 {I});
 }}"""
@@ -358,8 +358,8 @@ export function parseStructBody(
  */
 function parseNameContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<string, DeserializationError> {{
-{I}return new AasCommon.Either<string, DeserializationError>(
+): OurCommon.Either<string, DeserializationError> {{
+{I}return new OurCommon.Either<string, DeserializationError>(
 {II}parseTextContent(cursor), null
 {I});
 }}
@@ -379,11 +379,11 @@ function parseNameContent(
  */
 function parseMemberContent(
 {I}cursor: XmlCursor
-): AasCommon.Either<[string, AasTypes.JsonValue], DeserializationError> {{
+): OurCommon.Either<[string, OurTypes.JsonValue], DeserializationError> {{
 {I}const keyOrError = parseNamedElementInNoNamespace(cursor, "name", parseNameContent);
 {I}if (keyOrError.error !== null) {{
-{II}return new AasCommon.Either<
-{III}[string, AasTypes.JsonValue], DeserializationError
+{II}return new OurCommon.Either<
+{III}[string, OurTypes.JsonValue], DeserializationError
 {II}>(null, keyOrError.error);
 {I}}}
 {I}const key = keyOrError.mustValue();
@@ -392,13 +392,13 @@ function parseMemberContent(
 {I}if (valueOrError.error !== null) {{
 {II}valueOrError.error.path.prepend(new ElementSegment("value"));
 {II}valueOrError.error.path.prepend(new KeySegment(key));
-{II}return new AasCommon.Either<
-{III}[string, AasTypes.JsonValue], DeserializationError
+{II}return new OurCommon.Either<
+{III}[string, OurTypes.JsonValue], DeserializationError
 {II}>(null, valueOrError.error);
 {I}}}
 
-{I}return new AasCommon.Either<
-{II}[string, AasTypes.JsonValue], DeserializationError
+{I}return new OurCommon.Either<
+{II}[string, OurTypes.JsonValue], DeserializationError
 {I}>([key, valueOrError.mustValue()], null);
 }}"""
         ),
@@ -426,7 +426,7 @@ def _generate_writers() -> List[Stripped]:
  */
 export function writeValueContent(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonValue
+{I}value: OurTypes.JsonValue
 ): void {{
 {I}writeValue(parts, value, true);
 }}
@@ -441,14 +441,14 @@ export function writeValueContent(
  */
 function writeNestedValueContent(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonValue
+{I}value: OurTypes.JsonValue
 ): void {{
 {I}writeValue(parts, value, false);
 }}
 
 function writeValue(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonValue,
+{I}value: OurTypes.JsonValue,
 {I}undeclareNamespace: boolean
 ): void {{
 {I}const xmlns = undeclareNamespace ? ' xmlns=""' : "";
@@ -508,7 +508,7 @@ function writeValue(
 {I}}}
 
 {I}parts.push(`<struct${{xmlns}}>`);
-{I}writeStruct(parts, value as AasTypes.JsonObject, false);
+{I}writeStruct(parts, value as OurTypes.JsonObject, false);
 {I}parts.push("</struct>");
 }}"""
         ),
@@ -526,14 +526,14 @@ function writeValue(
  */
 export function writeArrayBody(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonArray
+{I}value: OurTypes.JsonArray
 ): void {{
 {I}writeArray(parts, value, true);
 }}
 
 function writeArray(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonArray,
+{I}value: OurTypes.JsonArray,
 {I}undeclareNamespace: boolean
 ): void {{
 {I}parts.push(undeclareNamespace ? '<data xmlns="">' : "<data>");
@@ -567,14 +567,14 @@ function writeArray(
  */
 export function writeStructBody(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonObject
+{I}value: OurTypes.JsonObject
 ): void {{
 {I}writeStruct(parts, value, true);
 }}
 
 function writeStruct(
 {I}parts: Array<string>,
-{I}value: AasTypes.JsonObject,
+{I}value: OurTypes.JsonObject,
 {I}undeclareNamespace: boolean
 ): void {{
 {I}// NOTE (mristin):
@@ -634,8 +634,8 @@ def generate() -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasCommon from "./common";
-import * as AasTypes from "./types";
+import * as OurCommon from "./common";
+import * as OurTypes from "./types";
 
 import {
   ContentParser,

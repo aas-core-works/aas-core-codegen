@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using System.Linq;  // can't alias
 using NUnit.Framework;  // can't alias
@@ -15,8 +15,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ModellingKind_valid()
         {
-            var errors = Aas.Verification.VerifyModellingKind(
-                Aas.ModellingKind.Template).ToList();
+            var errors = Our.Verification.VerifyModellingKind(
+                Our.ModellingKind.Template).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_ModellingKind_valid
@@ -25,9 +25,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ModellingKind_invalid()
         {
             int valueAsInt = -1;
-            Aas.ModellingKind value = (Aas.ModellingKind)valueAsInt;
+            Our.ModellingKind value = (Our.ModellingKind)valueAsInt;
 
-            var errors = Aas.Verification.VerifyModellingKind(
+            var errors = Our.Verification.VerifyModellingKind(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -37,8 +37,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_QualifierKind_valid()
         {
-            var errors = Aas.Verification.VerifyQualifierKind(
-                Aas.QualifierKind.ValueQualifier).ToList();
+            var errors = Our.Verification.VerifyQualifierKind(
+                Our.QualifierKind.ValueQualifier).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_QualifierKind_valid
@@ -47,9 +47,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_QualifierKind_invalid()
         {
             int valueAsInt = -1;
-            Aas.QualifierKind value = (Aas.QualifierKind)valueAsInt;
+            Our.QualifierKind value = (Our.QualifierKind)valueAsInt;
 
-            var errors = Aas.Verification.VerifyQualifierKind(
+            var errors = Our.Verification.VerifyQualifierKind(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -59,8 +59,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetKind_valid()
         {
-            var errors = Aas.Verification.VerifyAssetKind(
-                Aas.AssetKind.Type).ToList();
+            var errors = Our.Verification.VerifyAssetKind(
+                Our.AssetKind.Type).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_AssetKind_valid
@@ -69,9 +69,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AssetKind_invalid()
         {
             int valueAsInt = -1;
-            Aas.AssetKind value = (Aas.AssetKind)valueAsInt;
+            Our.AssetKind value = (Our.AssetKind)valueAsInt;
 
-            var errors = Aas.Verification.VerifyAssetKind(
+            var errors = Our.Verification.VerifyAssetKind(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -81,8 +81,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AasSubmodelElements_valid()
         {
-            var errors = Aas.Verification.VerifyAasSubmodelElements(
-                Aas.AasSubmodelElements.AnnotatedRelationshipElement).ToList();
+            var errors = Our.Verification.VerifyAasSubmodelElements(
+                Our.AasSubmodelElements.AnnotatedRelationshipElement).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_AasSubmodelElements_valid
@@ -91,9 +91,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AasSubmodelElements_invalid()
         {
             int valueAsInt = -1;
-            Aas.AasSubmodelElements value = (Aas.AasSubmodelElements)valueAsInt;
+            Our.AasSubmodelElements value = (Our.AasSubmodelElements)valueAsInt;
 
-            var errors = Aas.Verification.VerifyAasSubmodelElements(
+            var errors = Our.Verification.VerifyAasSubmodelElements(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -103,8 +103,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_EntityType_valid()
         {
-            var errors = Aas.Verification.VerifyEntityType(
-                Aas.EntityType.CoManagedEntity).ToList();
+            var errors = Our.Verification.VerifyEntityType(
+                Our.EntityType.CoManagedEntity).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_EntityType_valid
@@ -113,9 +113,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_EntityType_invalid()
         {
             int valueAsInt = -1;
-            Aas.EntityType value = (Aas.EntityType)valueAsInt;
+            Our.EntityType value = (Our.EntityType)valueAsInt;
 
-            var errors = Aas.Verification.VerifyEntityType(
+            var errors = Our.Verification.VerifyEntityType(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -125,8 +125,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Direction_valid()
         {
-            var errors = Aas.Verification.VerifyDirection(
-                Aas.Direction.Input).ToList();
+            var errors = Our.Verification.VerifyDirection(
+                Our.Direction.Input).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_Direction_valid
@@ -135,9 +135,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Direction_invalid()
         {
             int valueAsInt = -1;
-            Aas.Direction value = (Aas.Direction)valueAsInt;
+            Our.Direction value = (Our.Direction)valueAsInt;
 
-            var errors = Aas.Verification.VerifyDirection(
+            var errors = Our.Verification.VerifyDirection(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -147,8 +147,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_StateOfEvent_valid()
         {
-            var errors = Aas.Verification.VerifyStateOfEvent(
-                Aas.StateOfEvent.On).ToList();
+            var errors = Our.Verification.VerifyStateOfEvent(
+                Our.StateOfEvent.On).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_StateOfEvent_valid
@@ -157,9 +157,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_StateOfEvent_invalid()
         {
             int valueAsInt = -1;
-            Aas.StateOfEvent value = (Aas.StateOfEvent)valueAsInt;
+            Our.StateOfEvent value = (Our.StateOfEvent)valueAsInt;
 
-            var errors = Aas.Verification.VerifyStateOfEvent(
+            var errors = Our.Verification.VerifyStateOfEvent(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -169,8 +169,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceTypes_valid()
         {
-            var errors = Aas.Verification.VerifyReferenceTypes(
-                Aas.ReferenceTypes.ExternalReference).ToList();
+            var errors = Our.Verification.VerifyReferenceTypes(
+                Our.ReferenceTypes.ExternalReference).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_ReferenceTypes_valid
@@ -179,9 +179,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ReferenceTypes_invalid()
         {
             int valueAsInt = -1;
-            Aas.ReferenceTypes value = (Aas.ReferenceTypes)valueAsInt;
+            Our.ReferenceTypes value = (Our.ReferenceTypes)valueAsInt;
 
-            var errors = Aas.Verification.VerifyReferenceTypes(
+            var errors = Our.Verification.VerifyReferenceTypes(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -191,8 +191,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_KeyTypes_valid()
         {
-            var errors = Aas.Verification.VerifyKeyTypes(
-                Aas.KeyTypes.AnnotatedRelationshipElement).ToList();
+            var errors = Our.Verification.VerifyKeyTypes(
+                Our.KeyTypes.AnnotatedRelationshipElement).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_KeyTypes_valid
@@ -201,9 +201,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_KeyTypes_invalid()
         {
             int valueAsInt = -1;
-            Aas.KeyTypes value = (Aas.KeyTypes)valueAsInt;
+            Our.KeyTypes value = (Our.KeyTypes)valueAsInt;
 
-            var errors = Aas.Verification.VerifyKeyTypes(
+            var errors = Our.Verification.VerifyKeyTypes(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -213,8 +213,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataTypeDefXsd_valid()
         {
-            var errors = Aas.Verification.VerifyDataTypeDefXsd(
-                Aas.DataTypeDefXsd.AnyUri).ToList();
+            var errors = Our.Verification.VerifyDataTypeDefXsd(
+                Our.DataTypeDefXsd.AnyUri).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_DataTypeDefXsd_valid
@@ -223,9 +223,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_DataTypeDefXsd_invalid()
         {
             int valueAsInt = -1;
-            Aas.DataTypeDefXsd value = (Aas.DataTypeDefXsd)valueAsInt;
+            Our.DataTypeDefXsd value = (Our.DataTypeDefXsd)valueAsInt;
 
-            var errors = Aas.Verification.VerifyDataTypeDefXsd(
+            var errors = Our.Verification.VerifyDataTypeDefXsd(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);
@@ -235,8 +235,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataTypeIec61360_valid()
         {
-            var errors = Aas.Verification.VerifyDataTypeIec61360(
-                Aas.DataTypeIec61360.Date).ToList();
+            var errors = Our.Verification.VerifyDataTypeIec61360(
+                Our.DataTypeIec61360.Date).ToList();
 
             Assert.IsEmpty(errors);
         }  // void Test_DataTypeIec61360_valid
@@ -245,9 +245,9 @@ namespace AasCore.Aas3_0.Tests
         public void Test_DataTypeIec61360_invalid()
         {
             int valueAsInt = -1;
-            Aas.DataTypeIec61360 value = (Aas.DataTypeIec61360)valueAsInt;
+            Our.DataTypeIec61360 value = (Our.DataTypeIec61360)valueAsInt;
 
-            var errors = Aas.Verification.VerifyDataTypeIec61360(
+            var errors = Our.Verification.VerifyDataTypeIec61360(
                 value).ToList();
 
             Assert.AreEqual(1, errors.Count);

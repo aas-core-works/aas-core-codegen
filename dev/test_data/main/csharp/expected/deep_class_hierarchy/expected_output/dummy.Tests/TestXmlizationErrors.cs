@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -17,7 +17,7 @@ namespace dummy.Tests
         public void Test_error_on_unexpected_declaration()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Xml",
                 "Expected",
                 "branch",
@@ -46,17 +46,16 @@ namespace dummy.Tests
                 stringReader);
 
             // We intentionally do not call `MoveToContent` to test the error message.
-            // This is a very common situation, see:
-            // https://github.com/aas-core-works/aas-core3.0-csharp/issues/24
+            // This is a very common situation.
 
             string? message = null;
 
             try
             {
-                Aas.Xmlization.Deserialize.BranchFrom(
+                Our.Xmlization.Deserialize.BranchFrom(
                     xmlReader);
             }
-            catch (Aas.Xmlization.Exception exception)
+            catch (Our.Xmlization.Exception exception)
             {
                 message = exception.Message;
             }
@@ -76,7 +75,7 @@ namespace dummy.Tests
         public void Test_error_on_duplicate_property()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Xml",
                 "Expected",
                 "branch",
@@ -133,10 +132,10 @@ namespace dummy.Tests
 
             try
             {
-                Aas.Xmlization.Deserialize.BranchFrom(
+                Our.Xmlization.Deserialize.BranchFrom(
                     xmlReader);
             }
-            catch (Aas.Xmlization.Exception exception)
+            catch (Our.Xmlization.Exception exception)
             {
                 message = exception.Message;
             }

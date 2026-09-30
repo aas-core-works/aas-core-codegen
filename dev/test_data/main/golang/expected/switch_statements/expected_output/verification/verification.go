@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,15 +42,15 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check the switch with a single case and no default.
 func SwitchOnEnumWithASingleCase(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 ) bool {
 	switch kind {
-	case aastypes.KindDelta:
+	case ourtypes.KindDelta:
 		return false
 	}
 	return true
@@ -58,12 +58,12 @@ func SwitchOnEnumWithASingleCase(
 
 // Check the switch with a case per form of labels and a default.
 func SwitchOnEnumWithDefault(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha:
+	case ourtypes.KindAlpha:
 		return true
-	case aastypes.KindBeta, aastypes.KindGamma:
+	case ourtypes.KindBeta, ourtypes.KindGamma:
 		return false
 	default:
 		return true
@@ -72,10 +72,10 @@ func SwitchOnEnumWithDefault(
 
 // Check the switch with the labels given as a tuple.
 func SwitchOnEnumWithLabelsInTuple(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha, aastypes.KindBeta, aastypes.KindGamma:
+	case ourtypes.KindAlpha, ourtypes.KindBeta, ourtypes.KindGamma:
 		return true
 	default:
 		return false
@@ -84,12 +84,12 @@ func SwitchOnEnumWithLabelsInTuple(
 
 // Check the switch with the branches which pass and complete normally.
 func SwitchOnEnumWithPass(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 ) bool {
 	result := true
 	switch kind {
-	case aastypes.KindAlpha, aastypes.KindBeta:
-	case aastypes.KindGamma:
+	case ourtypes.KindAlpha, ourtypes.KindBeta:
+	case ourtypes.KindGamma:
 		result = false
 	default:
 	}
@@ -98,15 +98,15 @@ func SwitchOnEnumWithPass(
 
 // Check the variables defined in the cases of the switch.
 func SwitchOnEnumWithVariablesInCases(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 	text string,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha:
-		length := aascommon.LenStr(text)
+	case ourtypes.KindAlpha:
+		length := ourcommon.LenStr(text)
 		return length > 1
-	case aastypes.KindBeta:
-		length := aascommon.LenStr(text)
+	case ourtypes.KindBeta:
+		length := ourcommon.LenStr(text)
 		return length > 2
 	default:
 		return true
@@ -125,7 +125,7 @@ func SwitchOnStr(
 	case "delta", "epsilon":
 		return false
 	default:
-		return aascommon.LenStr(text) > 0
+		return ourcommon.LenStr(text) > 0
 	}
 }
 
@@ -159,18 +159,18 @@ func SwitchOnInt(
 
 // Check the nested switches, including an `elif` on another subject.
 func NestedSwitches(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 	number int64,
 ) bool {
 	switch kind {
-	case aastypes.KindAlpha:
+	case ourtypes.KindAlpha:
 		switch number {
 		case 0:
 			return true
 		default:
 			return number > 10
 		}
-	case aastypes.KindBeta:
+	case ourtypes.KindBeta:
 		switch number {
 		case 1:
 			return false
@@ -187,25 +187,25 @@ func NestedSwitches(
 // Check the integer variable defined with a literal, and re-assigned
 // an integer argument in a branch of the switch.
 func SwitchWithReassignedInt(
-	kind aastypes.Kind,
+	kind ourtypes.Kind,
 	number int64,
 ) bool {
 	result := int64(0)
 	switch kind {
-	case aastypes.KindBeta:
+	case ourtypes.KindBeta:
 		result = number
 	}
 	return result < 1000
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -319,7 +319,7 @@ func VerifySomething(
 		that.Kind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Kind",
 				},
 			)
@@ -334,7 +334,7 @@ func VerifySomething(
 		that.Name(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Name",
 				},
 			)
@@ -356,14 +356,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindDelta {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindDelta {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -389,7 +389,7 @@ func VerifyNonEmptyString(
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that) > 0) {
+	if !(ourcommon.LenStr(that) > 0) {
 		abort = onError(
 			newVerificationError(
 				"At least one character",),
@@ -409,14 +409,14 @@ func VerifyNonEmptyString(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

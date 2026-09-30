@@ -1,5 +1,5 @@
 def data_specification_iec_61360s_have_value(
-    embedded_data_specifications: Iterable[aas_types.EmbeddedDataSpecification],
+    embedded_data_specifications: Iterable[our_types.EmbeddedDataSpecification],
 ) -> bool:
     """
     Check that :py:attr:`.types.DataSpecificationIEC61360.value`
@@ -8,7 +8,7 @@ def data_specification_iec_61360s_have_value(
     for embedded_data_specification in embedded_data_specifications:
         if isinstance(
             embedded_data_specification.data_specification_content,
-            aas_types.DataSpecificationIEC61360,
+            our_types.DataSpecificationIEC61360,
         ):
             iec61360 = embedded_data_specification.data_specification_content
             if iec61360.value is None:

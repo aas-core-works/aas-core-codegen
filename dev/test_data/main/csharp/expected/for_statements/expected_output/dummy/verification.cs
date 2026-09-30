@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of Item:
     /// <code>
-    /// var anInstance = new Aas.Item(
+    /// var anInstance = new Our.Item(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -332,8 +332,8 @@ namespace dummy
             internal static readonly HashSet<int> ForKind = new HashSet<int>
             {
 
-                (int)Aas.Kind.Alpha,
-                (int)Aas.Kind.Beta
+                (int)Our.Kind.Alpha,
+                (int)Our.Kind.Beta
             };
         }  // internal static class EnumValueSet
 
@@ -346,7 +346,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformItem(
-                Aas.IItem that
+                Our.IItem that
             )
             {
                 // No verification has been defined for Item.
@@ -355,7 +355,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 if (!(
@@ -487,7 +487,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -499,7 +499,7 @@ namespace dummy
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKind(
-            Aas.Kind that)
+            Our.Kind that)
         {
             if (!EnumValueSet.ForKind.Contains(
                 (int)that))

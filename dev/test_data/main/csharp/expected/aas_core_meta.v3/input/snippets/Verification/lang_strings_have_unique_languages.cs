@@ -3,7 +3,7 @@
 /// language.
 /// </summary>
 public static bool LangStringsHaveUniqueLanguages(
-    IEnumerable<Aas.IAbstractLangString> langStrings
+    IEnumerable<Our.IAbstractLangString> langStrings
 )
 {
     var languageSet = new HashSet<string>();

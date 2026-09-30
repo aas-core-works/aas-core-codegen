@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -267,7 +267,7 @@ namespace dummy
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IItem IItemFrom(
+            public static Our.IItem IItemFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -295,14 +295,14 @@ namespace dummy
                         $"Unexpected model type for IItem: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IItem IItemFrom
+            }  // public static Our.IItem IItemFrom
 
             /// <summary>
             /// Deserialize an instance of Box from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Box BoxFrom(
+            internal static Our.Box BoxFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -379,7 +379,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Box(
+                return new Our.Box(
                     theNumber
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -448,7 +448,7 @@ namespace dummy
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.IItem anInstance = Deserialize.IItemFrom(
+        /// Our.IItem anInstance = Deserialize.IItemFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -463,10 +463,10 @@ namespace dummy
             /// representation of IItem.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IItem IItemFrom(
+            public static Our.IItem IItemFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IItem result = DeserializeImplementation.IItemFrom(
+                Our.IItem result = DeserializeImplementation.IItemFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -486,10 +486,10 @@ namespace dummy
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Box.
             /// </exception>
-            public static Aas.Box BoxFrom(
+            public static Our.Box BoxFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Box result = DeserializeImplementation.BoxFrom(
+                Our.Box result = DeserializeImplementation.BoxFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -526,7 +526,7 @@ namespace dummy
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -634,7 +634,7 @@ namespace dummy
             }
 
             public override Nodes.JsonObject TransformBox(
-                Aas.IBox that
+                Our.IBox that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -655,7 +655,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of IItem:
         /// <code>
-        /// var anInstance = new Aas.IItem(
+        /// var anInstance = new Our.IItem(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -672,7 +672,7 @@ namespace dummy
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {

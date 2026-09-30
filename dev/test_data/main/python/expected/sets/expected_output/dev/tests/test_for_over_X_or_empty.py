@@ -12,7 +12,7 @@ import pathlib
 import unittest
 
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
 import tests.common
@@ -34,7 +34,7 @@ class TestSomething(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Something
+                our_types.Something
             )
 
             log = [
@@ -71,7 +71,7 @@ class TestCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Collection
+                our_types.Collection
             )
 
             log = [
@@ -109,7 +109,7 @@ class TestCollection(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Collection
+                our_types.Collection
             )
 
             log = [

@@ -10,18 +10,18 @@ from typing import (
     Optional,
 )
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
-_KIND_FROM_STR: Mapping[str, aas_types.Kind] = {
-    'alpha': aas_types.Kind.ALPHA,
-    'beta': aas_types.Kind.BETA,
+_KIND_FROM_STR: Mapping[str, our_types.Kind] = {
+    'alpha': our_types.Kind.ALPHA,
+    'beta': our_types.Kind.BETA,
 }
 
 
 def kind_from_str(
         text: str
-) -> Optional[aas_types.Kind]:
+) -> Optional[our_types.Kind]:
     """
     Parse :paramref:`text` as string representation
     of :py:class:`dummy.Kind`.

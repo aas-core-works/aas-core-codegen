@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,39 +14,39 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.QueryCondition LoadMaximalQueryCondition()
+        public static Our.QueryCondition LoadMaximalQueryCondition()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "QueryCondition",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.QueryConditionFrom(
+            var instance = Our.Jsonization.Deserialize.QueryConditionFrom(
                 node);
 
             return instance;
-        }  // public static Aas.QueryCondition LoadMaximalQueryCondition
+        }  // public static Our.QueryCondition LoadMaximalQueryCondition
 
-        public static Aas.QueryCondition LoadMinimalQueryCondition()
+        public static Our.QueryCondition LoadMinimalQueryCondition()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "QueryCondition",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.QueryConditionFrom(
+            var instance = Our.Jsonization.Deserialize.QueryConditionFrom(
                 node);
 
             return instance;
-        }  // public static Aas.QueryCondition LoadMinimalQueryCondition
+        }  // public static Our.QueryCondition LoadMinimalQueryCondition
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

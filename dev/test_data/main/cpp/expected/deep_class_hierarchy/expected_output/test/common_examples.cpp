@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,72 +21,72 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::IBranch
+  our::types::IBranch
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IBranch
+  our::types::IBranch
 >::name = "IBranch";
 
 template<>
 struct StaticTypeName<
-  aas::types::ILeaf
+  our::types::ILeaf
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ILeaf
+  our::types::ILeaf
 >::name = "ILeaf";
 
 template<>
 struct StaticTypeName<
-  aas::types::IBlossom
+  our::types::IBlossom
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IBlossom
+  our::types::IBlossom
 >::name = "IBlossom";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISomething
+  our::types::ISomething
 >::name = "ISomething";
 
 template<>
 struct StaticTypeName<
-  aas::types::IContainer
+  our::types::IContainer
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IContainer
+  our::types::IContainer
 >::name = "IContainer";
 
 std::shared_ptr<
-  aas::types::IBranch
+  our::types::IBranch
 > LoadBranch(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IBranch
+    our::types::IBranch
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IBranch
+      our::types::IBranch
     >(
       abstract
     )
@@ -94,7 +94,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IBranch from ",
         path.string()
       )
@@ -105,7 +105,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IBranch
+  our::types::IBranch
 > LoadMinBranch() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -121,7 +121,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IBranch
+  our::types::IBranch
 > LoadMaxBranch() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -137,23 +137,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILeaf
+  our::types::ILeaf
 > LoadLeaf(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ILeaf
+    our::types::ILeaf
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ILeaf
+      our::types::ILeaf
     >(
       abstract
     )
@@ -161,7 +161,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ILeaf from ",
         path.string()
       )
@@ -172,7 +172,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILeaf
+  our::types::ILeaf
 > LoadMinLeaf() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -188,7 +188,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ILeaf
+  our::types::ILeaf
 > LoadMaxLeaf() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -204,23 +204,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IBlossom
+  our::types::IBlossom
 > LoadBlossom(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IBlossom
+    our::types::IBlossom
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IBlossom
+      our::types::IBlossom
     >(
       abstract
     )
@@ -228,7 +228,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IBlossom from ",
         path.string()
       )
@@ -239,7 +239,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IBlossom
+  our::types::IBlossom
 > LoadMinBlossom() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -255,7 +255,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IBlossom
+  our::types::IBlossom
 > LoadMaxBlossom() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -271,23 +271,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadSomething(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISomething
+      our::types::ISomething
     >(
       abstract
     )
@@ -295,7 +295,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISomething from ",
         path.string()
       )
@@ -306,7 +306,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMinSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -322,7 +322,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISomething
+  our::types::ISomething
 > LoadMaxSomething() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -338,23 +338,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IContainer
+  our::types::IContainer
 > LoadContainer(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IContainer
+    our::types::IContainer
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IContainer
+      our::types::IContainer
     >(
       abstract
     )
@@ -362,7 +362,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IContainer from ",
         path.string()
       )
@@ -373,7 +373,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IContainer
+  our::types::IContainer
 > LoadMinContainer() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -389,7 +389,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IContainer
+  our::types::IContainer
 > LoadMaxContainer() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

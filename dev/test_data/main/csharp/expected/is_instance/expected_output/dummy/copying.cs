@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 
 namespace dummy
 {
     /// <summary>
-    /// Allow for making shallow and deep copies of AAS model instances.
+    /// Allow for making shallow and deep copies of model instances.
     /// </summary>
     public static class Copying
     {
@@ -29,7 +29,7 @@ namespace dummy
         /// </remarks>.
         /// <param name="that">to be copied in a shallow manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Shallow<T>(T that) where T : Aas.IClass
+        public static T Shallow<T>(T that) where T : Our.IClass
         {
             return (T)ShallowCopierInstance.Transform(that);
         }
@@ -39,84 +39,84 @@ namespace dummy
         /// </summary>
         /// <param name="that">to be deeply copied in a recursive manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Deep<T>(T that) where T : Aas.IClass
+        public static T Deep<T>(T that) where T : Our.IClass
         {
             return (T)DeepCopierInstance.Transform(that);
         }
 
-        public static T Deep<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+        public static T Deep<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
         {
             return that.WithUnderlying(
                 Deep(that.Underlying));
         }
 
         /// <summary>Dispatch the making of shallow copies.</summary>
-        internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+        internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
-            public override Aas.IClass TransformLeaf(
-                Aas.ILeaf that
+            public override Our.IClass TransformLeaf(
+                Our.ILeaf that
             )
             {
-                return new Aas.Leaf(that.Identifier, that.Text);
+                return new Our.Leaf(that.Identifier, that.Text);
             }
 
-            public override Aas.IClass TransformOrderedContainer(
-                Aas.IOrderedContainer that
+            public override Our.IClass TransformOrderedContainer(
+                Our.IOrderedContainer that
             )
             {
-                return new Aas.OrderedContainer(
+                return new Our.OrderedContainer(
                     that.Identifier,
                     that.Children,
                     that.IsSorted);
             }
 
-            public override Aas.IClass TransformUnorderedContainer(
-                Aas.IUnorderedContainer that
+            public override Our.IClass TransformUnorderedContainer(
+                Our.IUnorderedContainer that
             )
             {
-                return new Aas.UnorderedContainer(that.Identifier, that.Children);
+                return new Our.UnorderedContainer(that.Identifier, that.Children);
             }
 
-            public override Aas.IClass TransformGlobalAttribute(
-                Aas.IGlobalAttribute that
+            public override Our.IClass TransformGlobalAttribute(
+                Our.IGlobalAttribute that
             )
             {
-                return new Aas.GlobalAttribute(that.Kind);
+                return new Our.GlobalAttribute(that.Kind);
             }
 
-            public override Aas.IClass TransformLocalAttribute(
-                Aas.ILocalAttribute that
+            public override Our.IClass TransformLocalAttribute(
+                Our.ILocalAttribute that
             )
             {
-                return new Aas.LocalAttribute(that.Name);
+                return new Our.LocalAttribute(that.Name);
             }
 
-            public override Aas.IClass TransformAttributeOperand(
-                Aas.IAttributeOperand that
+            public override Our.IClass TransformAttributeOperand(
+                Our.IAttributeOperand that
             )
             {
-                return new Aas.AttributeOperand(that.Attribute);
+                return new Our.AttributeOperand(that.Attribute);
             }
 
-            public override Aas.IClass TransformStringLiteral(
-                Aas.IStringLiteral that
+            public override Our.IClass TransformStringLiteral(
+                Our.IStringLiteral that
             )
             {
-                return new Aas.StringLiteral(that.Text);
+                return new Our.StringLiteral(that.Text);
             }
 
-            public override Aas.IClass TransformNumberLiteral(
-                Aas.INumberLiteral that
+            public override Our.IClass TransformNumberLiteral(
+                Our.INumberLiteral that
             )
             {
-                return new Aas.NumberLiteral(that.Number);
+                return new Our.NumberLiteral(that.Number);
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
-                return new Aas.Something(
+                return new Our.Something(
                     that.Root,
                     that.Value,
                     that.Values,
@@ -125,19 +125,19 @@ namespace dummy
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
-        internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass TransformLeaf(
-                Aas.ILeaf that
+        internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
+        {    public override Our.IClass TransformLeaf(
+                Our.ILeaf that
             )
             {
-                return new Aas.Leaf(
+                return new Our.Leaf(
                     that.Identifier,
                     that.Text
                 );
             }
 
-            public override Aas.IClass TransformOrderedContainer(
-                Aas.IOrderedContainer that
+            public override Our.IClass TransformOrderedContainer(
+                Our.IOrderedContainer that
             )
             {
                 var theChildren = new List<IElement>(
@@ -147,15 +147,15 @@ namespace dummy
                     theChildren.Add(Deep(item));
                 }
 
-                return new Aas.OrderedContainer(
+                return new Our.OrderedContainer(
                     that.Identifier,
                     theChildren,
                     that.IsSorted
                 );
             }
 
-            public override Aas.IClass TransformUnorderedContainer(
-                Aas.IUnorderedContainer that
+            public override Our.IClass TransformUnorderedContainer(
+                Our.IUnorderedContainer that
             )
             {
                 var theChildren = new List<IElement>(
@@ -165,59 +165,59 @@ namespace dummy
                     theChildren.Add(Deep(item));
                 }
 
-                return new Aas.UnorderedContainer(
+                return new Our.UnorderedContainer(
                     that.Identifier,
                     theChildren
                 );
             }
 
-            public override Aas.IClass TransformGlobalAttribute(
-                Aas.IGlobalAttribute that
+            public override Our.IClass TransformGlobalAttribute(
+                Our.IGlobalAttribute that
             )
             {
-                return new Aas.GlobalAttribute(
+                return new Our.GlobalAttribute(
                     that.Kind
                 );
             }
 
-            public override Aas.IClass TransformLocalAttribute(
-                Aas.ILocalAttribute that
+            public override Our.IClass TransformLocalAttribute(
+                Our.ILocalAttribute that
             )
             {
-                return new Aas.LocalAttribute(
+                return new Our.LocalAttribute(
                     that.Name
                 );
             }
 
-            public override Aas.IClass TransformAttributeOperand(
-                Aas.IAttributeOperand that
+            public override Our.IClass TransformAttributeOperand(
+                Our.IAttributeOperand that
             )
             {
-                return new Aas.AttributeOperand(
+                return new Our.AttributeOperand(
                     Deep(that.Attribute)
                 );
             }
 
-            public override Aas.IClass TransformStringLiteral(
-                Aas.IStringLiteral that
+            public override Our.IClass TransformStringLiteral(
+                Our.IStringLiteral that
             )
             {
-                return new Aas.StringLiteral(
+                return new Our.StringLiteral(
                     that.Text
                 );
             }
 
-            public override Aas.IClass TransformNumberLiteral(
-                Aas.INumberLiteral that
+            public override Our.IClass TransformNumberLiteral(
+                Our.INumberLiteral that
             )
             {
-                return new Aas.NumberLiteral(
+                return new Our.NumberLiteral(
                     that.Number
                 );
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
                 var theValues = new List<Value>(
@@ -227,7 +227,7 @@ namespace dummy
                     theValues.Add(Deep(item));
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     Deep(that.Root),
                     Deep(that.Value),
                     theValues,

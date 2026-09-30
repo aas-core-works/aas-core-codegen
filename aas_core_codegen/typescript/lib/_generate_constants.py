@@ -259,7 +259,7 @@ def _generate_constant_set_of_enumeration_literals(
     for literal in constant.literals:
         literal_name = typescript_naming.enum_literal_name(literal.name)
 
-        literal_codes.append(f"AasTypes.{enum_name}.{literal_name}")
+        literal_codes.append(f"OurTypes.{enum_name}.{literal_name}")
 
     constant_name = typescript_naming.constant_name(constant.name)
 
@@ -267,7 +267,7 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer.write(
         f"""\
-export const {constant_name} = new Set<AasTypes.{enum_name}>([
+export const {constant_name} = new Set<OurTypes.{enum_name}>([
 {I}{indent_but_first_line(literals_joined, I)}
 ]);"""
     )
@@ -298,7 +298,7 @@ def generate(
         ),
         typescript_common.WARNING,
         Stripped("/* eslint-disable @typescript-eslint/no-unused-vars */"),
-        Stripped('import * as AasTypes from "./types";'),
+        Stripped('import * as OurTypes from "./types";'),
     ]  # type: List[Stripped]
 
     for constant in symbol_table.constants:

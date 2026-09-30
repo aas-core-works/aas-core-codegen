@@ -12,7 +12,7 @@ import pathlib
 import unittest
 
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
 import tests.common
@@ -34,7 +34,7 @@ class TestBox(unittest.TestCase):
 
             assert isinstance(
                 instance,
-                aas_types.Box
+                our_types.Box
             )
 
             log = [tests.common.trace(instance.color_or_default())]

@@ -40,9 +40,9 @@ def _generate_for_cls(cls: intermediate.ConcreteClass) -> List[Stripped]:
         Stripped(
             f"""\
 func {test_name}(t *testing.T) {{
-{I}pths := aastesting.FindFilesBySuffixRecursively(
+{I}pths := ourtesting.FindFilesBySuffixRecursively(
 {II}filepath.Join(
-{III}aastesting.TestDataDir,
+{III}ourtesting.TestDataDir,
 {III}"Xml",
 {III}"Expected",
 {III}{xml_class_name_literal},
@@ -61,13 +61,13 @@ func {test_name}(t *testing.T) {{
 
 {II}decoder := xml.NewDecoder(strings.NewReader(text))
 
-{II}deserialized, deseriaErr := aasxmlization.{unmarshal_function}(decoder)
+{II}deserialized, deseriaErr := ourxmlization.{unmarshal_function}(decoder)
 {II}ok := assertNoDeserializationError(t, deseriaErr, pth)
 {II}if !ok {{
 {III}return
 {II}}}
 
-{II}if _, ok := deserialized.(aastypes.{interface_name}); !ok {{
+{II}if _, ok := deserialized.(ourtypes.{interface_name}); !ok {{
 {III}t.Fatalf(
 {IIII}"Expected an instance of {interface_name}, "+
 {IIIII}"but got %T: %v",
@@ -80,7 +80,7 @@ func {test_name}(t *testing.T) {{
 {II}encoder := xml.NewEncoder(buf)
 {II}encoder.Indent("", "\\t")
 
-{II}seriaErr := aasxmlization.Marshal(encoder, deserialized, true)
+{II}seriaErr := ourxmlization.Marshal(encoder, deserialized, true)
 {II}ok = assertNoSerializationError(t, seriaErr, pth)
 {II}if !ok {{
 {III}return
@@ -111,7 +111,7 @@ func {test_name}(t *testing.T) {{
             f"""\
 func {test_name}(t *testing.T) {{
 {I}pattern := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"Xml",
 {II}"Unexpected",
 {II}"Unserializable",
@@ -130,25 +130,25 @@ func {test_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, causeDir := range causeDirs {{
-{II}pths := aastesting.FindFilesBySuffixRecursively(
+{II}pths := ourtesting.FindFilesBySuffixRecursively(
 {III}causeDir,
 {III}".xml",
 {II})
 {II}sort.Strings(pths)
 
 {II}for _, pth := range pths {{
-{III}relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+{III}relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
 {III}if err != nil {{
 {IIII}panic(
 {IIIII}fmt.Sprintf(
 {IIIII}{I}"Failed to compute the relative path of %s to %s: %s",
-{IIIII}{I}aastesting.TestDataDir, pth, err.Error(),
+{IIIII}{I}ourtesting.TestDataDir, pth, err.Error(),
 {IIIII}),
 {IIII})
 {III}}}
 
 {III}expectedPth := filepath.Join(
-{IIII}aastesting.TestDataDir,
+{IIII}ourtesting.TestDataDir,
 {IIII}"DeserializationError",
 {IIII}filepath.Dir(relPth),
 {IIII}filepath.Base(relPth)+".error",
@@ -163,7 +163,7 @@ func {test_name}(t *testing.T) {{
 
 {III}decoder := xml.NewDecoder(strings.NewReader(text))
 
-{III}_, deseriaErr := aasxmlization.Unmarshal(decoder)
+{III}_, deseriaErr := ourxmlization.Unmarshal(decoder)
 {III}ok := assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 {IIII}t, deseriaErr, pth, expectedPth,
 {III})
@@ -284,10 +284,10 @@ func {cls_name_go}(
 {I}t *testing.T,
 {I}xmlName string,
 {I}text string,
-) aastypes.{interface_name} {{
-{I}pths := aastesting.FindFilesBySuffixRecursively(
+) ourtypes.{interface_name} {{
+{I}pths := ourtesting.FindFilesBySuffixRecursively(
 {II}filepath.Join(
-{III}aastesting.TestDataDir,
+{III}ourtesting.TestDataDir,
 {III}"Xml",
 {III}"Expected",
 {III}{golang_common.string_literal(cls_name_xml)},
@@ -316,7 +316,7 @@ func {cls_name_go}(
 {I}patched := original[:start] + text + original[end:]
 
 {I}decoder := xml.NewDecoder(strings.NewReader(patched))
-{I}deserialized, deseriaErr := aasxmlization.{unmarshal_function}(decoder)
+{I}deserialized, deseriaErr := ourxmlization.{unmarshal_function}(decoder)
 {I}if deseriaErr != nil {{
 {II}t.Fatalf(
 {III}"Expected no de-serialization error on %v, but got: %s",
@@ -324,7 +324,7 @@ func {cls_name_go}(
 {II})
 {I}}}
 
-{I}instance, ok := deserialized.(aastypes.{interface_name})
+{I}instance, ok := deserialized.(ourtypes.{interface_name})
 {I}if !ok {{
 {II}t.Fatalf("Expected an instance of {interface_name}, but got %T", deserialized)
 {I}}}
@@ -413,7 +413,7 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
                 f"""\
 func {test_name}(t *testing.T) {{
 {I}pth := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"Xml",
 {II}"Expected",
 {II}{golang_common.string_literal(duplicate_cls_name_xml)},
@@ -458,7 +458,7 @@ func {test_name}(t *testing.T) {{
 
 {I}decoder := xml.NewDecoder(strings.NewReader(brokenText))
 
-{I}_, deseriaErr := aasxmlization.{unmarshal_function}(decoder)
+{I}_, deseriaErr := ourxmlization.{unmarshal_function}(decoder)
 {I}if deseriaErr == nil {{
 {II}t.Fatalf(
 {III}"Expected a de-serialization error when the property %s is given twice, "+
@@ -495,9 +495,9 @@ import (
 {I}"strings"
 {I}"testing"
 {I}"encoding/xml"
-{math_import}{I}aastesting "{repo_url}/aastesting"
-{I}aastypes "{repo_url}/types"
-{I}aasxmlization "{repo_url}/xmlization"
+{math_import}{I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
+{I}ourxmlization "{repo_url}/xmlization"
 )"""
             ),
         ]

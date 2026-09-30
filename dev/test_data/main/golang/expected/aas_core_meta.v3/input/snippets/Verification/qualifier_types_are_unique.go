@@ -1,6 +1,6 @@
-// Check that there are no duplicate [aastypes.IQualifier.Type]'s in
+// Check that there are no duplicate [ourtypes.IQualifier.Type]'s in
 // the `qualifiers`.
-func QualifierTypesAreUnique[Q aastypes.IQualifier](
+func QualifierTypesAreUnique[Q ourtypes.IQualifier](
 	qualifiers []Q) bool {
 	typeSet := make(map[string]struct{})
 	for _, qualifier := range qualifiers {

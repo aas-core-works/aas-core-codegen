@@ -1,76 +1,76 @@
 // Check that `element` is an instance of the interface corresponding to
 // `expectedType`.
 func SubmodelElementIsOfType(
-	element aastypes.ISubmodelElement,
-	expectedType aastypes.AASSubmodelElements,
+	element ourtypes.ISubmodelElement,
+	expectedType ourtypes.AASSubmodelElements,
 ) bool {
 	switch expectedType {
-	case aastypes.AASSubmodelElementsAnnotatedRelationshipElement:
-		return aastypes.IsAnnotatedRelationshipElement(
+	case ourtypes.AASSubmodelElementsAnnotatedRelationshipElement:
+		return ourtypes.IsAnnotatedRelationshipElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsBasicEventElement:
-		return aastypes.IsBasicEventElement(
+	case ourtypes.AASSubmodelElementsBasicEventElement:
+		return ourtypes.IsBasicEventElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsBlob:
-		return aastypes.IsBlob(
+	case ourtypes.AASSubmodelElementsBlob:
+		return ourtypes.IsBlob(
 			element,
 		)
-	case aastypes.AASSubmodelElementsCapability:
-		return aastypes.IsCapability(
+	case ourtypes.AASSubmodelElementsCapability:
+		return ourtypes.IsCapability(
 			element,
 		)
-	case aastypes.AASSubmodelElementsDataElement:
-		return aastypes.IsDataElement(
+	case ourtypes.AASSubmodelElementsDataElement:
+		return ourtypes.IsDataElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsEntity:
-		return aastypes.IsEntity(
+	case ourtypes.AASSubmodelElementsEntity:
+		return ourtypes.IsEntity(
 			element,
 		)
-	case aastypes.AASSubmodelElementsEventElement:
-		return aastypes.IsEventElement(
+	case ourtypes.AASSubmodelElementsEventElement:
+		return ourtypes.IsEventElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsFile:
-		return aastypes.IsFile(
+	case ourtypes.AASSubmodelElementsFile:
+		return ourtypes.IsFile(
 			element,
 		)
-	case aastypes.AASSubmodelElementsMultiLanguageProperty:
-		return aastypes.IsMultiLanguageProperty(
+	case ourtypes.AASSubmodelElementsMultiLanguageProperty:
+		return ourtypes.IsMultiLanguageProperty(
 			element,
 		)
-	case aastypes.AASSubmodelElementsOperation:
-		return aastypes.IsOperation(
+	case ourtypes.AASSubmodelElementsOperation:
+		return ourtypes.IsOperation(
 			element,
 		)
-	case aastypes.AASSubmodelElementsProperty:
-		return aastypes.IsProperty(
+	case ourtypes.AASSubmodelElementsProperty:
+		return ourtypes.IsProperty(
 			element,
 		)
-	case aastypes.AASSubmodelElementsRange:
-		return aastypes.IsRange(
+	case ourtypes.AASSubmodelElementsRange:
+		return ourtypes.IsRange(
 			element,
 		)
-	case aastypes.AASSubmodelElementsReferenceElement:
-		return aastypes.IsReferenceElement(
+	case ourtypes.AASSubmodelElementsReferenceElement:
+		return ourtypes.IsReferenceElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsRelationshipElement:
-		return aastypes.IsRelationshipElement(
+	case ourtypes.AASSubmodelElementsRelationshipElement:
+		return ourtypes.IsRelationshipElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElement:
-		return aastypes.IsSubmodelElement(
+	case ourtypes.AASSubmodelElementsSubmodelElement:
+		return ourtypes.IsSubmodelElement(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElementList:
-		return aastypes.IsSubmodelElementList(
+	case ourtypes.AASSubmodelElementsSubmodelElementList:
+		return ourtypes.IsSubmodelElementList(
 			element,
 		)
-	case aastypes.AASSubmodelElementsSubmodelElementCollection:
-		return aastypes.IsSubmodelElementCollection(
+	case ourtypes.AASSubmodelElementsSubmodelElementCollection:
+		return ourtypes.IsSubmodelElementCollection(
 			element,
 		)
 	}

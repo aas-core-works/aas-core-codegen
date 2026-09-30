@@ -413,7 +413,7 @@ class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = csharp_naming.property_name(node.identifier)
-            return Stripped(f"Aas.Constants.{constant_as_prop}"), None
+            return Stripped(f"Our.Constants.{constant_as_prop}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(csharp_naming.method_name(node.identifier)), None
@@ -573,7 +573,7 @@ class _InvariantTranspiler(csharp_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = csharp_naming.property_name(node.identifier)
-            return Stripped(f"Aas.Constants.{constant_as_prop}"), None
+            return Stripped(f"Our.Constants.{constant_as_prop}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(csharp_naming.method_name(node.identifier)), None
@@ -700,7 +700,7 @@ internal static readonly HashSet<int> For{enum_name} = new HashSet<int>\n{{\n
 
             for i, literal in enumerate(enum.literals):
                 literal_name = csharp_naming.enum_literal_name(literal.name)
-                hash_set_writer.write(f"{I}(int)Aas.{enum_name}.{literal_name}")
+                hash_set_writer.write(f"{I}(int)Our.{enum_name}.{literal_name}")
                 if i < len(enum.literals) - 1:
                     hash_set_writer.write(",\n")
                 else:
@@ -1089,7 +1089,7 @@ foreach (
                         intermediate.ConcreteClass,
                     ),
                 ):
-                    value_type = Stripped(f"Aas.{value_type}")
+                    value_type = Stripped(f"Our.{value_type}")
 
             return (
                 Stripped(
@@ -1199,7 +1199,7 @@ yield break;"""
         f"""\
 [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
 public override IEnumerable<Reporting.Error> {transform_name}(
-{I}Aas.{interface_name} that
+{I}Our.{interface_name} that
 )
 {{
 """
@@ -1288,7 +1288,7 @@ def _generate_verify_enumeration(enumeration: intermediate.Enumeration) -> Strip
 /// Verify that <paramref name="that" /> is a valid enumeration value.
 /// </summary>
 public static IEnumerable<Reporting.Error> Verify{name}(
-{I}Aas.{name} that)
+{I}Our.{name} that)
 {{
 {I}if (!EnumValueSet.For{name}.Contains(
 {II}(int)that))
@@ -1386,12 +1386,12 @@ def _generate_union_verify_helper() -> Stripped:
     """
     Generate a single ``Verify`` overload shared by every named union.
 
-    A named union is not itself an ``Aas.IClass``, so it can not be passed to
-    the general ``Verify(Aas.IClass that)`` dispatch function directly. We add
+    A named union is not itself an ``Our.IClass``, so it can not be passed to
+    the general ``Verify(Our.IClass that)`` dispatch function directly. We add
     this overload, next to it, so that call sites can keep calling ``Verify``
     directly on a named union, exactly as they would on a class instance.
 
-    Dispatching over the common, non-generic ``Aas.IUnion`` (see ``generate()``
+    Dispatching over the common, non-generic ``Our.IUnion`` (see ``generate()``
     in ``_generate_types.py``) instead of the union's own type means we need
     only this one overload for *all* named unions, not one per union.
 
@@ -1401,7 +1401,7 @@ def _generate_union_verify_helper() -> Stripped:
     """
     return Stripped(
         f"""\
-public static IEnumerable<Reporting.Error> Verify(Aas.IUnion that)
+public static IEnumerable<Reporting.Error> Verify(Our.IUnion that)
 {{
 {I}foreach (var error in Verify(that.Underlying))
 {I}{{
@@ -1431,7 +1431,7 @@ def generate(
     """
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     # NOTE (mristin):
@@ -1541,7 +1541,7 @@ private static readonly Verification.Transformer _transformer = (
 /// <param name="that">
 /// The instance of the meta-model to be verified
 /// </param>
-public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
 {{
 {I}foreach (var error in _transformer.Transform(that))
 {I}{{
@@ -1580,7 +1580,7 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
 
         elif isinstance(our_type, intermediate.NamedUnion):
             # A named union has no invariants of its own; it is unwrapped by
-            # the single shared ``Verify(Aas.IUnion)`` overload instead (see
+            # the single shared ``Verify(Our.IUnion)`` overload instead (see
             # :py:func:`_generate_union_verify_helper`).
             pass
 
@@ -1627,7 +1627,7 @@ namespace {namespace}
 {I}/// <example>
 {I}/// Here is an example how to verify an instance of {cls_name}:
 {I}/// <code>
-{I}/// var {an_instance_variable} = new Aas.{cls_name}(
+{I}/// var {an_instance_variable} = new Our.{cls_name}(
 {I}///     // ... some constructor arguments ...
 {I}/// );
 {I}/// foreach (var error in Verification.Verify({an_instance_variable}))

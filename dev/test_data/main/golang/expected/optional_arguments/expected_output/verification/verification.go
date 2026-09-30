@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,7 +42,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check the optional string argument.
@@ -50,7 +50,7 @@ func TextIsShort(
 	text *string,
 ) bool {
 	return (text == nil) ||
-		aascommon.LenStr(*text) <= 10
+		ourcommon.LenStr(*text) <= 10
 }
 
 // Check the optional string argument compared for equality.
@@ -78,10 +78,10 @@ func NumberIsSmall(
 
 // Check the optional instance argument.
 func ItemHasName(
-	item aastypes.IItem,
+	item ourtypes.IItem,
 ) bool {
 	return (item == nil) ||
-		aascommon.LenStr(item.Name()) > 0
+		ourcommon.LenStr(item.Name()) > 0
 }
 
 // Check the optional list argument.
@@ -94,29 +94,29 @@ func TextsAreFew(
 
 // Check the optional enumeration argument.
 func KindIsNotGamma(
-	kind *aastypes.Kind,
+	kind *ourtypes.Kind,
 ) bool {
 	return (kind == nil) ||
-		*kind != aastypes.KindGamma
+		*kind != ourtypes.KindGamma
 }
 
 // Check the local variable holding an optional property.
 func NoteIsShort(
-	item aastypes.IItem,
+	item ourtypes.IItem,
 ) bool {
 	note := item.Note()
 	return (note == nil) ||
-		aascommon.LenStr(*note) <= 5
+		ourcommon.LenStr(*note) <= 5
 }
 
-// Verify `that` instance of [aastypes.IItem].
+// Verify `that` instance of [ourtypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyItem(
-	that aastypes.IItem,
+	that ourtypes.IItem,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -126,14 +126,14 @@ func VerifyItem(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -222,7 +222,7 @@ func VerifySomething(
 			that.Item(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Item",
 					},
 				)
@@ -239,7 +239,7 @@ func VerifySomething(
 			that.OptionalItem(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalItem",
 					},
 				)
@@ -256,7 +256,7 @@ func VerifySomething(
 			*that.OptionalKind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalKind",
 					},
 				)
@@ -279,14 +279,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindGamma {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindGamma {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -307,19 +307,19 @@ func VerifyKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		abort = VerifyItem(
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

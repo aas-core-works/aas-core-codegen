@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedBox[E any] struct {
-	instance aastypes.IBox
+	instance ourtypes.IBox
 	enhancement E
 }
 
 func (eb *enhancedBox[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eb.instance.ModelType()
 }
 
 func (eb *enhancedBox[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eb.instance.DescendOnce(action)
 }
 
 func (eb *enhancedBox[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eb.instance.Descend(action)
 }
@@ -51,12 +51,12 @@ func (eb *enhancedBox[E]) SetLabel(
 }
 
 func (eb *enhancedBox[E]) Color(
-) *aastypes.Color {
+) *ourtypes.Color {
 	return eb.instance.Color()
 }
 
 func (eb *enhancedBox[E]) SetColor(
-	value *aastypes.Color,
+	value *ourtypes.Color,
 ) {
 	eb.instance.SetColor(value)
 }
@@ -65,13 +65,13 @@ func (b *enhancedBox[E]) Describe() string {
 	return b.instance.Describe()
 }
 
-func (b *enhancedBox[E]) ColorOrDefault() aastypes.Color {
+func (b *enhancedBox[E]) ColorOrDefault() ourtypes.Color {
 	return b.instance.ColorOrDefault()
 }
 
 func (b *enhancedBox[E]) ResolveColor(
-	fallback *aastypes.Color,
-) aastypes.Color {
+	fallback *ourtypes.Color,
+) ourtypes.Color {
 	return b.instance.ResolveColor(
 		fallback,
 	)
@@ -97,9 +97,9 @@ func (eb *enhancedBox[E]) setEnhancement(
 }
 
 func wrapBox[E any](
-	that aastypes.IBox,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IBox) {
+	that ourtypes.IBox,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IBox) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -117,23 +117,23 @@ func wrapBox[E any](
 }
 
 type enhancedBag[E any] struct {
-	instance aastypes.IBag
+	instance ourtypes.IBag
 	enhancement E
 }
 
 func (eb *enhancedBag[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eb.instance.ModelType()
 }
 
 func (eb *enhancedBag[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eb.instance.DescendOnce(action)
 }
 
 func (eb *enhancedBag[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eb.instance.Descend(action)
 }
@@ -176,9 +176,9 @@ func (eb *enhancedBag[E]) setEnhancement(
 }
 
 func wrapBag[E any](
-	that aastypes.IBag,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IBag) {
+	that ourtypes.IBag,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IBag) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -196,23 +196,23 @@ func wrapBag[E any](
 }
 
 type enhancedContainer[E any] struct {
-	instance aastypes.IContainer
+	instance ourtypes.IContainer
 	enhancement E
 }
 
 func (ec *enhancedContainer[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ec.instance.ModelType()
 }
 
 func (ec *enhancedContainer[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ec.instance.DescendOnce(action)
 }
 
 func (ec *enhancedContainer[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ec.instance.Descend(action)
 }
@@ -229,12 +229,12 @@ func (ec *enhancedContainer[E]) SetNames(
 }
 
 func (ec *enhancedContainer[E]) Items(
-) []aastypes.IItem {
+) []ourtypes.IItem {
 	return ec.instance.Items()
 }
 
 func (ec *enhancedContainer[E]) SetItems(
-	value []aastypes.IItem,
+	value []ourtypes.IItem,
 ) {
 	ec.instance.SetItems(value)
 }
@@ -251,9 +251,9 @@ func (ec *enhancedContainer[E]) setEnhancement(
 }
 
 func wrapContainer[E any](
-	that aastypes.IContainer,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IContainer) {
+	that ourtypes.IContainer,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IContainer) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -273,7 +273,7 @@ func wrapContainer[E any](
 		theItems[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.IItem)
+		).(ourtypes.IItem)
 	}
 
 	return
@@ -288,9 +288,9 @@ func wrapContainer[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -302,19 +302,19 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeBox:
+	case ourtypes.ModelTypeBox:
 		result = wrapBox[E](
-			that.(aastypes.IBox),
+			that.(ourtypes.IBox),
 			factory,
 		)
-	case aastypes.ModelTypeBag:
+	case ourtypes.ModelTypeBag:
 		result = wrapBag[E](
-			that.(aastypes.IBag),
+			that.(ourtypes.IBag),
 			factory,
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		result = wrapContainer[E](
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 			factory,
 		)
 	default:
@@ -333,7 +333,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -346,7 +346,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

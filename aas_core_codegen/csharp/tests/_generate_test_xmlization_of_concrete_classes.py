@@ -115,11 +115,11 @@ def _generate_lexical_tests(symbol_table: intermediate.SymbolTable) -> List[Stri
 /// the element <paramref name="xmlName" /> replaced by
 /// <paramref name="text" />.
 /// </summary>
-private static Aas.{cls_name_csharp} ReadWith(string xmlName, string text)
+private static Our.{cls_name_csharp} ReadWith(string xmlName, string text)
 {{
 {I}var paths = Directory.GetFiles(
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"Xml",
 {III}"Expected",
 {III}{csharp_common.string_literal(cls_name_xml)}
@@ -143,7 +143,7 @@ private static Aas.{cls_name_csharp} ReadWith(string xmlName, string text)
 {I}using var xmlReader = System.Xml.XmlReader.Create(
 {II}new System.IO.StringReader(patched));
 
-{I}return Aas.Xmlization.Deserialize.{cls_name_csharp}From(xmlReader);
+{I}return Our.Xmlization.Deserialize.{cls_name_csharp}From(xmlReader);
 }}"""
         )
     ]  # type: List[Stripped]
@@ -277,7 +277,7 @@ private static void CheckElementsEqual(
         Stripped(
             f"""\
 private static void AssertSerializeDeserializeEqualsOriginal(
-{I}Aas.IClass instance, string path)
+{I}Our.IClass instance, string path)
 {{
 {I}// Serialize
 {I}var outputBuilder = new System.Text.StringBuilder();
@@ -291,7 +291,7 @@ private static void AssertSerializeDeserializeEqualsOriginal(
 {IIII}OmitXmlDeclaration = true
 {III}}}
 {II});
-{II}Aas.Xmlization.Serialize.To(
+{II}Our.Xmlization.Serialize.To(
 {III}instance,
 {III}writer);
 {I}}}
@@ -336,7 +336,7 @@ private static void AssertSerializeDeserializeEqualsOriginal(
         Stripped(
             f"""\
 private static void AssertEqualsExpectedOrRerecordDeserializationException(
-{I}Aas.Xmlization.Exception? exception,
+{I}Our.Xmlization.Exception? exception,
 {I}string path)
 {{
 {I}if (exception == null)
@@ -349,7 +349,7 @@ private static void AssertEqualsExpectedOrRerecordDeserializationException(
 {I}{{
 {II}string exceptionPath = path + ".exception";
 {II}string got = exception.Message;
-{II}if (Aas.Tests.Common.RecordMode)
+{II}if (Our.Tests.Common.RecordMode)
 {II}{{
 {III}System.IO.File.WriteAllText(exceptionPath, got);
 {II}}}
@@ -360,7 +360,7 @@ private static void AssertEqualsExpectedOrRerecordDeserializationException(
 {IIII}throw new System.IO.FileNotFoundException(
 {IIIII}"The file with the recorded exception does not " +
 {IIIII}$"exist: {{exceptionPath}}; maybe you want to set the environment " +
-{IIIII}$"variable {{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?");
+{IIIII}$"variable {{Our.Tests.Common.RecordModeEnvironmentVariableName}}?");
 {III}}}
 
 {III}string expected = System.IO.File.ReadAllText(exceptionPath);
@@ -386,7 +386,7 @@ public void Test_{cls_name_csharp}_ok()
 {{
 {I}var paths = Directory.GetFiles(
 {II}Path.Combine(
-{III}Aas.Tests.Common.TestDataDir,
+{III}Our.Tests.Common.TestDataDir,
 {III}"Xml",
 {III}"Expected",
 {III}{csharp_common.string_literal(cls_name_xml)}
@@ -399,11 +399,11 @@ public void Test_{cls_name_csharp}_ok()
 {I}{{
 {II}using var xmlReader = System.Xml.XmlReader.Create(path);
 
-{II}var instance = Aas.Xmlization.Deserialize.{cls_name_csharp}From(
+{II}var instance = Our.Xmlization.Deserialize.{cls_name_csharp}From(
 {III}xmlReader);
 
-{II}var errors = Aas.Verification.Verify(instance).ToList();
-{II}Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+{II}var errors = Our.Verification.Verify(instance).ToList();
+{II}Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
 {II}AssertSerializeDeserializeEqualsOriginal(
 {III}instance, path);
@@ -422,7 +422,7 @@ public void Test_{cls_name_csharp}_deserialization_fail()
 {II}string causeDir in
 {II}Directory.GetDirectories(
 {III}Path.Combine(
-{IIII}Aas.Tests.Common.TestDataDir,
+{IIII}Our.Tests.Common.TestDataDir,
 {IIII}"Xml",
 {IIII}"Unexpected",
 {IIII}"Unserializable"
@@ -451,14 +451,14 @@ public void Test_{cls_name_csharp}_deserialization_fail()
 {II}{{
 {III}using var xmlReader = System.Xml.XmlReader.Create(path);
 
-{III}Aas.Xmlization.Exception? exception = null;
+{III}Our.Xmlization.Exception? exception = null;
 
 {III}try
 {III}{{
-{IIII}_ = Aas.Xmlization.Deserialize.{cls_name_csharp}From(
+{IIII}_ = Our.Xmlization.Deserialize.{cls_name_csharp}From(
 {IIIII}xmlReader);
 {III}}}
-{III}catch (Aas.Xmlization.Exception observedException)
+{III}catch (Our.Xmlization.Exception observedException)
 {III}{{
 {IIII}exception = observedException;
 {III}}}
@@ -481,7 +481,7 @@ public void Test_{cls_name_csharp}_verification_fail()
 {II}string causeDir in
 {II}Directory.GetDirectories(
 {III}Path.Combine(
-{IIII}Aas.Tests.Common.TestDataDir,
+{IIII}Our.Tests.Common.TestDataDir,
 {IIII}"Xml",
 {IIII}"Unexpected",
 {IIII}"Invalid"
@@ -510,11 +510,11 @@ public void Test_{cls_name_csharp}_verification_fail()
 {II}{{
 {III}using var xmlReader = System.Xml.XmlReader.Create(path);
 
-{III}var instance = Aas.Xmlization.Deserialize.{cls_name_csharp}From(
+{III}var instance = Our.Xmlization.Deserialize.{cls_name_csharp}From(
 {IIII}xmlReader);
 
-{III}var errors = Aas.Verification.Verify(instance).ToList();
-{III}Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+{III}var errors = Our.Verification.Verify(instance).ToList();
+{III}Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
 {IIII}errors, path);
 {II}}}
 {I}}}
@@ -529,7 +529,7 @@ public void Test_{cls_name_csharp}_verification_fail()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;

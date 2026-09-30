@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnceOnAnInstanceOfLangString(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangString()
+	instance := ourtesting.MustLoadMaximalLangString()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"LangString",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnceOnAnInstanceOfLangString(
 func TestDescendOnceOnAnInstanceOfLangStringSet(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLangStringSet()
+	instance := ourtesting.MustLoadMaximalLangStringSet()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"LangStringSet",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnceOnAnInstanceOfLangStringSet(
 func TestDescendOnceOnAnInstanceOfIecContent(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalIecContent()
+	instance := ourtesting.MustLoadMaximalIecContent()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"IecContent",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnceOnAnInstanceOfIecContent(
 func TestDescendOnceOnAnInstanceOfOtherContent(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalOtherContent()
+	instance := ourtesting.MustLoadMaximalOtherContent()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"OtherContent",
 		"maximal.json.trace",
@@ -108,10 +108,10 @@ func TestDescendOnceOnAnInstanceOfOtherContent(
 func TestDescendOnceOnAnInstanceOfSpecification(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSpecification()
+	instance := ourtesting.MustLoadMaximalSpecification()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Specification",
 		"maximal.json.trace",
@@ -132,10 +132,10 @@ func TestDescendOnceOnAnInstanceOfSpecification(
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Something",
 		"maximal.json.trace",

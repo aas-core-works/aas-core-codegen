@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import * as AasTypes from "./types";
+import * as OurTypes from "./types";
 
 /**
  * Categories for {@link types!IDataElement} as defined in Constraint AASd-090
@@ -21,183 +21,183 @@ export const VALID_CATEGORIES_FOR_DATA_ELEMENT = new Set<string>([
 /**
  * Enumeration of all identifiable elements within an asset administration shell.
  */
-export const GENERIC_FRAGMENT_KEYS = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.FragmentReference
+export const GENERIC_FRAGMENT_KEYS = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.FragmentReference
 ]);
 
 /**
  * Enumeration of different key value types within a key.
  */
-export const GENERIC_GLOBALLY_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.GlobalReference
+export const GENERIC_GLOBALLY_IDENTIFIABLES = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.GlobalReference
 ]);
 
 /**
  * Enumeration of different key value types within a key.
  */
-export const AAS_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.AssetAdministrationShell,
-  AasTypes.KeyTypes.ConceptDescription,
-  AasTypes.KeyTypes.Identifiable,
-  AasTypes.KeyTypes.Submodel
+export const AAS_IDENTIFIABLES = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.AssetAdministrationShell,
+  OurTypes.KeyTypes.ConceptDescription,
+  OurTypes.KeyTypes.Identifiable,
+  OurTypes.KeyTypes.Submodel
 ]);
 
 /**
  * Enumeration of all submodel elements within an asset administration shell.
  */
-export const AAS_SUBMODEL_ELEMENTS_AS_KEYS = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.AnnotatedRelationshipElement,
-  AasTypes.KeyTypes.BasicEventElement,
-  AasTypes.KeyTypes.Blob,
-  AasTypes.KeyTypes.Capability,
-  AasTypes.KeyTypes.DataElement,
-  AasTypes.KeyTypes.Entity,
-  AasTypes.KeyTypes.EventElement,
-  AasTypes.KeyTypes.File,
-  AasTypes.KeyTypes.MultiLanguageProperty,
-  AasTypes.KeyTypes.Operation,
-  AasTypes.KeyTypes.Property,
-  AasTypes.KeyTypes.Range,
-  AasTypes.KeyTypes.ReferenceElement,
-  AasTypes.KeyTypes.RelationshipElement,
-  AasTypes.KeyTypes.SubmodelElement,
-  AasTypes.KeyTypes.SubmodelElementCollection,
-  AasTypes.KeyTypes.SubmodelElementList
+export const AAS_SUBMODEL_ELEMENTS_AS_KEYS = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.AnnotatedRelationshipElement,
+  OurTypes.KeyTypes.BasicEventElement,
+  OurTypes.KeyTypes.Blob,
+  OurTypes.KeyTypes.Capability,
+  OurTypes.KeyTypes.DataElement,
+  OurTypes.KeyTypes.Entity,
+  OurTypes.KeyTypes.EventElement,
+  OurTypes.KeyTypes.File,
+  OurTypes.KeyTypes.MultiLanguageProperty,
+  OurTypes.KeyTypes.Operation,
+  OurTypes.KeyTypes.Property,
+  OurTypes.KeyTypes.Range,
+  OurTypes.KeyTypes.ReferenceElement,
+  OurTypes.KeyTypes.RelationshipElement,
+  OurTypes.KeyTypes.SubmodelElement,
+  OurTypes.KeyTypes.SubmodelElementCollection,
+  OurTypes.KeyTypes.SubmodelElementList
 ]);
 
 /**
  * Enumeration of different fragment key value types within a key.
  */
-export const AAS_REFERABLE_NON_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.AnnotatedRelationshipElement,
-  AasTypes.KeyTypes.BasicEventElement,
-  AasTypes.KeyTypes.Blob,
-  AasTypes.KeyTypes.Capability,
-  AasTypes.KeyTypes.DataElement,
-  AasTypes.KeyTypes.Entity,
-  AasTypes.KeyTypes.EventElement,
-  AasTypes.KeyTypes.File,
-  AasTypes.KeyTypes.MultiLanguageProperty,
-  AasTypes.KeyTypes.Operation,
-  AasTypes.KeyTypes.Property,
-  AasTypes.KeyTypes.Range,
-  AasTypes.KeyTypes.ReferenceElement,
-  AasTypes.KeyTypes.RelationshipElement,
-  AasTypes.KeyTypes.SubmodelElement,
-  AasTypes.KeyTypes.SubmodelElementCollection,
-  AasTypes.KeyTypes.SubmodelElementList
+export const AAS_REFERABLE_NON_IDENTIFIABLES = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.AnnotatedRelationshipElement,
+  OurTypes.KeyTypes.BasicEventElement,
+  OurTypes.KeyTypes.Blob,
+  OurTypes.KeyTypes.Capability,
+  OurTypes.KeyTypes.DataElement,
+  OurTypes.KeyTypes.Entity,
+  OurTypes.KeyTypes.EventElement,
+  OurTypes.KeyTypes.File,
+  OurTypes.KeyTypes.MultiLanguageProperty,
+  OurTypes.KeyTypes.Operation,
+  OurTypes.KeyTypes.Property,
+  OurTypes.KeyTypes.Range,
+  OurTypes.KeyTypes.ReferenceElement,
+  OurTypes.KeyTypes.RelationshipElement,
+  OurTypes.KeyTypes.SubmodelElement,
+  OurTypes.KeyTypes.SubmodelElementCollection,
+  OurTypes.KeyTypes.SubmodelElementList
 ]);
 
 /**
  * Enumeration of referables. We need this to check that model references refer to a Referable. For example, the observed attribute of the Basic Event Element object must be a model reference to a Referable.
  */
-export const AAS_REFERABLES = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.AssetAdministrationShell,
-  AasTypes.KeyTypes.ConceptDescription,
-  AasTypes.KeyTypes.Identifiable,
-  AasTypes.KeyTypes.Submodel,
-  AasTypes.KeyTypes.AnnotatedRelationshipElement,
-  AasTypes.KeyTypes.BasicEventElement,
-  AasTypes.KeyTypes.Blob,
-  AasTypes.KeyTypes.Capability,
-  AasTypes.KeyTypes.DataElement,
-  AasTypes.KeyTypes.Entity,
-  AasTypes.KeyTypes.EventElement,
-  AasTypes.KeyTypes.File,
-  AasTypes.KeyTypes.MultiLanguageProperty,
-  AasTypes.KeyTypes.Operation,
-  AasTypes.KeyTypes.Property,
-  AasTypes.KeyTypes.Range,
-  AasTypes.KeyTypes.ReferenceElement,
-  AasTypes.KeyTypes.Referable,
-  AasTypes.KeyTypes.RelationshipElement,
-  AasTypes.KeyTypes.SubmodelElement,
-  AasTypes.KeyTypes.SubmodelElementCollection,
-  AasTypes.KeyTypes.SubmodelElementList
+export const AAS_REFERABLES = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.AssetAdministrationShell,
+  OurTypes.KeyTypes.ConceptDescription,
+  OurTypes.KeyTypes.Identifiable,
+  OurTypes.KeyTypes.Submodel,
+  OurTypes.KeyTypes.AnnotatedRelationshipElement,
+  OurTypes.KeyTypes.BasicEventElement,
+  OurTypes.KeyTypes.Blob,
+  OurTypes.KeyTypes.Capability,
+  OurTypes.KeyTypes.DataElement,
+  OurTypes.KeyTypes.Entity,
+  OurTypes.KeyTypes.EventElement,
+  OurTypes.KeyTypes.File,
+  OurTypes.KeyTypes.MultiLanguageProperty,
+  OurTypes.KeyTypes.Operation,
+  OurTypes.KeyTypes.Property,
+  OurTypes.KeyTypes.Range,
+  OurTypes.KeyTypes.ReferenceElement,
+  OurTypes.KeyTypes.Referable,
+  OurTypes.KeyTypes.RelationshipElement,
+  OurTypes.KeyTypes.SubmodelElement,
+  OurTypes.KeyTypes.SubmodelElementCollection,
+  OurTypes.KeyTypes.SubmodelElementList
 ]);
 
 /**
  * Enumeration of all referable elements within an asset administration shell
  */
-export const GLOBALLY_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.GlobalReference,
-  AasTypes.KeyTypes.AssetAdministrationShell,
-  AasTypes.KeyTypes.ConceptDescription,
-  AasTypes.KeyTypes.Identifiable,
-  AasTypes.KeyTypes.Submodel
+export const GLOBALLY_IDENTIFIABLES = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.GlobalReference,
+  OurTypes.KeyTypes.AssetAdministrationShell,
+  OurTypes.KeyTypes.ConceptDescription,
+  OurTypes.KeyTypes.Identifiable,
+  OurTypes.KeyTypes.Submodel
 ]);
 
 /**
  * Enumeration of different key value types within a key.
  */
-export const FRAGMENT_KEYS = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.AnnotatedRelationshipElement,
-  AasTypes.KeyTypes.BasicEventElement,
-  AasTypes.KeyTypes.Blob,
-  AasTypes.KeyTypes.Capability,
-  AasTypes.KeyTypes.DataElement,
-  AasTypes.KeyTypes.Entity,
-  AasTypes.KeyTypes.EventElement,
-  AasTypes.KeyTypes.File,
-  AasTypes.KeyTypes.FragmentReference,
-  AasTypes.KeyTypes.MultiLanguageProperty,
-  AasTypes.KeyTypes.Operation,
-  AasTypes.KeyTypes.Property,
-  AasTypes.KeyTypes.Range,
-  AasTypes.KeyTypes.ReferenceElement,
-  AasTypes.KeyTypes.RelationshipElement,
-  AasTypes.KeyTypes.SubmodelElement,
-  AasTypes.KeyTypes.SubmodelElementCollection,
-  AasTypes.KeyTypes.SubmodelElementList
+export const FRAGMENT_KEYS = new Set<OurTypes.KeyTypes>([
+  OurTypes.KeyTypes.AnnotatedRelationshipElement,
+  OurTypes.KeyTypes.BasicEventElement,
+  OurTypes.KeyTypes.Blob,
+  OurTypes.KeyTypes.Capability,
+  OurTypes.KeyTypes.DataElement,
+  OurTypes.KeyTypes.Entity,
+  OurTypes.KeyTypes.EventElement,
+  OurTypes.KeyTypes.File,
+  OurTypes.KeyTypes.FragmentReference,
+  OurTypes.KeyTypes.MultiLanguageProperty,
+  OurTypes.KeyTypes.Operation,
+  OurTypes.KeyTypes.Property,
+  OurTypes.KeyTypes.Range,
+  OurTypes.KeyTypes.ReferenceElement,
+  OurTypes.KeyTypes.RelationshipElement,
+  OurTypes.KeyTypes.SubmodelElement,
+  OurTypes.KeyTypes.SubmodelElementCollection,
+  OurTypes.KeyTypes.SubmodelElementList
 ]);
 
 /**
  * IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.
  */
-export const DATA_TYPE_IEC_61360_FOR_PROPERTY_OR_VALUE = new Set<AasTypes.DataTypeIec61360>([
-  AasTypes.DataTypeIec61360.Date,
-  AasTypes.DataTypeIec61360.String,
-  AasTypes.DataTypeIec61360.StringTranslatable,
-  AasTypes.DataTypeIec61360.IntegerMeasure,
-  AasTypes.DataTypeIec61360.IntegerCount,
-  AasTypes.DataTypeIec61360.IntegerCurrency,
-  AasTypes.DataTypeIec61360.RealMeasure,
-  AasTypes.DataTypeIec61360.RealCount,
-  AasTypes.DataTypeIec61360.RealCurrency,
-  AasTypes.DataTypeIec61360.Boolean,
-  AasTypes.DataTypeIec61360.Rational,
-  AasTypes.DataTypeIec61360.RationalMeasure,
-  AasTypes.DataTypeIec61360.Time,
-  AasTypes.DataTypeIec61360.Timestamp
+export const DATA_TYPE_IEC_61360_FOR_PROPERTY_OR_VALUE = new Set<OurTypes.DataTypeIec61360>([
+  OurTypes.DataTypeIec61360.Date,
+  OurTypes.DataTypeIec61360.String,
+  OurTypes.DataTypeIec61360.StringTranslatable,
+  OurTypes.DataTypeIec61360.IntegerMeasure,
+  OurTypes.DataTypeIec61360.IntegerCount,
+  OurTypes.DataTypeIec61360.IntegerCurrency,
+  OurTypes.DataTypeIec61360.RealMeasure,
+  OurTypes.DataTypeIec61360.RealCount,
+  OurTypes.DataTypeIec61360.RealCurrency,
+  OurTypes.DataTypeIec61360.Boolean,
+  OurTypes.DataTypeIec61360.Rational,
+  OurTypes.DataTypeIec61360.RationalMeasure,
+  OurTypes.DataTypeIec61360.Time,
+  OurTypes.DataTypeIec61360.Timestamp
 ]);
 
 /**
  * IEC 61360 data types for concept descriptions categorized with REFERENCE.
  */
-export const DATA_TYPE_IEC_61360_FOR_REFERENCE = new Set<AasTypes.DataTypeIec61360>([
-  AasTypes.DataTypeIec61360.String,
-  AasTypes.DataTypeIec61360.Iri,
-  AasTypes.DataTypeIec61360.Irdi
+export const DATA_TYPE_IEC_61360_FOR_REFERENCE = new Set<OurTypes.DataTypeIec61360>([
+  OurTypes.DataTypeIec61360.String,
+  OurTypes.DataTypeIec61360.Iri,
+  OurTypes.DataTypeIec61360.Irdi
 ]);
 
 /**
  * IEC 61360 data types for concept descriptions categorized with DOCUMENT.
  */
-export const DATA_TYPE_IEC_61360_FOR_DOCUMENT = new Set<AasTypes.DataTypeIec61360>([
-  AasTypes.DataTypeIec61360.File,
-  AasTypes.DataTypeIec61360.Blob,
-  AasTypes.DataTypeIec61360.Html
+export const DATA_TYPE_IEC_61360_FOR_DOCUMENT = new Set<OurTypes.DataTypeIec61360>([
+  OurTypes.DataTypeIec61360.File,
+  OurTypes.DataTypeIec61360.Blob,
+  OurTypes.DataTypeIec61360.Html
 ]);
 
 /**
  * These data types imply that the unit is defined in the data specification.
  */
-export const IEC_61360_DATA_TYPES_WITH_UNIT = new Set<AasTypes.DataTypeIec61360>([
-  AasTypes.DataTypeIec61360.IntegerMeasure,
-  AasTypes.DataTypeIec61360.RealMeasure,
-  AasTypes.DataTypeIec61360.RationalMeasure,
-  AasTypes.DataTypeIec61360.IntegerCurrency,
-  AasTypes.DataTypeIec61360.RealCurrency
+export const IEC_61360_DATA_TYPES_WITH_UNIT = new Set<OurTypes.DataTypeIec61360>([
+  OurTypes.DataTypeIec61360.IntegerMeasure,
+  OurTypes.DataTypeIec61360.RealMeasure,
+  OurTypes.DataTypeIec61360.RationalMeasure,
+  OurTypes.DataTypeIec61360.IntegerCurrency,
+  OurTypes.DataTypeIec61360.RealCurrency
 ]);
 
 /* eslint-enable @typescript-eslint/no-unused-vars */

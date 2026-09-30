@@ -3,8 +3,8 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy; // renamed
-using AasEnhancing = dummy.Enhancing; // renamed
+using Our = dummy; // renamed
+using OurEnhancing = dummy.Enhancing; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias
@@ -25,7 +25,7 @@ namespace dummy.Tests
             }
         }
 
-        private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
+        private static OurEnhancing.Enhancer<Enhancement> CreateEnhancer()
         {
             long lastCustomId = 0;
 
@@ -37,14 +37,14 @@ namespace dummy.Tests
                 }
             );
 
-            return new AasEnhancing.Enhancer<Enhancement>(enhancementFactory);
+            return new OurEnhancing.Enhancer<Enhancement>(enhancementFactory);
         }
 
         [Test]
         public void Test_Item()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalItem()
+                Our.Tests.CommonJsonization.LoadMaximalItem()
             );
 
             var enhancer = CreateEnhancer();
@@ -74,7 +74,7 @@ namespace dummy.Tests
         public void Test_Something()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+                Our.Tests.CommonJsonization.LoadMaximalSomething()
             );
 
             var enhancer = CreateEnhancer();

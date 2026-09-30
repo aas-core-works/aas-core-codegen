@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedFirst[E any] struct {
-	instance aastypes.IFirst
+	instance ourtypes.IFirst
 	enhancement E
 }
 
 func (ef *enhancedFirst[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return ef.instance.ModelType()
 }
 
 func (ef *enhancedFirst[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return ef.instance.DescendOnce(action)
 }
 
 func (ef *enhancedFirst[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return ef.instance.Descend(action)
 }
@@ -62,12 +62,12 @@ func (ef *enhancedFirst[E]) SetCount(
 }
 
 func (ef *enhancedFirst[E]) Kind(
-) *aastypes.Kind {
+) *ourtypes.Kind {
 	return ef.instance.Kind()
 }
 
 func (ef *enhancedFirst[E]) SetKind(
-	value *aastypes.Kind,
+	value *ourtypes.Kind,
 ) {
 	ef.instance.SetKind(value)
 }
@@ -109,7 +109,7 @@ func (f *enhancedFirst[E]) FillNumbers(
 }
 
 func (f *enhancedFirst[E]) CopyCountTo(
-	other aastypes.IItem,
+	other ourtypes.IItem,
 ) {
 	f.instance.CopyCountTo(
 		other,
@@ -144,9 +144,9 @@ func (ef *enhancedFirst[E]) setEnhancement(
 }
 
 func wrapFirst[E any](
-	that aastypes.IFirst,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IFirst) {
+	that ourtypes.IFirst,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IFirst) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -164,23 +164,23 @@ func wrapFirst[E any](
 }
 
 type enhancedSecond[E any] struct {
-	instance aastypes.ISecond
+	instance ourtypes.ISecond
 	enhancement E
 }
 
 func (es *enhancedSecond[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSecond[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSecond[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
@@ -208,12 +208,12 @@ func (es *enhancedSecond[E]) SetCount(
 }
 
 func (es *enhancedSecond[E]) Kind(
-) *aastypes.Kind {
+) *ourtypes.Kind {
 	return es.instance.Kind()
 }
 
 func (es *enhancedSecond[E]) SetKind(
-	value *aastypes.Kind,
+	value *ourtypes.Kind,
 ) {
 	es.instance.SetKind(value)
 }
@@ -266,7 +266,7 @@ func (s *enhancedSecond[E]) FillNumbers(
 }
 
 func (s *enhancedSecond[E]) CopyCountTo(
-	other aastypes.IItem,
+	other ourtypes.IItem,
 ) {
 	s.instance.CopyCountTo(
 		other,
@@ -305,9 +305,9 @@ func (es *enhancedSecond[E]) setEnhancement(
 }
 
 func wrapSecond[E any](
-	that aastypes.ISecond,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISecond) {
+	that ourtypes.ISecond,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISecond) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -333,9 +333,9 @@ func wrapSecond[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -347,14 +347,14 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeFirst:
+	case ourtypes.ModelTypeFirst:
 		result = wrapFirst[E](
-			that.(aastypes.IFirst),
+			that.(ourtypes.IFirst),
 			factory,
 		)
-	case aastypes.ModelTypeSecond:
+	case ourtypes.ModelTypeSecond:
 		result = wrapSecond[E](
-			that.(aastypes.ISecond),
+			that.(ourtypes.ISecond),
 			factory,
 		)
 	default:
@@ -373,7 +373,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -386,7 +386,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

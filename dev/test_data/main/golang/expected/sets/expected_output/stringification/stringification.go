@@ -6,20 +6,20 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"Something": aastypes.ModelTypeSomething,
-	"Collection": aastypes.ModelTypeCollection,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"Something": ourtypes.ModelTypeSomething,
+	"Collection": ourtypes.ModelTypeCollection,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -29,12 +29,12 @@ var modelTypeToStringArray = [...]string {
 	"Collection",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -48,11 +48,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {
@@ -66,18 +66,18 @@ func MustModelTypeToString(
 	return result
 }
 
-var kindFromStringMap = map[string]aastypes.Kind {
-	"alpha": aastypes.KindAlpha,
-	"beta": aastypes.KindBeta,
-	"gamma": aastypes.KindGamma,
+var kindFromStringMap = map[string]ourtypes.Kind {
+	"alpha": ourtypes.KindAlpha,
+	"beta": ourtypes.KindBeta,
+	"gamma": ourtypes.KindGamma,
 }
 
-// Parse `text` as a string representation of [aastypes.Kind].
+// Parse `text` as a string representation of [ourtypes.Kind].
 //
 // If not ok, the literal result is undefined.
 func KindFromString(
 	text string,
-) (literal aastypes.Kind, ok bool) {
+) (literal ourtypes.Kind, ok bool) {
 	literal, ok = kindFromStringMap[text]
 	return
 }
@@ -88,12 +88,12 @@ var kindToStringArray = [...]string {
 	"gamma",
 }
 
-// Translate `value` from [aastypes.Kind] to a string.
+// Translate `value` from [ourtypes.Kind] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func KindToString(
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -107,11 +107,11 @@ func KindToString(
 	return
 }
 
-// Translate the `value` from [aastypes.Kind] to a string.
+// Translate the `value` from [ourtypes.Kind] to a string.
 //
 // Panic if the given value is invalid.
 func MustKindToString(
-	value aastypes.Kind,
+	value ourtypes.Kind,
 ) string {
 	result, ok := KindToString(value)
 	if !ok {
@@ -125,18 +125,18 @@ func MustKindToString(
 	return result
 }
 
-var directionFromStringMap = map[string]aastypes.Direction {
-	"up": aastypes.DirectionNorth,
-	"down": aastypes.DirectionSouth,
-	"right": aastypes.DirectionEast,
+var directionFromStringMap = map[string]ourtypes.Direction {
+	"up": ourtypes.DirectionNorth,
+	"down": ourtypes.DirectionSouth,
+	"right": ourtypes.DirectionEast,
 }
 
-// Parse `text` as a string representation of [aastypes.Direction].
+// Parse `text` as a string representation of [ourtypes.Direction].
 //
 // If not ok, the literal result is undefined.
 func DirectionFromString(
 	text string,
-) (literal aastypes.Direction, ok bool) {
+) (literal ourtypes.Direction, ok bool) {
 	literal, ok = directionFromStringMap[text]
 	return
 }
@@ -147,12 +147,12 @@ var directionToStringArray = [...]string {
 	"right",
 }
 
-// Translate `value` from [aastypes.Direction] to a string.
+// Translate `value` from [ourtypes.Direction] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func DirectionToString(
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -166,11 +166,11 @@ func DirectionToString(
 	return
 }
 
-// Translate the `value` from [aastypes.Direction] to a string.
+// Translate the `value` from [ourtypes.Direction] to a string.
 //
 // Panic if the given value is invalid.
 func MustDirectionToString(
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) string {
 	result, ok := DirectionToString(value)
 	if !ok {
@@ -186,15 +186,15 @@ func MustDirectionToString(
 
 // Rank `that` by the code points of its string representation.
 //
-// We serialize the sets of [aastypes.Direction] in this order, which is the same
+// We serialize the sets of [ourtypes.Direction] in this order, which is the same
 // in all the SDKs. An invalid literal is ranked last.
-func RankOfDirection(that aastypes.Direction) int {
+func RankOfDirection(that ourtypes.Direction) int {
 	switch that {
-	case aastypes.DirectionSouth:
+	case ourtypes.DirectionSouth:
 		return 0 // "down"
-	case aastypes.DirectionEast:
+	case ourtypes.DirectionEast:
 		return 1 // "right"
-	case aastypes.DirectionNorth:
+	case ourtypes.DirectionNorth:
 		return 2 // "up"
 	}
 	return 3
@@ -203,8 +203,8 @@ func RankOfDirection(that aastypes.Direction) int {
 // Check whether `that` comes before `other` in the order of their string
 // representations, see [RankOfDirection].
 func LessByRankOfDirection(
-	that aastypes.Direction,
-	other aastypes.Direction,
+	that ourtypes.Direction,
+	other ourtypes.Direction,
 ) bool {
 	return RankOfDirection(that) < RankOfDirection(other)
 }

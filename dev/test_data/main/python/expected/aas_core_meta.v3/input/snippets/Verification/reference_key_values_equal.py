@@ -1,5 +1,5 @@
 def reference_key_values_equal(
-    that: aas_types.Reference, other: aas_types.Reference
+    that: our_types.Reference, other: our_types.Reference
 ) -> bool:
     """
     Check that the two references, :paramref:`that` and :paramref:`other`,

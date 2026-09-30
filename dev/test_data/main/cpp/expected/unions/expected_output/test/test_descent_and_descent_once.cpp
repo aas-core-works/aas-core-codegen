@@ -14,10 +14,10 @@
 
 #include <deque>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -26,7 +26,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineDescentDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Descent";
   }
@@ -35,7 +35,7 @@ const std::filesystem::path& DetermineDescentDir() {
 }
 
 const std::filesystem::path& DetermineDescentOnceDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "DescentOnce";
   }
@@ -48,7 +48,7 @@ void AssertOrRerecordDescent(
   const std::filesystem::path& trace_path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > instance(
     test::common::xmlization::MustDeserializeFile(xml_path)
   );
@@ -56,15 +56,15 @@ void AssertOrRerecordDescent(
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::Descent(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::Descent(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -72,21 +72,21 @@ void AssertOrRerecordDescent(
 }
 
 void AssertOrRerecordDescentOnce(
-  const std::shared_ptr<aas::types::IClass>& instance,
+  const std::shared_ptr<our::types::IClass>& instance,
   const std::filesystem::path& trace_path
 ) {
   std::deque<std::wstring> parts;
 
   for (
-    const std::shared_ptr<aas::types::IClass>& something
-    : aas::iteration::DescentOnce(instance)
+    const std::shared_ptr<our::types::IClass>& something
+    : our::iteration::DescentOnce(instance)
   ) {
     parts.emplace_back(test::common::TraceMark(*something));
     parts.push_back(L"\n");
   }
 
   test::common::AssertContentEqualsExpectedOrRecord(
-    aas::common::WstringToUtf8(
+    our::common::WstringToUtf8(
       test::common::JoinWstrings(parts, L"")
     ),
     trace_path
@@ -122,7 +122,7 @@ TEST_CASE("Test Descent over an StructuralFirst") {
 
 TEST_CASE("Test DescentOnce over an StructuralFirst") {
   const std::shared_ptr<
-    aas::types::IStructuralFirst
+    our::types::IStructuralFirst
   > instance(
     test::common::examples::LoadMaxStructuralFirst()
   );
@@ -164,7 +164,7 @@ TEST_CASE("Test Descent over an StructuralSecond") {
 
 TEST_CASE("Test DescentOnce over an StructuralSecond") {
   const std::shared_ptr<
-    aas::types::IStructuralSecond
+    our::types::IStructuralSecond
   > instance(
     test::common::examples::LoadMaxStructuralSecond()
   );
@@ -206,7 +206,7 @@ TEST_CASE("Test Descent over an MixedAbstractDescendantOne") {
 
 TEST_CASE("Test DescentOnce over an MixedAbstractDescendantOne") {
   const std::shared_ptr<
-    aas::types::IMixedAbstractDescendantOne
+    our::types::IMixedAbstractDescendantOne
   > instance(
     test::common::examples::LoadMaxMixedAbstractDescendantOne()
   );
@@ -248,7 +248,7 @@ TEST_CASE("Test Descent over an MixedAbstractDescendantTwo") {
 
 TEST_CASE("Test DescentOnce over an MixedAbstractDescendantTwo") {
   const std::shared_ptr<
-    aas::types::IMixedAbstractDescendantTwo
+    our::types::IMixedAbstractDescendantTwo
   > instance(
     test::common::examples::LoadMaxMixedAbstractDescendantTwo()
   );
@@ -290,7 +290,7 @@ TEST_CASE("Test Descent over an MixedConcreteWithDescendants") {
 
 TEST_CASE("Test DescentOnce over an MixedConcreteWithDescendants") {
   const std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendants
+    our::types::IMixedConcreteWithDescendants
   > instance(
     test::common::examples::LoadMaxMixedConcreteWithDescendants()
   );
@@ -332,7 +332,7 @@ TEST_CASE("Test Descent over an MixedConcreteWithDescendantsChild") {
 
 TEST_CASE("Test DescentOnce over an MixedConcreteWithDescendantsChild") {
   const std::shared_ptr<
-    aas::types::IMixedConcreteWithDescendantsChild
+    our::types::IMixedConcreteWithDescendantsChild
   > instance(
     test::common::examples::LoadMaxMixedConcreteWithDescendantsChild()
   );
@@ -374,7 +374,7 @@ TEST_CASE("Test Descent over an MixedConcreteLeaf") {
 
 TEST_CASE("Test DescentOnce over an MixedConcreteLeaf") {
   const std::shared_ptr<
-    aas::types::IMixedConcreteLeaf
+    our::types::IMixedConcreteLeaf
   > instance(
     test::common::examples::LoadMaxMixedConcreteLeaf()
   );
@@ -416,7 +416,7 @@ TEST_CASE("Test Descent over an ModelTypedFirst") {
 
 TEST_CASE("Test DescentOnce over an ModelTypedFirst") {
   const std::shared_ptr<
-    aas::types::IModelTypedFirst
+    our::types::IModelTypedFirst
   > instance(
     test::common::examples::LoadMaxModelTypedFirst()
   );
@@ -458,7 +458,7 @@ TEST_CASE("Test Descent over an ModelTypedSecond") {
 
 TEST_CASE("Test DescentOnce over an ModelTypedSecond") {
   const std::shared_ptr<
-    aas::types::IModelTypedSecond
+    our::types::IModelTypedSecond
   > instance(
     test::common::examples::LoadMaxModelTypedSecond()
   );
@@ -500,7 +500,7 @@ TEST_CASE("Test Descent over an Something") {
 
 TEST_CASE("Test DescentOnce over an Something") {
   const std::shared_ptr<
-    aas::types::ISomething
+    our::types::ISomething
   > instance(
     test::common::examples::LoadMaxSomething()
   );

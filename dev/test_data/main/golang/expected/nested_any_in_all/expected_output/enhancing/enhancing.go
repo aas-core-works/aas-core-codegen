@@ -6,7 +6,7 @@ package enhancing
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -18,23 +18,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedLangString[E any] struct {
-	instance aastypes.ILangString
+	instance ourtypes.ILangString
 	enhancement E
 }
 
 func (els *enhancedLangString[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return els.instance.ModelType()
 }
 
 func (els *enhancedLangString[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return els.instance.DescendOnce(action)
 }
 
 func (els *enhancedLangString[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return els.instance.Descend(action)
 }
@@ -73,9 +73,9 @@ func (els *enhancedLangString[E]) setEnhancement(
 }
 
 func wrapLangString[E any](
-	that aastypes.ILangString,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangString) {
+	that ourtypes.ILangString,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangString) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -93,34 +93,34 @@ func wrapLangString[E any](
 }
 
 type enhancedLangStringSet[E any] struct {
-	instance aastypes.ILangStringSet
+	instance ourtypes.ILangStringSet
 	enhancement E
 }
 
 func (elss *enhancedLangStringSet[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return elss.instance.ModelType()
 }
 
 func (elss *enhancedLangStringSet[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return elss.instance.DescendOnce(action)
 }
 
 func (elss *enhancedLangStringSet[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return elss.instance.Descend(action)
 }
 
 func (elss *enhancedLangStringSet[E]) LangStrings(
-) []aastypes.ILangString {
+) []ourtypes.ILangString {
 	return elss.instance.LangStrings()
 }
 
 func (elss *enhancedLangStringSet[E]) SetLangStrings(
-	value []aastypes.ILangString,
+	value []ourtypes.ILangString,
 ) {
 	elss.instance.SetLangStrings(value)
 }
@@ -137,9 +137,9 @@ func (elss *enhancedLangStringSet[E]) setEnhancement(
 }
 
 func wrapLangStringSet[E any](
-	that aastypes.ILangStringSet,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ILangStringSet) {
+	that ourtypes.ILangStringSet,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ILangStringSet) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -159,41 +159,41 @@ func wrapLangStringSet[E any](
 		theLangStrings[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.ILangString)
+		).(ourtypes.ILangString)
 	}
 
 	return
 }
 
 type enhancedIecContent[E any] struct {
-	instance aastypes.IIecContent
+	instance ourtypes.IIecContent
 	enhancement E
 }
 
 func (eic *enhancedIecContent[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eic.instance.ModelType()
 }
 
 func (eic *enhancedIecContent[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eic.instance.DescendOnce(action)
 }
 
 func (eic *enhancedIecContent[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eic.instance.Descend(action)
 }
 
 func (eic *enhancedIecContent[E]) Definition(
-) []aastypes.ILangString {
+) []ourtypes.ILangString {
 	return eic.instance.Definition()
 }
 
 func (eic *enhancedIecContent[E]) SetDefinition(
-	value []aastypes.ILangString,
+	value []ourtypes.ILangString,
 ) {
 	eic.instance.SetDefinition(value)
 }
@@ -210,9 +210,9 @@ func (eic *enhancedIecContent[E]) setEnhancement(
 }
 
 func wrapIecContent[E any](
-	that aastypes.IIecContent,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IIecContent) {
+	that ourtypes.IIecContent,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IIecContent) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -233,7 +233,7 @@ func wrapIecContent[E any](
 			theDefinition[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ILangString)
+			).(ourtypes.ILangString)
 		}
 	}
 
@@ -241,23 +241,23 @@ func wrapIecContent[E any](
 }
 
 type enhancedOtherContent[E any] struct {
-	instance aastypes.IOtherContent
+	instance ourtypes.IOtherContent
 	enhancement E
 }
 
 func (eoc *enhancedOtherContent[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eoc.instance.ModelType()
 }
 
 func (eoc *enhancedOtherContent[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eoc.instance.DescendOnce(action)
 }
 
 func (eoc *enhancedOtherContent[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eoc.instance.Descend(action)
 }
@@ -274,9 +274,9 @@ func (eoc *enhancedOtherContent[E]) setEnhancement(
 }
 
 func wrapOtherContent[E any](
-	that aastypes.IOtherContent,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IOtherContent) {
+	that ourtypes.IOtherContent,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IOtherContent) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -294,34 +294,34 @@ func wrapOtherContent[E any](
 }
 
 type enhancedSpecification[E any] struct {
-	instance aastypes.ISpecification
+	instance ourtypes.ISpecification
 	enhancement E
 }
 
 func (es *enhancedSpecification[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSpecification[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSpecification[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
 
 func (es *enhancedSpecification[E]) Content(
-) aastypes.IContent {
+) ourtypes.IContent {
 	return es.instance.Content()
 }
 
 func (es *enhancedSpecification[E]) SetContent(
-	value aastypes.IContent,
+	value ourtypes.IContent,
 ) {
 	es.instance.SetContent(value)
 }
@@ -338,9 +338,9 @@ func (es *enhancedSpecification[E]) setEnhancement(
 }
 
 func wrapSpecification[E any](
-	that aastypes.ISpecification,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISpecification) {
+	that ourtypes.ISpecification,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISpecification) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -359,30 +359,30 @@ func wrapSpecification[E any](
 		Wrap[E](
 			theContent,
 			factory,
-		).(aastypes.IContent),
+		).(ourtypes.IContent),
 	)
 
 	return
 }
 
 type enhancedSomething[E any] struct {
-	instance aastypes.ISomething
+	instance ourtypes.ISomething
 	enhancement E
 }
 
 func (es *enhancedSomething[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSomething[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSomething[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
@@ -399,23 +399,23 @@ func (es *enhancedSomething[E]) SetDefaultLanguage(
 }
 
 func (es *enhancedSomething[E]) LangStringSets(
-) []aastypes.ILangStringSet {
+) []ourtypes.ILangStringSet {
 	return es.instance.LangStringSets()
 }
 
 func (es *enhancedSomething[E]) SetLangStringSets(
-	value []aastypes.ILangStringSet,
+	value []ourtypes.ILangStringSet,
 ) {
 	es.instance.SetLangStringSets(value)
 }
 
 func (es *enhancedSomething[E]) Specifications(
-) []aastypes.ISpecification {
+) []ourtypes.ISpecification {
 	return es.instance.Specifications()
 }
 
 func (es *enhancedSomething[E]) SetSpecifications(
-	value []aastypes.ISpecification,
+	value []ourtypes.ISpecification,
 ) {
 	es.instance.SetSpecifications(value)
 }
@@ -432,9 +432,9 @@ func (es *enhancedSomething[E]) setEnhancement(
 }
 
 func wrapSomething[E any](
-	that aastypes.ISomething,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomething) {
+	that ourtypes.ISomething,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomething) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -454,7 +454,7 @@ func wrapSomething[E any](
 		theLangStringSets[i] = Wrap[E](
 			v,
 			factory,
-		).(aastypes.ILangStringSet)
+		).(ourtypes.ILangStringSet)
 	}
 
 	theSpecifications := that.Specifications()
@@ -464,7 +464,7 @@ func wrapSomething[E any](
 			theSpecifications[i] = Wrap[E](
 				v,
 				factory,
-			).(aastypes.ISpecification)
+			).(ourtypes.ISpecification)
 		}
 	}
 
@@ -480,9 +480,9 @@ func wrapSomething[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -494,34 +494,34 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeLangString:
+	case ourtypes.ModelTypeLangString:
 		result = wrapLangString[E](
-			that.(aastypes.ILangString),
+			that.(ourtypes.ILangString),
 			factory,
 		)
-	case aastypes.ModelTypeLangStringSet:
+	case ourtypes.ModelTypeLangStringSet:
 		result = wrapLangStringSet[E](
-			that.(aastypes.ILangStringSet),
+			that.(ourtypes.ILangStringSet),
 			factory,
 		)
-	case aastypes.ModelTypeIecContent:
+	case ourtypes.ModelTypeIecContent:
 		result = wrapIecContent[E](
-			that.(aastypes.IIecContent),
+			that.(ourtypes.IIecContent),
 			factory,
 		)
-	case aastypes.ModelTypeOtherContent:
+	case ourtypes.ModelTypeOtherContent:
 		result = wrapOtherContent[E](
-			that.(aastypes.IOtherContent),
+			that.(ourtypes.IOtherContent),
 			factory,
 		)
-	case aastypes.ModelTypeSpecification:
+	case ourtypes.ModelTypeSpecification:
 		result = wrapSpecification[E](
-			that.(aastypes.ISpecification),
+			that.(ourtypes.ISpecification),
 			factory,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			factory,
 		)
 	default:
@@ -540,7 +540,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -553,7 +553,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

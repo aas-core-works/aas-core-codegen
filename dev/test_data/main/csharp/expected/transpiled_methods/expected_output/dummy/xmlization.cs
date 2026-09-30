@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -414,15 +414,15 @@ namespace dummy
             /// <summary>
             /// Read an instance of class First from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.First> FirstFromElement = (
-                AtElement<Aas.First>(
+            internal static readonly ElementReader<Our.First> FirstFromElement = (
+                AtElement<Our.First>(
                     FirstFromSequence, "first"));
 
             /// <summary>
             /// Read an instance of class Second from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Second> SecondFromElement = (
-                AtElement<Aas.Second>(
+            internal static readonly ElementReader<Our.Second> SecondFromElement = (
+                AtElement<Our.Second>(
                     SecondFromSequence, "second"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -437,14 +437,14 @@ namespace dummy
                 AsText<long>(ReadContentAsLong));
 
             private static readonly ContentReader<Kind> Read_Kind = (
-                AsEnum<Aas.Kind>(
+                AsEnum<Our.Kind>(
                     Stringification.KindFromString));
 
             /// <summary>
             /// Deserialize an instance of IItem from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IItem IItemFromElement(
+            internal static Our.IItem IItemFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -468,7 +468,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IItem? IItemFromElement
+            }  // internal static Our.IItem? IItemFromElement
 
             /// <summary>
             /// Deserialize an instance of class First from a sequence of XML elements.
@@ -478,7 +478,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.First FirstFromSequence(
+            internal static Our.First FirstFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -588,7 +588,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.First(
+                return new Our.First(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -596,7 +596,7 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theKind);
-            }  // internal static Aas.First? FirstFromSequence
+            }  // internal static Our.First? FirstFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Second from a sequence of XML elements.
@@ -606,7 +606,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Second SecondFromSequence(
+            internal static Our.Second SecondFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -734,7 +734,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Second(
+                return new Our.Second(
                     theTexts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -745,7 +745,7 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theKind);
-            }  // internal static Aas.Second? SecondFromSequence
+            }  // internal static Our.Second? SecondFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -770,7 +770,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class IItem:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.IItem anInstance = Deserialize.IItemFrom(
+        /// Our.IItem anInstance = Deserialize.IItemFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -789,7 +789,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IItem.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IItem IItemFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IItem IItemFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -803,7 +803,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IItem result = DeserializeImplementation.IItemFromElement(
+                Our.IItem result = DeserializeImplementation.IItemFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -823,7 +823,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of First.
             /// </exception>
-            public static Aas.First FirstFrom(
+            public static Our.First FirstFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -837,7 +837,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.First result = DeserializeImplementation.FirstFromElement(
+                Our.First result = DeserializeImplementation.FirstFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -857,7 +857,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Second.
             /// </exception>
-            public static Aas.Second SecondFrom(
+            public static Our.Second SecondFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -871,7 +871,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Second result = DeserializeImplementation.SecondFromElement(
+                Our.Second result = DeserializeImplementation.SecondFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1086,7 +1086,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -1104,11 +1104,11 @@ namespace dummy
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<Kind> Write_Kind = (
-                WriteEnum<Aas.Kind>(
+                WriteEnum<Our.Kind>(
                     Stringification.ToString));
 
             private static void FirstToSequence(
-                Aas.IFirst that,
+                Our.IFirst that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1125,7 +1125,7 @@ namespace dummy
             }  // private static void FirstToSequence
 
             public override void VisitFirst(
-                Aas.IFirst that,
+                Our.IFirst that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1138,7 +1138,7 @@ namespace dummy
             }
 
             private static void SecondToSequence(
-                Aas.ISecond that,
+                Our.ISecond that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1158,7 +1158,7 @@ namespace dummy
             }  // private static void SecondToSequence
 
             public override void VisitSecond(
-                Aas.ISecond that,
+                Our.ISecond that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1177,7 +1177,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of IItem:
         /// <code>
-        /// var anInstance = new Aas.IItem(
+        /// var anInstance = new Our.IItem(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -1196,7 +1196,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

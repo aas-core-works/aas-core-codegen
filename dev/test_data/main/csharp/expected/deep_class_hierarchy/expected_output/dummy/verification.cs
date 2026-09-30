@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace dummy
     /// <example>
     /// Here is an example how to verify an instance of INode:
     /// <code>
-    /// var anInstance = new Aas.INode(
+    /// var anInstance = new Our.INode(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -48,7 +48,7 @@ namespace dummy
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBranch(
-                Aas.IBranch that
+                Our.IBranch that
             )
             {
                 // No verification has been defined for Branch.
@@ -57,7 +57,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLeaf(
-                Aas.ILeaf that
+                Our.ILeaf that
             )
             {
                 // No verification has been defined for Leaf.
@@ -66,7 +66,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBlossom(
-                Aas.IBlossom that
+                Our.IBlossom that
             )
             {
                 // No verification has been defined for Blossom.
@@ -75,7 +75,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
-                Aas.ISomething that
+                Our.ISomething that
             )
             {
                 foreach (var error in Verification.Verify(that.SomeChoice))
@@ -97,7 +97,7 @@ namespace dummy
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformContainer(
-                Aas.IContainer that
+                Our.IContainer that
             )
             {
                 foreach (var error in Verification.Verify(that.Node))
@@ -124,7 +124,7 @@ namespace dummy
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {

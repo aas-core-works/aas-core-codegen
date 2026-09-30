@@ -48,8 +48,8 @@ else:
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.types as aas_types
-import {qualified_module_name}.xmlization as aas_xmlization"""
+import {qualified_module_name}.types as our_types
+import {qualified_module_name}.xmlization as our_xmlization"""
         ),
         Stripped(
             f'''\
@@ -61,12 +61,12 @@ class Difference:
 
 {I}#: Path to the expected XML element which is different from
 {I}#: the obtained XML element
-{I}path: Final[aas_xmlization.Path]
+{I}path: Final[our_xmlization.Path]
 
 {I}def __init__(self, message: str) -> None:
 {II}"""Initialize with the given message and empty path."""
 {II}self.message = message
-{II}self.path = aas_xmlization.Path()
+{II}self.path = our_xmlization.Path()
 
 {I}def __str__(self) -> str:
 {II}return f"#{{self.path}}: {{self.message}}"'''
@@ -163,9 +163,9 @@ def check_equal(
 {I}):
 {II}for difference in check_equal(expected_child, got_child):
 {III}if children_tag_unique:
-{IIII}difference.path._prepend(aas_xmlization.ElementSegment(expected_child))
+{IIII}difference.path._prepend(our_xmlization.ElementSegment(expected_child))
 {III}else:
-{IIII}difference.path._prepend(aas_xmlization.IndexSegment(expected_child, i))
+{IIII}difference.path._prepend(our_xmlization.IndexSegment(expected_child, i))
 
 {III}yield difference'''
         ),
@@ -207,10 +207,10 @@ def assert_elements_equal(
             f'''\
 def must_load(
 {I}path: pathlib.Path,
-) -> aas_types.Class:
+) -> our_types.Class:
 {I}"""Load an instance from ``path``."""
 {I}try:
-{II}instance = aas_xmlization.from_file(path)
+{II}instance = our_xmlization.from_file(path)
 {I}except Exception as exception:
 {II}raise RuntimeError(f"Failed to read from {{path}}") from exception
 

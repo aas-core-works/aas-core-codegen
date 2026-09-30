@@ -98,7 +98,7 @@ def _generate_lexical_tests(symbol_table: intermediate.SymbolTable) -> List[Stri
  * Read the first recorded example of {cls_name_typescript} with the content
  * of the element `xmlName` replaced by `text`.
  */
-function readWith(xmlName: string, text: string): AasTypes.{cls_name_typescript} {{
+function readWith(xmlName: string, text: string): OurTypes.{cls_name_typescript} {{
 {I}const pths = Array.from(
 {II}TestCommon.findFilesBySuffixRecursively(
 {III}path.join(
@@ -121,10 +121,10 @@ function readWith(xmlName: string, text: string): AasTypes.{cls_name_typescript}
 
 {I}const patched = original.slice(0, start) + text + original.slice(end);
 
-{I}const instanceOrError = AasXmlization.fromXmlString(patched);
+{I}const instanceOrError = OurXmlization.fromXmlString(patched);
 {I}expect(instanceOrError.error).toBeNull();
 
-{I}const casted = AasTypes.{as_function}(instanceOrError.mustValue());
+{I}const casted = OurTypes.{as_function}(instanceOrError.mustValue());
 {I}if (casted === null) {{
 {II}throw new Error(`Expected an instance of {cls_name_typescript}`);
 {I}}}
@@ -183,9 +183,9 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasXmlization from "../src/xmlization";
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
+import * as OurXmlization from "../src/xmlization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
 
 import * as TestCommon from "./common";"""
         ),
@@ -218,11 +218,11 @@ test("{cls_name_typescript} XML round-trip OK", () => {{
 {I}for (const pth of pths) {{
 {II}const text = fs.readFileSync(pth, "utf-8");
 
-{II}const instanceOrError = AasXmlization.fromXmlString(text);
+{II}const instanceOrError = OurXmlization.fromXmlString(text);
 {II}expect(instanceOrError.error).toBeNull();
 {II}const instance = instanceOrError.mustValue();
 
-{II}const casted = AasTypes.{as_function}(instance);
+{II}const casted = OurTypes.{as_function}(instance);
 {II}if (casted === null) {{
 {III}throw new Error(
 {IIII}`Expected instance of {cls_name_typescript} in ${{pth}}, ` +
@@ -230,9 +230,9 @@ test("{cls_name_typescript} XML round-trip OK", () => {{
 {III});
 {II}}}
 
-{II}TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+{II}TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
 
-{II}const roundTripText = AasXmlization.toXmlString(casted);
+{II}const roundTripText = OurXmlization.toXmlString(casted);
 {II}expect(roundTripText.length).toBeGreaterThan(0);
 {I}}}
 }});"""
@@ -272,7 +272,7 @@ test("{cls_name_typescript} XML deserialization fail", () => {{
 
 {II}for (const pth of pths) {{
 {III}const text = fs.readFileSync(pth, "utf-8");
-{III}const instanceOrError = AasXmlization.fromXmlString(text);
+{III}const instanceOrError = OurXmlization.fromXmlString(text);
 {III}expect(instanceOrError.error).not.toBeNull();
 {II}}}
 {I}}}

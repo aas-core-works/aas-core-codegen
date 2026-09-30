@@ -13,24 +13,24 @@ package verification
 import (
 	"fmt"
 	"strings"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasconstants "github.com/dummy-works/dummy/constants"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aasstringification "github.com/dummy-works/dummy/stringification"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourconstants "github.com/dummy-works/dummy/constants"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourstringification "github.com/dummy-works/dummy/stringification"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -45,7 +45,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check a local set of strings.
@@ -55,7 +55,7 @@ func TextsAreUnique(
 	var seen map[string]struct{} = make(map[string]struct{})
 	for _, text := range texts {
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
 				text,
 			)) {
@@ -78,7 +78,7 @@ func NumbersAreUniqueBetweenZeros(
 			continue
 		}
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
 				number,
 			)) {
@@ -91,12 +91,12 @@ func NumbersAreUniqueBetweenZeros(
 
 // Check a local set of enumeration literals.
 func KindsAreUnique(
-	kinds []aastypes.Kind,
+	kinds []ourtypes.Kind,
 ) bool {
-	var seen map[aastypes.Kind]struct{} = make(map[aastypes.Kind]struct{})
+	var seen map[ourtypes.Kind]struct{} = make(map[ourtypes.Kind]struct{})
 	for _, kind := range kinds {
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
 				kind,
 			)) {
@@ -114,7 +114,7 @@ func CodesAreUnique(
 	var seen map[string]struct{} = make(map[string]struct{})
 	for _, code := range codes {
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
 				code,
 			)) {
@@ -133,11 +133,11 @@ func FlagsAreUniform(
 	for _, flag := range flags {
 		seen[flag] = struct{}{}
 	}
-	return !(aascommon.MapContains(
+	return !(ourcommon.MapContains(
 			seen,
 			true,
 		) &&
-		aascommon.MapContains(
+		ourcommon.MapContains(
 			seen,
 			false,
 		))
@@ -150,13 +150,13 @@ func LengthsAreUnique(
 	var seen map[int64]struct{} = make(map[int64]struct{})
 	for _, text := range texts {
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
-				int64(aascommon.LenStr(text)),
+				int64(ourcommon.LenStr(text)),
 			)) {
 			return false
 		}
-		seen[int64(aascommon.LenStr(text))] = struct{}{}
+		seen[int64(ourcommon.LenStr(text))] = struct{}{}
 	}
 	return true
 }
@@ -177,7 +177,7 @@ func IsInTexts(
 	text string,
 	texts map[string]struct{},
 ) bool {
-	return aascommon.MapContains(
+	return ourcommon.MapContains(
 			texts,
 			text,
 		)
@@ -191,7 +191,7 @@ func IsInOptionalTexts(
 	if texts == nil {
 		return false
 	}
-	return aascommon.MapContains(
+	return ourcommon.MapContains(
 			texts,
 			text,
 		)
@@ -199,10 +199,10 @@ func IsInOptionalTexts(
 
 // Check whether kind is in kinds, a read-only set.
 func IsInKinds(
-	kind aastypes.Kind,
-	kinds map[aastypes.Kind]struct{},
+	kind ourtypes.Kind,
+	kinds map[ourtypes.Kind]struct{},
 ) bool {
-	return aascommon.MapContains(
+	return ourcommon.MapContains(
 			kinds,
 			kind,
 		)
@@ -242,8 +242,8 @@ func TextsAreDisjoint(
 func TextIsNotReserved(
 	text string,
 ) bool {
-	return (!IsInTexts(text, aasconstants.ReservedTexts)) &&
-		(!IsInOptionalTexts(text, aasconstants.ReservedTexts))
+	return (!IsInTexts(text, ourconstants.ReservedTexts)) &&
+		(!IsInOptionalTexts(text, ourconstants.ReservedTexts))
 }
 
 // Check a for-loop over a read-only set argument.
@@ -251,7 +251,7 @@ func TextsAreAllShort(
 	texts map[string]struct{},
 ) bool {
 	for text := range texts {
-		if aascommon.LenStr(text) > 10 {
+		if ourcommon.LenStr(text) > 10 {
 			return false
 		}
 	}
@@ -275,7 +275,7 @@ func NumbersAreAllSmall(
 	for _, number := range numbers {
 		seen[number] = struct{}{}
 	}
-	return aascommon.AllKeys(
+	return ourcommon.AllKeys(
 			func(number int64) bool {
 				return number < 1000
 			},
@@ -290,8 +290,8 @@ func AtMostOneTextIsReserved(
 	var seen map[string]struct{} = make(map[string]struct{})
 	AddTexts(texts, seen)
 	reserved :=
-		aascommon.SetIntersection(
-			aasconstants.ReservedTexts,
+		ourcommon.SetIntersection(
+			ourconstants.ReservedTexts,
 			seen,
 		)
 	return len(reserved) <= 1
@@ -302,10 +302,10 @@ func AtMostOneTextIsReserved(
 // We also add optionalKind, if specified, to check adding
 // a narrowed optional to a set.
 func SomeKindIsNotSpecial(
-	kinds []aastypes.Kind,
-	optionalKind *aastypes.Kind,
+	kinds []ourtypes.Kind,
+	optionalKind *ourtypes.Kind,
 ) bool {
-	var seen map[aastypes.Kind]struct{} = make(map[aastypes.Kind]struct{})
+	var seen map[ourtypes.Kind]struct{} = make(map[ourtypes.Kind]struct{})
 	for _, kind := range kinds {
 		seen[kind] = struct{}{}
 	}
@@ -314,27 +314,27 @@ func SomeKindIsNotSpecial(
 	}
 	return len(seen) == 0 ||
 		len(
-			aascommon.SetDifference(
+			ourcommon.SetDifference(
 				seen,
-				aasconstants.SpecialKinds,
+				ourconstants.SpecialKinds,
 			),
 		) > 0
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if !(
-		that.OptionalTextsAreUniqueIgnoring(aasconstants.ReservedTexts)) {
+		that.OptionalTextsAreUniqueIgnoring(ourconstants.ReservedTexts)) {
 		abort = onError(
 			newVerificationError(
 				"Optional texts must be unique, apart from the reserved ones.",),
@@ -355,7 +355,7 @@ func VerifySomething(
 		}
 	}
 
-	if !(!IsInKinds(that.Kind(), aasconstants.SpecialKinds)) {
+	if !(!IsInKinds(that.Kind(), ourconstants.SpecialKinds)) {
 		abort = onError(
 			newVerificationError(
 				"Kind must not be special.",),
@@ -366,8 +366,8 @@ func VerifySomething(
 	}
 
 	if !(
-		!aascommon.MapContains(
-			aasconstants.LuckyNumbers,
+		!ourcommon.MapContains(
+			ourconstants.LuckyNumbers,
 			int64(len(that.Numbers())),
 		)) {
 		abort = onError(
@@ -380,8 +380,8 @@ func VerifySomething(
 	}
 
 	if !(
-		!aascommon.MapContains(
-			aasconstants.LuckyNumbers,
+		!ourcommon.MapContains(
+			ourconstants.LuckyNumbers,
 			that.Number(),
 		)) {
 		abort = onError(
@@ -455,8 +455,8 @@ func VerifySomething(
 
 	if !(
 		!(that.OptionalKind() != nil) ||
-		(!aascommon.MapContains(
-			aasconstants.SpecialKinds,
+		(!ourcommon.MapContains(
+			ourconstants.SpecialKinds,
 			*that.OptionalKind(),
 		))) {
 		abort = onError(
@@ -528,7 +528,7 @@ func VerifySomething(
 		that.Kind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Kind",
 				},
 			)
@@ -576,13 +576,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Kinds",
 						},
 					)
@@ -611,13 +611,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Codes",
 						},
 					)
@@ -647,7 +647,7 @@ func VerifySomething(
 			*that.OptionalKind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalKind",
 					},
 				)
@@ -662,19 +662,19 @@ func VerifySomething(
 	return
 }
 
-// Verify `that` instance of [aastypes.ICollection].
+// Verify `that` instance of [ourtypes.ICollection].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyCollection(
-	that aastypes.ICollection,
+	that ourtypes.ICollection,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !that.TextsAreNotAllIn(aasconstants.ReservedTexts) {
+	if !that.TextsAreNotAllIn(ourconstants.ReservedTexts) {
 		abort = onError(
 			newVerificationError(
 				"Texts must contain a text which is not reserved, if any.",),
@@ -687,7 +687,7 @@ func VerifyCollection(
 	if !(
 		!(that.OptionalTexts() != nil) ||
 		(len(
-			aascommon.SetIntersection(
+			ourcommon.SetIntersection(
 				that.OptionalTexts(),
 				that.Texts(),
 			),
@@ -702,13 +702,13 @@ func VerifyCollection(
 	}
 
 	if !(
-		!aascommon.MapContains(
+		!ourcommon.MapContains(
 			that.Directions(),
-			aastypes.DirectionNorth,
+			ourtypes.DirectionNorth,
 		) ||
-		aascommon.MapContains(
+		ourcommon.MapContains(
 			that.Directions(),
-			aastypes.DirectionSouth,
+			ourtypes.DirectionSouth,
 		)) {
 		abort = onError(
 			newVerificationError(
@@ -720,7 +720,7 @@ func VerifyCollection(
 	}
 
 	if !(
-		aascommon.AllKeys(
+		ourcommon.AllKeys(
 			func(number int64) bool {
 				return number > -1000
 			},
@@ -798,21 +798,21 @@ func VerifyCollection(
 			return
 		}
 	} else {
-		for i, v := range aascommon.SortedKeys(
+		for i, v := range ourcommon.SortedKeys(
 			that.Directions(),
-			aasstringification.LessByRankOfDirection,
+			ourstringification.LessByRankOfDirection,
 		) {
 			abort = VerifyDirection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Directions",
 						},
 					)
@@ -836,21 +836,21 @@ func VerifyCollection(
 			return
 		}
 	} else {
-		for i, v := range aascommon.SortedKeys(
+		for i, v := range ourcommon.SortedKeys(
 			that.Codes(),
-			aascommon.LessOrdered[string],
+			ourcommon.LessOrdered[string],
 		) {
 			abort = VerifyCode(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Codes",
 						},
 					)
@@ -865,21 +865,21 @@ func VerifyCollection(
 	}
 
 	if that.OptionalDirections() != nil {
-		for i, v := range aascommon.SortedKeys(
+		for i, v := range ourcommon.SortedKeys(
 			that.OptionalDirections(),
-			aasstringification.LessByRankOfDirection,
+			ourstringification.LessByRankOfDirection,
 		) {
 			abort = VerifyDirection(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "OptionalDirections",
 						},
 					)
@@ -904,14 +904,14 @@ func VerifyCollection(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindGamma {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindGamma {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -933,14 +933,14 @@ func VerifyKind(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyDirection(
-	that aastypes.Direction,
+	that ourtypes.Direction,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.DirectionNorth ||
-		that > aastypes.DirectionEast {
+		that < ourtypes.DirectionNorth ||
+		that > ourtypes.DirectionEast {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -966,7 +966,7 @@ func VerifyCode(
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that) > 0) {
+	if !(ourcommon.LenStr(that) > 0) {
 		abort = onError(
 			newVerificationError(
 				"Code must not be empty.",),
@@ -986,19 +986,19 @@ func VerifyCode(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
-	case aastypes.ModelTypeCollection:
+	case ourtypes.ModelTypeCollection:
 		abort = VerifyCollection(
-			that.(aastypes.ICollection),
+			that.(ourtypes.ICollection),
 			onError,
 		)
 	default:

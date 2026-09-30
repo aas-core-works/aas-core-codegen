@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,10 +14,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Item_OverMaybeTextsOrEmpty()
         {
-            foreach (Aas.Item instance in new[]
+            foreach (Our.Item instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalItem(),
-                Aas.Tests.CommonJsonization.LoadMaximalItem()
+                Our.Tests.CommonJsonization.LoadMinimalItem(),
+                Our.Tests.CommonJsonization.LoadMaximalItem()
             })
             {
                 int count = 0;

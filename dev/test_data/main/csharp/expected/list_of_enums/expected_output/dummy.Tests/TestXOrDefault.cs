@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;
@@ -19,10 +19,10 @@ namespace dummy.Tests
             object value,
             string expectedPath)
         {
-            Nodes.JsonNode got = Aas.Tests.CommonJson.ToJson(
+            Nodes.JsonNode got = Our.Tests.CommonJson.ToJson(
                 value);
 
-            if (Aas.Tests.Common.RecordMode)
+            if (Our.Tests.Common.RecordMode)
             {
                 string? parent = Path.GetDirectoryName(expectedPath);
                 if (parent != null)
@@ -43,14 +43,14 @@ namespace dummy.Tests
                     throw new System.IO.FileNotFoundException(
                         $"The file with the recorded value does not exist: {expectedPath}; " +
                         "maybe you want to set the environment " +
-                        $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                        $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                 }
 
-                Nodes.JsonNode expected = Aas.Tests.CommonJson.ReadFromFile(
+                Nodes.JsonNode expected = Our.Tests.CommonJson.ReadFromFile(
                     expectedPath);
 
-                Aas.Tests.CommonJson.CheckJsonNodesEqual(
-                    expected, got, out Aas.Reporting.Error? error);
+                Our.Tests.CommonJson.CheckJsonNodesEqual(
+                    expected, got, out Our.Reporting.Error? error);
 
                 if (error != null)
                 {

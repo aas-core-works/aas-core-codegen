@@ -3,8 +3,8 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0; // renamed
-using AasEnhancing = AasCore.Aas3_0.Enhancing; // renamed
+using Our = AasCore.Aas3_0; // renamed
+using OurEnhancing = AasCore.Aas3_0.Enhancing; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias
@@ -25,7 +25,7 @@ namespace AasCore.Aas3_0.Tests
             }
         }
 
-        private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
+        private static OurEnhancing.Enhancer<Enhancement> CreateEnhancer()
         {
             long lastCustomId = 0;
 
@@ -37,14 +37,14 @@ namespace AasCore.Aas3_0.Tests
                 }
             );
 
-            return new AasEnhancing.Enhancer<Enhancement>(enhancementFactory);
+            return new OurEnhancing.Enhancer<Enhancement>(enhancementFactory);
         }
 
         [Test]
         public void Test_Extension()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension()
+                Our.Tests.CommonJsonization.LoadMaximalExtension()
             );
 
             var enhancer = CreateEnhancer();
@@ -74,7 +74,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AdministrativeInformation()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation()
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation()
             );
 
             var enhancer = CreateEnhancer();
@@ -104,7 +104,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Qualifier()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier()
+                Our.Tests.CommonJsonization.LoadMaximalQualifier()
             );
 
             var enhancer = CreateEnhancer();
@@ -134,7 +134,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AssetAdministrationShell()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell()
             );
 
             var enhancer = CreateEnhancer();
@@ -164,7 +164,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AssetInformation()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation()
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation()
             );
 
             var enhancer = CreateEnhancer();
@@ -194,7 +194,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Resource()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalResource()
+                Our.Tests.CommonJsonization.LoadMaximalResource()
             );
 
             var enhancer = CreateEnhancer();
@@ -224,7 +224,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_SpecificAssetId()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId()
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId()
             );
 
             var enhancer = CreateEnhancer();
@@ -254,7 +254,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Submodel()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel()
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel()
             );
 
             var enhancer = CreateEnhancer();
@@ -284,7 +284,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_RelationshipElement()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement()
             );
 
             var enhancer = CreateEnhancer();
@@ -314,7 +314,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_SubmodelElementList()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList()
             );
 
             var enhancer = CreateEnhancer();
@@ -344,7 +344,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_SubmodelElementCollection()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection()
             );
 
             var enhancer = CreateEnhancer();
@@ -374,7 +374,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Property()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty()
+                Our.Tests.CommonJsonization.LoadMaximalProperty()
             );
 
             var enhancer = CreateEnhancer();
@@ -404,7 +404,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_MultiLanguageProperty()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty()
             );
 
             var enhancer = CreateEnhancer();
@@ -434,7 +434,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Range()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange()
+                Our.Tests.CommonJsonization.LoadMaximalRange()
             );
 
             var enhancer = CreateEnhancer();
@@ -464,7 +464,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ReferenceElement()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement()
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement()
             );
 
             var enhancer = CreateEnhancer();
@@ -494,7 +494,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Blob()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob()
+                Our.Tests.CommonJsonization.LoadMaximalBlob()
             );
 
             var enhancer = CreateEnhancer();
@@ -524,7 +524,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_File()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile()
+                Our.Tests.CommonJsonization.LoadMaximalFile()
             );
 
             var enhancer = CreateEnhancer();
@@ -554,7 +554,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_AnnotatedRelationshipElement()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement()
             );
 
             var enhancer = CreateEnhancer();
@@ -584,7 +584,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Entity()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEntity()
+                Our.Tests.CommonJsonization.LoadMaximalEntity()
             );
 
             var enhancer = CreateEnhancer();
@@ -614,7 +614,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_EventPayload()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEventPayload()
+                Our.Tests.CommonJsonization.LoadMaximalEventPayload()
             );
 
             var enhancer = CreateEnhancer();
@@ -644,7 +644,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_BasicEventElement()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement()
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement()
             );
 
             var enhancer = CreateEnhancer();
@@ -674,7 +674,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Operation()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperation()
+                Our.Tests.CommonJsonization.LoadMaximalOperation()
             );
 
             var enhancer = CreateEnhancer();
@@ -704,7 +704,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_OperationVariable()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperationVariable()
+                Our.Tests.CommonJsonization.LoadMaximalOperationVariable()
             );
 
             var enhancer = CreateEnhancer();
@@ -734,7 +734,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Capability()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCapability()
+                Our.Tests.CommonJsonization.LoadMaximalCapability()
             );
 
             var enhancer = CreateEnhancer();
@@ -764,7 +764,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ConceptDescription()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription()
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription()
             );
 
             var enhancer = CreateEnhancer();
@@ -794,7 +794,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Reference()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReference()
+                Our.Tests.CommonJsonization.LoadMaximalReference()
             );
 
             var enhancer = CreateEnhancer();
@@ -824,7 +824,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Key()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalKey()
+                Our.Tests.CommonJsonization.LoadMaximalKey()
             );
 
             var enhancer = CreateEnhancer();
@@ -854,7 +854,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LangStringNameType()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringNameType()
+                Our.Tests.CommonJsonization.LoadMaximalLangStringNameType()
             );
 
             var enhancer = CreateEnhancer();
@@ -884,7 +884,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LangStringTextType()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringTextType()
+                Our.Tests.CommonJsonization.LoadMaximalLangStringTextType()
             );
 
             var enhancer = CreateEnhancer();
@@ -914,7 +914,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_Environment()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment()
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment()
             );
 
             var enhancer = CreateEnhancer();
@@ -944,7 +944,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_EmbeddedDataSpecification()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification()
+                Our.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification()
             );
 
             var enhancer = CreateEnhancer();
@@ -974,7 +974,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LevelType()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLevelType()
+                Our.Tests.CommonJsonization.LoadMaximalLevelType()
             );
 
             var enhancer = CreateEnhancer();
@@ -1004,7 +1004,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ValueReferencePair()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueReferencePair()
+                Our.Tests.CommonJsonization.LoadMaximalValueReferencePair()
             );
 
             var enhancer = CreateEnhancer();
@@ -1034,7 +1034,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_ValueList()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueList()
+                Our.Tests.CommonJsonization.LoadMaximalValueList()
             );
 
             var enhancer = CreateEnhancer();
@@ -1064,7 +1064,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LangStringPreferredNameTypeIec61360()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360()
+                Our.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360()
             );
 
             var enhancer = CreateEnhancer();
@@ -1094,7 +1094,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LangStringShortNameTypeIec61360()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360()
+                Our.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360()
             );
 
             var enhancer = CreateEnhancer();
@@ -1124,7 +1124,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_LangStringDefinitionTypeIec61360()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360()
+                Our.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360()
             );
 
             var enhancer = CreateEnhancer();
@@ -1154,7 +1154,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_DataSpecificationIec61360()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360()
             );
 
             var enhancer = CreateEnhancer();

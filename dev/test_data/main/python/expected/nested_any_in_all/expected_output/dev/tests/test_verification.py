@@ -12,8 +12,8 @@ import json
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
-import dummy.verification as aas_verification
+import dummy.jsonization as our_jsonization
+import dummy.verification as our_verification
 
 
 import tests.common
@@ -32,9 +32,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.lang_string_from_jsonable(jsonable)
+            instance = our_jsonization.lang_string_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -57,9 +57,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.lang_string_set_from_jsonable(jsonable)
+            instance = our_jsonization.lang_string_set_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -82,9 +82,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.iec_content_from_jsonable(jsonable)
+            instance = our_jsonization.iec_content_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -107,9 +107,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.other_content_from_jsonable(jsonable)
+            instance = our_jsonization.other_content_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -132,9 +132,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.specification_from_jsonable(jsonable)
+            instance = our_jsonization.specification_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -157,9 +157,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.something_from_jsonable(jsonable)
+            instance = our_jsonization.something_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -196,9 +196,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.lang_string_from_jsonable(jsonable)
+                instance = our_jsonization.lang_string_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -237,9 +237,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.lang_string_set_from_jsonable(jsonable)
+                instance = our_jsonization.lang_string_set_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -278,9 +278,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.iec_content_from_jsonable(jsonable)
+                instance = our_jsonization.iec_content_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -319,9 +319,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.other_content_from_jsonable(jsonable)
+                instance = our_jsonization.other_content_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -360,9 +360,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.specification_from_jsonable(jsonable)
+                instance = our_jsonization.specification_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -401,9 +401,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.something_from_jsonable(jsonable)
+                instance = our_jsonization.something_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(

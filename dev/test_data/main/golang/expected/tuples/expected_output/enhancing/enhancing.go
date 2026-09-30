@@ -6,8 +6,8 @@ package enhancing
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 type enhanced[E any] interface {
@@ -19,23 +19,23 @@ type enhanced[E any] interface {
 }
 
 type enhancedSomeItem[E any] struct {
-	instance aastypes.ISomeItem
+	instance ourtypes.ISomeItem
 	enhancement E
 }
 
 func (esi *enhancedSomeItem[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return esi.instance.ModelType()
 }
 
 func (esi *enhancedSomeItem[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return esi.instance.DescendOnce(action)
 }
 
 func (esi *enhancedSomeItem[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return esi.instance.Descend(action)
 }
@@ -63,9 +63,9 @@ func (esi *enhancedSomeItem[E]) setEnhancement(
 }
 
 func wrapSomeItem[E any](
-	that aastypes.ISomeItem,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomeItem) {
+	that ourtypes.ISomeItem,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomeItem) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -83,23 +83,23 @@ func wrapSomeItem[E any](
 }
 
 type enhancedAnotherItem[E any] struct {
-	instance aastypes.IAnotherItem
+	instance ourtypes.IAnotherItem
 	enhancement E
 }
 
 func (eai *enhancedAnotherItem[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return eai.instance.ModelType()
 }
 
 func (eai *enhancedAnotherItem[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return eai.instance.DescendOnce(action)
 }
 
 func (eai *enhancedAnotherItem[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return eai.instance.Descend(action)
 }
@@ -127,9 +127,9 @@ func (eai *enhancedAnotherItem[E]) setEnhancement(
 }
 
 func wrapAnotherItem[E any](
-	that aastypes.IAnotherItem,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IAnotherItem) {
+	that ourtypes.IAnotherItem,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IAnotherItem) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -147,67 +147,67 @@ func wrapAnotherItem[E any](
 }
 
 type enhancedSomething[E any] struct {
-	instance aastypes.ISomething
+	instance ourtypes.ISomething
 	enhancement E
 }
 
 func (es *enhancedSomething[E]) ModelType(
-) aastypes.ModelType {
+) ourtypes.ModelType {
 	return es.instance.ModelType()
 }
 
 func (es *enhancedSomething[E]) DescendOnce(
-	action func(aastypes.IClass)bool,
+	action func(ourtypes.IClass)bool,
 ) bool {
 	return es.instance.DescendOnce(action)
 }
 
 func (es *enhancedSomething[E]) Descend(
-	action func(aastypes.IClass) bool,
+	action func(ourtypes.IClass) bool,
 ) bool {
 	return es.instance.Descend(action)
 }
 
 func (es *enhancedSomething[E]) Pair(
-) aascommon.Tuple2[string, int64] {
+) ourcommon.Tuple2[string, int64] {
 	return es.instance.Pair()
 }
 
 func (es *enhancedSomething[E]) SetPair(
-	value aascommon.Tuple2[string, int64],
+	value ourcommon.Tuple2[string, int64],
 ) {
 	es.instance.SetPair(value)
 }
 
 func (es *enhancedSomething[E]) Items(
-) aascommon.Tuple2[aastypes.IAbstractItem, aastypes.IAbstractItem] {
+) ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem] {
 	return es.instance.Items()
 }
 
 func (es *enhancedSomething[E]) SetItems(
-	value aascommon.Tuple2[aastypes.IAbstractItem, aastypes.IAbstractItem],
+	value ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
 ) {
 	es.instance.SetItems(value)
 }
 
 func (es *enhancedSomething[E]) Tricky(
-) aascommon.Tuple6[int64, aastypes.ISomeItem, aastypes.IAbstractItem, aastypes.ISomeItem, int64, aastypes.Result] {
+) ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result] {
 	return es.instance.Tricky()
 }
 
 func (es *enhancedSomething[E]) SetTricky(
-	value aascommon.Tuple6[int64, aastypes.ISomeItem, aastypes.IAbstractItem, aastypes.ISomeItem, int64, aastypes.Result],
+	value ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
 ) {
 	es.instance.SetTricky(value)
 }
 
 func (es *enhancedSomething[E]) OptionalPair(
-) *aascommon.Tuple2[string, aastypes.IAbstractItem] {
+) *ourcommon.Tuple2[string, ourtypes.IAbstractItem] {
 	return es.instance.OptionalPair()
 }
 
 func (es *enhancedSomething[E]) SetOptionalPair(
-	value *aascommon.Tuple2[string, aastypes.IAbstractItem],
+	value *ourcommon.Tuple2[string, ourtypes.IAbstractItem],
 ) {
 	es.instance.SetOptionalPair(value)
 }
@@ -224,9 +224,9 @@ func (es *enhancedSomething[E]) setEnhancement(
 }
 
 func wrapSomething[E any](
-	that aastypes.ISomething,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.ISomething) {
+	that ourtypes.ISomething,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.ISomething) {
 	// We assume that we already checked whether `that` has been enhanced
 	// in the caller.
 
@@ -244,11 +244,11 @@ func wrapSomething[E any](
 	theItems.Item1 = Wrap[E](
 		theItems.Item1,
 		factory,
-	).(aastypes.IAbstractItem)
+	).(ourtypes.IAbstractItem)
 	theItems.Item2 = Wrap[E](
 		theItems.Item2,
 		factory,
-	).(aastypes.IAbstractItem)
+	).(ourtypes.IAbstractItem)
 	that.SetItems(
 		theItems,
 	)
@@ -257,15 +257,15 @@ func wrapSomething[E any](
 	theTricky.Item2 = Wrap[E](
 		theTricky.Item2,
 		factory,
-	).(aastypes.ISomeItem)
+	).(ourtypes.ISomeItem)
 	theTricky.Item3 = Wrap[E](
 		theTricky.Item3,
 		factory,
-	).(aastypes.IAbstractItem)
+	).(ourtypes.IAbstractItem)
 	theTricky.Item4 = Wrap[E](
 		theTricky.Item4,
 		factory,
-	).(aastypes.ISomeItem)
+	).(ourtypes.ISomeItem)
 	that.SetTricky(
 		theTricky,
 	)
@@ -275,7 +275,7 @@ func wrapSomething[E any](
 		theOptionalPair.Item2 = Wrap[E](
 			theOptionalPair.Item2,
 			factory,
-		).(aastypes.IAbstractItem)
+		).(ourtypes.IAbstractItem)
 		that.SetOptionalPair(
 			theOptionalPair,
 		)
@@ -293,9 +293,9 @@ func wrapSomething[E any](
 //
 // If `that` instance has been already wrapped, panic.
 func Wrap[E any](
-	that aastypes.IClass,
-	factory func(aastypes.IClass) (E, bool),
-) (result aastypes.IClass) {
+	that ourtypes.IClass,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IClass) {
 	_, ok := that.(enhanced[E])
 	if ok {
 		panic(
@@ -307,19 +307,19 @@ func Wrap[E any](
 	}
 
 	switch that.ModelType() {
-	case aastypes.ModelTypeSomeItem:
+	case ourtypes.ModelTypeSomeItem:
 		result = wrapSomeItem[E](
-			that.(aastypes.ISomeItem),
+			that.(ourtypes.ISomeItem),
 			factory,
 		)
-	case aastypes.ModelTypeAnotherItem:
+	case ourtypes.ModelTypeAnotherItem:
 		result = wrapAnotherItem[E](
-			that.(aastypes.IAnotherItem),
+			that.(ourtypes.IAnotherItem),
 			factory,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			factory,
 		)
 	default:
@@ -338,7 +338,7 @@ func Wrap[E any](
 //
 // Return the enhancement, or `ok` false, if `that` instance has not been
 // enhanced.
-func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
+func Unwrap[E any](that ourtypes.IClass) (enhancement E, ok bool) {
 	var enh enhanced[E]
 	enh, ok = that.(enhanced[E])
 	if !ok {
@@ -351,7 +351,7 @@ func Unwrap[E any](that aastypes.IClass) (enhancement E, ok bool) {
 // Retrieve the enhancement from `that` instance.
 //
 // If `that` instance has not been enhanced yet, panic.
-func MustUnwrap[E any](that aastypes.IClass) (enhancement E) {
+func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {
 	var ok bool
 	enhancement, ok = Unwrap[E](that)
 	if !ok {

@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Path = System.IO.Path;
 
@@ -14,39 +14,39 @@ namespace dummy.Tests
     /// </summary>
     public static class CommonJsonization
     {
-        public static Aas.Box LoadMaximalBox()
+        public static Our.Box LoadMaximalBox()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Box",
                 "maximal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.BoxFrom(
+            var instance = Our.Jsonization.Deserialize.BoxFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Box LoadMaximalBox
+        }  // public static Our.Box LoadMaximalBox
 
-        public static Aas.Box LoadMinimalBox()
+        public static Our.Box LoadMinimalBox()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Json",
                 "Expected",
                 "Box",
                 "minimal.json");
 
-            var node = Aas.Tests.CommonJson.ReadFromFile(path);
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
 
-            var instance = Aas.Jsonization.Deserialize.BoxFrom(
+            var instance = Our.Jsonization.Deserialize.BoxFrom(
                 node);
 
             return instance;
-        }  // public static Aas.Box LoadMinimalBox
+        }  // public static Our.Box LoadMinimalBox
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

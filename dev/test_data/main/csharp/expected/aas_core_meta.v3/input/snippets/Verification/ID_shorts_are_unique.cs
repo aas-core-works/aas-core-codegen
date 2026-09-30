@@ -1,9 +1,9 @@
 /// <summary>
-/// Check that all <see cref="Aas.IReferable.IdShort" /> are unique among
+/// Check that all <see cref="Our.IReferable.IdShort" /> are unique among
 /// <paramref name="referables" />.
 /// </summary>
 public static bool IdShortsAreUnique(
-    IEnumerable<Aas.IReferable> referables
+    IEnumerable<Our.IReferable> referables
 )
 {
     var idShortSet = new HashSet<string>();

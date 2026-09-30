@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import * as AasTypes from "./types";
+import * as OurTypes from "./types";
 
 /**
  * List the texts which must not be used.
@@ -28,9 +28,9 @@ export const LUCKY_NUMBERS = new Set<number>([
 /**
  * List the special kinds.
  */
-export const SPECIAL_KINDS = new Set<AasTypes.Kind>([
-  AasTypes.Kind.Beta,
-  AasTypes.Kind.Gamma
+export const SPECIAL_KINDS = new Set<OurTypes.Kind>([
+  OurTypes.Kind.Beta,
+  OurTypes.Kind.Gamma
 ]);
 
 /* eslint-enable @typescript-eslint/no-unused-vars */

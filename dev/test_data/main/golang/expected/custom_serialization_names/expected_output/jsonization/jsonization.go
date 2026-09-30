@@ -16,8 +16,8 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -26,13 +26,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -47,7 +47,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -56,7 +56,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -67,7 +67,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -78,7 +78,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -395,12 +395,12 @@ func parseArray[T any](
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IQueryCondition],
+// Parse `jsonable` as an instance of [ourtypes.IQueryCondition],
 // or return an error.
 func QueryConditionFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IQueryCondition,
+	result ourtypes.IQueryCondition,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -412,12 +412,12 @@ func QueryConditionFromJsonable(
 	return queryConditionFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IQueryCondition] from a map,
+// Parse [ourtypes.IQueryCondition] from a map,
 // or return an error, if any.
 func queryConditionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IQueryCondition,
+	result ourtypes.IQueryCondition,
 	err error,
 ) {
 	var theEq *string
@@ -447,7 +447,7 @@ func queryConditionFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewQueryCondition()
+	result = ourtypes.NewQueryCondition()
 	result.SetEq(
 		theEq,
 	)
@@ -466,13 +466,13 @@ func queryConditionFromMapWithoutDispatch(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -487,7 +487,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -496,7 +496,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -507,7 +507,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -518,7 +518,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -640,14 +640,14 @@ func serializeArray[T any](
 	return
 }
 
-// Serialize [aastypes.IQueryCondition] as a JSON-able map.
+// Serialize [ourtypes.IQueryCondition] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IQueryCondition] with proper dispatch, call
+// [ourtypes.IQueryCondition] with proper dispatch, call
 // [ToJsonable].
 func queryConditionToMap(
-	that aastypes.IQueryCondition,
+	that ourtypes.IQueryCondition,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -667,12 +667,12 @@ func queryConditionToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeQueryCondition:
+	case ourtypes.ModelTypeQueryCondition:
 		result, err = queryConditionToMap(
-			that.(aastypes.IQueryCondition),
+			that.(ourtypes.IQueryCondition),
 		)
 	default:
 		err = newSerializationError(

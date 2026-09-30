@@ -10,7 +10,7 @@ package types
 // Do NOT edit or append.
 
 import (
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -23,7 +23,7 @@ const (
 	ModelTypeSecond
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -141,7 +141,7 @@ type IItem interface {
 	IncrementCount() int64;
 }
 
-// Check whether the instance corresponds to [aastypes.IItem]
+// Check whether the instance corresponds to [ourtypes.IItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -214,7 +214,7 @@ type IFirst interface {
 	IncrementCount() int64;
 }
 
-// Check whether the instance corresponds to [aastypes.IFirst]
+// Check whether the instance corresponds to [ourtypes.IFirst]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -275,7 +275,7 @@ func (f *First) ModelType(
 func (f *First) HasText(
 	text string,
 ) bool {
-	return aascommon.Some(
+	return ourcommon.Some(
 			func(existing string) bool {
 				return existing == text
 			},
@@ -287,7 +287,7 @@ func (f *First) HasText(
 func (f *First) TotalLength() int64 {
 	result := int64(0)
 	for _, text := range f.Texts() {
-		result = result + int64(aascommon.LenStr(text))
+		result = result + int64(ourcommon.LenStr(text))
 	}
 	return result
 }
@@ -312,7 +312,7 @@ func (f *First) doubledCount() int64 {
 
 // Compute the parity of the count with the modulo as in Python.
 func (f *First) Parity() int64 {
-	return aascommon.AbsInt64(aascommon.FloorMod(f.Count(), 2))
+	return ourcommon.AbsInt64(ourcommon.FloorMod(f.Count(), 2))
 }
 
 // Overwrite all the numbers with the count.
@@ -352,7 +352,7 @@ func (f *First) FillTexts(
 func (f *First) Reset() {
 	f.FillTexts("")
 	f.SetCount(0)
-	f.SetKind(aascommon.NewAndPointTo(KindAlpha))
+	f.SetKind(ourcommon.NewAndPointTo(KindAlpha))
 }
 
 // Increment the count, and return its double.
@@ -473,7 +473,7 @@ type ISecond interface {
 	Prefix() string;
 }
 
-// Check whether the instance corresponds to [aastypes.ISecond]
+// Check whether the instance corresponds to [ourtypes.ISecond]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -546,7 +546,7 @@ func (s *Second) ModelType(
 func (s *Second) HasText(
 	text string,
 ) bool {
-	return aascommon.Some(
+	return ourcommon.Some(
 			func(existing string) bool {
 				return existing == text
 			},
@@ -558,7 +558,7 @@ func (s *Second) HasText(
 func (s *Second) TotalLength() int64 {
 	result := int64(0)
 	for _, text := range s.Texts() {
-		result = result + int64(aascommon.LenStr(text))
+		result = result + int64(ourcommon.LenStr(text))
 	}
 	return result
 }
@@ -583,7 +583,7 @@ func (s *Second) doubledCount() int64 {
 
 // Compute the parity of the count with the modulo as in Python.
 func (s *Second) Parity() int64 {
-	return aascommon.AbsInt64(aascommon.FloorMod(s.Count(), 2))
+	return ourcommon.AbsInt64(ourcommon.FloorMod(s.Count(), 2))
 }
 
 // Overwrite all the numbers with the count.
@@ -623,7 +623,7 @@ func (s *Second) FillTexts(
 func (s *Second) Reset() {
 	s.FillTexts("")
 	s.SetCount(0)
-	s.SetKind(aascommon.NewAndPointTo(KindAlpha))
+	s.SetKind(ourcommon.NewAndPointTo(KindAlpha))
 }
 
 // Increment the count, and return its double.
@@ -638,7 +638,7 @@ func (s *Second) IncrementCount() int64 {
 
 // Return the first three characters of the note.
 func (s *Second) Prefix() string {
-	return aascommon.SliceStr(s.Note(), 0, 3)
+	return ourcommon.SliceStr(s.Note(), 0, 3)
 }
 
 // Apply the action on the instances referenced from s.

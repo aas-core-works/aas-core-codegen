@@ -64,9 +64,9 @@ import * as path from "path";"""
         ),
         Stripped(
             """\
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
-import * as AasJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
+import * as OurJsonization from "../src/jsonization";
 import { Path } from "../src/jsonization";"""
         ),
         Stripped(
@@ -119,9 +119,9 @@ if (!fs.lstatSync(TEST_DATA_DIR).isDirectory()) {{
  * @param aPath - to the file
  * @returns a JSON value read from the file
  */
-export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {{
+export function readJsonFromFileSync(aPath: string): OurJsonization.JsonValue {{
 {I}const text = fs.readFileSync(aPath, "utf-8");
-{I}let jsonable: AasJsonization.JsonValue | null = null;
+{I}let jsonable: OurJsonization.JsonValue | null = null;
 {I}try {{
 {II}jsonable = JSON.parse(text);
 {I}}} catch (error) {{
@@ -132,7 +132,7 @@ export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {{
 {II}throw new Error(`Unexpected null value as JSON from: ${{aPath}}`);
 {I}}}
 
-{I}return <AasJsonization.JsonValue>jsonable;
+{I}return <OurJsonization.JsonValue>jsonable;
 }}"""
         ),
         Stripped(
@@ -147,8 +147,8 @@ export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {{
  * `condition`
  */
 export function mustFind(
-{I}container: AasTypes.Class,
-{I}condition: (instance: AasTypes.Class) => boolean
+{I}container: OurTypes.Class,
+{I}condition: (instance: OurTypes.Class) => boolean
 ) {{
 {I}if (condition(container)) {{
 {II}return container;
@@ -173,7 +173,7 @@ export function mustFind(
  * @throws an {{@link Error}} with an informative message
  */
 export function assertNoVerificationErrors(
-{I}errors: IterableIterator<AasVerification.VerificationError>,
+{I}errors: IterableIterator<OurVerification.VerificationError>,
 {I}aPath: string
 ): void {{
 {I}const errorArray = errors instanceof Array ? errors : Array.from(errors);
@@ -204,7 +204,7 @@ export function assertNoVerificationErrors(
  * recorded errors do not coincide
  */
 export function assertExpectedOrRecordedVerificationErrors(
-{I}errors: IterableIterator<AasVerification.VerificationError>,
+{I}errors: IterableIterator<OurVerification.VerificationError>,
 {I}aPath: string
 ): void {{
 {I}const errorArray = errors instanceof Array ? errors : Array.from(errors);
@@ -248,7 +248,7 @@ export function assertExpectedOrRecordedVerificationErrors(
  * @param instance - to leave a mark in the trace
  * @returns the mark in the trace
  */
-export function traceMark(instance: AasTypes.Class): string {{
+export function traceMark(instance: OurTypes.Class): string {{
 {I}return instance.constructor.name;
 }}"""
         ),
@@ -310,9 +310,9 @@ export class InequalityError {{
 {I}/**
 {I} * Relative path to the erroneous value
 {I} */
-{I}readonly path: AasJsonization.Path;
+{I}readonly path: OurJsonization.Path;
 
-{I}constructor(message: string, path: AasJsonization.Path | null = null) {{
+{I}constructor(message: string, path: OurJsonization.Path | null = null) {{
 {II}this.message = message;
 {II}this.path = path ?? new Path();
 {I}}}
@@ -328,9 +328,9 @@ export class InequalityError {{
  * @param got - JSON-able structure
  */
 export function checkJsonablesEqual(
-{I}expected: AasJsonization.JsonValue | null,
-{I}got: AasJsonization.JsonValue | null
-): AasJsonization.DeserializationError | null {{
+{I}expected: OurJsonization.JsonValue | null,
+{I}got: OurJsonization.JsonValue | null
+): OurJsonization.DeserializationError | null {{
 {I}if (
 {II}expected === null ||
 {II}typeof expected === "boolean" ||
@@ -370,9 +370,9 @@ export function checkJsonablesEqual(
 {III});
 {II}}}
 
-{II}const expectedIt = <Iterator<AasJsonization.JsonValue>>expected[Symbol.iterator]();
+{II}const expectedIt = <Iterator<OurJsonization.JsonValue>>expected[Symbol.iterator]();
 
-{II}const gotIt = <Iterator<AasJsonization.JsonValue>>got[Symbol.iterator]();
+{II}const gotIt = <Iterator<OurJsonization.JsonValue>>got[Symbol.iterator]();
 
 {II}let i = 0;
 {II}// eslint-disable-next-line no-constant-condition
@@ -404,7 +404,7 @@ export function checkJsonablesEqual(
 {III}const error = checkJsonablesEqual(expectedItem, gotItem);
 {III}if (error !== null) {{
 {IIII}error.path.prepend(
-{IIIII}new AasJsonization.IndexSegment(<AasJsonization.JsonArray>expected, i)
+{IIIII}new OurJsonization.IndexSegment(<OurJsonization.JsonArray>expected, i)
 {IIII});
 {IIII}return error;
 {III}}}
@@ -449,7 +449,7 @@ export function checkJsonablesEqual(
 {III}const error = checkJsonablesEqual(expectedValue, gotValue);
 {III}if (error !== null) {{
 {IIII}error.path.prepend(
-{IIIII}new AasJsonization.PropertySegment(<AasJsonization.JsonObject>expected, key)
+{IIIII}new OurJsonization.PropertySegment(<OurJsonization.JsonObject>expected, key)
 {IIII});
 {IIII}return error;
 {III}}}

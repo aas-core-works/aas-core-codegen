@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,20 +14,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IParent_from_ChildA()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalChildA();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalChildA();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IParentFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {
@@ -43,20 +43,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IParent_from_ChildB()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalChildB();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalChildB();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IParentFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {
@@ -72,20 +72,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IParent_from_Container()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalContainer();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalContainer();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IParentFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IParentFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {

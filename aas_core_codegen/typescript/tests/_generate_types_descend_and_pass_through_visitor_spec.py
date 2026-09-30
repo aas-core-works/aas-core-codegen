@@ -40,7 +40,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasTypes from "../src/types";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
@@ -49,10 +49,10 @@ import * as TestCommonJsonization from "./commonJsonization";"""
 /**
  * Record a human-readable trace of a descent over an object tree.
  */
-class TracingVisitor extends AasTypes.PassThroughVisitor {{
+class TracingVisitor extends OurTypes.PassThroughVisitor {{
 {I}readonly log = new Array<string>();
 
-{I}visit(that: AasTypes.Class) {{
+{I}visit(that: OurTypes.Class) {{
 {II}this.log.push(TestCommon.traceMark(that));
 {II}super.visit(that);
 {I}}}
@@ -68,7 +68,7 @@ class TracingVisitor extends AasTypes.PassThroughVisitor {{
  * @throws an {{@link Error}} if the two traces are not equal
  */
 function expectDescendAndPassThroughVisitorSame(
-{I}instance: AasTypes.Class
+{I}instance: OurTypes.Class
 ): void {{
 {I}const traceFromDescend = new Array<string>();
 {I}for (const subInstance of instance.descend()) {{
@@ -97,7 +97,7 @@ function expectDescendAndPassThroughVisitorSame(
  * @param expectedPath - path to the golden trace
  */
 function compareOrRecordTrace(
-{I}instance: AasTypes.Class,
+{I}instance: OurTypes.Class,
 {I}expectedPath: string
 ) {{
 {I}const lines = new Array<string>();

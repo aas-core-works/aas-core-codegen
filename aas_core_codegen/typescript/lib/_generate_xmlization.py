@@ -49,14 +49,14 @@ def _generate_parse_content_for_primitive_type(
             f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<boolean, DeserializationError> {{
+): OurCommon.Either<boolean, DeserializationError> {{
 {I}const text = collapseWhitespace(parseTextContent(cursor));
 
 {I}if (text === "true" || text === "1") {{
-{II}return new AasCommon.Either<boolean, DeserializationError>(true, null);
+{II}return new OurCommon.Either<boolean, DeserializationError>(true, null);
 {I}}}
 {I}if (text === "false" || text === "0") {{
-{II}return new AasCommon.Either<boolean, DeserializationError>(false, null);
+{II}return new OurCommon.Either<boolean, DeserializationError>(false, null);
 {I}}}
 
 {I}return newDeserializationError<boolean>(
@@ -70,7 +70,7 @@ function {function_name}(
             f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<number, DeserializationError> {{
+): OurCommon.Either<number, DeserializationError> {{
 {I}const text = collapseWhitespace(parseTextContent(cursor));
 
 {I}if (!/^[+-]?\\d+$/.test(text)) {{
@@ -97,7 +97,7 @@ function {function_name}(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<number, DeserializationError>(value, null);
+{I}return new OurCommon.Either<number, DeserializationError>(value, null);
 }}"""
         )
 
@@ -106,7 +106,7 @@ function {function_name}(
             f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<number, DeserializationError> {{
+): OurCommon.Either<number, DeserializationError> {{
 {I}const text = collapseWhitespace(parseTextContent(cursor));
 
 {I}// NOTE (mristin):
@@ -114,13 +114,13 @@ function {function_name}(
 {I}// production being `(\\+|-)?INF`, and being liberal in what we accept
 {I}// costs nothing here.
 {I}if (text === "INF" || text === "+INF") {{
-{II}return new AasCommon.Either<number, DeserializationError>(Infinity, null);
+{II}return new OurCommon.Either<number, DeserializationError>(Infinity, null);
 {I}}}
 {I}if (text === "-INF") {{
-{II}return new AasCommon.Either<number, DeserializationError>(-Infinity, null);
+{II}return new OurCommon.Either<number, DeserializationError>(-Infinity, null);
 {I}}}
 {I}if (text === "NaN") {{
-{II}return new AasCommon.Either<number, DeserializationError>(NaN, null);
+{II}return new OurCommon.Either<number, DeserializationError>(NaN, null);
 {I}}}
 
 {I}// NOTE (mristin):
@@ -143,7 +143,7 @@ function {function_name}(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<number, DeserializationError>(value, null);
+{I}return new OurCommon.Either<number, DeserializationError>(value, null);
 }}"""
         )
 
@@ -152,8 +152,8 @@ function {function_name}(
             f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<string, DeserializationError> {{
-{I}return new AasCommon.Either<string, DeserializationError>(
+): OurCommon.Either<string, DeserializationError> {{
+{I}return new OurCommon.Either<string, DeserializationError>(
 {II}parseTextContent(cursor),
 {II}null
 {I});
@@ -165,7 +165,7 @@ function {function_name}(
             f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<Uint8Array, DeserializationError> {{
+): OurCommon.Either<Uint8Array, DeserializationError> {{
 {I}// NOTE (mristin):
 {I}// ``xs:base64Binary`` allows whitespace between the characters, and not
 {I}// only around them, while the decoder accepts none of it. So every
@@ -180,14 +180,14 @@ function {function_name}(
 {II});
 {I}}}
 
-{I}const decodedOrError = AasCommon.base64Decode(text);
+{I}const decodedOrError = OurCommon.base64Decode(text);
 {I}if (decodedOrError.error !== null) {{
 {II}return newDeserializationError<Uint8Array>(
 {III}decodedOrError.error
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<Uint8Array, DeserializationError>(
+{I}return new OurCommon.Either<Uint8Array, DeserializationError>(
 {II}decodedOrError.mustValue(),
 {II}null
 {I});
@@ -226,11 +226,11 @@ def _generate_parse_content_for_enumeration(
         f"""\
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.{enum_name}, DeserializationError> {{
+): OurCommon.Either<OurTypes.{enum_name}, DeserializationError> {{
 {I}return parseEnumerationContent(
 {II}cursor,
 {II}{typescript_common.string_literal(enum_name)},
-{II}AasStringification.{from_string_function}
+{II}OurStringification.{from_string_function}
 {I});
 }}"""
     )
@@ -424,7 +424,7 @@ class _ParserRegistry:
         name = _element_parser_name(type_anno, tag_suffix)
 
         value_type = typescript_common.generate_type(
-            type_anno, types_module=Identifier("AasTypes")
+            type_anno, types_module=Identifier("OurTypes")
         )
 
         if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
@@ -453,7 +453,7 @@ parseNamedElement(
                 f"""\
 function {name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<{value_type}, DeserializationError> {{
+): OurCommon.Either<{value_type}, DeserializationError> {{
 {I}return {indent_but_first_line(call, I)};
 }}"""
             ),
@@ -475,7 +475,7 @@ function {name}(
         name = _content_parser_name(type_anno)
 
         item_type = typescript_common.generate_type(
-            items_type_anno, types_module=Identifier("AasTypes")
+            items_type_anno, types_module=Identifier("OurTypes")
         )
         item_parser = _element_parser_name(items_type_anno, tag_suffix="")
 
@@ -493,7 +493,7 @@ parseList<{item_type}>(
                 f"""\
 function {name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<Array<{item_type}>, DeserializationError> {{
+): OurCommon.Either<Array<{item_type}>, DeserializationError> {{
 {I}return {indent_but_first_line(call, I)};
 }}"""
             ),
@@ -513,7 +513,7 @@ function {name}(
         name = _content_parser_name(type_anno)
 
         item_type = typescript_common.generate_type(
-            items_type_anno, types_module=Identifier("AasTypes")
+            items_type_anno, types_module=Identifier("OurTypes")
         )
         item_parser = _element_parser_name(items_type_anno, tag_suffix="")
 
@@ -531,7 +531,7 @@ parseSet<{item_type}>(
                 f"""\
 function {name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<Set<{item_type}>, DeserializationError> {{
+): OurCommon.Either<Set<{item_type}>, DeserializationError> {{
 {I}return {indent_but_first_line(call, I)};
 }}"""
             ),
@@ -560,7 +560,7 @@ function {name}(
 
             item_types.append(
                 typescript_common.generate_type(
-                    item_type_anno, types_module=Identifier("AasTypes")
+                    item_type_anno, types_module=Identifier("OurTypes")
                 )
             )
             parse_items.append(_element_parser_name(item_type_anno, str(i + 1)))
@@ -568,7 +568,7 @@ function {name}(
         name = _content_parser_name(type_anno)
 
         value_type = typescript_common.generate_type(
-            type_anno, types_module=Identifier("AasTypes")
+            type_anno, types_module=Identifier("OurTypes")
         )
 
         item_types_joined = ", ".join(item_types)
@@ -589,7 +589,7 @@ parseTuple{arity}<{item_types_joined}>(
                 f"""\
 function {name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<{value_type}, DeserializationError> {{
+): OurCommon.Either<{value_type}, DeserializationError> {{
 {I}return {indent_but_first_line(call, I)};
 }}"""
             ),
@@ -644,7 +644,7 @@ def _generate_parse_tuple_function(arity: int) -> Stripped:
 const item{i}OrError = parseItem{i}(cursor);
 if (item{i}OrError.error !== null) {{
 {I}item{i}OrError.error.path.prepend(new IndexSegment({i}));
-{I}return new AasCommon.Either<{tuple_type}, DeserializationError>(
+{I}return new OurCommon.Either<{tuple_type}, DeserializationError>(
 {II}null,
 {II}item{i}OrError.error
 {I});
@@ -660,10 +660,10 @@ if (item{i}OrError.error !== null) {{
 function parseTuple{arity}<{type_params_joined}>(
 {I}cursor: XmlCursor,
 {params_joined}
-): AasCommon.Either<{tuple_type}, DeserializationError> {{
+): OurCommon.Either<{tuple_type}, DeserializationError> {{
 {I}{indent_but_first_line(item_blocks_joined, I)}
 
-{I}return new AasCommon.Either<{tuple_type}, DeserializationError>(
+{I}return new OurCommon.Either<{tuple_type}, DeserializationError>(
 {II}[
 {III}{indent_but_first_line(values_joined, III)}
 {II}],
@@ -739,7 +739,7 @@ def _generate_parse_concrete_class(cls: intermediate.ConcreteClass) -> Stripped:
 
         var_type = typescript_common.generate_type(
             prop.type_annotation,
-            types_module=Identifier("AasTypes"),
+            types_module=Identifier("OurTypes"),
         )
         if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             var_type = Stripped(f"{var_type} | null")
@@ -754,7 +754,7 @@ def _generate_parse_concrete_class(cls: intermediate.ConcreteClass) -> Stripped:
                 Stripped(
                     f"""\
 if ({var_name} === null) {{
-{I}return newDeserializationError<AasTypes.{cls_name}>(
+{I}return newDeserializationError<OurTypes.{cls_name}>(
 {II}{message_literal}
 {I});
 }}"""
@@ -782,15 +782,15 @@ default: {
     if len(cls.constructor.arguments) == 0:
         construct = Stripped(
             f"""\
-const instance = new AasTypes.{cls_name}();
-return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
+const instance = new OurTypes.{cls_name}();
+return new OurCommon.Either<OurTypes.{cls_name}, DeserializationError>(
 {I}instance,
 {I}null
 );"""
         )
     else:
         writer = io.StringIO()
-        writer.write(f"const instance = new AasTypes.{cls_name}(\n")
+        writer.write(f"const instance = new OurTypes.{cls_name}(\n")
         for i, arg in enumerate(cls.constructor.arguments):
             var_name = var_name_by_property[arg.name]
             writer.write(f"{I}{var_name}")
@@ -801,7 +801,7 @@ return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
         writer.write(
             f"""\
 );
-return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
+return new OurCommon.Either<OurTypes.{cls_name}, DeserializationError>(
 {I}instance,
 {I}null
 );"""
@@ -833,10 +833,10 @@ return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
  */
 function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.{cls_name}, DeserializationError> {{
+): OurCommon.Either<OurTypes.{cls_name}, DeserializationError> {{
 {I}{indent_but_first_line(declarations, I)}
 
-{I}const className = AasTypes.{cls_name}.name;
+{I}const className = OurTypes.{cls_name}.name;
 
 {I}cursor.skipIgnorable();
 {I}// eslint-disable-next-line no-constant-condition
@@ -846,7 +846,7 @@ function {function_name}(
 {III}break;
 {II}}}
 {II}if (nextTagOrError instanceof DeserializationError) {{
-{III}return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.{cls_name}, DeserializationError>(
 {IIII}null,
 {IIII}nextTagOrError
 {III});
@@ -861,7 +861,7 @@ function {function_name}(
 
 {II}if (propertyError !== null) {{
 {III}propertyError.path.prepend(new ElementSegment(propertyLocalName));
-{III}return new AasCommon.Either<AasTypes.{cls_name}, DeserializationError>(
+{III}return new OurCommon.Either<OurTypes.{cls_name}, DeserializationError>(
 {IIII}null,
 {IIII}propertyError
 {III});
@@ -907,7 +907,7 @@ def _generate_dispatch_map(
         f"""\
 const {map_name} = new Map<
 {I}string,
-{I}ContentParser<AasTypes.{expected_name}>
+{I}ContentParser<OurTypes.{expected_name}>
 >([
 {entries_joined}
 ]);"""
@@ -963,7 +963,7 @@ dispatchParseElement(
  */
 {maybe_disable_unused}function {function_name}(
 {I}cursor: XmlCursor
-): AasCommon.Either<AasTypes.{expected_name}, DeserializationError> {{
+): OurCommon.Either<OurTypes.{expected_name}, DeserializationError> {{
 {I}return {indent_but_first_line(call, I)};
 }}"""
     )
@@ -999,16 +999,16 @@ def _generate_from_xml_string_for_interface(
  */
 export function {function_name}(
 {I}xml: string
-): AasCommon.Either<AasTypes.{expected_name}, DeserializationError> {{
+): OurCommon.Either<OurTypes.{expected_name}, DeserializationError> {{
 {I}if (xml.length === 0) {{
-{II}return newDeserializationError<AasTypes.{expected_name}>(
+{II}return newDeserializationError<OurTypes.{expected_name}>(
 {III}"Expected an XML document, but got an empty string"
 {II});
 {I}}}
 
 {I}const tokensOrError = tokenizeXml(xml);
 {I}if (tokensOrError.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.{expected_name}, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.{expected_name}, DeserializationError>(
 {III}null,
 {III}tokensOrError.error
 {II});
@@ -1023,7 +1023,7 @@ export function {function_name}(
 
 {I}cursor.skipIgnorable();
 {I}if (cursor.current() !== null) {{
-{II}return newDeserializationError<AasTypes.{expected_name}>(
+{II}return newDeserializationError<OurTypes.{expected_name}>(
 {III}"Expected no tokens after the root XML element, but got token kind: " +
 {IIII}currentTokenKind(cursor)
 {II});
@@ -1051,7 +1051,7 @@ def _generate_root_dispatch_map(symbol_table: intermediate.SymbolTable) -> Strip
         f"""\
 const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
 {I}string,
-{I}ContentParser<AasTypes.Class>
+{I}ContentParser<OurTypes.Class>
 >([
 {entries_joined}
 ]);"""
@@ -1251,7 +1251,7 @@ function {function_name}(
 {I}parts: Array<string>,
 {I}value: Uint8Array
 ): void {{
-{I}parts.push(escapeXmlText(AasCommon.base64Encode(value)));
+{I}parts.push(escapeXmlText(OurCommon.base64Encode(value)));
 }}"""
         )
 
@@ -1282,13 +1282,13 @@ def _generate_write_content_for_enumeration(
         f"""\
 function {function_name}(
 {I}parts: Array<string>,
-{I}value: AasTypes.{enum_name}
+{I}value: OurTypes.{enum_name}
 ): void {{
 {I}writeEnumerationContent(
 {II}parts,
 {II}value,
 {II}{typescript_common.string_literal(enum_name)},
-{II}AasStringification.{to_string_function}
+{II}OurStringification.{to_string_function}
 {I});
 }}"""
     )
@@ -1385,7 +1385,7 @@ class _WriterRegistry:
         name = _element_writer_name(type_anno, tag_suffix)
 
         value_type = typescript_common.generate_type(
-            type_anno, types_module=Identifier("AasTypes")
+            type_anno, types_module=Identifier("OurTypes")
         )
 
         tag_literal = typescript_common.string_literal(f"v{tag_suffix}")
@@ -1436,7 +1436,7 @@ function {name}(
         name = _content_writer_name(type_anno)
 
         item_type = typescript_common.generate_type(
-            items_type_anno, types_module=Identifier("AasTypes")
+            items_type_anno, types_module=Identifier("OurTypes")
         )
         item_writer = _element_writer_name(items_type_anno, tag_suffix="")
 
@@ -1481,7 +1481,7 @@ function {name}(
         name = _content_writer_name(type_anno)
 
         item_type = typescript_common.generate_type(
-            items_type_anno, types_module=Identifier("AasTypes")
+            items_type_anno, types_module=Identifier("OurTypes")
         )
         item_writer = _element_writer_name(items_type_anno, tag_suffix="")
 
@@ -1536,7 +1536,7 @@ function {name}(
         name = _content_writer_name(type_anno)
 
         value_type = typescript_common.generate_type(
-            type_anno, types_module=Identifier("AasTypes")
+            type_anno, types_module=Identifier("OurTypes")
         )
 
         arguments_joined = ",\n".join(f"{I}{argument}" for argument in write_items)
@@ -1660,7 +1660,7 @@ def _generate_write_sequence_of_concrete_class(
  */
 function {function_name}(
 {I}parts: Array<string>,
-{I}that: AasTypes.{cls_name}
+{I}that: OurTypes.{cls_name}
 ): void {{
 {I}{indent_but_first_line(body, I)}
 }}"""
@@ -1696,7 +1696,7 @@ writeElement(
             Stripped(
                 f"""\
 {method_name}(
-{I}that: AasTypes.{cls_name},
+{I}that: OurTypes.{cls_name},
 {I}parts: Array<string>
 ): void {{
 {I}{indent_but_first_line(call, I)};
@@ -1715,7 +1715,7 @@ writeElement(
  * properties are written by the corresponding module-level `write{Cls}AsSequence`,
  * which is the content writer of that very element.
  */
-class Serializer extends AasTypes.AbstractVisitorWithContext<Array<string>> {"""
+class Serializer extends OurTypes.AbstractVisitorWithContext<Array<string>> {"""
     )
 
     for method in methods:
@@ -1799,9 +1799,9 @@ def _generate_imports(body: str) -> Stripped:
     blocks = [
         Stripped(
             """\
-import * as AasCommon from "./common";
-import * as AasTypes from "./types";
-import * as AasStringification from "./stringification";"""
+import * as OurCommon from "./common";
+import * as OurTypes from "./types";
+import * as OurStringification from "./stringification";"""
         )
     ]  # type: List[Stripped]
 
@@ -1884,10 +1884,10 @@ function dispatchParseElement<T>(
 {I}cursor: XmlCursor,
 {I}expectedWhat: string,
 {I}parsersByLocalName: ReadonlyMap<string, ContentParser<T>>
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}const startTagOrError = readNextOpenTag(cursor);
 {I}if (startTagOrError.error !== null) {{
-{II}return new AasCommon.Either<T, DeserializationError>(
+{II}return new OurCommon.Either<T, DeserializationError>(
 {III}null,
 {III}startTagOrError.error
 {II});
@@ -1931,7 +1931,7 @@ function parseEnumerationContent<T>(
 {I}cursor: XmlCursor,
 {I}enumerationName: string,
 {I}fromString: (text: string) => T | null
-): AasCommon.Either<T, DeserializationError> {{
+): OurCommon.Either<T, DeserializationError> {{
 {I}const text = parseTextContent(cursor);
 
 {I}const literal = fromString(text);
@@ -1941,7 +1941,7 @@ function parseEnumerationContent<T>(
 {II});
 {I}}}
 
-{I}return new AasCommon.Either<T, DeserializationError>(literal, null);
+{I}return new OurCommon.Either<T, DeserializationError>(literal, null);
 }}"""
             )
         )
@@ -2097,23 +2097,23 @@ function duplicatePropertyError(localName: string): DeserializationError {{
             Stripped(
                 f"""\
 /**
- * Parse an XML string as an AAS instance.
+ * Parse an XML string as a model instance.
  *
  * @param xml - XML string to parse
- * @returns parsed AAS instance or an error
+ * @returns parsed model instance or an error
  */
 export function fromXmlString(
 {I}xml: string
-): AasCommon.Either<AasTypes.Class, DeserializationError> {{
+): OurCommon.Either<OurTypes.Class, DeserializationError> {{
 {I}if (xml.length === 0) {{
-{II}return newDeserializationError<AasTypes.Class>(
+{II}return newDeserializationError<OurTypes.Class>(
 {III}"Expected an XML document, but got an empty string"
 {II});
 {I}}}
 
 {I}const tokensOrError = tokenizeXml(xml);
 {I}if (tokensOrError.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.Class, DeserializationError>(
 {III}null,
 {III}tokensOrError.error
 {II});
@@ -2123,7 +2123,7 @@ export function fromXmlString(
 
 {I}const rootOpenTagOrError = readRequiredRootOpenTag(cursor);
 {I}if (rootOpenTagOrError.error !== null) {{
-{II}return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.Class, DeserializationError>(
 {III}null,
 {III}rootOpenTagOrError.error
 {II});
@@ -2134,7 +2134,7 @@ export function fromXmlString(
 
 {I}const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(rootLocalName);
 {I}if (dispatch === undefined) {{
-{II}return newDeserializationError<AasTypes.Class>(
+{II}return newDeserializationError<OurTypes.Class>(
 {III}`Unexpected root XML element: ${{rootLocalName}}`
 {II});
 {I}}}
@@ -2146,7 +2146,7 @@ export function fromXmlString(
 
 {I}const closeError = consumeCloseTag(cursor, rootLocalName);
 {I}if (closeError !== null) {{
-{II}return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+{II}return new OurCommon.Either<OurTypes.Class, DeserializationError>(
 {III}null,
 {III}closeError
 {II});
@@ -2154,7 +2154,7 @@ export function fromXmlString(
 
 {I}cursor.skipIgnorable();
 {I}if (cursor.current() !== null) {{
-{II}return newDeserializationError<AasTypes.Class>(
+{II}return newDeserializationError<OurTypes.Class>(
 {III}"Expected no tokens after the root XML element, but got token kind: " +
 {IIII}currentTokenKind(cursor)
 {II});
@@ -2175,7 +2175,7 @@ export function fromXmlString(
  */
 function writeListOfInstances(
 {I}parts: Array<string>,
-{I}values: Array<AasTypes.Class>
+{I}values: Array<OurTypes.Class>
 ): void {{
 {I}writeList(parts, values, writeClass);
 }}
@@ -2190,7 +2190,7 @@ function writeListOfInstances(
  * or of a tuple of any class at all. The reading, which has to decide what to
  * construct before it has read anything, needs a dispatcher per interface instead.
  */
-function writeClass(parts: Array<string>, that: AasTypes.Class): void {{
+function writeClass(parts: Array<string>, that: OurTypes.Class): void {{
 {I}SERIALIZER.visitWithContext(that, parts);
 }}
 
@@ -2234,14 +2234,14 @@ function writeEnumerationContent<T>(
             Stripped(
                 f"""\
 /**
- * Serialize an AAS instance as an XML string.
+ * Serialize a model instance as an XML string.
  *
- * @param that - AAS instance to serialize
+ * @param that - model instance to serialize
  * @returns serialized XML string
  * @throws {{@link SerializationError}} if `that` can not be serialized, *e.g.*, if
  * a property expected to be an integer holds a fractional number
  */
-export function toXmlString(that: AasTypes.Class): string {{
+export function toXmlString(that: OurTypes.Class): string {{
 {I}const parts = new Array<string>();
 {I}writeClass(parts, that);
 {I}return parts.join("");
@@ -2259,7 +2259,7 @@ export function toXmlString(that: AasTypes.Class): string {{
         Stripped(
             """\
 /**
- * Provide de/serialization of AAS classes to/from XML.
+ * Provide de/serialization of meta-model classes to/from XML.
  *
  * The implementation is incremental and follows a SAX-style parsing approach.
  *

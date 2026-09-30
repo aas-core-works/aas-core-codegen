@@ -23,8 +23,8 @@ import collections.abc
 import math
 from typing import Iterator
 
-import dummy.common as aas_common
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.types as our_types
 from dummy.reporting import (
     Error,
     IndexSegment,
@@ -33,7 +33,7 @@ from dummy.reporting import (
 
 
 def verify_json_value(
-    value: aas_types.JsonValue
+    value: our_types.JsonValue
 ) -> Iterator[Error]:
     """
     Verify that :paramref:`value` is a JSON-able value, at any depth.
@@ -61,7 +61,7 @@ def verify_json_value(
         # on the way out. Only an ``int`` which that conversion can not carry
         # exactly is an error here -- see
         # :py:func:`.common.try_to_convert_int_to_float`.
-        if aas_common.try_to_convert_int_to_float(value) is None:
+        if our_common.try_to_convert_int_to_float(value) is None:
             yield Error(
                 f"Expected a JSON-able value, but got the integer {value}, "
                 f"which is not exactly representable as a JSON number"
@@ -104,7 +104,7 @@ def verify_json_value(
 
         return
 
-    array_like = aas_common.try_to_cast_to_array_like(value)
+    array_like = our_common.try_to_cast_to_array_like(value)
     if array_like is not None:
         for i, item_value in enumerate(array_like):
             for error in verify_json_value(item_value):
@@ -120,7 +120,7 @@ def verify_json_value(
 
 
 def verify_json_array(
-    value: aas_types.JsonArray
+    value: our_types.JsonArray
 ) -> Iterator[Error]:
     """
     Verify that :paramref:`value` is a JSON-able array.
@@ -128,7 +128,7 @@ def verify_json_array(
     :param value: to be verified
     :yield: errors, if any
     """
-    if aas_common.try_to_cast_to_array_like(value) is None:
+    if our_common.try_to_cast_to_array_like(value) is None:
         yield Error(
             f"Expected a JSON-able array, but got: {type(value)}"
         )
@@ -138,7 +138,7 @@ def verify_json_array(
 
 
 def verify_json_object(
-    value: aas_types.JsonObject
+    value: our_types.JsonObject
 ) -> Iterator[Error]:
     """
     Verify that :paramref:`value` is a JSON-able object.

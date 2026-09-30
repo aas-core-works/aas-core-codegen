@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;
@@ -15,24 +15,24 @@ namespace AasCore.Aas3_0.Tests
 {
     public class TestDescendAndVisitorThrough
     {
-        class TracingVisitorThrough : Aas.Visitation.VisitorThrough
+        class TracingVisitorThrough : Our.Visitation.VisitorThrough
         {
             public readonly List<string> Log = new List<string>();
 
             public override void Visit(IClass that)
             {
-                Log.Add(Aas.Tests.Common.Trace(that));
+                Log.Add(Our.Tests.Common.Trace(that));
                 base.Visit(that);
             }
         }
 
         private static void AssertDescendAndVisitorThroughSame(
-            Aas.IClass instance)
+            Our.IClass instance)
         {
             var logFromDescend = new List<string>();
             foreach (var subInstance in instance.Descend())
             {
-                logFromDescend.Add(Aas.Tests.Common.Trace(subInstance));
+                logFromDescend.Add(Our.Tests.Common.Trace(subInstance));
             }
 
             var visitor = new TracingVisitorThrough();
@@ -42,7 +42,7 @@ namespace AasCore.Aas3_0.Tests
             Assert.IsNotEmpty(traceFromVisitor);
 
             Assert.AreEqual(
-                Aas.Tests.Common.Trace(instance),
+                Our.Tests.Common.Trace(instance),
                 traceFromVisitor[0]);
 
             traceFromVisitor.RemoveAt(0);
@@ -57,12 +57,12 @@ namespace AasCore.Aas3_0.Tests
             var writer = new System.IO.StringWriter();
             foreach (var descendant in instance.Descend())
             {
-                writer.WriteLine(Aas.Tests.Common.Trace(descendant));
+                writer.WriteLine(Our.Tests.Common.Trace(descendant));
             }
 
             string got = writer.ToString();
 
-            if (Aas.Tests.Common.RecordMode)
+            if (Our.Tests.Common.RecordMode)
             {
                 string? parent = Path.GetDirectoryName(expectedPath);
                 if (parent != null)
@@ -82,7 +82,7 @@ namespace AasCore.Aas3_0.Tests
                     throw new System.IO.FileNotFoundException(
                         "The file with the recorded trace does not " +
                         $"exist: {expectedPath}; maybe you want to set the environment " +
-                        $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                        $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                 }
 
                 string expected = System.IO.File.ReadAllText(expectedPath);
@@ -96,13 +96,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Extension()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMaximalExtension());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Extension",
                     "maximal.json.trace"));
@@ -111,8 +111,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Extension()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMaximalExtension());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -121,13 +121,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_AdministrativeInformation()
         {
-            Aas.AdministrativeInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
+            Our.AdministrativeInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "AdministrativeInformation",
                     "maximal.json.trace"));
@@ -136,8 +136,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_AdministrativeInformation()
         {
-            Aas.AdministrativeInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
+            Our.AdministrativeInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -146,13 +146,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Qualifier()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQualifier());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Qualifier",
                     "maximal.json.trace"));
@@ -161,8 +161,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Qualifier()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQualifier());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -171,13 +171,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_AssetAdministrationShell()
         {
-            Aas.AssetAdministrationShell instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
+            Our.AssetAdministrationShell instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "AssetAdministrationShell",
                     "maximal.json.trace"));
@@ -186,8 +186,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_AssetAdministrationShell()
         {
-            Aas.AssetAdministrationShell instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
+            Our.AssetAdministrationShell instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -196,13 +196,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_AssetInformation()
         {
-            Aas.AssetInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation());
+            Our.AssetInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "AssetInformation",
                     "maximal.json.trace"));
@@ -211,8 +211,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_AssetInformation()
         {
-            Aas.AssetInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation());
+            Our.AssetInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -221,13 +221,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Resource()
         {
-            Aas.Resource instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalResource());
+            Our.Resource instance = (
+                Our.Tests.CommonJsonization.LoadMaximalResource());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Resource",
                     "maximal.json.trace"));
@@ -236,8 +236,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Resource()
         {
-            Aas.Resource instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalResource());
+            Our.Resource instance = (
+                Our.Tests.CommonJsonization.LoadMaximalResource());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -246,13 +246,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_SpecificAssetId()
         {
-            Aas.SpecificAssetId instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
+            Our.SpecificAssetId instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "SpecificAssetId",
                     "maximal.json.trace"));
@@ -261,8 +261,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_SpecificAssetId()
         {
-            Aas.SpecificAssetId instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
+            Our.SpecificAssetId instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -271,13 +271,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Submodel()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Submodel",
                     "maximal.json.trace"));
@@ -286,8 +286,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Submodel()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -296,13 +296,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_RelationshipElement()
         {
-            Aas.RelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement());
+            Our.RelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "RelationshipElement",
                     "maximal.json.trace"));
@@ -311,8 +311,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_RelationshipElement()
         {
-            Aas.RelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement());
+            Our.RelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -321,13 +321,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_SubmodelElementList()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "SubmodelElementList",
                     "maximal.json.trace"));
@@ -336,8 +336,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_SubmodelElementList()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -346,13 +346,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_SubmodelElementCollection()
         {
-            Aas.SubmodelElementCollection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
+            Our.SubmodelElementCollection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "SubmodelElementCollection",
                     "maximal.json.trace"));
@@ -361,8 +361,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_SubmodelElementCollection()
         {
-            Aas.SubmodelElementCollection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
+            Our.SubmodelElementCollection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -371,13 +371,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Property()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMaximalProperty());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Property",
                     "maximal.json.trace"));
@@ -386,8 +386,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Property()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMaximalProperty());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -396,13 +396,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_MultiLanguageProperty()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "MultiLanguageProperty",
                     "maximal.json.trace"));
@@ -411,8 +411,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_MultiLanguageProperty()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -421,13 +421,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Range()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRange());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Range",
                     "maximal.json.trace"));
@@ -436,8 +436,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Range()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRange());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -446,13 +446,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_ReferenceElement()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "ReferenceElement",
                     "maximal.json.trace"));
@@ -461,8 +461,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_ReferenceElement()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -471,13 +471,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Blob()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlob());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Blob",
                     "maximal.json.trace"));
@@ -486,8 +486,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Blob()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlob());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -496,13 +496,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_File()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMaximalFile());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "File",
                     "maximal.json.trace"));
@@ -511,8 +511,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_File()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMaximalFile());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -521,13 +521,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_AnnotatedRelationshipElement()
         {
-            Aas.AnnotatedRelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
+            Our.AnnotatedRelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "AnnotatedRelationshipElement",
                     "maximal.json.trace"));
@@ -536,8 +536,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_AnnotatedRelationshipElement()
         {
-            Aas.AnnotatedRelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
+            Our.AnnotatedRelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -546,13 +546,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Entity()
         {
-            Aas.Entity instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEntity());
+            Our.Entity instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEntity());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Entity",
                     "maximal.json.trace"));
@@ -561,8 +561,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Entity()
         {
-            Aas.Entity instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEntity());
+            Our.Entity instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEntity());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -571,13 +571,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_EventPayload()
         {
-            Aas.EventPayload instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEventPayload());
+            Our.EventPayload instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEventPayload());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "EventPayload",
                     "maximal.json.trace"));
@@ -586,8 +586,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_EventPayload()
         {
-            Aas.EventPayload instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEventPayload());
+            Our.EventPayload instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEventPayload());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -596,13 +596,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_BasicEventElement()
         {
-            Aas.BasicEventElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement());
+            Our.BasicEventElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "BasicEventElement",
                     "maximal.json.trace"));
@@ -611,8 +611,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_BasicEventElement()
         {
-            Aas.BasicEventElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement());
+            Our.BasicEventElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -621,13 +621,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Operation()
         {
-            Aas.Operation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperation());
+            Our.Operation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperation());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Operation",
                     "maximal.json.trace"));
@@ -636,8 +636,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Operation()
         {
-            Aas.Operation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperation());
+            Our.Operation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperation());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -646,13 +646,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_OperationVariable()
         {
-            Aas.OperationVariable instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperationVariable());
+            Our.OperationVariable instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperationVariable());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "OperationVariable",
                     "maximal.json.trace"));
@@ -661,8 +661,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_OperationVariable()
         {
-            Aas.OperationVariable instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperationVariable());
+            Our.OperationVariable instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperationVariable());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -671,13 +671,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Capability()
         {
-            Aas.Capability instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCapability());
+            Our.Capability instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCapability());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Capability",
                     "maximal.json.trace"));
@@ -686,8 +686,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Capability()
         {
-            Aas.Capability instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCapability());
+            Our.Capability instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCapability());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -696,13 +696,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_ConceptDescription()
         {
-            Aas.ConceptDescription instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription());
+            Our.ConceptDescription instance = (
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "ConceptDescription",
                     "maximal.json.trace"));
@@ -711,8 +711,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_ConceptDescription()
         {
-            Aas.ConceptDescription instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription());
+            Our.ConceptDescription instance = (
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -721,13 +721,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Reference()
         {
-            Aas.Reference instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReference());
+            Our.Reference instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReference());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Reference",
                     "maximal.json.trace"));
@@ -736,8 +736,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Reference()
         {
-            Aas.Reference instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReference());
+            Our.Reference instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReference());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -746,13 +746,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Key()
         {
-            Aas.Key instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalKey());
+            Our.Key instance = (
+                Our.Tests.CommonJsonization.LoadMaximalKey());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Key",
                     "maximal.json.trace"));
@@ -761,8 +761,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Key()
         {
-            Aas.Key instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalKey());
+            Our.Key instance = (
+                Our.Tests.CommonJsonization.LoadMaximalKey());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -771,13 +771,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LangStringNameType()
         {
-            Aas.LangStringNameType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringNameType());
+            Our.LangStringNameType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringNameType());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LangStringNameType",
                     "maximal.json.trace"));
@@ -786,8 +786,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LangStringNameType()
         {
-            Aas.LangStringNameType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringNameType());
+            Our.LangStringNameType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringNameType());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -796,13 +796,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LangStringTextType()
         {
-            Aas.LangStringTextType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringTextType());
+            Our.LangStringTextType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringTextType());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LangStringTextType",
                     "maximal.json.trace"));
@@ -811,8 +811,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LangStringTextType()
         {
-            Aas.LangStringTextType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringTextType());
+            Our.LangStringTextType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringTextType());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -821,13 +821,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_Environment()
         {
-            Aas.Environment instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment());
+            Our.Environment instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "Environment",
                     "maximal.json.trace"));
@@ -836,8 +836,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_Environment()
         {
-            Aas.Environment instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment());
+            Our.Environment instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -846,13 +846,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_EmbeddedDataSpecification()
         {
-            Aas.EmbeddedDataSpecification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
+            Our.EmbeddedDataSpecification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "EmbeddedDataSpecification",
                     "maximal.json.trace"));
@@ -861,8 +861,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_EmbeddedDataSpecification()
         {
-            Aas.EmbeddedDataSpecification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
+            Our.EmbeddedDataSpecification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -871,13 +871,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LevelType()
         {
-            Aas.LevelType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLevelType());
+            Our.LevelType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLevelType());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LevelType",
                     "maximal.json.trace"));
@@ -886,8 +886,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LevelType()
         {
-            Aas.LevelType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLevelType());
+            Our.LevelType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLevelType());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -896,13 +896,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_ValueReferencePair()
         {
-            Aas.ValueReferencePair instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueReferencePair());
+            Our.ValueReferencePair instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueReferencePair());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "ValueReferencePair",
                     "maximal.json.trace"));
@@ -911,8 +911,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_ValueReferencePair()
         {
-            Aas.ValueReferencePair instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueReferencePair());
+            Our.ValueReferencePair instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueReferencePair());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -921,13 +921,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_ValueList()
         {
-            Aas.ValueList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueList());
+            Our.ValueList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueList());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "ValueList",
                     "maximal.json.trace"));
@@ -936,8 +936,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_ValueList()
         {
-            Aas.ValueList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueList());
+            Our.ValueList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueList());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -946,13 +946,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LangStringPreferredNameTypeIec61360()
         {
-            Aas.LangStringPreferredNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
+            Our.LangStringPreferredNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LangStringPreferredNameTypeIec61360",
                     "maximal.json.trace"));
@@ -961,8 +961,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LangStringPreferredNameTypeIec61360()
         {
-            Aas.LangStringPreferredNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
+            Our.LangStringPreferredNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -971,13 +971,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LangStringShortNameTypeIec61360()
         {
-            Aas.LangStringShortNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
+            Our.LangStringShortNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LangStringShortNameTypeIec61360",
                     "maximal.json.trace"));
@@ -986,8 +986,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LangStringShortNameTypeIec61360()
         {
-            Aas.LangStringShortNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
+            Our.LangStringShortNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -996,13 +996,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_LangStringDefinitionTypeIec61360()
         {
-            Aas.LangStringDefinitionTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
+            Our.LangStringDefinitionTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "LangStringDefinitionTypeIec61360",
                     "maximal.json.trace"));
@@ -1011,8 +1011,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_LangStringDefinitionTypeIec61360()
         {
-            Aas.LangStringDefinitionTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
+            Our.LangStringDefinitionTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
 
             AssertDescendAndVisitorThroughSame(
                 instance);
@@ -1021,13 +1021,13 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_of_DataSpecificationIec61360()
         {
-            Aas.DataSpecificationIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
+            Our.DataSpecificationIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
 
             CompareOrRerecordTrace(
                 instance,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Descend",
                     "DataSpecificationIec61360",
                     "maximal.json.trace"));
@@ -1036,8 +1036,8 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Descend_against_VisitorThrough_for_DataSpecificationIec61360()
         {
-            Aas.DataSpecificationIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
+            Our.DataSpecificationIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
 
             AssertDescendAndVisitorThroughSame(
                 instance);

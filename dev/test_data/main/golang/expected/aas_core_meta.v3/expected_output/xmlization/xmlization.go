@@ -11,9 +11,9 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
-	aasreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
-	aasstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
-	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
+	ourreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
+	ourstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 	xmlcommon "github.com/aas-core-works/aas-core3.0-golang/internal/xmlcommon"
 )
 
@@ -95,10 +95,10 @@ func unexpectedItemElement(local string, expectedLocal string) error {
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -127,7 +127,7 @@ func readListOf[T any](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -240,7 +240,7 @@ func concludeProperty(
 	if valueErr != nil {
 		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: local},
+				&ourreporting.NameSegment{Name: local},
 			)
 		}
 		err = valueErr
@@ -261,25 +261,25 @@ func concludeProperty(
 	return
 }
 
-// De-serialize the instance of [aastypes.IExtension]
+// De-serialize the instance of [ourtypes.IExtension]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IExtension].
+// of [ourtypes.IExtension].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readExtensionAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IExtension,
+) (instance ourtypes.IExtension,
 	next xml.Token,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
 	var theName string
-	var theValueType *aastypes.DataTypeDefXSD
+	var theValueType *ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theRefersTo []aastypes.IReference
+	var theRefersTo []ourtypes.IReference
 
 	foundSemanticID := false
 	foundSupplementalSemanticIDs := false
@@ -374,7 +374,7 @@ func readExtensionAsSequence(
 		return
 	}
 
-	instance = aastypes.NewExtension(
+	instance = ourtypes.NewExtension(
 		theName,
 	)
 	instance.SetSemanticID(theSemanticID)
@@ -385,7 +385,7 @@ func readExtensionAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IExtension] based on the `local` name
+// De-serialize an instance of [ourtypes.IExtension] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -394,7 +394,7 @@ func readExtensionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IExtension,
+) (instance ourtypes.IExtension,
 	next xml.Token,
 	err error,
 ) {
@@ -408,7 +408,7 @@ func readExtensionDispatched(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.ModellingKind].
+// [ourtypes.ModellingKind].
 //
 // Any comment tokens are skipped.
 //
@@ -419,7 +419,7 @@ func readExtensionDispatched(
 func readTextAs_ModellingKind(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.ModellingKind,
+) (value ourtypes.ModellingKind,
 	next xml.Token,
 	err error,
 ) {
@@ -430,7 +430,7 @@ func readTextAs_ModellingKind(
 	}
 
 	var ok bool
-	value, ok = aasstringification.ModellingKindFromString(text)
+	value, ok = ourstringification.ModellingKindFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -444,23 +444,23 @@ func readTextAs_ModellingKind(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAdministrativeInformation]
+// De-serialize the instance of [ourtypes.IAdministrativeInformation]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAdministrativeInformation].
+// of [ourtypes.IAdministrativeInformation].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAdministrativeInformationAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAdministrativeInformation,
+) (instance ourtypes.IAdministrativeInformation,
 	next xml.Token,
 	err error,
 ) {
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theVersion *string
 	var theRevision *string
-	var theCreator aastypes.IReference
+	var theCreator ourtypes.IReference
 	var theTemplateID *string
 
 	foundEmbeddedDataSpecifications := false
@@ -541,7 +541,7 @@ func readAdministrativeInformationAsSequence(
 
 	next = current
 
-	instance = aastypes.NewAdministrativeInformation()
+	instance = ourtypes.NewAdministrativeInformation()
 	instance.SetEmbeddedDataSpecifications(theEmbeddedDataSpecifications)
 	instance.SetVersion(theVersion)
 	instance.SetRevision(theRevision)
@@ -551,7 +551,7 @@ func readAdministrativeInformationAsSequence(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.QualifierKind].
+// [ourtypes.QualifierKind].
 //
 // Any comment tokens are skipped.
 //
@@ -562,7 +562,7 @@ func readAdministrativeInformationAsSequence(
 func readTextAs_QualifierKind(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.QualifierKind,
+) (value ourtypes.QualifierKind,
 	next xml.Token,
 	err error,
 ) {
@@ -573,7 +573,7 @@ func readTextAs_QualifierKind(
 	}
 
 	var ok bool
-	value, ok = aasstringification.QualifierKindFromString(text)
+	value, ok = ourstringification.QualifierKindFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -587,26 +587,26 @@ func readTextAs_QualifierKind(
 	return
 }
 
-// De-serialize the instance of [aastypes.IQualifier]
+// De-serialize the instance of [ourtypes.IQualifier]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IQualifier].
+// of [ourtypes.IQualifier].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readQualifierAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IQualifier,
+) (instance ourtypes.IQualifier,
 	next xml.Token,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theKind *aastypes.QualifierKind
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theKind *ourtypes.QualifierKind
 	var theType string
-	var theValueType aastypes.DataTypeDefXSD
+	var theValueType ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundSemanticID := false
 	foundSupplementalSemanticIDs := false
@@ -716,7 +716,7 @@ func readQualifierAsSequence(
 		return
 	}
 
-	instance = aastypes.NewQualifier(
+	instance = ourtypes.NewQualifier(
 		theType,
 		theValueType,
 	)
@@ -728,7 +728,7 @@ func readQualifierAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IQualifier] based on the `local` name
+// De-serialize an instance of [ourtypes.IQualifier] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -737,7 +737,7 @@ func readQualifierDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IQualifier,
+) (instance ourtypes.IQualifier,
 	next xml.Token,
 	err error,
 ) {
@@ -750,30 +750,30 @@ func readQualifierDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAssetAdministrationShell]
+// De-serialize the instance of [ourtypes.IAssetAdministrationShell]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAssetAdministrationShell].
+// of [ourtypes.IAssetAdministrationShell].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAssetAdministrationShellAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAssetAdministrationShell,
+) (instance ourtypes.IAssetAdministrationShell,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theDerivedFrom aastypes.IReference
-	var theAssetInformation aastypes.IAssetInformation
-	var theSubmodels []aastypes.IReference
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theDerivedFrom ourtypes.IReference
+	var theAssetInformation ourtypes.IAssetInformation
+	var theSubmodels []ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -923,7 +923,7 @@ func readAssetAdministrationShellAsSequence(
 		return
 	}
 
-	instance = aastypes.NewAssetAdministrationShell(
+	instance = ourtypes.NewAssetAdministrationShell(
 		theID,
 		theAssetInformation,
 	)
@@ -939,7 +939,7 @@ func readAssetAdministrationShellAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IAssetAdministrationShell] based on the `local` name
+// De-serialize an instance of [ourtypes.IAssetAdministrationShell] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -948,7 +948,7 @@ func readAssetAdministrationShellDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IAssetAdministrationShell,
+) (instance ourtypes.IAssetAdministrationShell,
 	next xml.Token,
 	err error,
 ) {
@@ -961,24 +961,24 @@ func readAssetAdministrationShellDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAssetInformation]
+// De-serialize the instance of [ourtypes.IAssetInformation]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAssetInformation].
+// of [ourtypes.IAssetInformation].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAssetInformationAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAssetInformation,
+) (instance ourtypes.IAssetInformation,
 	next xml.Token,
 	err error,
 ) {
-	var theAssetKind aastypes.AssetKind
+	var theAssetKind ourtypes.AssetKind
 	var theGlobalAssetID *string
-	var theSpecificAssetIDs []aastypes.ISpecificAssetID
+	var theSpecificAssetIDs []ourtypes.ISpecificAssetID
 	var theAssetType *string
-	var theDefaultThumbnail aastypes.IResource
+	var theDefaultThumbnail ourtypes.IResource
 
 	foundAssetKind := false
 	foundGlobalAssetID := false
@@ -1063,7 +1063,7 @@ func readAssetInformationAsSequence(
 		return
 	}
 
-	instance = aastypes.NewAssetInformation(
+	instance = ourtypes.NewAssetInformation(
 		theAssetKind,
 	)
 	instance.SetGlobalAssetID(theGlobalAssetID)
@@ -1073,16 +1073,16 @@ func readAssetInformationAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IResource]
+// De-serialize the instance of [ourtypes.IResource]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IResource].
+// of [ourtypes.IResource].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readResourceAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IResource,
+) (instance ourtypes.IResource,
 	next xml.Token,
 	err error,
 ) {
@@ -1142,7 +1142,7 @@ func readResourceAsSequence(
 		return
 	}
 
-	instance = aastypes.NewResource(
+	instance = ourtypes.NewResource(
 		thePath,
 	)
 	instance.SetContentType(theContentType)
@@ -1150,7 +1150,7 @@ func readResourceAsSequence(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.AssetKind].
+// [ourtypes.AssetKind].
 //
 // Any comment tokens are skipped.
 //
@@ -1161,7 +1161,7 @@ func readResourceAsSequence(
 func readTextAs_AssetKind(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.AssetKind,
+) (value ourtypes.AssetKind,
 	next xml.Token,
 	err error,
 ) {
@@ -1172,7 +1172,7 @@ func readTextAs_AssetKind(
 	}
 
 	var ok bool
-	value, ok = aasstringification.AssetKindFromString(text)
+	value, ok = ourstringification.AssetKindFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -1186,24 +1186,24 @@ func readTextAs_AssetKind(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISpecificAssetID]
+// De-serialize the instance of [ourtypes.ISpecificAssetID]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISpecificAssetID].
+// of [ourtypes.ISpecificAssetID].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSpecificAssetIDAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISpecificAssetID,
+) (instance ourtypes.ISpecificAssetID,
 	next xml.Token,
 	err error,
 ) {
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
 	var theName string
 	var theValue string
-	var theExternalSubjectID aastypes.IReference
+	var theExternalSubjectID ourtypes.IReference
 
 	foundSemanticID := false
 	foundSupplementalSemanticIDs := false
@@ -1293,7 +1293,7 @@ func readSpecificAssetIDAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSpecificAssetID(
+	instance = ourtypes.NewSpecificAssetID(
 		theName,
 		theValue,
 	)
@@ -1303,7 +1303,7 @@ func readSpecificAssetIDAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.ISpecificAssetID] based on the `local` name
+// De-serialize an instance of [ourtypes.ISpecificAssetID] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1312,7 +1312,7 @@ func readSpecificAssetIDDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ISpecificAssetID,
+) (instance ourtypes.ISpecificAssetID,
 	next xml.Token,
 	err error,
 ) {
@@ -1325,32 +1325,32 @@ func readSpecificAssetIDDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISubmodel]
+// De-serialize the instance of [ourtypes.ISubmodel]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISubmodel].
+// of [ourtypes.ISubmodel].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSubmodelAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISubmodel,
+) (instance ourtypes.ISubmodel,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theKind *aastypes.ModellingKind
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theSubmodelElements []aastypes.ISubmodelElement
+	var theKind *ourtypes.ModellingKind
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theSubmodelElements []ourtypes.ISubmodelElement
 
 	foundExtensions := false
 	foundCategory := false
@@ -1515,7 +1515,7 @@ func readSubmodelAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSubmodel(
+	instance = ourtypes.NewSubmodel(
 		theID,
 	)
 	instance.SetExtensions(theExtensions)
@@ -1533,7 +1533,7 @@ func readSubmodelAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.ISubmodel] based on the `local` name
+// De-serialize an instance of [ourtypes.ISubmodel] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1542,7 +1542,7 @@ func readSubmodelDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ISubmodel,
+) (instance ourtypes.ISubmodel,
 	next xml.Token,
 	err error,
 ) {
@@ -1555,7 +1555,7 @@ func readSubmodelDispatched(
 	return
 }
 
-// De-serialize an instance of [aastypes.ISubmodelElement] based on the `local` name
+// De-serialize an instance of [ourtypes.ISubmodelElement] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1564,7 +1564,7 @@ func readSubmodelElementDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ISubmodelElement,
+) (instance ourtypes.ISubmodelElement,
 	next xml.Token,
 	err error,
 ) {
@@ -1603,30 +1603,30 @@ func readSubmodelElementDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IRelationshipElement]
+// De-serialize the instance of [ourtypes.IRelationshipElement]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IRelationshipElement].
+// of [ourtypes.IRelationshipElement].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readRelationshipElementAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IRelationshipElement,
+) (instance ourtypes.IRelationshipElement,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theFirst aastypes.IReference
-	var theSecond aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theFirst ourtypes.IReference
+	var theSecond ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -1776,7 +1776,7 @@ func readRelationshipElementAsSequence(
 		return
 	}
 
-	instance = aastypes.NewRelationshipElement(
+	instance = ourtypes.NewRelationshipElement(
 		theFirst,
 		theSecond,
 	)
@@ -1793,7 +1793,7 @@ func readRelationshipElementAsSequence(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.AASSubmodelElements].
+// [ourtypes.AASSubmodelElements].
 //
 // Any comment tokens are skipped.
 //
@@ -1804,7 +1804,7 @@ func readRelationshipElementAsSequence(
 func readTextAs_AASSubmodelElements(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.AASSubmodelElements,
+) (value ourtypes.AASSubmodelElements,
 	next xml.Token,
 	err error,
 ) {
@@ -1815,7 +1815,7 @@ func readTextAs_AASSubmodelElements(
 	}
 
 	var ok bool
-	value, ok = aasstringification.AASSubmodelElementsFromString(text)
+	value, ok = ourstringification.AASSubmodelElementsFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -1829,33 +1829,33 @@ func readTextAs_AASSubmodelElements(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISubmodelElementList]
+// De-serialize the instance of [ourtypes.ISubmodelElementList]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISubmodelElementList].
+// of [ourtypes.ISubmodelElementList].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSubmodelElementListAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISubmodelElementList,
+) (instance ourtypes.ISubmodelElementList,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theOrderRelevant *bool
-	var theSemanticIDListElement aastypes.IReference
-	var theTypeValueListElement aastypes.AASSubmodelElements
-	var theValueTypeListElement *aastypes.DataTypeDefXSD
-	var theValue []aastypes.ISubmodelElement
+	var theSemanticIDListElement ourtypes.IReference
+	var theTypeValueListElement ourtypes.AASSubmodelElements
+	var theValueTypeListElement *ourtypes.DataTypeDefXSD
+	var theValue []ourtypes.ISubmodelElement
 
 	foundExtensions := false
 	foundCategory := false
@@ -2030,7 +2030,7 @@ func readSubmodelElementListAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSubmodelElementList(
+	instance = ourtypes.NewSubmodelElementList(
 		theTypeValueListElement,
 	)
 	instance.SetExtensions(theExtensions)
@@ -2049,29 +2049,29 @@ func readSubmodelElementListAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISubmodelElementCollection]
+// De-serialize the instance of [ourtypes.ISubmodelElementCollection]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISubmodelElementCollection].
+// of [ourtypes.ISubmodelElementCollection].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSubmodelElementCollectionAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISubmodelElementCollection,
+) (instance ourtypes.ISubmodelElementCollection,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue []aastypes.ISubmodelElement
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue []ourtypes.ISubmodelElement
 
 	foundExtensions := false
 	foundCategory := false
@@ -2201,7 +2201,7 @@ func readSubmodelElementCollectionAsSequence(
 
 	next = current
 
-	instance = aastypes.NewSubmodelElementCollection()
+	instance = ourtypes.NewSubmodelElementCollection()
 	instance.SetExtensions(theExtensions)
 	instance.SetCategory(theCategory)
 	instance.SetIDShort(theIDShort)
@@ -2215,7 +2215,7 @@ func readSubmodelElementCollectionAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IDataElement] based on the `local` name
+// De-serialize an instance of [ourtypes.IDataElement] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -2224,7 +2224,7 @@ func readDataElementDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IDataElement,
+) (instance ourtypes.IDataElement,
 	next xml.Token,
 	err error,
 ) {
@@ -2247,31 +2247,31 @@ func readDataElementDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IProperty]
+// De-serialize the instance of [ourtypes.IProperty]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IProperty].
+// of [ourtypes.IProperty].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readPropertyAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IProperty,
+) (instance ourtypes.IProperty,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValueType aastypes.DataTypeDefXSD
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValueType ourtypes.DataTypeDefXSD
 	var theValue *string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -2426,7 +2426,7 @@ func readPropertyAsSequence(
 		return
 	}
 
-	instance = aastypes.NewProperty(
+	instance = ourtypes.NewProperty(
 		theValueType,
 	)
 	instance.SetExtensions(theExtensions)
@@ -2443,30 +2443,30 @@ func readPropertyAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IMultiLanguageProperty]
+// De-serialize the instance of [ourtypes.IMultiLanguageProperty]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMultiLanguageProperty].
+// of [ourtypes.IMultiLanguageProperty].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMultiLanguagePropertyAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMultiLanguageProperty,
+) (instance ourtypes.IMultiLanguageProperty,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue []aastypes.ILangStringTextType
-	var theValueID aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue []ourtypes.ILangStringTextType
+	var theValueID ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -2606,7 +2606,7 @@ func readMultiLanguagePropertyAsSequence(
 
 	next = current
 
-	instance = aastypes.NewMultiLanguageProperty()
+	instance = ourtypes.NewMultiLanguageProperty()
 	instance.SetExtensions(theExtensions)
 	instance.SetCategory(theCategory)
 	instance.SetIDShort(theIDShort)
@@ -2621,29 +2621,29 @@ func readMultiLanguagePropertyAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IRange]
+// De-serialize the instance of [ourtypes.IRange]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IRange].
+// of [ourtypes.IRange].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readRangeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IRange,
+) (instance ourtypes.IRange,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValueType aastypes.DataTypeDefXSD
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValueType ourtypes.DataTypeDefXSD
 	var theMin *string
 	var theMax *string
 
@@ -2800,7 +2800,7 @@ func readRangeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewRange(
+	instance = ourtypes.NewRange(
 		theValueType,
 	)
 	instance.SetExtensions(theExtensions)
@@ -2817,29 +2817,29 @@ func readRangeAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IReferenceElement]
+// De-serialize the instance of [ourtypes.IReferenceElement]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IReferenceElement].
+// of [ourtypes.IReferenceElement].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readReferenceElementAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IReferenceElement,
+) (instance ourtypes.IReferenceElement,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theValue aastypes.IReference
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theValue ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -2969,7 +2969,7 @@ func readReferenceElementAsSequence(
 
 	next = current
 
-	instance = aastypes.NewReferenceElement()
+	instance = ourtypes.NewReferenceElement()
 	instance.SetExtensions(theExtensions)
 	instance.SetCategory(theCategory)
 	instance.SetIDShort(theIDShort)
@@ -2983,28 +2983,28 @@ func readReferenceElementAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IBlob]
+// De-serialize the instance of [ourtypes.IBlob]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IBlob].
+// of [ourtypes.IBlob].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readBlobAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IBlob,
+) (instance ourtypes.IBlob,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theValue []byte
 	var theContentType string
 
@@ -3151,7 +3151,7 @@ func readBlobAsSequence(
 		return
 	}
 
-	instance = aastypes.NewBlob(
+	instance = ourtypes.NewBlob(
 		theContentType,
 	)
 	instance.SetExtensions(theExtensions)
@@ -3167,28 +3167,28 @@ func readBlobAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IFile]
+// De-serialize the instance of [ourtypes.IFile]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IFile].
+// of [ourtypes.IFile].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readFileAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IFile,
+) (instance ourtypes.IFile,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 	var theValue *string
 	var theContentType string
 
@@ -3335,7 +3335,7 @@ func readFileAsSequence(
 		return
 	}
 
-	instance = aastypes.NewFile(
+	instance = ourtypes.NewFile(
 		theContentType,
 	)
 	instance.SetExtensions(theExtensions)
@@ -3351,31 +3351,31 @@ func readFileAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IAnnotatedRelationshipElement]
+// De-serialize the instance of [ourtypes.IAnnotatedRelationshipElement]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IAnnotatedRelationshipElement].
+// of [ourtypes.IAnnotatedRelationshipElement].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readAnnotatedRelationshipElementAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IAnnotatedRelationshipElement,
+) (instance ourtypes.IAnnotatedRelationshipElement,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theFirst aastypes.IReference
-	var theSecond aastypes.IReference
-	var theAnnotations []aastypes.IDataElement
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theFirst ourtypes.IReference
+	var theSecond ourtypes.IReference
+	var theAnnotations []ourtypes.IDataElement
 
 	foundExtensions := false
 	foundCategory := false
@@ -3535,7 +3535,7 @@ func readAnnotatedRelationshipElementAsSequence(
 		return
 	}
 
-	instance = aastypes.NewAnnotatedRelationshipElement(
+	instance = ourtypes.NewAnnotatedRelationshipElement(
 		theFirst,
 		theSecond,
 	)
@@ -3552,32 +3552,32 @@ func readAnnotatedRelationshipElementAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IEntity]
+// De-serialize the instance of [ourtypes.IEntity]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IEntity].
+// of [ourtypes.IEntity].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readEntityAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IEntity,
+) (instance ourtypes.IEntity,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theStatements []aastypes.ISubmodelElement
-	var theEntityType aastypes.EntityType
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theStatements []ourtypes.ISubmodelElement
+	var theEntityType ourtypes.EntityType
 	var theGlobalAssetID *string
-	var theSpecificAssetIDs []aastypes.ISpecificAssetID
+	var theSpecificAssetIDs []ourtypes.ISpecificAssetID
 
 	foundExtensions := false
 	foundCategory := false
@@ -3742,7 +3742,7 @@ func readEntityAsSequence(
 		return
 	}
 
-	instance = aastypes.NewEntity(
+	instance = ourtypes.NewEntity(
 		theEntityType,
 	)
 	instance.SetExtensions(theExtensions)
@@ -3761,7 +3761,7 @@ func readEntityAsSequence(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.EntityType].
+// [ourtypes.EntityType].
 //
 // Any comment tokens are skipped.
 //
@@ -3772,7 +3772,7 @@ func readEntityAsSequence(
 func readTextAs_EntityType(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.EntityType,
+) (value ourtypes.EntityType,
 	next xml.Token,
 	err error,
 ) {
@@ -3783,7 +3783,7 @@ func readTextAs_EntityType(
 	}
 
 	var ok bool
-	value, ok = aasstringification.EntityTypeFromString(text)
+	value, ok = ourstringification.EntityTypeFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -3798,7 +3798,7 @@ func readTextAs_EntityType(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.Direction].
+// [ourtypes.Direction].
 //
 // Any comment tokens are skipped.
 //
@@ -3809,7 +3809,7 @@ func readTextAs_EntityType(
 func readTextAs_Direction(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.Direction,
+) (value ourtypes.Direction,
 	next xml.Token,
 	err error,
 ) {
@@ -3820,7 +3820,7 @@ func readTextAs_Direction(
 	}
 
 	var ok bool
-	value, ok = aasstringification.DirectionFromString(text)
+	value, ok = ourstringification.DirectionFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -3835,7 +3835,7 @@ func readTextAs_Direction(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.StateOfEvent].
+// [ourtypes.StateOfEvent].
 //
 // Any comment tokens are skipped.
 //
@@ -3846,7 +3846,7 @@ func readTextAs_Direction(
 func readTextAs_StateOfEvent(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.StateOfEvent,
+) (value ourtypes.StateOfEvent,
 	next xml.Token,
 	err error,
 ) {
@@ -3857,7 +3857,7 @@ func readTextAs_StateOfEvent(
 	}
 
 	var ok bool
-	value, ok = aasstringification.StateOfEventFromString(text)
+	value, ok = ourstringification.StateOfEventFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -3871,25 +3871,25 @@ func readTextAs_StateOfEvent(
 	return
 }
 
-// De-serialize the instance of [aastypes.IEventPayload]
+// De-serialize the instance of [ourtypes.IEventPayload]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IEventPayload].
+// of [ourtypes.IEventPayload].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readEventPayloadAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IEventPayload,
+) (instance ourtypes.IEventPayload,
 	next xml.Token,
 	err error,
 ) {
-	var theSource aastypes.IReference
-	var theSourceSemanticID aastypes.IReference
-	var theObservableReference aastypes.IReference
-	var theObservableSemanticID aastypes.IReference
+	var theSource ourtypes.IReference
+	var theSourceSemanticID ourtypes.IReference
+	var theObservableReference ourtypes.IReference
+	var theObservableSemanticID ourtypes.IReference
 	var theTopic *string
-	var theSubjectID aastypes.IReference
+	var theSubjectID ourtypes.IReference
 	var theTimeStamp string
 	var thePayload []byte
 
@@ -4016,7 +4016,7 @@ func readEventPayloadAsSequence(
 		return
 	}
 
-	instance = aastypes.NewEventPayload(
+	instance = ourtypes.NewEventPayload(
 		theSource,
 		theObservableReference,
 		theTimeStamp,
@@ -4029,33 +4029,33 @@ func readEventPayloadAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IBasicEventElement]
+// De-serialize the instance of [ourtypes.IBasicEventElement]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IBasicEventElement].
+// of [ourtypes.IBasicEventElement].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readBasicEventElementAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IBasicEventElement,
+) (instance ourtypes.IBasicEventElement,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theObserved aastypes.IReference
-	var theDirection aastypes.Direction
-	var theState aastypes.StateOfEvent
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theObserved ourtypes.IReference
+	var theDirection ourtypes.Direction
+	var theState ourtypes.StateOfEvent
 	var theMessageTopic *string
-	var theMessageBroker aastypes.IReference
+	var theMessageBroker ourtypes.IReference
 	var theLastUpdate *string
 	var theMinInterval *string
 	var theMaxInterval *string
@@ -4273,7 +4273,7 @@ func readBasicEventElementAsSequence(
 		return
 	}
 
-	instance = aastypes.NewBasicEventElement(
+	instance = ourtypes.NewBasicEventElement(
 		theObserved,
 		theDirection,
 		theState,
@@ -4295,31 +4295,31 @@ func readBasicEventElementAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IOperation]
+// De-serialize the instance of [ourtypes.IOperation]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IOperation].
+// of [ourtypes.IOperation].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readOperationAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IOperation,
+) (instance ourtypes.IOperation,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theInputVariables []aastypes.IOperationVariable
-	var theOutputVariables []aastypes.IOperationVariable
-	var theInoutputVariables []aastypes.IOperationVariable
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theInputVariables []ourtypes.IOperationVariable
+	var theOutputVariables []ourtypes.IOperationVariable
+	var theInoutputVariables []ourtypes.IOperationVariable
 
 	foundExtensions := false
 	foundCategory := false
@@ -4469,7 +4469,7 @@ func readOperationAsSequence(
 
 	next = current
 
-	instance = aastypes.NewOperation()
+	instance = ourtypes.NewOperation()
 	instance.SetExtensions(theExtensions)
 	instance.SetCategory(theCategory)
 	instance.SetIDShort(theIDShort)
@@ -4485,20 +4485,20 @@ func readOperationAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IOperationVariable]
+// De-serialize the instance of [ourtypes.IOperationVariable]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IOperationVariable].
+// of [ourtypes.IOperationVariable].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readOperationVariableAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IOperationVariable,
+) (instance ourtypes.IOperationVariable,
 	next xml.Token,
 	err error,
 ) {
-	var theValue aastypes.ISubmodelElement
+	var theValue ourtypes.ISubmodelElement
 
 	foundValue := false
 
@@ -4543,13 +4543,13 @@ func readOperationVariableAsSequence(
 		return
 	}
 
-	instance = aastypes.NewOperationVariable(
+	instance = ourtypes.NewOperationVariable(
 		theValue,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.IOperationVariable] based on the `local` name
+// De-serialize an instance of [ourtypes.IOperationVariable] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -4558,7 +4558,7 @@ func readOperationVariableDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IOperationVariable,
+) (instance ourtypes.IOperationVariable,
 	next xml.Token,
 	err error,
 ) {
@@ -4571,28 +4571,28 @@ func readOperationVariableDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ICapability]
+// De-serialize the instance of [ourtypes.ICapability]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ICapability].
+// of [ourtypes.ICapability].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readCapabilityAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ICapability,
+) (instance ourtypes.ICapability,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theSemanticID aastypes.IReference
-	var theSupplementalSemanticIDs []aastypes.IReference
-	var theQualifiers []aastypes.IQualifier
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theSemanticID ourtypes.IReference
+	var theSupplementalSemanticIDs []ourtypes.IReference
+	var theQualifiers []ourtypes.IQualifier
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
 
 	foundExtensions := false
 	foundCategory := false
@@ -4712,7 +4712,7 @@ func readCapabilityAsSequence(
 
 	next = current
 
-	instance = aastypes.NewCapability()
+	instance = ourtypes.NewCapability()
 	instance.SetExtensions(theExtensions)
 	instance.SetCategory(theCategory)
 	instance.SetIDShort(theIDShort)
@@ -4725,28 +4725,28 @@ func readCapabilityAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IConceptDescription]
+// De-serialize the instance of [ourtypes.IConceptDescription]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IConceptDescription].
+// of [ourtypes.IConceptDescription].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readConceptDescriptionAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IConceptDescription,
+) (instance ourtypes.IConceptDescription,
 	next xml.Token,
 	err error,
 ) {
-	var theExtensions []aastypes.IExtension
+	var theExtensions []ourtypes.IExtension
 	var theCategory *string
 	var theIDShort *string
-	var theDisplayName []aastypes.ILangStringNameType
-	var theDescription []aastypes.ILangStringTextType
-	var theAdministration aastypes.IAdministrativeInformation
+	var theDisplayName []ourtypes.ILangStringNameType
+	var theDescription []ourtypes.ILangStringTextType
+	var theAdministration ourtypes.IAdministrativeInformation
 	var theID string
-	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
-	var theIsCaseOf []aastypes.IReference
+	var theEmbeddedDataSpecifications []ourtypes.IEmbeddedDataSpecification
+	var theIsCaseOf []ourtypes.IReference
 
 	foundExtensions := false
 	foundCategory := false
@@ -4871,7 +4871,7 @@ func readConceptDescriptionAsSequence(
 		return
 	}
 
-	instance = aastypes.NewConceptDescription(
+	instance = ourtypes.NewConceptDescription(
 		theID,
 	)
 	instance.SetExtensions(theExtensions)
@@ -4885,7 +4885,7 @@ func readConceptDescriptionAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IConceptDescription] based on the `local` name
+// De-serialize an instance of [ourtypes.IConceptDescription] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -4894,7 +4894,7 @@ func readConceptDescriptionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IConceptDescription,
+) (instance ourtypes.IConceptDescription,
 	next xml.Token,
 	err error,
 ) {
@@ -4908,7 +4908,7 @@ func readConceptDescriptionDispatched(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.ReferenceTypes].
+// [ourtypes.ReferenceTypes].
 //
 // Any comment tokens are skipped.
 //
@@ -4919,7 +4919,7 @@ func readConceptDescriptionDispatched(
 func readTextAs_ReferenceTypes(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.ReferenceTypes,
+) (value ourtypes.ReferenceTypes,
 	next xml.Token,
 	err error,
 ) {
@@ -4930,7 +4930,7 @@ func readTextAs_ReferenceTypes(
 	}
 
 	var ok bool
-	value, ok = aasstringification.ReferenceTypesFromString(text)
+	value, ok = ourstringification.ReferenceTypesFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -4944,22 +4944,22 @@ func readTextAs_ReferenceTypes(
 	return
 }
 
-// De-serialize the instance of [aastypes.IReference]
+// De-serialize the instance of [ourtypes.IReference]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IReference].
+// of [ourtypes.IReference].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readReferenceAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IReference,
+) (instance ourtypes.IReference,
 	next xml.Token,
 	err error,
 ) {
-	var theType aastypes.ReferenceTypes
-	var theReferredSemanticID aastypes.IReference
-	var theKeys []aastypes.IKey
+	var theType ourtypes.ReferenceTypes
+	var theReferredSemanticID ourtypes.IReference
+	var theKeys []ourtypes.IKey
 
 	foundType := false
 	foundReferredSemanticID := false
@@ -5029,7 +5029,7 @@ func readReferenceAsSequence(
 		return
 	}
 
-	instance = aastypes.NewReference(
+	instance = ourtypes.NewReference(
 		theType,
 		theKeys,
 	)
@@ -5037,7 +5037,7 @@ func readReferenceAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IReference] based on the `local` name
+// De-serialize an instance of [ourtypes.IReference] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5046,7 +5046,7 @@ func readReferenceDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IReference,
+) (instance ourtypes.IReference,
 	next xml.Token,
 	err error,
 ) {
@@ -5059,20 +5059,20 @@ func readReferenceDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IKey]
+// De-serialize the instance of [ourtypes.IKey]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IKey].
+// of [ourtypes.IKey].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readKeyAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IKey,
+) (instance ourtypes.IKey,
 	next xml.Token,
 	err error,
 ) {
-	var theType aastypes.KeyTypes
+	var theType ourtypes.KeyTypes
 	var theValue string
 
 	foundType := false
@@ -5133,14 +5133,14 @@ func readKeyAsSequence(
 		return
 	}
 
-	instance = aastypes.NewKey(
+	instance = ourtypes.NewKey(
 		theType,
 		theValue,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.IKey] based on the `local` name
+// De-serialize an instance of [ourtypes.IKey] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5149,7 +5149,7 @@ func readKeyDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IKey,
+) (instance ourtypes.IKey,
 	next xml.Token,
 	err error,
 ) {
@@ -5163,7 +5163,7 @@ func readKeyDispatched(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.KeyTypes].
+// [ourtypes.KeyTypes].
 //
 // Any comment tokens are skipped.
 //
@@ -5174,7 +5174,7 @@ func readKeyDispatched(
 func readTextAs_KeyTypes(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.KeyTypes,
+) (value ourtypes.KeyTypes,
 	next xml.Token,
 	err error,
 ) {
@@ -5185,7 +5185,7 @@ func readTextAs_KeyTypes(
 	}
 
 	var ok bool
-	value, ok = aasstringification.KeyTypesFromString(text)
+	value, ok = ourstringification.KeyTypesFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -5200,7 +5200,7 @@ func readTextAs_KeyTypes(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.DataTypeDefXSD].
+// [ourtypes.DataTypeDefXSD].
 //
 // Any comment tokens are skipped.
 //
@@ -5211,7 +5211,7 @@ func readTextAs_KeyTypes(
 func readTextAs_DataTypeDefXSD(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.DataTypeDefXSD,
+) (value ourtypes.DataTypeDefXSD,
 	next xml.Token,
 	err error,
 ) {
@@ -5222,7 +5222,7 @@ func readTextAs_DataTypeDefXSD(
 	}
 
 	var ok bool
-	value, ok = aasstringification.DataTypeDefXSDFromString(text)
+	value, ok = ourstringification.DataTypeDefXSDFromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -5236,16 +5236,16 @@ func readTextAs_DataTypeDefXSD(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILangStringNameType]
+// De-serialize the instance of [ourtypes.ILangStringNameType]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILangStringNameType].
+// of [ourtypes.ILangStringNameType].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLangStringNameTypeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILangStringNameType,
+) (instance ourtypes.ILangStringNameType,
 	next xml.Token,
 	err error,
 ) {
@@ -5310,14 +5310,14 @@ func readLangStringNameTypeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewLangStringNameType(
+	instance = ourtypes.NewLangStringNameType(
 		theLanguage,
 		theText,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ILangStringNameType] based on the `local` name
+// De-serialize an instance of [ourtypes.ILangStringNameType] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5326,7 +5326,7 @@ func readLangStringNameTypeDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ILangStringNameType,
+) (instance ourtypes.ILangStringNameType,
 	next xml.Token,
 	err error,
 ) {
@@ -5339,16 +5339,16 @@ func readLangStringNameTypeDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILangStringTextType]
+// De-serialize the instance of [ourtypes.ILangStringTextType]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILangStringTextType].
+// of [ourtypes.ILangStringTextType].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLangStringTextTypeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILangStringTextType,
+) (instance ourtypes.ILangStringTextType,
 	next xml.Token,
 	err error,
 ) {
@@ -5413,14 +5413,14 @@ func readLangStringTextTypeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewLangStringTextType(
+	instance = ourtypes.NewLangStringTextType(
 		theLanguage,
 		theText,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ILangStringTextType] based on the `local` name
+// De-serialize an instance of [ourtypes.ILangStringTextType] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5429,7 +5429,7 @@ func readLangStringTextTypeDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ILangStringTextType,
+) (instance ourtypes.ILangStringTextType,
 	next xml.Token,
 	err error,
 ) {
@@ -5442,22 +5442,22 @@ func readLangStringTextTypeDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IEnvironment]
+// De-serialize the instance of [ourtypes.IEnvironment]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IEnvironment].
+// of [ourtypes.IEnvironment].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readEnvironmentAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IEnvironment,
+) (instance ourtypes.IEnvironment,
 	next xml.Token,
 	err error,
 ) {
-	var theAssetAdministrationShells []aastypes.IAssetAdministrationShell
-	var theSubmodels []aastypes.ISubmodel
-	var theConceptDescriptions []aastypes.IConceptDescription
+	var theAssetAdministrationShells []ourtypes.IAssetAdministrationShell
+	var theSubmodels []ourtypes.ISubmodel
+	var theConceptDescriptions []ourtypes.IConceptDescription
 
 	foundAssetAdministrationShells := false
 	foundSubmodels := false
@@ -5517,14 +5517,14 @@ func readEnvironmentAsSequence(
 
 	next = current
 
-	instance = aastypes.NewEnvironment()
+	instance = ourtypes.NewEnvironment()
 	instance.SetAssetAdministrationShells(theAssetAdministrationShells)
 	instance.SetSubmodels(theSubmodels)
 	instance.SetConceptDescriptions(theConceptDescriptions)
 	return
 }
 
-// De-serialize an instance of [aastypes.IDataSpecificationContent] based on the `local` name
+// De-serialize an instance of [ourtypes.IDataSpecificationContent] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5533,7 +5533,7 @@ func readDataSpecificationContentDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IDataSpecificationContent,
+) (instance ourtypes.IDataSpecificationContent,
 	next xml.Token,
 	err error,
 ) {
@@ -5546,21 +5546,21 @@ func readDataSpecificationContentDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IEmbeddedDataSpecification]
+// De-serialize the instance of [ourtypes.IEmbeddedDataSpecification]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IEmbeddedDataSpecification].
+// of [ourtypes.IEmbeddedDataSpecification].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readEmbeddedDataSpecificationAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IEmbeddedDataSpecification,
+) (instance ourtypes.IEmbeddedDataSpecification,
 	next xml.Token,
 	err error,
 ) {
-	var theDataSpecification aastypes.IReference
-	var theDataSpecificationContent aastypes.IDataSpecificationContent
+	var theDataSpecification ourtypes.IReference
+	var theDataSpecificationContent ourtypes.IDataSpecificationContent
 
 	foundDataSpecification := false
 	foundDataSpecificationContent := false
@@ -5620,14 +5620,14 @@ func readEmbeddedDataSpecificationAsSequence(
 		return
 	}
 
-	instance = aastypes.NewEmbeddedDataSpecification(
+	instance = ourtypes.NewEmbeddedDataSpecification(
 		theDataSpecification,
 		theDataSpecificationContent,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.IEmbeddedDataSpecification] based on the `local` name
+// De-serialize an instance of [ourtypes.IEmbeddedDataSpecification] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5636,7 +5636,7 @@ func readEmbeddedDataSpecificationDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IEmbeddedDataSpecification,
+) (instance ourtypes.IEmbeddedDataSpecification,
 	next xml.Token,
 	err error,
 ) {
@@ -5650,7 +5650,7 @@ func readEmbeddedDataSpecificationDispatched(
 }
 
 // Consume the text tokens (char data) as a string-encoded literal of
-// [aastypes.DataTypeIEC61360].
+// [ourtypes.DataTypeIEC61360].
 //
 // Any comment tokens are skipped.
 //
@@ -5661,7 +5661,7 @@ func readEmbeddedDataSpecificationDispatched(
 func readTextAs_DataTypeIEC61360(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (value aastypes.DataTypeIEC61360,
+) (value ourtypes.DataTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -5672,7 +5672,7 @@ func readTextAs_DataTypeIEC61360(
 	}
 
 	var ok bool
-	value, ok = aasstringification.DataTypeIEC61360FromString(text)
+	value, ok = ourstringification.DataTypeIEC61360FromString(text)
 	if !ok {
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -5686,16 +5686,16 @@ func readTextAs_DataTypeIEC61360(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILevelType]
+// De-serialize the instance of [ourtypes.ILevelType]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILevelType].
+// of [ourtypes.ILevelType].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLevelTypeAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILevelType,
+) (instance ourtypes.ILevelType,
 	next xml.Token,
 	err error,
 ) {
@@ -5792,7 +5792,7 @@ func readLevelTypeAsSequence(
 		return
 	}
 
-	instance = aastypes.NewLevelType(
+	instance = ourtypes.NewLevelType(
 		theMin,
 		theNom,
 		theTyp,
@@ -5801,21 +5801,21 @@ func readLevelTypeAsSequence(
 	return
 }
 
-// De-serialize the instance of [aastypes.IValueReferencePair]
+// De-serialize the instance of [ourtypes.IValueReferencePair]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IValueReferencePair].
+// of [ourtypes.IValueReferencePair].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readValueReferencePairAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IValueReferencePair,
+) (instance ourtypes.IValueReferencePair,
 	next xml.Token,
 	err error,
 ) {
 	var theValue string
-	var theValueID aastypes.IReference
+	var theValueID ourtypes.IReference
 
 	foundValue := false
 	foundValueID := false
@@ -5875,14 +5875,14 @@ func readValueReferencePairAsSequence(
 		return
 	}
 
-	instance = aastypes.NewValueReferencePair(
+	instance = ourtypes.NewValueReferencePair(
 		theValue,
 		theValueID,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.IValueReferencePair] based on the `local` name
+// De-serialize an instance of [ourtypes.IValueReferencePair] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -5891,7 +5891,7 @@ func readValueReferencePairDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IValueReferencePair,
+) (instance ourtypes.IValueReferencePair,
 	next xml.Token,
 	err error,
 ) {
@@ -5904,20 +5904,20 @@ func readValueReferencePairDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IValueList]
+// De-serialize the instance of [ourtypes.IValueList]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IValueList].
+// of [ourtypes.IValueList].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readValueListAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IValueList,
+) (instance ourtypes.IValueList,
 	next xml.Token,
 	err error,
 ) {
-	var theValueReferencePairs []aastypes.IValueReferencePair
+	var theValueReferencePairs []ourtypes.IValueReferencePair
 
 	foundValueReferencePairs := false
 
@@ -5962,22 +5962,22 @@ func readValueListAsSequence(
 		return
 	}
 
-	instance = aastypes.NewValueList(
+	instance = ourtypes.NewValueList(
 		theValueReferencePairs,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.ILangStringPreferredNameTypeIEC61360]
+// De-serialize the instance of [ourtypes.ILangStringPreferredNameTypeIEC61360]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILangStringPreferredNameTypeIEC61360].
+// of [ourtypes.ILangStringPreferredNameTypeIEC61360].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLangStringPreferredNameTypeIEC61360AsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILangStringPreferredNameTypeIEC61360,
+) (instance ourtypes.ILangStringPreferredNameTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6042,14 +6042,14 @@ func readLangStringPreferredNameTypeIEC61360AsSequence(
 		return
 	}
 
-	instance = aastypes.NewLangStringPreferredNameTypeIEC61360(
+	instance = ourtypes.NewLangStringPreferredNameTypeIEC61360(
 		theLanguage,
 		theText,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ILangStringPreferredNameTypeIEC61360] based on the `local` name
+// De-serialize an instance of [ourtypes.ILangStringPreferredNameTypeIEC61360] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -6058,7 +6058,7 @@ func readLangStringPreferredNameTypeIEC61360Dispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ILangStringPreferredNameTypeIEC61360,
+) (instance ourtypes.ILangStringPreferredNameTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6071,16 +6071,16 @@ func readLangStringPreferredNameTypeIEC61360Dispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILangStringShortNameTypeIEC61360]
+// De-serialize the instance of [ourtypes.ILangStringShortNameTypeIEC61360]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILangStringShortNameTypeIEC61360].
+// of [ourtypes.ILangStringShortNameTypeIEC61360].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLangStringShortNameTypeIEC61360AsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILangStringShortNameTypeIEC61360,
+) (instance ourtypes.ILangStringShortNameTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6145,14 +6145,14 @@ func readLangStringShortNameTypeIEC61360AsSequence(
 		return
 	}
 
-	instance = aastypes.NewLangStringShortNameTypeIEC61360(
+	instance = ourtypes.NewLangStringShortNameTypeIEC61360(
 		theLanguage,
 		theText,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ILangStringShortNameTypeIEC61360] based on the `local` name
+// De-serialize an instance of [ourtypes.ILangStringShortNameTypeIEC61360] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -6161,7 +6161,7 @@ func readLangStringShortNameTypeIEC61360Dispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ILangStringShortNameTypeIEC61360,
+) (instance ourtypes.ILangStringShortNameTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6174,16 +6174,16 @@ func readLangStringShortNameTypeIEC61360Dispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ILangStringDefinitionTypeIEC61360]
+// De-serialize the instance of [ourtypes.ILangStringDefinitionTypeIEC61360]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ILangStringDefinitionTypeIEC61360].
+// of [ourtypes.ILangStringDefinitionTypeIEC61360].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readLangStringDefinitionTypeIEC61360AsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ILangStringDefinitionTypeIEC61360,
+) (instance ourtypes.ILangStringDefinitionTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6248,14 +6248,14 @@ func readLangStringDefinitionTypeIEC61360AsSequence(
 		return
 	}
 
-	instance = aastypes.NewLangStringDefinitionTypeIEC61360(
+	instance = ourtypes.NewLangStringDefinitionTypeIEC61360(
 		theLanguage,
 		theText,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ILangStringDefinitionTypeIEC61360] based on the `local` name
+// De-serialize an instance of [ourtypes.ILangStringDefinitionTypeIEC61360] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -6264,7 +6264,7 @@ func readLangStringDefinitionTypeIEC61360Dispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.ILangStringDefinitionTypeIEC61360,
+) (instance ourtypes.ILangStringDefinitionTypeIEC61360,
 	next xml.Token,
 	err error,
 ) {
@@ -6277,31 +6277,31 @@ func readLangStringDefinitionTypeIEC61360Dispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IDataSpecificationIEC61360]
+// De-serialize the instance of [ourtypes.IDataSpecificationIEC61360]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IDataSpecificationIEC61360].
+// of [ourtypes.IDataSpecificationIEC61360].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readDataSpecificationIEC61360AsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IDataSpecificationIEC61360,
+) (instance ourtypes.IDataSpecificationIEC61360,
 	next xml.Token,
 	err error,
 ) {
-	var thePreferredName []aastypes.ILangStringPreferredNameTypeIEC61360
-	var theShortName []aastypes.ILangStringShortNameTypeIEC61360
+	var thePreferredName []ourtypes.ILangStringPreferredNameTypeIEC61360
+	var theShortName []ourtypes.ILangStringShortNameTypeIEC61360
 	var theUnit *string
-	var theUnitID aastypes.IReference
+	var theUnitID ourtypes.IReference
 	var theSourceOfDefinition *string
 	var theSymbol *string
-	var theDataType *aastypes.DataTypeIEC61360
-	var theDefinition []aastypes.ILangStringDefinitionTypeIEC61360
+	var theDataType *ourtypes.DataTypeIEC61360
+	var theDefinition []ourtypes.ILangStringDefinitionTypeIEC61360
 	var theValueFormat *string
-	var theValueList aastypes.IValueList
+	var theValueList ourtypes.IValueList
 	var theValue *string
-	var theLevelType aastypes.ILevelType
+	var theLevelType ourtypes.ILevelType
 
 	foundPreferredName := false
 	foundShortName := false
@@ -6456,7 +6456,7 @@ func readDataSpecificationIEC61360AsSequence(
 		return
 	}
 
-	instance = aastypes.NewDataSpecificationIEC61360(
+	instance = ourtypes.NewDataSpecificationIEC61360(
 		thePreferredName,
 	)
 	instance.SetShortName(theShortName)
@@ -6473,7 +6473,7 @@ func readDataSpecificationIEC61360AsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -6482,7 +6482,7 @@ func readClassDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 	next xml.Token,
 	err error,
 ) {
@@ -6574,12 +6574,12 @@ func readClassDispatched(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 	decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {
+) (instance ourtypes.IClass, err error) {
 	var current xml.Token
 	current, err = xmlcommon.ReadNext(decoder, nil)
 	if err != nil {
@@ -6694,7 +6694,7 @@ func writeList[T any](
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
 				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			return
@@ -6712,7 +6712,7 @@ func writeList[T any](
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -6727,7 +6727,7 @@ func finishProperty(
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: getter},
+				&ourreporting.NameSegment{Name: getter},
 			)
 		}
 		return err
@@ -6745,13 +6745,13 @@ func finishProperty(
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 	encoder *xml.Encoder,
 	that T,
 ) error {
@@ -6793,10 +6793,10 @@ func writeClassElement[T any](
 // Do not flush.
 func writeListOf_IReference(
 	encoder *xml.Encoder,
-	list []aastypes.IReference,
+	list []ourtypes.IReference,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IReference],
+		encoder, list, writeInstance[ourtypes.IReference],
 	)
 }
 
@@ -6805,10 +6805,10 @@ func writeListOf_IReference(
 // Do not flush.
 func writeListOf_IEmbeddedDataSpecification(
 	encoder *xml.Encoder,
-	list []aastypes.IEmbeddedDataSpecification,
+	list []ourtypes.IEmbeddedDataSpecification,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IEmbeddedDataSpecification],
+		encoder, list, writeInstance[ourtypes.IEmbeddedDataSpecification],
 	)
 }
 
@@ -6817,10 +6817,10 @@ func writeListOf_IEmbeddedDataSpecification(
 // Do not flush.
 func writeListOf_IExtension(
 	encoder *xml.Encoder,
-	list []aastypes.IExtension,
+	list []ourtypes.IExtension,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IExtension],
+		encoder, list, writeInstance[ourtypes.IExtension],
 	)
 }
 
@@ -6829,10 +6829,10 @@ func writeListOf_IExtension(
 // Do not flush.
 func writeListOf_ILangStringNameType(
 	encoder *xml.Encoder,
-	list []aastypes.ILangStringNameType,
+	list []ourtypes.ILangStringNameType,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ILangStringNameType],
+		encoder, list, writeInstance[ourtypes.ILangStringNameType],
 	)
 }
 
@@ -6841,10 +6841,10 @@ func writeListOf_ILangStringNameType(
 // Do not flush.
 func writeListOf_ILangStringTextType(
 	encoder *xml.Encoder,
-	list []aastypes.ILangStringTextType,
+	list []ourtypes.ILangStringTextType,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ILangStringTextType],
+		encoder, list, writeInstance[ourtypes.ILangStringTextType],
 	)
 }
 
@@ -6853,10 +6853,10 @@ func writeListOf_ILangStringTextType(
 // Do not flush.
 func writeListOf_ISpecificAssetID(
 	encoder *xml.Encoder,
-	list []aastypes.ISpecificAssetID,
+	list []ourtypes.ISpecificAssetID,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ISpecificAssetID],
+		encoder, list, writeInstance[ourtypes.ISpecificAssetID],
 	)
 }
 
@@ -6865,10 +6865,10 @@ func writeListOf_ISpecificAssetID(
 // Do not flush.
 func writeListOf_IQualifier(
 	encoder *xml.Encoder,
-	list []aastypes.IQualifier,
+	list []ourtypes.IQualifier,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IQualifier],
+		encoder, list, writeInstance[ourtypes.IQualifier],
 	)
 }
 
@@ -6877,10 +6877,10 @@ func writeListOf_IQualifier(
 // Do not flush.
 func writeListOf_ISubmodelElement(
 	encoder *xml.Encoder,
-	list []aastypes.ISubmodelElement,
+	list []ourtypes.ISubmodelElement,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ISubmodelElement],
+		encoder, list, writeInstance[ourtypes.ISubmodelElement],
 	)
 }
 
@@ -6889,10 +6889,10 @@ func writeListOf_ISubmodelElement(
 // Do not flush.
 func writeListOf_IDataElement(
 	encoder *xml.Encoder,
-	list []aastypes.IDataElement,
+	list []ourtypes.IDataElement,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IDataElement],
+		encoder, list, writeInstance[ourtypes.IDataElement],
 	)
 }
 
@@ -6901,10 +6901,10 @@ func writeListOf_IDataElement(
 // Do not flush.
 func writeListOf_IOperationVariable(
 	encoder *xml.Encoder,
-	list []aastypes.IOperationVariable,
+	list []ourtypes.IOperationVariable,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IOperationVariable],
+		encoder, list, writeInstance[ourtypes.IOperationVariable],
 	)
 }
 
@@ -6913,10 +6913,10 @@ func writeListOf_IOperationVariable(
 // Do not flush.
 func writeListOf_IKey(
 	encoder *xml.Encoder,
-	list []aastypes.IKey,
+	list []ourtypes.IKey,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IKey],
+		encoder, list, writeInstance[ourtypes.IKey],
 	)
 }
 
@@ -6925,10 +6925,10 @@ func writeListOf_IKey(
 // Do not flush.
 func writeListOf_IAssetAdministrationShell(
 	encoder *xml.Encoder,
-	list []aastypes.IAssetAdministrationShell,
+	list []ourtypes.IAssetAdministrationShell,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IAssetAdministrationShell],
+		encoder, list, writeInstance[ourtypes.IAssetAdministrationShell],
 	)
 }
 
@@ -6937,10 +6937,10 @@ func writeListOf_IAssetAdministrationShell(
 // Do not flush.
 func writeListOf_ISubmodel(
 	encoder *xml.Encoder,
-	list []aastypes.ISubmodel,
+	list []ourtypes.ISubmodel,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ISubmodel],
+		encoder, list, writeInstance[ourtypes.ISubmodel],
 	)
 }
 
@@ -6949,10 +6949,10 @@ func writeListOf_ISubmodel(
 // Do not flush.
 func writeListOf_IConceptDescription(
 	encoder *xml.Encoder,
-	list []aastypes.IConceptDescription,
+	list []ourtypes.IConceptDescription,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IConceptDescription],
+		encoder, list, writeInstance[ourtypes.IConceptDescription],
 	)
 }
 
@@ -6961,10 +6961,10 @@ func writeListOf_IConceptDescription(
 // Do not flush.
 func writeListOf_IValueReferencePair(
 	encoder *xml.Encoder,
-	list []aastypes.IValueReferencePair,
+	list []ourtypes.IValueReferencePair,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.IValueReferencePair],
+		encoder, list, writeInstance[ourtypes.IValueReferencePair],
 	)
 }
 
@@ -6973,10 +6973,10 @@ func writeListOf_IValueReferencePair(
 // Do not flush.
 func writeListOf_ILangStringPreferredNameTypeIEC61360(
 	encoder *xml.Encoder,
-	list []aastypes.ILangStringPreferredNameTypeIEC61360,
+	list []ourtypes.ILangStringPreferredNameTypeIEC61360,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ILangStringPreferredNameTypeIEC61360],
+		encoder, list, writeInstance[ourtypes.ILangStringPreferredNameTypeIEC61360],
 	)
 }
 
@@ -6985,10 +6985,10 @@ func writeListOf_ILangStringPreferredNameTypeIEC61360(
 // Do not flush.
 func writeListOf_ILangStringShortNameTypeIEC61360(
 	encoder *xml.Encoder,
-	list []aastypes.ILangStringShortNameTypeIEC61360,
+	list []ourtypes.ILangStringShortNameTypeIEC61360,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ILangStringShortNameTypeIEC61360],
+		encoder, list, writeInstance[ourtypes.ILangStringShortNameTypeIEC61360],
 	)
 }
 
@@ -6997,15 +6997,15 @@ func writeListOf_ILangStringShortNameTypeIEC61360(
 // Do not flush.
 func writeListOf_ILangStringDefinitionTypeIEC61360(
 	encoder *xml.Encoder,
-	list []aastypes.ILangStringDefinitionTypeIEC61360,
+	list []ourtypes.ILangStringDefinitionTypeIEC61360,
 ) error {
 	return writeList(
-		encoder, list, writeInstance[aastypes.ILangStringDefinitionTypeIEC61360],
+		encoder, list, writeInstance[ourtypes.ILangStringDefinitionTypeIEC61360],
 	)
 }
 
 // Serialize the instance
-// of [aastypes.IExtension]
+// of [ourtypes.IExtension]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7014,7 +7014,7 @@ func writeListOf_ILangStringDefinitionTypeIEC61360(
 // Do not flush.
 func writeExtensionAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IExtension,
+	that ourtypes.IExtension,
 ) (err error) {
 	err = finishProperty(
 		"SemanticID()",
@@ -7083,15 +7083,15 @@ func writeExtensionAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.ModellingKind]
+// of [ourtypes.ModellingKind]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_ModellingKind(
 	encoder *xml.Encoder,
-	value aastypes.ModellingKind,
+	value ourtypes.ModellingKind,
 ) (err error) {
-	text, ok := aasstringification.ModellingKindToString(
+	text, ok := ourstringification.ModellingKindToString(
 		value,
 	)
 	if !ok {
@@ -7109,7 +7109,7 @@ func writeAsText_ModellingKind(
 }
 
 // Serialize the instance
-// of [aastypes.IAdministrativeInformation]
+// of [ourtypes.IAdministrativeInformation]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7118,7 +7118,7 @@ func writeAsText_ModellingKind(
 // Do not flush.
 func writeAdministrativeInformationAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAdministrativeInformation,
+	that ourtypes.IAdministrativeInformation,
 ) (err error) {
 	err = finishProperty(
 		"EmbeddedDataSpecifications()",
@@ -7177,15 +7177,15 @@ func writeAdministrativeInformationAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.QualifierKind]
+// of [ourtypes.QualifierKind]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_QualifierKind(
 	encoder *xml.Encoder,
-	value aastypes.QualifierKind,
+	value ourtypes.QualifierKind,
 ) (err error) {
-	text, ok := aasstringification.QualifierKindToString(
+	text, ok := ourstringification.QualifierKindToString(
 		value,
 	)
 	if !ok {
@@ -7203,7 +7203,7 @@ func writeAsText_QualifierKind(
 }
 
 // Serialize the instance
-// of [aastypes.IQualifier]
+// of [ourtypes.IQualifier]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7212,7 +7212,7 @@ func writeAsText_QualifierKind(
 // Do not flush.
 func writeQualifierAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IQualifier,
+	that ourtypes.IQualifier,
 ) (err error) {
 	err = finishProperty(
 		"SemanticID()",
@@ -7291,7 +7291,7 @@ func writeQualifierAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IAssetAdministrationShell]
+// of [ourtypes.IAssetAdministrationShell]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7300,7 +7300,7 @@ func writeQualifierAsSequence(
 // Do not flush.
 func writeAssetAdministrationShellAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAssetAdministrationShell,
+	that ourtypes.IAssetAdministrationShell,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -7425,7 +7425,7 @@ func writeAssetAdministrationShellAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IAssetInformation]
+// of [ourtypes.IAssetInformation]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7434,7 +7434,7 @@ func writeAssetAdministrationShellAsSequence(
 // Do not flush.
 func writeAssetInformationAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAssetInformation,
+	that ourtypes.IAssetInformation,
 ) (err error) {
 	err = finishProperty(
 		"AssetKind()",
@@ -7499,7 +7499,7 @@ func writeAssetInformationAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IResource]
+// of [ourtypes.IResource]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7508,7 +7508,7 @@ func writeAssetInformationAsSequence(
 // Do not flush.
 func writeResourceAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IResource,
+	that ourtypes.IResource,
 ) (err error) {
 	err = finishProperty(
 		"Path()",
@@ -7534,15 +7534,15 @@ func writeResourceAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.AssetKind]
+// of [ourtypes.AssetKind]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_AssetKind(
 	encoder *xml.Encoder,
-	value aastypes.AssetKind,
+	value ourtypes.AssetKind,
 ) (err error) {
-	text, ok := aasstringification.AssetKindToString(
+	text, ok := ourstringification.AssetKindToString(
 		value,
 	)
 	if !ok {
@@ -7560,7 +7560,7 @@ func writeAsText_AssetKind(
 }
 
 // Serialize the instance
-// of [aastypes.ISpecificAssetID]
+// of [ourtypes.ISpecificAssetID]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7569,7 +7569,7 @@ func writeAsText_AssetKind(
 // Do not flush.
 func writeSpecificAssetIDAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISpecificAssetID,
+	that ourtypes.ISpecificAssetID,
 ) (err error) {
 	err = finishProperty(
 		"SemanticID()",
@@ -7631,7 +7631,7 @@ func writeSpecificAssetIDAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ISubmodel]
+// of [ourtypes.ISubmodel]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7640,7 +7640,7 @@ func writeSpecificAssetIDAsSequence(
 // Do not flush.
 func writeSubmodelAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISubmodel,
+	that ourtypes.ISubmodel,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -7788,7 +7788,7 @@ func writeSubmodelAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IRelationshipElement]
+// of [ourtypes.IRelationshipElement]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7797,7 +7797,7 @@ func writeSubmodelAsSequence(
 // Do not flush.
 func writeRelationshipElementAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IRelationshipElement,
+	that ourtypes.IRelationshipElement,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -7919,15 +7919,15 @@ func writeRelationshipElementAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.AASSubmodelElements]
+// of [ourtypes.AASSubmodelElements]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_AASSubmodelElements(
 	encoder *xml.Encoder,
-	value aastypes.AASSubmodelElements,
+	value ourtypes.AASSubmodelElements,
 ) (err error) {
-	text, ok := aasstringification.AASSubmodelElementsToString(
+	text, ok := ourstringification.AASSubmodelElementsToString(
 		value,
 	)
 	if !ok {
@@ -7945,7 +7945,7 @@ func writeAsText_AASSubmodelElements(
 }
 
 // Serialize the instance
-// of [aastypes.ISubmodelElementList]
+// of [ourtypes.ISubmodelElementList]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -7954,7 +7954,7 @@ func writeAsText_AASSubmodelElements(
 // Do not flush.
 func writeSubmodelElementListAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISubmodelElementList,
+	that ourtypes.ISubmodelElementList,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8115,7 +8115,7 @@ func writeSubmodelElementListAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ISubmodelElementCollection]
+// of [ourtypes.ISubmodelElementCollection]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8124,7 +8124,7 @@ func writeSubmodelElementListAsSequence(
 // Do not flush.
 func writeSubmodelElementCollectionAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISubmodelElementCollection,
+	that ourtypes.ISubmodelElementCollection,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8236,7 +8236,7 @@ func writeSubmodelElementCollectionAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IProperty]
+// of [ourtypes.IProperty]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8245,7 +8245,7 @@ func writeSubmodelElementCollectionAsSequence(
 // Do not flush.
 func writePropertyAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IProperty,
+	that ourtypes.IProperty,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8377,7 +8377,7 @@ func writePropertyAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMultiLanguageProperty]
+// of [ourtypes.IMultiLanguageProperty]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8386,7 +8386,7 @@ func writePropertyAsSequence(
 // Do not flush.
 func writeMultiLanguagePropertyAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMultiLanguageProperty,
+	that ourtypes.IMultiLanguageProperty,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8508,7 +8508,7 @@ func writeMultiLanguagePropertyAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IRange]
+// of [ourtypes.IRange]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8517,7 +8517,7 @@ func writeMultiLanguagePropertyAsSequence(
 // Do not flush.
 func writeRangeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IRange,
+	that ourtypes.IRange,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8649,7 +8649,7 @@ func writeRangeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IReferenceElement]
+// of [ourtypes.IReferenceElement]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8658,7 +8658,7 @@ func writeRangeAsSequence(
 // Do not flush.
 func writeReferenceElementAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IReferenceElement,
+	that ourtypes.IReferenceElement,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8770,7 +8770,7 @@ func writeReferenceElementAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IBlob]
+// of [ourtypes.IBlob]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8779,7 +8779,7 @@ func writeReferenceElementAsSequence(
 // Do not flush.
 func writeBlobAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IBlob,
+	that ourtypes.IBlob,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -8901,7 +8901,7 @@ func writeBlobAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IFile]
+// of [ourtypes.IFile]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -8910,7 +8910,7 @@ func writeBlobAsSequence(
 // Do not flush.
 func writeFileAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IFile,
+	that ourtypes.IFile,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9032,7 +9032,7 @@ func writeFileAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IAnnotatedRelationshipElement]
+// of [ourtypes.IAnnotatedRelationshipElement]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9041,7 +9041,7 @@ func writeFileAsSequence(
 // Do not flush.
 func writeAnnotatedRelationshipElementAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IAnnotatedRelationshipElement,
+	that ourtypes.IAnnotatedRelationshipElement,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9173,7 +9173,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IEntity]
+// of [ourtypes.IEntity]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9182,7 +9182,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 // Do not flush.
 func writeEntityAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IEntity,
+	that ourtypes.IEntity,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9330,15 +9330,15 @@ func writeEntityAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.EntityType]
+// of [ourtypes.EntityType]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_EntityType(
 	encoder *xml.Encoder,
-	value aastypes.EntityType,
+	value ourtypes.EntityType,
 ) (err error) {
-	text, ok := aasstringification.EntityTypeToString(
+	text, ok := ourstringification.EntityTypeToString(
 		value,
 	)
 	if !ok {
@@ -9356,15 +9356,15 @@ func writeAsText_EntityType(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.Direction]
+// of [ourtypes.Direction]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_Direction(
 	encoder *xml.Encoder,
-	value aastypes.Direction,
+	value ourtypes.Direction,
 ) (err error) {
-	text, ok := aasstringification.DirectionToString(
+	text, ok := ourstringification.DirectionToString(
 		value,
 	)
 	if !ok {
@@ -9382,15 +9382,15 @@ func writeAsText_Direction(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.StateOfEvent]
+// of [ourtypes.StateOfEvent]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_StateOfEvent(
 	encoder *xml.Encoder,
-	value aastypes.StateOfEvent,
+	value ourtypes.StateOfEvent,
 ) (err error) {
-	text, ok := aasstringification.StateOfEventToString(
+	text, ok := ourstringification.StateOfEventToString(
 		value,
 	)
 	if !ok {
@@ -9408,7 +9408,7 @@ func writeAsText_StateOfEvent(
 }
 
 // Serialize the instance
-// of [aastypes.IEventPayload]
+// of [ourtypes.IEventPayload]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9417,7 +9417,7 @@ func writeAsText_StateOfEvent(
 // Do not flush.
 func writeEventPayloadAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IEventPayload,
+	that ourtypes.IEventPayload,
 ) (err error) {
 	err = finishProperty(
 		"Source()",
@@ -9512,7 +9512,7 @@ func writeEventPayloadAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IBasicEventElement]
+// of [ourtypes.IBasicEventElement]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9521,7 +9521,7 @@ func writeEventPayloadAsSequence(
 // Do not flush.
 func writeBasicEventElementAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IBasicEventElement,
+	that ourtypes.IBasicEventElement,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9703,7 +9703,7 @@ func writeBasicEventElementAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IOperation]
+// of [ourtypes.IOperation]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9712,7 +9712,7 @@ func writeBasicEventElementAsSequence(
 // Do not flush.
 func writeOperationAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IOperation,
+	that ourtypes.IOperation,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9853,7 +9853,7 @@ func writeOperationAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IOperationVariable]
+// of [ourtypes.IOperationVariable]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9862,12 +9862,12 @@ func writeOperationAsSequence(
 // Do not flush.
 func writeOperationVariableAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IOperationVariable,
+	that ourtypes.IOperationVariable,
 ) (err error) {
 	err = finishProperty(
 		"Value()",
 		xmlcommon.WriteElement(
-			encoder, "value", that.Value(), writeInstance[aastypes.ISubmodelElement],
+			encoder, "value", that.Value(), writeInstance[ourtypes.ISubmodelElement],
 		),
 	)
 	if err != nil {
@@ -9878,7 +9878,7 @@ func writeOperationVariableAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ICapability]
+// of [ourtypes.ICapability]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9887,7 +9887,7 @@ func writeOperationVariableAsSequence(
 // Do not flush.
 func writeCapabilityAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ICapability,
+	that ourtypes.ICapability,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -9989,7 +9989,7 @@ func writeCapabilityAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IConceptDescription]
+// of [ourtypes.IConceptDescription]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -9998,7 +9998,7 @@ func writeCapabilityAsSequence(
 // Do not flush.
 func writeConceptDescriptionAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IConceptDescription,
+	that ourtypes.IConceptDescription,
 ) (err error) {
 	err = finishProperty(
 		"Extensions()",
@@ -10100,15 +10100,15 @@ func writeConceptDescriptionAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.ReferenceTypes]
+// of [ourtypes.ReferenceTypes]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_ReferenceTypes(
 	encoder *xml.Encoder,
-	value aastypes.ReferenceTypes,
+	value ourtypes.ReferenceTypes,
 ) (err error) {
-	text, ok := aasstringification.ReferenceTypesToString(
+	text, ok := ourstringification.ReferenceTypesToString(
 		value,
 	)
 	if !ok {
@@ -10126,7 +10126,7 @@ func writeAsText_ReferenceTypes(
 }
 
 // Serialize the instance
-// of [aastypes.IReference]
+// of [ourtypes.IReference]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10135,7 +10135,7 @@ func writeAsText_ReferenceTypes(
 // Do not flush.
 func writeReferenceAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IReference,
+	that ourtypes.IReference,
 ) (err error) {
 	err = finishProperty(
 		"Type()",
@@ -10174,7 +10174,7 @@ func writeReferenceAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IKey]
+// of [ourtypes.IKey]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10183,7 +10183,7 @@ func writeReferenceAsSequence(
 // Do not flush.
 func writeKeyAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IKey,
+	that ourtypes.IKey,
 ) (err error) {
 	err = finishProperty(
 		"Type()",
@@ -10209,15 +10209,15 @@ func writeKeyAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.KeyTypes]
+// of [ourtypes.KeyTypes]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_KeyTypes(
 	encoder *xml.Encoder,
-	value aastypes.KeyTypes,
+	value ourtypes.KeyTypes,
 ) (err error) {
-	text, ok := aasstringification.KeyTypesToString(
+	text, ok := ourstringification.KeyTypesToString(
 		value,
 	)
 	if !ok {
@@ -10235,15 +10235,15 @@ func writeAsText_KeyTypes(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.DataTypeDefXSD]
+// of [ourtypes.DataTypeDefXSD]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_DataTypeDefXSD(
 	encoder *xml.Encoder,
-	value aastypes.DataTypeDefXSD,
+	value ourtypes.DataTypeDefXSD,
 ) (err error) {
-	text, ok := aasstringification.DataTypeDefXSDToString(
+	text, ok := ourstringification.DataTypeDefXSDToString(
 		value,
 	)
 	if !ok {
@@ -10261,7 +10261,7 @@ func writeAsText_DataTypeDefXSD(
 }
 
 // Serialize the instance
-// of [aastypes.ILangStringNameType]
+// of [ourtypes.ILangStringNameType]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10270,7 +10270,7 @@ func writeAsText_DataTypeDefXSD(
 // Do not flush.
 func writeLangStringNameTypeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILangStringNameType,
+	that ourtypes.ILangStringNameType,
 ) (err error) {
 	err = finishProperty(
 		"Language()",
@@ -10296,7 +10296,7 @@ func writeLangStringNameTypeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ILangStringTextType]
+// of [ourtypes.ILangStringTextType]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10305,7 +10305,7 @@ func writeLangStringNameTypeAsSequence(
 // Do not flush.
 func writeLangStringTextTypeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILangStringTextType,
+	that ourtypes.ILangStringTextType,
 ) (err error) {
 	err = finishProperty(
 		"Language()",
@@ -10331,7 +10331,7 @@ func writeLangStringTextTypeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IEnvironment]
+// of [ourtypes.IEnvironment]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10340,7 +10340,7 @@ func writeLangStringTextTypeAsSequence(
 // Do not flush.
 func writeEnvironmentAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IEnvironment,
+	that ourtypes.IEnvironment,
 ) (err error) {
 	err = finishProperty(
 		"AssetAdministrationShells()",
@@ -10382,7 +10382,7 @@ func writeEnvironmentAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IEmbeddedDataSpecification]
+// of [ourtypes.IEmbeddedDataSpecification]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10391,7 +10391,7 @@ func writeEnvironmentAsSequence(
 // Do not flush.
 func writeEmbeddedDataSpecificationAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IEmbeddedDataSpecification,
+	that ourtypes.IEmbeddedDataSpecification,
 ) (err error) {
 	err = finishProperty(
 		"DataSpecification()",
@@ -10412,7 +10412,7 @@ func writeEmbeddedDataSpecificationAsSequence(
 			encoder,
 			"dataSpecificationContent",
 			that.DataSpecificationContent(),
-			writeInstance[aastypes.IDataSpecificationContent],
+			writeInstance[ourtypes.IDataSpecificationContent],
 		),
 	)
 	if err != nil {
@@ -10423,15 +10423,15 @@ func writeEmbeddedDataSpecificationAsSequence(
 }
 
 // Write the `value` of a property as string representation
-// of [aastypes.DataTypeIEC61360]
+// of [ourtypes.DataTypeIEC61360]
 // in a text element.
 //
 // Do not flush.
 func writeAsText_DataTypeIEC61360(
 	encoder *xml.Encoder,
-	value aastypes.DataTypeIEC61360,
+	value ourtypes.DataTypeIEC61360,
 ) (err error) {
-	text, ok := aasstringification.DataTypeIEC61360ToString(
+	text, ok := ourstringification.DataTypeIEC61360ToString(
 		value,
 	)
 	if !ok {
@@ -10449,7 +10449,7 @@ func writeAsText_DataTypeIEC61360(
 }
 
 // Serialize the instance
-// of [aastypes.ILevelType]
+// of [ourtypes.ILevelType]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10458,7 +10458,7 @@ func writeAsText_DataTypeIEC61360(
 // Do not flush.
 func writeLevelTypeAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILevelType,
+	that ourtypes.ILevelType,
 ) (err error) {
 	err = finishProperty(
 		"Min()",
@@ -10504,7 +10504,7 @@ func writeLevelTypeAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IValueReferencePair]
+// of [ourtypes.IValueReferencePair]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10513,7 +10513,7 @@ func writeLevelTypeAsSequence(
 // Do not flush.
 func writeValueReferencePairAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IValueReferencePair,
+	that ourtypes.IValueReferencePair,
 ) (err error) {
 	err = finishProperty(
 		"Value()",
@@ -10539,7 +10539,7 @@ func writeValueReferencePairAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IValueList]
+// of [ourtypes.IValueList]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10548,7 +10548,7 @@ func writeValueReferencePairAsSequence(
 // Do not flush.
 func writeValueListAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IValueList,
+	that ourtypes.IValueList,
 ) (err error) {
 	err = finishProperty(
 		"ValueReferencePairs()",
@@ -10567,7 +10567,7 @@ func writeValueListAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ILangStringPreferredNameTypeIEC61360]
+// of [ourtypes.ILangStringPreferredNameTypeIEC61360]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10576,7 +10576,7 @@ func writeValueListAsSequence(
 // Do not flush.
 func writeLangStringPreferredNameTypeIEC61360AsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILangStringPreferredNameTypeIEC61360,
+	that ourtypes.ILangStringPreferredNameTypeIEC61360,
 ) (err error) {
 	err = finishProperty(
 		"Language()",
@@ -10602,7 +10602,7 @@ func writeLangStringPreferredNameTypeIEC61360AsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ILangStringShortNameTypeIEC61360]
+// of [ourtypes.ILangStringShortNameTypeIEC61360]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10611,7 +10611,7 @@ func writeLangStringPreferredNameTypeIEC61360AsSequence(
 // Do not flush.
 func writeLangStringShortNameTypeIEC61360AsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILangStringShortNameTypeIEC61360,
+	that ourtypes.ILangStringShortNameTypeIEC61360,
 ) (err error) {
 	err = finishProperty(
 		"Language()",
@@ -10637,7 +10637,7 @@ func writeLangStringShortNameTypeIEC61360AsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ILangStringDefinitionTypeIEC61360]
+// of [ourtypes.ILangStringDefinitionTypeIEC61360]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10646,7 +10646,7 @@ func writeLangStringShortNameTypeIEC61360AsSequence(
 // Do not flush.
 func writeLangStringDefinitionTypeIEC61360AsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ILangStringDefinitionTypeIEC61360,
+	that ourtypes.ILangStringDefinitionTypeIEC61360,
 ) (err error) {
 	err = finishProperty(
 		"Language()",
@@ -10672,7 +10672,7 @@ func writeLangStringDefinitionTypeIEC61360AsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IDataSpecificationIEC61360]
+// of [ourtypes.IDataSpecificationIEC61360]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -10681,7 +10681,7 @@ func writeLangStringDefinitionTypeIEC61360AsSequence(
 // Do not flush.
 func writeDataSpecificationIEC61360AsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IDataSpecificationIEC61360,
+	that ourtypes.IDataSpecificationIEC61360,
 ) (err error) {
 	err = finishProperty(
 		"PreferredName()",
@@ -10826,300 +10826,300 @@ func writeDataSpecificationIEC61360AsSequence(
 // to [Namespace].
 func writeClass(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeExtension:
+	case ourtypes.ModelTypeExtension:
 		err = writeClassElement(
 			encoder,
 			"extension",
 			withNamespace,
-			that.(aastypes.IExtension),
+			that.(ourtypes.IExtension),
 			writeExtensionAsSequence,
 		)
-	case aastypes.ModelTypeAdministrativeInformation:
+	case ourtypes.ModelTypeAdministrativeInformation:
 		err = writeClassElement(
 			encoder,
 			"administrativeInformation",
 			withNamespace,
-			that.(aastypes.IAdministrativeInformation),
+			that.(ourtypes.IAdministrativeInformation),
 			writeAdministrativeInformationAsSequence,
 		)
-	case aastypes.ModelTypeQualifier:
+	case ourtypes.ModelTypeQualifier:
 		err = writeClassElement(
 			encoder,
 			"qualifier",
 			withNamespace,
-			that.(aastypes.IQualifier),
+			that.(ourtypes.IQualifier),
 			writeQualifierAsSequence,
 		)
-	case aastypes.ModelTypeAssetAdministrationShell:
+	case ourtypes.ModelTypeAssetAdministrationShell:
 		err = writeClassElement(
 			encoder,
 			"assetAdministrationShell",
 			withNamespace,
-			that.(aastypes.IAssetAdministrationShell),
+			that.(ourtypes.IAssetAdministrationShell),
 			writeAssetAdministrationShellAsSequence,
 		)
-	case aastypes.ModelTypeAssetInformation:
+	case ourtypes.ModelTypeAssetInformation:
 		err = writeClassElement(
 			encoder,
 			"assetInformation",
 			withNamespace,
-			that.(aastypes.IAssetInformation),
+			that.(ourtypes.IAssetInformation),
 			writeAssetInformationAsSequence,
 		)
-	case aastypes.ModelTypeResource:
+	case ourtypes.ModelTypeResource:
 		err = writeClassElement(
 			encoder,
 			"resource",
 			withNamespace,
-			that.(aastypes.IResource),
+			that.(ourtypes.IResource),
 			writeResourceAsSequence,
 		)
-	case aastypes.ModelTypeSpecificAssetID:
+	case ourtypes.ModelTypeSpecificAssetID:
 		err = writeClassElement(
 			encoder,
 			"specificAssetId",
 			withNamespace,
-			that.(aastypes.ISpecificAssetID),
+			that.(ourtypes.ISpecificAssetID),
 			writeSpecificAssetIDAsSequence,
 		)
-	case aastypes.ModelTypeSubmodel:
+	case ourtypes.ModelTypeSubmodel:
 		err = writeClassElement(
 			encoder,
 			"submodel",
 			withNamespace,
-			that.(aastypes.ISubmodel),
+			that.(ourtypes.ISubmodel),
 			writeSubmodelAsSequence,
 		)
-	case aastypes.ModelTypeRelationshipElement:
+	case ourtypes.ModelTypeRelationshipElement:
 		err = writeClassElement(
 			encoder,
 			"relationshipElement",
 			withNamespace,
-			that.(aastypes.IRelationshipElement),
+			that.(ourtypes.IRelationshipElement),
 			writeRelationshipElementAsSequence,
 		)
-	case aastypes.ModelTypeSubmodelElementList:
+	case ourtypes.ModelTypeSubmodelElementList:
 		err = writeClassElement(
 			encoder,
 			"submodelElementList",
 			withNamespace,
-			that.(aastypes.ISubmodelElementList),
+			that.(ourtypes.ISubmodelElementList),
 			writeSubmodelElementListAsSequence,
 		)
-	case aastypes.ModelTypeSubmodelElementCollection:
+	case ourtypes.ModelTypeSubmodelElementCollection:
 		err = writeClassElement(
 			encoder,
 			"submodelElementCollection",
 			withNamespace,
-			that.(aastypes.ISubmodelElementCollection),
+			that.(ourtypes.ISubmodelElementCollection),
 			writeSubmodelElementCollectionAsSequence,
 		)
-	case aastypes.ModelTypeProperty:
+	case ourtypes.ModelTypeProperty:
 		err = writeClassElement(
 			encoder,
 			"property",
 			withNamespace,
-			that.(aastypes.IProperty),
+			that.(ourtypes.IProperty),
 			writePropertyAsSequence,
 		)
-	case aastypes.ModelTypeMultiLanguageProperty:
+	case ourtypes.ModelTypeMultiLanguageProperty:
 		err = writeClassElement(
 			encoder,
 			"multiLanguageProperty",
 			withNamespace,
-			that.(aastypes.IMultiLanguageProperty),
+			that.(ourtypes.IMultiLanguageProperty),
 			writeMultiLanguagePropertyAsSequence,
 		)
-	case aastypes.ModelTypeRange:
+	case ourtypes.ModelTypeRange:
 		err = writeClassElement(
 			encoder,
 			"range",
 			withNamespace,
-			that.(aastypes.IRange),
+			that.(ourtypes.IRange),
 			writeRangeAsSequence,
 		)
-	case aastypes.ModelTypeReferenceElement:
+	case ourtypes.ModelTypeReferenceElement:
 		err = writeClassElement(
 			encoder,
 			"referenceElement",
 			withNamespace,
-			that.(aastypes.IReferenceElement),
+			that.(ourtypes.IReferenceElement),
 			writeReferenceElementAsSequence,
 		)
-	case aastypes.ModelTypeBlob:
+	case ourtypes.ModelTypeBlob:
 		err = writeClassElement(
-			encoder, "blob", withNamespace, that.(aastypes.IBlob), writeBlobAsSequence,
+			encoder, "blob", withNamespace, that.(ourtypes.IBlob), writeBlobAsSequence,
 		)
-	case aastypes.ModelTypeFile:
+	case ourtypes.ModelTypeFile:
 		err = writeClassElement(
-			encoder, "file", withNamespace, that.(aastypes.IFile), writeFileAsSequence,
+			encoder, "file", withNamespace, that.(ourtypes.IFile), writeFileAsSequence,
 		)
-	case aastypes.ModelTypeAnnotatedRelationshipElement:
+	case ourtypes.ModelTypeAnnotatedRelationshipElement:
 		err = writeClassElement(
 			encoder,
 			"annotatedRelationshipElement",
 			withNamespace,
-			that.(aastypes.IAnnotatedRelationshipElement),
+			that.(ourtypes.IAnnotatedRelationshipElement),
 			writeAnnotatedRelationshipElementAsSequence,
 		)
-	case aastypes.ModelTypeEntity:
+	case ourtypes.ModelTypeEntity:
 		err = writeClassElement(
 			encoder,
 			"entity",
 			withNamespace,
-			that.(aastypes.IEntity),
+			that.(ourtypes.IEntity),
 			writeEntityAsSequence,
 		)
-	case aastypes.ModelTypeEventPayload:
+	case ourtypes.ModelTypeEventPayload:
 		err = writeClassElement(
 			encoder,
 			"eventPayload",
 			withNamespace,
-			that.(aastypes.IEventPayload),
+			that.(ourtypes.IEventPayload),
 			writeEventPayloadAsSequence,
 		)
-	case aastypes.ModelTypeBasicEventElement:
+	case ourtypes.ModelTypeBasicEventElement:
 		err = writeClassElement(
 			encoder,
 			"basicEventElement",
 			withNamespace,
-			that.(aastypes.IBasicEventElement),
+			that.(ourtypes.IBasicEventElement),
 			writeBasicEventElementAsSequence,
 		)
-	case aastypes.ModelTypeOperation:
+	case ourtypes.ModelTypeOperation:
 		err = writeClassElement(
 			encoder,
 			"operation",
 			withNamespace,
-			that.(aastypes.IOperation),
+			that.(ourtypes.IOperation),
 			writeOperationAsSequence,
 		)
-	case aastypes.ModelTypeOperationVariable:
+	case ourtypes.ModelTypeOperationVariable:
 		err = writeClassElement(
 			encoder,
 			"operationVariable",
 			withNamespace,
-			that.(aastypes.IOperationVariable),
+			that.(ourtypes.IOperationVariable),
 			writeOperationVariableAsSequence,
 		)
-	case aastypes.ModelTypeCapability:
+	case ourtypes.ModelTypeCapability:
 		err = writeClassElement(
 			encoder,
 			"capability",
 			withNamespace,
-			that.(aastypes.ICapability),
+			that.(ourtypes.ICapability),
 			writeCapabilityAsSequence,
 		)
-	case aastypes.ModelTypeConceptDescription:
+	case ourtypes.ModelTypeConceptDescription:
 		err = writeClassElement(
 			encoder,
 			"conceptDescription",
 			withNamespace,
-			that.(aastypes.IConceptDescription),
+			that.(ourtypes.IConceptDescription),
 			writeConceptDescriptionAsSequence,
 		)
-	case aastypes.ModelTypeReference:
+	case ourtypes.ModelTypeReference:
 		err = writeClassElement(
 			encoder,
 			"reference",
 			withNamespace,
-			that.(aastypes.IReference),
+			that.(ourtypes.IReference),
 			writeReferenceAsSequence,
 		)
-	case aastypes.ModelTypeKey:
+	case ourtypes.ModelTypeKey:
 		err = writeClassElement(
-			encoder, "key", withNamespace, that.(aastypes.IKey), writeKeyAsSequence,
+			encoder, "key", withNamespace, that.(ourtypes.IKey), writeKeyAsSequence,
 		)
-	case aastypes.ModelTypeLangStringNameType:
+	case ourtypes.ModelTypeLangStringNameType:
 		err = writeClassElement(
 			encoder,
 			"langStringNameType",
 			withNamespace,
-			that.(aastypes.ILangStringNameType),
+			that.(ourtypes.ILangStringNameType),
 			writeLangStringNameTypeAsSequence,
 		)
-	case aastypes.ModelTypeLangStringTextType:
+	case ourtypes.ModelTypeLangStringTextType:
 		err = writeClassElement(
 			encoder,
 			"langStringTextType",
 			withNamespace,
-			that.(aastypes.ILangStringTextType),
+			that.(ourtypes.ILangStringTextType),
 			writeLangStringTextTypeAsSequence,
 		)
-	case aastypes.ModelTypeEnvironment:
+	case ourtypes.ModelTypeEnvironment:
 		err = writeClassElement(
 			encoder,
 			"environment",
 			withNamespace,
-			that.(aastypes.IEnvironment),
+			that.(ourtypes.IEnvironment),
 			writeEnvironmentAsSequence,
 		)
-	case aastypes.ModelTypeEmbeddedDataSpecification:
+	case ourtypes.ModelTypeEmbeddedDataSpecification:
 		err = writeClassElement(
 			encoder,
 			"embeddedDataSpecification",
 			withNamespace,
-			that.(aastypes.IEmbeddedDataSpecification),
+			that.(ourtypes.IEmbeddedDataSpecification),
 			writeEmbeddedDataSpecificationAsSequence,
 		)
-	case aastypes.ModelTypeLevelType:
+	case ourtypes.ModelTypeLevelType:
 		err = writeClassElement(
 			encoder,
 			"levelType",
 			withNamespace,
-			that.(aastypes.ILevelType),
+			that.(ourtypes.ILevelType),
 			writeLevelTypeAsSequence,
 		)
-	case aastypes.ModelTypeValueReferencePair:
+	case ourtypes.ModelTypeValueReferencePair:
 		err = writeClassElement(
 			encoder,
 			"valueReferencePair",
 			withNamespace,
-			that.(aastypes.IValueReferencePair),
+			that.(ourtypes.IValueReferencePair),
 			writeValueReferencePairAsSequence,
 		)
-	case aastypes.ModelTypeValueList:
+	case ourtypes.ModelTypeValueList:
 		err = writeClassElement(
 			encoder,
 			"valueList",
 			withNamespace,
-			that.(aastypes.IValueList),
+			that.(ourtypes.IValueList),
 			writeValueListAsSequence,
 		)
-	case aastypes.ModelTypeLangStringPreferredNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringPreferredNameTypeIEC61360:
 		err = writeClassElement(
 			encoder,
 			"langStringPreferredNameTypeIec61360",
 			withNamespace,
-			that.(aastypes.ILangStringPreferredNameTypeIEC61360),
+			that.(ourtypes.ILangStringPreferredNameTypeIEC61360),
 			writeLangStringPreferredNameTypeIEC61360AsSequence,
 		)
-	case aastypes.ModelTypeLangStringShortNameTypeIEC61360:
+	case ourtypes.ModelTypeLangStringShortNameTypeIEC61360:
 		err = writeClassElement(
 			encoder,
 			"langStringShortNameTypeIec61360",
 			withNamespace,
-			that.(aastypes.ILangStringShortNameTypeIEC61360),
+			that.(ourtypes.ILangStringShortNameTypeIEC61360),
 			writeLangStringShortNameTypeIEC61360AsSequence,
 		)
-	case aastypes.ModelTypeLangStringDefinitionTypeIEC61360:
+	case ourtypes.ModelTypeLangStringDefinitionTypeIEC61360:
 		err = writeClassElement(
 			encoder,
 			"langStringDefinitionTypeIec61360",
 			withNamespace,
-			that.(aastypes.ILangStringDefinitionTypeIEC61360),
+			that.(ourtypes.ILangStringDefinitionTypeIEC61360),
 			writeLangStringDefinitionTypeIEC61360AsSequence,
 		)
-	case aastypes.ModelTypeDataSpecificationIEC61360:
+	case ourtypes.ModelTypeDataSpecificationIEC61360:
 		err = writeClassElement(
 			encoder,
 			"dataSpecificationIec61360",
 			withNamespace,
-			that.(aastypes.IDataSpecificationIEC61360),
+			that.(ourtypes.IDataSpecificationIEC61360),
 			writeDataSpecificationIEC61360AsSequence,
 		)
 	default:
@@ -11139,7 +11139,7 @@ func writeClass(
 // to [Namespace].
 func Marshal(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	err = writeClass(encoder, that, withNamespace)

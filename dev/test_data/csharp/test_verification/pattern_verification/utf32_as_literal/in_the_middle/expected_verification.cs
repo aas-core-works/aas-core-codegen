@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummyNamespace;  // renamed
+using Our = dummyNamespace;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -58,7 +58,7 @@ namespace dummyNamespace
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {

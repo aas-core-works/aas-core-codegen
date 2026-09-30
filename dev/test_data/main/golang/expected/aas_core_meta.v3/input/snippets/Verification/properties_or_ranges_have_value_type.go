@@ -1,18 +1,18 @@
-// Check that `elements` which are [aastypes.IProperty] or [aastypes.IRange]
+// Check that `elements` which are [ourtypes.IProperty] or [ourtypes.IRange]
 // have the given `valueType`.
-func PropertiesOrRangesHaveValueType[E aastypes.ISubmodelElement](
+func PropertiesOrRangesHaveValueType[E ourtypes.ISubmodelElement](
 	elements []E,
-	valueType aastypes.DataTypeDefXSD,
+	valueType ourtypes.DataTypeDefXSD,
 ) bool {
 	for _, element := range elements {
 		switch element.ModelType() {
-		case aastypes.ModelTypeProperty:
-			prop := any(element).(aastypes.IProperty)
+		case ourtypes.ModelTypeProperty:
+			prop := any(element).(ourtypes.IProperty)
 			if prop.ValueType() != valueType {
 				return false
 			}
-		case aastypes.ModelTypeRange:
-			rng := any(element).(aastypes.IRange)
+		case ourtypes.ModelTypeRange:
+			rng := any(element).(ourtypes.IRange)
 			if rng.ValueType() != valueType {
 				return false
 			}

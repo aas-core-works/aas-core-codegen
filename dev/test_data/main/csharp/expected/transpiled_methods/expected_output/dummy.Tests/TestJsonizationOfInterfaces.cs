@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,20 +14,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IItem_from_First()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalFirst();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalFirst();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IItemFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IItemFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {
@@ -43,20 +43,20 @@ namespace dummy.Tests
         [Test]
         public void Test_round_trip_IItem_from_Second()
         {
-            var instance = Aas.Tests.CommonJsonization.LoadMaximalSecond();
+            var instance = Our.Tests.CommonJsonization.LoadMaximalSecond();
 
-            var jsonObject = Aas.Jsonization.Serialize.ToJsonObject(instance);
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
 
-            var anotherInstance = Aas.Jsonization.Deserialize.IItemFrom(
+            var anotherInstance = Our.Jsonization.Deserialize.IItemFrom(
                 jsonObject);
 
-            var anotherJsonObject = Aas.Jsonization.Serialize.ToJsonObject(
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
                 anotherInstance);
 
-            Aas.Tests.CommonJson.CheckJsonNodesEqual(
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
                 jsonObject,
                 anotherJsonObject,
-                out Aas.Reporting.Error? error);
+                out Our.Reporting.Error? error);
 
             if (error != null)
             {

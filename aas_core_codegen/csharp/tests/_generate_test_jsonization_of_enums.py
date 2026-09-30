@@ -53,10 +53,10 @@ public void Test_round_trip_{enum_name}()
 {III}?? throw new System.InvalidOperationException(
 {IIII}"Unexpected null node");
 
-{I}var parsed = Aas.Jsonization.Deserialize.{enum_name}From(
+{I}var parsed = Our.Jsonization.Deserialize.{enum_name}From(
 {II}node);
 
-{I}var serialized = Aas.Jsonization.Serialize.{enum_name}ToJsonValue(
+{I}var serialized = Our.Jsonization.Serialize.{enum_name}ToJsonValue(
 {II}parsed);
 
 {I}Assert.AreEqual(
@@ -71,7 +71,7 @@ public void Test_round_trip_{enum_name}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using Nodes = System.Text.Json.Nodes;
 

@@ -22,7 +22,7 @@ package types
 // Do NOT edit or append.
 
 import (
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -35,7 +35,7 @@ const (
 	ModelTypeCollection
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -168,7 +168,7 @@ type ISomething interface {
 	) bool;
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -319,14 +319,14 @@ func (s *Something) OptionalTextsAreUniqueIgnoring(
 	var seen map[string]struct{} = make(map[string]struct{})
 	for _, text := range s.OptionalTexts() {
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				ignored,
 				text,
 			)) {
 			continue
 		}
 		if (
-			aascommon.MapContains(
+			ourcommon.MapContains(
 				seen,
 				text,
 			)) {
@@ -444,7 +444,7 @@ type ICollection interface {
 	) bool;
 }
 
-// Check whether the instance corresponds to [aastypes.ICollection]
+// Check whether the instance corresponds to [ourtypes.ICollection]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -555,7 +555,7 @@ func (c *Collection) TextsAreNotAllIn(
 ) bool {
 	return len(c.Texts()) == 0 ||
 		len(
-			aascommon.SetDifference(
+			ourcommon.SetDifference(
 				c.Texts(),
 				others,
 			),

@@ -12,7 +12,7 @@
 
 #include <fstream>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -25,16 +25,16 @@ std::shared_ptr<
 ) {
   std::ifstream ifs(path);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > instance = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > instance = our::xmlization::From(
     ifs
   );
 
   if (ifs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read XML from ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -44,13 +44,13 @@ std::shared_ptr<
 
   if (!instance.has_value()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to parse the instance from the XML file ",
         path.string(),
         ": ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     );
   }
@@ -143,7 +143,7 @@ struct OurData {
   }
 };  // struct OurData
 
-aas::common::expected<
+our::common::expected<
   std::string,
   std::string
 > EscapeForXmlAttribute(const std::string_view& text) {
@@ -161,7 +161,7 @@ aas::common::expected<
       case '"':size += sizeof("&quot;");
         break;
       case '\0':
-        return aas::common::unexpected<std::string>(
+        return our::common::unexpected<std::string>(
           "Unexpected zero character in the text to be escaped "
           "for XML attribute. The XML format does not allow zero characters, "
           "not even in escaped form."
@@ -187,7 +187,7 @@ aas::common::expected<
   return result;
 }
 
-aas::common::expected<
+our::common::expected<
   std::string,
   std::string
 > EscapeForXmlText(const std::string_view& text) {
@@ -206,7 +206,7 @@ aas::common::expected<
       case '"':size += sizeof("&quot;");
         break;
       case '\0':
-        return aas::common::unexpected(
+        return our::common::unexpected(
           "Unexpected zero character in the text to be escaped "
           "for XML attribute. The XML format does not allow zero characters, "
           "not even in escaped form."
@@ -265,7 +265,7 @@ void XMLCALL OnStartElement(
     const char* attribute_name = attributes[i];
     const char* attribute_value = attributes[i + 1];
 
-    aas::common::expected<
+    our::common::expected<
       std::string,
       std::string
     > escaped = EscapeForXmlAttribute(
@@ -290,7 +290,7 @@ void XMLCALL OnStartElement(
   ss << ">";
 
   our_data->nodes.emplace_back(
-    aas::common::make_unique<StartNode>(
+    our::common::make_unique<StartNode>(
       name,
       ss.str()
     )
@@ -312,9 +312,9 @@ void XMLCALL OnStopElement(
   }
 
   our_data->nodes.emplace_back(
-    aas::common::make_unique<StopNode>(
+    our::common::make_unique<StopNode>(
       name,
-      aas::common::Concat(
+      our::common::Concat(
         "</", name, ">"
       )
     )
@@ -336,7 +336,7 @@ void XMLCALL OnText(
     return;
   }
 
-  aas::common::expected<
+  our::common::expected<
     std::string,
     std::string
   > escaped = EscapeForXmlText(std::string_view(val, len));
@@ -348,7 +348,7 @@ void XMLCALL OnText(
   }
 
   our_data->nodes.emplace_back(
-    aas::common::make_unique<TextNode>(
+    our::common::make_unique<TextNode>(
       std::move(*escaped)
     )
   );
@@ -509,7 +509,7 @@ std::string CanonicalizeXml(
   XML_Parser parser = XML_ParserCreateNS(nullptr, namespace_separator);
 
   std::unique_ptr<canonicalizer::OurData> our_data(
-    aas::common::make_unique<canonicalizer::OurData>(
+    our::common::make_unique<canonicalizer::OurData>(
       parser
     )
   );
@@ -549,7 +549,7 @@ std::string CanonicalizeXml(
     }
 
     throw std::invalid_argument(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to parse XML for canonicalization: ",
         std::to_string(XML_GetCurrentLineNumber(parser)),
         ":",
@@ -592,16 +592,16 @@ std::shared_ptr<
 ) {
   std::ifstream ifs(path, std::ios::binary);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ifs
   );
 
   if (ifs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "The file stream is in the bad mode after "
         "reading and parsing the file as XML: ",
         path.string()
@@ -611,15 +611,15 @@ std::shared_ptr<
 
   if (!deserialized.has_value()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to de-serialize from ",
         path.string(),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().path.ToWstring()
         ),
         ": ",
-        aas::common::WstringToUtf8(
+        our::common::WstringToUtf8(
           deserialized.error().cause
         )
       )

@@ -8,7 +8,7 @@
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasTypes from "../src/types";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";
 
@@ -20,7 +20,7 @@ import * as TestCommonJsonization from "./commonJsonization";
  * @param expectedPath - path to the golden trace
  */
 function compareOrRecordTrace(
-  instance: AasTypes.Class,
+  instance: OurTypes.Class,
   expectedPath: string
 ) {
   const lines = new Array<string>();

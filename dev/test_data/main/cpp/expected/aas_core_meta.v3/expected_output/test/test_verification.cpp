@@ -10,27 +10,27 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 void AssertNoVerificationError(
   const std::filesystem::path& xml_path
 ) {
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > instance(
     test::common::xmlization::MustDeserializeFile(xml_path)
   );
 
   std::vector<std::string> error_messages;
   for (
-    const aas::verification::Error &error
-    : aas::verification::RecursiveVerification(instance)
+    const our::verification::Error &error
+    : our::verification::RecursiveVerification(instance)
   ) {
     error_messages.emplace_back(
-      aas::common::Concat(
-        aas::common::WstringToUtf8(error.path.ToWstring()),
+      our::common::Concat(
+        our::common::WstringToUtf8(error.path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(error.cause)
+        our::common::WstringToUtf8(error.cause)
       )
     );
   }
@@ -48,7 +48,7 @@ void AssertNoVerificationError(
 }
 
 const std::filesystem::path& DetermineXmlDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "Xml";
   }
@@ -57,7 +57,7 @@ const std::filesystem::path& DetermineXmlDir() {
 }
 
 const std::filesystem::path& DetermineErrorDir() {
-  static aas::common::optional<std::filesystem::path> result;
+  static our::common::optional<std::filesystem::path> result;
   if (!result.has_value()) {
     result = test::common::DetermineTestDataDir() / "VerificationError";
   }
@@ -71,21 +71,21 @@ void AssertVerificationFailure(
 ) {
   std::ifstream ifs(path, std::ios::binary);
 
-  aas::common::expected<
-    std::shared_ptr<aas::types::IClass>,
-    aas::xmlization::DeserializationError
-  > deserialized = aas::xmlization::From(
+  our::common::expected<
+    std::shared_ptr<our::types::IClass>,
+    our::xmlization::DeserializationError
+  > deserialized = our::xmlization::From(
     ifs
   );
 
   if (!deserialized.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected to de-serialize ",
         path.string(),
         ", but the de-serialization failed: ",
-        aas::common::WstringToUtf8(deserialized.error().path.ToWstring()),
-        aas::common::WstringToUtf8(deserialized.error().cause)
+        our::common::WstringToUtf8(deserialized.error().path.ToWstring()),
+        our::common::WstringToUtf8(deserialized.error().cause)
       )
     )
     REQUIRE(!deserialized.has_value());
@@ -93,21 +93,21 @@ void AssertVerificationFailure(
 
   std::vector<std::string> error_messages;
   for (
-    const aas::verification::Error& error
-    : aas::verification::RecursiveVerification(deserialized.value())
+    const our::verification::Error& error
+    : our::verification::RecursiveVerification(deserialized.value())
     ) {
     error_messages.emplace_back(
-      aas::common::Concat(
-        aas::common::WstringToUtf8(error.path.ToWstring()),
+      our::common::Concat(
+        our::common::WstringToUtf8(error.path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(error.cause)
+        our::common::WstringToUtf8(error.cause)
       )
     );
   }
 
   if (error_messages.empty()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected error messages from ",
         path.string(),
         ", but got none"

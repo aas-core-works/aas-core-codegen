@@ -43,7 +43,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
  * the language of the meta-model specifications. Hence, it strips
  * the characters (code points) rather than the UTF-16 code units.
  *
- * The built-in `int` is transpiled to `AasCommon.parseSafeInt`, which is
+ * The built-in `int` is transpiled to `OurCommon.parseSafeInt`, which is
  * stricter than the Python `int`. It accepts only an optional sign followed by
  * the ASCII digits, and only the safe integers, *i.e.*, the integers within
  * `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`. Otherwise, it throws.
@@ -54,7 +54,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
         typescript_common.WARNING,
     ]  # type: List[Stripped]
 
-    blocks.append(Stripped('import * as AasCommon from "../src/common";'))
+    blocks.append(Stripped('import * as OurCommon from "../src/common";'))
 
     if intermediate_uses.lstrip_call(symbol_table):
         for text, chars, expected in tests_common.LSTRIP_CASES:
@@ -70,7 +70,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
                 Stripped(
                     f"""\
 test({title}, () => {{
-{I}expect(AasCommon.lstrip({text_literal}, {chars_literal})).toStrictEqual(
+{I}expect(OurCommon.lstrip({text_literal}, {chars_literal})).toStrictEqual(
 {II}{expected_literal}
 {I});
 }});"""
@@ -93,7 +93,7 @@ test({title}, () => {{
                 Stripped(
                     f"""\
 test({title}, () => {{
-{I}expect(AasCommon.parseSafeInt({text_literal})).toBe(
+{I}expect(OurCommon.parseSafeInt({text_literal})).toBe(
 {II}{expected_literal}
 {I});
 }});"""
@@ -109,7 +109,7 @@ test({title}, () => {{
                 Stripped(
                     f"""\
 test({title}, () => {{
-{I}expect(() => AasCommon.parseSafeInt({text_literal})).toThrow();
+{I}expect(() => OurCommon.parseSafeInt({text_literal})).toThrow();
 }});"""
                 )
             )

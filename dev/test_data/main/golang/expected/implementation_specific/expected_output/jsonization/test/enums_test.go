@@ -6,7 +6,7 @@ package jsonization_test
 import (
 	"fmt"
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
 )
 
 func TestColorRoundTripOK(t *testing.T) {
@@ -19,7 +19,7 @@ func TestColorRoundTripOK(t *testing.T) {
 		source := fmt.Sprintf("<string literal %s>", literal)
 		jsonable := any(literal)
 
-		deserialized, deseriaErr := aasjsonization.ColorFromJsonable(
+		deserialized, deseriaErr := ourjsonization.ColorFromJsonable(
 			jsonable,
 		)
 		ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -28,7 +28,7 @@ func TestColorRoundTripOK(t *testing.T) {
 		}
 
 		anotherJsonable, seriaErr :=
-			aasjsonization.ColorToJsonable(deserialized)
+			ourjsonization.ColorToJsonable(deserialized)
 		ok = assertNoSerializationError(t, seriaErr, source)
 		if !ok {
 			return
@@ -49,7 +49,7 @@ func TestColorRoundTripOK(t *testing.T) {
 func TestColorDeserializationFail(t *testing.T) {
 	jsonable := any("THIS-CANNOT-POSSIBLY-BE-VALID")
 
-	_, err := aasjsonization.ColorFromJsonable(
+	_, err := ourjsonization.ColorFromJsonable(
 		jsonable,
 	)
 
@@ -58,7 +58,7 @@ func TestColorDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

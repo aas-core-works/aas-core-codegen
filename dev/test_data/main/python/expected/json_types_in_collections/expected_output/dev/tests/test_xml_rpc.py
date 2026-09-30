@@ -13,16 +13,16 @@ import unittest
 import xml.etree.ElementTree
 from typing import Any, cast, Iterator, List, Mapping, Tuple
 
-import dummy.types as aas_types
-import dummy.xmlcommon as aas_xmlcommon
-import dummy.xmlrpc as aas_xmlrpc
+import dummy.types as our_types
+import dummy.xmlcommon as our_xmlcommon
+import dummy.xmlrpc as our_xmlrpc
 
 
 def _enter(
         text: str
 ) -> Tuple[
-        aas_xmlcommon.Element,
-        Iterator[Tuple[str, aas_xmlcommon.Element]]
+        our_xmlcommon.Element,
+        Iterator[Tuple[str, our_xmlcommon.Element]]
 ]:
     """
     Parse :paramref:`text` and consume the start event of its root element.
@@ -48,7 +48,7 @@ def _enter(
 class TestReading(unittest.TestCase):
     def test_a_value_round_trips_through_every_discriminator(self) -> None:
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}"><struct xmlns="">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}"><struct xmlns="">'
             f'<member><name>b</name><value><boolean>1</boolean></value></member>'
             f'<member><name>n</name><value><double>1</double></value></member>'
             f'<member><name>f</name><value><double>1.5</double></value></member>'
@@ -61,7 +61,7 @@ class TestReading(unittest.TestCase):
 
         self.assertEqual(
             {"b": True, "n": 1.0, "f": 1.5, "s": "x", "a": [0.0]},
-            aas_xmlrpc.read_value_content(element, iterator)
+            our_xmlrpc.read_value_content(element, iterator)
         )
 
     def test_a_discriminator_in_the_document_namespace_is_refused(self) -> None:
@@ -70,13 +70,13 @@ class TestReading(unittest.TestCase):
         # which inherits the namespace of the enclosing document is no
         # discriminator of ours.
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}"><boolean>1</boolean></v>'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}"><boolean>1</boolean></v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_value_content(element, iterator)
+            our_xmlrpc.read_value_content(element, iterator)
 
         self.assertIn(
             'Expected the element in no namespace', context.exception.cause
@@ -88,25 +88,25 @@ class TestReading(unittest.TestCase):
         # whether or not its text carries a fraction.
         for text, expected in (('1', 1.0), ('1.0', 1.0), ('1e1', 10.0)):
             element, iterator = _enter(
-                f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+                f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
                 f'<double xmlns="">{text}</double></v>'
             )
 
-            value = aas_xmlrpc.read_value_content(element, iterator)
+            value = our_xmlrpc.read_value_content(element, iterator)
 
             self.assertEqual(expected, value, f"for the text {text!r}")
             self.assertIs(float, type(value), f"for the text {text!r}")
 
     def test_the_discriminator_is_a_step_of_the_path(self) -> None:
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
             f'<boolean xmlns="">yes</boolean></v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_value_content(element, iterator)
+            our_xmlrpc.read_value_content(element, iterator)
 
         self.assertEqual('boolean', str(context.exception.path))
 
@@ -115,20 +115,20 @@ class TestReading(unittest.TestCase):
         # It is this very element which does not belong here, so naming it in
         # the path as well as in the message would say nothing more.
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}"><oops xmlns=""/></v>'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}"><oops xmlns=""/></v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_value_content(element, iterator)
+            our_xmlrpc.read_value_content(element, iterator)
 
         self.assertEqual('', str(context.exception.path))
         self.assertIn('but got: ', context.exception.cause)
 
     def test_the_path_into_a_nested_value(self) -> None:
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}"><struct xmlns="">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}"><struct xmlns="">'
             f'<member><name>nested</name><value><array><data>'
             f'<value><double>0</double></value>'
             f'<value><string><oops/></string></value>'
@@ -137,9 +137,9 @@ class TestReading(unittest.TestCase):
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_value_content(element, iterator)
+            our_xmlrpc.read_value_content(element, iterator)
 
         self.assertEqual(
             'struct/member[name="nested"]/value/array/data/*[1]/string',
@@ -151,15 +151,15 @@ class TestReading(unittest.TestCase):
         # A ``JSONArray`` property is represented by a <data> element directly,
         # with no <array> element around it, so the path has none either.
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}"><data xmlns="">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}"><data xmlns="">'
             f'<value><boolean>yes</boolean></value>'
             f'</data></v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_array_body(element, iterator)
+            our_xmlrpc.read_array_body(element, iterator)
 
         self.assertEqual('data/*[0]/boolean', str(context.exception.path))
 
@@ -168,15 +168,15 @@ class TestReading(unittest.TestCase):
         # A ``JSONObject`` property is represented by its <member> elements
         # directly, with no <struct> element around them.
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
             f'<member xmlns=""><name>k</name><value><oops/></value></member>'
             f'</v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_struct_body(element, iterator)
+            our_xmlrpc.read_struct_body(element, iterator)
 
         self.assertEqual(
             'member[name="k"]/value', str(context.exception.path)
@@ -184,15 +184,15 @@ class TestReading(unittest.TestCase):
 
     def test_the_key_of_a_member_is_escaped_in_the_path(self) -> None:
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
             f'<member xmlns=""><name>a&amp;b/c&lt;d</name><value><oops/></value></member>'
             f'</v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_struct_body(element, iterator)
+            our_xmlrpc.read_struct_body(element, iterator)
 
         self.assertEqual(
             'member[name="a&amp;b&#47;c&lt;d"]/value',
@@ -201,16 +201,16 @@ class TestReading(unittest.TestCase):
 
     def test_a_repeated_member_is_refused(self) -> None:
         element, iterator = _enter(
-            f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+            f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
             f'<member xmlns=""><name>k</name><value><double>1</double></value></member>'
             f'<member xmlns=""><name>k</name><value><double>2</double></value></member>'
             f'</v>'
         )
 
         with self.assertRaises(
-            aas_xmlcommon.DeserializationException
+            our_xmlcommon.DeserializationException
         ) as context:
-            aas_xmlrpc.read_struct_body(element, iterator)
+            our_xmlrpc.read_struct_body(element, iterator)
 
         self.assertEqual(
             'member[name="k"]', str(context.exception.path)
@@ -222,15 +222,15 @@ class TestReading(unittest.TestCase):
     def test_neither_an_infinity_nor_a_not_a_number_is_read(self) -> None:
         for text in ('INF', '-INF', 'NaN', '1e400'):
             element, iterator = _enter(
-                f'<v xmlns="{aas_xmlcommon.NAMESPACE}">'
+                f'<v xmlns="{our_xmlcommon.NAMESPACE}">'
                 f'<double xmlns="">{text}</double></v>'
             )
 
             with self.assertRaises(
-                aas_xmlcommon.DeserializationException,
+                our_xmlcommon.DeserializationException,
                 msg=f"for the text {text!r}"
             ) as context:
-                aas_xmlrpc.read_value_content(element, iterator)
+                our_xmlrpc.read_value_content(element, iterator)
 
             self.assertEqual('double', str(context.exception.path))
 
@@ -256,13 +256,13 @@ class TestWriting(unittest.TestCase):
                 '<struct><member><name>k</name>'
                 '<value><double>0.0</double></value></member></struct>'
             ),
-        ]  # type: List[Tuple[aas_types.JsonValue, str]]
+        ]  # type: List[Tuple[our_types.JsonValue, str]]
 
         for value, expected in cases:
             stream = io.StringIO()
-            writer = aas_xmlcommon.Writer(stream)
+            writer = our_xmlcommon.Writer(stream)
 
-            aas_xmlrpc.write_discriminator(value, writer)
+            our_xmlrpc.write_discriminator(value, writer)
 
             # NOTE (mristin):
             # The outermost element in no namespace undeclares the default
@@ -275,12 +275,12 @@ class TestWriting(unittest.TestCase):
 
     def test_the_path_of_a_failure_points_into_the_value(self) -> None:
         stream = io.StringIO()
-        writer = aas_xmlcommon.Writer(stream)
+        writer = our_xmlcommon.Writer(stream)
 
         with self.assertRaises(
-            aas_xmlcommon.SerializationException
+            our_xmlcommon.SerializationException
         ) as context:
-            aas_xmlrpc.write_struct_body(
+            our_xmlrpc.write_struct_body(
                 {'a b': [0, float('inf')]}, writer
             )
 
@@ -295,13 +295,13 @@ class TestWriting(unittest.TestCase):
         # to be written as.
         for number in (2 ** 53 + 1, 10 ** 400):
             stream = io.StringIO()
-            writer = aas_xmlcommon.Writer(stream)
+            writer = our_xmlcommon.Writer(stream)
 
             with self.assertRaises(
-                aas_xmlcommon.SerializationException,
+                our_xmlcommon.SerializationException,
                 msg=f"for the number {number}"
             ) as context:
-                aas_xmlrpc.write_discriminator(number, writer)
+                our_xmlrpc.write_discriminator(number, writer)
 
             self.assertIn(
                 'not exactly representable as a JSON number',
@@ -310,12 +310,12 @@ class TestWriting(unittest.TestCase):
 
     def test_a_key_which_is_no_string_stops_the_path(self) -> None:
         stream = io.StringIO()
-        writer = aas_xmlcommon.Writer(stream)
+        writer = our_xmlcommon.Writer(stream)
 
         with self.assertRaises(
-            aas_xmlcommon.SerializationException
+            our_xmlcommon.SerializationException
         ) as context:
-            aas_xmlrpc.write_struct_body(
+            our_xmlrpc.write_struct_body(
                 cast(Mapping[str, Any], {1: 'no string key'}), writer
             )
 

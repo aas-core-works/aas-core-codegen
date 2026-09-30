@@ -27,7 +27,7 @@ from aas_core_codegen.intermediate import uses as intermediate_uses
 def _generate_delegate_method(method: intermediate.Method) -> Stripped:
     """Generate the delegated method to ``_instance``."""
     returns = (
-        csharp_common.generate_type(method.returns, our_type_qualifier=Stripped("Aas"))
+        csharp_common.generate_type(method.returns, our_type_qualifier=Stripped("Our"))
         if method.returns is not None
         else "void"
     )
@@ -35,7 +35,7 @@ def _generate_delegate_method(method: intermediate.Method) -> Stripped:
     arg_types_names = [
         (
             csharp_common.generate_type(
-                arg.type_annotation, our_type_qualifier=Stripped("Aas")
+                arg.type_annotation, our_type_qualifier=Stripped("Our")
             ),
             csharp_naming.argument_name(arg.name),
         )
@@ -83,11 +83,11 @@ def _generate_enhanced_class(
     interface_name = csharp_naming.interface_name(cls.name)
 
     blocks = [
-        Stripped(f"private readonly Aas.{interface_name} _instance;"),
+        Stripped(f"private readonly Our.{interface_name} _instance;"),
         Stripped(
             f"""\
 public {enhanced_name}(
-{I}Aas.{interface_name} instance,
+{I}Our.{interface_name} instance,
 {I}TEnhancement enhancement
 ) : base(enhancement)
 {{
@@ -122,7 +122,7 @@ public {prop_type} {prop_name}
         ):
             prop_name = csharp_naming.property_name(prop.name)
             items_type = csharp_common.generate_type(
-                prop.type_annotation.value.items, our_type_qualifier=Stripped("Aas")
+                prop.type_annotation.value.items, our_type_qualifier=Stripped("Our")
             )
 
             blocks.append(
@@ -151,21 +151,21 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
         [
             Stripped(
                 f"""\
-public IEnumerable<Aas.IClass> DescendOnce()
+public IEnumerable<Our.IClass> DescendOnce()
 {{
 {I}return _instance.DescendOnce();
 }}"""
             ),
             Stripped(
                 f"""\
-public IEnumerable<Aas.IClass> Descend()
+public IEnumerable<Our.IClass> Descend()
 {{
 {I}return _instance.Descend();
 }}"""
             ),
             Stripped(
                 f"""\
-public void Accept(Aas.Visitation.IVisitor visitor)
+public void Accept(Our.Visitation.IVisitor visitor)
 {{
 {I}visitor.{visit_name}(_instance);
 }}"""
@@ -204,7 +204,7 @@ public T Transform<TContext, T>(
     writer.write(
         f"""\
 public class {enhanced_name}<TEnhancement>
-{I}: Enhanced<TEnhancement>, Aas.{interface_name}
+{I}: Enhanced<TEnhancement>, Our.{interface_name}
 {I}where TEnhancement : class
 {{
 """
@@ -227,7 +227,7 @@ def _generate_union_transform_helper() -> Stripped:
     """
     Generate a single ``Transform`` overload shared by every named union.
 
-    A named union is not itself an ``Aas.IClass``, so it can not be dispatched
+    A named union is not itself an ``Our.IClass``, so it can not be dispatched
     by the inherited, ``IClass``-typed ``Transform`` overload, and its
     underlying instance has to be unwrapped, enhanced and wrapped back up.
     We add this overload, single-purpose, next to the per-class ``Transform``
@@ -235,38 +235,38 @@ def _generate_union_transform_helper() -> Stripped:
     a plain method group or calling it directly, regardless of whether the
     value at hand is a class instance or a named union.
 
-    ``T`` is bounded by ``Aas.IUnion<T>`` (see ``generate()`` in
+    ``T`` is bounded by ``Our.IUnion<T>`` (see ``generate()`` in
     ``_generate_types.py``) instead of by the union's own type, so we need
     only this one overload for *all* named unions, not one per union.
-    Unlike the per-class ``Transform(Aas.IClass that)`` (non-generic, plain
-    ``IClass``-typed, inherited from ``AbstractTransformer<Aas.IClass>``),
+    Unlike the per-class ``Transform(Our.IClass that)`` (non-generic, plain
+    ``IClass``-typed, inherited from ``AbstractTransformer<Our.IClass>``),
     this overload returns ``T`` itself, since re-wrapping with
     ``WithUnderlying`` already recovers the caller's own concrete union type
     exactly -- so call sites need no downcast.
 
     .. note::
 
-        The parameter is typed as ``Aas.IUnion<T>``, not bare ``T`` --
+        The parameter is typed as ``Our.IUnion<T>``, not bare ``T`` --
         confirmed with a real, minimal ``dotnet build`` reproduction that a
         bare-``T`` signature here breaks the recursive call inside this
         very method's own body (``Transform(that.Underlying)``, where
-        ``that.Underlying`` is plain ``Aas.IClass``): C# resolves that call
-        against *this* generic method itself (inferring ``T = Aas.IClass``)
+        ``that.Underlying`` is plain ``Our.IClass``): C# resolves that call
+        against *this* generic method itself (inferring ``T = Our.IClass``)
         rather than falling back to the inherited, non-generic
-        ``Transform(Aas.IClass that)``, and only then fails the ``where T :
-        Aas.IUnion<T>`` constraint (CS0311) -- a tie in "exactness" between
+        ``Transform(Our.IClass that)``, and only then fails the ``where T :
+        Our.IUnion<T>`` constraint (CS0311) -- a tie in "exactness" between
         a generic method (post-substitution) and a non-generic one is
         broken in favor of the generic one, so the non-generic overload is
         effectively unreachable by unqualified calls from inside a
-        bare-``T`` version of this method. Typing the parameter as ``Aas.
-        IUnion<T>`` removes ``Aas.IClass`` from the generic overload's
-        applicable argument types entirely (``Aas.IClass`` does not
-        implement ``Aas.IUnion<T>`` for any ``T``), so
+        bare-``T`` version of this method. Typing the parameter as ``Our.
+        IUnion<T>`` removes ``Our.IClass`` from the generic overload's
+        applicable argument types entirely (``Our.IClass`` does not
+        implement ``Our.IUnion<T>`` for any ``T``), so
         ``Transform(that.Underlying)`` has only the non-generic overload to
         choose from -- no ambiguity. (Copying's ``Deep<T>`` needed the same
-        ``Aas.IUnion<T>`` parameter shape, but for the different reason of
+        ``Our.IUnion<T>`` parameter shape, but for the different reason of
         avoiding a duplicate-signature clash with its sibling
-        ``Deep<T>(T that) where T : Aas.IClass``, since both of *its*
+        ``Deep<T>(T that) where T : Our.IClass``, since both of *its*
         overloads are generic -- see
         :py:func:`_generate_union_deep_copy_helper` in
         ``_generate_copying.py``.)
@@ -277,7 +277,7 @@ def _generate_union_transform_helper() -> Stripped:
     """
     return Stripped(
         f"""\
-private T Transform<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
 {{
 {I}return that.WithUnderlying(
 {II}Transform(that.Underlying));
@@ -337,7 +337,7 @@ var {transformed_name} = Transform(
 {I}that.{prop_name}
 );
 var {casted_name} = (
-{I}{transformed_name} as Aas.{value_interface_name}
+{I}{transformed_name} as Our.{value_interface_name}
 ) ?? throw new System.InvalidOperationException(
 {I}"Expected the transformed value to be a {value_interface_name}, " +
 {I}$"but got: {{{transformed_name}}}"
@@ -387,7 +387,7 @@ that.{prop_name} = (
 {II}(item) => {{
 {III}var transformed = Transform(item);
 {III}return (
-{IIII}transformed as Aas.{item_interface_name}
+{IIII}transformed as Our.{item_interface_name}
 {III}) ?? throw new System.InvalidOperationException(
 {IIII}"Expected the transformed item to be a {item_interface_name}, " +
 {IIII}$"but got: {{transformed}}"
@@ -480,7 +480,7 @@ var {transformed_name} = Transform(
 {I}{item_access}
 );
 var {casted_name} = (
-{I}{transformed_name} as Aas.{item_interface_name}
+{I}{transformed_name} as Our.{item_interface_name}
 ) ?? throw new System.InvalidOperationException(
 {I}"Expected the transformed value to be a {item_interface_name}, " +
 {I}$"but got: {{{transformed_name}}}"
@@ -580,8 +580,8 @@ return (enhancement == null)
 
     return Stripped(
         f"""\
-public override Aas.IClass {transform_name}(
-{I}Aas.{interface_name} that
+public override Our.IClass {transform_name}(
+{I}Our.{interface_name} that
 )
 {{
 {I}{indent_but_first_line(blocks_joined, I)}
@@ -596,13 +596,13 @@ def _generate_wrapper(
     """Generate the transformer that wraps an instance with the enhancement."""
     blocks = [
         Stripped(
-            "private readonly System.Func<Aas.IClass, TEnhancement?> "
+            "private readonly System.Func<Our.IClass, TEnhancement?> "
             "_enhancementFactory;"
         ),
         Stripped(
             f"""\
 internal Wrapper(
-{I}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+{I}System.Func<Our.IClass, TEnhancement?> enhancementFactory
 )
 {{
 {I}_enhancementFactory = enhancementFactory;
@@ -620,7 +620,7 @@ internal Wrapper(
     writer.write(
         f"""\
 internal class Wrapper<TEnhancement>
-{I}: Aas.Visitation.AbstractTransformer<Aas.IClass>
+{I}: Our.Visitation.AbstractTransformer<Our.IClass>
 {I}where TEnhancement : class
 {{
 """
@@ -712,7 +712,7 @@ public class Unwrapper<TEnhancement> where TEnhancement : class
 {I}/// Enhancement, or <c>null</c> if <paramref name="that" />
 {I}/// has not been wrapped yet.
 {I}/// </returns>
-{I}public TEnhancement? Unwrap(Aas.IClass that)
+{I}public TEnhancement? Unwrap(Our.IClass that)
 {I}{{
 {II}// ReSharper disable once SuspiciousTypeConversion.Global
 {II}var enhanced = that as Enhanced<TEnhancement>;
@@ -729,7 +729,7 @@ public class Unwrapper<TEnhancement> where TEnhancement : class
 {I}/// <exception cref="System.ArgumentException">
 {I}/// Thrown when <paramref name="that" /> has not been wrapped yet
 {I}/// </exception>
-{I}public TEnhancement MustUnwrap(Aas.IClass that)
+{I}public TEnhancement MustUnwrap(Our.IClass that)
 {I}{{
 {II}return Unwrap(that) ?? throw new System.ArgumentException(
 {III}$"Expected the instance to have been wrapped, but it was not: {{that}}"
@@ -759,7 +759,7 @@ public class Enhancer<TEnhancement>
 {I}/// the wrapping will continue recursively.</para>
 {I}///</param>
 {I}public Enhancer(
-{II}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+{II}System.Func<Our.IClass, TEnhancement?> enhancementFactory
 {I})
 {I}{{
 {II}_wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -781,8 +781,8 @@ public class Enhancer<TEnhancement>
 {I}/// <exception cref="System.ArgumentException">
 {I}/// Thrown when <paramref name="that" /> has been already wrapped
 {I}/// </exception>
-{I}public Aas.IClass Wrap(
-{II}Aas.IClass that
+{I}public Our.IClass Wrap(
+{II}Our.IClass that
 {I})
 {I}{{
 {II}var wrapped = _wrapper.Transform(that);
@@ -799,7 +799,7 @@ public class Enhancer<TEnhancement>
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     if intermediate_uses.json_types(symbol_table):

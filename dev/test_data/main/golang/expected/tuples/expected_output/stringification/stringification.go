@@ -6,21 +6,21 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"SomeItem": aastypes.ModelTypeSomeItem,
-	"AnotherItem": aastypes.ModelTypeAnotherItem,
-	"Something": aastypes.ModelTypeSomething,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"SomeItem": ourtypes.ModelTypeSomeItem,
+	"AnotherItem": ourtypes.ModelTypeAnotherItem,
+	"Something": ourtypes.ModelTypeSomething,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -31,12 +31,12 @@ var modelTypeToStringArray = [...]string {
 	"Something",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -50,11 +50,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {
@@ -68,17 +68,17 @@ func MustModelTypeToString(
 	return result
 }
 
-var resultFromStringMap = map[string]aastypes.Result {
-	"ok": aastypes.ResultOk,
-	"not-ok": aastypes.ResultNotOk,
+var resultFromStringMap = map[string]ourtypes.Result {
+	"ok": ourtypes.ResultOk,
+	"not-ok": ourtypes.ResultNotOk,
 }
 
-// Parse `text` as a string representation of [aastypes.Result].
+// Parse `text` as a string representation of [ourtypes.Result].
 //
 // If not ok, the literal result is undefined.
 func ResultFromString(
 	text string,
-) (literal aastypes.Result, ok bool) {
+) (literal ourtypes.Result, ok bool) {
 	literal, ok = resultFromStringMap[text]
 	return
 }
@@ -88,12 +88,12 @@ var resultToStringArray = [...]string {
 	"not-ok",
 }
 
-// Translate `value` from [aastypes.Result] to a string.
+// Translate `value` from [ourtypes.Result] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ResultToString(
-	value aastypes.Result,
+	value ourtypes.Result,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -107,11 +107,11 @@ func ResultToString(
 	return
 }
 
-// Translate the `value` from [aastypes.Result] to a string.
+// Translate the `value` from [ourtypes.Result] to a string.
 //
 // Panic if the given value is invalid.
 func MustResultToString(
-	value aastypes.Result,
+	value ourtypes.Result,
 ) string {
 	result, ok := ResultToString(value)
 	if !ok {

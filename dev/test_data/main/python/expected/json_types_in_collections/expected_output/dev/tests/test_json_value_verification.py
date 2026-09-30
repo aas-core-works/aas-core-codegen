@@ -12,12 +12,12 @@ import math
 import unittest
 from typing import Any, cast, Iterable, List, Mapping, Sequence, Tuple
 
-import dummy.jsonvalueverification as aas_json_value_verification
-import dummy.reporting as aas_reporting
+import dummy.jsonvalueverification as our_json_value_verification
+import dummy.reporting as our_reporting
 
 
 def _paths_and_causes(
-        errors: Iterable[aas_reporting.Error]
+        errors: Iterable[our_reporting.Error]
 ) -> List[Tuple[str, str]]:
     return [(str(error.path), error.cause) for error in errors]
 
@@ -32,7 +32,7 @@ class TestJsonValue(unittest.TestCase):
         self.assertListEqual(
             [],
             _paths_and_causes(
-                aas_json_value_verification.verify_json_value(value)
+                our_json_value_verification.verify_json_value(value)
             )
         )
 
@@ -51,7 +51,7 @@ class TestJsonValue(unittest.TestCase):
             [
                 path
                 for path, _ in _paths_and_causes(
-                    aas_json_value_verification.verify_json_value(value)
+                    our_json_value_verification.verify_json_value(value)
                 )
             ]
         )
@@ -60,7 +60,7 @@ class TestJsonValue(unittest.TestCase):
         value = {"a b": [0, {"c'd": math.nan}]}
 
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_value(value)
+            our_json_value_verification.verify_json_value(value)
         )
 
         self.assertEqual(1, len(paths_and_causes))
@@ -73,7 +73,7 @@ class TestJsonValue(unittest.TestCase):
         value = {"a": {1: "the key is no string"}}
 
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_value(value)
+            our_json_value_verification.verify_json_value(value)
         )
 
         self.assertEqual(1, len(paths_and_causes))
@@ -84,7 +84,7 @@ class TestJsonValue(unittest.TestCase):
         inner = {"deep": math.nan}
         value = {"a": inner}
 
-        errors = list(aas_json_value_verification.verify_json_value(value))
+        errors = list(our_json_value_verification.verify_json_value(value))
 
         self.assertEqual(1, len(errors))
 
@@ -92,19 +92,19 @@ class TestJsonValue(unittest.TestCase):
         self.assertEqual(2, len(segments))
 
         outer_segment = segments[0]
-        assert isinstance(outer_segment, aas_reporting.KeySegment)
+        assert isinstance(outer_segment, our_reporting.KeySegment)
         self.assertIs(value, outer_segment.mapping)
         self.assertEqual("a", outer_segment.key)
 
         inner_segment = segments[1]
-        assert isinstance(inner_segment, aas_reporting.KeySegment)
+        assert isinstance(inner_segment, our_reporting.KeySegment)
         self.assertIs(inner, inner_segment.mapping)
         self.assertEqual("deep", inner_segment.key)
 
     def test_neither_an_infinity_nor_a_not_a_number_is_json_able(self) -> None:
         for number in (math.inf, -math.inf, math.nan):
             paths_and_causes = _paths_and_causes(
-                aas_json_value_verification.verify_json_value([number])
+                our_json_value_verification.verify_json_value([number])
             )
 
             self.assertEqual(1, len(paths_and_causes), f"for the number {number}")
@@ -119,7 +119,7 @@ class TestJsonValue(unittest.TestCase):
             self.assertListEqual(
                 [],
                 _paths_and_causes(
-                    aas_json_value_verification.verify_json_value([number])
+                    our_json_value_verification.verify_json_value([number])
                 ),
                 f"for the number {number}"
             )
@@ -132,7 +132,7 @@ class TestJsonValue(unittest.TestCase):
         # altogether.
         for number in (2 ** 53 + 1, 10 ** 400):
             paths_and_causes = _paths_and_causes(
-                aas_json_value_verification.verify_json_value([number])
+                our_json_value_verification.verify_json_value([number])
             )
 
             self.assertEqual(1, len(paths_and_causes), f"for the number {number}")
@@ -144,7 +144,7 @@ class TestJsonValue(unittest.TestCase):
 
     def test_a_value_of_an_unexpected_type_is_refused(self) -> None:
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_value({"a": object()})
+            our_json_value_verification.verify_json_value({"a": object()})
         )
 
         self.assertEqual(1, len(paths_and_causes))
@@ -155,7 +155,7 @@ class TestJsonValue(unittest.TestCase):
 class TestJsonArrayAndJsonObject(unittest.TestCase):
     def test_an_array_has_to_be_an_array(self) -> None:
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_array(
+            our_json_value_verification.verify_json_array(
                 cast(Sequence[Any], {"a": 1})
             )
         )
@@ -169,7 +169,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
         # A ``str`` is a ``Sequence`` in Python, so it has to be ruled out
         # explicitly.
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_array("not an array")
+            our_json_value_verification.verify_json_array("not an array")
         )
 
         self.assertEqual(1, len(paths_and_causes))
@@ -177,7 +177,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 
     def test_an_object_has_to_be_an_object(self) -> None:
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_object(
+            our_json_value_verification.verify_json_object(
                 cast(Mapping[str, Any], [1, 2])
             )
         )
@@ -188,7 +188,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 
     def test_the_content_is_verified_beneath_the_shape(self) -> None:
         paths_and_causes = _paths_and_causes(
-            aas_json_value_verification.verify_json_object(
+            our_json_value_verification.verify_json_object(
                 {"a": [{"b": math.nan}]}
             )
         )

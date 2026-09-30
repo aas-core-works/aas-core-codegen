@@ -70,7 +70,7 @@ public void Test_FloorMod_{i}()
 {I}// {case.explanation}
 {I}Assert.AreEqual(
 {II}{_long_literal(case.expected)},
-{II}Aas.Common.FloorMod({_long_literal(case.dividend)}, {_long_literal(case.divisor)}));
+{II}Our.Common.FloorMod({_long_literal(case.dividend)}, {_long_literal(case.divisor)}));
 }}"""
                 )
             )
@@ -111,7 +111,7 @@ public void Test_Abs_of_double_{i}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

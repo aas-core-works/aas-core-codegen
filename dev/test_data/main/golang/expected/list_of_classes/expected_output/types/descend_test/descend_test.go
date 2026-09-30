@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnAnInstanceOfSomeItem(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomeItem()
+	instance := ourtesting.MustLoadMaximalSomeItem()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"SomeItem",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnAnInstanceOfSomeItem(
 func TestDescendOnAnInstanceOfAnotherItem(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAnotherItem()
+	instance := ourtesting.MustLoadMaximalAnotherItem()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"AnotherItem",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnAnInstanceOfAnotherItem(
 func TestDescendOnAnInstanceOfSimple(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSimple()
+	instance := ourtesting.MustLoadMaximalSimple()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Simple",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnAnInstanceOfSimple(
 func TestDescendOnAnInstanceOfSomething(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"Descend",
 		"Something",
 		"maximal.json.trace",

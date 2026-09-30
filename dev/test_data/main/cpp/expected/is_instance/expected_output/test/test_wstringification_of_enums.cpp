@@ -6,131 +6,131 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kLeaf
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLeaf
+    == our::wstringification::MustModelTypeFromWstring(
       L"Leaf"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLeaf
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLeaf
     )
     == L"Leaf"
   );
 
   REQUIRE(
-    aas::types::ModelType::kOrderedContainer
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kOrderedContainer
+    == our::wstringification::MustModelTypeFromWstring(
       L"OrderedContainer"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kOrderedContainer
+    our::wstringification::to_wstring(
+      our::types::ModelType::kOrderedContainer
     )
     == L"OrderedContainer"
   );
 
   REQUIRE(
-    aas::types::ModelType::kUnorderedContainer
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kUnorderedContainer
+    == our::wstringification::MustModelTypeFromWstring(
       L"UnorderedContainer"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kUnorderedContainer
+    our::wstringification::to_wstring(
+      our::types::ModelType::kUnorderedContainer
     )
     == L"UnorderedContainer"
   );
 
   REQUIRE(
-    aas::types::ModelType::kGlobalAttribute
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kGlobalAttribute
+    == our::wstringification::MustModelTypeFromWstring(
       L"GlobalAttribute"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kGlobalAttribute
+    our::wstringification::to_wstring(
+      our::types::ModelType::kGlobalAttribute
     )
     == L"GlobalAttribute"
   );
 
   REQUIRE(
-    aas::types::ModelType::kLocalAttribute
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kLocalAttribute
+    == our::wstringification::MustModelTypeFromWstring(
       L"LocalAttribute"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kLocalAttribute
+    our::wstringification::to_wstring(
+      our::types::ModelType::kLocalAttribute
     )
     == L"LocalAttribute"
   );
 
   REQUIRE(
-    aas::types::ModelType::kAttributeOperand
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kAttributeOperand
+    == our::wstringification::MustModelTypeFromWstring(
       L"AttributeOperand"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kAttributeOperand
+    our::wstringification::to_wstring(
+      our::types::ModelType::kAttributeOperand
     )
     == L"AttributeOperand"
   );
 
   REQUIRE(
-    aas::types::ModelType::kStringLiteral
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kStringLiteral
+    == our::wstringification::MustModelTypeFromWstring(
       L"StringLiteral"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kStringLiteral
+    our::wstringification::to_wstring(
+      our::types::ModelType::kStringLiteral
     )
     == L"StringLiteral"
   );
 
   REQUIRE(
-    aas::types::ModelType::kNumberLiteral
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kNumberLiteral
+    == our::wstringification::MustModelTypeFromWstring(
       L"NumberLiteral"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kNumberLiteral
+    our::wstringification::to_wstring(
+      our::types::ModelType::kNumberLiteral
     )
     == L"NumberLiteral"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
@@ -138,13 +138,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

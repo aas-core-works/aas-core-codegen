@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
@@ -16,7 +16,7 @@ namespace AasCore.Aas3_0.Tests
     public class TestCopying
     {
         internal class DeepEqualiser
-            : Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+            : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
             /// <summary>Compare two byte spans for equal content.</summary>
             /// <remarks>
@@ -31,10 +31,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformExtension(
-                Aas.IExtension that,
-                Aas.IClass other)
+                Our.IExtension that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Extension casted))
+                if (!(other is Our.Extension casted))
                 {
                     return false;
                 }
@@ -71,10 +71,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformAdministrativeInformation(
-                Aas.IAdministrativeInformation that,
-                Aas.IClass other)
+                Our.IAdministrativeInformation that,
+                Our.IClass other)
             {
-                if (!(other is Aas.AdministrativeInformation casted))
+                if (!(other is Our.AdministrativeInformation casted))
                 {
                     return false;
                 }
@@ -100,10 +100,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformQualifier(
-                Aas.IQualifier that,
-                Aas.IClass other)
+                Our.IQualifier that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Qualifier casted))
+                if (!(other is Our.Qualifier casted))
                 {
                     return false;
                 }
@@ -137,10 +137,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformAssetAdministrationShell(
-                Aas.IAssetAdministrationShell that,
-                Aas.IClass other)
+                Our.IAssetAdministrationShell that,
+                Our.IClass other)
             {
-                if (!(other is Aas.AssetAdministrationShell casted))
+                if (!(other is Our.AssetAdministrationShell casted))
                 {
                     return false;
                 }
@@ -210,10 +210,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformAssetInformation(
-                Aas.IAssetInformation that,
-                Aas.IClass other)
+                Our.IAssetInformation that,
+                Our.IClass other)
             {
-                if (!(other is Aas.AssetInformation casted))
+                if (!(other is Our.AssetInformation casted))
                 {
                     return false;
                 }
@@ -239,10 +239,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformResource(
-                Aas.IResource that,
-                Aas.IClass other)
+                Our.IResource that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Resource casted))
+                if (!(other is Our.Resource casted))
                 {
                     return false;
                 }
@@ -253,10 +253,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformSpecificAssetId(
-                Aas.ISpecificAssetId that,
-                Aas.IClass other)
+                Our.ISpecificAssetId that,
+                Our.IClass other)
             {
-                if (!(other is Aas.SpecificAssetId casted))
+                if (!(other is Our.SpecificAssetId casted))
                 {
                     return false;
                 }
@@ -286,10 +286,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformSubmodel(
-                Aas.ISubmodel that,
-                Aas.IClass other)
+                Our.ISubmodel that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Submodel casted))
+                if (!(other is Our.Submodel casted))
                 {
                     return false;
                 }
@@ -377,10 +377,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformRelationshipElement(
-                Aas.IRelationshipElement that,
-                Aas.IClass other)
+                Our.IRelationshipElement that,
+                Our.IClass other)
             {
-                if (!(other is Aas.RelationshipElement casted))
+                if (!(other is Our.RelationshipElement casted))
                 {
                     return false;
                 }
@@ -456,10 +456,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformSubmodelElementList(
-                Aas.ISubmodelElementList that,
-                Aas.IClass other)
+                Our.ISubmodelElementList that,
+                Our.IClass other)
             {
-                if (!(other is Aas.SubmodelElementList casted))
+                if (!(other is Our.SubmodelElementList casted))
                 {
                     return false;
                 }
@@ -548,10 +548,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformSubmodelElementCollection(
-                Aas.ISubmodelElementCollection that,
-                Aas.IClass other)
+                Our.ISubmodelElementCollection that,
+                Our.IClass other)
             {
-                if (!(other is Aas.SubmodelElementCollection casted))
+                if (!(other is Our.SubmodelElementCollection casted))
                 {
                     return false;
                 }
@@ -630,10 +630,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformProperty(
-                Aas.IProperty that,
-                Aas.IClass other)
+                Our.IProperty that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Property casted))
+                if (!(other is Our.Property casted))
                 {
                     return false;
                 }
@@ -710,10 +710,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformMultiLanguageProperty(
-                Aas.IMultiLanguageProperty that,
-                Aas.IClass other)
+                Our.IMultiLanguageProperty that,
+                Our.IClass other)
             {
-                if (!(other is Aas.MultiLanguageProperty casted))
+                if (!(other is Our.MultiLanguageProperty casted))
                 {
                     return false;
                 }
@@ -797,10 +797,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformRange(
-                Aas.IRange that,
-                Aas.IClass other)
+                Our.IRange that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Range casted))
+                if (!(other is Our.Range casted))
                 {
                     return false;
                 }
@@ -873,10 +873,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformReferenceElement(
-                Aas.IReferenceElement that,
-                Aas.IClass other)
+                Our.IReferenceElement that,
+                Our.IClass other)
             {
-                if (!(other is Aas.ReferenceElement casted))
+                if (!(other is Our.ReferenceElement casted))
                 {
                     return false;
                 }
@@ -951,10 +951,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformBlob(
-                Aas.IBlob that,
-                Aas.IClass other)
+                Our.IBlob that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Blob casted))
+                if (!(other is Our.Blob casted))
                 {
                     return false;
                 }
@@ -1028,10 +1028,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformFile(
-                Aas.IFile that,
-                Aas.IClass other)
+                Our.IFile that,
+                Our.IClass other)
             {
-                if (!(other is Aas.File casted))
+                if (!(other is Our.File casted))
                 {
                     return false;
                 }
@@ -1103,10 +1103,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement that,
-                Aas.IClass other)
+                Our.IAnnotatedRelationshipElement that,
+                Our.IClass other)
             {
-                if (!(other is Aas.AnnotatedRelationshipElement casted))
+                if (!(other is Our.AnnotatedRelationshipElement casted))
                 {
                     return false;
                 }
@@ -1191,10 +1191,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformEntity(
-                Aas.IEntity that,
-                Aas.IClass other)
+                Our.IEntity that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Entity casted))
+                if (!(other is Our.Entity casted))
                 {
                     return false;
                 }
@@ -1284,10 +1284,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformEventPayload(
-                Aas.IEventPayload that,
-                Aas.IClass other)
+                Our.IEventPayload that,
+                Our.IClass other)
             {
-                if (!(other is Aas.EventPayload casted))
+                if (!(other is Our.EventPayload casted))
                 {
                     return false;
                 }
@@ -1322,10 +1322,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformBasicEventElement(
-                Aas.IBasicEventElement that,
-                Aas.IClass other)
+                Our.IBasicEventElement that,
+                Our.IClass other)
             {
-                if (!(other is Aas.BasicEventElement casted))
+                if (!(other is Our.BasicEventElement casted))
                 {
                     return false;
                 }
@@ -1409,10 +1409,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformOperation(
-                Aas.IOperation that,
-                Aas.IClass other)
+                Our.IOperation that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Operation casted))
+                if (!(other is Our.Operation casted))
                 {
                     return false;
                 }
@@ -1509,10 +1509,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformOperationVariable(
-                Aas.IOperationVariable that,
-                Aas.IClass other)
+                Our.IOperationVariable that,
+                Our.IClass other)
             {
-                if (!(other is Aas.OperationVariable casted))
+                if (!(other is Our.OperationVariable casted))
                 {
                     return false;
                 }
@@ -1524,10 +1524,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformCapability(
-                Aas.ICapability that,
-                Aas.IClass other)
+                Our.ICapability that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Capability casted))
+                if (!(other is Our.Capability casted))
                 {
                     return false;
                 }
@@ -1597,10 +1597,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformConceptDescription(
-                Aas.IConceptDescription that,
-                Aas.IClass other)
+                Our.IConceptDescription that,
+                Our.IClass other)
             {
-                if (!(other is Aas.ConceptDescription casted))
+                if (!(other is Our.ConceptDescription casted))
                 {
                     return false;
                 }
@@ -1662,10 +1662,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformReference(
-                Aas.IReference that,
-                Aas.IClass other)
+                Our.IReference that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Reference casted))
+                if (!(other is Our.Reference casted))
                 {
                     return false;
                 }
@@ -1687,10 +1687,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformKey(
-                Aas.IKey that,
-                Aas.IClass other)
+                Our.IKey that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Key casted))
+                if (!(other is Our.Key casted))
                 {
                     return false;
                 }
@@ -1701,10 +1701,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLangStringNameType(
-                Aas.ILangStringNameType that,
-                Aas.IClass other)
+                Our.ILangStringNameType that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringNameType casted))
+                if (!(other is Our.LangStringNameType casted))
                 {
                     return false;
                 }
@@ -1715,10 +1715,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLangStringTextType(
-                Aas.ILangStringTextType that,
-                Aas.IClass other)
+                Our.ILangStringTextType that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringTextType casted))
+                if (!(other is Our.LangStringTextType casted))
                 {
                     return false;
                 }
@@ -1729,10 +1729,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformEnvironment(
-                Aas.IEnvironment that,
-                Aas.IClass other)
+                Our.IEnvironment that,
+                Our.IClass other)
             {
-                if (!(other is Aas.Environment casted))
+                if (!(other is Our.Environment casted))
                 {
                     return false;
                 }
@@ -1768,10 +1768,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification that,
-                Aas.IClass other)
+                Our.IEmbeddedDataSpecification that,
+                Our.IClass other)
             {
-                if (!(other is Aas.EmbeddedDataSpecification casted))
+                if (!(other is Our.EmbeddedDataSpecification casted))
                 {
                     return false;
                 }
@@ -1786,10 +1786,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLevelType(
-                Aas.ILevelType that,
-                Aas.IClass other)
+                Our.ILevelType that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LevelType casted))
+                if (!(other is Our.LevelType casted))
                 {
                     return false;
                 }
@@ -1802,10 +1802,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformValueReferencePair(
-                Aas.IValueReferencePair that,
-                Aas.IClass other)
+                Our.IValueReferencePair that,
+                Our.IClass other)
             {
-                if (!(other is Aas.ValueReferencePair casted))
+                if (!(other is Our.ValueReferencePair casted))
                 {
                     return false;
                 }
@@ -1818,10 +1818,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformValueList(
-                Aas.IValueList that,
-                Aas.IClass other)
+                Our.IValueList that,
+                Our.IClass other)
             {
-                if (!(other is Aas.ValueList casted))
+                if (!(other is Our.ValueList casted))
                 {
                     return false;
                 }
@@ -1837,10 +1837,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 that,
-                Aas.IClass other)
+                Our.ILangStringPreferredNameTypeIec61360 that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringPreferredNameTypeIec61360 casted))
+                if (!(other is Our.LangStringPreferredNameTypeIec61360 casted))
                 {
                     return false;
                 }
@@ -1851,10 +1851,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 that,
-                Aas.IClass other)
+                Our.ILangStringShortNameTypeIec61360 that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringShortNameTypeIec61360 casted))
+                if (!(other is Our.LangStringShortNameTypeIec61360 casted))
                 {
                     return false;
                 }
@@ -1865,10 +1865,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 that,
-                Aas.IClass other)
+                Our.ILangStringDefinitionTypeIec61360 that,
+                Our.IClass other)
             {
-                if (!(other is Aas.LangStringDefinitionTypeIec61360 casted))
+                if (!(other is Our.LangStringDefinitionTypeIec61360 casted))
                 {
                     return false;
                 }
@@ -1879,10 +1879,10 @@ namespace AasCore.Aas3_0.Tests
             }
 
             public override bool TransformDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 that,
-                Aas.IClass other)
+                Our.IDataSpecificationIec61360 that,
+                Our.IClass other)
             {
-                if (!(other is Aas.DataSpecificationIec61360 casted))
+                if (!(other is Our.DataSpecificationIec61360 casted))
                 {
                     return false;
                 }
@@ -1942,8 +1942,8 @@ namespace AasCore.Aas3_0.Tests
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
 
         private static bool ExtensionShallowEquals(
-            Aas.Extension that,
-            Aas.Extension other)
+            Our.Extension that,
+            Our.Extension other)
         {
             return (
                 that.SemanticId == other.SemanticId
@@ -1955,8 +1955,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool AdministrativeInformationShallowEquals(
-            Aas.AdministrativeInformation that,
-            Aas.AdministrativeInformation other)
+            Our.AdministrativeInformation that,
+            Our.AdministrativeInformation other)
         {
             return (
                 that.EmbeddedDataSpecifications == other.EmbeddedDataSpecifications
@@ -1967,8 +1967,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool QualifierShallowEquals(
-            Aas.Qualifier that,
-            Aas.Qualifier other)
+            Our.Qualifier that,
+            Our.Qualifier other)
         {
             return (
                 that.SemanticId == other.SemanticId
@@ -1981,8 +1981,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool AssetAdministrationShellShallowEquals(
-            Aas.AssetAdministrationShell that,
-            Aas.AssetAdministrationShell other)
+            Our.AssetAdministrationShell that,
+            Our.AssetAdministrationShell other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -1999,8 +1999,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool AssetInformationShallowEquals(
-            Aas.AssetInformation that,
-            Aas.AssetInformation other)
+            Our.AssetInformation that,
+            Our.AssetInformation other)
         {
             return (
                 that.AssetKind == other.AssetKind
@@ -2011,15 +2011,15 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ResourceShallowEquals(
-            Aas.Resource that,
-            Aas.Resource other)
+            Our.Resource that,
+            Our.Resource other)
         {
             return that.Path == other.Path && that.ContentType == other.ContentType;
         }
 
         private static bool SpecificAssetIdShallowEquals(
-            Aas.SpecificAssetId that,
-            Aas.SpecificAssetId other)
+            Our.SpecificAssetId that,
+            Our.SpecificAssetId other)
         {
             return (
                 that.SemanticId == other.SemanticId
@@ -2030,8 +2030,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool SubmodelShallowEquals(
-            Aas.Submodel that,
-            Aas.Submodel other)
+            Our.Submodel that,
+            Our.Submodel other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2050,8 +2050,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool RelationshipElementShallowEquals(
-            Aas.RelationshipElement that,
-            Aas.RelationshipElement other)
+            Our.RelationshipElement that,
+            Our.RelationshipElement other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2068,8 +2068,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool SubmodelElementListShallowEquals(
-            Aas.SubmodelElementList that,
-            Aas.SubmodelElementList other)
+            Our.SubmodelElementList that,
+            Our.SubmodelElementList other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2089,8 +2089,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool SubmodelElementCollectionShallowEquals(
-            Aas.SubmodelElementCollection that,
-            Aas.SubmodelElementCollection other)
+            Our.SubmodelElementCollection that,
+            Our.SubmodelElementCollection other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2106,8 +2106,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool PropertyShallowEquals(
-            Aas.Property that,
-            Aas.Property other)
+            Our.Property that,
+            Our.Property other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2125,8 +2125,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool MultiLanguagePropertyShallowEquals(
-            Aas.MultiLanguageProperty that,
-            Aas.MultiLanguageProperty other)
+            Our.MultiLanguageProperty that,
+            Our.MultiLanguageProperty other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2143,8 +2143,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool RangeShallowEquals(
-            Aas.Range that,
-            Aas.Range other)
+            Our.Range that,
+            Our.Range other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2162,8 +2162,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ReferenceElementShallowEquals(
-            Aas.ReferenceElement that,
-            Aas.ReferenceElement other)
+            Our.ReferenceElement that,
+            Our.ReferenceElement other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2179,8 +2179,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool BlobShallowEquals(
-            Aas.Blob that,
-            Aas.Blob other)
+            Our.Blob that,
+            Our.Blob other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2197,8 +2197,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool FileShallowEquals(
-            Aas.File that,
-            Aas.File other)
+            Our.File that,
+            Our.File other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2215,8 +2215,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool AnnotatedRelationshipElementShallowEquals(
-            Aas.AnnotatedRelationshipElement that,
-            Aas.AnnotatedRelationshipElement other)
+            Our.AnnotatedRelationshipElement that,
+            Our.AnnotatedRelationshipElement other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2234,8 +2234,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool EntityShallowEquals(
-            Aas.Entity that,
-            Aas.Entity other)
+            Our.Entity that,
+            Our.Entity other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2254,8 +2254,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool EventPayloadShallowEquals(
-            Aas.EventPayload that,
-            Aas.EventPayload other)
+            Our.EventPayload that,
+            Our.EventPayload other)
         {
             return (
                 that.Source == other.Source
@@ -2269,8 +2269,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool BasicEventElementShallowEquals(
-            Aas.BasicEventElement that,
-            Aas.BasicEventElement other)
+            Our.BasicEventElement that,
+            Our.BasicEventElement other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2293,8 +2293,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool OperationShallowEquals(
-            Aas.Operation that,
-            Aas.Operation other)
+            Our.Operation that,
+            Our.Operation other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2312,15 +2312,15 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool OperationVariableShallowEquals(
-            Aas.OperationVariable that,
-            Aas.OperationVariable other)
+            Our.OperationVariable that,
+            Our.OperationVariable other)
         {
             return that.Value == other.Value;
         }
 
         private static bool CapabilityShallowEquals(
-            Aas.Capability that,
-            Aas.Capability other)
+            Our.Capability that,
+            Our.Capability other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2335,8 +2335,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ConceptDescriptionShallowEquals(
-            Aas.ConceptDescription that,
-            Aas.ConceptDescription other)
+            Our.ConceptDescription that,
+            Our.ConceptDescription other)
         {
             return (
                 that.Extensions == other.Extensions
@@ -2351,8 +2351,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ReferenceShallowEquals(
-            Aas.Reference that,
-            Aas.Reference other)
+            Our.Reference that,
+            Our.Reference other)
         {
             return (
                 that.Type == other.Type
@@ -2361,29 +2361,29 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool KeyShallowEquals(
-            Aas.Key that,
-            Aas.Key other)
+            Our.Key that,
+            Our.Key other)
         {
             return that.Type == other.Type && that.Value == other.Value;
         }
 
         private static bool LangStringNameTypeShallowEquals(
-            Aas.LangStringNameType that,
-            Aas.LangStringNameType other)
+            Our.LangStringNameType that,
+            Our.LangStringNameType other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool LangStringTextTypeShallowEquals(
-            Aas.LangStringTextType that,
-            Aas.LangStringTextType other)
+            Our.LangStringTextType that,
+            Our.LangStringTextType other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool EnvironmentShallowEquals(
-            Aas.Environment that,
-            Aas.Environment other)
+            Our.Environment that,
+            Our.Environment other)
         {
             return (
                 that.AssetAdministrationShells == other.AssetAdministrationShells
@@ -2392,8 +2392,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool EmbeddedDataSpecificationShallowEquals(
-            Aas.EmbeddedDataSpecification that,
-            Aas.EmbeddedDataSpecification other)
+            Our.EmbeddedDataSpecification that,
+            Our.EmbeddedDataSpecification other)
         {
             return (
                 that.DataSpecification == other.DataSpecification
@@ -2401,8 +2401,8 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool LevelTypeShallowEquals(
-            Aas.LevelType that,
-            Aas.LevelType other)
+            Our.LevelType that,
+            Our.LevelType other)
         {
             return (
                 that.Min == other.Min
@@ -2412,43 +2412,43 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ValueReferencePairShallowEquals(
-            Aas.ValueReferencePair that,
-            Aas.ValueReferencePair other)
+            Our.ValueReferencePair that,
+            Our.ValueReferencePair other)
         {
             return that.Value == other.Value && that.ValueId == other.ValueId;
         }
 
         private static bool ValueListShallowEquals(
-            Aas.ValueList that,
-            Aas.ValueList other)
+            Our.ValueList that,
+            Our.ValueList other)
         {
             return that.ValueReferencePairs == other.ValueReferencePairs;
         }
 
         private static bool LangStringPreferredNameTypeIec61360ShallowEquals(
-            Aas.LangStringPreferredNameTypeIec61360 that,
-            Aas.LangStringPreferredNameTypeIec61360 other)
+            Our.LangStringPreferredNameTypeIec61360 that,
+            Our.LangStringPreferredNameTypeIec61360 other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool LangStringShortNameTypeIec61360ShallowEquals(
-            Aas.LangStringShortNameTypeIec61360 that,
-            Aas.LangStringShortNameTypeIec61360 other)
+            Our.LangStringShortNameTypeIec61360 that,
+            Our.LangStringShortNameTypeIec61360 other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool LangStringDefinitionTypeIec61360ShallowEquals(
-            Aas.LangStringDefinitionTypeIec61360 that,
-            Aas.LangStringDefinitionTypeIec61360 other)
+            Our.LangStringDefinitionTypeIec61360 that,
+            Our.LangStringDefinitionTypeIec61360 other)
         {
             return that.Language == other.Language && that.Text == other.Text;
         }
 
         private static bool DataSpecificationIec61360ShallowEquals(
-            Aas.DataSpecificationIec61360 that,
-            Aas.DataSpecificationIec61360 other)
+            Our.DataSpecificationIec61360 that,
+            Our.DataSpecificationIec61360 other)
         {
             return (
                 that.PreferredName == other.PreferredName
@@ -2466,267 +2466,267 @@ namespace AasCore.Aas3_0.Tests
         }
 
         private static bool ExtensionDeepEquals(
-            Aas.Extension that,
-            Aas.Extension other)
+            Our.Extension that,
+            Our.Extension other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool AdministrativeInformationDeepEquals(
-            Aas.AdministrativeInformation that,
-            Aas.AdministrativeInformation other)
+            Our.AdministrativeInformation that,
+            Our.AdministrativeInformation other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool QualifierDeepEquals(
-            Aas.Qualifier that,
-            Aas.Qualifier other)
+            Our.Qualifier that,
+            Our.Qualifier other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool AssetAdministrationShellDeepEquals(
-            Aas.AssetAdministrationShell that,
-            Aas.AssetAdministrationShell other)
+            Our.AssetAdministrationShell that,
+            Our.AssetAdministrationShell other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool AssetInformationDeepEquals(
-            Aas.AssetInformation that,
-            Aas.AssetInformation other)
+            Our.AssetInformation that,
+            Our.AssetInformation other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ResourceDeepEquals(
-            Aas.Resource that,
-            Aas.Resource other)
+            Our.Resource that,
+            Our.Resource other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SpecificAssetIdDeepEquals(
-            Aas.SpecificAssetId that,
-            Aas.SpecificAssetId other)
+            Our.SpecificAssetId that,
+            Our.SpecificAssetId other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SubmodelDeepEquals(
-            Aas.Submodel that,
-            Aas.Submodel other)
+            Our.Submodel that,
+            Our.Submodel other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool RelationshipElementDeepEquals(
-            Aas.RelationshipElement that,
-            Aas.RelationshipElement other)
+            Our.RelationshipElement that,
+            Our.RelationshipElement other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SubmodelElementListDeepEquals(
-            Aas.SubmodelElementList that,
-            Aas.SubmodelElementList other)
+            Our.SubmodelElementList that,
+            Our.SubmodelElementList other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool SubmodelElementCollectionDeepEquals(
-            Aas.SubmodelElementCollection that,
-            Aas.SubmodelElementCollection other)
+            Our.SubmodelElementCollection that,
+            Our.SubmodelElementCollection other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool PropertyDeepEquals(
-            Aas.Property that,
-            Aas.Property other)
+            Our.Property that,
+            Our.Property other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool MultiLanguagePropertyDeepEquals(
-            Aas.MultiLanguageProperty that,
-            Aas.MultiLanguageProperty other)
+            Our.MultiLanguageProperty that,
+            Our.MultiLanguageProperty other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool RangeDeepEquals(
-            Aas.Range that,
-            Aas.Range other)
+            Our.Range that,
+            Our.Range other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ReferenceElementDeepEquals(
-            Aas.ReferenceElement that,
-            Aas.ReferenceElement other)
+            Our.ReferenceElement that,
+            Our.ReferenceElement other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool BlobDeepEquals(
-            Aas.Blob that,
-            Aas.Blob other)
+            Our.Blob that,
+            Our.Blob other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool FileDeepEquals(
-            Aas.File that,
-            Aas.File other)
+            Our.File that,
+            Our.File other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool AnnotatedRelationshipElementDeepEquals(
-            Aas.AnnotatedRelationshipElement that,
-            Aas.AnnotatedRelationshipElement other)
+            Our.AnnotatedRelationshipElement that,
+            Our.AnnotatedRelationshipElement other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool EntityDeepEquals(
-            Aas.Entity that,
-            Aas.Entity other)
+            Our.Entity that,
+            Our.Entity other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool EventPayloadDeepEquals(
-            Aas.EventPayload that,
-            Aas.EventPayload other)
+            Our.EventPayload that,
+            Our.EventPayload other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool BasicEventElementDeepEquals(
-            Aas.BasicEventElement that,
-            Aas.BasicEventElement other)
+            Our.BasicEventElement that,
+            Our.BasicEventElement other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool OperationDeepEquals(
-            Aas.Operation that,
-            Aas.Operation other)
+            Our.Operation that,
+            Our.Operation other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool OperationVariableDeepEquals(
-            Aas.OperationVariable that,
-            Aas.OperationVariable other)
+            Our.OperationVariable that,
+            Our.OperationVariable other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool CapabilityDeepEquals(
-            Aas.Capability that,
-            Aas.Capability other)
+            Our.Capability that,
+            Our.Capability other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ConceptDescriptionDeepEquals(
-            Aas.ConceptDescription that,
-            Aas.ConceptDescription other)
+            Our.ConceptDescription that,
+            Our.ConceptDescription other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ReferenceDeepEquals(
-            Aas.Reference that,
-            Aas.Reference other)
+            Our.Reference that,
+            Our.Reference other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool KeyDeepEquals(
-            Aas.Key that,
-            Aas.Key other)
+            Our.Key that,
+            Our.Key other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringNameTypeDeepEquals(
-            Aas.LangStringNameType that,
-            Aas.LangStringNameType other)
+            Our.LangStringNameType that,
+            Our.LangStringNameType other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringTextTypeDeepEquals(
-            Aas.LangStringTextType that,
-            Aas.LangStringTextType other)
+            Our.LangStringTextType that,
+            Our.LangStringTextType other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool EnvironmentDeepEquals(
-            Aas.Environment that,
-            Aas.Environment other)
+            Our.Environment that,
+            Our.Environment other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool EmbeddedDataSpecificationDeepEquals(
-            Aas.EmbeddedDataSpecification that,
-            Aas.EmbeddedDataSpecification other)
+            Our.EmbeddedDataSpecification that,
+            Our.EmbeddedDataSpecification other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LevelTypeDeepEquals(
-            Aas.LevelType that,
-            Aas.LevelType other)
+            Our.LevelType that,
+            Our.LevelType other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ValueReferencePairDeepEquals(
-            Aas.ValueReferencePair that,
-            Aas.ValueReferencePair other)
+            Our.ValueReferencePair that,
+            Our.ValueReferencePair other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool ValueListDeepEquals(
-            Aas.ValueList that,
-            Aas.ValueList other)
+            Our.ValueList that,
+            Our.ValueList other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringPreferredNameTypeIec61360DeepEquals(
-            Aas.LangStringPreferredNameTypeIec61360 that,
-            Aas.LangStringPreferredNameTypeIec61360 other)
+            Our.LangStringPreferredNameTypeIec61360 that,
+            Our.LangStringPreferredNameTypeIec61360 other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringShortNameTypeIec61360DeepEquals(
-            Aas.LangStringShortNameTypeIec61360 that,
-            Aas.LangStringShortNameTypeIec61360 other)
+            Our.LangStringShortNameTypeIec61360 that,
+            Our.LangStringShortNameTypeIec61360 other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool LangStringDefinitionTypeIec61360DeepEquals(
-            Aas.LangStringDefinitionTypeIec61360 that,
-            Aas.LangStringDefinitionTypeIec61360 other)
+            Our.LangStringDefinitionTypeIec61360 that,
+            Our.LangStringDefinitionTypeIec61360 other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
 
         private static bool DataSpecificationIec61360DeepEquals(
-            Aas.DataSpecificationIec61360 that,
-            Aas.DataSpecificationIec61360 other)
+            Our.DataSpecificationIec61360 that,
+            Our.DataSpecificationIec61360 other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -2734,10 +2734,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_shallow_copy()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMaximalExtension());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ExtensionShallowEquals(
@@ -2748,10 +2748,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_deep_copy()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMaximalExtension());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ExtensionDeepEquals(
@@ -2762,10 +2762,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AdministrativeInformation_shallow_copy()
         {
-            Aas.AdministrativeInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
+            Our.AdministrativeInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 AdministrativeInformationShallowEquals(
@@ -2776,10 +2776,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AdministrativeInformation_deep_copy()
         {
-            Aas.AdministrativeInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
+            Our.AdministrativeInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAdministrativeInformation());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 AdministrativeInformationDeepEquals(
@@ -2790,10 +2790,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Qualifier_shallow_copy()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQualifier());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 QualifierShallowEquals(
@@ -2804,10 +2804,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Qualifier_deep_copy()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQualifier());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 QualifierDeepEquals(
@@ -2818,10 +2818,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_shallow_copy()
         {
-            Aas.AssetAdministrationShell instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
+            Our.AssetAdministrationShell instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 AssetAdministrationShellShallowEquals(
@@ -2832,10 +2832,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetAdministrationShell_deep_copy()
         {
-            Aas.AssetAdministrationShell instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
+            Our.AssetAdministrationShell instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetAdministrationShell());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 AssetAdministrationShellDeepEquals(
@@ -2846,10 +2846,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetInformation_shallow_copy()
         {
-            Aas.AssetInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation());
+            Our.AssetInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 AssetInformationShallowEquals(
@@ -2860,10 +2860,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AssetInformation_deep_copy()
         {
-            Aas.AssetInformation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAssetInformation());
+            Our.AssetInformation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAssetInformation());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 AssetInformationDeepEquals(
@@ -2874,10 +2874,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Resource_shallow_copy()
         {
-            Aas.Resource instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalResource());
+            Our.Resource instance = (
+                Our.Tests.CommonJsonization.LoadMaximalResource());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ResourceShallowEquals(
@@ -2888,10 +2888,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Resource_deep_copy()
         {
-            Aas.Resource instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalResource());
+            Our.Resource instance = (
+                Our.Tests.CommonJsonization.LoadMaximalResource());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ResourceDeepEquals(
@@ -2902,10 +2902,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SpecificAssetId_shallow_copy()
         {
-            Aas.SpecificAssetId instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
+            Our.SpecificAssetId instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SpecificAssetIdShallowEquals(
@@ -2916,10 +2916,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SpecificAssetId_deep_copy()
         {
-            Aas.SpecificAssetId instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
+            Our.SpecificAssetId instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSpecificAssetId());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SpecificAssetIdDeepEquals(
@@ -2930,10 +2930,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_shallow_copy()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SubmodelShallowEquals(
@@ -2944,10 +2944,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_deep_copy()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SubmodelDeepEquals(
@@ -2958,10 +2958,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_shallow_copy()
         {
-            Aas.RelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement());
+            Our.RelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 RelationshipElementShallowEquals(
@@ -2972,10 +2972,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_RelationshipElement_deep_copy()
         {
-            Aas.RelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRelationshipElement());
+            Our.RelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRelationshipElement());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 RelationshipElementDeepEquals(
@@ -2986,10 +2986,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_shallow_copy()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SubmodelElementListShallowEquals(
@@ -3000,10 +3000,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_deep_copy()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SubmodelElementListDeepEquals(
@@ -3014,10 +3014,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_shallow_copy()
         {
-            Aas.SubmodelElementCollection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
+            Our.SubmodelElementCollection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 SubmodelElementCollectionShallowEquals(
@@ -3028,10 +3028,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementCollection_deep_copy()
         {
-            Aas.SubmodelElementCollection instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
+            Our.SubmodelElementCollection instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementCollection());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 SubmodelElementCollectionDeepEquals(
@@ -3042,10 +3042,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_shallow_copy()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMaximalProperty());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 PropertyShallowEquals(
@@ -3056,10 +3056,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_deep_copy()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMaximalProperty());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 PropertyDeepEquals(
@@ -3070,10 +3070,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_shallow_copy()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 MultiLanguagePropertyShallowEquals(
@@ -3084,10 +3084,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_deep_copy()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 MultiLanguagePropertyDeepEquals(
@@ -3098,10 +3098,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_shallow_copy()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRange());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 RangeShallowEquals(
@@ -3112,10 +3112,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_deep_copy()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRange());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 RangeDeepEquals(
@@ -3126,10 +3126,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_shallow_copy()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ReferenceElementShallowEquals(
@@ -3140,10 +3140,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_deep_copy()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ReferenceElementDeepEquals(
@@ -3154,10 +3154,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_shallow_copy()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlob());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 BlobShallowEquals(
@@ -3168,10 +3168,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_deep_copy()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlob());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 BlobDeepEquals(
@@ -3182,10 +3182,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_shallow_copy()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMaximalFile());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 FileShallowEquals(
@@ -3196,10 +3196,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_deep_copy()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMaximalFile());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 FileDeepEquals(
@@ -3210,10 +3210,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_shallow_copy()
         {
-            Aas.AnnotatedRelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
+            Our.AnnotatedRelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 AnnotatedRelationshipElementShallowEquals(
@@ -3224,10 +3224,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_AnnotatedRelationshipElement_deep_copy()
         {
-            Aas.AnnotatedRelationshipElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
+            Our.AnnotatedRelationshipElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalAnnotatedRelationshipElement());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 AnnotatedRelationshipElementDeepEquals(
@@ -3238,10 +3238,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_shallow_copy()
         {
-            Aas.Entity instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEntity());
+            Our.Entity instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEntity());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 EntityShallowEquals(
@@ -3252,10 +3252,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Entity_deep_copy()
         {
-            Aas.Entity instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEntity());
+            Our.Entity instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEntity());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 EntityDeepEquals(
@@ -3266,10 +3266,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_EventPayload_shallow_copy()
         {
-            Aas.EventPayload instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEventPayload());
+            Our.EventPayload instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEventPayload());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 EventPayloadShallowEquals(
@@ -3280,10 +3280,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_EventPayload_deep_copy()
         {
-            Aas.EventPayload instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEventPayload());
+            Our.EventPayload instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEventPayload());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 EventPayloadDeepEquals(
@@ -3294,10 +3294,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_shallow_copy()
         {
-            Aas.BasicEventElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement());
+            Our.BasicEventElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 BasicEventElementShallowEquals(
@@ -3308,10 +3308,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_BasicEventElement_deep_copy()
         {
-            Aas.BasicEventElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBasicEventElement());
+            Our.BasicEventElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBasicEventElement());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 BasicEventElementDeepEquals(
@@ -3322,10 +3322,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_shallow_copy()
         {
-            Aas.Operation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperation());
+            Our.Operation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperation());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 OperationShallowEquals(
@@ -3336,10 +3336,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Operation_deep_copy()
         {
-            Aas.Operation instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperation());
+            Our.Operation instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperation());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 OperationDeepEquals(
@@ -3350,10 +3350,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_OperationVariable_shallow_copy()
         {
-            Aas.OperationVariable instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperationVariable());
+            Our.OperationVariable instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperationVariable());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 OperationVariableShallowEquals(
@@ -3364,10 +3364,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_OperationVariable_deep_copy()
         {
-            Aas.OperationVariable instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOperationVariable());
+            Our.OperationVariable instance = (
+                Our.Tests.CommonJsonization.LoadMaximalOperationVariable());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 OperationVariableDeepEquals(
@@ -3378,10 +3378,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_shallow_copy()
         {
-            Aas.Capability instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCapability());
+            Our.Capability instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCapability());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 CapabilityShallowEquals(
@@ -3392,10 +3392,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Capability_deep_copy()
         {
-            Aas.Capability instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalCapability());
+            Our.Capability instance = (
+                Our.Tests.CommonJsonization.LoadMaximalCapability());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 CapabilityDeepEquals(
@@ -3406,10 +3406,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_shallow_copy()
         {
-            Aas.ConceptDescription instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription());
+            Our.ConceptDescription instance = (
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ConceptDescriptionShallowEquals(
@@ -3420,10 +3420,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ConceptDescription_deep_copy()
         {
-            Aas.ConceptDescription instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalConceptDescription());
+            Our.ConceptDescription instance = (
+                Our.Tests.CommonJsonization.LoadMaximalConceptDescription());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ConceptDescriptionDeepEquals(
@@ -3434,10 +3434,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Reference_shallow_copy()
         {
-            Aas.Reference instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReference());
+            Our.Reference instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReference());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ReferenceShallowEquals(
@@ -3448,10 +3448,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Reference_deep_copy()
         {
-            Aas.Reference instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReference());
+            Our.Reference instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReference());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ReferenceDeepEquals(
@@ -3462,10 +3462,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Key_shallow_copy()
         {
-            Aas.Key instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalKey());
+            Our.Key instance = (
+                Our.Tests.CommonJsonization.LoadMaximalKey());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 KeyShallowEquals(
@@ -3476,10 +3476,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Key_deep_copy()
         {
-            Aas.Key instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalKey());
+            Our.Key instance = (
+                Our.Tests.CommonJsonization.LoadMaximalKey());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 KeyDeepEquals(
@@ -3490,10 +3490,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringNameType_shallow_copy()
         {
-            Aas.LangStringNameType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringNameType());
+            Our.LangStringNameType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringNameType());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringNameTypeShallowEquals(
@@ -3504,10 +3504,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringNameType_deep_copy()
         {
-            Aas.LangStringNameType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringNameType());
+            Our.LangStringNameType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringNameType());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringNameTypeDeepEquals(
@@ -3518,10 +3518,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringTextType_shallow_copy()
         {
-            Aas.LangStringTextType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringTextType());
+            Our.LangStringTextType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringTextType());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringTextTypeShallowEquals(
@@ -3532,10 +3532,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringTextType_deep_copy()
         {
-            Aas.LangStringTextType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringTextType());
+            Our.LangStringTextType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringTextType());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringTextTypeDeepEquals(
@@ -3546,10 +3546,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Environment_shallow_copy()
         {
-            Aas.Environment instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment());
+            Our.Environment instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 EnvironmentShallowEquals(
@@ -3560,10 +3560,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Environment_deep_copy()
         {
-            Aas.Environment instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEnvironment());
+            Our.Environment instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEnvironment());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 EnvironmentDeepEquals(
@@ -3574,10 +3574,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_EmbeddedDataSpecification_shallow_copy()
         {
-            Aas.EmbeddedDataSpecification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
+            Our.EmbeddedDataSpecification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 EmbeddedDataSpecificationShallowEquals(
@@ -3588,10 +3588,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_EmbeddedDataSpecification_deep_copy()
         {
-            Aas.EmbeddedDataSpecification instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
+            Our.EmbeddedDataSpecification instance = (
+                Our.Tests.CommonJsonization.LoadMaximalEmbeddedDataSpecification());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 EmbeddedDataSpecificationDeepEquals(
@@ -3602,10 +3602,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LevelType_shallow_copy()
         {
-            Aas.LevelType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLevelType());
+            Our.LevelType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLevelType());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LevelTypeShallowEquals(
@@ -3616,10 +3616,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LevelType_deep_copy()
         {
-            Aas.LevelType instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLevelType());
+            Our.LevelType instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLevelType());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LevelTypeDeepEquals(
@@ -3630,10 +3630,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ValueReferencePair_shallow_copy()
         {
-            Aas.ValueReferencePair instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueReferencePair());
+            Our.ValueReferencePair instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueReferencePair());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ValueReferencePairShallowEquals(
@@ -3644,10 +3644,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ValueReferencePair_deep_copy()
         {
-            Aas.ValueReferencePair instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueReferencePair());
+            Our.ValueReferencePair instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueReferencePair());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ValueReferencePairDeepEquals(
@@ -3658,10 +3658,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ValueList_shallow_copy()
         {
-            Aas.ValueList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueList());
+            Our.ValueList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueList());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 ValueListShallowEquals(
@@ -3672,10 +3672,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ValueList_deep_copy()
         {
-            Aas.ValueList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalValueList());
+            Our.ValueList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalValueList());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 ValueListDeepEquals(
@@ -3686,10 +3686,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringPreferredNameTypeIec61360_shallow_copy()
         {
-            Aas.LangStringPreferredNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
+            Our.LangStringPreferredNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringPreferredNameTypeIec61360ShallowEquals(
@@ -3700,10 +3700,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringPreferredNameTypeIec61360_deep_copy()
         {
-            Aas.LangStringPreferredNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
+            Our.LangStringPreferredNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringPreferredNameTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringPreferredNameTypeIec61360DeepEquals(
@@ -3714,10 +3714,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringShortNameTypeIec61360_shallow_copy()
         {
-            Aas.LangStringShortNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
+            Our.LangStringShortNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringShortNameTypeIec61360ShallowEquals(
@@ -3728,10 +3728,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringShortNameTypeIec61360_deep_copy()
         {
-            Aas.LangStringShortNameTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
+            Our.LangStringShortNameTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringShortNameTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringShortNameTypeIec61360DeepEquals(
@@ -3742,10 +3742,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringDefinitionTypeIec61360_shallow_copy()
         {
-            Aas.LangStringDefinitionTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
+            Our.LangStringDefinitionTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 LangStringDefinitionTypeIec61360ShallowEquals(
@@ -3756,10 +3756,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_LangStringDefinitionTypeIec61360_deep_copy()
         {
-            Aas.LangStringDefinitionTypeIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
+            Our.LangStringDefinitionTypeIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalLangStringDefinitionTypeIec61360());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 LangStringDefinitionTypeIec61360DeepEquals(
@@ -3770,10 +3770,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataSpecificationIec61360_shallow_copy()
         {
-            Aas.DataSpecificationIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
+            Our.DataSpecificationIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 DataSpecificationIec61360ShallowEquals(
@@ -3784,10 +3784,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_DataSpecificationIec61360_deep_copy()
         {
-            Aas.DataSpecificationIec61360 instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
+            Our.DataSpecificationIec61360 instance = (
+                Our.Tests.CommonJsonization.LoadMaximalDataSpecificationIec61360());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 DataSpecificationIec61360DeepEquals(

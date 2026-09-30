@@ -204,7 +204,7 @@ class _ParserRegistry:
         name = _parser_name(type_annotation)
 
         item_type = python_common.generate_type(
-            items_type_anno, types_module=Identifier("aas_types")
+            items_type_anno, types_module=Identifier("our_types")
         )
 
         parse_item = _parser_name(items_type_anno)
@@ -242,7 +242,7 @@ def {name}(
         name = _parser_name(type_annotation)
 
         item_type = python_common.generate_type(
-            type_annotation.items, types_module=Identifier("aas_types")
+            type_annotation.items, types_module=Identifier("our_types")
         )
 
         parse_item = _parser_name(type_annotation.items)
@@ -295,7 +295,7 @@ def {name}(
             parse_items.append(_parser_name(item_type_anno))
             item_types.append(
                 python_common.generate_type(
-                    item_type_anno, types_module=Identifier("aas_types")
+                    item_type_anno, types_module=Identifier("our_types")
                 )
             )
 
@@ -638,7 +638,7 @@ def _list_from_jsonable(
 {I}:return: parsed list
 {I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
 {I}"""
-{I}array_like = aas_common.try_to_cast_to_array_like(jsonable)
+{I}array_like = our_common.try_to_cast_to_array_like(jsonable)
 {I}if array_like is None:
 {II}raise DeserializationException(
 {III}f"Expected something array-like, but got: {{type(jsonable)}}"
@@ -674,7 +674,7 @@ def _set_from_jsonable(
 {I}:return: parsed set
 {I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
 {I}"""
-{I}array_like = aas_common.try_to_cast_to_array_like(jsonable)
+{I}array_like = our_common.try_to_cast_to_array_like(jsonable)
 {I}if array_like is None:
 {II}raise DeserializationException(
 {III}f"Expected something array-like, but got: {{type(jsonable)}}"
@@ -703,7 +703,7 @@ def _set_from_jsonable(
             f'''\
 def _json_value_from_jsonable(
 {I}jsonable: Jsonable
-) -> aas_types.JsonValue:
+) -> our_types.JsonValue:
 {I}"""
 {I}Parse :paramref:`jsonable` as a JSON-able value.
 
@@ -732,7 +732,7 @@ def _json_value_from_jsonable(
 {II}# JSON knows a single numeric type, so :py:mod:`json` giving us
 {II}# an ``int`` says nothing about the document: "1" and "1.0" are
 {II}# the same number, and a JSON-able value holds it as a ``float``.
-{II}number = aas_common.try_to_convert_int_to_float(jsonable)
+{II}number = our_common.try_to_convert_int_to_float(jsonable)
 {II}if number is None:
 {III}raise DeserializationException(
 {IIII}f"Expected a JSON-able value, but got the integer {{jsonable}}, "
@@ -775,7 +775,7 @@ def _json_value_from_jsonable(
 
 {II}return mapping
 
-{I}array_like = aas_common.try_to_cast_to_array_like(jsonable)
+{I}array_like = our_common.try_to_cast_to_array_like(jsonable)
 {I}if array_like is not None:
 {II}items = []  # type: List[Any]
 {II}for i, jsonable_item in enumerate(array_like):
@@ -796,7 +796,7 @@ def _json_value_from_jsonable(
             f'''\
 def _json_array_from_jsonable(
 {I}jsonable: Jsonable
-) -> aas_types.JsonArray:
+) -> our_types.JsonArray:
 {I}"""
 {I}Parse :paramref:`jsonable` as a JSON-able array.
 
@@ -804,7 +804,7 @@ def _json_array_from_jsonable(
 {I}:return: parsed JSON-able array
 {I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
 {I}"""
-{I}if aas_common.try_to_cast_to_array_like(jsonable) is None:
+{I}if our_common.try_to_cast_to_array_like(jsonable) is None:
 {II}raise DeserializationException(
 {III}f"Expected a JSON-able array, but got: {{type(jsonable)}}"
 {II})
@@ -817,7 +817,7 @@ def _json_array_from_jsonable(
             f'''\
 def _json_object_from_jsonable(
 {I}jsonable: Jsonable
-) -> aas_types.JsonObject:
+) -> our_types.JsonObject:
 {I}"""
 {I}Parse :paramref:`jsonable` as a JSON-able object.
 
@@ -883,7 +883,7 @@ def {function_name}(
 {I}:return: parsed tuple
 {I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
 {I}"""
-{I}array_like = aas_common.try_to_cast_to_array_like(jsonable)
+{I}array_like = our_common.try_to_cast_to_array_like(jsonable)
 {I}if array_like is None:
 {II}raise DeserializationException(
 {III}f"Expected something array-like, but got: {{type(jsonable)}}"
@@ -936,7 +936,7 @@ def _generate_enumeration_from_jsonable(
         f"""\
 def {function_name}(
 {I}jsonable: Jsonable
-) -> aas_types.{enum_name}:
+) -> our_types.{enum_name}:
 {I}\"\"\"
 {I}Convert the JSON-able structure :paramref:`jsonable` to a literal of
 {I}:py:class:`.types.{enum_name}`.
@@ -950,7 +950,7 @@ def {function_name}(
 {III}"Expected a str, but got: {{type(jsonable)}}"
 {II})
 
-{I}literal = aas_stringification.{enum_from_str}(jsonable)
+{I}literal = our_stringification.{enum_from_str}(jsonable)
 {I}if literal is None:
 {II}raise DeserializationException(
 {III}f"Not a valid string representation of "
@@ -983,7 +983,7 @@ def _generate_dispatch_map_for_abstract_class(
 #: :py:class:`.types.{cls_name}`, by its model type
 {mapping_name}: Mapping[
 {I}str,
-{I}_Parser[aas_types.{cls_name}]
+{I}_Parser[our_types.{cls_name}]
 ] = {{
 """
     )
@@ -1031,7 +1031,7 @@ def _generate_dispatch_map_for_concrete_class(
 #: :py:class:`.types.{cls_name}`, by its model type
 {mapping_name}: Mapping[
 {I}str,
-{I}_Parser[aas_types.{cls_name}]
+{I}_Parser[our_types.{cls_name}]
 ] = {{
 """
     )
@@ -1088,7 +1088,7 @@ def _generate_dispatch_from_jsonable(cls: intermediate.ClassUnion) -> Stripped:
         f"""\
 def {function_name}(
 {II}jsonable: Jsonable
-) -> aas_types.{cls_name}:
+) -> our_types.{cls_name}:
 {I}\"\"\"
 {I}Parse an instance of :py:class:`.types.{cls_name}` from the JSON-able
 {I}structure :paramref:`jsonable`.
@@ -1128,7 +1128,7 @@ def _generate_dispatch_map_for_named_union(
 #: :py:class:`.types.{union_name}`, by its model type
 {mapping_name}: Mapping[
 {I}str,
-{I}_Parser[aas_types.{union_name}]
+{I}_Parser[our_types.{union_name}]
 ] = {{
 """
     )
@@ -1261,7 +1261,7 @@ raise DeserializationException(
         f"""\
 def {function_name}(
 {II}jsonable: Jsonable
-) -> aas_types.{union_name}:
+) -> our_types.{union_name}:
 {I}\"\"\"
 {I}Parse an instance of :py:class:`.types.{union_name}` from the JSON-able
 {I}structure :paramref:`jsonable`.
@@ -1291,7 +1291,7 @@ def _generate_optional_type(
     of whether the property itself is.
     """
     prop_type = python_common.generate_type(
-        type_annotation, types_module=Identifier("aas_types")
+        type_annotation, types_module=Identifier("our_types")
     )
 
     if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
@@ -1525,10 +1525,10 @@ if {variable_by_prop_name[prop.name]} is None:
     # region Pass in the arguments to the constructor
 
     if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return aas_types.{cls_name}()"))
+        blocks.append(Stripped(f"return our_types.{cls_name}()"))
     else:
         init_writer = io.StringIO()
-        init_writer.write(f"return aas_types.{cls_name}(\n")
+        init_writer.write(f"return our_types.{cls_name}(\n")
 
         for i, arg in enumerate(cls.constructor.arguments):
             init_writer.write(f"{I}{variable_by_prop_name[arg.name]}")
@@ -1595,7 +1595,7 @@ directly. If you want to de-serialize an instance of
         f"""\
 def {function_name}(
 {II}jsonable: Jsonable
-) -> aas_types.{cls_name}:
+) -> our_types.{cls_name}:
 {I}\"\"\"
 {I}{indent_but_first_line(docstring, I)}
 {I}\"\"\"
@@ -1713,7 +1713,7 @@ def _generate_json_value_to_jsonable() -> Stripped:
     return Stripped(
         f'''\
 def _json_value_to_jsonable(
-{I}value: aas_types.JsonValue
+{I}value: our_types.JsonValue
 ) -> MutableJsonable:
 {I}"""
 {I}Serialize :paramref:`value` as a JSON-able structure.
@@ -1743,7 +1743,7 @@ def _json_value_to_jsonable(
 {II}# numeric type, though, so it has to be one which a ``float`` can
 {II}# hold exactly -- otherwise a reader, which reads every number as
 {II}# a ``float``, would get a different number back.
-{II}if aas_common.try_to_convert_int_to_float(value) is None:
+{II}if our_common.try_to_convert_int_to_float(value) is None:
 {III}raise SerializationException(
 {IIII}f"Expected a JSON-able value, but got the integer {{value}}, "
 {IIII}f"which is not exactly representable as a JSON number"
@@ -1781,7 +1781,7 @@ def _json_value_to_jsonable(
 
 {II}return mapping
 
-{I}array_like = aas_common.try_to_cast_to_array_like(value)
+{I}array_like = our_common.try_to_cast_to_array_like(value)
 {I}if array_like is not None:
 {II}items = []  # type: List[Any]
 {II}for i, item_value in enumerate(array_like):
@@ -2043,7 +2043,7 @@ class _SerializerRegistry:
         name = _list_serializer_name(type_annotation)
 
         list_type = python_common.generate_type(
-            type_annotation, types_module=Identifier("aas_types")
+            type_annotation, types_module=Identifier("our_types")
         )
 
         item_serialization = _generate_atomic_serialization(
@@ -2112,7 +2112,7 @@ def {name}(
         name = _set_serializer_name(type_annotation)
 
         set_type = python_common.generate_type(
-            type_annotation, types_module=Identifier("aas_types")
+            type_annotation, types_module=Identifier("our_types")
         )
 
         item_serialization = _generate_atomic_serialization(
@@ -2124,7 +2124,7 @@ def {name}(
             items_type_anno.our_type, intermediate.Enumeration
         ):
             rank_function = python_common.rank_function_name(items_type_anno.our_type)
-            sorted_that = f"sorted(that, key=aas_stringification.{rank_function})"
+            sorted_that = f"sorted(that, key=our_stringification.{rank_function})"
         else:
             sorted_that = "sorted(that)"
 
@@ -2188,7 +2188,7 @@ def {name}(
         name = _tuple_serializer_name(type_annotation)
 
         tuple_type = python_common.generate_type(
-            type_annotation, types_module=Identifier("aas_types")
+            type_annotation, types_module=Identifier("our_types")
         )
 
         # NOTE (mristin):
@@ -2491,7 +2491,7 @@ if that.{prop_name} is not None:
     return Stripped(
         f'''\
 def {function_name}(
-{I}that: aas_types.{cls_name}
+{I}that: our_types.{cls_name}
 ) -> MutableMapping[str, MutableJsonable]:
 {I}"""Serialize :paramref:`that` to a JSON-able representation."""
 {I}{indent_but_first_line(body, I)}'''
@@ -2525,7 +2525,7 @@ def _generate_serializer(symbol_table: intermediate.SymbolTable) -> Stripped:
     return Stripped(
         f'''\
 class _Serializer(
-{II}aas_types.AbstractTransformer[MutableJsonable]
+{II}our_types.AbstractTransformer[MutableJsonable]
 ):
 {I}"""
 {I}Dispatch on the class of an instance to serialize it.
@@ -2631,7 +2631,7 @@ def generate(
         Stripped(
             """\
 \"\"\"
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -2666,9 +2666,9 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-import {qualified_module_name}.common as aas_common
-import {qualified_module_name}.stringification as aas_stringification
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.common as our_common
+import {qualified_module_name}.stringification as our_stringification
+import {qualified_module_name}.types as our_types"""
         ),
         python_common.generate_note_on_the_three_error_paths(
             qualified_module_name=qualified_module_name
@@ -2777,7 +2777,7 @@ class Path:
 {II}elif isinstance(first, KeySegment):
 {III}parts.append(f"[{{first.key!r}}]")
 {II}else:
-{III}aas_common.assert_never(first)
+{III}our_common.assert_never(first)
 
 {II}for segment in iterator:
 {III}if isinstance(segment, PropertySegment):
@@ -2787,7 +2787,7 @@ class Path:
 {III}elif isinstance(segment, KeySegment):
 {IIII}parts.append(f"[{{segment.key!r}}]")
 {III}else:
-{IIII}aas_common.assert_never(segment)
+{IIII}our_common.assert_never(segment)
 
 {II}return "".join(parts)"""
         ),
@@ -2938,12 +2938,12 @@ _Parser = Callable[
     blocks.append(
         Stripped(
             f"""\
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
 {I}\"\"\"
 {I}Convert :paramref:`that` to a JSON-able structure.
 
 {I}:param that:
-{II}AAS data to be recursively converted to a JSON-able structure
+{II}Model instance to be recursively converted to a JSON-able structure
 {I}:return:
 {II}JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
 {I}:raise:

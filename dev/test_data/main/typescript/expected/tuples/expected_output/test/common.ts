@@ -6,9 +6,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";
-import * as AasJsonization from "../src/jsonization";
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";
+import * as OurJsonization from "../src/jsonization";
 import { Path } from "../src/jsonization";
 
 // NOTE (mristin):
@@ -53,9 +53,9 @@ if (!fs.lstatSync(TEST_DATA_DIR).isDirectory()) {
  * @param aPath - to the file
  * @returns a JSON value read from the file
  */
-export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {
+export function readJsonFromFileSync(aPath: string): OurJsonization.JsonValue {
   const text = fs.readFileSync(aPath, "utf-8");
-  let jsonable: AasJsonization.JsonValue | null = null;
+  let jsonable: OurJsonization.JsonValue | null = null;
   try {
     jsonable = JSON.parse(text);
   } catch (error) {
@@ -66,7 +66,7 @@ export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {
     throw new Error(`Unexpected null value as JSON from: ${aPath}`);
   }
 
-  return <AasJsonization.JsonValue>jsonable;
+  return <OurJsonization.JsonValue>jsonable;
 }
 
 /**
@@ -79,8 +79,8 @@ export function readJsonFromFileSync(aPath: string): AasJsonization.JsonValue {
  * `condition`
  */
 export function mustFind(
-  container: AasTypes.Class,
-  condition: (instance: AasTypes.Class) => boolean
+  container: OurTypes.Class,
+  condition: (instance: OurTypes.Class) => boolean
 ) {
   if (condition(container)) {
     return container;
@@ -103,7 +103,7 @@ export function mustFind(
  * @throws an {@link Error} with an informative message
  */
 export function assertNoVerificationErrors(
-  errors: IterableIterator<AasVerification.VerificationError>,
+  errors: IterableIterator<OurVerification.VerificationError>,
   aPath: string
 ): void {
   const errorArray = errors instanceof Array ? errors : Array.from(errors);
@@ -132,7 +132,7 @@ export function assertNoVerificationErrors(
  * recorded errors do not coincide
  */
 export function assertExpectedOrRecordedVerificationErrors(
-  errors: IterableIterator<AasVerification.VerificationError>,
+  errors: IterableIterator<OurVerification.VerificationError>,
   aPath: string
 ): void {
   const errorArray = errors instanceof Array ? errors : Array.from(errors);
@@ -174,7 +174,7 @@ export function assertExpectedOrRecordedVerificationErrors(
  * @param instance - to leave a mark in the trace
  * @returns the mark in the trace
  */
-export function traceMark(instance: AasTypes.Class): string {
+export function traceMark(instance: OurTypes.Class): string {
   return instance.constructor.name;
 }
 
@@ -230,9 +230,9 @@ export class InequalityError {
   /**
    * Relative path to the erroneous value
    */
-  readonly path: AasJsonization.Path;
+  readonly path: OurJsonization.Path;
 
-  constructor(message: string, path: AasJsonization.Path | null = null) {
+  constructor(message: string, path: OurJsonization.Path | null = null) {
     this.message = message;
     this.path = path ?? new Path();
   }
@@ -246,9 +246,9 @@ export class InequalityError {
  * @param got - JSON-able structure
  */
 export function checkJsonablesEqual(
-  expected: AasJsonization.JsonValue | null,
-  got: AasJsonization.JsonValue | null
-): AasJsonization.DeserializationError | null {
+  expected: OurJsonization.JsonValue | null,
+  got: OurJsonization.JsonValue | null
+): OurJsonization.DeserializationError | null {
   if (
     expected === null ||
     typeof expected === "boolean" ||
@@ -288,9 +288,9 @@ export function checkJsonablesEqual(
       );
     }
 
-    const expectedIt = <Iterator<AasJsonization.JsonValue>>expected[Symbol.iterator]();
+    const expectedIt = <Iterator<OurJsonization.JsonValue>>expected[Symbol.iterator]();
 
-    const gotIt = <Iterator<AasJsonization.JsonValue>>got[Symbol.iterator]();
+    const gotIt = <Iterator<OurJsonization.JsonValue>>got[Symbol.iterator]();
 
     let i = 0;
     // eslint-disable-next-line no-constant-condition
@@ -322,7 +322,7 @@ export function checkJsonablesEqual(
       const error = checkJsonablesEqual(expectedItem, gotItem);
       if (error !== null) {
         error.path.prepend(
-          new AasJsonization.IndexSegment(<AasJsonization.JsonArray>expected, i)
+          new OurJsonization.IndexSegment(<OurJsonization.JsonArray>expected, i)
         );
         return error;
       }
@@ -367,7 +367,7 @@ export function checkJsonablesEqual(
       const error = checkJsonablesEqual(expectedValue, gotValue);
       if (error !== null) {
         error.path.prepend(
-          new AasJsonization.PropertySegment(<AasJsonization.JsonObject>expected, key)
+          new OurJsonization.PropertySegment(<OurJsonization.JsonObject>expected, key)
         );
         return error;
       }

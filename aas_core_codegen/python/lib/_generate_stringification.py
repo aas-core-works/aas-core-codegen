@@ -29,7 +29,7 @@ def _generate_enum_from_string(
     from_str_map_writer = io.StringIO()
     from_str_map_writer.write(
         f"""\
-{from_str_map_name}: Mapping[str, aas_types.{name}] = {{
+{from_str_map_name}: Mapping[str, our_types.{name}] = {{
 """
     )
 
@@ -37,7 +37,7 @@ def _generate_enum_from_string(
         literal_name = python_naming.enum_literal_name(literal.name)
         from_str_map_writer.write(
             f"{I}{python_common.string_literal(literal.value)}: "
-            f"aas_types.{name}.{literal_name},\n"
+            f"our_types.{name}.{literal_name},\n"
         )
 
     from_str_map_writer.write("}")
@@ -57,7 +57,7 @@ def _generate_enum_from_string(
         f"""\
 def {from_str_name}(
 {II}text: str
-) -> Optional[aas_types.{name}]:
+) -> Optional[our_types.{name}]:
 {I}\"\"\"
 {I}Parse :paramref:`text` as string representation
 {I}of :py:class:`{qualified_module_name}.{name}`.
@@ -100,7 +100,7 @@ def _generate_rank(
     rank_map_writer = io.StringIO()
     rank_map_writer.write(
         f"""\
-{rank_map_name}: Final[Mapping[aas_types.{name}, int]] = {{
+{rank_map_name}: Final[Mapping[our_types.{name}, int]] = {{
 """
     )
 
@@ -109,7 +109,7 @@ def _generate_rank(
     ):
         literal_name = python_naming.enum_literal_name(literal.name)
         rank_map_writer.write(
-            f"{I}aas_types.{name}.{literal_name}: {rank},  "
+            f"{I}our_types.{name}.{literal_name}: {rank},  "
             f"# {python_common.string_literal(literal.value)}\n"
         )
 
@@ -123,7 +123,7 @@ def _generate_rank(
 
 
 def {rank_function_name}(
-{II}literal: aas_types.{name}
+{II}literal: our_types.{name}
 ) -> int:
 {I}\"\"\"
 {I}Give out the rank of :paramref:`literal` in the serialization order.
@@ -175,7 +175,7 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         )
         if len(ranked_enumerations) > 0
         else Stripped(
@@ -185,7 +185,7 @@ from typing import (
 {I}Optional,
 )
 
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         )
     )
 

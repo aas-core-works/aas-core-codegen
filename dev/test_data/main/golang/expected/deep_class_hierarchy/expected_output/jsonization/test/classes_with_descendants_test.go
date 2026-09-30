@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestNodeRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBranch()
+	instance := ourtesting.MustLoadMinimalBranch()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Branch: %v",
@@ -23,7 +23,7 @@ func TestNodeRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Branch>"
 
-	deserialized, deseriaErr := aasjsonization.NodeFromJsonable(
+	deserialized, deseriaErr := ourjsonization.NodeFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestNodeRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -51,7 +51,7 @@ func TestNodeRoundTripOKOverDescendant(t *testing.T) {
 func TestNodeDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.NodeFromJsonable(
+	_, err := ourjsonization.NodeFromJsonable(
 		jsonable,
 	)
 
@@ -60,7 +60,7 @@ func TestNodeDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return
@@ -88,9 +88,9 @@ func TestNodeDeserializationFail(t *testing.T) {
 }
 
 func TestBranchRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLeaf()
+	instance := ourtesting.MustLoadMinimalLeaf()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Leaf: %v",
@@ -101,7 +101,7 @@ func TestBranchRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Leaf>"
 
-	deserialized, deseriaErr := aasjsonization.BranchFromJsonable(
+	deserialized, deseriaErr := ourjsonization.BranchFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -109,7 +109,7 @@ func TestBranchRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -127,9 +127,9 @@ func TestBranchRoundTripOKOverDescendant(t *testing.T) {
 }
 
 func TestLeafRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBlossom()
+	instance := ourtesting.MustLoadMinimalBlossom()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal Blossom: %v",
@@ -140,7 +140,7 @@ func TestLeafRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal Blossom>"
 
-	deserialized, deseriaErr := aasjsonization.LeafFromJsonable(
+	deserialized, deseriaErr := ourjsonization.LeafFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -148,7 +148,7 @@ func TestLeafRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return

@@ -16,8 +16,8 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -26,13 +26,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -47,7 +47,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -56,7 +56,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -67,7 +67,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -78,7 +78,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -395,12 +395,12 @@ func parseArray[T any](
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IItem],
+// Parse `jsonable` as an instance of [ourtypes.IItem],
 // or return an error.
 func ItemFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IItem,
+	result ourtypes.IItem,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -412,12 +412,12 @@ func ItemFromJsonable(
 	return itemFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IBox],
+// Parse `jsonable` as an instance of [ourtypes.IBox],
 // or return an error.
 func BoxFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IBox,
+	result ourtypes.IBox,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -434,12 +434,12 @@ func BoxFromJsonable(
 	return boxFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IBox] from a map,
+// Parse [ourtypes.IBox] from a map,
 // or return an error, if any.
 func boxFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IBox,
+	result ourtypes.IBox,
 	err error,
 ) {
 	var theLabel string
@@ -491,7 +491,7 @@ func boxFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewBox(
+	result = ourtypes.NewBox(
 		theLabel,
 		theSize,
 	)
@@ -499,12 +499,12 @@ func boxFromMapWithoutDispatch(
 	return
 }
 
-// De-serialize an instance of [aastypes.IItem]
+// De-serialize an instance of [ourtypes.IItem]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func itemFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IItem,
+	result ourtypes.IItem,
 	err error,
 ) {
 	var modelType string
@@ -537,13 +537,13 @@ func itemFromMap(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -558,7 +558,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -567,7 +567,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -578,7 +578,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -589,7 +589,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -711,14 +711,14 @@ func serializeArray[T any](
 	return
 }
 
-// Serialize [aastypes.IBox] as a JSON-able map.
+// Serialize [ourtypes.IBox] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IBox] with proper dispatch, call
+// [ourtypes.IBox] with proper dispatch, call
 // [ToJsonable].
 func boxToMap(
-	that aastypes.IBox,
+	that ourtypes.IBox,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -740,12 +740,12 @@ func boxToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeBox:
+	case ourtypes.ModelTypeBox:
 		result, err = boxToMap(
-			that.(aastypes.IBox),
+			that.(ourtypes.IBox),
 		)
 	default:
 		err = newSerializationError(

@@ -17,7 +17,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -79,7 +79,7 @@ type IItem interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IItem]
+// Check whether the instance corresponds to [ourtypes.IItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -175,7 +175,7 @@ type IParent interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IParent]
+// Check whether the instance corresponds to [ourtypes.IParent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -204,7 +204,7 @@ type IChildA interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IChildA]
+// Check whether the instance corresponds to [ourtypes.IChildA]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -300,7 +300,7 @@ type IChildB interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IChildB]
+// Check whether the instance corresponds to [ourtypes.IChildB]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -396,7 +396,7 @@ type IContainer interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IContainer]
+// Check whether the instance corresponds to [ourtypes.IContainer]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -547,7 +547,7 @@ type ISomething interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

@@ -5,14 +5,14 @@ package jsonization_test
 
 import (
 	"testing"
-	aasjsonization "github.com/dummy-works/dummy/jsonization"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourjsonization "github.com/dummy-works/dummy/jsonization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestContentRoundTripOKOverDescendant(t *testing.T) {
-	instance := aastesting.MustLoadMinimalIecContent()
+	instance := ourtesting.MustLoadMinimalIecContent()
 
-	jsonable, err := aasjsonization.ToJsonable(instance)
+	jsonable, err := ourjsonization.ToJsonable(instance)
 	if err != nil {
 		t.Fatalf(
 			"Failed to serialize the minimal IecContent: %v",
@@ -23,7 +23,7 @@ func TestContentRoundTripOKOverDescendant(t *testing.T) {
 
 	source := "<minimal IecContent>"
 
-	deserialized, deseriaErr := aasjsonization.ContentFromJsonable(
+	deserialized, deseriaErr := ourjsonization.ContentFromJsonable(
 		jsonable,
 	)
 	ok := assertNoDeserializationError(t, deseriaErr, source)
@@ -31,7 +31,7 @@ func TestContentRoundTripOKOverDescendant(t *testing.T) {
 		return
 	}
 
-	anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+	anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
 	ok = assertNoSerializationError(t, seriaErr, source)
 	if !ok {
 		return
@@ -51,7 +51,7 @@ func TestContentRoundTripOKOverDescendant(t *testing.T) {
 func TestContentDeserializationFail(t *testing.T) {
 	jsonable := any("this is not an object")
 
-	_, err := aasjsonization.ContentFromJsonable(
+	_, err := ourjsonization.ContentFromJsonable(
 		jsonable,
 	)
 
@@ -60,7 +60,7 @@ func TestContentDeserializationFail(t *testing.T) {
 		return
 	}
 
-	deseriaErr, ok := err.(*aasjsonization.DeserializationError)
+	deseriaErr, ok := err.(*ourjsonization.DeserializationError)
 	if !ok {
 		t.Fatalf("Expected a de-serialization error, but got: %v", err)
 		return

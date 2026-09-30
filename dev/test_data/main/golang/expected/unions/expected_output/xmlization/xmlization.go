@@ -11,9 +11,9 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 	xmlcommon "github.com/dummy-works/dummy/internal/xmlcommon"
 )
 
@@ -95,10 +95,10 @@ func unexpectedItemElement(local string, expectedLocal string) error {
 // share this one function: an instance is discriminated by its own element name,
 // while a scalar is expected in an element named `v`.
 //
-// `T` is left unconstrained (instead of `aastypes.IClass`) since this
-// function never invokes any `aastypes.IClass` method on `T` -- this lets it
+// `T` is left unconstrained (instead of `ourtypes.IClass`) since this
+// function never invokes any `ourtypes.IClass` method on `T` -- this lets it
 // be reused for a list of scalars and for a list of a named union as well,
-// the latter being deliberately not an `aastypes.IClass` itself.
+// the latter being deliberately not an `ourtypes.IClass` itself.
 func readListOf[T any](
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -127,7 +127,7 @@ func readListOf[T any](
 		if valueErr != nil {
 			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 				deseriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			err = valueErr
@@ -240,7 +240,7 @@ func concludeProperty(
 	if valueErr != nil {
 		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: local},
+				&ourreporting.NameSegment{Name: local},
 			)
 		}
 		err = valueErr
@@ -285,7 +285,7 @@ func readTuple3[T1 any, T2 any, T3 any](
 		aCurrent xml.Token,
 		aLocal string,
 	) (T3, xml.Token, error),
-) (result aascommon.Tuple3[T1, T2, T3], next xml.Token, err error) {
+) (result ourcommon.Tuple3[T1, T2, T3], next xml.Token, err error) {
 	var item1 T1
 	item1, current, err = xmlcommon.ReadElementDispatched(
 		decoder, current, readItem1,
@@ -293,7 +293,7 @@ func readTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -306,7 +306,7 @@ func readTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
@@ -319,13 +319,13 @@ func readTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 2},
+				&ourreporting.IndexSegment{Index: 2},
 			)
 		}
 		return
 	}
 
-	result = aascommon.Tuple3[T1, T2, T3]{
+	result = ourcommon.Tuple3[T1, T2, T3]{
 		Item1: item1,
 		Item2: item2,
 		Item3: item3,
@@ -334,16 +334,16 @@ func readTuple3[T1 any, T2 any, T3 any](
 	return
 }
 
-// De-serialize the instance of [aastypes.IStructuralFirst]
+// De-serialize the instance of [ourtypes.IStructuralFirst]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IStructuralFirst].
+// of [ourtypes.IStructuralFirst].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readStructuralFirstAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IStructuralFirst,
+) (instance ourtypes.IStructuralFirst,
 	next xml.Token,
 	err error,
 ) {
@@ -392,22 +392,22 @@ func readStructuralFirstAsSequence(
 		return
 	}
 
-	instance = aastypes.NewStructuralFirst(
+	instance = ourtypes.NewStructuralFirst(
 		theUniqueToFirst,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IStructuralSecond]
+// De-serialize the instance of [ourtypes.IStructuralSecond]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IStructuralSecond].
+// of [ourtypes.IStructuralSecond].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readStructuralSecondAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IStructuralSecond,
+) (instance ourtypes.IStructuralSecond,
 	next xml.Token,
 	err error,
 ) {
@@ -456,13 +456,13 @@ func readStructuralSecondAsSequence(
 		return
 	}
 
-	instance = aastypes.NewStructuralSecond(
+	instance = ourtypes.NewStructuralSecond(
 		theUniqueToSecond,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.StructuralUnion] based on the `local` name
+// De-serialize an instance of [ourtypes.StructuralUnion] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -471,22 +471,22 @@ func readStructuralUnionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.StructuralUnion,
+) (instance *ourtypes.StructuralUnion,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "structuralFirst":
-		var casted aastypes.IStructuralFirst
+		var casted ourtypes.IStructuralFirst
 		casted, next, err = readStructuralFirstAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewStructuralUnionFromStructuralFirst(casted)
+			instance = ourtypes.NewStructuralUnionFromStructuralFirst(casted)
 		}
 	case "structuralSecond":
-		var casted aastypes.IStructuralSecond
+		var casted ourtypes.IStructuralSecond
 		casted, next, err = readStructuralSecondAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewStructuralUnionFromStructuralSecond(casted)
+			instance = ourtypes.NewStructuralUnionFromStructuralSecond(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union StructuralUnion")
@@ -494,16 +494,16 @@ func readStructuralUnionDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IMixedAbstractDescendantOne]
+// De-serialize the instance of [ourtypes.IMixedAbstractDescendantOne]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMixedAbstractDescendantOne].
+// of [ourtypes.IMixedAbstractDescendantOne].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMixedAbstractDescendantOneAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMixedAbstractDescendantOne,
+) (instance ourtypes.IMixedAbstractDescendantOne,
 	next xml.Token,
 	err error,
 ) {
@@ -552,22 +552,22 @@ func readMixedAbstractDescendantOneAsSequence(
 		return
 	}
 
-	instance = aastypes.NewMixedAbstractDescendantOne(
+	instance = ourtypes.NewMixedAbstractDescendantOne(
 		theUniqueToAbstractDescendantOne,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IMixedAbstractDescendantTwo]
+// De-serialize the instance of [ourtypes.IMixedAbstractDescendantTwo]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMixedAbstractDescendantTwo].
+// of [ourtypes.IMixedAbstractDescendantTwo].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMixedAbstractDescendantTwoAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMixedAbstractDescendantTwo,
+) (instance ourtypes.IMixedAbstractDescendantTwo,
 	next xml.Token,
 	err error,
 ) {
@@ -616,22 +616,22 @@ func readMixedAbstractDescendantTwoAsSequence(
 		return
 	}
 
-	instance = aastypes.NewMixedAbstractDescendantTwo(
+	instance = ourtypes.NewMixedAbstractDescendantTwo(
 		theUniqueToAbstractDescendantTwo,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IMixedConcreteWithDescendants]
+// De-serialize the instance of [ourtypes.IMixedConcreteWithDescendants]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMixedConcreteWithDescendants].
+// of [ourtypes.IMixedConcreteWithDescendants].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMixedConcreteWithDescendantsAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMixedConcreteWithDescendants,
+) (instance ourtypes.IMixedConcreteWithDescendants,
 	next xml.Token,
 	err error,
 ) {
@@ -680,22 +680,22 @@ func readMixedConcreteWithDescendantsAsSequence(
 		return
 	}
 
-	instance = aastypes.NewMixedConcreteWithDescendants(
+	instance = ourtypes.NewMixedConcreteWithDescendants(
 		theSomeBaseProperty,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IMixedConcreteWithDescendantsChild]
+// De-serialize the instance of [ourtypes.IMixedConcreteWithDescendantsChild]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMixedConcreteWithDescendantsChild].
+// of [ourtypes.IMixedConcreteWithDescendantsChild].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMixedConcreteWithDescendantsChildAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMixedConcreteWithDescendantsChild,
+) (instance ourtypes.IMixedConcreteWithDescendantsChild,
 	next xml.Token,
 	err error,
 ) {
@@ -760,23 +760,23 @@ func readMixedConcreteWithDescendantsChildAsSequence(
 		return
 	}
 
-	instance = aastypes.NewMixedConcreteWithDescendantsChild(
+	instance = ourtypes.NewMixedConcreteWithDescendantsChild(
 		theSomeBaseProperty,
 		theSomeChildProperty,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IMixedConcreteLeaf]
+// De-serialize the instance of [ourtypes.IMixedConcreteLeaf]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IMixedConcreteLeaf].
+// of [ourtypes.IMixedConcreteLeaf].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readMixedConcreteLeafAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IMixedConcreteLeaf,
+) (instance ourtypes.IMixedConcreteLeaf,
 	next xml.Token,
 	err error,
 ) {
@@ -825,13 +825,13 @@ func readMixedConcreteLeafAsSequence(
 		return
 	}
 
-	instance = aastypes.NewMixedConcreteLeaf(
+	instance = ourtypes.NewMixedConcreteLeaf(
 		theUniqueToConcreteLeaf,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.MixedUnion] based on the `local` name
+// De-serialize an instance of [ourtypes.MixedUnion] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -840,40 +840,40 @@ func readMixedUnionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.MixedUnion,
+) (instance *ourtypes.MixedUnion,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "mixedAbstractDescendantOne":
-		var casted aastypes.IMixedAbstractDescendantOne
+		var casted ourtypes.IMixedAbstractDescendantOne
 		casted, next, err = readMixedAbstractDescendantOneAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewMixedUnionFromMixedAbstractMember(casted)
+			instance = ourtypes.NewMixedUnionFromMixedAbstractMember(casted)
 		}
 	case "mixedAbstractDescendantTwo":
-		var casted aastypes.IMixedAbstractDescendantTwo
+		var casted ourtypes.IMixedAbstractDescendantTwo
 		casted, next, err = readMixedAbstractDescendantTwoAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewMixedUnionFromMixedAbstractMember(casted)
+			instance = ourtypes.NewMixedUnionFromMixedAbstractMember(casted)
 		}
 	case "mixedConcreteWithDescendantsChild":
-		var casted aastypes.IMixedConcreteWithDescendantsChild
+		var casted ourtypes.IMixedConcreteWithDescendantsChild
 		casted, next, err = readMixedConcreteWithDescendantsChildAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewMixedUnionFromMixedConcreteWithDescendants(casted)
+			instance = ourtypes.NewMixedUnionFromMixedConcreteWithDescendants(casted)
 		}
 	case "mixedConcreteWithDescendants":
-		var casted aastypes.IMixedConcreteWithDescendants
+		var casted ourtypes.IMixedConcreteWithDescendants
 		casted, next, err = readMixedConcreteWithDescendantsAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewMixedUnionFromMixedConcreteWithDescendants(casted)
+			instance = ourtypes.NewMixedUnionFromMixedConcreteWithDescendants(casted)
 		}
 	case "mixedConcreteLeaf":
-		var casted aastypes.IMixedConcreteLeaf
+		var casted ourtypes.IMixedConcreteLeaf
 		casted, next, err = readMixedConcreteLeafAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewMixedUnionFromMixedConcreteLeaf(casted)
+			instance = ourtypes.NewMixedUnionFromMixedConcreteLeaf(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union MixedUnion")
@@ -881,16 +881,16 @@ func readMixedUnionDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.IModelTypedFirst]
+// De-serialize the instance of [ourtypes.IModelTypedFirst]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IModelTypedFirst].
+// of [ourtypes.IModelTypedFirst].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readModelTypedFirstAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IModelTypedFirst,
+) (instance ourtypes.IModelTypedFirst,
 	next xml.Token,
 	err error,
 ) {
@@ -939,22 +939,22 @@ func readModelTypedFirstAsSequence(
 		return
 	}
 
-	instance = aastypes.NewModelTypedFirst(
+	instance = ourtypes.NewModelTypedFirst(
 		theSomeProperty,
 	)
 	return
 }
 
-// De-serialize the instance of [aastypes.IModelTypedSecond]
+// De-serialize the instance of [ourtypes.IModelTypedSecond]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.IModelTypedSecond].
+// of [ourtypes.IModelTypedSecond].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readModelTypedSecondAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.IModelTypedSecond,
+) (instance ourtypes.IModelTypedSecond,
 	next xml.Token,
 	err error,
 ) {
@@ -1003,13 +1003,13 @@ func readModelTypedSecondAsSequence(
 		return
 	}
 
-	instance = aastypes.NewModelTypedSecond(
+	instance = ourtypes.NewModelTypedSecond(
 		theSomeProperty,
 	)
 	return
 }
 
-// De-serialize an instance of [aastypes.ModelTypedUnion] based on the `local` name
+// De-serialize an instance of [ourtypes.ModelTypedUnion] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1018,22 +1018,22 @@ func readModelTypedUnionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.ModelTypedUnion,
+) (instance *ourtypes.ModelTypedUnion,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "modelTypedFirst":
-		var casted aastypes.IModelTypedFirst
+		var casted ourtypes.IModelTypedFirst
 		casted, next, err = readModelTypedFirstAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewModelTypedUnionFromModelTypedFirst(casted)
+			instance = ourtypes.NewModelTypedUnionFromModelTypedFirst(casted)
 		}
 	case "modelTypedSecond":
-		var casted aastypes.IModelTypedSecond
+		var casted ourtypes.IModelTypedSecond
 		casted, next, err = readModelTypedSecondAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewModelTypedUnionFromModelTypedSecond(casted)
+			instance = ourtypes.NewModelTypedUnionFromModelTypedSecond(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union ModelTypedUnion")
@@ -1041,7 +1041,7 @@ func readModelTypedUnionDispatched(
 	return
 }
 
-// De-serialize an instance of [aastypes.OverlappingUnion] based on the `local` name
+// De-serialize an instance of [ourtypes.OverlappingUnion] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1050,34 +1050,34 @@ func readOverlappingUnionDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance *aastypes.OverlappingUnion,
+) (instance *ourtypes.OverlappingUnion,
 	next xml.Token,
 	err error,
 ) {
 	switch local {
 	case "modelTypedFirst":
-		var casted aastypes.IModelTypedFirst
+		var casted ourtypes.IModelTypedFirst
 		casted, next, err = readModelTypedFirstAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewOverlappingUnionFromModelTypedFirst(casted)
+			instance = ourtypes.NewOverlappingUnionFromModelTypedFirst(casted)
 		}
 	case "modelTypedSecond":
-		var casted aastypes.IModelTypedSecond
+		var casted ourtypes.IModelTypedSecond
 		casted, next, err = readModelTypedSecondAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewOverlappingUnionFromModelTypedSecond(casted)
+			instance = ourtypes.NewOverlappingUnionFromModelTypedSecond(casted)
 		}
 	case "mixedConcreteWithDescendantsChild":
-		var casted aastypes.IMixedConcreteWithDescendantsChild
+		var casted ourtypes.IMixedConcreteWithDescendantsChild
 		casted, next, err = readMixedConcreteWithDescendantsChildAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewOverlappingUnionFromMixedConcreteWithDescendantsChild(casted)
+			instance = ourtypes.NewOverlappingUnionFromMixedConcreteWithDescendantsChild(casted)
 		}
 	case "mixedConcreteWithDescendants":
-		var casted aastypes.IMixedConcreteWithDescendants
+		var casted ourtypes.IMixedConcreteWithDescendants
 		casted, next, err = readMixedConcreteWithDescendantsAsSequence(decoder, current)
 		if err == nil {
-			instance = aastypes.NewOverlappingUnionFromMixedConcreteWithDescendants(casted)
+			instance = ourtypes.NewOverlappingUnionFromMixedConcreteWithDescendants(casted)
 		}
 	default:
 		err = unexpectedDiscriminator(local, "the union OverlappingUnion")
@@ -1085,30 +1085,30 @@ func readOverlappingUnionDispatched(
 	return
 }
 
-// De-serialize the instance of [aastypes.ISomething]
+// De-serialize the instance of [ourtypes.ISomething]
 // as a sequence of XML elements, each representing a property
-// of [aastypes.ISomething].
+// of [ourtypes.ISomething].
 //
 // The reading stops as soon as we encounter a non-start element, and we return
 // that token as the `next` token.
 func readSomethingAsSequence(
 	decoder *xml.Decoder,
 	current xml.Token,
-) (instance aastypes.ISomething,
+) (instance ourtypes.ISomething,
 	next xml.Token,
 	err error,
 ) {
-	var theStructuralProperty *aastypes.StructuralUnion
-	var theMixedProperty *aastypes.MixedUnion
-	var theModelTypedProperty *aastypes.ModelTypedUnion
-	var theListStructuralProperty []*aastypes.StructuralUnion
-	var theListMixedProperty []*aastypes.MixedUnion
-	var theListModelTypedProperty []*aastypes.ModelTypedUnion
-	var theTupleProperty aascommon.Tuple3[*aastypes.StructuralUnion, *aastypes.MixedUnion, *aastypes.ModelTypedUnion]
-	var theOptionalStructuralProperty *aastypes.StructuralUnion
-	var theOptionalMixedProperty *aastypes.MixedUnion
-	var theOptionalModelTypedProperty *aastypes.ModelTypedUnion
-	var theOptionalListOverlappingProperty []*aastypes.OverlappingUnion
+	var theStructuralProperty *ourtypes.StructuralUnion
+	var theMixedProperty *ourtypes.MixedUnion
+	var theModelTypedProperty *ourtypes.ModelTypedUnion
+	var theListStructuralProperty []*ourtypes.StructuralUnion
+	var theListMixedProperty []*ourtypes.MixedUnion
+	var theListModelTypedProperty []*ourtypes.ModelTypedUnion
+	var theTupleProperty ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion]
+	var theOptionalStructuralProperty *ourtypes.StructuralUnion
+	var theOptionalMixedProperty *ourtypes.MixedUnion
+	var theOptionalModelTypedProperty *ourtypes.ModelTypedUnion
+	var theOptionalListOverlappingProperty []*ourtypes.OverlappingUnion
 
 	foundStructuralProperty := false
 	foundMixedProperty := false
@@ -1286,7 +1286,7 @@ func readSomethingAsSequence(
 		return
 	}
 
-	instance = aastypes.NewSomething(
+	instance = ourtypes.NewSomething(
 		theStructuralProperty,
 		theMixedProperty,
 		theModelTypedProperty,
@@ -1302,7 +1302,7 @@ func readSomethingAsSequence(
 	return
 }
 
-// De-serialize an instance of [aastypes.IClass] based on the `local` name
+// De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
 // The `current` token is expected to point to the content of that start element, and
@@ -1311,7 +1311,7 @@ func readClassDispatched(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
-) (instance aastypes.IClass,
+) (instance ourtypes.IClass,
 	next xml.Token,
 	err error,
 ) {
@@ -1347,12 +1347,12 @@ func readClassDispatched(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IClass] serialized as an XML element.
+// Unmarshal an instance of [ourtypes.IClass] serialized as an XML element.
 //
 // The XML element must live in the [Namespace] space.
 func Unmarshal(
 	decoder *xml.Decoder,
-) (instance aastypes.IClass, err error) {
+) (instance ourtypes.IClass, err error) {
 	var current xml.Token
 	current, err = xmlcommon.ReadNext(decoder, nil)
 	if err != nil {
@@ -1467,7 +1467,7 @@ func writeList[T any](
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
 				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{Index: i},
+					&ourreporting.IndexSegment{Index: i},
 				)
 			}
 			return
@@ -1485,7 +1485,7 @@ func writeList[T any](
 // `getter` is the getter of the property *as it is spelled in Golang*, `Value()`
 // and not `value`, since it is prepended to the path of a serialization error,
 // which [SerializationError.PathString] renders as a Golang expression through
-// [aasreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
+// [ourreporting.ToGolangPath]. (Golang has no way to name a member at compile time,
 // so the getter has to be spelled out; mind that the de-serialization reports
 // an XPath instead, and hence prepends the XML name there.)
 //
@@ -1500,7 +1500,7 @@ func finishProperty(
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{Name: getter},
+				&ourreporting.NameSegment{Name: getter},
 			)
 		}
 		return err
@@ -1518,13 +1518,13 @@ func finishProperty(
 // the element name from the runtime model type.
 //
 // Golang function values are invariant in their parameter type, so [Marshal], which
-// takes the wide [aastypes.IClass], can not be used where a writer of a more
+// takes the wide [ourtypes.IClass], can not be used where a writer of a more
 // specific interface is expected -- this generic function exists solely to narrow
 // the parameter type to `T`. Golang can not infer `T` from the context here, so
 // every call site instantiates it explicitly, *e.g.*,
-// `writeInstance[aastypes.IReference]`, and passes it on as that instantiated
+// `writeInstance[ourtypes.IReference]`, and passes it on as that instantiated
 // function value, without a closure.
-func writeInstance[T aastypes.IClass](
+func writeInstance[T ourtypes.IClass](
 	encoder *xml.Encoder,
 	that T,
 ) error {
@@ -1564,14 +1564,14 @@ func writeClassElement[T any](
 // Constrain a generic type to a named union, giving access to its
 // underlying instance for serialization.
 type namedUnion interface {
-	Underlying() aastypes.IClass
+	Underlying() ourtypes.IClass
 }
 
 // Write the named union `that` as the XML element of its underlying instance.
 //
 // Do not flush.
 //
-// A named union is deliberately not an [aastypes.IClass], so [writeInstance] can not
+// A named union is deliberately not an [ourtypes.IClass], so [writeInstance] can not
 // serve it; this writer narrows through the [namedUnion] constraint instead, and one
 // generic writer thus covers every named union.
 //
@@ -1592,7 +1592,7 @@ func writeUnion[T namedUnion](
 // arity 3, whichever mix of scalar and instance items it holds.
 func writeTuple3[T1 any, T2 any, T3 any](
 	encoder *xml.Encoder,
-	that aascommon.Tuple3[T1, T2, T3],
+	that ourcommon.Tuple3[T1, T2, T3],
 	writeItem1 func(encoder *xml.Encoder, value T1) error,
 	writeItem2 func(encoder *xml.Encoder, value T2) error,
 	writeItem3 func(encoder *xml.Encoder, value T3) error,
@@ -1601,7 +1601,7 @@ func writeTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 0},
+				&ourreporting.IndexSegment{Index: 0},
 			)
 		}
 		return
@@ -1611,7 +1611,7 @@ func writeTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 1},
+				&ourreporting.IndexSegment{Index: 1},
 			)
 		}
 		return
@@ -1621,7 +1621,7 @@ func writeTuple3[T1 any, T2 any, T3 any](
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
 			seriaErr.Path.PrependIndex(
-				&aasreporting.IndexSegment{Index: 2},
+				&ourreporting.IndexSegment{Index: 2},
 			)
 		}
 		return
@@ -1635,10 +1635,10 @@ func writeTuple3[T1 any, T2 any, T3 any](
 // Do not flush.
 func writeListOf_StructuralUnion(
 	encoder *xml.Encoder,
-	list []*aastypes.StructuralUnion,
+	list []*ourtypes.StructuralUnion,
 ) error {
 	return writeList(
-		encoder, list, writeUnion[*aastypes.StructuralUnion],
+		encoder, list, writeUnion[*ourtypes.StructuralUnion],
 	)
 }
 
@@ -1647,10 +1647,10 @@ func writeListOf_StructuralUnion(
 // Do not flush.
 func writeListOf_MixedUnion(
 	encoder *xml.Encoder,
-	list []*aastypes.MixedUnion,
+	list []*ourtypes.MixedUnion,
 ) error {
 	return writeList(
-		encoder, list, writeUnion[*aastypes.MixedUnion],
+		encoder, list, writeUnion[*ourtypes.MixedUnion],
 	)
 }
 
@@ -1659,10 +1659,10 @@ func writeListOf_MixedUnion(
 // Do not flush.
 func writeListOf_ModelTypedUnion(
 	encoder *xml.Encoder,
-	list []*aastypes.ModelTypedUnion,
+	list []*ourtypes.ModelTypedUnion,
 ) error {
 	return writeList(
-		encoder, list, writeUnion[*aastypes.ModelTypedUnion],
+		encoder, list, writeUnion[*ourtypes.ModelTypedUnion],
 	)
 }
 
@@ -1671,10 +1671,10 @@ func writeListOf_ModelTypedUnion(
 // Do not flush.
 func writeListOf_OverlappingUnion(
 	encoder *xml.Encoder,
-	list []*aastypes.OverlappingUnion,
+	list []*ourtypes.OverlappingUnion,
 ) error {
 	return writeList(
-		encoder, list, writeUnion[*aastypes.OverlappingUnion],
+		encoder, list, writeUnion[*ourtypes.OverlappingUnion],
 	)
 }
 
@@ -1683,19 +1683,19 @@ func writeListOf_OverlappingUnion(
 // Do not flush.
 func writeTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
 	encoder *xml.Encoder,
-	that aascommon.Tuple3[*aastypes.StructuralUnion, *aastypes.MixedUnion, *aastypes.ModelTypedUnion],
+	that ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
 ) error {
 	return writeTuple3(
 		encoder,
 		that,
-		writeUnion[*aastypes.StructuralUnion],
-		writeUnion[*aastypes.MixedUnion],
-		writeUnion[*aastypes.ModelTypedUnion],
+		writeUnion[*ourtypes.StructuralUnion],
+		writeUnion[*ourtypes.MixedUnion],
+		writeUnion[*ourtypes.ModelTypedUnion],
 	)
 }
 
 // Serialize the instance
-// of [aastypes.IStructuralFirst]
+// of [ourtypes.IStructuralFirst]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1704,7 +1704,7 @@ func writeTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
 // Do not flush.
 func writeStructuralFirstAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IStructuralFirst,
+	that ourtypes.IStructuralFirst,
 ) (err error) {
 	err = finishProperty(
 		"UniqueToFirst()",
@@ -1723,7 +1723,7 @@ func writeStructuralFirstAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IStructuralSecond]
+// of [ourtypes.IStructuralSecond]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1732,7 +1732,7 @@ func writeStructuralFirstAsSequence(
 // Do not flush.
 func writeStructuralSecondAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IStructuralSecond,
+	that ourtypes.IStructuralSecond,
 ) (err error) {
 	err = finishProperty(
 		"UniqueToSecond()",
@@ -1751,7 +1751,7 @@ func writeStructuralSecondAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMixedAbstractDescendantOne]
+// of [ourtypes.IMixedAbstractDescendantOne]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1760,7 +1760,7 @@ func writeStructuralSecondAsSequence(
 // Do not flush.
 func writeMixedAbstractDescendantOneAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMixedAbstractDescendantOne,
+	that ourtypes.IMixedAbstractDescendantOne,
 ) (err error) {
 	err = finishProperty(
 		"UniqueToAbstractDescendantOne()",
@@ -1779,7 +1779,7 @@ func writeMixedAbstractDescendantOneAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMixedAbstractDescendantTwo]
+// of [ourtypes.IMixedAbstractDescendantTwo]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1788,7 +1788,7 @@ func writeMixedAbstractDescendantOneAsSequence(
 // Do not flush.
 func writeMixedAbstractDescendantTwoAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMixedAbstractDescendantTwo,
+	that ourtypes.IMixedAbstractDescendantTwo,
 ) (err error) {
 	err = finishProperty(
 		"UniqueToAbstractDescendantTwo()",
@@ -1807,7 +1807,7 @@ func writeMixedAbstractDescendantTwoAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMixedConcreteWithDescendants]
+// of [ourtypes.IMixedConcreteWithDescendants]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1816,7 +1816,7 @@ func writeMixedAbstractDescendantTwoAsSequence(
 // Do not flush.
 func writeMixedConcreteWithDescendantsAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMixedConcreteWithDescendants,
+	that ourtypes.IMixedConcreteWithDescendants,
 ) (err error) {
 	err = finishProperty(
 		"SomeBaseProperty()",
@@ -1835,7 +1835,7 @@ func writeMixedConcreteWithDescendantsAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMixedConcreteWithDescendantsChild]
+// of [ourtypes.IMixedConcreteWithDescendantsChild]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1844,7 +1844,7 @@ func writeMixedConcreteWithDescendantsAsSequence(
 // Do not flush.
 func writeMixedConcreteWithDescendantsChildAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMixedConcreteWithDescendantsChild,
+	that ourtypes.IMixedConcreteWithDescendantsChild,
 ) (err error) {
 	err = finishProperty(
 		"SomeBaseProperty()",
@@ -1876,7 +1876,7 @@ func writeMixedConcreteWithDescendantsChildAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IMixedConcreteLeaf]
+// of [ourtypes.IMixedConcreteLeaf]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1885,7 +1885,7 @@ func writeMixedConcreteWithDescendantsChildAsSequence(
 // Do not flush.
 func writeMixedConcreteLeafAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IMixedConcreteLeaf,
+	that ourtypes.IMixedConcreteLeaf,
 ) (err error) {
 	err = finishProperty(
 		"UniqueToConcreteLeaf()",
@@ -1904,7 +1904,7 @@ func writeMixedConcreteLeafAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IModelTypedFirst]
+// of [ourtypes.IModelTypedFirst]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1913,7 +1913,7 @@ func writeMixedConcreteLeafAsSequence(
 // Do not flush.
 func writeModelTypedFirstAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IModelTypedFirst,
+	that ourtypes.IModelTypedFirst,
 ) (err error) {
 	err = finishProperty(
 		"SomeProperty()",
@@ -1929,7 +1929,7 @@ func writeModelTypedFirstAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.IModelTypedSecond]
+// of [ourtypes.IModelTypedSecond]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1938,7 +1938,7 @@ func writeModelTypedFirstAsSequence(
 // Do not flush.
 func writeModelTypedSecondAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.IModelTypedSecond,
+	that ourtypes.IModelTypedSecond,
 ) (err error) {
 	err = finishProperty(
 		"SomeProperty()",
@@ -1954,7 +1954,7 @@ func writeModelTypedSecondAsSequence(
 }
 
 // Serialize the instance
-// of [aastypes.ISomething]
+// of [ourtypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
 // The XML namespace is expected to be set in the one of the parent elements
@@ -1963,7 +1963,7 @@ func writeModelTypedSecondAsSequence(
 // Do not flush.
 func writeSomethingAsSequence(
 	encoder *xml.Encoder,
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (err error) {
 	err = finishProperty(
 		"StructuralProperty()",
@@ -1971,7 +1971,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"structuralProperty",
 			that.StructuralProperty(),
-			writeUnion[*aastypes.StructuralUnion],
+			writeUnion[*ourtypes.StructuralUnion],
 		),
 	)
 	if err != nil {
@@ -1984,7 +1984,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"mixedProperty",
 			that.MixedProperty(),
-			writeUnion[*aastypes.MixedUnion],
+			writeUnion[*ourtypes.MixedUnion],
 		),
 	)
 	if err != nil {
@@ -1997,7 +1997,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"modelTypedProperty",
 			that.ModelTypedProperty(),
-			writeUnion[*aastypes.ModelTypedUnion],
+			writeUnion[*ourtypes.ModelTypedUnion],
 		),
 	)
 	if err != nil {
@@ -2062,7 +2062,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"optionalStructuralProperty",
 			that.OptionalStructuralProperty(),
-			writeUnion[*aastypes.StructuralUnion],
+			writeUnion[*ourtypes.StructuralUnion],
 		),
 	)
 	if err != nil {
@@ -2075,7 +2075,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"optionalMixedProperty",
 			that.OptionalMixedProperty(),
-			writeUnion[*aastypes.MixedUnion],
+			writeUnion[*ourtypes.MixedUnion],
 		),
 	)
 	if err != nil {
@@ -2088,7 +2088,7 @@ func writeSomethingAsSequence(
 			encoder,
 			"optionalModelTypedProperty",
 			that.OptionalModelTypedProperty(),
-			writeUnion[*aastypes.ModelTypedUnion],
+			writeUnion[*ourtypes.ModelTypedUnion],
 		),
 	)
 	if err != nil {
@@ -2119,88 +2119,88 @@ func writeSomethingAsSequence(
 // to [Namespace].
 func writeClass(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeStructuralFirst:
+	case ourtypes.ModelTypeStructuralFirst:
 		err = writeClassElement(
 			encoder,
 			"structuralFirst",
 			withNamespace,
-			that.(aastypes.IStructuralFirst),
+			that.(ourtypes.IStructuralFirst),
 			writeStructuralFirstAsSequence,
 		)
-	case aastypes.ModelTypeStructuralSecond:
+	case ourtypes.ModelTypeStructuralSecond:
 		err = writeClassElement(
 			encoder,
 			"structuralSecond",
 			withNamespace,
-			that.(aastypes.IStructuralSecond),
+			that.(ourtypes.IStructuralSecond),
 			writeStructuralSecondAsSequence,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantOne:
+	case ourtypes.ModelTypeMixedAbstractDescendantOne:
 		err = writeClassElement(
 			encoder,
 			"mixedAbstractDescendantOne",
 			withNamespace,
-			that.(aastypes.IMixedAbstractDescendantOne),
+			that.(ourtypes.IMixedAbstractDescendantOne),
 			writeMixedAbstractDescendantOneAsSequence,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantTwo:
+	case ourtypes.ModelTypeMixedAbstractDescendantTwo:
 		err = writeClassElement(
 			encoder,
 			"mixedAbstractDescendantTwo",
 			withNamespace,
-			that.(aastypes.IMixedAbstractDescendantTwo),
+			that.(ourtypes.IMixedAbstractDescendantTwo),
 			writeMixedAbstractDescendantTwoAsSequence,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendants:
+	case ourtypes.ModelTypeMixedConcreteWithDescendants:
 		err = writeClassElement(
 			encoder,
 			"mixedConcreteWithDescendants",
 			withNamespace,
-			that.(aastypes.IMixedConcreteWithDescendants),
+			that.(ourtypes.IMixedConcreteWithDescendants),
 			writeMixedConcreteWithDescendantsAsSequence,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendantsChild:
+	case ourtypes.ModelTypeMixedConcreteWithDescendantsChild:
 		err = writeClassElement(
 			encoder,
 			"mixedConcreteWithDescendantsChild",
 			withNamespace,
-			that.(aastypes.IMixedConcreteWithDescendantsChild),
+			that.(ourtypes.IMixedConcreteWithDescendantsChild),
 			writeMixedConcreteWithDescendantsChildAsSequence,
 		)
-	case aastypes.ModelTypeMixedConcreteLeaf:
+	case ourtypes.ModelTypeMixedConcreteLeaf:
 		err = writeClassElement(
 			encoder,
 			"mixedConcreteLeaf",
 			withNamespace,
-			that.(aastypes.IMixedConcreteLeaf),
+			that.(ourtypes.IMixedConcreteLeaf),
 			writeMixedConcreteLeafAsSequence,
 		)
-	case aastypes.ModelTypeModelTypedFirst:
+	case ourtypes.ModelTypeModelTypedFirst:
 		err = writeClassElement(
 			encoder,
 			"modelTypedFirst",
 			withNamespace,
-			that.(aastypes.IModelTypedFirst),
+			that.(ourtypes.IModelTypedFirst),
 			writeModelTypedFirstAsSequence,
 		)
-	case aastypes.ModelTypeModelTypedSecond:
+	case ourtypes.ModelTypeModelTypedSecond:
 		err = writeClassElement(
 			encoder,
 			"modelTypedSecond",
 			withNamespace,
-			that.(aastypes.IModelTypedSecond),
+			that.(ourtypes.IModelTypedSecond),
 			writeModelTypedSecondAsSequence,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		err = writeClassElement(
 			encoder,
 			"something",
 			withNamespace,
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			writeSomethingAsSequence,
 		)
 	default:
@@ -2220,7 +2220,7 @@ func writeClass(
 // to [Namespace].
 func Marshal(
 	encoder *xml.Encoder,
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	withNamespace bool,
 ) (err error) {
 	err = writeClass(encoder, that, withNamespace)

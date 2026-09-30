@@ -10,18 +10,18 @@ from typing import (
     Optional,
 )
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
-_RESULT_FROM_STR: Mapping[str, aas_types.Result] = {
-    'ok': aas_types.Result.OK,
-    'not-ok': aas_types.Result.NOT_OK,
+_RESULT_FROM_STR: Mapping[str, our_types.Result] = {
+    'ok': our_types.Result.OK,
+    'not-ok': our_types.Result.NOT_OK,
 }
 
 
 def result_from_str(
         text: str
-) -> Optional[aas_types.Result]:
+) -> Optional[our_types.Result]:
     """
     Parse :paramref:`text` as string representation
     of :py:class:`dummy.Result`.

@@ -10,7 +10,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 std::string BytesToString(const std::vector<uint8_t>& bytes) {
   std::string result;
@@ -36,7 +36,7 @@ void AssertEncodeDecode(
   const std::string& text,
   const std::string& expected_encoded
 ) {
-  const std::string encoded = aas::stringification::Base64Encode(
+  const std::string encoded = our::stringification::Base64Encode(
     StringToBytes(text)
   );
 
@@ -45,10 +45,10 @@ void AssertEncodeDecode(
       == encoded
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::vector<std::uint8_t>,
     std::string
-  > bytes = aas::stringification::Base64Decode(encoded);
+  > bytes = our::stringification::Base64Decode(encoded);
 
   REQUIRE(bytes.has_value());
 
@@ -117,10 +117,10 @@ TEST_CASE("Test unexpected padding in the middle") {
         + encoded.substr(i + 1, encoded.size() - i)
     );
 
-    aas::common::expected<
+    our::common::expected<
       std::vector<std::uint8_t>,
       std::string
-    > bytes = aas::stringification::Base64Decode(bad_encoded);
+    > bytes = our::stringification::Base64Decode(bad_encoded);
 
     REQUIRE(!bytes.has_value());
 
@@ -151,10 +151,10 @@ TEST_CASE("Test 'Hello' is encoded as 'SGVsbG8='") {
 TEST_CASE("Test that our implementation suffers from padding inconsistency of 'Hello' as 'SGVsbG9='") {
   const std::string encoded = "SGVsbG9=";
 
-  aas::common::expected<
+  our::common::expected<
     std::vector<std::uint8_t>,
     std::string
-  > bytes = aas::stringification::Base64Decode(encoded);
+  > bytes = our::stringification::Base64Decode(encoded);
 
   REQUIRE(bytes.has_value());
 
@@ -168,10 +168,10 @@ void AssertDecode(
   const std::string& encoded,
   const std::vector<std::uint8_t>& expected_decoded
 ) {
-  aas::common::expected<
+  our::common::expected<
     std::vector<std::uint8_t>,
     std::string
-  > bytes = aas::stringification::Base64Decode(encoded);
+  > bytes = our::stringification::Base64Decode(encoded);
 
   INFO(encoded)
   REQUIRE(bytes.has_value());

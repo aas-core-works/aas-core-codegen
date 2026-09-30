@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Directory = System.IO.Directory;
 using Path = System.IO.Path;
@@ -74,7 +74,7 @@ namespace dummy.Tests
         }
 
         private static void AssertSerializeDeserializeEqualsOriginal(
-            Aas.IClass instance, string path)
+            Our.IClass instance, string path)
         {
             // Serialize
             var outputBuilder = new System.Text.StringBuilder();
@@ -88,7 +88,7 @@ namespace dummy.Tests
                         OmitXmlDeclaration = true
                     }
                 );
-                Aas.Xmlization.Serialize.To(
+                Our.Xmlization.Serialize.To(
                     instance,
                     writer);
             }
@@ -131,7 +131,7 @@ namespace dummy.Tests
         }
 
         private static void AssertEqualsExpectedOrRerecordDeserializationException(
-            Aas.Xmlization.Exception? exception,
+            Our.Xmlization.Exception? exception,
             string path)
         {
             if (exception == null)
@@ -144,7 +144,7 @@ namespace dummy.Tests
             {
                 string exceptionPath = path + ".exception";
                 string got = exception.Message;
-                if (Aas.Tests.Common.RecordMode)
+                if (Our.Tests.Common.RecordMode)
                 {
                     System.IO.File.WriteAllText(exceptionPath, got);
                 }
@@ -155,7 +155,7 @@ namespace dummy.Tests
                         throw new System.IO.FileNotFoundException(
                             "The file with the recorded exception does not " +
                             $"exist: {exceptionPath}; maybe you want to set the environment " +
-                            $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                            $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                     }
 
                     string expected = System.IO.File.ReadAllText(exceptionPath);
@@ -172,7 +172,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Xml",
                     "Expected",
                     "item"
@@ -185,11 +185,11 @@ namespace dummy.Tests
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                var instance = Aas.Xmlization.Deserialize.ItemFrom(
+                var instance = Our.Xmlization.Deserialize.ItemFrom(
                     xmlReader);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     instance, path);
@@ -203,7 +203,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Xml",
                         "Unexpected",
                         "Unserializable"
@@ -232,14 +232,14 @@ namespace dummy.Tests
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                    Aas.Xmlization.Exception? exception = null;
+                    Our.Xmlization.Exception? exception = null;
 
                     try
                     {
-                        _ = Aas.Xmlization.Deserialize.ItemFrom(
+                        _ = Our.Xmlization.Deserialize.ItemFrom(
                             xmlReader);
                     }
-                    catch (Aas.Xmlization.Exception observedException)
+                    catch (Our.Xmlization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -257,7 +257,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Xml",
                         "Unexpected",
                         "Invalid"
@@ -286,11 +286,11 @@ namespace dummy.Tests
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                    var instance = Aas.Xmlization.Deserialize.ItemFrom(
+                    var instance = Our.Xmlization.Deserialize.ItemFrom(
                         xmlReader);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }
@@ -301,7 +301,7 @@ namespace dummy.Tests
         {
             var paths = Directory.GetFiles(
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "Xml",
                     "Expected",
                     "something"
@@ -314,11 +314,11 @@ namespace dummy.Tests
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                var instance = Aas.Xmlization.Deserialize.SomethingFrom(
+                var instance = Our.Xmlization.Deserialize.SomethingFrom(
                     xmlReader);
 
-                var errors = Aas.Verification.Verify(instance).ToList();
-                Aas.Tests.Common.AssertNoVerificationErrors(errors, path);
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
 
                 AssertSerializeDeserializeEqualsOriginal(
                     instance, path);
@@ -332,7 +332,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Xml",
                         "Unexpected",
                         "Unserializable"
@@ -361,14 +361,14 @@ namespace dummy.Tests
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                    Aas.Xmlization.Exception? exception = null;
+                    Our.Xmlization.Exception? exception = null;
 
                     try
                     {
-                        _ = Aas.Xmlization.Deserialize.SomethingFrom(
+                        _ = Our.Xmlization.Deserialize.SomethingFrom(
                             xmlReader);
                     }
-                    catch (Aas.Xmlization.Exception observedException)
+                    catch (Our.Xmlization.Exception observedException)
                     {
                         exception = observedException;
                     }
@@ -386,7 +386,7 @@ namespace dummy.Tests
                 string causeDir in
                 Directory.GetDirectories(
                     Path.Combine(
-                        Aas.Tests.Common.TestDataDir,
+                        Our.Tests.Common.TestDataDir,
                         "Xml",
                         "Unexpected",
                         "Invalid"
@@ -415,11 +415,11 @@ namespace dummy.Tests
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
 
-                    var instance = Aas.Xmlization.Deserialize.SomethingFrom(
+                    var instance = Our.Xmlization.Deserialize.SomethingFrom(
                         xmlReader);
 
-                    var errors = Aas.Verification.Verify(instance).ToList();
-                    Aas.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
                         errors, path);
                 }
             }

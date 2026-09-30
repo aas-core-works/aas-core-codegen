@@ -12,8 +12,8 @@ import json
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
-import dummy.verification as aas_verification
+import dummy.jsonization as our_jsonization
+import dummy.verification as our_verification
 
 
 import tests.common
@@ -32,9 +32,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.leaf_from_jsonable(jsonable)
+            instance = our_jsonization.leaf_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -57,9 +57,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.ordered_container_from_jsonable(jsonable)
+            instance = our_jsonization.ordered_container_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -82,9 +82,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.unordered_container_from_jsonable(jsonable)
+            instance = our_jsonization.unordered_container_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -107,9 +107,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.global_attribute_from_jsonable(jsonable)
+            instance = our_jsonization.global_attribute_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -132,9 +132,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.local_attribute_from_jsonable(jsonable)
+            instance = our_jsonization.local_attribute_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -157,9 +157,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.attribute_operand_from_jsonable(jsonable)
+            instance = our_jsonization.attribute_operand_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -182,9 +182,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.string_literal_from_jsonable(jsonable)
+            instance = our_jsonization.string_literal_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -207,9 +207,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.number_literal_from_jsonable(jsonable)
+            instance = our_jsonization.number_literal_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -232,9 +232,9 @@ class TestVerificationOfValidInstances(unittest.TestCase):
             with path.open("rt") as fid:
                 jsonable = json.load(fid)
 
-            instance = aas_jsonization.something_from_jsonable(jsonable)
+            instance = our_jsonization.something_from_jsonable(jsonable)
 
-            errors = list(aas_verification.verify(instance))
+            errors = list(our_verification.verify(instance))
 
             if len(errors) > 0:
                 self.fail(
@@ -271,9 +271,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.leaf_from_jsonable(jsonable)
+                instance = our_jsonization.leaf_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -312,9 +312,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.ordered_container_from_jsonable(jsonable)
+                instance = our_jsonization.ordered_container_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -353,9 +353,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.unordered_container_from_jsonable(jsonable)
+                instance = our_jsonization.unordered_container_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -394,9 +394,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.global_attribute_from_jsonable(jsonable)
+                instance = our_jsonization.global_attribute_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -435,9 +435,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.local_attribute_from_jsonable(jsonable)
+                instance = our_jsonization.local_attribute_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -476,9 +476,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.attribute_operand_from_jsonable(jsonable)
+                instance = our_jsonization.attribute_operand_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -517,9 +517,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.string_literal_from_jsonable(jsonable)
+                instance = our_jsonization.string_literal_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -558,9 +558,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.number_literal_from_jsonable(jsonable)
+                instance = our_jsonization.number_literal_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(
@@ -599,9 +599,9 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                 with path.open("rt") as fid:
                     jsonable = json.load(fid)
 
-                instance = aas_jsonization.something_from_jsonable(jsonable)
+                instance = our_jsonization.something_from_jsonable(jsonable)
 
-                errors = list(aas_verification.verify(instance))
+                errors = list(our_verification.verify(instance))
 
                 if len(errors) == 0:
                     self.fail(

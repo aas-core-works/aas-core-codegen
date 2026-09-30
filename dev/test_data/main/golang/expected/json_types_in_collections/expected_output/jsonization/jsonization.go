@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -27,13 +27,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -48,7 +48,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -57,7 +57,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -68,7 +68,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -79,7 +79,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -397,7 +397,7 @@ func parseArray[T any](
 }
 
 // Parse `jsonable` as an array of exactly 4 item(s) and parse them into
-// a aascommon.Tuple4[T0, T1, T2, T3] with `parseItem0`, `parseItem1`, *etc.*,
+// a ourcommon.Tuple4[T0, T1, T2, T3] with `parseItem0`, `parseItem1`, *etc.*,
 // or return an error.
 func parseTuple4[T0 any, T1 any, T2 any, T3 any](
 	jsonable interface{},
@@ -405,7 +405,7 @@ func parseTuple4[T0 any, T1 any, T2 any, T3 any](
 	parseItem1 func(jsonable interface{}) (T1, error),
 	parseItem2 func(jsonable interface{}) (T2, error),
 	parseItem3 func(jsonable interface{}) (T3, error),
-) (result aascommon.Tuple4[T0, T1, T2, T3], err error) {
+) (result ourcommon.Tuple4[T0, T1, T2, T3], err error) {
 	jsonableArray, ok := jsonable.([]interface{})
 	if !ok {
 		err = newDeserializationError(
@@ -455,7 +455,7 @@ func parseTuple4[T0 any, T1 any, T2 any, T3 any](
 		return
 	}
 
-	result = aascommon.Tuple4[T0, T1, T2, T3]{
+	result = ourcommon.Tuple4[T0, T1, T2, T3]{
 		Item1: item0,
 		Item2: item1,
 		Item3: item2,
@@ -464,12 +464,12 @@ func parseTuple4[T0 any, T1 any, T2 any, T3 any](
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISomething],
+// Parse `jsonable` as an instance of [ourtypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -481,16 +481,16 @@ func SomethingFromJsonable(
 	return somethingFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISomething] from a map,
+// Parse [ourtypes.ISomething] from a map,
 // or return an error, if any.
 func somethingFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
-	var theValues []aastypes.JsonValue
-	var theTupleWithJson aascommon.Tuple4[string, aastypes.JsonValue, aastypes.JsonArray, aastypes.JsonObject]
+	var theValues []ourtypes.JsonValue
+	var theTupleWithJson ourcommon.Tuple4[string, ourtypes.JsonValue, ourtypes.JsonArray, ourtypes.JsonObject]
 
 	foundValues := false
 	foundTupleWithJson := false
@@ -541,7 +541,7 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSomething(
+	result = ourtypes.NewSomething(
 		theValues,
 		theTupleWithJson,
 	)
@@ -557,13 +557,13 @@ func somethingFromMapWithoutDispatch(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -578,7 +578,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -587,7 +587,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -598,7 +598,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -609,7 +609,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -738,10 +738,10 @@ func directToJsonable[T any](item T) (interface{}, error) {
 
 // Serialize the JSON-able `item` as a JSON-able value.
 //
-// ``jsonValueToJsonable`` takes an ``aastypes.JsonValue``, so a *function*
-// which takes an ``aastypes.JsonArray`` or an ``aastypes.JsonObject`` is
+// ``jsonValueToJsonable`` takes an ``ourtypes.JsonValue``, so a *function*
+// which takes an ``ourtypes.JsonArray`` or an ``ourtypes.JsonObject`` is
 // a different type altogether, even though either value is assignable to
-// an ``aastypes.JsonValue``. This wrapper gives the one signature which
+// an ``ourtypes.JsonValue``. This wrapper gives the one signature which
 // ``serializeArray``/``serializeTupleN`` expect for every shape.
 func jsonAbleToJsonable[T any](item T) (interface{}, error) {
 	return jsonValueToJsonable(item)
@@ -762,7 +762,7 @@ func jsonAbleToJsonable[T any](item T) (interface{}, error) {
 // to prepend the way to it.
 func jsonValueFromJsonable(
 	jsonable interface{},
-) (result aastypes.JsonValue, err error) {
+) (result ourtypes.JsonValue, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a JSON-able value, but got a nil",
@@ -798,9 +798,9 @@ func jsonValueFromJsonable(
 			return
 
 		case []interface{}:
-			items := make(aastypes.JsonArray, 0, len(casted))
+			items := make(ourtypes.JsonArray, 0, len(casted))
 			for i, item := range casted {
-				var parsed aastypes.JsonValue
+				var parsed ourtypes.JsonValue
 				parsed, err = jsonValueFromJsonable(item)
 				if err != nil {
 					mustDeserializationError(err).prependIndex(i)
@@ -812,9 +812,9 @@ func jsonValueFromJsonable(
 			return
 
 		case map[string]interface{}:
-			members := make(aastypes.JsonObject, len(casted))
+			members := make(ourtypes.JsonObject, len(casted))
 			for key, value := range casted {
-				var parsed aastypes.JsonValue
+				var parsed ourtypes.JsonValue
 				parsed, err = jsonValueFromJsonable(value)
 				if err != nil {
 					mustDeserializationError(err).prependKey(key)
@@ -840,7 +840,7 @@ func jsonValueFromJsonable(
 // Parse `jsonable` as a JSON-able array.
 func jsonArrayFromJsonable(
 	jsonable interface{},
-) (result aastypes.JsonArray, err error) {
+) (result ourtypes.JsonArray, err error) {
 	if _, ok := jsonable.([]interface{}); !ok {
 		err = newDeserializationError(
 			fmt.Sprintf("Expected a JSON-able array, but got: %T", jsonable),
@@ -848,20 +848,20 @@ func jsonArrayFromJsonable(
 		return
 	}
 
-	var value aastypes.JsonValue
+	var value ourtypes.JsonValue
 	value, err = jsonValueFromJsonable(jsonable)
 	if err != nil {
 		return
 	}
 
-	result = value.(aastypes.JsonArray)
+	result = value.(ourtypes.JsonArray)
 	return
 }
 
 // Parse `jsonable` as a JSON-able object.
 func jsonObjectFromJsonable(
 	jsonable interface{},
-) (result aastypes.JsonObject, err error) {
+) (result ourtypes.JsonObject, err error) {
 	if _, ok := jsonable.(map[string]interface{}); !ok {
 		err = newDeserializationError(
 			fmt.Sprintf("Expected a JSON-able object, but got: %T", jsonable),
@@ -869,13 +869,13 @@ func jsonObjectFromJsonable(
 		return
 	}
 
-	var value aastypes.JsonValue
+	var value ourtypes.JsonValue
 	value, err = jsonValueFromJsonable(jsonable)
 	if err != nil {
 		return
 	}
 
-	result = value.(aastypes.JsonObject)
+	result = value.(ourtypes.JsonObject)
 	return
 }
 
@@ -888,7 +888,7 @@ func jsonObjectFromJsonable(
 // The result is a new structure, and never `value` itself, so that
 // the serialized document does not alias the instance it came from.
 func jsonValueToJsonable(
-	value aastypes.JsonValue,
+	value ourtypes.JsonValue,
 ) (result interface{}, err error) {
 	if value == nil {
 		err = newSerializationError(
@@ -920,7 +920,7 @@ func jsonValueToJsonable(
 			result = casted
 			return
 
-		case aastypes.JsonArray:
+		case ourtypes.JsonArray:
 			items := make([]interface{}, 0, len(casted))
 			for i, item := range casted {
 				var serialized interface{}
@@ -934,7 +934,7 @@ func jsonValueToJsonable(
 			result = items
 			return
 
-		case aastypes.JsonObject:
+		case ourtypes.JsonObject:
 			members := make(map[string]interface{}, len(casted))
 			for key, item := range casted {
 				var serialized interface{}
@@ -963,7 +963,7 @@ func jsonValueToJsonable(
 // Serialize `that` with `serializeItem0`, `serializeItem1`, *etc.* into
 // a JSON-able array, or return an error.
 func serializeTuple4[T0 any, T1 any, T2 any, T3 any](
-	that aascommon.Tuple4[T0, T1, T2, T3],
+	that ourcommon.Tuple4[T0, T1, T2, T3],
 	serializeItem0 func(item T0) (interface{}, error),
 	serializeItem1 func(item T1) (interface{}, error),
 	serializeItem2 func(item T2) (interface{}, error),
@@ -998,19 +998,19 @@ func serializeTuple4[T0 any, T1 any, T2 any, T3 any](
 	return
 }
 
-// Serialize [aastypes.ISomething] as a JSON-able map.
+// Serialize [ourtypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISomething] with proper dispatch, call
+// [ourtypes.ISomething] with proper dispatch, call
 // [ToJsonable].
 func somethingToMap(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["values"], err = serializeArray(
-		that.Values(), jsonAbleToJsonable[aastypes.JsonValue],
+		that.Values(), jsonAbleToJsonable[ourtypes.JsonValue],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("Values()")
@@ -1020,9 +1020,9 @@ func somethingToMap(
 	result["tupleWithJson"], err = serializeTuple4(
 		that.TupleWithJson(),
 		directToJsonable[string],
-		jsonAbleToJsonable[aastypes.JsonValue],
-		jsonAbleToJsonable[aastypes.JsonArray],
-		jsonAbleToJsonable[aastypes.JsonObject],
+		jsonAbleToJsonable[ourtypes.JsonValue],
+		jsonAbleToJsonable[ourtypes.JsonArray],
+		jsonAbleToJsonable[ourtypes.JsonObject],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("TupleWithJson()")
@@ -1037,12 +1037,12 @@ func somethingToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 		)
 	default:
 		err = newSerializationError(

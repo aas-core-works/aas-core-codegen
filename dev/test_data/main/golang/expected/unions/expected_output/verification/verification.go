@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,22 +42,22 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
-// Verify `that` instance of [aastypes.IStructuralFirst].
+// Verify `that` instance of [ourtypes.IStructuralFirst].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyStructuralFirst(
-	that aastypes.IStructuralFirst,
+	that ourtypes.IStructuralFirst,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.UniqueToFirst()) > 0) {
+	if !(ourcommon.LenStr(that.UniqueToFirst()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -70,19 +70,19 @@ func VerifyStructuralFirst(
 	return
 }
 
-// Verify `that` instance of [aastypes.IStructuralSecond].
+// Verify `that` instance of [ourtypes.IStructuralSecond].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyStructuralSecond(
-	that aastypes.IStructuralSecond,
+	that ourtypes.IStructuralSecond,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.UniqueToSecond()) > 0) {
+	if !(ourcommon.LenStr(that.UniqueToSecond()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -95,20 +95,20 @@ func VerifyStructuralSecond(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMixedAbstractDescendantOne].
+// Verify `that` instance of [ourtypes.IMixedAbstractDescendantOne].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMixedAbstractDescendantOne(
-	that aastypes.IMixedAbstractDescendantOne,
+	that ourtypes.IMixedAbstractDescendantOne,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if !(
-		aascommon.LenStr(that.UniqueToAbstractDescendantOne()) > 0) {
+		ourcommon.LenStr(that.UniqueToAbstractDescendantOne()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -121,20 +121,20 @@ func VerifyMixedAbstractDescendantOne(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMixedAbstractDescendantTwo].
+// Verify `that` instance of [ourtypes.IMixedAbstractDescendantTwo].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMixedAbstractDescendantTwo(
-	that aastypes.IMixedAbstractDescendantTwo,
+	that ourtypes.IMixedAbstractDescendantTwo,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if !(
-		aascommon.LenStr(that.UniqueToAbstractDescendantTwo()) > 0) {
+		ourcommon.LenStr(that.UniqueToAbstractDescendantTwo()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -147,19 +147,19 @@ func VerifyMixedAbstractDescendantTwo(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMixedConcreteWithDescendants].
+// Verify `that` instance of [ourtypes.IMixedConcreteWithDescendants].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMixedConcreteWithDescendants(
-	that aastypes.IMixedConcreteWithDescendants,
+	that ourtypes.IMixedConcreteWithDescendants,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.SomeBaseProperty()) > 0) {
+	if !(ourcommon.LenStr(that.SomeBaseProperty()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -172,19 +172,19 @@ func VerifyMixedConcreteWithDescendants(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMixedConcreteWithDescendantsChild].
+// Verify `that` instance of [ourtypes.IMixedConcreteWithDescendantsChild].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMixedConcreteWithDescendantsChild(
-	that aastypes.IMixedConcreteWithDescendantsChild,
+	that ourtypes.IMixedConcreteWithDescendantsChild,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.SomeBaseProperty()) > 0) {
+	if !(ourcommon.LenStr(that.SomeBaseProperty()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -194,7 +194,7 @@ func VerifyMixedConcreteWithDescendantsChild(
 		}
 	}
 
-	if !(aascommon.LenStr(that.SomeChildProperty()) > 0) {
+	if !(ourcommon.LenStr(that.SomeChildProperty()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The child value must not be empty.",),
@@ -207,19 +207,19 @@ func VerifyMixedConcreteWithDescendantsChild(
 	return
 }
 
-// Verify `that` instance of [aastypes.IMixedConcreteLeaf].
+// Verify `that` instance of [ourtypes.IMixedConcreteLeaf].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyMixedConcreteLeaf(
-	that aastypes.IMixedConcreteLeaf,
+	that ourtypes.IMixedConcreteLeaf,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.UniqueToConcreteLeaf()) > 0) {
+	if !(ourcommon.LenStr(that.UniqueToConcreteLeaf()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -232,19 +232,19 @@ func VerifyMixedConcreteLeaf(
 	return
 }
 
-// Verify `that` instance of [aastypes.IModelTypedFirst].
+// Verify `that` instance of [ourtypes.IModelTypedFirst].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyModelTypedFirst(
-	that aastypes.IModelTypedFirst,
+	that ourtypes.IModelTypedFirst,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.SomeProperty()) > 0) {
+	if !(ourcommon.LenStr(that.SomeProperty()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -257,19 +257,19 @@ func VerifyModelTypedFirst(
 	return
 }
 
-// Verify `that` instance of [aastypes.IModelTypedSecond].
+// Verify `that` instance of [ourtypes.IModelTypedSecond].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyModelTypedSecond(
-	that aastypes.IModelTypedSecond,
+	that ourtypes.IModelTypedSecond,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that.SomeProperty()) > 0) {
+	if !(ourcommon.LenStr(that.SomeProperty()) > 0) {
 		abort = onError(
 			newVerificationError(
 				"The value must not be empty.",),
@@ -282,14 +282,14 @@ func VerifyModelTypedSecond(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -308,7 +308,7 @@ func VerifySomething(
 			that.StructuralProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "StructuralProperty",
 					},
 				)
@@ -334,7 +334,7 @@ func VerifySomething(
 			that.MixedProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "MixedProperty",
 					},
 				)
@@ -360,7 +360,7 @@ func VerifySomething(
 			that.ModelTypedProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "ModelTypedProperty",
 					},
 				)
@@ -387,13 +387,13 @@ func VerifySomething(
 				v.Underlying(),
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ListStructuralProperty",
 						},
 					)
@@ -422,13 +422,13 @@ func VerifySomething(
 				v.Underlying(),
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ListMixedProperty",
 						},
 					)
@@ -457,13 +457,13 @@ func VerifySomething(
 				v.Underlying(),
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "ListModelTypedProperty",
 						},
 					)
@@ -481,13 +481,13 @@ func VerifySomething(
 		that.TupleProperty().Item1.Underlying(),
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 0,
 				},
 			)
 
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleProperty",
 				},
 			)
@@ -503,13 +503,13 @@ func VerifySomething(
 		that.TupleProperty().Item2.Underlying(),
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 1,
 				},
 			)
 
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleProperty",
 				},
 			)
@@ -525,13 +525,13 @@ func VerifySomething(
 		that.TupleProperty().Item3.Underlying(),
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 2,
 				},
 			)
 
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleProperty",
 				},
 			)
@@ -548,7 +548,7 @@ func VerifySomething(
 			that.OptionalStructuralProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalStructuralProperty",
 					},
 				)
@@ -565,7 +565,7 @@ func VerifySomething(
 			that.OptionalMixedProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalMixedProperty",
 					},
 				)
@@ -582,7 +582,7 @@ func VerifySomething(
 			that.OptionalModelTypedProperty().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalModelTypedProperty",
 					},
 				)
@@ -600,13 +600,13 @@ func VerifySomething(
 				v.Underlying(),
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "OptionalListOverlappingProperty",
 						},
 					)
@@ -630,59 +630,59 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeStructuralFirst:
+	case ourtypes.ModelTypeStructuralFirst:
 		abort = VerifyStructuralFirst(
-			that.(aastypes.IStructuralFirst),
+			that.(ourtypes.IStructuralFirst),
 			onError,
 		)
-	case aastypes.ModelTypeStructuralSecond:
+	case ourtypes.ModelTypeStructuralSecond:
 		abort = VerifyStructuralSecond(
-			that.(aastypes.IStructuralSecond),
+			that.(ourtypes.IStructuralSecond),
 			onError,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantOne:
+	case ourtypes.ModelTypeMixedAbstractDescendantOne:
 		abort = VerifyMixedAbstractDescendantOne(
-			that.(aastypes.IMixedAbstractDescendantOne),
+			that.(ourtypes.IMixedAbstractDescendantOne),
 			onError,
 		)
-	case aastypes.ModelTypeMixedAbstractDescendantTwo:
+	case ourtypes.ModelTypeMixedAbstractDescendantTwo:
 		abort = VerifyMixedAbstractDescendantTwo(
-			that.(aastypes.IMixedAbstractDescendantTwo),
+			that.(ourtypes.IMixedAbstractDescendantTwo),
 			onError,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendants:
+	case ourtypes.ModelTypeMixedConcreteWithDescendants:
 		abort = VerifyMixedConcreteWithDescendants(
-			that.(aastypes.IMixedConcreteWithDescendants),
+			that.(ourtypes.IMixedConcreteWithDescendants),
 			onError,
 		)
-	case aastypes.ModelTypeMixedConcreteWithDescendantsChild:
+	case ourtypes.ModelTypeMixedConcreteWithDescendantsChild:
 		abort = VerifyMixedConcreteWithDescendantsChild(
-			that.(aastypes.IMixedConcreteWithDescendantsChild),
+			that.(ourtypes.IMixedConcreteWithDescendantsChild),
 			onError,
 		)
-	case aastypes.ModelTypeMixedConcreteLeaf:
+	case ourtypes.ModelTypeMixedConcreteLeaf:
 		abort = VerifyMixedConcreteLeaf(
-			that.(aastypes.IMixedConcreteLeaf),
+			that.(ourtypes.IMixedConcreteLeaf),
 			onError,
 		)
-	case aastypes.ModelTypeModelTypedFirst:
+	case ourtypes.ModelTypeModelTypedFirst:
 		abort = VerifyModelTypedFirst(
-			that.(aastypes.IModelTypedFirst),
+			that.(ourtypes.IModelTypedFirst),
 			onError,
 		)
-	case aastypes.ModelTypeModelTypedSecond:
+	case ourtypes.ModelTypeModelTypedSecond:
 		abort = VerifyModelTypedSecond(
-			that.(aastypes.IModelTypedSecond),
+			that.(ourtypes.IModelTypedSecond),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfQueryCondition(t *testing.T) {
-	instance := aastesting.MustLoadMinimalQueryCondition()
+	instance := ourtesting.MustLoadMinimalQueryCondition()
 
-	if !aastypes.IsQueryCondition(instance) {
+	if !ourtypes.IsQueryCondition(instance) {
 		t.Errorf(
 			"Expected IsQueryCondition to be true on an instance " +
 			"of IQueryCondition with runtime type %T and with model type %v",

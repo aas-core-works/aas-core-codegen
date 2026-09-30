@@ -1,7 +1,7 @@
-// Check that all `elements` have the identical [aastypes.IHasSemantics.SemanticID].
-func SubmodelElementsHaveIdenticalSemanticIDs[S aastypes.ISubmodelElement](
+// Check that all `elements` have the identical [ourtypes.IHasSemantics.SemanticID].
+func SubmodelElementsHaveIdenticalSemanticIDs[S ourtypes.ISubmodelElement](
 	elements []S) bool {
-	var thatSemanticID aastypes.IReference
+	var thatSemanticID ourtypes.IReference
 
 	for _, element := range elements {
 		thisSemanticID := element.SemanticID()

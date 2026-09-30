@@ -204,13 +204,11 @@ def generate(
     namespace_condition = (
         Stripped(
             f"""\
-Xmlization.AAS_NAME_SPACE.equals(EVENT.getName().getNamespaceURI())
+Xmlization.NAMESPACE.equals(EVENT.getName().getNamespaceURI())
 {I}|| EVENT.getName().getNamespaceURI().isEmpty()"""
         )
         if intermediate_uses.json_types(symbol_table)
-        else Stripped(
-            "Xmlization.AAS_NAME_SPACE.equals(EVENT.getName().getNamespaceURI())"
-        )
+        else Stripped("Xmlization.NAMESPACE.equals(EVENT.getName().getNamespaceURI())")
     )
 
     blocks = [
@@ -327,7 +325,7 @@ final XMLEventReader outputReader =
 {I}xmlInputFactory.createXMLEventReader(new StringReader(outputText));
 final Map<XMLEvent, String> outputMap = buildElementsMap(outputReader);
 
-// check output for aas-name-space
+// check the namespace of the output
 for (XMLEvent event : outputMap.keySet()) {{
 {I}if (event.isStartElement()) {{
 {II}assertTrue(

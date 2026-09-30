@@ -32,7 +32,7 @@ public class Xmlization {
   /**
    * The XML namespace of the meta-model
    */
-  public static final String AAS_NAME_SPACE =
+  public static final String NAMESPACE =
     XmlCommon.NAMESPACE;
 
 

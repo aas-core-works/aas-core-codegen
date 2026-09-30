@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
@@ -11,7 +11,7 @@ using System.Collections.Generic;  // can't alias
 namespace dummy
 {
     /// <summary>
-    /// Represent a general class of an AAS model.
+    /// Represent a general class of the meta-model.
     /// </summary>
     public interface IClass
     {
@@ -59,7 +59,7 @@ namespace dummy
     /// Represent an item.
     /// </summary>
     /// <remarks>
-    /// See <see cref="Aas.IItem.Describe" /> for a human-readable description.
+    /// See <see cref="Our.IItem.Describe" /> for a human-readable description.
     /// </remarks>
     public interface IItem : IClass
     {
@@ -75,7 +75,7 @@ namespace dummy
     /// Represent a box.
     /// </summary>
     /// <remarks>
-    /// Its <see cref="Aas.IItem.Describe" /> is complemented by <see cref="Aas.Box.Volume" />.
+    /// Its <see cref="Our.IItem.Describe" /> is complemented by <see cref="Our.Box.Volume" />.
     /// </remarks>
     public interface IBox : IItem
     {
@@ -85,7 +85,7 @@ namespace dummy
         /// Compute the volume of the box.
         /// </summary>
         /// <remarks>
-        /// The unqualified reference to the inherited <see cref="Aas.Box.Describe" /> is resolved in
+        /// The unqualified reference to the inherited <see cref="Our.Box.Describe" /> is resolved in
         /// the context of the class.
         /// </remarks>
         public long Volume();
@@ -95,7 +95,7 @@ namespace dummy
     /// Represent a box.
     /// </summary>
     /// <remarks>
-    /// Its <see cref="Aas.IItem.Describe" /> is complemented by <see cref="Aas.Box.Volume" />.
+    /// Its <see cref="Our.IItem.Describe" /> is complemented by <see cref="Our.Box.Volume" />.
     /// </remarks>
     public class Box : IBox
     {

@@ -6,22 +6,22 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"SomeItem": aastypes.ModelTypeSomeItem,
-	"AnotherItem": aastypes.ModelTypeAnotherItem,
-	"Simple": aastypes.ModelTypeSimple,
-	"Something": aastypes.ModelTypeSomething,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"SomeItem": ourtypes.ModelTypeSomeItem,
+	"AnotherItem": ourtypes.ModelTypeAnotherItem,
+	"Simple": ourtypes.ModelTypeSimple,
+	"Something": ourtypes.ModelTypeSomething,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -33,12 +33,12 @@ var modelTypeToStringArray = [...]string {
 	"Something",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -52,11 +52,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {

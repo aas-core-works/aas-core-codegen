@@ -6,7 +6,7 @@ package common_arithmetic_test
 import (
 	"math"
 	"testing"
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // The meta-model is written in Python, so the invariants follow the Python
@@ -14,7 +14,7 @@ import (
 // the modulo takes the sign of the divisor in Python (`-7 % 3 == 2`), while
 // the native Go operator `%` gives the remainder with the sign of the dividend
 // (`-7 % 3 == -1`). Therefore, we transpile the modulo to
-// aascommon.FloorMod instead of the native operator.
+// ourcommon.FloorMod instead of the native operator.
 //
 // The tests in this file document how the generated code behaves, and make sure
 // that it matches the Python semantics.
@@ -62,7 +62,7 @@ func TestFloorMod(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		got := aascommon.FloorMod(c.dividend, c.divisor)
+		got := ourcommon.FloorMod(c.dividend, c.divisor)
 		if got != c.expected {
 			t.Errorf(
 				"Expected FloorMod(%d, %d) to be %d, but got %d",
@@ -89,7 +89,7 @@ func TestAbsInt64(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		got := aascommon.AbsInt64(c.argument)
+		got := ourcommon.AbsInt64(c.argument)
 		if got != c.expected {
 			t.Errorf(
 				"Expected AbsInt64(%d) to be %d, but got %d",

@@ -1,5 +1,5 @@
-// Check that [aastypes.IItem.Label]'s of the `items` do not repeat.
-func ItemsHaveUniqueLabels[I aastypes.IItem](items []I) bool {
+// Check that [ourtypes.IItem.Label]'s of the `items` do not repeat.
+func ItemsHaveUniqueLabels[I ourtypes.IItem](items []I) bool {
 	labelSet := make(map[string]struct{})
 
 	for _, item := range items {

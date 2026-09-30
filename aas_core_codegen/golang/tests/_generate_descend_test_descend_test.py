@@ -34,10 +34,10 @@ def _generate_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
 func {test_function_name}(
 {I}t *testing.T,
 ) {{
-{I}instance := aastesting.{must_load_maximal_name}()
+{I}instance := ourtesting.{must_load_maximal_name}()
 
 {I}expectedPth := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"Descend",
 {II}{model_type_literal},
 {II}"maximal.json.trace",
@@ -73,7 +73,7 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
 import (
 {I}"path/filepath"
 {I}"testing"
-{I}aastesting "{repo_url}/aastesting"
+{I}ourtesting "{repo_url}/ourtesting"
 )"""
         ),
     ]  # type: List[Stripped]

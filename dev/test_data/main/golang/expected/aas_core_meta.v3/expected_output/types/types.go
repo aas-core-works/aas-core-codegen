@@ -52,7 +52,7 @@
 //     the definition of element types in a [ISubmodelElementList].
 //
 //     To avoid confusion, we introduce two separate enumerations for the separate contexts.
-//     Firstly, a set of [KeyTypes], [aasconstants.AASSubmodelElementsAsKeys] to
+//     Firstly, a set of [KeyTypes], [ourconstants.AASSubmodelElementsAsKeys] to
 //     represent the first context (key type in a reference).
 //     Secondly, the enumeration [AASSubmodelElements] is kept as designator
 //     for [ISubmodelElementList.TypeValueListElement].
@@ -138,7 +138,7 @@ const (
 	ModelTypeDataSpecificationIEC61360
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -196,7 +196,7 @@ type IHasSemantics interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IHasSemantics]
+// Check whether the instance corresponds to [ourtypes.IHasSemantics]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -286,7 +286,7 @@ type IExtension interface {
 	ValueTypeOrDefault() DataTypeDefXSD;
 }
 
-// Check whether the instance corresponds to [aastypes.IExtension]
+// Check whether the instance corresponds to [ourtypes.IExtension]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -519,7 +519,7 @@ type IHasExtensions interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IHasExtensions]
+// Check whether the instance corresponds to [ourtypes.IHasExtensions]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -630,7 +630,7 @@ type IReferable interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IReferable]
+// Check whether the instance corresponds to [ourtypes.IReferable]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -699,7 +699,7 @@ type IIdentifiable interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IIdentifiable]
+// Check whether the instance corresponds to [ourtypes.IIdentifiable]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -758,7 +758,7 @@ type IHasKind interface {
 	KindOrDefault() ModellingKind;
 }
 
-// Check whether the instance corresponds to [aastypes.IHasKind]
+// Check whether the instance corresponds to [ourtypes.IHasKind]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -789,7 +789,7 @@ type IHasDataSpecification interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IHasDataSpecification]
+// Check whether the instance corresponds to [ourtypes.IHasDataSpecification]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -886,7 +886,7 @@ type IAdministrativeInformation interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAdministrativeInformation]
+// Check whether the instance corresponds to [ourtypes.IAdministrativeInformation]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1079,7 +1079,7 @@ type IQualifiable interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IQualifiable]
+// Check whether the instance corresponds to [ourtypes.IQualifiable]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1213,7 +1213,7 @@ type IQualifier interface {
 	KindOrDefault() QualifierKind;
 }
 
-// Check whether the instance corresponds to [aastypes.IQualifier]
+// Check whether the instance corresponds to [ourtypes.IQualifier]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1479,7 +1479,7 @@ type IAssetAdministrationShell interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAssetAdministrationShell]
+// Check whether the instance corresponds to [ourtypes.IAssetAdministrationShell]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -1959,7 +1959,7 @@ type IAssetInformation interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAssetInformation]
+// Check whether the instance corresponds to [ourtypes.IAssetInformation]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -2153,7 +2153,7 @@ type IResource interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IResource]
+// Check whether the instance corresponds to [ourtypes.IResource]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -2296,7 +2296,7 @@ type ISpecificAssetID interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISpecificAssetID]
+// Check whether the instance corresponds to [ourtypes.ISpecificAssetID]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -2518,7 +2518,7 @@ type ISubmodel interface {
 	KindOrDefault() ModellingKind;
 }
 
-// Check whether the instance corresponds to [aastypes.ISubmodel]
+// Check whether the instance corresponds to [ourtypes.ISubmodel]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -2998,7 +2998,7 @@ type ISubmodelElement interface {
 	IHasDataSpecification
 }
 
-// Check whether the instance corresponds to [aastypes.ISubmodelElement]
+// Check whether the instance corresponds to [ourtypes.ISubmodelElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -3059,7 +3059,7 @@ type IRelationshipElement interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IRelationshipElement]
+// Check whether the instance corresponds to [ourtypes.IRelationshipElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -3606,7 +3606,7 @@ type ISubmodelElementList interface {
 	OrderRelevantOrDefault() bool;
 }
 
-// Check whether the instance corresponds to [aastypes.ISubmodelElementList]
+// Check whether the instance corresponds to [ourtypes.ISubmodelElementList]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -4091,7 +4091,7 @@ type ISubmodelElementCollection interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISubmodelElementCollection]
+// Check whether the instance corresponds to [ourtypes.ISubmodelElementCollection]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -4491,7 +4491,7 @@ type IDataElement interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IDataElement]
+// Check whether the instance corresponds to [ourtypes.IDataElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -4551,7 +4551,7 @@ type IProperty interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IProperty]
+// Check whether the instance corresponds to [ourtypes.IProperty]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -5000,7 +5000,7 @@ type IMultiLanguageProperty interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IMultiLanguageProperty]
+// Check whether the instance corresponds to [ourtypes.IMultiLanguageProperty]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -5463,7 +5463,7 @@ type IRange interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IRange]
+// Check whether the instance corresponds to [ourtypes.IRange]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -5878,7 +5878,7 @@ type IReferenceElement interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IReferenceElement]
+// Check whether the instance corresponds to [ourtypes.IReferenceElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -6303,7 +6303,7 @@ type IBlob interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IBlob]
+// Check whether the instance corresponds to [ourtypes.IBlob]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -6714,7 +6714,7 @@ type IFile interface {
 	CategoryOrDefault() string;
 }
 
-// Check whether the instance corresponds to [aastypes.IFile]
+// Check whether the instance corresponds to [ourtypes.IFile]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -7112,7 +7112,7 @@ type IAnnotatedRelationshipElement interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAnnotatedRelationshipElement]
+// Check whether the instance corresponds to [ourtypes.IAnnotatedRelationshipElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -7606,7 +7606,7 @@ type IEntity interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IEntity]
+// Check whether the instance corresponds to [ourtypes.IEntity]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -8200,7 +8200,7 @@ type IEventPayload interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IEventPayload]
+// Check whether the instance corresponds to [ourtypes.IEventPayload]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -8482,7 +8482,7 @@ type IEventElement interface {
 	ISubmodelElement
 }
 
-// Check whether the instance corresponds to [aastypes.IEventElement]
+// Check whether the instance corresponds to [ourtypes.IEventElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -8591,7 +8591,7 @@ type IBasicEventElement interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IBasicEventElement]
+// Check whether the instance corresponds to [ourtypes.IBasicEventElement]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -9120,7 +9120,7 @@ type IOperation interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IOperation]
+// Check whether the instance corresponds to [ourtypes.IOperation]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -9592,7 +9592,7 @@ type IOperationVariable interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IOperationVariable]
+// Check whether the instance corresponds to [ourtypes.IOperationVariable]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -9690,7 +9690,7 @@ type ICapability interface {
 	ISubmodelElement
 }
 
-// Check whether the instance corresponds to [aastypes.ICapability]
+// Check whether the instance corresponds to [ourtypes.ICapability]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -10111,7 +10111,7 @@ type IConceptDescription interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IConceptDescription]
+// Check whether the instance corresponds to [ourtypes.IConceptDescription]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -10465,33 +10465,33 @@ var LiteralsOfReferenceTypes = [...]ReferenceTypes {
 //
 // Constraint AASd-121:
 // For [IReference]'s the value of [IKey.Type] of the first key of "
-// [IReference.Keys] shall be one of [aasconstants.GloballyIdentifiables].
+// [IReference.Keys] shall be one of [ourconstants.GloballyIdentifiables].
 //
 // Constraint AASd-122:
 // For external references, i.e. [IReference]'s with
 // [IReference.Type] = [ReferenceTypesExternalReference], the value
 // of [IKey.Type] of the first key of [IReference.Keys] shall be one of
-// [aasconstants.GenericGloballyIdentifiables].
+// [ourconstants.GenericGloballyIdentifiables].
 //
 // Constraint AASd-123:
 // For model references, i.e. [IReference]'s with
 // [IReference.Type] = [ReferenceTypesModelReference], the value
 // of [IKey.Type] of the first key of [IReference.Keys] shall be one of
-// [aasconstants.AASIdentifiables].
+// [ourconstants.AASIdentifiables].
 //
 // Constraint AASd-124:
 // For external references, i.e. [IReference]'s with
 // [IReference.Type] = [ReferenceTypesExternalReference], the last
 // key of [IReference.Keys] shall be either one of
-// [aasconstants.GenericGloballyIdentifiables] or one of
-// [aasconstants.GenericFragmentKeys].
+// [ourconstants.GenericGloballyIdentifiables] or one of
+// [ourconstants.GenericFragmentKeys].
 //
 // Constraint AASd-125:
 // For model references, i.e. [IReference]'s with
 // [IReference.Type] = [ReferenceTypesModelReference], with more
 // than one key in [IReference.Keys] the value of [IKey.Type]
 // of each of the keys following the first
-// key of [IReference.Keys] shall be one of [aasconstants.FragmentKeys].
+// key of [IReference.Keys] shall be one of [ourconstants.FragmentKeys].
 //
 // NOTE: Constraint AASd-125 ensures that the shortest path is used.
 //
@@ -10500,8 +10500,8 @@ var LiteralsOfReferenceTypes = [...]ReferenceTypes {
 // [IReference.Type] = [ReferenceTypesModelReference], with more
 // than one key in [IReference.Keys] the value of [IKey.Type]
 // of the last key in the reference key chain may be
-// one of [aasconstants.GenericFragmentKeys] or no key at all
-// shall have a value out of [aasconstants.GenericFragmentKeys].
+// one of [ourconstants.GenericFragmentKeys] or no key at all
+// shall have a value out of [ourconstants.GenericFragmentKeys].
 //
 // Constraint AASd-127:
 // For model references, i.e. [IReference]'s with
@@ -10510,7 +10510,7 @@ var LiteralsOfReferenceTypes = [...]ReferenceTypes {
 // [KeyTypesFragmentReference] shall be preceded by a key with
 // [IKey.Type] [KeyTypesFile] or [KeyTypesBlob]. All other
 // AAS fragments, i.e. [IKey.Type] values
-// out of [aasconstants.AASSubmodelElementsAsKeys], do not support fragments.
+// out of [ourconstants.AASSubmodelElementsAsKeys], do not support fragments.
 //
 // NOTE: Which kind of fragments are supported depends on the content type and the
 // specification of allowed fragment identifiers for the corresponding resource
@@ -10554,7 +10554,7 @@ type IReference interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IReference]
+// Check whether the instance corresponds to [ourtypes.IReference]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -10724,7 +10724,7 @@ type IKey interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IKey]
+// Check whether the instance corresponds to [ourtypes.IKey]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -10987,7 +10987,7 @@ type IAbstractLangString interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IAbstractLangString]
+// Check whether the instance corresponds to [ourtypes.IAbstractLangString]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11015,7 +11015,7 @@ type ILangStringNameType interface {
 	IAbstractLangString
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringNameType]
+// Check whether the instance corresponds to [ourtypes.ILangStringNameType]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11107,7 +11107,7 @@ type ILangStringTextType interface {
 	IAbstractLangString
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringTextType]
+// Check whether the instance corresponds to [ourtypes.ILangStringTextType]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11224,7 +11224,7 @@ type IEnvironment interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IEnvironment]
+// Check whether the instance corresponds to [ourtypes.IEnvironment]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11407,7 +11407,7 @@ type IDataSpecificationContent interface {
 	IClass
 }
 
-// Check whether the instance corresponds to [aastypes.IDataSpecificationContent]
+// Check whether the instance corresponds to [ourtypes.IDataSpecificationContent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11441,7 +11441,7 @@ type IEmbeddedDataSpecification interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IEmbeddedDataSpecification]
+// Check whether the instance corresponds to [ourtypes.IEmbeddedDataSpecification]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11735,7 +11735,7 @@ type ILevelType interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ILevelType]
+// Check whether the instance corresponds to [ourtypes.ILevelType]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11872,7 +11872,7 @@ type IValueReferencePair interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IValueReferencePair]
+// Check whether the instance corresponds to [ourtypes.IValueReferencePair]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -11987,7 +11987,7 @@ type IValueList interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IValueList]
+// Check whether the instance corresponds to [ourtypes.IValueList]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -12084,7 +12084,7 @@ type ILangStringPreferredNameTypeIEC61360 interface {
 	IAbstractLangString
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringPreferredNameTypeIEC61360]
+// Check whether the instance corresponds to [ourtypes.ILangStringPreferredNameTypeIEC61360]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -12176,7 +12176,7 @@ type ILangStringShortNameTypeIEC61360 interface {
 	IAbstractLangString
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringShortNameTypeIEC61360]
+// Check whether the instance corresponds to [ourtypes.ILangStringShortNameTypeIEC61360]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -12268,7 +12268,7 @@ type ILangStringDefinitionTypeIEC61360 interface {
 	IAbstractLangString
 }
 
-// Check whether the instance corresponds to [aastypes.ILangStringDefinitionTypeIEC61360]
+// Check whether the instance corresponds to [ourtypes.ILangStringDefinitionTypeIEC61360]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -12494,7 +12494,7 @@ type IDataSpecificationIEC61360 interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IDataSpecificationIEC61360]
+// Check whether the instance corresponds to [ourtypes.IDataSpecificationIEC61360]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is

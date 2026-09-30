@@ -12,21 +12,21 @@ package verification
 
 import (
 	"fmt"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -41,7 +41,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check that the square brackets in `text` are balanced.
@@ -76,8 +76,8 @@ func TextsAreUnique(texts []string) bool {
 	return true
 }
 
-// Check that [aastypes.IItem.Label]'s of the `items` do not repeat.
-func ItemsHaveUniqueLabels[I aastypes.IItem](items []I) bool {
+// Check that [ourtypes.IItem.Label]'s of the `items` do not repeat.
+func ItemsHaveUniqueLabels[I ourtypes.IItem](items []I) bool {
 	labelSet := make(map[string]struct{})
 
 	for _, item := range items {
@@ -92,14 +92,14 @@ func ItemsHaveUniqueLabels[I aastypes.IItem](items []I) bool {
 	return true
 }
 
-// Verify `that` instance of [aastypes.IBox].
+// Verify `that` instance of [ourtypes.IBox].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBox(
-	that aastypes.IBox,
+	that ourtypes.IBox,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -119,7 +119,7 @@ func VerifyBox(
 			*that.Color(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Color",
 					},
 				)
@@ -134,14 +134,14 @@ func VerifyBox(
 	return
 }
 
-// Verify `that` instance of [aastypes.IBag].
+// Verify `that` instance of [ourtypes.IBag].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBag(
-	that aastypes.IBag,
+	that ourtypes.IBag,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -170,14 +170,14 @@ func VerifyBag(
 	return
 }
 
-// Verify `that` instance of [aastypes.IContainer].
+// Verify `that` instance of [ourtypes.IContainer].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyContainer(
-	that aastypes.IContainer,
+	that ourtypes.IContainer,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -228,13 +228,13 @@ func VerifyContainer(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Items",
 						},
 					)
@@ -259,14 +259,14 @@ func VerifyContainer(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyColor(
-	that aastypes.Color,
+	that ourtypes.Color,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.ColorRed ||
-		that > aastypes.ColorGreen {
+		that < ourtypes.ColorRed ||
+		that > ourtypes.ColorGreen {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -287,24 +287,24 @@ func VerifyColor(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeBox:
+	case ourtypes.ModelTypeBox:
 		abort = VerifyBox(
-			that.(aastypes.IBox),
+			that.(ourtypes.IBox),
 			onError,
 		)
-	case aastypes.ModelTypeBag:
+	case ourtypes.ModelTypeBag:
 		abort = VerifyBag(
-			that.(aastypes.IBag),
+			that.(ourtypes.IBag),
 			onError,
 		)
-	case aastypes.ModelTypeContainer:
+	case ourtypes.ModelTypeContainer:
 		abort = VerifyContainer(
-			that.(aastypes.IContainer),
+			that.(ourtypes.IContainer),
 			onError,
 		)
 	default:

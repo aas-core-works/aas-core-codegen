@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -34,9 +34,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -170,7 +170,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -180,7 +180,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -337,7 +337,7 @@ def _list_from_jsonable(
     :return: parsed list
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is None:
         raise DeserializationException(
             f"Expected something array-like, but got: {type(jsonable)}"
@@ -372,7 +372,7 @@ def _set_from_jsonable(
     :return: parsed set
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is None:
         raise DeserializationException(
             f"Expected something array-like, but got: {type(jsonable)}"
@@ -434,7 +434,7 @@ def _list_of__int_from_jsonable(
 
 def _list_of__kind_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.Kind]:
+) -> List[our_types.Kind]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.Kind`.
@@ -485,7 +485,7 @@ def _set_of__bool_from_jsonable(
 
 def _set_of__direction_from_jsonable(
     jsonable: Jsonable
-) -> Set[aas_types.Direction]:
+) -> Set[our_types.Direction]:
     """
     Parse :paramref:`jsonable` as a set of
     :py:class:`.types.Direction`.
@@ -536,7 +536,7 @@ def _set_of__str_from_jsonable(
 
 def kind_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.Kind:
+) -> our_types.Kind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.Kind`.
@@ -550,7 +550,7 @@ def kind_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.kind_from_str(jsonable)
+    literal = our_stringification.kind_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -562,7 +562,7 @@ def kind_from_jsonable(
 
 def direction_from_jsonable(
     jsonable: Jsonable
-) -> aas_types.Direction:
+) -> our_types.Direction:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.Direction`.
@@ -576,7 +576,7 @@ def direction_from_jsonable(
             "Expected a str, but got: {type(jsonable)}"
         )
 
-    literal = aas_stringification.direction_from_str(jsonable)
+    literal = our_stringification.direction_from_str(jsonable)
     if literal is None:
         raise DeserializationException(
             f"Not a valid string representation of "
@@ -588,7 +588,7 @@ def direction_from_jsonable(
 
 def something_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Parse an instance of :py:class:`.types.Something` from the JSON-able
     structure :paramref:`jsonable`.
@@ -601,14 +601,14 @@ def something_from_jsonable(
 
     the_text: Optional[str] = None
     the_number: Optional[int] = None
-    the_kind: Optional[aas_types.Kind] = None
+    the_kind: Optional[our_types.Kind] = None
     the_texts: Optional[List[str]] = None
     the_numbers: Optional[List[int]] = None
-    the_kinds: Optional[List[aas_types.Kind]] = None
+    the_kinds: Optional[List[our_types.Kind]] = None
     the_codes: Optional[List[str]] = None
     the_flags: Optional[List[bool]] = None
     the_optional_texts: Optional[List[str]] = None
-    the_optional_kind: Optional[aas_types.Kind] = None
+    the_optional_kind: Optional[our_types.Kind] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -685,7 +685,7 @@ def something_from_jsonable(
             "The required property 'flags' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_text,
         the_number,
         the_kind,
@@ -701,7 +701,7 @@ def something_from_jsonable(
 
 def collection_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Collection:
+) -> our_types.Collection:
     """
     Parse an instance of :py:class:`.types.Collection` from the JSON-able
     structure :paramref:`jsonable`.
@@ -715,10 +715,10 @@ def collection_from_jsonable(
     the_texts: Optional[Set[str]] = None
     the_numbers: Optional[Set[int]] = None
     the_flags: Optional[Set[bool]] = None
-    the_directions: Optional[Set[aas_types.Direction]] = None
+    the_directions: Optional[Set[our_types.Direction]] = None
     the_codes: Optional[Set[str]] = None
     the_optional_texts: Optional[Set[str]] = None
-    the_optional_directions: Optional[Set[aas_types.Direction]] = None
+    the_optional_directions: Optional[Set[our_types.Direction]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -774,7 +774,7 @@ def collection_from_jsonable(
             "The required property 'codes' is missing"
         )
 
-    return aas_types.Collection(
+    return our_types.Collection(
         the_texts,
         the_numbers,
         the_flags,
@@ -890,7 +890,7 @@ def _list_of__int_to_jsonable(
 
 
 def _list_of__kind_to_jsonable(
-    that: List[aas_types.Kind]
+    that: List[our_types.Kind]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -912,7 +912,7 @@ def _list_of__kind_to_jsonable(
 
 
 def _set_of__direction_to_jsonable(
-    that: Set[aas_types.Direction]
+    that: Set[our_types.Direction]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a sorted list of
@@ -922,7 +922,7 @@ def _set_of__direction_to_jsonable(
     :return: JSON-able representation of :paramref:`that`
     """
     jsonable = []  # type: List[MutableJsonable]
-    for i, item in enumerate(sorted(that, key=aas_stringification.rank_of_direction)):
+    for i, item in enumerate(sorted(that, key=our_stringification.rank_of_direction)):
         try:
             jsonable.append(
                 item.value
@@ -958,7 +958,7 @@ def _set_of__int_to_jsonable(
 
 
 def _something_to_jsonable(
-    that: aas_types.Something
+    that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1032,7 +1032,7 @@ def _something_to_jsonable(
 
 
 def _collection_to_jsonable(
-    that: aas_types.Collection
+    that: our_types.Collection
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1091,7 +1091,7 @@ def _collection_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -1113,12 +1113,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

@@ -14,7 +14,7 @@ from typing import Any
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 import tests.common
@@ -34,11 +34,11 @@ class TestRoundTrips(unittest.TestCase):
             with path.open("rt") as fid:
                 original_jsonable = json.load(fid)
 
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 original_jsonable
             )
 
-            another_jsonable = aas_jsonization.to_jsonable(instance)
+            another_jsonable = our_jsonization.to_jsonable(instance)
 
             mismatches = tests.common_jsonization.check_equal(
                 original_jsonable,
@@ -69,16 +69,16 @@ def _load_the_first_expected(model_type: str) -> Any:
 class TestSerializationFailures(unittest.TestCase):
     def test_something_even_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.even = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.even',
@@ -87,16 +87,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_offset_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.offset = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.offset',
@@ -105,16 +105,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_small_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.small = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.small',
@@ -123,16 +123,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_by_negative_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.by_negative = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.by_negative',
@@ -141,16 +141,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_negative_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.negative = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.negative',
@@ -159,16 +159,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_deviation_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.deviation = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.deviation',
@@ -177,16 +177,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_ratio_non_finite(self) -> None:
         for value in [math.inf, -math.inf, math.nan]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.ratio = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.ratio',
@@ -195,16 +195,16 @@ class TestSerializationFailures(unittest.TestCase):
 
     def test_something_alignment_out_of_range(self) -> None:
         for value in [9007199254740992, -9007199254740992]:
-            instance = aas_jsonization.something_from_jsonable(
+            instance = our_jsonization.something_from_jsonable(
                 _load_the_first_expected('Something')
             )
 
             instance.alignment = value
 
             with self.assertRaises(
-                aas_jsonization.SerializationException
+                our_jsonization.SerializationException
             ) as context_manager:
-                aas_jsonization.to_jsonable(instance)
+                our_jsonization.to_jsonable(instance)
 
             self.assertEqual(
                 '.alignment',

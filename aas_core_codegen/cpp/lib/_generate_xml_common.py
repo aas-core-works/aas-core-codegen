@@ -1730,6 +1730,9 @@ def _generate_self_closing_writer_declaration(
         else ""
     )
 
+    # NOTE (mristin):
+    # See https://github.com/aas-core-works/aas-core-meta/issues/298 on why we
+    # do not check the range of ``SerializeInt64``.
     return [
         Stripped("// region class SelfClosingWriter"),
         Stripped(
@@ -1785,8 +1788,7 @@ class SelfClosingWriter {{
 {I} * floats, as the value can be de-serialized correctly from XML. However, this
 {I} * means that XML and JSON serializations are not interoperable. If you need
 {I} * interoperability, you have to ensure that range yourself (<i>e.g.</i>, through
-{I} * \\ref validation, see also
-{I} * https://github.com/aas-core-works/aas-core-meta/issues/298).
+{I} * \\ref validation).
 {I} */
 {I}void SerializeInt64(
 {II}int64_t value

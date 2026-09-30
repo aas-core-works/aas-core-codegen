@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -357,36 +357,36 @@ namespace dummy
             /// <summary>
             /// Read an instance of class Branch from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Branch> BranchFromElement = (
-                AtElement<Aas.Branch>(
+            internal static readonly ElementReader<Our.Branch> BranchFromElement = (
+                AtElement<Our.Branch>(
                     BranchFromSequence, "branch"));
 
             /// <summary>
             /// Read an instance of class Leaf from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Leaf> LeafFromElement = (
-                AtElement<Aas.Leaf>(
+            internal static readonly ElementReader<Our.Leaf> LeafFromElement = (
+                AtElement<Our.Leaf>(
                     LeafFromSequence, "leaf"));
 
             /// <summary>
             /// Read an instance of class Blossom from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Blossom> BlossomFromElement = (
-                AtElement<Aas.Blossom>(
+            internal static readonly ElementReader<Our.Blossom> BlossomFromElement = (
+                AtElement<Our.Blossom>(
                     BlossomFromSequence, "blossom"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             /// <summary>
             /// Read an instance of class Container from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Container> ContainerFromElement = (
-                AtElement<Aas.Container>(
+            internal static readonly ElementReader<Our.Container> ContainerFromElement = (
+                AtElement<Our.Container>(
                     ContainerFromSequence, "container"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -396,11 +396,11 @@ namespace dummy
                 AsText<long>(ReadContentAsLong));
 
             private static readonly ContentReader<INode> Read_INode = (
-                AsElement<Aas.INode>(
+                AsElement<Our.INode>(
                     INodeFromElement));
 
             private static readonly ContentReader<IBranch> Read_IBranch = (
-                AsElement<Aas.IBranch>(
+                AsElement<Our.IBranch>(
                     IBranchFromElement));
 
             private static readonly ContentReader<ISomething> Read_ISomething = (
@@ -410,7 +410,7 @@ namespace dummy
             /// Deserialize an instance of INode from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.INode INodeFromElement(
+            internal static Our.INode INodeFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -437,7 +437,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.INode? INodeFromElement
+            }  // internal static Our.INode? INodeFromElement
 
             /// <summary>
             /// Deserialize an instance of class Branch from a sequence of XML elements.
@@ -447,7 +447,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Branch BranchFromSequence(
+            internal static Our.Branch BranchFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -547,20 +547,20 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Branch(
+                return new Our.Branch(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theDescription
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Branch? BranchFromSequence
+            }  // internal static Our.Branch? BranchFromSequence
 
             /// <summary>
             /// Deserialize an instance of IBranch from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IBranch IBranchFromElement(
+            internal static Our.IBranch IBranchFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -587,7 +587,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IBranch? IBranchFromElement
+            }  // internal static Our.IBranch? IBranchFromElement
 
             /// <summary>
             /// Deserialize an instance of class Leaf from a sequence of XML elements.
@@ -597,7 +597,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Leaf LeafFromSequence(
+            internal static Our.Leaf LeafFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -715,7 +715,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Leaf(
+                return new Our.Leaf(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -725,13 +725,13 @@ namespace dummy
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Leaf? LeafFromSequence
+            }  // internal static Our.Leaf? LeafFromSequence
 
             /// <summary>
             /// Deserialize an instance of ILeaf from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.ILeaf ILeafFromElement(
+            internal static Our.ILeaf ILeafFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -755,7 +755,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.ILeaf? ILeafFromElement
+            }  // internal static Our.ILeaf? ILeafFromElement
 
             /// <summary>
             /// Deserialize an instance of class Blossom from a sequence of XML elements.
@@ -765,7 +765,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Blossom BlossomFromSequence(
+            internal static Our.Blossom BlossomFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -901,7 +901,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Blossom(
+                return new Our.Blossom(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -914,7 +914,7 @@ namespace dummy
                     theDetails
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Blossom? BlossomFromSequence
+            }  // internal static Our.Blossom? BlossomFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -924,7 +924,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1024,14 +1024,14 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theSomeChoice
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theSomethingWithoutChoice
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Container from a sequence of XML elements.
@@ -1041,7 +1041,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Container ContainerFromSequence(
+            internal static Our.Container ContainerFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1141,14 +1141,14 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Container(
+                return new Our.Container(
                     theNode
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theSomething
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Container? ContainerFromSequence
+            }  // internal static Our.Container? ContainerFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -1173,7 +1173,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class INode:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.INode anInstance = Deserialize.INodeFrom(
+        /// Our.INode anInstance = Deserialize.INodeFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -1192,7 +1192,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of INode.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.INode INodeFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.INode INodeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1206,7 +1206,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.INode result = DeserializeImplementation.INodeFromElement(
+                Our.INode result = DeserializeImplementation.INodeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1226,7 +1226,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IBranch.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IBranch IBranchFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IBranch IBranchFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1240,7 +1240,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IBranch result = DeserializeImplementation.IBranchFromElement(
+                Our.IBranch result = DeserializeImplementation.IBranchFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1260,7 +1260,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Branch.
             /// </exception>
-            public static Aas.Branch BranchFrom(
+            public static Our.Branch BranchFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1274,7 +1274,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Branch result = DeserializeImplementation.BranchFromElement(
+                Our.Branch result = DeserializeImplementation.BranchFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1294,7 +1294,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ILeaf.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.ILeaf ILeafFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.ILeaf ILeafFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1308,7 +1308,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ILeaf result = DeserializeImplementation.ILeafFromElement(
+                Our.ILeaf result = DeserializeImplementation.ILeafFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1328,7 +1328,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Leaf.
             /// </exception>
-            public static Aas.Leaf LeafFrom(
+            public static Our.Leaf LeafFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1342,7 +1342,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Leaf result = DeserializeImplementation.LeafFromElement(
+                Our.Leaf result = DeserializeImplementation.LeafFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1362,7 +1362,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Blossom.
             /// </exception>
-            public static Aas.Blossom BlossomFrom(
+            public static Our.Blossom BlossomFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1376,7 +1376,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Blossom result = DeserializeImplementation.BlossomFromElement(
+                Our.Blossom result = DeserializeImplementation.BlossomFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1396,7 +1396,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1410,7 +1410,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1430,7 +1430,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Container.
             /// </exception>
-            public static Aas.Container ContainerFrom(
+            public static Our.Container ContainerFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1444,7 +1444,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Container result = DeserializeImplementation.ContainerFromElement(
+                Our.Container result = DeserializeImplementation.ContainerFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1562,7 +1562,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -1584,7 +1584,7 @@ namespace dummy
                 SomethingToSequence);
 
             private static void BranchToSequence(
-                Aas.IBranch that,
+                Our.IBranch that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1595,7 +1595,7 @@ namespace dummy
             }  // private static void BranchToSequence
 
             public override void VisitBranch(
-                Aas.IBranch that,
+                Our.IBranch that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1608,7 +1608,7 @@ namespace dummy
             }
 
             private static void LeafToSequence(
-                Aas.ILeaf that,
+                Our.ILeaf that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1622,7 +1622,7 @@ namespace dummy
             }  // private static void LeafToSequence
 
             public override void VisitLeaf(
-                Aas.ILeaf that,
+                Our.ILeaf that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1635,7 +1635,7 @@ namespace dummy
             }
 
             private static void BlossomToSequence(
-                Aas.IBlossom that,
+                Our.IBlossom that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1652,7 +1652,7 @@ namespace dummy
             }  // private static void BlossomToSequence
 
             public override void VisitBlossom(
-                Aas.IBlossom that,
+                Our.IBlossom that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1665,7 +1665,7 @@ namespace dummy
             }
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1680,7 +1680,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1693,7 +1693,7 @@ namespace dummy
             }
 
             private static void ContainerToSequence(
-                Aas.IContainer that,
+                Our.IContainer that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1704,7 +1704,7 @@ namespace dummy
             }  // private static void ContainerToSequence
 
             public override void VisitContainer(
-                Aas.IContainer that,
+                Our.IContainer that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1723,7 +1723,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of INode:
         /// <code>
-        /// var anInstance = new Aas.INode(
+        /// var anInstance = new Our.INode(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -1742,7 +1742,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

@@ -91,7 +91,7 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             """\
 /// <summary>
-/// See <see cref="Aas.Verification.MatchesSomething" />.
+/// See <see cref="Our.Verification.MatchesSomething" />.
 /// </summary>""",
             code,
         )
@@ -257,7 +257,7 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             """\
 /// <summary>
-/// See <see cref="Aas.IParent.DoSomething" />.
+/// See <see cref="Our.IParent.DoSomething" />.
 /// </summary>""",
             code,
         )

@@ -35,8 +35,8 @@ from typing import (
     Tuple
 )
 
-import dummy.common as aas_common
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.types as our_types
 from dummy.xmlcommon import (
     DeserializationException,
     Element,
@@ -62,7 +62,7 @@ from dummy.xmlcommon import (
 def read_value_content(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.JsonValue:
+) -> our_types.JsonValue:
     """
     Read the content of :paramref:`element` as a JSON-able value.
 
@@ -115,7 +115,7 @@ _DOUBLE_RE = re.compile(
 def _read_discriminator(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.JsonValue:
+) -> our_types.JsonValue:
     """
     Read :paramref:`element` as one of the five XML-RPC discriminators.
 
@@ -212,7 +212,7 @@ def _read_discriminator(
 def read_array_body(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.JsonArray:
+) -> our_types.JsonArray:
     """
     Read the content of :paramref:`element` as a ``<data>`` of ``<value>``'s.
 
@@ -288,7 +288,7 @@ def read_array_body(
 def read_value_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.JsonValue:
+) -> our_types.JsonValue:
     """
     Read :paramref:`element`, which has to be a ``<value>``, as a JSON-able value.
 
@@ -314,7 +314,7 @@ def read_value_element(
 def read_struct_body(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.JsonObject:
+) -> our_types.JsonObject:
     """
     Read the content of :paramref:`element` as a sequence of ``<member>``'s.
 
@@ -377,7 +377,7 @@ def read_struct_body(
 def _read_member(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> Tuple[str, aas_types.JsonValue]:
+) -> Tuple[str, our_types.JsonValue]:
     """
     Read :paramref:`element`, a ``<member>``, as a key and a JSON-able value.
 
@@ -438,7 +438,7 @@ def _read_member(
 
 
 def write_discriminator(
-    value: aas_types.JsonValue,
+    value: our_types.JsonValue,
     writer: Writer
 ) -> None:
     """
@@ -467,7 +467,7 @@ def write_discriminator(
         # it has to be one which a ``float`` can hold exactly -- otherwise
         # a reader, which reads every <double> as a ``float``, would get
         # a different number back.
-        if aas_common.try_to_convert_int_to_float(value) is None:
+        if our_common.try_to_convert_int_to_float(value) is None:
             raise SerializationException(
                 f"Expected a JSON-able value, but got the integer {value}, "
                 f"which is not exactly representable as a JSON number"
@@ -516,7 +516,7 @@ def write_discriminator(
         writer.write_end_element_in_no_namespace('struct')
         return
 
-    array_like = aas_common.try_to_cast_to_array_like(value)
+    array_like = our_common.try_to_cast_to_array_like(value)
     if array_like is not None:
         writer.write_start_element_in_no_namespace('array')
         write_array_body(array_like, writer)
@@ -530,7 +530,7 @@ def write_discriminator(
 
 
 def write_array_body(
-    value: aas_types.JsonArray,
+    value: our_types.JsonArray,
     writer: Writer
 ) -> None:
     """
@@ -557,7 +557,7 @@ def write_array_body(
 
 
 def write_struct_body(
-    value: aas_types.JsonObject,
+    value: our_types.JsonObject,
     writer: Writer
 ) -> None:
     """

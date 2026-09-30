@@ -32,8 +32,8 @@ def generate() -> str:
         typescript_common.WARNING,
         Stripped(
             """\
-import * as AasTypes from "../src/types";
-import * as AasVerification from "../src/verification";"""
+import * as OurTypes from "../src/types";
+import * as OurVerification from "../src/verification";"""
         ),
         Stripped(
             f"""\
@@ -41,7 +41,7 @@ import * as AasVerification from "../src/verification";"""
  * Collect the path and the message of every error of `errors`.
  */
 function pathsAndMessages(
-{I}errors: IterableIterator<AasVerification.VerificationError>
+{I}errors: IterableIterator<OurVerification.VerificationError>
 ): Array<[string, string]> {{
 {I}const result = new Array<[string, string]>();
 {I}for (const error of errors) {{
@@ -53,12 +53,12 @@ function pathsAndMessages(
         Stripped(
             f"""\
 test("a deeply nested value is JSON-able", () => {{
-{I}const value: AasTypes.JsonValue = {{
+{I}const value: OurTypes.JsonValue = {{
 {II}a: [1, 1.5, "x", true, [2], {{ b: "text" }}],
 {II}c: {{ d: {{ e: [] }} }}
 {I}}};
 
-{I}expect(pathsAndMessages(AasVerification.verifyJsonValue(value))).toStrictEqual(
+{I}expect(pathsAndMessages(OurVerification.verifyJsonValue(value))).toStrictEqual(
 {II}[]
 {I});
 }});"""
@@ -69,12 +69,12 @@ test("the walk of a JSON-able value is depth first", () => {{
 {I}// NOTE (mristin):
 {I}// A breadth-first walk would report the shallow `["z"]` before the deeper
 {I}// `["a"]["deep"]`, although the latter comes first in the value.
-{I}const value: AasTypes.JsonValue = {{
+{I}const value: OurTypes.JsonValue = {{
 {II}a: {{ deep: Number.NaN }},
 {II}z: Number.POSITIVE_INFINITY
 {I}}};
 
-{I}const paths = pathsAndMessages(AasVerification.verifyJsonValue(value)).map(
+{I}const paths = pathsAndMessages(OurVerification.verifyJsonValue(value)).map(
 {II}([path]) => path
 {I});
 
@@ -84,10 +84,10 @@ test("the walk of a JSON-able value is depth first", () => {{
         Stripped(
             f"""\
 test("an index and a key render as a subscript", () => {{
-{I}const value: AasTypes.JsonValue = {{ "a b": [0, {{ "c'd": Number.NaN }}] }};
+{I}const value: OurTypes.JsonValue = {{ "a b": [0, {{ "c'd": Number.NaN }}] }};
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonValue(value)
+{II}OurVerification.verifyJsonValue(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -98,23 +98,23 @@ test("an index and a key render as a subscript", () => {{
             f"""\
 test("the segments of a JSON-able path carry their container", () => {{
 {I}const inner = {{ deep: Number.NaN }};
-{I}const value: AasTypes.JsonValue = {{ a: inner }};
+{I}const value: OurTypes.JsonValue = {{ a: inner }};
 
-{I}const errors = Array.from(AasVerification.verifyJsonValue(value));
+{I}const errors = Array.from(OurVerification.verifyJsonValue(value));
 {I}expect(errors.length).toStrictEqual(1);
 
 {I}const segments = errors[0].path.segments;
 {I}expect(segments.length).toStrictEqual(2);
 
 {I}const outer = segments[0];
-{I}expect(outer).toBeInstanceOf(AasVerification.KeySegment);
-{I}expect((outer as AasVerification.KeySegment).object).toBe(value);
-{I}expect((outer as AasVerification.KeySegment).key).toStrictEqual("a");
+{I}expect(outer).toBeInstanceOf(OurVerification.KeySegment);
+{I}expect((outer as OurVerification.KeySegment).object).toBe(value);
+{I}expect((outer as OurVerification.KeySegment).key).toStrictEqual("a");
 
 {I}const nested = segments[1];
-{I}expect(nested).toBeInstanceOf(AasVerification.KeySegment);
-{I}expect((nested as AasVerification.KeySegment).object).toBe(inner);
-{I}expect((nested as AasVerification.KeySegment).key).toStrictEqual("deep");
+{I}expect(nested).toBeInstanceOf(OurVerification.KeySegment);
+{I}expect((nested as OurVerification.KeySegment).object).toBe(inner);
+{I}expect((nested as OurVerification.KeySegment).key).toStrictEqual("deep");
 }});"""
         ),
         Stripped(
@@ -126,7 +126,7 @@ test("neither an infinity nor a not-a-number is JSON-able", () => {{
 {II}Number.NaN
 {I}]) {{
 {II}const pathsAndCauses = pathsAndMessages(
-{III}AasVerification.verifyJsonValue([number])
+{III}OurVerification.verifyJsonValue([number])
 {II});
 
 {II}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -143,10 +143,10 @@ test("a value of an unexpected type is refused", () => {{
 {I}// NOTE (mristin):
 {I}// `JsonValue` rules a function out, but a JavaScript caller can hand one
 {I}// over all the same, which is the very reason this verification exists.
-{I}const value = {{ a: () => 1 }} as unknown as AasTypes.JsonValue;
+{I}const value = {{ a: () => 1 }} as unknown as OurTypes.JsonValue;
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonValue(value)
+{II}OurVerification.verifyJsonValue(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -157,10 +157,10 @@ test("a value of an unexpected type is refused", () => {{
         Stripped(
             f"""\
 test("a null is refused at any depth", () => {{
-{I}const value = {{ a: [null] }} as unknown as AasTypes.JsonValue;
+{I}const value = {{ a: [null] }} as unknown as OurTypes.JsonValue;
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonValue(value)
+{II}OurVerification.verifyJsonValue(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -171,10 +171,10 @@ test("a null is refused at any depth", () => {{
         Stripped(
             f"""\
 test("a JSON-able array has to be an array", () => {{
-{I}const value = {{ a: 1 }} as unknown as AasTypes.JsonArray;
+{I}const value = {{ a: 1 }} as unknown as OurTypes.JsonArray;
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonArray(value)
+{II}OurVerification.verifyJsonArray(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -185,10 +185,10 @@ test("a JSON-able array has to be an array", () => {{
         Stripped(
             f"""\
 test("a JSON-able object has to be an object", () => {{
-{I}const value = [1, 2] as unknown as AasTypes.JsonObject;
+{I}const value = [1, 2] as unknown as OurTypes.JsonObject;
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonObject(value)
+{II}OurVerification.verifyJsonObject(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);
@@ -199,10 +199,10 @@ test("a JSON-able object has to be an object", () => {{
         Stripped(
             f"""\
 test("the content is verified beneath the shape", () => {{
-{I}const value: AasTypes.JsonObject = {{ a: [{{ b: Number.NaN }}] }};
+{I}const value: OurTypes.JsonObject = {{ a: [{{ b: Number.NaN }}] }};
 
 {I}const pathsAndCauses = pathsAndMessages(
-{II}AasVerification.verifyJsonObject(value)
+{II}OurVerification.verifyJsonObject(value)
 {I});
 
 {I}expect(pathsAndCauses.length).toStrictEqual(1);

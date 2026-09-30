@@ -40,7 +40,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasTypes from "../src/types";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";"""
         ),
@@ -54,7 +54,7 @@ import * as TestCommonJsonization from "./commonJsonization";"""
  * @param expectedPath - path to the golden trace
  */
 function compareOrRecordTrace(
-{I}instance: AasTypes.Class,
+{I}instance: OurTypes.Class,
 {I}expectedPath: string
 ) {{
 {I}const lines = new Array<string>();

@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,7 +42,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check recursively whether there is a leaf in the tree of element.
@@ -50,15 +50,15 @@ func (ve *VerificationError) PathString() string {
 // This function tests the narrowing in a conjunction nested in a disjunction,
 // and the self-recursion.
 func HasLeafInTree(
-	element aastypes.IElement,
+	element ourtypes.IElement,
 ) bool {
-	return aastypes.IsLeaf(element) ||
-		(aastypes.IsContainer(element) &&
-		aascommon.Some(
-			func(child aastypes.IElement) bool {
+	return ourtypes.IsLeaf(element) ||
+		(ourtypes.IsContainer(element) &&
+		ourcommon.Some(
+			func(child ourtypes.IElement) bool {
 				return HasLeafInTree(child)
 			},
-			element.(aastypes.IContainer).Children(),
+			element.(ourtypes.IContainer).Children(),
 		))
 }
 
@@ -68,16 +68,16 @@ func HasLeafInTree(
 // This function tests the narrowing in a chain of implications, and
 // the self-recursion.
 func LeavesInTreeAreNotEmpty(
-	element aastypes.IElement,
+	element ourtypes.IElement,
 ) bool {
-	return (!aastypes.IsLeaf(element) ||
-		(aascommon.LenStr(element.(aastypes.ILeaf).Text()) > 0)) &&
-		(!aastypes.IsContainer(element) ||
-		aascommon.All(
-			func(child aastypes.IElement) bool {
+	return (!ourtypes.IsLeaf(element) ||
+		(ourcommon.LenStr(element.(ourtypes.ILeaf).Text()) > 0)) &&
+		(!ourtypes.IsContainer(element) ||
+		ourcommon.All(
+			func(child ourtypes.IElement) bool {
 				return LeavesInTreeAreNotEmpty(child)
 			},
-			element.(aastypes.IContainer).Children(),
+			element.(ourtypes.IContainer).Children(),
 		))
 }
 
@@ -86,37 +86,37 @@ func LeavesInTreeAreNotEmpty(
 // This function tests the narrowing in a disjunction of more than two values,
 // where the first value is a negated `isinstance`.
 func IsShortLeafOrNoLeaf(
-	element aastypes.IElement,
+	element ourtypes.IElement,
 ) bool {
-	return (!aastypes.IsLeaf(element)) ||
-		aascommon.LenStr(element.(aastypes.ILeaf).Text()) == 0 ||
-		aascommon.LenStr(element.(aastypes.ILeaf).Text()) < 16
+	return (!ourtypes.IsLeaf(element)) ||
+		ourcommon.LenStr(element.(ourtypes.ILeaf).Text()) == 0 ||
+		ourcommon.LenStr(element.(ourtypes.ILeaf).Text()) < 16
 }
 
 // Check that element is a container.
 //
 // This function tests `isinstance` over a tuple of classes.
 func IsContainer(
-	element aastypes.IElement,
+	element ourtypes.IElement,
 ) bool {
-	return (aastypes.IsOrderedContainer(element) ||
-		aastypes.IsUnorderedContainer(element))
+	return (ourtypes.IsOrderedContainer(element) ||
+		ourtypes.IsUnorderedContainer(element))
 }
 
 // Check that element is an ordered container which is sorted.
 //
 // This function tests the narrowing over two levels of the class hierarchy.
 func IsSortedOrderedContainer(
-	element aastypes.IElement,
+	element ourtypes.IElement,
 ) bool {
-	return aastypes.IsContainer(element) &&
-		aastypes.IsOrderedContainer(element.(aastypes.IContainer)) &&
-		element.(aastypes.IOrderedContainer).IsSorted()
+	return ourtypes.IsContainer(element) &&
+		ourtypes.IsOrderedContainer(element.(ourtypes.IContainer)) &&
+		element.(ourtypes.IOrderedContainer).IsSorted()
 }
 
 // Check that container has at least one child.
 func ContainerHasChildren(
-	container aastypes.IContainer,
+	container ourtypes.IContainer,
 ) bool {
 	return len(container.Children()) > 0
 }
@@ -126,31 +126,31 @@ func ContainerHasChildren(
 // This function tests the narrowing of a named union to a class, and then
 // the narrowing of a property of that class from another named union to a class.
 func IsGlobalAttributeOfKindName(
-	value *aastypes.Value,
+	value *ourtypes.Value,
 ) bool {
-	return aastypes.IsAttributeOperand(value.Underlying()) &&
-		aastypes.IsGlobalAttribute(value.Underlying().(aastypes.IAttributeOperand).Attribute().Underlying()) &&
-		value.Underlying().(aastypes.IAttributeOperand).Attribute().Underlying().(aastypes.IGlobalAttribute).Kind() == "name"
+	return ourtypes.IsAttributeOperand(value.Underlying()) &&
+		ourtypes.IsGlobalAttribute(value.Underlying().(ourtypes.IAttributeOperand).Attribute().Underlying()) &&
+		value.Underlying().(ourtypes.IAttributeOperand).Attribute().Underlying().(ourtypes.IGlobalAttribute).Kind() == "name"
 }
 
 // Check that value is a string value.
 //
 // This function tests `isinstance` over a tuple of classes on a named union.
 func IsStringValue(
-	value *aastypes.Value,
+	value *ourtypes.Value,
 ) bool {
-	return (aastypes.IsStringLiteral(value.Underlying()) ||
-		aastypes.IsAttributeOperand(value.Underlying()))
+	return (ourtypes.IsStringLiteral(value.Underlying()) ||
+		ourtypes.IsAttributeOperand(value.Underlying()))
 }
 
-// Verify `that` instance of [aastypes.ILeaf].
+// Verify `that` instance of [ourtypes.ILeaf].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLeaf(
-	that aastypes.ILeaf,
+	that ourtypes.ILeaf,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -160,14 +160,14 @@ func VerifyLeaf(
 	return
 }
 
-// Verify `that` instance of [aastypes.IOrderedContainer].
+// Verify `that` instance of [ourtypes.IOrderedContainer].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyOrderedContainer(
-	that aastypes.IOrderedContainer,
+	that ourtypes.IOrderedContainer,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -187,13 +187,13 @@ func VerifyOrderedContainer(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Children",
 						},
 					)
@@ -210,14 +210,14 @@ func VerifyOrderedContainer(
 	return
 }
 
-// Verify `that` instance of [aastypes.IUnorderedContainer].
+// Verify `that` instance of [ourtypes.IUnorderedContainer].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyUnorderedContainer(
-	that aastypes.IUnorderedContainer,
+	that ourtypes.IUnorderedContainer,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -237,13 +237,13 @@ func VerifyUnorderedContainer(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Children",
 						},
 					)
@@ -260,14 +260,14 @@ func VerifyUnorderedContainer(
 	return
 }
 
-// Verify `that` instance of [aastypes.IGlobalAttribute].
+// Verify `that` instance of [ourtypes.IGlobalAttribute].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyGlobalAttribute(
-	that aastypes.IGlobalAttribute,
+	that ourtypes.IGlobalAttribute,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -277,14 +277,14 @@ func VerifyGlobalAttribute(
 	return
 }
 
-// Verify `that` instance of [aastypes.ILocalAttribute].
+// Verify `that` instance of [ourtypes.ILocalAttribute].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyLocalAttribute(
-	that aastypes.ILocalAttribute,
+	that ourtypes.ILocalAttribute,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -294,14 +294,14 @@ func VerifyLocalAttribute(
 	return
 }
 
-// Verify `that` instance of [aastypes.IAttributeOperand].
+// Verify `that` instance of [ourtypes.IAttributeOperand].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyAttributeOperand(
-	that aastypes.IAttributeOperand,
+	that ourtypes.IAttributeOperand,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -320,7 +320,7 @@ func VerifyAttributeOperand(
 			that.Attribute().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Attribute",
 					},
 				)
@@ -335,14 +335,14 @@ func VerifyAttributeOperand(
 	return
 }
 
-// Verify `that` instance of [aastypes.IStringLiteral].
+// Verify `that` instance of [ourtypes.IStringLiteral].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyStringLiteral(
-	that aastypes.IStringLiteral,
+	that ourtypes.IStringLiteral,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -352,14 +352,14 @@ func VerifyStringLiteral(
 	return
 }
 
-// Verify `that` instance of [aastypes.INumberLiteral].
+// Verify `that` instance of [ourtypes.INumberLiteral].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyNumberLiteral(
-	that aastypes.INumberLiteral,
+	that ourtypes.INumberLiteral,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -369,14 +369,14 @@ func VerifyNumberLiteral(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -402,10 +402,10 @@ func VerifySomething(
 	}
 
 	if !(
-		aascommon.All(
-			func(value *aastypes.Value) bool {
-				return !aastypes.IsNumberLiteral(value.Underlying()) ||
-					(value.Underlying().(aastypes.INumberLiteral).Number() >= 0.0)
+		ourcommon.All(
+			func(value *ourtypes.Value) bool {
+				return !ourtypes.IsNumberLiteral(value.Underlying()) ||
+					(value.Underlying().(ourtypes.INumberLiteral).Number() >= 0.0)
 			},
 			that.Values(),
 		)) {
@@ -419,10 +419,10 @@ func VerifySomething(
 	}
 
 	if !(
-		aascommon.Some(
-			func(value *aastypes.Value) bool {
-				return aastypes.IsStringLiteral(value.Underlying()) &&
-					value.Underlying().(aastypes.IStringLiteral).Text() == "root"
+		ourcommon.Some(
+			func(value *ourtypes.Value) bool {
+				return ourtypes.IsStringLiteral(value.Underlying()) &&
+					value.Underlying().(ourtypes.IStringLiteral).Text() == "root"
 			},
 			that.Values(),
 		)) {
@@ -438,9 +438,9 @@ func VerifySomething(
 	}
 
 	if !(
-		!aastypes.IsContainer(that.Root()) ||
+		!ourtypes.IsContainer(that.Root()) ||
 		ContainerHasChildren(
-			that.Root().(aastypes.IContainer),
+			that.Root().(ourtypes.IContainer),
 		)) {
 		abort = onError(
 			newVerificationError(
@@ -453,8 +453,8 @@ func VerifySomething(
 
 	if !(
 		!((that.OptionalElement() != nil) &&
-		aastypes.IsLeaf(that.OptionalElement())) ||
-		(aascommon.LenStr(that.OptionalElement().(aastypes.ILeaf).Text()) > 0)) {
+		ourtypes.IsLeaf(that.OptionalElement())) ||
+		(ourcommon.LenStr(that.OptionalElement().(ourtypes.ILeaf).Text()) > 0)) {
 		abort = onError(
 			newVerificationError(
 				"The optional element, if a leaf, must have a non-empty text.",),
@@ -478,7 +478,7 @@ func VerifySomething(
 			that.Root(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Root",
 					},
 				)
@@ -495,7 +495,7 @@ func VerifySomething(
 			that.OptionalElement(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalElement",
 					},
 				)
@@ -521,7 +521,7 @@ func VerifySomething(
 			that.Value().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Value",
 					},
 				)
@@ -548,13 +548,13 @@ func VerifySomething(
 				v.Underlying(),
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Values",
 						},
 					)
@@ -578,54 +578,54 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeLeaf:
+	case ourtypes.ModelTypeLeaf:
 		abort = VerifyLeaf(
-			that.(aastypes.ILeaf),
+			that.(ourtypes.ILeaf),
 			onError,
 		)
-	case aastypes.ModelTypeOrderedContainer:
+	case ourtypes.ModelTypeOrderedContainer:
 		abort = VerifyOrderedContainer(
-			that.(aastypes.IOrderedContainer),
+			that.(ourtypes.IOrderedContainer),
 			onError,
 		)
-	case aastypes.ModelTypeUnorderedContainer:
+	case ourtypes.ModelTypeUnorderedContainer:
 		abort = VerifyUnorderedContainer(
-			that.(aastypes.IUnorderedContainer),
+			that.(ourtypes.IUnorderedContainer),
 			onError,
 		)
-	case aastypes.ModelTypeGlobalAttribute:
+	case ourtypes.ModelTypeGlobalAttribute:
 		abort = VerifyGlobalAttribute(
-			that.(aastypes.IGlobalAttribute),
+			that.(ourtypes.IGlobalAttribute),
 			onError,
 		)
-	case aastypes.ModelTypeLocalAttribute:
+	case ourtypes.ModelTypeLocalAttribute:
 		abort = VerifyLocalAttribute(
-			that.(aastypes.ILocalAttribute),
+			that.(ourtypes.ILocalAttribute),
 			onError,
 		)
-	case aastypes.ModelTypeAttributeOperand:
+	case ourtypes.ModelTypeAttributeOperand:
 		abort = VerifyAttributeOperand(
-			that.(aastypes.IAttributeOperand),
+			that.(ourtypes.IAttributeOperand),
 			onError,
 		)
-	case aastypes.ModelTypeStringLiteral:
+	case ourtypes.ModelTypeStringLiteral:
 		abort = VerifyStringLiteral(
-			that.(aastypes.IStringLiteral),
+			that.(ourtypes.IStringLiteral),
 			onError,
 		)
-	case aastypes.ModelTypeNumberLiteral:
+	case ourtypes.ModelTypeNumberLiteral:
 		abort = VerifyNumberLiteral(
-			that.(aastypes.INumberLiteral),
+			that.(ourtypes.INumberLiteral),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

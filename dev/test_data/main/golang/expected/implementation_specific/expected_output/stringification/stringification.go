@@ -6,21 +6,21 @@ package stringification
 
 import (
 	"fmt"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
-var modelTypeFromStringMap = map[string]aastypes.ModelType {
-	"Box": aastypes.ModelTypeBox,
-	"Bag": aastypes.ModelTypeBag,
-	"Container": aastypes.ModelTypeContainer,
+var modelTypeFromStringMap = map[string]ourtypes.ModelType {
+	"Box": ourtypes.ModelTypeBox,
+	"Bag": ourtypes.ModelTypeBag,
+	"Container": ourtypes.ModelTypeContainer,
 }
 
-// Parse `text` as a string representation of [aastypes.ModelType].
+// Parse `text` as a string representation of [ourtypes.ModelType].
 //
 // If not ok, the literal result is undefined.
 func ModelTypeFromString(
 	text string,
-) (literal aastypes.ModelType, ok bool) {
+) (literal ourtypes.ModelType, ok bool) {
 	literal, ok = modelTypeFromStringMap[text]
 	return
 }
@@ -31,12 +31,12 @@ var modelTypeToStringArray = [...]string {
 	"Container",
 }
 
-// Translate `value` from [aastypes.ModelType] to a string.
+// Translate `value` from [ourtypes.ModelType] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -50,11 +50,11 @@ func ModelTypeToString(
 	return
 }
 
-// Translate the `value` from [aastypes.ModelType] to a string.
+// Translate the `value` from [ourtypes.ModelType] to a string.
 //
 // Panic if the given value is invalid.
 func MustModelTypeToString(
-	value aastypes.ModelType,
+	value ourtypes.ModelType,
 ) string {
 	result, ok := ModelTypeToString(value)
 	if !ok {
@@ -68,17 +68,17 @@ func MustModelTypeToString(
 	return result
 }
 
-var colorFromStringMap = map[string]aastypes.Color {
-	"Red": aastypes.ColorRed,
-	"Green": aastypes.ColorGreen,
+var colorFromStringMap = map[string]ourtypes.Color {
+	"Red": ourtypes.ColorRed,
+	"Green": ourtypes.ColorGreen,
 }
 
-// Parse `text` as a string representation of [aastypes.Color].
+// Parse `text` as a string representation of [ourtypes.Color].
 //
 // If not ok, the literal result is undefined.
 func ColorFromString(
 	text string,
-) (literal aastypes.Color, ok bool) {
+) (literal ourtypes.Color, ok bool) {
 	literal, ok = colorFromStringMap[text]
 	return
 }
@@ -88,12 +88,12 @@ var colorToStringArray = [...]string {
 	"Green",
 }
 
-// Translate `value` from [aastypes.Color] to a string.
+// Translate `value` from [ourtypes.Color] to a string.
 //
 // If the value is not valid, the OK is false and the string representation is
 // undefined.
 func ColorToString(
-	value aastypes.Color,
+	value ourtypes.Color,
 ) (result string, ok bool) {
 	i := int(value)
 	ok =
@@ -107,11 +107,11 @@ func ColorToString(
 	return
 }
 
-// Translate the `value` from [aastypes.Color] to a string.
+// Translate the `value` from [ourtypes.Color] to a string.
 //
 // Panic if the given value is invalid.
 func MustColorToString(
-	value aastypes.Color,
+	value ourtypes.Color,
 ) string {
 	result, ok := ColorToString(value)
 	if !ok {

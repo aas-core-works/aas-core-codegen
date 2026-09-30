@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfBox(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBox()
+	instance := ourtesting.MustLoadMinimalBox()
 
-	if !aastypes.IsBox(instance) {
+	if !ourtypes.IsBox(instance) {
 		t.Errorf(
 			"Expected IsBox to be true on an instance " +
 			"of IBox with runtime type %T and with model type %v",

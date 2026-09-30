@@ -10,18 +10,18 @@ from typing import (
     Optional,
 )
 
-import dummy.types as aas_types
+import dummy.types as our_types
 
 
-_COLOR_FROM_STR: Mapping[str, aas_types.Color] = {
-    'Red': aas_types.Color.RED,
-    'Green': aas_types.Color.GREEN,
+_COLOR_FROM_STR: Mapping[str, our_types.Color] = {
+    'Red': our_types.Color.RED,
+    'Green': our_types.Color.GREEN,
 }
 
 
 def color_from_str(
         text: str
-) -> Optional[aas_types.Color]:
+) -> Optional[our_types.Color]:
     """
     Parse :paramref:`text` as string representation
     of :py:class:`dummy.Color`.

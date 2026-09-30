@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using Nodes = System.Text.Json.Nodes;
 
@@ -21,10 +21,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.ModellingKindFrom(
+            var parsed = Our.Jsonization.Deserialize.ModellingKindFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.ModellingKindToJsonValue(
+            var serialized = Our.Jsonization.Serialize.ModellingKindToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -40,10 +40,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.QualifierKindFrom(
+            var parsed = Our.Jsonization.Deserialize.QualifierKindFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.QualifierKindToJsonValue(
+            var serialized = Our.Jsonization.Serialize.QualifierKindToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -59,10 +59,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.AssetKindFrom(
+            var parsed = Our.Jsonization.Deserialize.AssetKindFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.AssetKindToJsonValue(
+            var serialized = Our.Jsonization.Serialize.AssetKindToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -78,10 +78,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.AasSubmodelElementsFrom(
+            var parsed = Our.Jsonization.Deserialize.AasSubmodelElementsFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.AasSubmodelElementsToJsonValue(
+            var serialized = Our.Jsonization.Serialize.AasSubmodelElementsToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -97,10 +97,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.EntityTypeFrom(
+            var parsed = Our.Jsonization.Deserialize.EntityTypeFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.EntityTypeToJsonValue(
+            var serialized = Our.Jsonization.Serialize.EntityTypeToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -116,10 +116,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.DirectionFrom(
+            var parsed = Our.Jsonization.Deserialize.DirectionFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.DirectionToJsonValue(
+            var serialized = Our.Jsonization.Serialize.DirectionToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -135,10 +135,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.StateOfEventFrom(
+            var parsed = Our.Jsonization.Deserialize.StateOfEventFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.StateOfEventToJsonValue(
+            var serialized = Our.Jsonization.Serialize.StateOfEventToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -154,10 +154,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.ReferenceTypesFrom(
+            var parsed = Our.Jsonization.Deserialize.ReferenceTypesFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.ReferenceTypesToJsonValue(
+            var serialized = Our.Jsonization.Serialize.ReferenceTypesToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -173,10 +173,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.KeyTypesFrom(
+            var parsed = Our.Jsonization.Deserialize.KeyTypesFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.KeyTypesToJsonValue(
+            var serialized = Our.Jsonization.Serialize.KeyTypesToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -192,10 +192,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.DataTypeDefXsdFrom(
+            var parsed = Our.Jsonization.Deserialize.DataTypeDefXsdFrom(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.DataTypeDefXsdToJsonValue(
+            var serialized = Our.Jsonization.Serialize.DataTypeDefXsdToJsonValue(
                 parsed);
 
             Assert.AreEqual(
@@ -211,10 +211,10 @@ namespace AasCore.Aas3_0.Tests
                     ?? throw new System.InvalidOperationException(
                         "Unexpected null node");
 
-            var parsed = Aas.Jsonization.Deserialize.DataTypeIec61360From(
+            var parsed = Our.Jsonization.Deserialize.DataTypeIec61360From(
                 node);
 
-            var serialized = Aas.Jsonization.Serialize.DataTypeIec61360ToJsonValue(
+            var serialized = Our.Jsonization.Serialize.DataTypeIec61360ToJsonValue(
                 parsed);
 
             Assert.AreEqual(

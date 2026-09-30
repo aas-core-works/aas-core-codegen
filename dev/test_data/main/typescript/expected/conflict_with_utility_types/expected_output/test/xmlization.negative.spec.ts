@@ -21,7 +21,7 @@ import * as path from "path";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import type { Document } from "@xmldom/xmldom";
 
-import * as AasXmlization from "../src/xmlization";
+import * as OurXmlization from "../src/xmlization";
 
 import * as TestCommon from "./common";
 
@@ -40,7 +40,7 @@ function parseXml(xmlText: string): [Document, null] | [null, string] {
 }
 
 function expectDeserializationError(xmlText: string): void {
-  const instanceOrError = AasXmlization.fromXmlString(xmlText);
+  const instanceOrError = OurXmlization.fromXmlString(xmlText);
   expect(instanceOrError.error).not.toBeNull();
 }
 

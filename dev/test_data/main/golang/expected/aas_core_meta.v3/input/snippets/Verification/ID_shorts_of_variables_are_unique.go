@@ -1,8 +1,8 @@
-// Check that [aastypes.IReferable.IDShort]'s among all the `inputVariables`,
+// Check that [ourtypes.IReferable.IDShort]'s among all the `inputVariables`,
 // `outputVariables` and `inoutputVariables` are unique.
-func IDShortsOfVariablesAreUnique[O1 aastypes.IOperationVariable,
-		O2 aastypes.IOperationVariable,
-		O3 aastypes.IOperationVariable] (
+func IDShortsOfVariablesAreUnique[O1 ourtypes.IOperationVariable,
+		O2 ourtypes.IOperationVariable,
+		O3 ourtypes.IOperationVariable] (
 	inputVariables []O1,
 	outputVariables []O2,
 	inoutputVariables []O3) bool {

@@ -12,22 +12,22 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -42,26 +42,26 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check that text is not empty.
 //
-// This is meant to check the result of [aastypes.IItem.Describe].
+// This is meant to check the result of [ourtypes.IItem.Describe].
 func IsDescribed(
 	text string,
 ) bool {
-	return aascommon.LenStr(text) > 0
+	return ourcommon.LenStr(text) > 0
 }
 
-// Verify `that` instance of [aastypes.IBox].
+// Verify `that` instance of [ourtypes.IBox].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyBox(
-	that aastypes.IBox,
+	that ourtypes.IBox,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -86,14 +86,14 @@ func VerifyBox(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeBox:
+	case ourtypes.ModelTypeBox:
 		abort = VerifyBox(
-			that.(aastypes.IBox),
+			that.(ourtypes.IBox),
 			onError,
 		)
 	default:

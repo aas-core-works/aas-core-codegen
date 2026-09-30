@@ -100,8 +100,8 @@ public static readonly string TestDataDir = (
 /// in the <paramref name="container" />,
 /// including the <paramref name="container" /> itself.
 /// </summary>
-public static T MustFind<T>(Aas.IClass container)
-{I}where T : Aas.IClass
+public static T MustFind<T>(Our.IClass container)
+{I}where T : Our.IClass
 {{
 {I}var instance = (
 {II}(container is T)
@@ -118,7 +118,7 @@ public static T MustFind<T>(Aas.IClass container)
         Stripped(
             f"""\
 public static void AssertNoVerificationErrors(
-{I}List<Aas.Reporting.Error> errors,
+{I}List<Our.Reporting.Error> errors,
 {I}string path
 )
 {{
@@ -145,7 +145,7 @@ public static void AssertNoVerificationErrors(
         Stripped(
             f"""\
 public static void AssertEqualsExpectedOrRerecordVerificationErrors(
-{I}List<Aas.Reporting.Error> errors,
+{I}List<Our.Reporting.Error> errors,
 {I}string path
 )
 {{
@@ -177,7 +177,7 @@ public static void AssertEqualsExpectedOrRerecordVerificationErrors(
 {IIII}"The file with the recorded errors does not "
 {IIIII}+ $"exist: {{errorsPath}}; maybe you want to set "
 {IIIII}+ "the environment variable "
-{IIIII}+ $"{{Aas.Tests.Common.RecordModeEnvironmentVariableName}}?"
+{IIIII}+ $"{{Our.Tests.Common.RecordModeEnvironmentVariableName}}?"
 {III});
 {II}}}
 
@@ -192,7 +192,7 @@ public static void AssertEqualsExpectedOrRerecordVerificationErrors(
         ),
         Stripped(
             f"""\
-public static string Trace(Aas.IClass instance)
+public static string Trace(Our.IClass instance)
 {{
 {I}return instance.GetType().Name;
 }}"""
@@ -204,7 +204,7 @@ public static string Trace(Aas.IClass instance)
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace}; // renamed
+using Our = {namespace}; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias

@@ -6,7 +6,7 @@
  * @returns `true` if the check passes
  */
 export function qualifierTypesAreUnique(
-  qualifiers: Iterable<AasTypes.Qualifier>
+  qualifiers: Iterable<OurTypes.Qualifier>
 ): boolean {
   const typeSet = new Set<string>();
 

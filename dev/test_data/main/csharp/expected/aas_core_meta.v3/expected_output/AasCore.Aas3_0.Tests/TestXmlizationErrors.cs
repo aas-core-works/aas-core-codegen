@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using Path = System.IO.Path;
 
@@ -17,7 +17,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_error_on_unexpected_declaration()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Xml",
                 "Expected",
                 "extension",
@@ -46,17 +46,16 @@ namespace AasCore.Aas3_0.Tests
                 stringReader);
 
             // We intentionally do not call `MoveToContent` to test the error message.
-            // This is a very common situation, see:
-            // https://github.com/aas-core-works/aas-core3.0-csharp/issues/24
+            // This is a very common situation.
 
             string? message = null;
 
             try
             {
-                Aas.Xmlization.Deserialize.ExtensionFrom(
+                Our.Xmlization.Deserialize.ExtensionFrom(
                     xmlReader);
             }
-            catch (Aas.Xmlization.Exception exception)
+            catch (Our.Xmlization.Exception exception)
             {
                 message = exception.Message;
             }
@@ -76,7 +75,7 @@ namespace AasCore.Aas3_0.Tests
         public void Test_error_on_duplicate_property()
         {
             string path = Path.Combine(
-                Aas.Tests.Common.TestDataDir,
+                Our.Tests.Common.TestDataDir,
                 "Xml",
                 "Expected",
                 "extension",
@@ -133,10 +132,10 @@ namespace AasCore.Aas3_0.Tests
 
             try
             {
-                Aas.Xmlization.Deserialize.ExtensionFrom(
+                Our.Xmlization.Deserialize.ExtensionFrom(
                     xmlReader);
             }
-            catch (Aas.Xmlization.Exception exception)
+            catch (Our.Xmlization.Exception exception)
             {
                 message = exception.Message;
             }

@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Item`:
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.Item(
+    an_instance = our_types.Item(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -48,31 +48,31 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 def first_child_a_is_small(
-    parents: List[aas_types.Parent]
+    parents: List[our_types.Parent]
 ) -> bool:
     """
     Check an optional class declared with ``None`` and assigned in a loop.
     """
     # pylint: disable=all
-    found: Optional[aas_types.ChildA] = None
+    found: Optional[our_types.ChildA] = None
     for parent in parents:
-        if isinstance(parent, aas_types.ChildA):
+        if isinstance(parent, our_types.ChildA):
             found = parent
             break
     if found is None:
@@ -118,29 +118,29 @@ def text_is_allowed_unless_long(
 
 
 def last_child_b_is_not_zero(
-    parent: aas_types.Parent,
-    parents: List[aas_types.Parent]
+    parent: our_types.Parent,
+    parents: List[our_types.Parent]
 ) -> bool:
     """Check a non-optional variable declared wider than its value."""
     # pylint: disable=all
-    last: aas_types.Parent = parent
+    last: our_types.Parent = parent
     for other in parents:
         last = other
-    if isinstance(last, aas_types.ChildB):
+    if isinstance(last, our_types.ChildB):
         return last.b_only != 0
     return True
 
 
 def child_a_declarations_agree(
-    parent: aas_types.Parent
+    parent: our_types.Parent
 ) -> bool:
     """Check the declarations from a value narrowed by ``isinstance``."""
     # pylint: disable=all
-    if isinstance(parent, aas_types.ChildA):
-        child: aas_types.ChildA = parent
+    if isinstance(parent, our_types.ChildA):
+        child: our_types.ChildA = parent
         child_copy = parent
-        wider: aas_types.Parent = parent
-        if isinstance(wider, aas_types.ChildB):
+        wider: our_types.Parent = parent
+        if isinstance(wider, our_types.ChildB):
             return False
         wider = child
         return (
@@ -203,21 +203,21 @@ def primitive_locals_are_consistent(
 
 
 def kinds_are_consistent(
-    kind: aas_types.Kind,
-    optional_kind: Optional[aas_types.Kind]
+    kind: our_types.Kind,
+    optional_kind: Optional[our_types.Kind]
 ) -> bool:
     """Check the declarations of the enumerations."""
     # pylint: disable=all
-    current: aas_types.Kind = kind
-    other: Optional[aas_types.Kind] = None
+    current: our_types.Kind = kind
+    other: Optional[our_types.Kind] = None
     if optional_kind is not None:
         other = optional_kind
     if other is None:
         return True
     return (
         (
-            current != aas_types.Kind.BETA
-            or other != aas_types.Kind.BETA
+            current != our_types.Kind.BETA
+            or other != our_types.Kind.BETA
         ))
 
 
@@ -267,12 +267,12 @@ def texts_are_few(
 def tuples_are_consistent(
     text: str,
     number: int,
-    optional_parent: Optional[aas_types.Parent]
+    optional_parent: Optional[our_types.Parent]
 ) -> bool:
     """Check the declarations of the tuples."""
     # pylint: disable=all
     pair: Tuple[str, int] = (text, number)
-    optional_pair: Optional[Tuple[str, aas_types.Parent]] = None
+    optional_pair: Optional[Tuple[str, our_types.Parent]] = None
     if optional_parent is not None:
         optional_pair = (text, optional_parent)
     if (
@@ -287,47 +287,47 @@ def tuples_are_consistent(
 
 
 def union_locals_are_consistent(
-    parent: aas_types.Parent,
-    item: aas_types.Item
+    parent: our_types.Parent,
+    item: our_types.Item
 ) -> bool:
     """Check the declarations of the named unions."""
     # pylint: disable=all
-    current: aas_types.ParentOrItem = parent
-    if isinstance(parent, aas_types.ChildA):
+    current: our_types.ParentOrItem = parent
+    if isinstance(parent, our_types.ChildA):
         current = parent
         if current.a_only == 13:
             return False
     current = item
     if len(current.name) < 1:
         return False
-    optional_member: Optional[aas_types.ParentOrItem] = None
-    if isinstance(parent, aas_types.ChildB):
+    optional_member: Optional[our_types.ParentOrItem] = None
+    if isinstance(parent, our_types.ChildB):
         optional_member = parent
     if (
         (
             (optional_member is not None)
-            and isinstance(optional_member, aas_types.ChildB)
+            and isinstance(optional_member, our_types.ChildB)
         )
     ):
         if optional_member.b_only == 13:
             return False
-    wide: aas_types.WideUnion = item
-    if isinstance(parent, aas_types.ChildB):
+    wide: our_types.WideUnion = item
+    if isinstance(parent, our_types.ChildB):
         wide = parent
     return (
-        not isinstance(wide, aas_types.ChildB)
+        not isinstance(wide, our_types.ChildB)
         or (wide.b_only != 14))
 
 
 def member_is_lucky(
-    member: Optional[aas_types.ParentOrItem]
+    member: Optional[our_types.ParentOrItem]
 ) -> bool:
     """Check reading the optional named union of a property."""
     # pylint: disable=all
     if (
         (
             (member is not None)
-            and isinstance(member, aas_types.ChildA)
+            and isinstance(member, our_types.ChildA)
         )
     ):
         return member.a_only != 13
@@ -335,8 +335,8 @@ def member_is_lucky(
 
 
 def wrap_into_member(
-    something: aas_types.Something,
-    item: aas_types.Item
+    something: our_types.Something,
+    item: our_types.Item
 ) -> bool:
     """Check wrapping an instance into the named union of a property."""
     # pylint: disable=all
@@ -349,7 +349,7 @@ def final_locals_are_consistent(
     number: int,
     texts: List[str],
     optional_text: Optional[str],
-    parent: aas_types.Parent
+    parent: our_types.Parent
 ) -> bool:
     """Check the immutable variables declared as ``Final[...]``."""
     # pylint: disable=all
@@ -359,9 +359,9 @@ def final_locals_are_consistent(
     all_texts: Final[Sequence[str]] = texts
     seen: Set[str] = set()
     seen.add(text)
-    reserved_seen: Final[AbstractSet[str]] = seen & aas_constants.RESERVED_TEXTS
+    reserved_seen: Final[AbstractSet[str]] = seen & our_constants.RESERVED_TEXTS
     pair: Final[Tuple[str, int]] = (text, number)
-    base: Final[aas_types.Parent] = parent
+    base: Final[our_types.Parent] = parent
     if (
         (
             len(reserved_seen) > 0
@@ -381,7 +381,7 @@ def final_locals_are_consistent(
         return False
     if (
         (
-            isinstance(base, aas_types.ChildA)
+            isinstance(base, our_types.ChildA)
             and base.a_only == 77
         )
     ):
@@ -416,14 +416,14 @@ def none_is_short_and_text_is_short(
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_item(
             self,
-            that: aas_types.Item
+            that: our_types.Item
     ) -> Iterator[Error]:
         # No verification has been defined for Item.
         return
@@ -435,7 +435,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_child_a(
             self,
-            that: aas_types.ChildA
+            that: our_types.ChildA
     ) -> Iterator[Error]:
         # No verification has been defined for ChildA.
         return
@@ -447,7 +447,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_child_b(
             self,
-            that: aas_types.ChildB
+            that: our_types.ChildB
     ) -> Iterator[Error]:
         # No verification has been defined for ChildB.
         return
@@ -459,7 +459,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         if not that.first_child_b_is_not_forty_two():
             yield Error(
@@ -665,7 +665,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

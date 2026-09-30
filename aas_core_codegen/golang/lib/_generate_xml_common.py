@@ -27,7 +27,7 @@ def _generate_deserialization_error_and_its_methods() -> List[Stripped]:
 //
 // Implements `error`.
 type DeserializationError struct{{
-{I}Path *aasreporting.Path
+{I}Path *ourreporting.Path
 {I}Message string
 }}"""
         ),
@@ -35,7 +35,7 @@ type DeserializationError struct{{
             f"""\
 func NewDeserializationError(message string) *DeserializationError {{
 {I}return &DeserializationError{{
-{II}Path: &aasreporting.Path{{}},
+{II}Path: &ourreporting.Path{{}},
 {II}Message: message,
 {I}}}
 }}"""
@@ -54,7 +54,7 @@ func (de *DeserializationError) Error() string {{
             f"""\
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {{
-{I}return aasreporting.ToRelativeXPath(de.Path)
+{I}return ourreporting.ToRelativeXPath(de.Path)
 }}"""
         ),
         Stripped(
@@ -65,7 +65,7 @@ func (de *DeserializationError) PrependName(
 {I}name string,
 ) *DeserializationError {{
 {I}de.Path.PrependName(
-{II}&aasreporting.NameSegment{{Name: name}},
+{II}&ourreporting.NameSegment{{Name: name}},
 {I})
 {I}return de
 }}"""
@@ -78,7 +78,7 @@ func (de *DeserializationError) PrependIndex(
 {I}index int,
 ) *DeserializationError {{
 {I}de.Path.PrependIndex(
-{II}&aasreporting.IndexSegment{{Index: index}},
+{II}&ourreporting.IndexSegment{{Index: index}},
 {I})
 {I}return de
 }}"""
@@ -91,7 +91,7 @@ func (de *DeserializationError) PrependKey(
 {I}key string,
 ) *DeserializationError {{
 {I}de.Path.PrependKey(
-{II}&aasreporting.KeySegment{{Key: key}},
+{II}&ourreporting.KeySegment{{Key: key}},
 {I})
 {I}return de
 }}"""
@@ -127,7 +127,7 @@ def _generate_serialization_error() -> List[Stripped]:
 //
 // Implements `error`.
 type SerializationError struct {{
-{I}Path    *aasreporting.Path
+{I}Path    *ourreporting.Path
 {I}Message string
 }}"""
         ),
@@ -135,7 +135,7 @@ type SerializationError struct {{
             f"""\
 func NewSerializationError(message string) *SerializationError {{
 {I}return &SerializationError{{
-{II}Path:    &aasreporting.Path{{}},
+{II}Path:    &ourreporting.Path{{}},
 {II}Message: message,
 {I}}}
 }}"""
@@ -154,7 +154,7 @@ func (se *SerializationError) Error() string {{
             f"""\
 // Render the path as a string.
 func (se *SerializationError) PathString() string {{
-{I}return aasreporting.ToGolangPath(se.Path)
+{I}return ourreporting.ToGolangPath(se.Path)
 }}"""
         ),
         Stripped(
@@ -165,7 +165,7 @@ func (se *SerializationError) PrependIndex(
 {I}index int,
 ) *SerializationError {{
 {I}se.Path.PrependIndex(
-{II}&aasreporting.IndexSegment{{Index: index}},
+{II}&ourreporting.IndexSegment{{Index: index}},
 {I})
 {I}return se
 }}"""
@@ -178,7 +178,7 @@ func (se *SerializationError) PrependKey(
 {I}key string,
 ) *SerializationError {{
 {I}se.Path.PrependKey(
-{II}&aasreporting.KeySegment{{Key: key}},
+{II}&ourreporting.KeySegment{{Key: key}},
 {I})
 {I}return se
 }}"""
@@ -542,7 +542,7 @@ func constructXsDoubleRe() *regexp.Regexp {{
 {I}// its production being (\\+|-)?INF, and being liberal in what we accept
 {I}// costs nothing here. strconv.ParseFloat reads it without complaint.
 {I}doubleRep := "((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|(\\\\+|-)?INF|NaN)"
-{I}pattern := aascommon.Concat(
+{I}pattern := ourcommon.Concat(
 {II}"^",
 {II}doubleRep,
 {II}"$",
@@ -1373,9 +1373,9 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     # only generated for a meta-model which actually has a JSON-able type.
     uses_json_types = intermediate_uses.json_types(symbol_table)
 
-    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+    ourcommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
-    aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
+    ourreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
     blocks = [
         Stripped(
@@ -1402,8 +1402,8 @@ import (
 {I}"strconv"
 {I}"strings"
 {I}"unicode"
-{I}aascommon {aascommon_url_literal}
-{I}aasreporting {aasreporting_url_literal}
+{I}ourcommon {ourcommon_url_literal}
+{I}ourreporting {ourreporting_url_literal}
 )"""
         ),
     ]  # type: List[Stripped]

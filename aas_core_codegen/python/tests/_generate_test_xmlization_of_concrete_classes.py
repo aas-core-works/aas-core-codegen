@@ -126,7 +126,7 @@ def _generate_lexical_test_case(
     blocks = [
         Stripped(
             f"""\
-def _read_with(self, xml_name: str, text: str) -> aas_types.{python_naming.class_name(cls.name)}:
+def _read_with(self, xml_name: str, text: str) -> our_types.{python_naming.class_name(cls.name)}:
 {I}\"\"\"Read a recorded example with the content of ``xml_name`` put to ``text``.\"\"\"
 {I}paths = sorted(
 {II}(
@@ -147,7 +147,7 @@ def _read_with(self, xml_name: str, text: str) -> aas_types.{python_naming.class
 {I}start = original.index(f"<{{xml_name}}>") + len(xml_name) + 2
 {I}end = original.index(f"</{{xml_name}}>")
 
-{I}return aas_xmlization.{from_str}(
+{I}return our_xmlization.{from_str}(
 {II}original[:start] + text + original[end:]
 {I})"""
         )
@@ -205,7 +205,7 @@ def {python_naming.method_name(
 def {python_naming.method_name(
                 Identifier(f"test_{int_prop.name}_read_from_many_digits_fails")
             )}(self) -> None:
-{I}with self.assertRaises(aas_xmlization.DeserializationException):
+{I}with self.assertRaises(our_xmlization.DeserializationException):
 {II}self._read_with({int_prop_xml_name!r}, "1" + "0" * 5000)"""
             )
         )
@@ -258,22 +258,22 @@ def {test_method_name}(self) -> None:
 {II}# region From iterparse
 {II}iterator = ET.iterparse(source=io.StringIO(text), events=["start", "end"])
 {II}got_from_iterparse = (
-{III}aas_xmlization.{from_iterparse}(iterator)
+{III}our_xmlization.{from_iterparse}(iterator)
 {II})
 
-{II}et_from_iterparse = ET.fromstring(aas_xmlization.to_str(got_from_iterparse))
+{II}et_from_iterparse = ET.fromstring(our_xmlization.to_str(got_from_iterparse))
 {II}tests.common_xmlization.remove_redundant_whitespace(et_from_iterparse)
 {II}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_iterparse)
 {II}# endregion
 
 {II}# region From stream
 {II}got_from_stream = (
-{III}aas_xmlization
+{III}our_xmlization
 {III}.{from_stream}(
 {IIII}io.StringIO(text)
 {III})
 {II})
-{II}et_from_stream = ET.fromstring(aas_xmlization.to_str(got_from_stream))
+{II}et_from_stream = ET.fromstring(our_xmlization.to_str(got_from_stream))
 {II}tests.common_xmlization.remove_redundant_whitespace(et_from_stream)
 {II}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_stream)
 {II}# endregion
@@ -284,20 +284,20 @@ def {test_method_name}(self) -> None:
 {III}path.write_text(text, encoding="utf-8")
 
 {III}got_from_file = (
-{IIII}aas_xmlization
+{IIII}our_xmlization
 {IIII}.{from_file}(path)
 {III})
-{II}et_from_file = ET.fromstring(aas_xmlization.to_str(got_from_file))
+{II}et_from_file = ET.fromstring(our_xmlization.to_str(got_from_file))
 {II}tests.common_xmlization.remove_redundant_whitespace(et_from_file)
 {II}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_file)
 {II}# endregion
 
 {II}# region From string
 {II}got_from_str = (
-{III}aas_xmlization
+{III}our_xmlization
 {III}.{from_str}(text)
 {II})
-{II}et_from_str = ET.fromstring(aas_xmlization.to_str(got_from_str))
+{II}et_from_str = ET.fromstring(our_xmlization.to_str(got_from_str))
 {II}tests.common_xmlization.remove_redundant_whitespace(et_from_str)
 {II}tests.common_xmlization.assert_elements_equal(et_concrete, et_from_str)
 {II}# endregion"""
@@ -381,8 +381,8 @@ class TestDuplicateProperty(unittest.TestCase):
 {III}text[:insertion_index] + duplicated + text[insertion_index:]
 {II})
 
-{II}with self.assertRaises(aas_xmlization.DeserializationException):
-{III}aas_xmlization.{from_str}(broken_text)"""
+{II}with self.assertRaises(our_xmlization.DeserializationException):
+{III}our_xmlization.{from_str}(broken_text)"""
     )
 
 
@@ -420,8 +420,8 @@ import xml.etree.ElementTree as ET"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.types as aas_types
-import {qualified_module_name}.xmlization as aas_xmlization"""
+import {qualified_module_name}.types as our_types
+import {qualified_module_name}.xmlization as our_xmlization"""
         ),
         Stripped(
             """\

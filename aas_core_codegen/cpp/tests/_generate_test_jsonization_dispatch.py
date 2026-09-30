@@ -45,7 +45,7 @@ def generate_implementation(
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
     ]  # type: List[Stripped]
 
@@ -75,38 +75,38 @@ namespace aas = {library_namespace};"""
                 f"""\
 TEST_CASE("Test the round-trip of an expected {interface_name}") {{
 {I}const std::shared_ptr<
-{II}aas::types::{concrete_interface_name}
+{II}our::types::{concrete_interface_name}
 {I}> concrete_instance(
 {II}test::common::examples::{load_min}()
 {I});
 
-{I}const nlohmann::json json = aas::jsonization::Serialize(
+{I}const nlohmann::json json = our::jsonization::Serialize(
 {II}*concrete_instance
 {I});
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::shared_ptr<
-{III}aas::types::{interface_name}
+{III}our::types::{interface_name}
 {II}>,
-{II}aas::jsonization::DeserializationError
-{I}> instance = aas::jsonization::{from_json}(
+{II}our::jsonization::DeserializationError
+{I}> instance = our::jsonization::{from_json}(
 {II}json
 {I});
 
 {I}if (!instance.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to deserialize a {interface_name} "
 {IIII}"from a minimal {concrete_interface_name}: ",
-{IIII}aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+{IIII}our::common::WstringToUtf8(instance.error().path.ToWstring()),
 {IIII}": ",
-{IIII}aas::common::WstringToUtf8(instance.error().cause)
+{IIII}our::common::WstringToUtf8(instance.error().cause)
 {III})
 {II})
 {II}CHECK(instance.has_value());
 {I}}}
 
-{I}const nlohmann::json another_json = aas::jsonization::Serialize(
+{I}const nlohmann::json another_json = our::jsonization::Serialize(
 {II}**instance
 {I});
 
@@ -118,7 +118,7 @@ TEST_CASE("Test the round-trip of an expected {interface_name}") {{
 {I});
 {I}if (patch_message.has_value()) {{
 {II}INFO(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to make a round-trip of a {interface_name} "
 {IIII}"over a minimal {concrete_interface_name}: ",
 {IIII}*patch_message

@@ -51,7 +51,7 @@ public void {method_name}()
 {{
 {I}Assert.AreEqual(
 {II}{len_case.expected},
-{II}Aas.Common.StringHelpers.Len(
+{II}Our.Common.StringHelpers.Len(
 {III}{csharp_common.string_literal(len_case.text)}));
 }}  // void {method_name}"""
             )
@@ -82,7 +82,7 @@ public void {method_name}()
 {{
 {I}Assert.AreEqual(
 {II}{csharp_common.string_literal(slice_case.expected)},
-{II}Aas.Common.StringHelpers.Slice({", ".join(args)}));
+{II}Our.Common.StringHelpers.Slice({", ".join(args)}));
 }}  // void {method_name}"""
             )
         )
@@ -102,7 +102,7 @@ public void {method_name}()
         if find_case.start is not None:
             args.append(str(find_case.start))
 
-        call = f"Aas.Common.StringHelpers.Find({', '.join(args)})"
+        call = f"Our.Common.StringHelpers.Find({', '.join(args)})"
 
         method_name = _method_name("find", find_case.description)
 
@@ -124,7 +124,7 @@ public void {method_name}()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using NUnit.Framework;  // can't alias
 

@@ -45,8 +45,8 @@ def generate(
 [Test]
 public void Test_{enum_name}_valid()
 {{
-{I}var errors = Aas.Verification.Verify{enum_name}(
-{II}Aas.{enum_name}.{literal_name}).ToList();
+{I}var errors = Our.Verification.Verify{enum_name}(
+{II}Our.{enum_name}.{literal_name}).ToList();
 
 {I}Assert.IsEmpty(errors);
 }}  // void Test_{enum_name}_valid"""
@@ -60,9 +60,9 @@ public void Test_{enum_name}_valid()
 public void Test_{enum_name}_invalid()
 {{
 {I}int valueAsInt = -1;
-{I}Aas.{enum_name} value = (Aas.{enum_name})valueAsInt;
+{I}Our.{enum_name} value = (Our.{enum_name})valueAsInt;
 
-{I}var errors = Aas.Verification.Verify{enum_name}(
+{I}var errors = Our.Verification.Verify{enum_name}(
 {II}value).ToList();
 
 {I}Assert.AreEqual(1, errors.Count);
@@ -76,7 +76,7 @@ public void Test_{enum_name}_invalid()
     return f"""\
 {csharp_common.WARNING}
 
-using Aas = {namespace};  // renamed
+using Our = {namespace};  // renamed
 
 using System.Linq;  // can't alias
 using NUnit.Framework;  // can't alias

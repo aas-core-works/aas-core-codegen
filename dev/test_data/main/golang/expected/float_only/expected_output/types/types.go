@@ -5,7 +5,7 @@ package types
 // Do NOT edit or append.
 
 import (
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -17,7 +17,7 @@ const (
 	ModelTypeSomething ModelType = iota
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -73,14 +73,14 @@ type ISomething interface {
 		value []float64,
 	);
 
-	SomePair() aascommon.Tuple2[string, float64];
+	SomePair() ourcommon.Tuple2[string, float64];
 
 	SetSomePair(
-		value aascommon.Tuple2[string, float64],
+		value ourcommon.Tuple2[string, float64],
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -97,7 +97,7 @@ type Something struct {
 	someFloat float64
 	someOptionalFloat *float64
 	someFloats []float64
-	somePair aascommon.Tuple2[string, float64]
+	somePair ourcommon.Tuple2[string, float64]
 }
 
 func (s *Something) SomeFloat(
@@ -134,12 +134,12 @@ func (s *Something) SetSomeFloats(
 }
 
 func (s *Something) SomePair(
-) aascommon.Tuple2[string, float64] {
+) ourcommon.Tuple2[string, float64] {
 	return s.somePair
 }
 
 func (s *Something) SetSomePair(
-	value aascommon.Tuple2[string, float64],
+	value ourcommon.Tuple2[string, float64],
 ) {
 	s.somePair = value
 }
@@ -184,7 +184,7 @@ func (s *Something) Descend(
 func NewSomething(
 	someFloat float64,
 	someFloats []float64,
-	somePair aascommon.Tuple2[string, float64],
+	somePair ourcommon.Tuple2[string, float64],
 ) *Something {
 	return &Something{
 		someFloat: someFloat,

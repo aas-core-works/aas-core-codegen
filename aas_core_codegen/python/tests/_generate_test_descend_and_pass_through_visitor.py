@@ -47,7 +47,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.types as aas_types"""
+import {qualified_module_name}.types as our_types"""
         ),
         Stripped(
             """\
@@ -56,7 +56,7 @@ import tests.common_xmlization"""
         ),
         Stripped(
             f'''\
-class _TracingVisitor(aas_types.PassThroughVisitor):
+class _TracingVisitor(our_types.PassThroughVisitor):
 {I}"""Visit the instances and trace them."""
 
 {I}def __init__(self) -> None:
@@ -68,19 +68,19 @@ class _TracingVisitor(aas_types.PassThroughVisitor):
 {II}"""Get the tracing log."""
 {II}return self._log
 
-{I}def visit(self, that: aas_types.Class) -> None:
+{I}def visit(self, that: our_types.Class) -> None:
 {II}self._log.append(tests.common.trace(that))
 {II}super().visit(that)'''
         ),
         Stripped(
             f'''\
 def assert_tracing_logs_from_descend_and_visitor_are_the_same(
-{I}that: aas_types.Class, test_case: unittest.TestCase
+{I}that: our_types.Class, test_case: unittest.TestCase
 ) -> None:
 {I}"""
 {I}Check that the tracing logs are the same when :paramref:`that` instance
 {I}is visited and when :paramref:`that` is ran through
-{I}:py:method:`aas_types.Class.descend`.
+{I}:py:method:`our_types.Class.descend`.
 
 {I}:param that: instance to be iterated over
 {I}:param test_case: in which this assertion runs

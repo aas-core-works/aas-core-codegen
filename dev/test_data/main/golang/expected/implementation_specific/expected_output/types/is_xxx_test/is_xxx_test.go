@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfBox(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBox()
+	instance := ourtesting.MustLoadMinimalBox()
 
-	if !aastypes.IsBox(instance) {
+	if !ourtypes.IsBox(instance) {
 		t.Errorf(
 			"Expected IsBox to be true on an instance " +
 			"of IBox with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfBox(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBag(instance) {
+	if ourtypes.IsBag(instance) {
 		t.Errorf(
 			"Expected IsBag to be false on an instance " +
 			"of IBox with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfBox(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of IBox with runtime type %T and with model type %v",
@@ -38,9 +38,9 @@ func TestIsXxxOnAnInstanceOfBox(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfBag(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBag()
+	instance := ourtesting.MustLoadMinimalBag()
 
-	if aastypes.IsBox(instance) {
+	if ourtypes.IsBox(instance) {
 		t.Errorf(
 			"Expected IsBox to be false on an instance " +
 			"of IBag with runtime type %T and with model type %v",
@@ -48,7 +48,7 @@ func TestIsXxxOnAnInstanceOfBag(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsBag(instance) {
+	if !ourtypes.IsBag(instance) {
 		t.Errorf(
 			"Expected IsBag to be true on an instance " +
 			"of IBag with runtime type %T and with model type %v",
@@ -56,7 +56,7 @@ func TestIsXxxOnAnInstanceOfBag(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of IBag with runtime type %T and with model type %v",
@@ -66,9 +66,9 @@ func TestIsXxxOnAnInstanceOfBag(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
-	instance := aastesting.MustLoadMinimalContainer()
+	instance := ourtesting.MustLoadMinimalContainer()
 
-	if aastypes.IsBox(instance) {
+	if ourtypes.IsBox(instance) {
 		t.Errorf(
 			"Expected IsBox to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -76,7 +76,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBag(instance) {
+	if ourtypes.IsBag(instance) {
 		t.Errorf(
 			"Expected IsBag to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -84,7 +84,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsContainer(instance) {
+	if !ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be true on an instance " +
 			"of IContainer with runtime type %T and with model type %v",

@@ -1,5 +1,5 @@
 // Check that `langStrings` are specified each for a unique language.
-func LangStringsHaveUniqueLanguages[L aastypes.IAbstractLangString](
+func LangStringsHaveUniqueLanguages[L ourtypes.IAbstractLangString](
 	langStrings []L) bool {
 	languageSet := make(map[string]struct{})
 

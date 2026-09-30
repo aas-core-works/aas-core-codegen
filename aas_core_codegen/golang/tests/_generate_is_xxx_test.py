@@ -28,7 +28,7 @@ def _generate_for_cls(
     block = [
         Stripped(
             f"""\
-instance := aastesting.{must_load_minimal_name}()"""
+instance := ourtesting.{must_load_minimal_name}()"""
         )
     ]  # type: List[Stripped]
 
@@ -41,7 +41,7 @@ instance := aastesting.{must_load_minimal_name}()"""
             block.append(
                 Stripped(
                     f"""\
-if !aastypes.{is_function_name}(instance) {{
+if !ourtypes.{is_function_name}(instance) {{
 {I}t.Errorf(
 {II}"Expected {is_function_name} to be true on an instance " +
 {II}"of {interface_name} with runtime type %T and with model type %v",
@@ -54,7 +54,7 @@ if !aastypes.{is_function_name}(instance) {{
             block.append(
                 Stripped(
                     f"""\
-if aastypes.{is_function_name}(instance) {{
+if ourtypes.{is_function_name}(instance) {{
 {I}t.Errorf(
 {II}"Expected {is_function_name} to be false on an instance " +
 {II}"of {interface_name} with runtime type %T and with model type %v",
@@ -93,8 +93,8 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
             f"""\
 import (
 {I}"testing"
-{I}aastesting "{repo_url}/aastesting"
-{I}aastypes "{repo_url}/types"
+{I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
 )"""
         ),
     ]  # type: List[Stripped]

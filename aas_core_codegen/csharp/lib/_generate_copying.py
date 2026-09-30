@@ -30,13 +30,13 @@ def _generate_union_deep_copy_helper() -> Stripped:
     """
     Generate a single ``Deep`` overload shared by every named union.
 
-    A named union is not itself an ``Aas.IClass``, so it can not be passed
-    to the generic ``Deep<T>() where T : Aas.IClass``. We add this second
+    A named union is not itself an ``Our.IClass``, so it can not be passed
+    to the generic ``Deep<T>() where T : Our.IClass``. We add this second
     generic overload, next to it, so that call sites can keep calling
     ``Deep`` directly, regardless of whether the value at hand is a class
     instance or a named union.
 
-    ``T`` is bounded by ``Aas.IUnion<T>`` (see ``generate()`` in
+    ``T`` is bounded by ``Our.IUnion<T>`` (see ``generate()`` in
     ``_generate_types.py``) instead of by the union's own type, so we need
     only this one overload for *all* named unions, not one per union --
     while ``T.WithUnderlying(...)`` still lets the result come back as the
@@ -45,13 +45,13 @@ def _generate_union_deep_copy_helper() -> Stripped:
 
     .. note::
 
-        The parameter is typed as ``Aas.IUnion<T>``, not bare ``T``. C# does
+        The parameter is typed as ``Our.IUnion<T>``, not bare ``T``. C# does
         *not* allow overloading a generic method solely by its type
-        parameter's constraint -- ``Deep<T>(T that) where T : Aas.IUnion<T>``
+        parameter's constraint -- ``Deep<T>(T that) where T : Our.IUnion<T>``
         would be flagged as a duplicate member of the existing
-        ``Deep<T>(T that) where T : Aas.IClass`` above (confirmed with a
+        ``Deep<T>(T that) where T : Our.IClass`` above (confirmed with a
         real ``dotnet build``: CS0111). Typing the parameter itself as
-        ``Aas.IUnion<T>`` gives the two overloads genuinely different formal
+        ``Our.IUnion<T>`` gives the two overloads genuinely different formal
         parameter types, which C# *does* allow, while type inference still
         resolves ``T`` to the caller's own concrete union type from the
         argument (confirmed with a real ``dotnet run``, including through a
@@ -63,7 +63,7 @@ def _generate_union_deep_copy_helper() -> Stripped:
     """
     return Stripped(
         f"""\
-public static T Deep<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+public static T Deep<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
 {{
 {I}return that.WithUnderlying(
 {II}Deep(that.Underlying));
@@ -92,7 +92,7 @@ def _generate_shallow_copy_transform_method(
     cls_name = csharp_naming.class_name(cls.name)
 
     if len(cls.constructor.arguments) == 0:
-        return_statement = Stripped(f"return new Aas.{cls_name}();")
+        return_statement = Stripped(f"return new Our.{cls_name}();")
     else:
         constructor_arg_exprs = []  # type: List[str]
         for arg in cls.constructor.arguments:
@@ -103,13 +103,13 @@ def _generate_shallow_copy_transform_method(
         # This is poor man's heuristic for line breaking, but it works fairly well
         # in practice.
         args_joined = ", ".join(constructor_arg_exprs)
-        return_statement = Stripped(f"return new Aas.{cls_name}({args_joined});")
+        return_statement = Stripped(f"return new Our.{cls_name}({args_joined});")
 
         if len(return_statement) > 70:
             args_joined = ",\n".join(constructor_arg_exprs)
             return_statement = Stripped(
                 f"""\
-return new Aas.{cls_name}(
+return new Our.{cls_name}(
 {I}{indent_but_first_line(args_joined, I)});"""
             )
 
@@ -118,8 +118,8 @@ return new Aas.{cls_name}(
 
     return Stripped(
         f"""\
-public override Aas.IClass {transform_name}(
-{I}Aas.{interface_name} that
+public override Our.IClass {transform_name}(
+{I}Our.{interface_name} that
 )
 {{
 {I}{indent_but_first_line(return_statement, I)}
@@ -140,7 +140,7 @@ def _generate_shallow_copier(
     writer.write(
         """\
 /// <summary>Dispatch the making of shallow copies.</summary>
-internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
 {
 """
     )
@@ -217,7 +217,7 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
     body_blocks = []  # type: List[Stripped]
 
     if len(cls.constructor.arguments) == 0:
-        body_blocks.append(Stripped(f"return new Aas.{cls_name}();"))
+        body_blocks.append(Stripped(f"return new Our.{cls_name}();"))
     else:
         # NOTE (mristin):
         # We handle first the case of properties containing lists, and make copies of
@@ -583,7 +583,7 @@ if (that.{prop_name} != null)
 
         return_statement_writer = io.StringIO()
 
-        return_statement_writer.write(f"return new Aas.{cls_name}(\n")
+        return_statement_writer.write(f"return new Our.{cls_name}(\n")
 
         for i, arg_expr in enumerate(constructor_arg_exprs):
             return_statement_writer.write(textwrap.indent(arg_expr, I))
@@ -609,8 +609,8 @@ if (that.{prop_name} != null)
 
     return Stripped(
         f"""\
-public override Aas.IClass {transform_name}(
-{I}Aas.{interface_name} that
+public override Our.IClass {transform_name}(
+{I}Our.{interface_name} that
 )
 {{
 {I}{indent_but_first_line(body_writer.getvalue(), I)}
@@ -631,7 +631,7 @@ def _generate_deep_copier(
     writer.write(
         """\
 /// <summary>Dispatch the making of deep copies.</summary>
-internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
+internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
 {"""
     )
 
@@ -667,7 +667,7 @@ def generate(
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     using_directives.append(
@@ -709,7 +709,7 @@ private static readonly DeepCopier DeepCopierInstance = (
 /// </remarks>.
 /// <param name="that">to be copied in a shallow manner</param>
 /// <typeparam name="T">type to cast the result to</typeparam>
-public static T Shallow<T>(T that) where T : Aas.IClass
+public static T Shallow<T>(T that) where T : Our.IClass
 {{
 {I}return (T)ShallowCopierInstance.Transform(that);
 }}"""
@@ -721,7 +721,7 @@ public static T Shallow<T>(T that) where T : Aas.IClass
 /// </summary>
 /// <param name="that">to be deeply copied in a recursive manner</param>
 /// <typeparam name="T">type to cast the result to</typeparam>
-public static T Deep<T>(T that) where T : Aas.IClass
+public static T Deep<T>(T that) where T : Our.IClass
 {{
 {I}return (T)DeepCopierInstance.Transform(that);
 }}"""
@@ -754,7 +754,7 @@ public static T Deep<T>(T that) where T : Aas.IClass
     copying_writer.write(
         """\
 /// <summary>
-/// Allow for making shallow and deep copies of AAS model instances.
+/// Allow for making shallow and deep copies of model instances.
 /// </summary>
 public static class Copying
 {

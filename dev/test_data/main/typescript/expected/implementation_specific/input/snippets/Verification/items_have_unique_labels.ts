@@ -5,7 +5,7 @@
  * @returns `true` if the check passes
  */
 export function itemsHaveUniqueLabels(
-  items: Iterable<AasTypes.IItem>
+  items: Iterable<OurTypes.IItem>
 ): boolean {
   const labelSet = new Set<string>();
   for (const item of items) {

@@ -60,11 +60,11 @@ def {test_method_name}(self) -> None:
 {III}with path.open("rt") as fid:
 {IIII}original_jsonable = json.load(fid)
 
-{III}instance = aas_jsonization.{from_jsonable}(
+{III}instance = our_jsonization.{from_jsonable}(
 {IIII}original_jsonable
 {III})
 
-{III}another_jsonable = aas_jsonization.to_jsonable(instance)
+{III}another_jsonable = our_jsonization.to_jsonable(instance)
 
 {III}mismatch = tests.common_jsonization.check_equal(
 {IIII}original_jsonable,
@@ -120,7 +120,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {qualified_module_name}.jsonization as aas_jsonization"""
+import {qualified_module_name}.jsonization as our_jsonization"""
         ),
         Stripped(
             """\

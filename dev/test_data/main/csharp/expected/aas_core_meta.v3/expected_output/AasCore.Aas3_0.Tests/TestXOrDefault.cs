@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 
 using Directory = System.IO.Directory;
 using Nodes = System.Text.Json.Nodes;
@@ -19,10 +19,10 @@ namespace AasCore.Aas3_0.Tests
             object value,
             string expectedPath)
         {
-            Nodes.JsonNode got = Aas.Tests.CommonJson.ToJson(
+            Nodes.JsonNode got = Our.Tests.CommonJson.ToJson(
                 value);
 
-            if (Aas.Tests.Common.RecordMode)
+            if (Our.Tests.Common.RecordMode)
             {
                 string? parent = Path.GetDirectoryName(expectedPath);
                 if (parent != null)
@@ -43,14 +43,14 @@ namespace AasCore.Aas3_0.Tests
                     throw new System.IO.FileNotFoundException(
                         $"The file with the recorded value does not exist: {expectedPath}; " +
                         "maybe you want to set the environment " +
-                        $"variable {Aas.Tests.Common.RecordModeEnvironmentVariableName}?");
+                        $"variable {Our.Tests.Common.RecordModeEnvironmentVariableName}?");
                 }
 
-                Nodes.JsonNode expected = Aas.Tests.CommonJson.ReadFromFile(
+                Nodes.JsonNode expected = Our.Tests.CommonJson.ReadFromFile(
                     expectedPath);
 
-                Aas.Tests.CommonJson.CheckJsonNodesEqual(
-                    expected, got, out Aas.Reporting.Error? error);
+                Our.Tests.CommonJson.CheckJsonNodesEqual(
+                    expected, got, out Our.Reporting.Error? error);
 
                 if (error != null)
                 {
@@ -67,10 +67,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_ValueTypeOrDefault_non_default()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMaximalExtension());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.ValueTypeOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -78,7 +78,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Extension",
                     "ValueTypeOrDefault.non-default.json"));
@@ -87,10 +87,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Extension_ValueTypeOrDefault_default()
         {
-            Aas.Extension instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalExtension());
+            Our.Extension instance = (
+                Our.Tests.CommonJsonization.LoadMinimalExtension());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.ValueTypeOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -98,7 +98,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Extension",
                     "ValueTypeOrDefault.default.json"));
@@ -107,10 +107,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Qualifier_KindOrDefault_non_default()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQualifier());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.KindOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -118,7 +118,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Qualifier",
                     "KindOrDefault.non-default.json"));
@@ -127,10 +127,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Qualifier_KindOrDefault_default()
         {
-            Aas.Qualifier instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalQualifier());
+            Our.Qualifier instance = (
+                Our.Tests.CommonJsonization.LoadMinimalQualifier());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.KindOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -138,7 +138,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Qualifier",
                     "KindOrDefault.default.json"));
@@ -147,10 +147,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_KindOrDefault_non_default()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodel());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.KindOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -158,7 +158,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Submodel",
                     "KindOrDefault.non-default.json"));
@@ -167,10 +167,10 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Submodel_KindOrDefault_default()
         {
-            Aas.Submodel instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodel());
+            Our.Submodel instance = (
+                Our.Tests.CommonJsonization.LoadMinimalSubmodel());
 
-            string value = Aas.Stringification.ToString(
+            string value = Our.Stringification.ToString(
                 instance.KindOrDefault())
                     ?? throw new System.InvalidOperationException(
                         "Failed to stringify the enum");
@@ -178,7 +178,7 @@ namespace AasCore.Aas3_0.Tests
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Submodel",
                     "KindOrDefault.default.json"));
@@ -187,15 +187,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OrderRelevantOrDefault_non_default()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMaximalSubmodelElementList());
 
             var value = instance.OrderRelevantOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "SubmodelElementList",
                     "OrderRelevantOrDefault.non-default.json"));
@@ -204,15 +204,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_SubmodelElementList_OrderRelevantOrDefault_default()
         {
-            Aas.SubmodelElementList instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalSubmodelElementList());
+            Our.SubmodelElementList instance = (
+                Our.Tests.CommonJsonization.LoadMinimalSubmodelElementList());
 
             var value = instance.OrderRelevantOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "SubmodelElementList",
                     "OrderRelevantOrDefault.default.json"));
@@ -221,15 +221,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_CategoryOrDefault_non_default()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMaximalProperty());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Property",
                     "CategoryOrDefault.non-default.json"));
@@ -238,15 +238,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Property_CategoryOrDefault_default()
         {
-            Aas.Property instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalProperty());
+            Our.Property instance = (
+                Our.Tests.CommonJsonization.LoadMinimalProperty());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Property",
                     "CategoryOrDefault.default.json"));
@@ -255,15 +255,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_CategoryOrDefault_non_default()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMaximalMultiLanguageProperty());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "MultiLanguageProperty",
                     "CategoryOrDefault.non-default.json"));
@@ -272,15 +272,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_MultiLanguageProperty_CategoryOrDefault_default()
         {
-            Aas.MultiLanguageProperty instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty());
+            Our.MultiLanguageProperty instance = (
+                Our.Tests.CommonJsonization.LoadMinimalMultiLanguageProperty());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "MultiLanguageProperty",
                     "CategoryOrDefault.default.json"));
@@ -289,15 +289,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_CategoryOrDefault_non_default()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRange());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Range",
                     "CategoryOrDefault.non-default.json"));
@@ -306,15 +306,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Range_CategoryOrDefault_default()
         {
-            Aas.Range instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalRange());
+            Our.Range instance = (
+                Our.Tests.CommonJsonization.LoadMinimalRange());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Range",
                     "CategoryOrDefault.default.json"));
@@ -323,15 +323,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_CategoryOrDefault_non_default()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMaximalReferenceElement());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "ReferenceElement",
                     "CategoryOrDefault.non-default.json"));
@@ -340,15 +340,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_ReferenceElement_CategoryOrDefault_default()
         {
-            Aas.ReferenceElement instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalReferenceElement());
+            Our.ReferenceElement instance = (
+                Our.Tests.CommonJsonization.LoadMinimalReferenceElement());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "ReferenceElement",
                     "CategoryOrDefault.default.json"));
@@ -357,15 +357,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_CategoryOrDefault_non_default()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMaximalBlob());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Blob",
                     "CategoryOrDefault.non-default.json"));
@@ -374,15 +374,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_Blob_CategoryOrDefault_default()
         {
-            Aas.Blob instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalBlob());
+            Our.Blob instance = (
+                Our.Tests.CommonJsonization.LoadMinimalBlob());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "Blob",
                     "CategoryOrDefault.default.json"));
@@ -391,15 +391,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_CategoryOrDefault_non_default()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMaximalFile());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "File",
                     "CategoryOrDefault.non-default.json"));
@@ -408,15 +408,15 @@ namespace AasCore.Aas3_0.Tests
         [Test]
         public void Test_File_CategoryOrDefault_default()
         {
-            Aas.File instance = (
-                Aas.Tests.CommonJsonization.LoadMinimalFile());
+            Our.File instance = (
+                Our.Tests.CommonJsonization.LoadMinimalFile());
 
             var value = instance.CategoryOrDefault();
 
             CompareOrRerecordValue(
                 value,
                 Path.Combine(
-                    Aas.Tests.Common.TestDataDir,
+                    Our.Tests.Common.TestDataDir,
                     "XOrDefault",
                     "File",
                     "CategoryOrDefault.default.json"));

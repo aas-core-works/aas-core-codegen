@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using RegularExpressions = System.Text.RegularExpressions;
 using Xml = System.Xml;
 

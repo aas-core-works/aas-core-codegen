@@ -994,7 +994,7 @@ def _content_reader_initializer(
             enum_name = csharp_naming.enum_name(our_type.name)
             return Stripped(
                 f"""\
-AsEnum<Aas.{enum_name}>(
+AsEnum<Our.{enum_name}>(
 {I}Stringification.{enum_name}FromString)"""
             )
 
@@ -1007,7 +1007,7 @@ AsEnum<Aas.{enum_name}>(
         ):
             return Stripped(
                 f"""\
-AsElement<Aas.{csharp_common.generate_type(type_anno)}>(
+AsElement<Our.{csharp_common.generate_type(type_anno)}>(
 {I}{_from_element_name(our_type)})"""
             )
 
@@ -1086,12 +1086,12 @@ def _generate_from_element_fields(
         xml_name_literal = csharp_common.string_literal(naming.xml_class_name(cls.name))
 
         declaration = (
-            f"internal static readonly ElementReader<Aas.{name}> {name}FromElement = ("
+            f"internal static readonly ElementReader<Our.{name}> {name}FromElement = ("
         )
         if len(declaration) + len(I) * 3 > _MAX_LINE_LENGTH:
             declaration = f"""\
 internal static readonly ElementReader<
-{I}Aas.{name}
+{I}Our.{name}
 > {name}FromElement = ("""
 
         result.append(
@@ -1101,7 +1101,7 @@ internal static readonly ElementReader<
 /// Read an instance of class {name} from its XML element.
 /// </summary>
 {declaration}
-{I}AtElement<Aas.{name}>(
+{I}AtElement<Our.{name}>(
 {II}{name}FromSequence, {xml_name_literal}));"""
             )
         )
@@ -1283,14 +1283,14 @@ def _generate_deserialize_impl_cls_from_sequence(
             Stripped(
                 f"""\
 {description}
-internal static Aas.{name} {name}FromSequence(
+internal static Our.{name} {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
 {I}out Reporting.Error? error)
 {{
 {I}error = null;
-{I}return new Aas.{name}();
-}}  // internal static Aas.{name} {name}FromSequence"""
+{I}return new Our.{name}();
+}}  // internal static Our.{name} {name}FromSequence"""
             ),
             None,
         )
@@ -1471,7 +1471,7 @@ if ({target_var} == null)
     # fmt: on
 
     init_writer = io.StringIO()
-    init_writer.write(f"return new Aas.{name}(\n")
+    init_writer.write(f"return new Our.{name}(\n")
 
     for i, arg in enumerate(cls.constructor.arguments):
         prop = cls.properties_by_name[arg.name]
@@ -1536,7 +1536,7 @@ if ({target_var} == null)
     writer.write(
         f"""\
 {description}
-internal static Aas.{name} {name}FromSequence(
+internal static Our.{name} {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
 {I}out Reporting.Error? error)
@@ -1549,7 +1549,7 @@ internal static Aas.{name} {name}FromSequence(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}  // internal static Aas.{name}? {name}FromSequence")
+    writer.write(f"\n}}  // internal static Our.{name}? {name}FromSequence")
 
     return Stripped(writer.getvalue()), None
 
@@ -1619,7 +1619,7 @@ switch (elementName)
 /// Deserialize an instance of {name} from an XML element.
 /// </summary>
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static Aas.{name} {name}FromElement(
+internal static Our.{name} {name}FromElement(
 {I}Xml.XmlReader reader,
 {I}out Reporting.Error? error)
 {{
@@ -1631,7 +1631,7 @@ internal static Aas.{name} {name}FromElement(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}  // internal static Aas.{name}? {name}FromElement")
+    writer.write(f"\n}}  // internal static Our.{name}? {name}FromElement")
 
     return Stripped(writer.getvalue())
 
@@ -1662,13 +1662,13 @@ def _generate_deserialize_impl_named_union_from_element(
                 f"""\
 case {implementer_xml_name_literal}:
 {{
-{I}Aas.{implementer_name} instance = {implementer_name}FromElement(
+{I}Our.{implementer_name} instance = {implementer_name}FromElement(
 {II}reader, out error);
 {I}if (error != null)
 {I}{{
 {II}return default!;
 {I}}}
-{I}return Aas.{name}.{from_method_name}(instance);
+{I}return Our.{name}.{from_method_name}(instance);
 }}"""
             )
         )
@@ -1712,7 +1712,7 @@ switch (elementName)
 /// <summary>
 /// Deserialize an instance of {name} from an XML element.
 /// </summary>
-internal static Aas.{name} {name}FromElement(
+internal static Our.{name} {name}FromElement(
 {I}Xml.XmlReader reader,
 {I}out Reporting.Error? error)
 {{
@@ -1724,7 +1724,7 @@ internal static Aas.{name} {name}FromElement(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}  // internal static Aas.{name}? {name}FromElement")
+    writer.write(f"\n}}  // internal static Our.{name}? {name}FromElement")
 
     return Stripped(writer.getvalue())
 
@@ -1989,7 +1989,7 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 
     writer.write(
         f"""\
-public static Aas.{name} {name}From(
+public static Our.{name} {name}From(
 {I}Xml.XmlReader reader)
 {{
 {I}XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2003,7 +2003,7 @@ public static Aas.{name} {name}From(
 {III}"to be set at content with MoveToContent");
 {I}}}
 
-{I}Aas.{name} result = DeserializeImplementation.{name}FromElement(
+{I}Our.{name} result = DeserializeImplementation.{name}FromElement(
 {II}reader,
 {II}out Reporting.Error? error);
 {I}if (error != null)
@@ -2076,7 +2076,7 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
 /// Here is an example how to parse an instance of class {cls_name}:
 /// <code>
 /// var reader = new System.Xml.XmlReader(/* some arguments */);
-/// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+/// Our.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
 /// {I}reader);
 /// </code>
 /// </example>
@@ -2116,7 +2116,7 @@ def _generate_content_writer_delegate() -> Stripped:
 
     The type parameter is contravariant -- the dual of the covariance of
     the :py:class:`ElementReader` -- so that the one writer of
-    an ``Aas.IClass`` serves wherever the writer of a more specific interface
+    an ``Our.IClass`` serves wherever the writer of a more specific interface
     is expected.
     """
     return Stripped(
@@ -2508,7 +2508,7 @@ private static readonly VisitorWithWriter _instance = (
 /// or of a tuple of any of them.
 /// </remarks>
 internal static void WriteIClass(
-{I}Aas.IClass that,
+{I}Our.IClass that,
 {I}Xml.XmlWriter writer)
 {{
 {I}that.Accept(_instance, writer);
@@ -2525,16 +2525,16 @@ internal static void WriteIClass(
 /// element.
 /// </summary>
 /// <remarks>
-/// A named union is not itself an <c>Aas.IClass</c>, so it can not be
+/// A named union is not itself an <c>Our.IClass</c>, so it can not be
 /// dispatched by <see cref="WriteIClass" /> directly. Going through
-/// the common, non-generic <c>Aas.IUnion</c> instead of the union's own
+/// the common, non-generic <c>Our.IUnion</c> instead of the union's own
 /// type means one writer for *all* the named unions, not one per union.
 ///
 /// Should a named union ever be allowed to flatten a primitive or
 /// an enumeration alternative, only this body has to change.
 /// </remarks>
 private static void WriteIUnion(
-{I}Aas.IUnion that,
+{I}Our.IUnion that,
 {I}Xml.XmlWriter writer)
 {{
 {I}WriteIClass(that.Underlying, writer);
@@ -2630,7 +2630,7 @@ def _content_writer_initializer(
             enum_name = csharp_naming.enum_name(our_type.name)
             return Stripped(
                 f"""\
-WriteEnum<Aas.{enum_name}>(
+WriteEnum<Our.{enum_name}>(
 {I}Stringification.ToString)"""
             )
 
@@ -2840,7 +2840,7 @@ def _generate_class_to_sequence(
     writer.write(
         f"""\
 private static void {method_name}(
-{I}Aas.{interface_name} that,
+{I}Our.{interface_name} that,
 {I}Xml.XmlWriter writer)
 {{
 """
@@ -2870,7 +2870,7 @@ def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
     return Stripped(
         f"""\
 public override void {visit_name}(
-{I}Aas.{interface_name} that,
+{I}Our.{interface_name} that,
 {I}Xml.XmlWriter writer)
 {{
 {I}writer.WriteStartElement(
@@ -2988,7 +2988,7 @@ def _generate_serialize(
 /// represented in XML
 /// </exception>
 public static void To(
-{I}Aas.IClass that,
+{I}Our.IClass that,
 {I}Xml.XmlWriter writer)
 {{
 {I}try
@@ -3035,7 +3035,7 @@ public static void To(
 /// <example>
 /// Here is an example how to serialize an instance of {cls_name}:
 /// <code>
-/// var {an_instance_variable} = new Aas.{cls_name}(
+/// var {an_instance_variable} = new Our.{cls_name}(
 ///     /* ... some constructor arguments ... */
 /// );
 /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -3157,7 +3157,7 @@ namespace {namespace}
 
     using_directives = []  # type: List[Stripped]
     using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+        csharp_common.generate_using_our_directive_if_necessary(namespace)
     )
 
     using_directives.append(

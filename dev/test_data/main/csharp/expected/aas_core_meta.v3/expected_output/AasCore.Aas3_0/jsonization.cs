@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 
@@ -447,7 +447,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasSemantics IHasSemanticsFrom(
+            public static Our.IHasSemantics IHasSemanticsFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -526,14 +526,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IHasSemantics: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IHasSemantics IHasSemanticsFrom
+            }  // public static Our.IHasSemantics IHasSemanticsFrom
 
             /// <summary>
             /// Deserialize an instance of Extension from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Extension ExtensionFrom(
+            internal static Our.Extension ExtensionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -604,7 +604,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Extension(
+                return new Our.Extension(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -622,7 +622,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasExtensions IHasExtensionsFrom(
+            public static Our.IHasExtensions IHasExtensionsFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -698,7 +698,7 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IHasExtensions: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IHasExtensions IHasExtensionsFrom
+            }  // public static Our.IHasExtensions IHasExtensionsFrom
 
             /// <summary>
             /// Deserialize an instance of IReferable by dispatching
@@ -707,7 +707,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IReferable IReferableFrom(
+            public static Our.IReferable IReferableFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -783,7 +783,7 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IReferable: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IReferable IReferableFrom
+            }  // public static Our.IReferable IReferableFrom
 
             /// <summary>
             /// Deserialize an instance of IIdentifiable by dispatching
@@ -792,7 +792,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IIdentifiable IIdentifiableFrom(
+            public static Our.IIdentifiable IIdentifiableFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -826,14 +826,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IIdentifiable: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IIdentifiable IIdentifiableFrom
+            }  // public static Our.IIdentifiable IIdentifiableFrom
 
             /// <summary>
             /// Deserialize the enumeration ModellingKind from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ModellingKind ModellingKindFrom(
+            internal static Our.ModellingKind ModellingKindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -843,7 +843,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.ModellingKind? result = Stringification.ModellingKindFromString(text);
+                Our.ModellingKind? result = Stringification.ModellingKindFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -861,7 +861,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasKind IHasKindFrom(
+            public static Our.IHasKind IHasKindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -889,7 +889,7 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IHasKind: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IHasKind IHasKindFrom
+            }  // public static Our.IHasKind IHasKindFrom
 
             /// <summary>
             /// Deserialize an instance of IHasDataSpecification by dispatching
@@ -898,7 +898,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+            public static Our.IHasDataSpecification IHasDataSpecificationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -977,14 +977,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IHasDataSpecification: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IHasDataSpecification IHasDataSpecificationFrom
+            }  // public static Our.IHasDataSpecification IHasDataSpecificationFrom
 
             /// <summary>
             /// Deserialize an instance of AdministrativeInformation from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AdministrativeInformation AdministrativeInformationFrom(
+            internal static Our.AdministrativeInformation AdministrativeInformationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1043,7 +1043,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.AdministrativeInformation(
+                return new Our.AdministrativeInformation(
                     theEmbeddedDataSpecifications,
                     theVersion,
                     theRevision,
@@ -1058,7 +1058,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IQualifiable IQualifiableFrom(
+            public static Our.IQualifiable IQualifiableFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1128,14 +1128,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IQualifiable: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IQualifiable IQualifiableFrom
+            }  // public static Our.IQualifiable IQualifiableFrom
 
             /// <summary>
             /// Deserialize the enumeration QualifierKind from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.QualifierKind QualifierKindFrom(
+            internal static Our.QualifierKind QualifierKindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1145,7 +1145,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.QualifierKind? result = Stringification.QualifierKindFromString(text);
+                Our.QualifierKind? result = Stringification.QualifierKindFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -1161,7 +1161,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Qualifier QualifierFrom(
+            internal static Our.Qualifier QualifierFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1244,7 +1244,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Qualifier(
+                return new Our.Qualifier(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1263,7 +1263,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
+            internal static Our.AssetAdministrationShell AssetAdministrationShellFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1385,7 +1385,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AssetAdministrationShell(
+                return new Our.AssetAdministrationShell(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1408,7 +1408,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AssetInformation AssetInformationFrom(
+            internal static Our.AssetInformation AssetInformationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1474,7 +1474,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AssetInformation(
+                return new Our.AssetInformation(
                     theAssetKind
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1489,7 +1489,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Resource ResourceFrom(
+            internal static Our.Resource ResourceFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1540,7 +1540,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Resource(
+                return new Our.Resource(
                     thePath
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1552,7 +1552,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AssetKind AssetKindFrom(
+            internal static Our.AssetKind AssetKindFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1562,7 +1562,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.AssetKind? result = Stringification.AssetKindFromString(text);
+                Our.AssetKind? result = Stringification.AssetKindFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -1578,7 +1578,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.SpecificAssetId SpecificAssetIdFrom(
+            internal static Our.SpecificAssetId SpecificAssetIdFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1651,7 +1651,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.SpecificAssetId(
+                return new Our.SpecificAssetId(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1668,7 +1668,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Submodel SubmodelFrom(
+            internal static Our.Submodel SubmodelFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1793,7 +1793,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Submodel(
+                return new Our.Submodel(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1818,7 +1818,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.ISubmodelElement ISubmodelElementFrom(
+            public static Our.ISubmodelElement ISubmodelElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1885,7 +1885,7 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for ISubmodelElement: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.ISubmodelElement ISubmodelElementFrom
+            }  // public static Our.ISubmodelElement ISubmodelElementFrom
 
             /// <summary>
             /// Deserialize an instance of IRelationshipElement by dispatching
@@ -1894,7 +1894,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IRelationshipElement IRelationshipElementFrom(
+            public static Our.IRelationshipElement IRelationshipElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -1925,14 +1925,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IRelationshipElement: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IRelationshipElement IRelationshipElementFrom
+            }  // public static Our.IRelationshipElement IRelationshipElementFrom
 
             /// <summary>
             /// Deserialize an instance of RelationshipElement from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.RelationshipElement RelationshipElementFrom(
+            internal static Our.RelationshipElement RelationshipElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2054,7 +2054,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.RelationshipElement(
+                return new Our.RelationshipElement(
                     theFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2077,7 +2077,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AasSubmodelElements AasSubmodelElementsFrom(
+            internal static Our.AasSubmodelElements AasSubmodelElementsFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2087,7 +2087,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.AasSubmodelElements? result = Stringification.AasSubmodelElementsFromString(text);
+                Our.AasSubmodelElements? result = Stringification.AasSubmodelElementsFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -2103,7 +2103,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.SubmodelElementList SubmodelElementListFrom(
+            internal static Our.SubmodelElementList SubmodelElementListFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2233,7 +2233,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.SubmodelElementList(
+                return new Our.SubmodelElementList(
                     theTypeValueListElement
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2257,7 +2257,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.SubmodelElementCollection SubmodelElementCollectionFrom(
+            internal static Our.SubmodelElementCollection SubmodelElementCollectionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2360,7 +2360,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.SubmodelElementCollection(
+                return new Our.SubmodelElementCollection(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -2380,7 +2380,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataElement IDataElementFrom(
+            public static Our.IDataElement IDataElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2423,14 +2423,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IDataElement: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IDataElement IDataElementFrom
+            }  // public static Our.IDataElement IDataElementFrom
 
             /// <summary>
             /// Deserialize an instance of Property from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Property PropertyFrom(
+            internal static Our.Property PropertyFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2550,7 +2550,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Property(
+                return new Our.Property(
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2572,7 +2572,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
+            internal static Our.MultiLanguageProperty MultiLanguagePropertyFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2680,7 +2680,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.MultiLanguageProperty(
+                return new Our.MultiLanguageProperty(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -2699,7 +2699,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Range RangeFrom(
+            internal static Our.Range RangeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2819,7 +2819,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Range(
+                return new Our.Range(
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2841,7 +2841,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ReferenceElement ReferenceElementFrom(
+            internal static Our.ReferenceElement ReferenceElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -2944,7 +2944,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ReferenceElement(
+                return new Our.ReferenceElement(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -2962,7 +2962,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Blob BlobFrom(
+            internal static Our.Blob BlobFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3077,7 +3077,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Blob(
+                return new Our.Blob(
                     theContentType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3098,7 +3098,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.File FileFrom(
+            internal static Our.File FileFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3213,7 +3213,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.File(
+                return new Our.File(
                     theContentType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3234,7 +3234,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
+            internal static Our.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3361,7 +3361,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.AnnotatedRelationshipElement(
+                return new Our.AnnotatedRelationshipElement(
                     theFirst
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3385,7 +3385,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Entity EntityFrom(
+            internal static Our.Entity EntityFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3510,7 +3510,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Entity(
+                return new Our.Entity(
                     theEntityType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3533,7 +3533,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.EntityType EntityTypeFrom(
+            internal static Our.EntityType EntityTypeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3543,7 +3543,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.EntityType? result = Stringification.EntityTypeFromString(text);
+                Our.EntityType? result = Stringification.EntityTypeFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -3559,7 +3559,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Direction DirectionFrom(
+            internal static Our.Direction DirectionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3569,7 +3569,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.Direction? result = Stringification.DirectionFromString(text);
+                Our.Direction? result = Stringification.DirectionFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -3585,7 +3585,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.StateOfEvent StateOfEventFrom(
+            internal static Our.StateOfEvent StateOfEventFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3595,7 +3595,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.StateOfEvent? result = Stringification.StateOfEventFromString(text);
+                Our.StateOfEvent? result = Stringification.StateOfEventFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -3611,7 +3611,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.EventPayload EventPayloadFrom(
+            internal static Our.EventPayload EventPayloadFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3706,7 +3706,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.EventPayload(
+                return new Our.EventPayload(
                     theSource
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3730,7 +3730,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IEventElement IEventElementFrom(
+            public static Our.IEventElement IEventElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3758,14 +3758,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IEventElement: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IEventElement IEventElementFrom
+            }  // public static Our.IEventElement IEventElementFrom
 
             /// <summary>
             /// Deserialize an instance of BasicEventElement from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.BasicEventElement BasicEventElementFrom(
+            internal static Our.BasicEventElement BasicEventElementFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -3924,7 +3924,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.BasicEventElement(
+                return new Our.BasicEventElement(
                     theObserved
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -3955,7 +3955,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Operation OperationFrom(
+            internal static Our.Operation OperationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4068,7 +4068,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Operation(
+                return new Our.Operation(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -4088,7 +4088,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.OperationVariable OperationVariableFrom(
+            internal static Our.OperationVariable OperationVariableFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4134,7 +4134,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.OperationVariable(
+                return new Our.OperationVariable(
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -4145,7 +4145,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Capability CapabilityFrom(
+            internal static Our.Capability CapabilityFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4243,7 +4243,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Capability(
+                return new Our.Capability(
                     theExtensions,
                     theCategory,
                     theIdShort,
@@ -4260,7 +4260,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ConceptDescription ConceptDescriptionFrom(
+            internal static Our.ConceptDescription ConceptDescriptionFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4365,7 +4365,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ConceptDescription(
+                return new Our.ConceptDescription(
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4384,7 +4384,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ReferenceTypes ReferenceTypesFrom(
+            internal static Our.ReferenceTypes ReferenceTypesFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4394,7 +4394,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.ReferenceTypes? result = Stringification.ReferenceTypesFromString(text);
+                Our.ReferenceTypes? result = Stringification.ReferenceTypesFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -4410,7 +4410,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Reference ReferenceFrom(
+            internal static Our.Reference ReferenceFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4473,7 +4473,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Reference(
+                return new Our.Reference(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4488,7 +4488,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Key KeyFrom(
+            internal static Our.Key KeyFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4546,7 +4546,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.Key(
+                return new Our.Key(
                     theType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4560,7 +4560,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.KeyTypes KeyTypesFrom(
+            internal static Our.KeyTypes KeyTypesFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4570,7 +4570,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.KeyTypes? result = Stringification.KeyTypesFromString(text);
+                Our.KeyTypes? result = Stringification.KeyTypesFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -4586,7 +4586,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataTypeDefXsd DataTypeDefXsdFrom(
+            internal static Our.DataTypeDefXsd DataTypeDefXsdFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4596,7 +4596,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.DataTypeDefXsd? result = Stringification.DataTypeDefXsdFromString(text);
+                Our.DataTypeDefXsd? result = Stringification.DataTypeDefXsdFromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -4614,7 +4614,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IAbstractLangString IAbstractLangStringFrom(
+            public static Our.IAbstractLangString IAbstractLangStringFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4654,14 +4654,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IAbstractLangString: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IAbstractLangString IAbstractLangStringFrom
+            }  // public static Our.IAbstractLangString IAbstractLangStringFrom
 
             /// <summary>
             /// Deserialize an instance of LangStringNameType from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringNameType LangStringNameTypeFrom(
+            internal static Our.LangStringNameType LangStringNameTypeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4719,7 +4719,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringNameType(
+                return new Our.LangStringNameType(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4733,7 +4733,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringTextType LangStringTextTypeFrom(
+            internal static Our.LangStringTextType LangStringTextTypeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4791,7 +4791,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringTextType(
+                return new Our.LangStringTextType(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4805,7 +4805,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Environment EnvironmentFrom(
+            internal static Our.Environment EnvironmentFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4854,7 +4854,7 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                return new Aas.Environment(
+                return new Our.Environment(
                     theAssetAdministrationShells,
                     theSubmodels,
                     theConceptDescriptions);
@@ -4867,7 +4867,7 @@ namespace AasCore.Aas3_0
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+            public static Our.IDataSpecificationContent IDataSpecificationContentFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4895,14 +4895,14 @@ namespace AasCore.Aas3_0
                         $"Unexpected model type for IDataSpecificationContent: {modelType}");
                     return default!;
                 }
-            }  // public static Aas.IDataSpecificationContent IDataSpecificationContentFrom
+            }  // public static Our.IDataSpecificationContent IDataSpecificationContentFrom
 
             /// <summary>
             /// Deserialize an instance of EmbeddedDataSpecification from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
+            internal static Our.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4960,7 +4960,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.EmbeddedDataSpecification(
+                return new Our.EmbeddedDataSpecification(
                     theDataSpecification
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -4974,7 +4974,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataTypeIec61360 DataTypeIec61360From(
+            internal static Our.DataTypeIec61360 DataTypeIec61360From(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -4984,7 +4984,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                Aas.DataTypeIec61360? result = Stringification.DataTypeIec61360FromString(text);
+                Our.DataTypeIec61360? result = Stringification.DataTypeIec61360FromString(text);
                 if (result == null)
                 {
                     error = new Reporting.Error(
@@ -5000,7 +5000,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LevelType LevelTypeFrom(
+            internal static Our.LevelType LevelTypeFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5082,7 +5082,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LevelType(
+                return new Our.LevelType(
                     theMin
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5102,7 +5102,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ValueReferencePair ValueReferencePairFrom(
+            internal static Our.ValueReferencePair ValueReferencePairFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5160,7 +5160,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ValueReferencePair(
+                return new Our.ValueReferencePair(
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5174,7 +5174,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ValueList ValueListFrom(
+            internal static Our.ValueList ValueListFrom(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5220,7 +5220,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.ValueList(
+                return new Our.ValueList(
                     theValueReferencePairs
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
@@ -5231,7 +5231,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
+            internal static Our.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5289,7 +5289,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringPreferredNameTypeIec61360(
+                return new Our.LangStringPreferredNameTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5303,7 +5303,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
+            internal static Our.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5361,7 +5361,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringShortNameTypeIec61360(
+                return new Our.LangStringShortNameTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5375,7 +5375,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
+            internal static Our.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5433,7 +5433,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.LangStringDefinitionTypeIec61360(
+                return new Our.LangStringDefinitionTypeIec61360(
                     theLanguage
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5447,7 +5447,7 @@ namespace AasCore.Aas3_0
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataSpecificationIec61360 DataSpecificationIec61360From(
+            internal static Our.DataSpecificationIec61360 DataSpecificationIec61360From(
                 Nodes.JsonNode? node,
                 out Reporting.Error? error)
             {
@@ -5567,7 +5567,7 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return new Aas.DataSpecificationIec61360(
+                return new Our.DataSpecificationIec61360(
                     thePreferredName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -5644,7 +5644,7 @@ namespace AasCore.Aas3_0
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
+        /// Our.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
         ///     node);
         /// </code>
         /// </example>
@@ -5659,10 +5659,10 @@ namespace AasCore.Aas3_0
             /// representation of IHasSemantics.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasSemantics IHasSemanticsFrom(
+            public static Our.IHasSemantics IHasSemanticsFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IHasSemantics result = DeserializeImplementation.IHasSemanticsFrom(
+                Our.IHasSemantics result = DeserializeImplementation.IHasSemanticsFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5682,10 +5682,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Extension.
             /// </exception>
-            public static Aas.Extension ExtensionFrom(
+            public static Our.Extension ExtensionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Extension result = DeserializeImplementation.ExtensionFrom(
+                Our.Extension result = DeserializeImplementation.ExtensionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5706,10 +5706,10 @@ namespace AasCore.Aas3_0
             /// representation of IHasExtensions.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasExtensions IHasExtensionsFrom(
+            public static Our.IHasExtensions IHasExtensionsFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IHasExtensions result = DeserializeImplementation.IHasExtensionsFrom(
+                Our.IHasExtensions result = DeserializeImplementation.IHasExtensionsFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5730,10 +5730,10 @@ namespace AasCore.Aas3_0
             /// representation of IReferable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IReferable IReferableFrom(
+            public static Our.IReferable IReferableFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IReferable result = DeserializeImplementation.IReferableFrom(
+                Our.IReferable result = DeserializeImplementation.IReferableFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5754,10 +5754,10 @@ namespace AasCore.Aas3_0
             /// representation of IIdentifiable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IIdentifiable IIdentifiableFrom(
+            public static Our.IIdentifiable IIdentifiableFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IIdentifiable result = DeserializeImplementation.IIdentifiableFrom(
+                Our.IIdentifiable result = DeserializeImplementation.IIdentifiableFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5777,10 +5777,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ModellingKind.
             /// </exception>
-            public static Aas.ModellingKind ModellingKindFrom(
+            public static Our.ModellingKind ModellingKindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ModellingKind result = DeserializeImplementation.ModellingKindFrom(
+                Our.ModellingKind result = DeserializeImplementation.ModellingKindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5801,10 +5801,10 @@ namespace AasCore.Aas3_0
             /// representation of IHasKind.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasKind IHasKindFrom(
+            public static Our.IHasKind IHasKindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IHasKind result = DeserializeImplementation.IHasKindFrom(
+                Our.IHasKind result = DeserializeImplementation.IHasKindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5825,10 +5825,10 @@ namespace AasCore.Aas3_0
             /// representation of IHasDataSpecification.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+            public static Our.IHasDataSpecification IHasDataSpecificationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IHasDataSpecification result = DeserializeImplementation.IHasDataSpecificationFrom(
+                Our.IHasDataSpecification result = DeserializeImplementation.IHasDataSpecificationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5848,10 +5848,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AdministrativeInformation.
             /// </exception>
-            public static Aas.AdministrativeInformation AdministrativeInformationFrom(
+            public static Our.AdministrativeInformation AdministrativeInformationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AdministrativeInformation result = DeserializeImplementation.AdministrativeInformationFrom(
+                Our.AdministrativeInformation result = DeserializeImplementation.AdministrativeInformationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5872,10 +5872,10 @@ namespace AasCore.Aas3_0
             /// representation of IQualifiable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IQualifiable IQualifiableFrom(
+            public static Our.IQualifiable IQualifiableFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IQualifiable result = DeserializeImplementation.IQualifiableFrom(
+                Our.IQualifiable result = DeserializeImplementation.IQualifiableFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5895,10 +5895,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of QualifierKind.
             /// </exception>
-            public static Aas.QualifierKind QualifierKindFrom(
+            public static Our.QualifierKind QualifierKindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.QualifierKind result = DeserializeImplementation.QualifierKindFrom(
+                Our.QualifierKind result = DeserializeImplementation.QualifierKindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5918,10 +5918,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Qualifier.
             /// </exception>
-            public static Aas.Qualifier QualifierFrom(
+            public static Our.Qualifier QualifierFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Qualifier result = DeserializeImplementation.QualifierFrom(
+                Our.Qualifier result = DeserializeImplementation.QualifierFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5941,10 +5941,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AssetAdministrationShell.
             /// </exception>
-            public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
+            public static Our.AssetAdministrationShell AssetAdministrationShellFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AssetAdministrationShell result = DeserializeImplementation.AssetAdministrationShellFrom(
+                Our.AssetAdministrationShell result = DeserializeImplementation.AssetAdministrationShellFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5964,10 +5964,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AssetInformation.
             /// </exception>
-            public static Aas.AssetInformation AssetInformationFrom(
+            public static Our.AssetInformation AssetInformationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AssetInformation result = DeserializeImplementation.AssetInformationFrom(
+                Our.AssetInformation result = DeserializeImplementation.AssetInformationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -5987,10 +5987,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Resource.
             /// </exception>
-            public static Aas.Resource ResourceFrom(
+            public static Our.Resource ResourceFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Resource result = DeserializeImplementation.ResourceFrom(
+                Our.Resource result = DeserializeImplementation.ResourceFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6010,10 +6010,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AssetKind.
             /// </exception>
-            public static Aas.AssetKind AssetKindFrom(
+            public static Our.AssetKind AssetKindFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AssetKind result = DeserializeImplementation.AssetKindFrom(
+                Our.AssetKind result = DeserializeImplementation.AssetKindFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6033,10 +6033,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of SpecificAssetId.
             /// </exception>
-            public static Aas.SpecificAssetId SpecificAssetIdFrom(
+            public static Our.SpecificAssetId SpecificAssetIdFrom(
                 Nodes.JsonNode node)
             {
-                Aas.SpecificAssetId result = DeserializeImplementation.SpecificAssetIdFrom(
+                Our.SpecificAssetId result = DeserializeImplementation.SpecificAssetIdFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6056,10 +6056,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Submodel.
             /// </exception>
-            public static Aas.Submodel SubmodelFrom(
+            public static Our.Submodel SubmodelFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Submodel result = DeserializeImplementation.SubmodelFrom(
+                Our.Submodel result = DeserializeImplementation.SubmodelFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6080,10 +6080,10 @@ namespace AasCore.Aas3_0
             /// representation of ISubmodelElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.ISubmodelElement ISubmodelElementFrom(
+            public static Our.ISubmodelElement ISubmodelElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ISubmodelElement result = DeserializeImplementation.ISubmodelElementFrom(
+                Our.ISubmodelElement result = DeserializeImplementation.ISubmodelElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6104,10 +6104,10 @@ namespace AasCore.Aas3_0
             /// representation of IRelationshipElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IRelationshipElement IRelationshipElementFrom(
+            public static Our.IRelationshipElement IRelationshipElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IRelationshipElement result = DeserializeImplementation.IRelationshipElementFrom(
+                Our.IRelationshipElement result = DeserializeImplementation.IRelationshipElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6127,10 +6127,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of RelationshipElement.
             /// </exception>
-            public static Aas.RelationshipElement RelationshipElementFrom(
+            public static Our.RelationshipElement RelationshipElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.RelationshipElement result = DeserializeImplementation.RelationshipElementFrom(
+                Our.RelationshipElement result = DeserializeImplementation.RelationshipElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6150,10 +6150,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AasSubmodelElements.
             /// </exception>
-            public static Aas.AasSubmodelElements AasSubmodelElementsFrom(
+            public static Our.AasSubmodelElements AasSubmodelElementsFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AasSubmodelElements result = DeserializeImplementation.AasSubmodelElementsFrom(
+                Our.AasSubmodelElements result = DeserializeImplementation.AasSubmodelElementsFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6173,10 +6173,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of SubmodelElementList.
             /// </exception>
-            public static Aas.SubmodelElementList SubmodelElementListFrom(
+            public static Our.SubmodelElementList SubmodelElementListFrom(
                 Nodes.JsonNode node)
             {
-                Aas.SubmodelElementList result = DeserializeImplementation.SubmodelElementListFrom(
+                Our.SubmodelElementList result = DeserializeImplementation.SubmodelElementListFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6196,10 +6196,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of SubmodelElementCollection.
             /// </exception>
-            public static Aas.SubmodelElementCollection SubmodelElementCollectionFrom(
+            public static Our.SubmodelElementCollection SubmodelElementCollectionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.SubmodelElementCollection result = DeserializeImplementation.SubmodelElementCollectionFrom(
+                Our.SubmodelElementCollection result = DeserializeImplementation.SubmodelElementCollectionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6220,10 +6220,10 @@ namespace AasCore.Aas3_0
             /// representation of IDataElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataElement IDataElementFrom(
+            public static Our.IDataElement IDataElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IDataElement result = DeserializeImplementation.IDataElementFrom(
+                Our.IDataElement result = DeserializeImplementation.IDataElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6243,10 +6243,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Property.
             /// </exception>
-            public static Aas.Property PropertyFrom(
+            public static Our.Property PropertyFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Property result = DeserializeImplementation.PropertyFrom(
+                Our.Property result = DeserializeImplementation.PropertyFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6266,10 +6266,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of MultiLanguageProperty.
             /// </exception>
-            public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
+            public static Our.MultiLanguageProperty MultiLanguagePropertyFrom(
                 Nodes.JsonNode node)
             {
-                Aas.MultiLanguageProperty result = DeserializeImplementation.MultiLanguagePropertyFrom(
+                Our.MultiLanguageProperty result = DeserializeImplementation.MultiLanguagePropertyFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6289,10 +6289,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Range.
             /// </exception>
-            public static Aas.Range RangeFrom(
+            public static Our.Range RangeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Range result = DeserializeImplementation.RangeFrom(
+                Our.Range result = DeserializeImplementation.RangeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6312,10 +6312,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ReferenceElement.
             /// </exception>
-            public static Aas.ReferenceElement ReferenceElementFrom(
+            public static Our.ReferenceElement ReferenceElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ReferenceElement result = DeserializeImplementation.ReferenceElementFrom(
+                Our.ReferenceElement result = DeserializeImplementation.ReferenceElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6335,10 +6335,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Blob.
             /// </exception>
-            public static Aas.Blob BlobFrom(
+            public static Our.Blob BlobFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Blob result = DeserializeImplementation.BlobFrom(
+                Our.Blob result = DeserializeImplementation.BlobFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6358,10 +6358,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of File.
             /// </exception>
-            public static Aas.File FileFrom(
+            public static Our.File FileFrom(
                 Nodes.JsonNode node)
             {
-                Aas.File result = DeserializeImplementation.FileFrom(
+                Our.File result = DeserializeImplementation.FileFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6381,10 +6381,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of AnnotatedRelationshipElement.
             /// </exception>
-            public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
+            public static Our.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.AnnotatedRelationshipElement result = DeserializeImplementation.AnnotatedRelationshipElementFrom(
+                Our.AnnotatedRelationshipElement result = DeserializeImplementation.AnnotatedRelationshipElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6404,10 +6404,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Entity.
             /// </exception>
-            public static Aas.Entity EntityFrom(
+            public static Our.Entity EntityFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Entity result = DeserializeImplementation.EntityFrom(
+                Our.Entity result = DeserializeImplementation.EntityFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6427,10 +6427,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of EntityType.
             /// </exception>
-            public static Aas.EntityType EntityTypeFrom(
+            public static Our.EntityType EntityTypeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.EntityType result = DeserializeImplementation.EntityTypeFrom(
+                Our.EntityType result = DeserializeImplementation.EntityTypeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6450,10 +6450,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Direction.
             /// </exception>
-            public static Aas.Direction DirectionFrom(
+            public static Our.Direction DirectionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Direction result = DeserializeImplementation.DirectionFrom(
+                Our.Direction result = DeserializeImplementation.DirectionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6473,10 +6473,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of StateOfEvent.
             /// </exception>
-            public static Aas.StateOfEvent StateOfEventFrom(
+            public static Our.StateOfEvent StateOfEventFrom(
                 Nodes.JsonNode node)
             {
-                Aas.StateOfEvent result = DeserializeImplementation.StateOfEventFrom(
+                Our.StateOfEvent result = DeserializeImplementation.StateOfEventFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6496,10 +6496,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of EventPayload.
             /// </exception>
-            public static Aas.EventPayload EventPayloadFrom(
+            public static Our.EventPayload EventPayloadFrom(
                 Nodes.JsonNode node)
             {
-                Aas.EventPayload result = DeserializeImplementation.EventPayloadFrom(
+                Our.EventPayload result = DeserializeImplementation.EventPayloadFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6520,10 +6520,10 @@ namespace AasCore.Aas3_0
             /// representation of IEventElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IEventElement IEventElementFrom(
+            public static Our.IEventElement IEventElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IEventElement result = DeserializeImplementation.IEventElementFrom(
+                Our.IEventElement result = DeserializeImplementation.IEventElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6543,10 +6543,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of BasicEventElement.
             /// </exception>
-            public static Aas.BasicEventElement BasicEventElementFrom(
+            public static Our.BasicEventElement BasicEventElementFrom(
                 Nodes.JsonNode node)
             {
-                Aas.BasicEventElement result = DeserializeImplementation.BasicEventElementFrom(
+                Our.BasicEventElement result = DeserializeImplementation.BasicEventElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6566,10 +6566,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Operation.
             /// </exception>
-            public static Aas.Operation OperationFrom(
+            public static Our.Operation OperationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Operation result = DeserializeImplementation.OperationFrom(
+                Our.Operation result = DeserializeImplementation.OperationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6589,10 +6589,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of OperationVariable.
             /// </exception>
-            public static Aas.OperationVariable OperationVariableFrom(
+            public static Our.OperationVariable OperationVariableFrom(
                 Nodes.JsonNode node)
             {
-                Aas.OperationVariable result = DeserializeImplementation.OperationVariableFrom(
+                Our.OperationVariable result = DeserializeImplementation.OperationVariableFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6612,10 +6612,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Capability.
             /// </exception>
-            public static Aas.Capability CapabilityFrom(
+            public static Our.Capability CapabilityFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Capability result = DeserializeImplementation.CapabilityFrom(
+                Our.Capability result = DeserializeImplementation.CapabilityFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6635,10 +6635,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ConceptDescription.
             /// </exception>
-            public static Aas.ConceptDescription ConceptDescriptionFrom(
+            public static Our.ConceptDescription ConceptDescriptionFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ConceptDescription result = DeserializeImplementation.ConceptDescriptionFrom(
+                Our.ConceptDescription result = DeserializeImplementation.ConceptDescriptionFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6658,10 +6658,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ReferenceTypes.
             /// </exception>
-            public static Aas.ReferenceTypes ReferenceTypesFrom(
+            public static Our.ReferenceTypes ReferenceTypesFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ReferenceTypes result = DeserializeImplementation.ReferenceTypesFrom(
+                Our.ReferenceTypes result = DeserializeImplementation.ReferenceTypesFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6681,10 +6681,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Reference.
             /// </exception>
-            public static Aas.Reference ReferenceFrom(
+            public static Our.Reference ReferenceFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Reference result = DeserializeImplementation.ReferenceFrom(
+                Our.Reference result = DeserializeImplementation.ReferenceFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6704,10 +6704,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Key.
             /// </exception>
-            public static Aas.Key KeyFrom(
+            public static Our.Key KeyFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Key result = DeserializeImplementation.KeyFrom(
+                Our.Key result = DeserializeImplementation.KeyFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6727,10 +6727,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of KeyTypes.
             /// </exception>
-            public static Aas.KeyTypes KeyTypesFrom(
+            public static Our.KeyTypes KeyTypesFrom(
                 Nodes.JsonNode node)
             {
-                Aas.KeyTypes result = DeserializeImplementation.KeyTypesFrom(
+                Our.KeyTypes result = DeserializeImplementation.KeyTypesFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6750,10 +6750,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of DataTypeDefXsd.
             /// </exception>
-            public static Aas.DataTypeDefXsd DataTypeDefXsdFrom(
+            public static Our.DataTypeDefXsd DataTypeDefXsdFrom(
                 Nodes.JsonNode node)
             {
-                Aas.DataTypeDefXsd result = DeserializeImplementation.DataTypeDefXsdFrom(
+                Our.DataTypeDefXsd result = DeserializeImplementation.DataTypeDefXsdFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6774,10 +6774,10 @@ namespace AasCore.Aas3_0
             /// representation of IAbstractLangString.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IAbstractLangString IAbstractLangStringFrom(
+            public static Our.IAbstractLangString IAbstractLangStringFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IAbstractLangString result = DeserializeImplementation.IAbstractLangStringFrom(
+                Our.IAbstractLangString result = DeserializeImplementation.IAbstractLangStringFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6797,10 +6797,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringNameType.
             /// </exception>
-            public static Aas.LangStringNameType LangStringNameTypeFrom(
+            public static Our.LangStringNameType LangStringNameTypeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringNameType result = DeserializeImplementation.LangStringNameTypeFrom(
+                Our.LangStringNameType result = DeserializeImplementation.LangStringNameTypeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6820,10 +6820,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringTextType.
             /// </exception>
-            public static Aas.LangStringTextType LangStringTextTypeFrom(
+            public static Our.LangStringTextType LangStringTextTypeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringTextType result = DeserializeImplementation.LangStringTextTypeFrom(
+                Our.LangStringTextType result = DeserializeImplementation.LangStringTextTypeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6843,10 +6843,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of Environment.
             /// </exception>
-            public static Aas.Environment EnvironmentFrom(
+            public static Our.Environment EnvironmentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Environment result = DeserializeImplementation.EnvironmentFrom(
+                Our.Environment result = DeserializeImplementation.EnvironmentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6867,10 +6867,10 @@ namespace AasCore.Aas3_0
             /// representation of IDataSpecificationContent.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+            public static Our.IDataSpecificationContent IDataSpecificationContentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IDataSpecificationContent result = DeserializeImplementation.IDataSpecificationContentFrom(
+                Our.IDataSpecificationContent result = DeserializeImplementation.IDataSpecificationContentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6890,10 +6890,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of EmbeddedDataSpecification.
             /// </exception>
-            public static Aas.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
+            public static Our.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.EmbeddedDataSpecification result = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                Our.EmbeddedDataSpecification result = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6913,10 +6913,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of DataTypeIec61360.
             /// </exception>
-            public static Aas.DataTypeIec61360 DataTypeIec61360From(
+            public static Our.DataTypeIec61360 DataTypeIec61360From(
                 Nodes.JsonNode node)
             {
-                Aas.DataTypeIec61360 result = DeserializeImplementation.DataTypeIec61360From(
+                Our.DataTypeIec61360 result = DeserializeImplementation.DataTypeIec61360From(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6936,10 +6936,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LevelType.
             /// </exception>
-            public static Aas.LevelType LevelTypeFrom(
+            public static Our.LevelType LevelTypeFrom(
                 Nodes.JsonNode node)
             {
-                Aas.LevelType result = DeserializeImplementation.LevelTypeFrom(
+                Our.LevelType result = DeserializeImplementation.LevelTypeFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6959,10 +6959,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ValueReferencePair.
             /// </exception>
-            public static Aas.ValueReferencePair ValueReferencePairFrom(
+            public static Our.ValueReferencePair ValueReferencePairFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ValueReferencePair result = DeserializeImplementation.ValueReferencePairFrom(
+                Our.ValueReferencePair result = DeserializeImplementation.ValueReferencePairFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -6982,10 +6982,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ValueList.
             /// </exception>
-            public static Aas.ValueList ValueListFrom(
+            public static Our.ValueList ValueListFrom(
                 Nodes.JsonNode node)
             {
-                Aas.ValueList result = DeserializeImplementation.ValueListFrom(
+                Our.ValueList result = DeserializeImplementation.ValueListFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -7005,10 +7005,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringPreferredNameTypeIec61360.
             /// </exception>
-            public static Aas.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
+            public static Our.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringPreferredNameTypeIec61360 result = DeserializeImplementation.LangStringPreferredNameTypeIec61360From(
+                Our.LangStringPreferredNameTypeIec61360 result = DeserializeImplementation.LangStringPreferredNameTypeIec61360From(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -7028,10 +7028,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringShortNameTypeIec61360.
             /// </exception>
-            public static Aas.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
+            public static Our.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringShortNameTypeIec61360 result = DeserializeImplementation.LangStringShortNameTypeIec61360From(
+                Our.LangStringShortNameTypeIec61360 result = DeserializeImplementation.LangStringShortNameTypeIec61360From(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -7051,10 +7051,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of LangStringDefinitionTypeIec61360.
             /// </exception>
-            public static Aas.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
+            public static Our.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
                 Nodes.JsonNode node)
             {
-                Aas.LangStringDefinitionTypeIec61360 result = DeserializeImplementation.LangStringDefinitionTypeIec61360From(
+                Our.LangStringDefinitionTypeIec61360 result = DeserializeImplementation.LangStringDefinitionTypeIec61360From(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -7074,10 +7074,10 @@ namespace AasCore.Aas3_0
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of DataSpecificationIec61360.
             /// </exception>
-            public static Aas.DataSpecificationIec61360 DataSpecificationIec61360From(
+            public static Our.DataSpecificationIec61360 DataSpecificationIec61360From(
                 Nodes.JsonNode node)
             {
-                Aas.DataSpecificationIec61360 result = DeserializeImplementation.DataSpecificationIec61360From(
+                Our.DataSpecificationIec61360 result = DeserializeImplementation.DataSpecificationIec61360From(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -7114,7 +7114,7 @@ namespace AasCore.Aas3_0
             /// class and every concrete class with descendants, as well as the item of
             /// a list or of a tuple of any of them.
             /// </remarks>
-            internal static Nodes.JsonObject TransformIClass(Aas.IClass that)
+            internal static Nodes.JsonObject TransformIClass(Our.IClass that)
             {
                 return _instance.Transform(that);
             }
@@ -7341,7 +7341,7 @@ namespace AasCore.Aas3_0
                 SerializeList<ILangStringDefinitionTypeIec61360>(
                     TransformIClass));
 
-            private static readonly Serializer<Aas.IClass> Serialize_IClass = TransformIClass;
+            private static readonly Serializer<Our.IClass> Serialize_IClass = TransformIClass;
 
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
@@ -7414,7 +7414,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformExtension(
-                Aas.IExtension that
+                Our.IExtension that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7470,7 +7470,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformAdministrativeInformation(
-                Aas.IAdministrativeInformation that
+                Our.IAdministrativeInformation that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7514,7 +7514,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformQualifier(
-                Aas.IQualifier that
+                Our.IQualifier that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7567,7 +7567,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformAssetAdministrationShell(
-                Aas.IAssetAdministrationShell that
+                Our.IAssetAdministrationShell that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7667,7 +7667,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformAssetInformation(
-                Aas.IAssetInformation that
+                Our.IAssetInformation that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7713,7 +7713,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformResource(
-                Aas.IResource that
+                Our.IResource that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7734,7 +7734,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformSpecificAssetId(
-                Aas.ISpecificAssetId that
+                Our.ISpecificAssetId that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7777,7 +7777,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformSubmodel(
-                Aas.ISubmodel that
+                Our.ISubmodel that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7895,7 +7895,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformRelationshipElement(
-                Aas.IRelationshipElement that
+                Our.IRelationshipElement that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -7990,7 +7990,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformSubmodelElementList(
-                Aas.ISubmodelElementList that
+                Our.ISubmodelElementList that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8128,7 +8128,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformSubmodelElementCollection(
-                Aas.ISubmodelElementCollection that
+                Our.ISubmodelElementCollection that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8229,7 +8229,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformProperty(
-                Aas.IProperty that
+                Our.IProperty that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8337,7 +8337,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformMultiLanguageProperty(
-                Aas.IMultiLanguageProperty that
+                Our.IMultiLanguageProperty that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8443,7 +8443,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformRange(
-                Aas.IRange that
+                Our.IRange that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8551,7 +8551,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformReferenceElement(
-                Aas.IReferenceElement that
+                Our.IReferenceElement that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8647,7 +8647,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformBlob(
-                Aas.IBlob that
+                Our.IBlob that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8750,7 +8750,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformFile(
-                Aas.IFile that
+                Our.IFile that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8853,7 +8853,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement that
+                Our.IAnnotatedRelationshipElement that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -8958,7 +8958,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformEntity(
-                Aas.IEntity that
+                Our.IEntity that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9086,7 +9086,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformEventPayload(
-                Aas.IEventPayload that
+                Our.IEventPayload that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9141,7 +9141,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformBasicEventElement(
-                Aas.IBasicEventElement that
+                Our.IBasicEventElement that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9288,7 +9288,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformOperation(
-                Aas.IOperation that
+                Our.IOperation that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9409,7 +9409,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformOperationVariable(
-                Aas.IOperationVariable that
+                Our.IOperationVariable that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9420,7 +9420,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformCapability(
-                Aas.ICapability that
+                Our.ICapability that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9511,7 +9511,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformConceptDescription(
-                Aas.IConceptDescription that
+                Our.IConceptDescription that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9594,7 +9594,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformReference(
-                Aas.IReference that
+                Our.IReference that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9617,7 +9617,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformKey(
-                Aas.IKey that
+                Our.IKey that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9630,7 +9630,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLangStringNameType(
-                Aas.ILangStringNameType that
+                Our.ILangStringNameType that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9643,7 +9643,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLangStringTextType(
-                Aas.ILangStringTextType that
+                Our.ILangStringTextType that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9656,7 +9656,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformEnvironment(
-                Aas.IEnvironment that
+                Our.IEnvironment that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9695,7 +9695,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification that
+                Our.IEmbeddedDataSpecification that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9718,7 +9718,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLevelType(
-                Aas.ILevelType that
+                Our.ILevelType that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9735,7 +9735,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformValueReferencePair(
-                Aas.IValueReferencePair that
+                Our.IValueReferencePair that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9748,7 +9748,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformValueList(
-                Aas.IValueList that
+                Our.IValueList that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9764,7 +9764,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 that
+                Our.ILangStringPreferredNameTypeIec61360 that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9777,7 +9777,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 that
+                Our.ILangStringShortNameTypeIec61360 that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9790,7 +9790,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 that
+                Our.ILangStringDefinitionTypeIec61360 that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9803,7 +9803,7 @@ namespace AasCore.Aas3_0
             }
 
             public override Nodes.JsonObject TransformDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 that
+                Our.IDataSpecificationIec61360 that
             )
             {
                 var result = new Nodes.JsonObject();
@@ -9907,7 +9907,7 @@ namespace AasCore.Aas3_0
         /// <example>
         /// Here is an example how to serialize an instance of IHasSemantics:
         /// <code>
-        /// var anInstance = new Aas.IHasSemantics(
+        /// var anInstance = new Our.IHasSemantics(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -9924,7 +9924,7 @@ namespace AasCore.Aas3_0
             /// Thrown when a value within <paramref name="that" /> instance can not be
             /// represented in JSON
             /// </exception>
-            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+            public static Nodes.JsonObject ToJsonObject(Our.IClass that)
             {
                 try
                 {
@@ -9946,7 +9946,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue ModellingKindToJsonValue(Aas.ModellingKind that)
+            public static Nodes.JsonValue ModellingKindToJsonValue(Our.ModellingKind that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -9963,7 +9963,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue QualifierKindToJsonValue(Aas.QualifierKind that)
+            public static Nodes.JsonValue QualifierKindToJsonValue(Our.QualifierKind that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -9980,7 +9980,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue AssetKindToJsonValue(Aas.AssetKind that)
+            public static Nodes.JsonValue AssetKindToJsonValue(Our.AssetKind that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -9997,7 +9997,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue AasSubmodelElementsToJsonValue(Aas.AasSubmodelElements that)
+            public static Nodes.JsonValue AasSubmodelElementsToJsonValue(Our.AasSubmodelElements that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10014,7 +10014,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue EntityTypeToJsonValue(Aas.EntityType that)
+            public static Nodes.JsonValue EntityTypeToJsonValue(Our.EntityType that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10031,7 +10031,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue DirectionToJsonValue(Aas.Direction that)
+            public static Nodes.JsonValue DirectionToJsonValue(Our.Direction that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10048,7 +10048,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue StateOfEventToJsonValue(Aas.StateOfEvent that)
+            public static Nodes.JsonValue StateOfEventToJsonValue(Our.StateOfEvent that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10065,7 +10065,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue ReferenceTypesToJsonValue(Aas.ReferenceTypes that)
+            public static Nodes.JsonValue ReferenceTypesToJsonValue(Our.ReferenceTypes that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10082,7 +10082,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue KeyTypesToJsonValue(Aas.KeyTypes that)
+            public static Nodes.JsonValue KeyTypesToJsonValue(Our.KeyTypes that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10099,7 +10099,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue DataTypeDefXsdToJsonValue(Aas.DataTypeDefXsd that)
+            public static Nodes.JsonValue DataTypeDefXsdToJsonValue(Our.DataTypeDefXsd that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)
@@ -10116,7 +10116,7 @@ namespace AasCore.Aas3_0
             /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
             /// a whole instance catches <see cref="SerializationException" /> instead.
             /// </exception>
-            public static Nodes.JsonValue DataTypeIec61360ToJsonValue(Aas.DataTypeIec61360 that)
+            public static Nodes.JsonValue DataTypeIec61360ToJsonValue(Our.DataTypeIec61360 that)
             {
                 string? text = Stringification.ToString(that);
                 return Nodes.JsonValue.Create(text)

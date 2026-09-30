@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using Nodes = System.Text.Json.Nodes;
 
@@ -24,19 +24,19 @@ namespace dummy.Tests
                     OmitXmlDeclaration = true
                 }))
             {
-                Aas.XmlRpc.SerializeValue(that, writer);
+                Our.XmlRpc.SerializeValue(that, writer);
             }
             return builder.ToString();
         }
 
         private static Nodes.JsonNode? DeserializeFromString(
             string text,
-            out Aas.Reporting.Error? error)
+            out Our.Reporting.Error? error)
         {
             using var stringReader = new System.IO.StringReader(text);
             using var xmlReader = System.Xml.XmlReader.Create(stringReader);
             xmlReader.MoveToContent();
-            return Aas.XmlRpc.DeserializeValue(xmlReader, out error);
+            return Our.XmlRpc.DeserializeValue(xmlReader, out error);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace dummy.Tests
                 string text = SerializeToString(original);
 
                 Nodes.JsonNode? roundTripped = DeserializeFromString(
-                    text, out Aas.Reporting.Error? error);
+                    text, out Our.Reporting.Error? error);
 
                 Assert.IsNull(error);
                 Assert.IsNotNull(roundTripped);
@@ -70,7 +70,7 @@ namespace dummy.Tests
                 string text = SerializeToString(original);
 
                 Nodes.JsonNode? roundTripped = DeserializeFromString(
-                    text, out Aas.Reporting.Error? error);
+                    text, out Our.Reporting.Error? error);
 
                 Assert.IsNull(error);
                 Assert.IsNotNull(roundTripped);
@@ -97,7 +97,7 @@ namespace dummy.Tests
                 string text = SerializeToString(original);
 
                 Nodes.JsonNode? roundTripped = DeserializeFromString(
-                    text, out Aas.Reporting.Error? error);
+                    text, out Our.Reporting.Error? error);
 
                 Assert.IsNull(error);
                 Assert.IsNotNull(roundTripped);
@@ -114,7 +114,7 @@ namespace dummy.Tests
             string text = SerializeToString(original);
 
             Nodes.JsonNode? roundTripped = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error);
             Assert.IsNotNull(roundTripped);
@@ -139,7 +139,7 @@ namespace dummy.Tests
             string text = SerializeToString(original);
 
             Nodes.JsonNode? roundTripped = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error);
             Assert.IsNotNull(roundTripped);
@@ -155,7 +155,7 @@ namespace dummy.Tests
             string text = SerializeToString(original);
 
             Nodes.JsonNode? roundTripped = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error);
             Assert.IsNotNull(roundTripped);
@@ -182,7 +182,7 @@ namespace dummy.Tests
             string text = SerializeToString(original);
 
             Nodes.JsonNode? roundTripped = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error);
             Assert.IsNotNull(roundTripped);
@@ -194,12 +194,12 @@ namespace dummy.Tests
         [Test]
         public void Test_serialize_rejects_null()
         {
-            Aas.SerializationException? caught = null;
+            Our.SerializationException? caught = null;
             try
             {
                 SerializeToString(null);
             }
-            catch (Aas.SerializationException exception)
+            catch (Our.SerializationException exception)
             {
                 caught = exception;
             }
@@ -215,12 +215,12 @@ namespace dummy.Tests
                 Nodes.JsonValue.Create(2.0),
                 null);
 
-            Aas.SerializationException? caught = null;
+            Our.SerializationException? caught = null;
             try
             {
                 SerializeToString(original);
             }
-            catch (Aas.SerializationException exception)
+            catch (Our.SerializationException exception)
             {
                 caught = exception;
             }
@@ -241,7 +241,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(result);
             Assert.IsNotNull(error);
@@ -252,7 +252,7 @@ namespace dummy.Tests
             // a ``<data>`` element is a ``<value>`` element.
             Assert.AreEqual(
                 "array/data/*[1]",
-                Aas.Reporting.GenerateRelativeXPath(error!.PathSegments));
+                Our.Reporting.GenerateRelativeXPath(error!.PathSegments));
         }
 
         [Test]
@@ -261,7 +261,7 @@ namespace dummy.Tests
             string text = "<value><nil/></value>";
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(result);
             Assert.IsNotNull(error);
@@ -276,7 +276,7 @@ namespace dummy.Tests
             string text = "<value><boolean>true</boolean></value>";
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(result);
             Assert.IsNotNull(error);
@@ -302,7 +302,7 @@ namespace dummy.Tests
             // would silently accept a document which says two different things
             // about the same key.
             DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNotNull(error);
         }
@@ -318,12 +318,12 @@ namespace dummy.Tests
                 double.PositiveInfinity, double.NegativeInfinity, double.NaN
             })
             {
-                Aas.SerializationException? caught = null;
+                Our.SerializationException? caught = null;
                 try
                 {
                     SerializeToString(Nodes.JsonValue.Create(value));
                 }
-                catch (Aas.SerializationException exception)
+                catch (Our.SerializationException exception)
                 {
                     caught = exception;
                 }
@@ -346,7 +346,7 @@ namespace dummy.Tests
                     + "</value>");
 
                 DeserializeFromString(
-                    text, out Aas.Reporting.Error? error);
+                    text, out Our.Reporting.Error? error);
 
                 Assert.IsNotNull(error, $"Unexpectedly accepted <double>{numeral}</double>");
             }
@@ -364,7 +364,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? booleanResult = DeserializeFromString(
-                booleanText, out Aas.Reporting.Error? booleanError);
+                booleanText, out Our.Reporting.Error? booleanError);
 
             Assert.IsNull(booleanError);
             Assert.IsNotNull(booleanResult);
@@ -376,7 +376,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? doubleResult = DeserializeFromString(
-                doubleText, out Aas.Reporting.Error? doubleError);
+                doubleText, out Our.Reporting.Error? doubleError);
 
             Assert.IsNull(doubleError);
             Assert.IsNotNull(doubleResult);
@@ -395,7 +395,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error);
             Assert.IsNotNull(result);
@@ -431,7 +431,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(error, $"Unexpected cause: {error?.Cause}");
             Assert.IsNotNull(result);
@@ -452,7 +452,7 @@ namespace dummy.Tests
                 + "</value>");
 
             Nodes.JsonNode? result = DeserializeFromString(
-                text, out Aas.Reporting.Error? error);
+                text, out Our.Reporting.Error? error);
 
             Assert.IsNull(result);
             Assert.IsNotNull(error);

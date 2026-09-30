@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -519,29 +519,29 @@ namespace dummy
             /// <summary>
             /// Read an instance of class Item from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Item> ItemFromElement = (
-                AtElement<Aas.Item>(
+            internal static readonly ElementReader<Our.Item> ItemFromElement = (
+                AtElement<Our.Item>(
                     ItemFromSequence, "item"));
 
             /// <summary>
             /// Read an instance of class ChildA from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.ChildA> ChildAFromElement = (
-                AtElement<Aas.ChildA>(
+            internal static readonly ElementReader<Our.ChildA> ChildAFromElement = (
+                AtElement<Our.ChildA>(
                     ChildAFromSequence, "childA"));
 
             /// <summary>
             /// Read an instance of class ChildB from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.ChildB> ChildBFromElement = (
-                AtElement<Aas.ChildB>(
+            internal static readonly ElementReader<Our.ChildB> ChildBFromElement = (
+                AtElement<Our.ChildB>(
                     ChildBFromSequence, "childB"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -554,14 +554,14 @@ namespace dummy
                 AsText<bool>(ReadContentAsBoolean));
 
             private static readonly ContentReader<Kind> Read_Kind = (
-                AsEnum<Aas.Kind>(
+                AsEnum<Our.Kind>(
                     Stringification.KindFromString));
 
             private static readonly ContentReader<IItem> Read_IItem = (
                 ItemFromSequence);
 
             private static readonly ContentReader<IParent> Read_IParent = (
-                AsElement<Aas.IParent>(
+                AsElement<Our.IParent>(
                     IParentFromElement));
 
             private static readonly ContentReader<List<IParent>> Read_ListOf_IParent = (
@@ -577,7 +577,7 @@ namespace dummy
                 AsText<byte[]>(ReadContentAsBytes, new byte[0]));
 
             private static readonly ContentReader<ParentOrItem> Read_ParentOrItem = (
-                AsElement<Aas.ParentOrItem>(
+                AsElement<Our.ParentOrItem>(
                     ParentOrItemFromElement));
 
             /// <summary>
@@ -588,7 +588,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Item ItemFromSequence(
+            internal static Our.Item ItemFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -670,17 +670,17 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Item(
+                return new Our.Item(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Item? ItemFromSequence
+            }  // internal static Our.Item? ItemFromSequence
 
             /// <summary>
             /// Deserialize an instance of IParent from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IParent IParentFromElement(
+            internal static Our.IParent IParentFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -704,7 +704,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IParent? IParentFromElement
+            }  // internal static Our.IParent? IParentFromElement
 
             /// <summary>
             /// Deserialize an instance of class ChildA from a sequence of XML elements.
@@ -714,7 +714,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ChildA ChildAFromSequence(
+            internal static Our.ChildA ChildAFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -806,12 +806,12 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ChildA(
+                return new Our.ChildA(
                     theAOnly
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theOptionalText);
-            }  // internal static Aas.ChildA? ChildAFromSequence
+            }  // internal static Our.ChildA? ChildAFromSequence
 
             /// <summary>
             /// Deserialize an instance of class ChildB from a sequence of XML elements.
@@ -821,7 +821,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.ChildB ChildBFromSequence(
+            internal static Our.ChildB ChildBFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -913,12 +913,12 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.ChildB(
+                return new Our.ChildB(
                     theBOnly
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theOptionalText);
-            }  // internal static Aas.ChildB? ChildBFromSequence
+            }  // internal static Our.ChildB? ChildBFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -928,7 +928,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1214,7 +1214,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1248,12 +1248,12 @@ namespace dummy
                     theOptionalTexts,
                     theOptionalData,
                     theOptionalMember);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
 
             /// <summary>
             /// Deserialize an instance of ParentOrItem from an XML element.
             /// </summary>
-            internal static Aas.ParentOrItem ParentOrItemFromElement(
+            internal static Our.ParentOrItem ParentOrItemFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1268,45 +1268,45 @@ namespace dummy
                 {
                     case "childA":
                     {
-                        Aas.ChildA instance = ChildAFromElement(
+                        Our.ChildA instance = ChildAFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.ParentOrItem.FromParent(instance);
+                        return Our.ParentOrItem.FromParent(instance);
                     }
                     case "childB":
                     {
-                        Aas.ChildB instance = ChildBFromElement(
+                        Our.ChildB instance = ChildBFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.ParentOrItem.FromParent(instance);
+                        return Our.ParentOrItem.FromParent(instance);
                     }
                     case "item":
                     {
-                        Aas.Item instance = ItemFromElement(
+                        Our.Item instance = ItemFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.ParentOrItem.FromItem(instance);
+                        return Our.ParentOrItem.FromItem(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.ParentOrItem? ParentOrItemFromElement
+            }  // internal static Our.ParentOrItem? ParentOrItemFromElement
 
             /// <summary>
             /// Deserialize an instance of WideUnion from an XML element.
             /// </summary>
-            internal static Aas.WideUnion WideUnionFromElement(
+            internal static Our.WideUnion WideUnionFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1321,40 +1321,40 @@ namespace dummy
                 {
                     case "childA":
                     {
-                        Aas.ChildA instance = ChildAFromElement(
+                        Our.ChildA instance = ChildAFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.WideUnion.FromParent(instance);
+                        return Our.WideUnion.FromParent(instance);
                     }
                     case "childB":
                     {
-                        Aas.ChildB instance = ChildBFromElement(
+                        Our.ChildB instance = ChildBFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.WideUnion.FromChildB(instance);
+                        return Our.WideUnion.FromChildB(instance);
                     }
                     case "item":
                     {
-                        Aas.Item instance = ItemFromElement(
+                        Our.Item instance = ItemFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.WideUnion.FromItem(instance);
+                        return Our.WideUnion.FromItem(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.WideUnion? WideUnionFromElement
+            }  // internal static Our.WideUnion? WideUnionFromElement
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -1379,7 +1379,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class Item:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.Item anInstance = Deserialize.ItemFrom(
+        /// Our.Item anInstance = Deserialize.ItemFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -1398,7 +1398,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Item.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.Item ItemFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.Item ItemFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1412,7 +1412,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Item result = DeserializeImplementation.ItemFromElement(
+                Our.Item result = DeserializeImplementation.ItemFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1432,7 +1432,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IParent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IParent IParentFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IParent IParentFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1446,7 +1446,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IParent result = DeserializeImplementation.IParentFromElement(
+                Our.IParent result = DeserializeImplementation.IParentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1466,7 +1466,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ChildA.
             /// </exception>
-            public static Aas.ChildA ChildAFrom(
+            public static Our.ChildA ChildAFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1480,7 +1480,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ChildA result = DeserializeImplementation.ChildAFromElement(
+                Our.ChildA result = DeserializeImplementation.ChildAFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1500,7 +1500,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ChildB.
             /// </exception>
-            public static Aas.ChildB ChildBFrom(
+            public static Our.ChildB ChildBFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1514,7 +1514,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ChildB result = DeserializeImplementation.ChildBFromElement(
+                Our.ChildB result = DeserializeImplementation.ChildBFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1534,7 +1534,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1548,7 +1548,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1568,7 +1568,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of ParentOrItem.
             /// </exception>
-            public static Aas.ParentOrItem ParentOrItemFrom(
+            public static Our.ParentOrItem ParentOrItemFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1582,7 +1582,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.ParentOrItem result = DeserializeImplementation.ParentOrItemFromElement(
+                Our.ParentOrItem result = DeserializeImplementation.ParentOrItemFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1602,7 +1602,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of WideUnion.
             /// </exception>
-            public static Aas.WideUnion WideUnionFrom(
+            public static Our.WideUnion WideUnionFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1616,7 +1616,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.WideUnion result = DeserializeImplementation.WideUnionFromElement(
+                Our.WideUnion result = DeserializeImplementation.WideUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1831,7 +1831,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -1842,16 +1842,16 @@ namespace dummy
             /// element.
             /// </summary>
             /// <remarks>
-            /// A named union is not itself an <c>Aas.IClass</c>, so it can not be
+            /// A named union is not itself an <c>Our.IClass</c>, so it can not be
             /// dispatched by <see cref="WriteIClass" /> directly. Going through
-            /// the common, non-generic <c>Aas.IUnion</c> instead of the union's own
+            /// the common, non-generic <c>Our.IUnion</c> instead of the union's own
             /// type means one writer for *all* the named unions, not one per union.
             ///
             /// Should a named union ever be allowed to flatten a primitive or
             /// an enumeration alternative, only this body has to change.
             /// </remarks>
             private static void WriteIUnion(
-                Aas.IUnion that,
+                Our.IUnion that,
                 Xml.XmlWriter writer)
             {
                 WriteIClass(that.Underlying, writer);
@@ -1867,7 +1867,7 @@ namespace dummy
                 (that, writer) => writer.WriteValue(that));
 
             private static readonly ContentWriter<Kind> Write_Kind = (
-                WriteEnum<Aas.Kind>(
+                WriteEnum<Our.Kind>(
                     Stringification.ToString));
 
             private static readonly ContentWriter<IItem> Write_IItem = (
@@ -1892,7 +1892,7 @@ namespace dummy
                 WriteIUnion);
 
             private static void ItemToSequence(
-                Aas.IItem that,
+                Our.IItem that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -1900,7 +1900,7 @@ namespace dummy
             }  // private static void ItemToSequence
 
             public override void VisitItem(
-                Aas.IItem that,
+                Our.IItem that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1913,7 +1913,7 @@ namespace dummy
             }
 
             private static void ChildAToSequence(
-                Aas.IChildA that,
+                Our.IChildA that,
                 Xml.XmlWriter writer)
             {
                 if (that.OptionalText != null)
@@ -1927,7 +1927,7 @@ namespace dummy
             }  // private static void ChildAToSequence
 
             public override void VisitChildA(
-                Aas.IChildA that,
+                Our.IChildA that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1940,7 +1940,7 @@ namespace dummy
             }
 
             private static void ChildBToSequence(
-                Aas.IChildB that,
+                Our.IChildB that,
                 Xml.XmlWriter writer)
             {
                 if (that.OptionalText != null)
@@ -1954,7 +1954,7 @@ namespace dummy
             }  // private static void ChildBToSequence
 
             public override void VisitChildB(
-                Aas.IChildB that,
+                Our.IChildB that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -1967,7 +1967,7 @@ namespace dummy
             }
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2051,7 +2051,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2070,7 +2070,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of Item:
         /// <code>
-        /// var anInstance = new Aas.Item(
+        /// var anInstance = new Our.Item(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -2089,7 +2089,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

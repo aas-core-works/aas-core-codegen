@@ -8,8 +8,8 @@
 import * as path from "path";
 import * as fs from "fs";
 
-import * as AasStringification from "../src/stringification";
-import * as AasTypes from "../src/types";
+import * as OurStringification from "../src/stringification";
+import * as OurTypes from "../src/types";
 import * as TestCommon from "./common";
 import * as TestCommonJsonization from "./commonJsonization";
 
@@ -38,7 +38,7 @@ class EnumerationLiteral {
  * @param expectedPath - to the golden file
  */
 function compareOrRecordValue(
-  value: boolean | number | string | null | EnumerationLiteral | AasTypes.Class,
+  value: boolean | number | string | null | EnumerationLiteral | OurTypes.Class,
   expectedPath: string
 ): void {
   let got = "";
@@ -51,7 +51,7 @@ function compareOrRecordValue(
     got = JSON.stringify(value);
   } else if (value instanceof EnumerationLiteral) {
     got = value.toString();
-  } else if (value instanceof AasTypes.Class) {
+  } else if (value instanceof OurTypes.Class) {
     got = TestCommon.traceMark(value);
   } else {
     throw new Error(`We do not know how to represent the value ${value}`);
@@ -89,7 +89,7 @@ test("Extension.valueTypeOrDefault on maximal", () => {
 
   const value = new EnumerationLiteral(
     "DataTypeDefXsd",
-    AasStringification.mustDataTypeDefXsdToString(
+    OurStringification.mustDataTypeDefXsdToString(
       instance.valueTypeOrDefault()
     )
   );
@@ -110,7 +110,7 @@ test("Extension.valueTypeOrDefault on minimal", () => {
 
   const value = new EnumerationLiteral(
     "DataTypeDefXsd",
-    AasStringification.mustDataTypeDefXsdToString(
+    OurStringification.mustDataTypeDefXsdToString(
       instance.valueTypeOrDefault()
     )
   );
@@ -131,7 +131,7 @@ test("Qualifier.kindOrDefault on maximal", () => {
 
   const value = new EnumerationLiteral(
     "QualifierKind",
-    AasStringification.mustQualifierKindToString(
+    OurStringification.mustQualifierKindToString(
       instance.kindOrDefault()
     )
   );
@@ -152,7 +152,7 @@ test("Qualifier.kindOrDefault on minimal", () => {
 
   const value = new EnumerationLiteral(
     "QualifierKind",
-    AasStringification.mustQualifierKindToString(
+    OurStringification.mustQualifierKindToString(
       instance.kindOrDefault()
     )
   );
@@ -173,7 +173,7 @@ test("Submodel.kindOrDefault on maximal", () => {
 
   const value = new EnumerationLiteral(
     "ModellingKind",
-    AasStringification.mustModellingKindToString(
+    OurStringification.mustModellingKindToString(
       instance.kindOrDefault()
     )
   );
@@ -194,7 +194,7 @@ test("Submodel.kindOrDefault on minimal", () => {
 
   const value = new EnumerationLiteral(
     "ModellingKind",
-    AasStringification.mustModellingKindToString(
+    OurStringification.mustModellingKindToString(
       instance.kindOrDefault()
     )
   );

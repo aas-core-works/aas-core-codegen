@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasreporting "github.com/dummy-works/dummy/reporting"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourreporting "github.com/dummy-works/dummy/reporting"
 )
 
 // Namespace is the XML namespace in which all the elements of a document live.
@@ -34,13 +34,13 @@ const Namespace = "https://dummy.com"
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func NewDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -55,7 +55,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToRelativeXPath(de.Path)
+	return ourreporting.ToRelativeXPath(de.Path)
 }
 
 // Prepend the element with the `name` to the path, and return the error back
@@ -64,7 +64,7 @@ func (de *DeserializationError) PrependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -75,7 +75,7 @@ func (de *DeserializationError) PrependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -86,7 +86,7 @@ func (de *DeserializationError) PrependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -113,13 +113,13 @@ func MustDeserializationError(err error) *DeserializationError {
 //
 // Implements `error`.
 type SerializationError struct {
-	Path    *aasreporting.Path
+	Path    *ourreporting.Path
 	Message string
 }
 
 func NewSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path:    &aasreporting.Path{},
+		Path:    &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -134,7 +134,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the item at the `index` to the path, and return the error back
@@ -143,7 +143,7 @@ func (se *SerializationError) PrependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -154,7 +154,7 @@ func (se *SerializationError) PrependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -475,7 +475,7 @@ func constructXsDoubleRe() *regexp.Regexp {
 	// its production being (\+|-)?INF, and being liberal in what we accept
 	// costs nothing here. strconv.ParseFloat reads it without complaint.
 	doubleRep := "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN)"
-	pattern := aascommon.Concat(
+	pattern := ourcommon.Concat(
 		"^",
 		doubleRep,
 		"$",

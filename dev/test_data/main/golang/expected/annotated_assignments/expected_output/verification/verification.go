@@ -12,23 +12,23 @@ package verification
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
-	aasconstants "github.com/dummy-works/dummy/constants"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourcommon "github.com/dummy-works/dummy/common"
+	ourconstants "github.com/dummy-works/dummy/constants"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -43,17 +43,17 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Check an optional class declared with `None` and assigned in a loop.
 func FirstChildAIsSmall(
-	parents []aastypes.IParent,
+	parents []ourtypes.IParent,
 ) bool {
-	var found aastypes.IChildA = nil
+	var found ourtypes.IChildA = nil
 	for _, parent := range parents {
-		if aastypes.IsChildA(parent) {
-			found = parent.(aastypes.IChildA)
+		if ourtypes.IsChildA(parent) {
+			found = parent.(ourtypes.IChildA)
 			break
 		}
 	}
@@ -70,7 +70,7 @@ func TextIsAllowedUnlessLong(
 	var trimmed *string = text
 	if (
 		(trimmed != nil) &&
-		aascommon.LenStr(*trimmed) > 10) {
+		ourcommon.LenStr(*trimmed) > 10) {
 		trimmed = nil
 	}
 	fallback := text
@@ -85,38 +85,38 @@ func TextIsAllowedUnlessLong(
 		return true
 	}
 	return *trimmed != "forbidden" &&
-		aascommon.LenStr(*trimmed) <= 10
+		ourcommon.LenStr(*trimmed) <= 10
 }
 
 // Check a non-optional variable declared wider than its value.
 func LastChildBIsNotZero(
-	parent aastypes.IParent,
-	parents []aastypes.IParent,
+	parent ourtypes.IParent,
+	parents []ourtypes.IParent,
 ) bool {
-	var last aastypes.IParent = parent
+	var last ourtypes.IParent = parent
 	for _, other := range parents {
 		last = other
 	}
-	if aastypes.IsChildB(last) {
-		return last.(aastypes.IChildB).BOnly() != 0
+	if ourtypes.IsChildB(last) {
+		return last.(ourtypes.IChildB).BOnly() != 0
 	}
 	return true
 }
 
 // Check the declarations from a value narrowed by `isinstance`.
 func ChildADeclarationsAgree(
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
-	if aastypes.IsChildA(parent) {
-		var child aastypes.IChildA = parent.(aastypes.IChildA)
-		childCopy := parent.(aastypes.IChildA)
-		var wider aastypes.IParent = parent.(aastypes.IChildA)
-		if aastypes.IsChildB(wider) {
+	if ourtypes.IsChildA(parent) {
+		var child ourtypes.IChildA = parent.(ourtypes.IChildA)
+		childCopy := parent.(ourtypes.IChildA)
+		var wider ourtypes.IParent = parent.(ourtypes.IChildA)
+		if ourtypes.IsChildB(wider) {
 			return false
 		}
 		wider = child
 		return child.AOnly() == childCopy.AOnly() &&
-			wider.(aastypes.IChildA).AOnly() > -1000
+			wider.(ourtypes.IChildA).AOnly() > -1000
 	}
 	return true
 }
@@ -126,7 +126,7 @@ func OptionalsFromValuesAreSmall(
 	number int64,
 	optionalText *string,
 ) bool {
-	var maybeNumber *int64 = aascommon.NewAndPointTo(number)
+	var maybeNumber *int64 = ourcommon.NewAndPointTo(number)
 	var maybeText *string = optionalText
 	if (
 		(maybeNumber != nil) &&
@@ -136,7 +136,7 @@ func OptionalsFromValuesAreSmall(
 	if maybeText == nil {
 		return true
 	}
-	return aascommon.LenStr(*maybeText) < 20
+	return ourcommon.LenStr(*maybeText) < 20
 }
 
 // Check the primitive declarations and their re-assignments.
@@ -149,7 +149,7 @@ func PrimitiveLocalsAreConsistent(
 	if flag {
 		count = count + 1
 	}
-	var size int64 = int64(aascommon.LenStr(text))
+	var size int64 = int64(ourcommon.LenStr(text))
 	var ratio float64 = 0.5
 	var enabled bool = flag
 	var label string = text
@@ -165,19 +165,19 @@ func PrimitiveLocalsAreConsistent(
 
 // Check the declarations of the enumerations.
 func KindsAreConsistent(
-	kind aastypes.Kind,
-	optionalKind *aastypes.Kind,
+	kind ourtypes.Kind,
+	optionalKind *ourtypes.Kind,
 ) bool {
-	var current aastypes.Kind = kind
-	var other *aastypes.Kind = nil
+	var current ourtypes.Kind = kind
+	var other *ourtypes.Kind = nil
 	if optionalKind != nil {
 		other = optionalKind
 	}
 	if other == nil {
 		return true
 	}
-	return current != aastypes.KindBeta ||
-		*other != aastypes.KindBeta
+	return current != ourtypes.KindBeta ||
+		*other != ourtypes.KindBeta
 }
 
 // Check the declarations of a constrained primitive.
@@ -187,7 +187,7 @@ func CodeIsNotReserved(
 	var exact string = code
 	var plain string = code
 	return exact != "reserved" &&
-		aascommon.LenStr(plain) < 10
+		ourcommon.LenStr(plain) < 10
 }
 
 // Check the declaration of an optional byte array.
@@ -220,17 +220,17 @@ func TextsAreFew(
 func TuplesAreConsistent(
 	text string,
 	number int64,
-	optionalParent aastypes.IParent,
+	optionalParent ourtypes.IParent,
 ) bool {
-	var pair aascommon.Tuple2[string, int64] =
-		aascommon.Tuple2[string, int64]{
+	var pair ourcommon.Tuple2[string, int64] =
+		ourcommon.Tuple2[string, int64]{
 			text,
 			number,
 		}
-	var optionalPair *aascommon.Tuple2[string, aastypes.IParent] = nil
+	var optionalPair *ourcommon.Tuple2[string, ourtypes.IParent] = nil
 	if optionalParent != nil {
 		optionalPair =
-			aascommon.NewAndPointTo(aascommon.Tuple2[string, aastypes.IParent]{
+			ourcommon.NewAndPointTo(ourcommon.Tuple2[string, ourtypes.IParent]{
 				text,
 				optionalParent,
 			})
@@ -246,62 +246,62 @@ func TuplesAreConsistent(
 
 // Check the declarations of the named unions.
 func UnionLocalsAreConsistent(
-	parent aastypes.IParent,
-	item aastypes.IItem,
+	parent ourtypes.IParent,
+	item ourtypes.IItem,
 ) bool {
-	var current *aastypes.ParentOrItem = aastypes.NewParentOrItemFromParent(parent)
-	if aastypes.IsChildA(parent) {
+	var current *ourtypes.ParentOrItem = ourtypes.NewParentOrItemFromParent(parent)
+	if ourtypes.IsChildA(parent) {
 		current =
-			aastypes.NewParentOrItemFromParent(parent.(aastypes.IChildA))
-		switch current.Underlying().(aastypes.IChildA).AOnly() {
+			ourtypes.NewParentOrItemFromParent(parent.(ourtypes.IChildA))
+		switch current.Underlying().(ourtypes.IChildA).AOnly() {
 		case 13:
 			return false
 		}
 	}
-	current = aastypes.NewParentOrItemFromItem(item)
-	if aascommon.LenStr(current.Underlying().(aastypes.IItem).Name()) < 1 {
+	current = ourtypes.NewParentOrItemFromItem(item)
+	if ourcommon.LenStr(current.Underlying().(ourtypes.IItem).Name()) < 1 {
 		return false
 	}
-	var optionalMember *aastypes.ParentOrItem = nil
-	if aastypes.IsChildB(parent) {
+	var optionalMember *ourtypes.ParentOrItem = nil
+	if ourtypes.IsChildB(parent) {
 		optionalMember =
-			aastypes.NewParentOrItemFromParent(parent.(aastypes.IChildB))
+			ourtypes.NewParentOrItemFromParent(parent.(ourtypes.IChildB))
 	}
 	if (
 		(optionalMember != nil) &&
-		aastypes.IsChildB(optionalMember.Underlying())) {
-		switch optionalMember.Underlying().(aastypes.IChildB).BOnly() {
+		ourtypes.IsChildB(optionalMember.Underlying())) {
+		switch optionalMember.Underlying().(ourtypes.IChildB).BOnly() {
 		case 13:
 			return false
 		}
 	}
-	var wide *aastypes.WideUnion = aastypes.NewWideUnionFromItem(item)
-	if aastypes.IsChildB(parent) {
+	var wide *ourtypes.WideUnion = ourtypes.NewWideUnionFromItem(item)
+	if ourtypes.IsChildB(parent) {
 		wide =
-			aastypes.NewWideUnionFromChildB(parent.(aastypes.IChildB))
+			ourtypes.NewWideUnionFromChildB(parent.(ourtypes.IChildB))
 	}
-	return !aastypes.IsChildB(wide.Underlying()) ||
-		(wide.Underlying().(aastypes.IChildB).BOnly() != 14)
+	return !ourtypes.IsChildB(wide.Underlying()) ||
+		(wide.Underlying().(ourtypes.IChildB).BOnly() != 14)
 }
 
 // Check reading the optional named union of a property.
 func MemberIsLucky(
-	member *aastypes.ParentOrItem,
+	member *ourtypes.ParentOrItem,
 ) bool {
 	if (
 		(member != nil) &&
-		aastypes.IsChildA(member.Underlying())) {
-		return member.Underlying().(aastypes.IChildA).AOnly() != 13
+		ourtypes.IsChildA(member.Underlying())) {
+		return member.Underlying().(ourtypes.IChildA).AOnly() != 13
 	}
 	return true
 }
 
 // Check wrapping an instance into the named union of a property.
 func WrapIntoMember(
-	something aastypes.ISomething,
-	item aastypes.IItem,
+	something ourtypes.ISomething,
+	item ourtypes.IItem,
 ) bool {
-	something.SetOptionalMember(aastypes.NewParentOrItemFromItem(item))
+	something.SetOptionalMember(ourtypes.NewParentOrItemFromItem(item))
 	return true
 }
 
@@ -311,7 +311,7 @@ func FinalLocalsAreConsistent(
 	number int64,
 	texts []string,
 	optionalText *string,
-	parent aastypes.IParent,
+	parent ourtypes.IParent,
 ) bool {
 	var limit int64 = int64(1000)
 	var label string = text
@@ -320,19 +320,19 @@ func FinalLocalsAreConsistent(
 	var seen map[string]struct{} = make(map[string]struct{})
 	seen[text] = struct{}{}
 	var reservedSeen map[string]struct{} =
-		aascommon.SetIntersection(
+		ourcommon.SetIntersection(
 			seen,
-			aasconstants.ReservedTexts,
+			ourconstants.ReservedTexts,
 		)
-	var pair aascommon.Tuple2[string, int64] =
-		aascommon.Tuple2[string, int64]{
+	var pair ourcommon.Tuple2[string, int64] =
+		ourcommon.Tuple2[string, int64]{
 			text,
 			number,
 		}
-	var base aastypes.IParent = parent
+	var base ourtypes.IParent = parent
 	if (
 		len(reservedSeen) > 0 ||
-		int64(aascommon.LenStr(label)) > limit) {
+		int64(ourcommon.LenStr(label)) > limit) {
 		return false
 	}
 	for _, item := range allTexts {
@@ -343,12 +343,12 @@ func FinalLocalsAreConsistent(
 	}
 	if (
 		(maybeText != nil) &&
-		int64(aascommon.LenStr(*maybeText)) > limit) {
+		int64(ourcommon.LenStr(*maybeText)) > limit) {
 		return false
 	}
 	if (
-		aastypes.IsChildA(base) &&
-		base.(aastypes.IChildA).AOnly() == 77) {
+		ourtypes.IsChildA(base) &&
+		base.(ourtypes.IChildA).AOnly() == 77) {
 		return false
 	}
 	return pair.Item2 != 17
@@ -359,7 +359,7 @@ func TextIsShort(
 	text *string,
 ) bool {
 	return (text == nil) ||
-		aascommon.LenStr(*text) <= 10
+		ourcommon.LenStr(*text) <= 10
 }
 
 // Check `None` passed as an optional argument.
@@ -367,17 +367,17 @@ func NoneIsShortAndTextIsShort(
 	text string,
 ) bool {
 	return TextIsShort(nil) &&
-		TextIsShort(aascommon.NewAndPointTo(text))
+		TextIsShort(ourcommon.NewAndPointTo(text))
 }
 
-// Verify `that` instance of [aastypes.IItem].
+// Verify `that` instance of [ourtypes.IItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyItem(
-	that aastypes.IItem,
+	that ourtypes.IItem,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -387,14 +387,14 @@ func VerifyItem(
 	return
 }
 
-// Verify `that` instance of [aastypes.IChildA].
+// Verify `that` instance of [ourtypes.IChildA].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyChildA(
-	that aastypes.IChildA,
+	that ourtypes.IChildA,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -404,14 +404,14 @@ func VerifyChildA(
 	return
 }
 
-// Verify `that` instance of [aastypes.IChildB].
+// Verify `that` instance of [ourtypes.IChildB].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyChildB(
-	that aastypes.IChildB,
+	that ourtypes.IChildB,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -421,14 +421,14 @@ func VerifyChildB(
 	return
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -669,7 +669,7 @@ func VerifySomething(
 		that.Kind(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Kind",
 				},
 			)
@@ -684,7 +684,7 @@ func VerifySomething(
 		that.Code(),
 		func(err *VerificationError) bool {
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "Code",
 				},
 			)
@@ -709,7 +709,7 @@ func VerifySomething(
 			that.Item(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Item",
 					},
 				)
@@ -735,7 +735,7 @@ func VerifySomething(
 			that.Parent(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "Parent",
 					},
 				)
@@ -762,13 +762,13 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Parents",
 						},
 					)
@@ -798,7 +798,7 @@ func VerifySomething(
 			*that.OptionalKind(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalKind",
 					},
 				)
@@ -815,7 +815,7 @@ func VerifySomething(
 			that.OptionalParent(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalParent",
 					},
 				)
@@ -832,7 +832,7 @@ func VerifySomething(
 			that.OptionalMember().Underlying(),
 			func(err *VerificationError) bool {
 				err.Path.PrependName(
-					&aasreporting.NameSegment{
+					&ourreporting.NameSegment{
 						Name: "OptionalMember",
 					},
 				)
@@ -855,14 +855,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifyKind(
-	that aastypes.Kind,
+	that ourtypes.Kind,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
 
 	if
-		that < aastypes.KindAlpha ||
-		that > aastypes.KindBeta {
+		that < ourtypes.KindAlpha ||
+		that > ourtypes.KindBeta {
 		abort = onError(
 			newVerificationError(
 				fmt.Sprintf(
@@ -888,7 +888,7 @@ func VerifyCode(
 ) (abort bool) {
 	abort = false
 
-	if !(aascommon.LenStr(that) > 0) {
+	if !(ourcommon.LenStr(that) > 0) {
 		abort = onError(
 			newVerificationError(
 				"Code must not be empty.",),
@@ -908,29 +908,29 @@ func VerifyCode(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeItem:
+	case ourtypes.ModelTypeItem:
 		abort = VerifyItem(
-			that.(aastypes.IItem),
+			that.(ourtypes.IItem),
 			onError,
 		)
-	case aastypes.ModelTypeChildA:
+	case ourtypes.ModelTypeChildA:
 		abort = VerifyChildA(
-			that.(aastypes.IChildA),
+			that.(ourtypes.IChildA),
 			onError,
 		)
-	case aastypes.ModelTypeChildB:
+	case ourtypes.ModelTypeChildB:
 		abort = VerifyChildB(
-			that.(aastypes.IChildB),
+			that.(ourtypes.IChildB),
 			onError,
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

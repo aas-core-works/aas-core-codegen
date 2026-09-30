@@ -66,7 +66,7 @@ def generate_type(
     """
     Generate the C# type for the given type annotation.
 
-    We assume that our types are referred to with the ``Aas.`` prefix.
+    We assume that our types are referred to with the ``Our.`` prefix.
 
     We handle only the type annotations which can be declared for the variables.
     Otherwise, we return an error message.
@@ -89,16 +89,16 @@ def generate_type(
         our_type = type_annotation.our_type
 
         if isinstance(our_type, intermediate.Enumeration):
-            return Stripped(f"Aas.{csharp_naming.enum_name(our_type.name)}"), None
+            return Stripped(f"Our.{csharp_naming.enum_name(our_type.name)}"), None
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return csharp_common.PRIMITIVE_TYPE_MAP[our_type.constrainee], None
         elif isinstance(our_type, intermediate.Class):
             return (
-                Stripped(f"Aas.{csharp_naming.interface_name(our_type.name)}"),
+                Stripped(f"Our.{csharp_naming.interface_name(our_type.name)}"),
                 None,
             )
         elif isinstance(our_type, intermediate.NamedUnion):
-            return Stripped(f"Aas.{csharp_naming.class_name(our_type.name)}"), None
+            return Stripped(f"Our.{csharp_naming.class_name(our_type.name)}"), None
         else:
             assert_never(our_type)
 
@@ -241,9 +241,9 @@ class Transpiler(
         interface_name = csharp_naming.interface_name(downcast.target.our_type.name)
 
         # NOTE (mristin):
-        # We assume that the types are referred to with the ``Aas.`` prefix in
+        # We assume that the types are referred to with the ``Our.`` prefix in
         # the generated code, as is the case with the verification module.
-        return Stripped(f"((Aas.{interface_name}){value})")
+        return Stripped(f"((Our.{interface_name}){value})")
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
@@ -739,10 +739,10 @@ class Transpiler(
         )
 
         # NOTE (mristin):
-        # We assume that the types are referred to with the ``Aas.`` prefix in
+        # We assume that the types are referred to with the ``Our.`` prefix in
         # the generated code, as is the case with the verification module.
         checks = [
-            f"{value} is Aas.{csharp_naming.interface_name(cls.identifier)}"
+            f"{value} is Our.{csharp_naming.interface_name(cls.identifier)}"
             for cls in node.classes
         ]
 
@@ -1838,7 +1838,7 @@ Enumerable.Range(
             from_method_name = csharp_naming.method_name(
                 Identifier(f"from_{root.name}")
             )
-            value = Stripped(f"Aas.{union_name}.{from_method_name}({value})")
+            value = Stripped(f"Our.{union_name}.{from_method_name}({value})")
 
         # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in

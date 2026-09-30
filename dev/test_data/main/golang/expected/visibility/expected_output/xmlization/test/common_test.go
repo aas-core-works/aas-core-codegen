@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aasxmlization "github.com/dummy-works/dummy/xmlization"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourxmlization "github.com/dummy-works/dummy/xmlization"
 )
 
 // Assert that there is no de-serialization error when de-serializing
@@ -199,7 +199,7 @@ func assertSerializationEqualsDeserialization(
 
 // Assert that there is a de-serialization error.
 //
-// If [aastesting.RecordMode] is set, the de-serialization error is re-recorded
+// If [ourtesting.RecordMode] is set, the de-serialization error is re-recorded
 // to `expectedPth`. Otherwise, the error is compared against the golden file
 // `expectedPth`.
 func assertIsDeserializationErrorAndEqualsExpectedOrRecord(
@@ -216,7 +216,7 @@ func assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 		return
 	}
 
-	deseriaErr, is := err.(*aasxmlization.DeserializationError)
+	deseriaErr, is := err.(*ourxmlization.DeserializationError)
 	if !is {
 		ok = false
 		t.Fatalf(
@@ -230,7 +230,7 @@ func assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 	// Add a new line for POSIX systems.
 	got := deseriaErr.Error() + "\n"
 
-	if aastesting.RecordMode {
+	if ourtesting.RecordMode {
 		parent := filepath.Dir(expectedPth)
 		err := os.MkdirAll(parent, os.ModePerm)
 		if err != nil {
@@ -257,7 +257,7 @@ func assertIsDeserializationErrorAndEqualsExpectedOrRecord(
 				"Failed to stat the file %s: %s; if the file does not exist, "+
 					"you probably want to record the test data by "+
 					"setting the environment variable %s",
-				expectedPth, err.Error(), aastesting.RecordModeEnvironmentVariableName,
+				expectedPth, err.Error(), ourtesting.RecordModeEnvironmentVariableName,
 			)
 			return
 		}

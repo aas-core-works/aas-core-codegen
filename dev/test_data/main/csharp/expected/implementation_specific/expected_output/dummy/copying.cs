@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 
 namespace dummy
 {
     /// <summary>
-    /// Allow for making shallow and deep copies of AAS model instances.
+    /// Allow for making shallow and deep copies of model instances.
     /// </summary>
     public static class Copying
     {
@@ -29,7 +29,7 @@ namespace dummy
         /// </remarks>.
         /// <param name="that">to be copied in a shallow manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Shallow<T>(T that) where T : Aas.IClass
+        public static T Shallow<T>(T that) where T : Our.IClass
         {
             return (T)ShallowCopierInstance.Transform(that);
         }
@@ -39,63 +39,63 @@ namespace dummy
         /// </summary>
         /// <param name="that">to be deeply copied in a recursive manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Deep<T>(T that) where T : Aas.IClass
+        public static T Deep<T>(T that) where T : Our.IClass
         {
             return (T)DeepCopierInstance.Transform(that);
         }
 
         /// <summary>Dispatch the making of shallow copies.</summary>
-        internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+        internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
-            public override Aas.IClass TransformBox(
-                Aas.IBox that
+            public override Our.IClass TransformBox(
+                Our.IBox that
             )
             {
-                return new Aas.Box(that.Label, that.Color);
+                return new Our.Box(that.Label, that.Color);
             }
 
-            public override Aas.IClass TransformBag(
-                Aas.IBag that
+            public override Our.IClass TransformBag(
+                Our.IBag that
             )
             {
-                return new Aas.Bag(that.Label, that.Tags);
+                return new Our.Bag(that.Label, that.Tags);
             }
 
-            public override Aas.IClass TransformContainer(
-                Aas.IContainer that
+            public override Our.IClass TransformContainer(
+                Our.IContainer that
             )
             {
-                return new Aas.Container(that.Names, that.Items);
+                return new Our.Container(that.Names, that.Items);
             }
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
-        internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass TransformBox(
-                Aas.IBox that
+        internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
+        {    public override Our.IClass TransformBox(
+                Our.IBox that
             )
             {
-                return new Aas.Box(
+                return new Our.Box(
                     that.Label,
                     that.Color
                 );
             }
 
-            public override Aas.IClass TransformBag(
-                Aas.IBag that
+            public override Our.IClass TransformBag(
+                Our.IBag that
             )
             {
                 var theTags = new List<string>(
                     that.Tags);
 
-                return new Aas.Bag(
+                return new Our.Bag(
                     that.Label,
                     theTags
                 );
             }
 
-            public override Aas.IClass TransformContainer(
-                Aas.IContainer that
+            public override Our.IClass TransformContainer(
+                Our.IContainer that
             )
             {
                 var theNames = new List<string>(
@@ -108,7 +108,7 @@ namespace dummy
                     theItems.Add(Deep(item));
                 }
 
-                return new Aas.Container(
+                return new Our.Container(
                     theNames,
                     theItems
                 );

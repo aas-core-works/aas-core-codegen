@@ -16,8 +16,8 @@ import (
 	"fmt"
 	"math"
 	b64 "encoding/base64"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // region De-serialization
@@ -26,13 +26,13 @@ import (
 //
 // Implements `error`.
 type DeserializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newDeserializationError(message string) *DeserializationError {
 	return &DeserializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -47,7 +47,7 @@ func (de *DeserializationError) Error() string {
 
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {
-	return aasreporting.ToJSONPath(de.Path)
+	return ourreporting.ToJSONPath(de.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -56,7 +56,7 @@ func (de *DeserializationError) prependName(
 	name string,
 ) *DeserializationError {
 	de.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return de
 }
@@ -67,7 +67,7 @@ func (de *DeserializationError) prependIndex(
 	index int,
 ) *DeserializationError {
 	de.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return de
 }
@@ -78,7 +78,7 @@ func (de *DeserializationError) prependKey(
 	key string,
 ) *DeserializationError {
 	de.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return de
 }
@@ -395,12 +395,12 @@ func parseArray[T any](
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangString],
+// Parse `jsonable` as an instance of [ourtypes.ILangString],
 // or return an error.
 func LangStringFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangString,
+	result ourtypes.ILangString,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -412,12 +412,12 @@ func LangStringFromJsonable(
 	return langStringFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangString] from a map,
+// Parse [ourtypes.ILangString] from a map,
 // or return an error, if any.
 func langStringFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangString,
+	result ourtypes.ILangString,
 	err error,
 ) {
 	var theLanguage string
@@ -466,7 +466,7 @@ func langStringFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangString(
+	result = ourtypes.NewLangString(
 		theLanguage,
 		theText,
 	)
@@ -474,12 +474,12 @@ func langStringFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ILangStringSet],
+// Parse `jsonable` as an instance of [ourtypes.ILangStringSet],
 // or return an error.
 func LangStringSetFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ILangStringSet,
+	result ourtypes.ILangStringSet,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -491,15 +491,15 @@ func LangStringSetFromJsonable(
 	return langStringSetFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ILangStringSet] from a map,
+// Parse [ourtypes.ILangStringSet] from a map,
 // or return an error, if any.
 func langStringSetFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ILangStringSet,
+	result ourtypes.ILangStringSet,
 	err error,
 ) {
-	var theLangStrings []aastypes.ILangString
+	var theLangStrings []ourtypes.ILangString
 
 	foundLangStrings := false
 
@@ -532,19 +532,19 @@ func langStringSetFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewLangStringSet(
+	result = ourtypes.NewLangStringSet(
 		theLangStrings,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IContent],
+// Parse `jsonable` as an instance of [ourtypes.IContent],
 // or return an error.
 func ContentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IContent,
+	result ourtypes.IContent,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -556,12 +556,12 @@ func ContentFromJsonable(
 	return contentFromMap(m)
 }
 
-// Parse `jsonable` as an instance of [aastypes.IIecContent],
+// Parse `jsonable` as an instance of [ourtypes.IIecContent],
 // or return an error.
 func IecContentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IIecContent,
+	result ourtypes.IIecContent,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -578,15 +578,15 @@ func IecContentFromJsonable(
 	return iecContentFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IIecContent] from a map,
+// Parse [ourtypes.IIecContent] from a map,
 // or return an error, if any.
 func iecContentFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IIecContent,
+	result ourtypes.IIecContent,
 	err error,
 ) {
-	var theDefinition []aastypes.ILangString
+	var theDefinition []ourtypes.ILangString
 
 	for k, v := range m {
 		switch k {
@@ -612,7 +612,7 @@ func iecContentFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewIecContent()
+	result = ourtypes.NewIecContent()
 	result.SetDefinition(
 		theDefinition,
 	)
@@ -620,12 +620,12 @@ func iecContentFromMapWithoutDispatch(
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.IOtherContent],
+// Parse `jsonable` as an instance of [ourtypes.IOtherContent],
 // or return an error.
 func OtherContentFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.IOtherContent,
+	result ourtypes.IOtherContent,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -642,12 +642,12 @@ func OtherContentFromJsonable(
 	return otherContentFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.IOtherContent] from a map,
+// Parse [ourtypes.IOtherContent] from a map,
 // or return an error, if any.
 func otherContentFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.IOtherContent,
+	result ourtypes.IOtherContent,
 	err error,
 ) {
 	for k := range m {
@@ -666,17 +666,17 @@ func otherContentFromMapWithoutDispatch(
 		}
 	}
 
-	result = aastypes.NewOtherContent()
+	result = ourtypes.NewOtherContent()
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISpecification],
+// Parse `jsonable` as an instance of [ourtypes.ISpecification],
 // or return an error.
 func SpecificationFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISpecification,
+	result ourtypes.ISpecification,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -688,15 +688,15 @@ func SpecificationFromJsonable(
 	return specificationFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISpecification] from a map,
+// Parse [ourtypes.ISpecification] from a map,
 // or return an error, if any.
 func specificationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISpecification,
+	result ourtypes.ISpecification,
 	err error,
 ) {
-	var theContent aastypes.IContent
+	var theContent ourtypes.IContent
 
 	foundContent := false
 
@@ -729,19 +729,19 @@ func specificationFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSpecification(
+	result = ourtypes.NewSpecification(
 		theContent,
 	)
 
 	return
 }
 
-// Parse `jsonable` as an instance of [aastypes.ISomething],
+// Parse `jsonable` as an instance of [ourtypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
 	jsonable interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
 	m, ok := jsonable.(map[string]interface{})
@@ -753,17 +753,17 @@ func SomethingFromJsonable(
 	return somethingFromMapWithoutDispatch(m)
 }
 
-// Parse [aastypes.ISomething] from a map,
+// Parse [ourtypes.ISomething] from a map,
 // or return an error, if any.
 func somethingFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
-	result aastypes.ISomething,
+	result ourtypes.ISomething,
 	err error,
 ) {
 	var theDefaultLanguage string
-	var theLangStringSets []aastypes.ILangStringSet
-	var theSpecifications []aastypes.ISpecification
+	var theLangStringSets []ourtypes.ILangStringSet
+	var theSpecifications []ourtypes.ISpecification
 
 	foundDefaultLanguage := false
 	foundLangStringSets := false
@@ -811,7 +811,7 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
-	result = aastypes.NewSomething(
+	result = ourtypes.NewSomething(
 		theDefaultLanguage,
 		theLangStringSets,
 	)
@@ -822,12 +822,12 @@ func somethingFromMapWithoutDispatch(
 	return
 }
 
-// De-serialize an instance of [aastypes.IContent]
+// De-serialize an instance of [ourtypes.IContent]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func contentFromMap(
 	m map[string]interface{},
 ) (
-	result aastypes.IContent,
+	result ourtypes.IContent,
 	err error,
 ) {
 	var modelType string
@@ -862,13 +862,13 @@ func contentFromMap(
 //
 // Implements `error`.
 type SerializationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newSerializationError(message string) *SerializationError {
 	return &SerializationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -883,7 +883,7 @@ func (se *SerializationError) Error() string {
 
 // Render the path as a string.
 func (se *SerializationError) PathString() string {
-	return aasreporting.ToGolangPath(se.Path)
+	return ourreporting.ToGolangPath(se.Path)
 }
 
 // Prepend the `name` segment to the path, and return the error back
@@ -892,7 +892,7 @@ func (se *SerializationError) prependName(
 	name string,
 ) *SerializationError {
 	se.Path.PrependName(
-		&aasreporting.NameSegment{Name: name},
+		&ourreporting.NameSegment{Name: name},
 	)
 	return se
 }
@@ -903,7 +903,7 @@ func (se *SerializationError) prependIndex(
 	index int,
 ) *SerializationError {
 	se.Path.PrependIndex(
-		&aasreporting.IndexSegment{Index: index},
+		&ourreporting.IndexSegment{Index: index},
 	)
 	return se
 }
@@ -914,7 +914,7 @@ func (se *SerializationError) prependKey(
 	key string,
 ) *SerializationError {
 	se.Path.PrependKey(
-		&aasreporting.KeySegment{Key: key},
+		&ourreporting.KeySegment{Key: key},
 	)
 	return se
 }
@@ -1038,29 +1038,29 @@ func serializeArray[T any](
 
 // Serialize `that` to a JSON-able value, or return an error.
 //
-// `ToJsonable` takes an `aastypes.IClass`, but a list or a tuple item's own
-// (more specific) interface type, e.g., `aastypes.ISomeItem`, can not be
+// `ToJsonable` takes an `ourtypes.IClass`, but a list or a tuple item's own
+// (more specific) interface type, e.g., `ourtypes.ISomeItem`, can not be
 // unified with that when passing `ToJsonable` itself as a
 // `func(item T) (interface{}, error)` value -- Go function values are
 // invariant in their parameter type (no contravariance, unlike, say, a C#
 // delegate). Making this wrapper itself generic (instead of fixing its
-// parameter to `aastypes.IClass`) lets the very same one be passed on bare,
+// parameter to `ourtypes.IClass`) lets the very same one be passed on bare,
 // uninstantiated, for every class-typed item regardless of its
 // concrete interface: Go infers both the item's type and this
 // wrapper's own type parameter together from the context of the
 // `serializeArray`/`serializeTupleN` call.
-func classAsJsonableInterface[T aastypes.IClass](that T) (interface{}, error) {
+func classAsJsonableInterface[T ourtypes.IClass](that T) (interface{}, error) {
 	return ToJsonable(that)
 }
 
-// Serialize [aastypes.ILangString] as a JSON-able map.
+// Serialize [ourtypes.ILangString] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangString] with proper dispatch, call
+// [ourtypes.ILangString] with proper dispatch, call
 // [ToJsonable].
 func langStringToMap(
-	that aastypes.ILangString,
+	that ourtypes.ILangString,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1071,19 +1071,19 @@ func langStringToMap(
 	return
 }
 
-// Serialize [aastypes.ILangStringSet] as a JSON-able map.
+// Serialize [ourtypes.ILangStringSet] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ILangStringSet] with proper dispatch, call
+// [ourtypes.ILangStringSet] with proper dispatch, call
 // [ToJsonable].
 func langStringSetToMap(
-	that aastypes.ILangStringSet,
+	that ourtypes.ILangStringSet,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["langStrings"], err = serializeArray(
-		that.LangStrings(), classAsJsonableInterface[aastypes.ILangString],
+		that.LangStrings(), classAsJsonableInterface[ourtypes.ILangString],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("LangStrings()")
@@ -1093,20 +1093,20 @@ func langStringSetToMap(
 	return
 }
 
-// Serialize [aastypes.IIecContent] as a JSON-able map.
+// Serialize [ourtypes.IIecContent] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IIecContent] with proper dispatch, call
+// [ourtypes.IIecContent] with proper dispatch, call
 // [ToJsonable].
 func iecContentToMap(
-	that aastypes.IIecContent,
+	that ourtypes.IIecContent,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Definition() != nil {
 		result["definition"], err = serializeArray(
-			that.Definition(), classAsJsonableInterface[aastypes.ILangString],
+			that.Definition(), classAsJsonableInterface[ourtypes.ILangString],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Definition()")
@@ -1119,14 +1119,14 @@ func iecContentToMap(
 	return
 }
 
-// Serialize [aastypes.IOtherContent] as a JSON-able map.
+// Serialize [ourtypes.IOtherContent] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.IOtherContent] with proper dispatch, call
+// [ourtypes.IOtherContent] with proper dispatch, call
 // [ToJsonable].
 func otherContentToMap(
-	that aastypes.IOtherContent,
+	that ourtypes.IOtherContent,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1135,14 +1135,14 @@ func otherContentToMap(
 	return
 }
 
-// Serialize [aastypes.ISpecification] as a JSON-able map.
+// Serialize [ourtypes.ISpecification] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISpecification] with proper dispatch, call
+// [ourtypes.ISpecification] with proper dispatch, call
 // [ToJsonable].
 func specificationToMap(
-	that aastypes.ISpecification,
+	that ourtypes.ISpecification,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
@@ -1155,21 +1155,21 @@ func specificationToMap(
 	return
 }
 
-// Serialize [aastypes.ISomething] as a JSON-able map.
+// Serialize [ourtypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.ISomething] with proper dispatch, call
+// [ourtypes.ISomething] with proper dispatch, call
 // [ToJsonable].
 func somethingToMap(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["defaultLanguage"] = that.DefaultLanguage()
 
 	result["langStringSets"], err = serializeArray(
-		that.LangStringSets(), classAsJsonableInterface[aastypes.ILangStringSet],
+		that.LangStringSets(), classAsJsonableInterface[ourtypes.ILangStringSet],
 	)
 	if err != nil {
 		mustSerializationError(err).prependName("LangStringSets()")
@@ -1178,7 +1178,7 @@ func somethingToMap(
 
 	if that.Specifications() != nil {
 		result["specifications"], err = serializeArray(
-			that.Specifications(), classAsJsonableInterface[aastypes.ISpecification],
+			that.Specifications(), classAsJsonableInterface[ourtypes.ISpecification],
 		)
 		if err != nil {
 			mustSerializationError(err).prependName("Specifications()")
@@ -1194,32 +1194,32 @@ func somethingToMap(
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 ) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
-	case aastypes.ModelTypeLangString:
+	case ourtypes.ModelTypeLangString:
 		result, err = langStringToMap(
-			that.(aastypes.ILangString),
+			that.(ourtypes.ILangString),
 		)
-	case aastypes.ModelTypeLangStringSet:
+	case ourtypes.ModelTypeLangStringSet:
 		result, err = langStringSetToMap(
-			that.(aastypes.ILangStringSet),
+			that.(ourtypes.ILangStringSet),
 		)
-	case aastypes.ModelTypeIecContent:
+	case ourtypes.ModelTypeIecContent:
 		result, err = iecContentToMap(
-			that.(aastypes.IIecContent),
+			that.(ourtypes.IIecContent),
 		)
-	case aastypes.ModelTypeOtherContent:
+	case ourtypes.ModelTypeOtherContent:
 		result, err = otherContentToMap(
-			that.(aastypes.IOtherContent),
+			that.(ourtypes.IOtherContent),
 		)
-	case aastypes.ModelTypeSpecification:
+	case ourtypes.ModelTypeSpecification:
 		result, err = specificationToMap(
-			that.(aastypes.ISpecification),
+			that.(ourtypes.ISpecification),
 		)
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 		)
 	default:
 		err = newSerializationError(

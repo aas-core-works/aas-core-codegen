@@ -46,7 +46,7 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             f"""\
-namespace aas = {library_namespace};"""
+namespace our = {library_namespace};"""
         ),
         Stripped(
             f"""\
@@ -78,7 +78,7 @@ void AssertEncodeDecode(
 {I}const std::string& text,
 {I}const std::string& expected_encoded
 ) {{
-{I}const std::string encoded = aas::stringification::Base64Encode(
+{I}const std::string encoded = our::stringification::Base64Encode(
 {II}StringToBytes(text)
 {I});
 
@@ -87,10 +87,10 @@ void AssertEncodeDecode(
 {III}== encoded
 {I});
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::vector<std::uint8_t>,
 {II}std::string
-{I}> bytes = aas::stringification::Base64Decode(encoded);
+{I}> bytes = our::stringification::Base64Decode(encoded);
 
 {I}REQUIRE(bytes.has_value());
 
@@ -175,10 +175,10 @@ TEST_CASE("Test unexpected padding in the middle") {{
 {IIII}+ encoded.substr(i + 1, encoded.size() - i)
 {II});
 
-{II}aas::common::expected<
+{II}our::common::expected<
 {III}std::vector<std::uint8_t>,
 {III}std::string
-{II}> bytes = aas::stringification::Base64Decode(bad_encoded);
+{II}> bytes = our::stringification::Base64Decode(bad_encoded);
 
 {II}REQUIRE(!bytes.has_value());
 
@@ -213,10 +213,10 @@ TEST_CASE("Test 'Hello' is encoded as 'SGVsbG8='") {{
 TEST_CASE("Test that our implementation suffers from padding inconsistency of 'Hello' as 'SGVsbG9='") {{
 {I}const std::string encoded = "SGVsbG9=";
 
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::vector<std::uint8_t>,
 {II}std::string
-{I}> bytes = aas::stringification::Base64Decode(encoded);
+{I}> bytes = our::stringification::Base64Decode(encoded);
 
 {I}REQUIRE(bytes.has_value());
 
@@ -232,10 +232,10 @@ void AssertDecode(
 {I}const std::string& encoded,
 {I}const std::vector<std::uint8_t>& expected_decoded
 ) {{
-{I}aas::common::expected<
+{I}our::common::expected<
 {II}std::vector<std::uint8_t>,
 {II}std::string
-{I}> bytes = aas::stringification::Base64Decode(encoded);
+{I}> bytes = our::stringification::Base64Decode(encoded);
 
 {I}INFO(encoded)
 {I}REQUIRE(bytes.has_value());

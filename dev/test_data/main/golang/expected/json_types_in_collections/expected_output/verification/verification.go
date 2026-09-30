@@ -14,21 +14,21 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	aasreporting "github.com/dummy-works/dummy/reporting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 // Represent a verification violation.
 //
 // Implements `error`.
 type VerificationError struct{
-	Path *aasreporting.Path
+	Path *ourreporting.Path
 	Message string
 }
 
 func newVerificationError(message string) *VerificationError {
 	return &VerificationError{
-		Path: &aasreporting.Path{},
+		Path: &ourreporting.Path{},
 		Message: message,
 	}
 }
@@ -43,7 +43,7 @@ func (ve *VerificationError) Error() string {
 
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
-	return aasreporting.ToGolangPath(ve.Path)
+	return ourreporting.ToGolangPath(ve.Path)
 }
 
 // Verify that `value` is a JSON-able value, at any depth.
@@ -51,7 +51,7 @@ func (ve *VerificationError) PathString() string {
 // The path of an error is relative to `value`, and the caller is expected to
 // prepend the way to it.
 func verifyJsonValue(
-	value aastypes.JsonValue,
+	value ourtypes.JsonValue,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	if value == nil {
@@ -86,13 +86,13 @@ func verifyJsonValue(
 			}
 			return false
 
-		case aastypes.JsonArray:
+		case ourtypes.JsonArray:
 			for i, item := range casted {
 				abort = verifyJsonValue(
 					item,
 					func(err *VerificationError) bool {
 						err.Path.PrependIndex(
-							&aasreporting.IndexSegment{
+							&ourreporting.IndexSegment{
 								Index: i,
 							},
 						)
@@ -106,7 +106,7 @@ func verifyJsonValue(
 			}
 			return false
 
-		case aastypes.JsonObject:
+		case ourtypes.JsonObject:
 			// NOTE (mristin):
 			// The keys are sorted so that the errors come in a stable order,
 			// as the iteration order of a Go map is deliberately random.
@@ -121,7 +121,7 @@ func verifyJsonValue(
 					casted[key],
 					func(err *VerificationError) bool {
 						err.Path.PrependKey(
-							&aasreporting.KeySegment{
+							&ourreporting.KeySegment{
 								Key: key,
 							},
 						)
@@ -150,7 +150,7 @@ func verifyJsonValue(
 
 // Verify that `value` is a JSON-able array.
 func verifyJsonArray(
-	value aastypes.JsonArray,
+	value ourtypes.JsonArray,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	if value == nil {
@@ -166,7 +166,7 @@ func verifyJsonArray(
 
 // Verify that `value` is a JSON-able object.
 func verifyJsonObject(
-	value aastypes.JsonObject,
+	value ourtypes.JsonObject,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	if value == nil {
@@ -180,14 +180,14 @@ func verifyJsonObject(
 	return verifyJsonValue(value, onError)
 }
 
-// Verify `that` instance of [aastypes.ISomething].
+// Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
 // If `onError` returns abort `true`, this function will abort
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func VerifySomething(
-	that aastypes.ISomething,
+	that ourtypes.ISomething,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
@@ -207,12 +207,12 @@ func VerifySomething(
 				v,
 				func(err *VerificationError) bool {
 					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
+						&ourreporting.IndexSegment{
 							Index: i,
 						},
 					)
 					err.Path.PrependName(
-						&aasreporting.NameSegment{
+						&ourreporting.NameSegment{
 							Name: "Values",
 						},
 					)
@@ -229,12 +229,12 @@ func VerifySomething(
 		that.TupleWithJson().Item2,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 1,
 				},
 			)
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleWithJson",
 				},
 			)
@@ -250,12 +250,12 @@ func VerifySomething(
 		that.TupleWithJson().Item3,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 2,
 				},
 			)
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleWithJson",
 				},
 			)
@@ -271,12 +271,12 @@ func VerifySomething(
 		that.TupleWithJson().Item4,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
+				&ourreporting.IndexSegment{
 					Index: 3,
 				},
 			)
 			err.Path.PrependName(
-				&aasreporting.NameSegment{
+				&ourreporting.NameSegment{
 					Name: "TupleWithJson",
 				},
 			)
@@ -298,14 +298,14 @@ func VerifySomething(
 // further verification as well, and return abort `true`. Otherwise,
 // abort `false` is returned.
 func Verify(
-	that aastypes.IClass,
+	that ourtypes.IClass,
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	modelType := that.ModelType()
 	switch modelType {
-	case aastypes.ModelTypeSomething:
+	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
-			that.(aastypes.ISomething),
+			that.(ourtypes.ISomething),
 			onError,
 		)
 	default:

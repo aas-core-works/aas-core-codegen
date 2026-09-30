@@ -6,145 +6,145 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 TEST_CASE("Test ModelType round-trip") {
   REQUIRE(
-    aas::types::ModelType::kStructuralFirst
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kStructuralFirst
+    == our::wstringification::MustModelTypeFromWstring(
       L"StructuralFirst"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kStructuralFirst
+    our::wstringification::to_wstring(
+      our::types::ModelType::kStructuralFirst
     )
     == L"StructuralFirst"
   );
 
   REQUIRE(
-    aas::types::ModelType::kStructuralSecond
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kStructuralSecond
+    == our::wstringification::MustModelTypeFromWstring(
       L"StructuralSecond"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kStructuralSecond
+    our::wstringification::to_wstring(
+      our::types::ModelType::kStructuralSecond
     )
     == L"StructuralSecond"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMixedAbstractDescendantOne
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMixedAbstractDescendantOne
+    == our::wstringification::MustModelTypeFromWstring(
       L"MixedAbstractDescendantOne"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMixedAbstractDescendantOne
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMixedAbstractDescendantOne
     )
     == L"MixedAbstractDescendantOne"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMixedAbstractDescendantTwo
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMixedAbstractDescendantTwo
+    == our::wstringification::MustModelTypeFromWstring(
       L"MixedAbstractDescendantTwo"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMixedAbstractDescendantTwo
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMixedAbstractDescendantTwo
     )
     == L"MixedAbstractDescendantTwo"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMixedConcreteWithDescendants
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMixedConcreteWithDescendants
+    == our::wstringification::MustModelTypeFromWstring(
       L"MixedConcreteWithDescendants"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMixedConcreteWithDescendants
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMixedConcreteWithDescendants
     )
     == L"MixedConcreteWithDescendants"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMixedConcreteWithDescendantsChild
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMixedConcreteWithDescendantsChild
+    == our::wstringification::MustModelTypeFromWstring(
       L"MixedConcreteWithDescendantsChild"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMixedConcreteWithDescendantsChild
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMixedConcreteWithDescendantsChild
     )
     == L"MixedConcreteWithDescendantsChild"
   );
 
   REQUIRE(
-    aas::types::ModelType::kMixedConcreteLeaf
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kMixedConcreteLeaf
+    == our::wstringification::MustModelTypeFromWstring(
       L"MixedConcreteLeaf"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kMixedConcreteLeaf
+    our::wstringification::to_wstring(
+      our::types::ModelType::kMixedConcreteLeaf
     )
     == L"MixedConcreteLeaf"
   );
 
   REQUIRE(
-    aas::types::ModelType::kModelTypedFirst
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kModelTypedFirst
+    == our::wstringification::MustModelTypeFromWstring(
       L"ModelTypedFirst"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kModelTypedFirst
+    our::wstringification::to_wstring(
+      our::types::ModelType::kModelTypedFirst
     )
     == L"ModelTypedFirst"
   );
 
   REQUIRE(
-    aas::types::ModelType::kModelTypedSecond
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kModelTypedSecond
+    == our::wstringification::MustModelTypeFromWstring(
       L"ModelTypedSecond"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kModelTypedSecond
+    our::wstringification::to_wstring(
+      our::types::ModelType::kModelTypedSecond
     )
     == L"ModelTypedSecond"
   );
 
   REQUIRE(
-    aas::types::ModelType::kSomething
-    == aas::wstringification::MustModelTypeFromWstring(
+    our::types::ModelType::kSomething
+    == our::wstringification::MustModelTypeFromWstring(
       L"Something"
     )
   );
 
   REQUIRE(
-    aas::wstringification::to_wstring(
-      aas::types::ModelType::kSomething
+    our::wstringification::to_wstring(
+      our::types::ModelType::kSomething
     )
     == L"Something"
   );
@@ -152,13 +152,13 @@ TEST_CASE("Test ModelType round-trip") {
 
 TEST_CASE("Test failure on ModelType") {
   CHECK(
-    !aas::wstringification::ModelTypeFromWstring(
+    !our::wstringification::ModelTypeFromWstring(
       L"Totally utterly invalid"
     ).has_value()
   );
 
   REQUIRE_THROWS_WITH(
-    aas::wstringification::MustModelTypeFromWstring(
+    our::wstringification::MustModelTypeFromWstring(
       L"Totally utterly invalid"
     ),
     "Unexpected ModelType literal: Totally utterly invalid"

@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
 using System.Collections.Generic;  // can't alias
@@ -12,7 +12,7 @@ using Nodes = System.Text.Json.Nodes;
 namespace dummy
 {
     /// <summary>
-    /// Represent a general class of an AAS model.
+    /// Represent a general class of the meta-model.
     /// </summary>
     public interface IClass
     {

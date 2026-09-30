@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 using NUnit.Framework;  // can't alias
 
@@ -14,10 +14,10 @@ namespace dummy.Tests
         [Test]
         public void Test_IecContent_OverDefinitionOrEmpty()
         {
-            foreach (Aas.IecContent instance in new[]
+            foreach (Our.IecContent instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalIecContent(),
-                Aas.Tests.CommonJsonization.LoadMaximalIecContent()
+                Our.Tests.CommonJsonization.LoadMinimalIecContent(),
+                Our.Tests.CommonJsonization.LoadMaximalIecContent()
             })
             {
                 int count = 0;
@@ -35,10 +35,10 @@ namespace dummy.Tests
         [Test]
         public void Test_Something_OverSpecificationsOrEmpty()
         {
-            foreach (Aas.Something instance in new[]
+            foreach (Our.Something instance in new[]
             {
-                Aas.Tests.CommonJsonization.LoadMinimalSomething(),
-                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+                Our.Tests.CommonJsonization.LoadMinimalSomething(),
+                Our.Tests.CommonJsonization.LoadMaximalSomething()
             })
             {
                 int count = 0;

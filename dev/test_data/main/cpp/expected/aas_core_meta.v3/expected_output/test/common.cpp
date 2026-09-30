@@ -17,7 +17,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 namespace fs = std::filesystem;
 
@@ -37,7 +37,7 @@ static std::optional<std::string> GetEnv(const char *variable_name) {
   );
   if (error != 0) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "The getenv_s returned an error code ",
         std::to_string(error),
         " when asking for the variable ",
@@ -52,7 +52,7 @@ static std::optional<std::string> GetEnv(const char *variable_name) {
 
   if (buffer[len - 1] != 0) {
     throw std::logic_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected the last byte of buffer for getenv_s on ",
         variable_name,
         " to be zero, but got ",
@@ -100,7 +100,7 @@ std::filesystem::path DetermineTestDataDir() {
   if (!result.has_value())
   {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "The environment variable ",
         variable_name,
         " has not been set."
@@ -120,12 +120,12 @@ void MustWriteWstringAsUtf8(
 ) {
   std::ofstream ofs(path, std::ios::binary);
 
-  const std::string encoded = aas::common::WstringToUtf8(text);
+  const std::string encoded = our::common::WstringToUtf8(text);
   ofs.write(encoded.data(), encoded.size());
 
   if (ofs.fail()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to write to ",
         path.string(),
         "; the fail bit of the file stream is set"
@@ -135,7 +135,7 @@ void MustWriteWstringAsUtf8(
 
   if (ofs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to write to ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -155,7 +155,7 @@ std::wstring MustReadWstringAsUtf8(
   std::streamoff size = ifs.tellg();
   if (size < 0) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Unexpected negative size of ",
         path.string(),
         ": ",
@@ -170,7 +170,7 @@ std::wstring MustReadWstringAsUtf8(
 
   if (ifs.fail()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read from ",
         path.string(),
         "; the fail bit of the file stream is set"
@@ -180,7 +180,7 @@ std::wstring MustReadWstringAsUtf8(
 
   if (ifs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read from ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -189,10 +189,10 @@ std::wstring MustReadWstringAsUtf8(
   }
 
   try {
-    return aas::common::Utf8ToWstring(buffer);
+    return our::common::Utf8ToWstring(buffer);
   } catch (const std::exception& exception) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to de-code ",
         path.string(),
         " as UTF-8: ",
@@ -215,7 +215,7 @@ void MustWriteString(
 
   if (ofs.fail()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to write to ",
         path.string(),
         "; the fail bit of the file stream is set"
@@ -225,7 +225,7 @@ void MustWriteString(
 
   if (ofs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to write to ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -245,7 +245,7 @@ std::string MustReadString(
   std::streamoff size = ifs.tellg();
   if (size < 0) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Unexpected negative size of ",
         path.string(),
         ": ",
@@ -260,7 +260,7 @@ std::string MustReadString(
 
   if (ifs.fail()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read from ",
         path.string(),
         "; the fail bit of the file stream is set"
@@ -270,7 +270,7 @@ std::string MustReadString(
 
   if (ifs.bad()) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to read from ",
         path.string(),
         "; the bad bit of the file stream is set"
@@ -284,7 +284,7 @@ std::string MustReadString(
 std::wstring TraceMark(
   const aas_core::aas_3_0::types::IClass& that
 ) {
-  const std::wstring model_type = aas::wstringification::to_wstring(
+  const std::wstring model_type = our::wstringification::to_wstring(
     that.model_type()
   );
   return model_type;
@@ -314,7 +314,7 @@ std::deque<std::filesystem::path> FindFilesBySuffixRecursively(
 
   if (!fs::is_directory(root)) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected to search for files with suffix recursively in ",
         root.string(),
         ", but it is not a directory"
@@ -348,7 +348,7 @@ std::deque<std::filesystem::path> ListSubdirectories(
 ) {
   if (!fs::exists(root)) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "The root directory which you wanted to list for subdirectories "
         "does not exist: ",
         root.string()
@@ -358,7 +358,7 @@ std::deque<std::filesystem::path> ListSubdirectories(
 
   if (!fs::is_directory(root)) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "The path that you specified as a root directory which you wanted to "
         "list for subdirectories is not a directory: ",
         root.string()
@@ -392,7 +392,7 @@ void AssertContentEqualsExpectedOrRecord(
     MustWriteString(path, content);
   } else {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Expected to compare the content against "
         "the recorded file: ",
         path.string(),
@@ -405,7 +405,7 @@ void AssertContentEqualsExpectedOrRecord(
 
     const std::string expected = MustReadString(path);
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Got unexpected content, which should have been equal "
         "to the content of the file: ",
         path.string()

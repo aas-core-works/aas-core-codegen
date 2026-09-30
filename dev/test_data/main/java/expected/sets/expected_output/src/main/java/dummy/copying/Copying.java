@@ -16,7 +16,7 @@ import dummy.types.model.*;
 import java.util.HashSet;
 
 /**
- * Allow for making shallow and deep copies of AAS model instances.
+ * Allow for making shallow and deep copies of model instances.
  */
 public class Copying
 {

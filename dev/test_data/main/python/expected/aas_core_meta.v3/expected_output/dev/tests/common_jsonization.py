@@ -21,9 +21,9 @@ else:
     from typing_extensions import Final
 
 
-import aas_core3.common as aas_common
-import aas_core3.jsonization as aas_jsonization
-import aas_core3.types as aas_types
+import aas_core3.common as our_common
+import aas_core3.jsonization as our_jsonization
+import aas_core3.types as our_types
 
 
 class Difference:
@@ -34,20 +34,20 @@ class Difference:
 
     #: Path in the expected JSON-able value which is different from
     #: the obtained JSON-able value
-    path: Final[aas_jsonization.Path]
+    path: Final[our_jsonization.Path]
 
     def __init__(self, message: str) -> None:
         """Initialize with the given message and empty path."""
         self.message = message
-        self.path = aas_jsonization.Path()
+        self.path = our_jsonization.Path()
 
     def __str__(self) -> str:
         return f"#{self.path}: {self.message}"
 
 
 def check_equal(
-    expected: aas_jsonization.Jsonable,
-    got: aas_jsonization.Jsonable,
+    expected: our_jsonization.Jsonable,
+    got: our_jsonization.Jsonable,
 ) -> Iterator[Difference]:
     """
     Compare recursively two JSON-able values for equality.
@@ -74,7 +74,7 @@ def check_equal(
 
             for i, (expected_item, got_item) in enumerate(zip(expected, got)):
                 for difference in check_equal(expected_item, got_item):
-                    difference.path._prepend(aas_jsonization.IndexSegment(expected, i))
+                    difference.path._prepend(our_jsonization.IndexSegment(expected, i))
                     yield difference
 
     elif isinstance(expected, collections.abc.Mapping):
@@ -109,183 +109,183 @@ def check_equal(
 
                 for difference in check_equal(expected_value, got_value):
                     difference.path._prepend(
-                        aas_jsonization.PropertySegment(expected, key)
+                        our_jsonization.PropertySegment(expected, key)
                     )
                     yield difference
     else:
-        aas_common.assert_never(expected)
+        our_common.assert_never(expected)
 
 
 _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
     str,
-    Callable[[aas_jsonization.Jsonable], aas_types.Class]
+    Callable[[our_jsonization.Jsonable], our_types.Class]
 ] = {
     'AdministrativeInformation':
-        aas_jsonization.administrative_information_from_jsonable,
+        our_jsonization.administrative_information_from_jsonable,
     'AnnotatedRelationshipElement':
-        aas_jsonization.annotated_relationship_element_from_jsonable,
+        our_jsonization.annotated_relationship_element_from_jsonable,
     'AssetAdministrationShell':
-        aas_jsonization.asset_administration_shell_from_jsonable,
+        our_jsonization.asset_administration_shell_from_jsonable,
     'AssetInformation':
-        aas_jsonization.asset_information_from_jsonable,
+        our_jsonization.asset_information_from_jsonable,
     'BasicEventElement':
-        aas_jsonization.basic_event_element_from_jsonable,
+        our_jsonization.basic_event_element_from_jsonable,
     'Blob':
-        aas_jsonization.blob_from_jsonable,
+        our_jsonization.blob_from_jsonable,
     'Capability':
-        aas_jsonization.capability_from_jsonable,
+        our_jsonization.capability_from_jsonable,
     'ConceptDescription':
-        aas_jsonization.concept_description_from_jsonable,
+        our_jsonization.concept_description_from_jsonable,
     'DataSpecificationIec61360':
-        aas_jsonization.data_specification_iec_61360_from_jsonable,
+        our_jsonization.data_specification_iec_61360_from_jsonable,
     'EmbeddedDataSpecification':
-        aas_jsonization.embedded_data_specification_from_jsonable,
+        our_jsonization.embedded_data_specification_from_jsonable,
     'Entity':
-        aas_jsonization.entity_from_jsonable,
+        our_jsonization.entity_from_jsonable,
     'Environment':
-        aas_jsonization.environment_from_jsonable,
+        our_jsonization.environment_from_jsonable,
     'EventPayload':
-        aas_jsonization.event_payload_from_jsonable,
+        our_jsonization.event_payload_from_jsonable,
     'Extension':
-        aas_jsonization.extension_from_jsonable,
+        our_jsonization.extension_from_jsonable,
     'File':
-        aas_jsonization.file_from_jsonable,
+        our_jsonization.file_from_jsonable,
     'Key':
-        aas_jsonization.key_from_jsonable,
+        our_jsonization.key_from_jsonable,
     'LangStringDefinitionTypeIec61360':
-        aas_jsonization.lang_string_definition_type_iec_61360_from_jsonable,
+        our_jsonization.lang_string_definition_type_iec_61360_from_jsonable,
     'LangStringNameType':
-        aas_jsonization.lang_string_name_type_from_jsonable,
+        our_jsonization.lang_string_name_type_from_jsonable,
     'LangStringPreferredNameTypeIec61360':
-        aas_jsonization.lang_string_preferred_name_type_iec_61360_from_jsonable,
+        our_jsonization.lang_string_preferred_name_type_iec_61360_from_jsonable,
     'LangStringShortNameTypeIec61360':
-        aas_jsonization.lang_string_short_name_type_iec_61360_from_jsonable,
+        our_jsonization.lang_string_short_name_type_iec_61360_from_jsonable,
     'LangStringTextType':
-        aas_jsonization.lang_string_text_type_from_jsonable,
+        our_jsonization.lang_string_text_type_from_jsonable,
     'LevelType':
-        aas_jsonization.level_type_from_jsonable,
+        our_jsonization.level_type_from_jsonable,
     'MultiLanguageProperty':
-        aas_jsonization.multi_language_property_from_jsonable,
+        our_jsonization.multi_language_property_from_jsonable,
     'Operation':
-        aas_jsonization.operation_from_jsonable,
+        our_jsonization.operation_from_jsonable,
     'OperationVariable':
-        aas_jsonization.operation_variable_from_jsonable,
+        our_jsonization.operation_variable_from_jsonable,
     'Property':
-        aas_jsonization.property_from_jsonable,
+        our_jsonization.property_from_jsonable,
     'Qualifier':
-        aas_jsonization.qualifier_from_jsonable,
+        our_jsonization.qualifier_from_jsonable,
     'Range':
-        aas_jsonization.range_from_jsonable,
+        our_jsonization.range_from_jsonable,
     'Reference':
-        aas_jsonization.reference_from_jsonable,
+        our_jsonization.reference_from_jsonable,
     'ReferenceElement':
-        aas_jsonization.reference_element_from_jsonable,
+        our_jsonization.reference_element_from_jsonable,
     'RelationshipElement':
-        aas_jsonization.relationship_element_from_jsonable,
+        our_jsonization.relationship_element_from_jsonable,
     'Resource':
-        aas_jsonization.resource_from_jsonable,
+        our_jsonization.resource_from_jsonable,
     'SpecificAssetId':
-        aas_jsonization.specific_asset_id_from_jsonable,
+        our_jsonization.specific_asset_id_from_jsonable,
     'Submodel':
-        aas_jsonization.submodel_from_jsonable,
+        our_jsonization.submodel_from_jsonable,
     'SubmodelElementCollection':
-        aas_jsonization.submodel_element_collection_from_jsonable,
+        our_jsonization.submodel_element_collection_from_jsonable,
     'SubmodelElementList':
-        aas_jsonization.submodel_element_list_from_jsonable,
+        our_jsonization.submodel_element_list_from_jsonable,
     'ValueList':
-        aas_jsonization.value_list_from_jsonable,
+        our_jsonization.value_list_from_jsonable,
     'ValueReferencePair':
-        aas_jsonization.value_reference_pair_from_jsonable
+        our_jsonization.value_reference_pair_from_jsonable
 }
 
 
 _MODEL_TYPE_TO_CLASS: Mapping[
     str,
-    Type[aas_types.Class]
+    Type[our_types.Class]
 ] = {
     'AdministrativeInformation':
-        aas_types.AdministrativeInformation,
+        our_types.AdministrativeInformation,
     'AnnotatedRelationshipElement':
-        aas_types.AnnotatedRelationshipElement,
+        our_types.AnnotatedRelationshipElement,
     'AssetAdministrationShell':
-        aas_types.AssetAdministrationShell,
+        our_types.AssetAdministrationShell,
     'AssetInformation':
-        aas_types.AssetInformation,
+        our_types.AssetInformation,
     'BasicEventElement':
-        aas_types.BasicEventElement,
+        our_types.BasicEventElement,
     'Blob':
-        aas_types.Blob,
+        our_types.Blob,
     'Capability':
-        aas_types.Capability,
+        our_types.Capability,
     'ConceptDescription':
-        aas_types.ConceptDescription,
+        our_types.ConceptDescription,
     'DataSpecificationIec61360':
-        aas_types.DataSpecificationIEC61360,
+        our_types.DataSpecificationIEC61360,
     'EmbeddedDataSpecification':
-        aas_types.EmbeddedDataSpecification,
+        our_types.EmbeddedDataSpecification,
     'Entity':
-        aas_types.Entity,
+        our_types.Entity,
     'Environment':
-        aas_types.Environment,
+        our_types.Environment,
     'EventPayload':
-        aas_types.EventPayload,
+        our_types.EventPayload,
     'Extension':
-        aas_types.Extension,
+        our_types.Extension,
     'File':
-        aas_types.File,
+        our_types.File,
     'Key':
-        aas_types.Key,
+        our_types.Key,
     'LangStringDefinitionTypeIec61360':
-        aas_types.LangStringDefinitionTypeIEC61360,
+        our_types.LangStringDefinitionTypeIEC61360,
     'LangStringNameType':
-        aas_types.LangStringNameType,
+        our_types.LangStringNameType,
     'LangStringPreferredNameTypeIec61360':
-        aas_types.LangStringPreferredNameTypeIEC61360,
+        our_types.LangStringPreferredNameTypeIEC61360,
     'LangStringShortNameTypeIec61360':
-        aas_types.LangStringShortNameTypeIEC61360,
+        our_types.LangStringShortNameTypeIEC61360,
     'LangStringTextType':
-        aas_types.LangStringTextType,
+        our_types.LangStringTextType,
     'LevelType':
-        aas_types.LevelType,
+        our_types.LevelType,
     'MultiLanguageProperty':
-        aas_types.MultiLanguageProperty,
+        our_types.MultiLanguageProperty,
     'Operation':
-        aas_types.Operation,
+        our_types.Operation,
     'OperationVariable':
-        aas_types.OperationVariable,
+        our_types.OperationVariable,
     'Property':
-        aas_types.Property,
+        our_types.Property,
     'Qualifier':
-        aas_types.Qualifier,
+        our_types.Qualifier,
     'Range':
-        aas_types.Range,
+        our_types.Range,
     'Reference':
-        aas_types.Reference,
+        our_types.Reference,
     'ReferenceElement':
-        aas_types.ReferenceElement,
+        our_types.ReferenceElement,
     'RelationshipElement':
-        aas_types.RelationshipElement,
+        our_types.RelationshipElement,
     'Resource':
-        aas_types.Resource,
+        our_types.Resource,
     'SpecificAssetId':
-        aas_types.SpecificAssetID,
+        our_types.SpecificAssetID,
     'Submodel':
-        aas_types.Submodel,
+        our_types.Submodel,
     'SubmodelElementCollection':
-        aas_types.SubmodelElementCollection,
+        our_types.SubmodelElementCollection,
     'SubmodelElementList':
-        aas_types.SubmodelElementList,
+        our_types.SubmodelElementList,
     'ValueList':
-        aas_types.ValueList,
+        our_types.ValueList,
     'ValueReferencePair':
-        aas_types.ValueReferencePair
+        our_types.ValueReferencePair
 }
 
 
 def must_load(
     path: pathlib.Path,
     model_type: str
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Load an instance from ``path``.
 

@@ -100,8 +100,8 @@ func stringify(value interface{{}}) (got string) {{
 {IIII}got = fmt.Sprintf("%d byte(s)", len(casted))
 {III}case *enumerationLiteral:
 {IIII}got = casted.String()
-{III}case aastypes.IClass:
-{IIII}got = aastesting.TraceMark(casted)
+{III}case ourtypes.IClass:
+{IIII}got = ourtesting.TraceMark(casted)
 {III}default:
 {IIII}panic(
 {IIII}{I}fmt.Sprintf(
@@ -121,10 +121,10 @@ func stringify(value interface{{}}) (got string) {{
 // Represent `value` such that we can immediately check whether it is the default value
 // or the set one.
 //
-// We compare it against the recorded golden file, if not [aastesting.RecordMode].
+// We compare it against the recorded golden file, if not [ourtesting.RecordMode].
 // If there are differences, a `message` is set.
 //
-// Otherwise, when [aastesting.RecordMode] is set, we re-record the golden file.
+// Otherwise, when [ourtesting.RecordMode] is set, we re-record the golden file.
 func compareOrRerecordValue(
 {I}value interface{{}},
 {I}expectedPath string,
@@ -135,7 +135,7 @@ func compareOrRerecordValue(
 {I}// Add a new line for POSIX systems.
 {I}got += "\\n"
 
-{I}if aastesting.RecordMode {{
+{I}if ourtesting.RecordMode {{
 {II}parent := filepath.Dir(expectedPath)
 {II}err := os.MkdirAll(parent, os.ModePerm)
 {II}if err != nil {{
@@ -227,7 +227,7 @@ func compareOrRerecordValue(
                     f"""\
 value := &enumerationLiteral{{
 {I}enumerationName: {golang_common.string_literal(enum_name)},
-{I}literalName: aasstringification.{enum_to_string_name}(
+{I}literalName: ourstringification.{enum_to_string_name}(
 {II}instance.{method_name}(),
 {I}),
 }}"""
@@ -245,12 +245,12 @@ value := &enumerationLiteral{{
                 Stripped(
                     f"""\
 func {test_function_name}(t *testing.T) {{
-{I}instance := aastesting.{must_load_minimal_name}()
+{I}instance := ourtesting.{must_load_minimal_name}()
 
 {I}{indent_but_first_line(value_assignment_snippet, I)}
 
 {I}expectedPth := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"XxxOrDefault",
 {II}{golang_common.string_literal(model_type)},
 {II}"{method_name}.on_minimal.txt",
@@ -280,12 +280,12 @@ func {test_function_name}(t *testing.T) {{
                 Stripped(
                     f"""\
 func {test_function_name}(t *testing.T) {{
-{I}instance := aastesting.{must_load_maximal_name}()
+{I}instance := ourtesting.{must_load_maximal_name}()
 
 {I}{indent_but_first_line(value_assignment_snippet, I)}
 
 {I}expectedPth := filepath.Join(
-{II}aastesting.TestDataDir,
+{II}ourtesting.TestDataDir,
 {II}"XxxOrDefault",
 {II}{golang_common.string_literal(model_type)},
 {II}"{method_name}.on_maximal.txt",
@@ -316,9 +316,9 @@ func {test_function_name}(t *testing.T) {{
         ("reflect", f'{I}"reflect"'),
         ("strings", f'{I}"strings"'),
         ("testing", f'{I}"testing"'),
-        ("aasstringification", f'{I}aasstringification "{repo_url}/stringification"'),
-        ("aastesting", f'{I}aastesting "{repo_url}/aastesting"'),
-        ("aastypes", f'{I}aastypes "{repo_url}/types"'),
+        ("ourstringification", f'{I}ourstringification "{repo_url}/stringification"'),
+        ("ourtesting", f'{I}ourtesting "{repo_url}/ourtesting"'),
+        ("ourtypes", f'{I}ourtypes "{repo_url}/types"'),
     ):
         if golang_common.names_package(blocks, module):
             import_lines.append(literal)

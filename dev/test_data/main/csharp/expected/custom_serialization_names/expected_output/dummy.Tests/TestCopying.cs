@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
@@ -16,7 +16,7 @@ namespace dummy.Tests
     public class TestCopying
     {
         internal class DeepEqualiser
-            : Aas.Visitation.AbstractTransformerWithContext<Aas.IClass, bool>
+            : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
             /// <summary>Compare two byte spans for equal content.</summary>
             /// <remarks>
@@ -31,10 +31,10 @@ namespace dummy.Tests
             }
 
             public override bool TransformQueryCondition(
-                Aas.IQueryCondition that,
-                Aas.IClass other)
+                Our.IQueryCondition that,
+                Our.IClass other)
             {
-                if (!(other is Aas.QueryCondition casted))
+                if (!(other is Our.QueryCondition casted))
                 {
                     return false;
                 }
@@ -48,15 +48,15 @@ namespace dummy.Tests
         private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
 
         private static bool QueryConditionShallowEquals(
-            Aas.QueryCondition that,
-            Aas.QueryCondition other)
+            Our.QueryCondition that,
+            Our.QueryCondition other)
         {
             return that.Eq == other.Eq && that.NotEq == other.NotEq;
         }
 
         private static bool QueryConditionDeepEquals(
-            Aas.QueryCondition that,
-            Aas.QueryCondition other)
+            Our.QueryCondition that,
+            Our.QueryCondition other)
         {
             return DeepEqualiserInstance.Transform(that, other);
         }
@@ -64,10 +64,10 @@ namespace dummy.Tests
         [Test]
         public void Test_QueryCondition_shallow_copy()
         {
-            Aas.QueryCondition instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQueryCondition());
+            Our.QueryCondition instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQueryCondition());
 
-            var instanceCopy = Aas.Copying.Shallow(instance);
+            var instanceCopy = Our.Copying.Shallow(instance);
 
             Assert.IsTrue(
                 QueryConditionShallowEquals(
@@ -78,10 +78,10 @@ namespace dummy.Tests
         [Test]
         public void Test_QueryCondition_deep_copy()
         {
-            Aas.QueryCondition instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalQueryCondition());
+            Our.QueryCondition instance = (
+                Our.Tests.CommonJsonization.LoadMaximalQueryCondition());
 
-            var instanceCopy = Aas.Copying.Deep(instance);
+            var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
                 QueryConditionDeepEquals(

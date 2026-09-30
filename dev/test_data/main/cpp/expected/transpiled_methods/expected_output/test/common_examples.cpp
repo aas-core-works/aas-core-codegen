@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace aas = dummy;
+namespace our = dummy;
 
 namespace test {
 namespace common {
@@ -21,42 +21,42 @@ struct StaticTypeName;
 
 template<>
 struct StaticTypeName<
-  aas::types::IFirst
+  our::types::IFirst
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::IFirst
+  our::types::IFirst
 >::name = "IFirst";
 
 template<>
 struct StaticTypeName<
-  aas::types::ISecond
+  our::types::ISecond
 > {
   static const char* name;
 };
 const char* StaticTypeName<
-  aas::types::ISecond
+  our::types::ISecond
 >::name = "ISecond";
 
 std::shared_ptr<
-  aas::types::IFirst
+  our::types::IFirst
 > LoadFirst(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::IFirst
+    our::types::IFirst
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::IFirst
+      our::types::IFirst
     >(
       abstract
     )
@@ -64,7 +64,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to IFirst from ",
         path.string()
       )
@@ -75,7 +75,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IFirst
+  our::types::IFirst
 > LoadMinFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -91,7 +91,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::IFirst
+  our::types::IFirst
 > LoadMaxFirst() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -107,23 +107,23 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISecond
+  our::types::ISecond
 > LoadSecond(
   const std::filesystem::path& path
 ) {
   
 
   std::shared_ptr<
-    aas::types::IClass
+    our::types::IClass
   > abstract = test::common::xmlization::MustReadInstance(
     path
   );
 
   std::shared_ptr<
-    aas::types::ISecond
+    our::types::ISecond
   > instance(
     std::dynamic_pointer_cast<
-      aas::types::ISecond
+      our::types::ISecond
     >(
       abstract
     )
@@ -131,7 +131,7 @@ std::shared_ptr<
 
   if (instance == nullptr) {
     throw std::runtime_error(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to cast the instance to ISecond from ",
         path.string()
       )
@@ -142,7 +142,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISecond
+  our::types::ISecond
 > LoadMinSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()
@@ -158,7 +158,7 @@ std::shared_ptr<
 }
 
 std::shared_ptr<
-  aas::types::ISecond
+  our::types::ISecond
 > LoadMaxSecond() {
   const std::filesystem::path path(
     test::common::DetermineTestDataDir()

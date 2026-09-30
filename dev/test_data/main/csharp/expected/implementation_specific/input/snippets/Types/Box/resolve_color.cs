@@ -4,5 +4,5 @@
 /// </summary>
 public Color ResolveColor(Color? fallback)
 {
-    return Color ?? fallback ?? Aas.Color.Red;
+    return Color ?? fallback ?? Our.Color.Red;
 }

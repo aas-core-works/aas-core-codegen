@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 
@@ -439,72 +439,72 @@ namespace dummy
             /// <summary>
             /// Read an instance of class Leaf from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Leaf> LeafFromElement = (
-                AtElement<Aas.Leaf>(
+            internal static readonly ElementReader<Our.Leaf> LeafFromElement = (
+                AtElement<Our.Leaf>(
                     LeafFromSequence, "leaf"));
 
             /// <summary>
             /// Read an instance of class OrderedContainer from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.OrderedContainer
+                Our.OrderedContainer
             > OrderedContainerFromElement = (
-                AtElement<Aas.OrderedContainer>(
+                AtElement<Our.OrderedContainer>(
                     OrderedContainerFromSequence, "orderedContainer"));
 
             /// <summary>
             /// Read an instance of class UnorderedContainer from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.UnorderedContainer
+                Our.UnorderedContainer
             > UnorderedContainerFromElement = (
-                AtElement<Aas.UnorderedContainer>(
+                AtElement<Our.UnorderedContainer>(
                     UnorderedContainerFromSequence, "unorderedContainer"));
 
             /// <summary>
             /// Read an instance of class GlobalAttribute from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.GlobalAttribute
+                Our.GlobalAttribute
             > GlobalAttributeFromElement = (
-                AtElement<Aas.GlobalAttribute>(
+                AtElement<Our.GlobalAttribute>(
                     GlobalAttributeFromSequence, "globalAttribute"));
 
             /// <summary>
             /// Read an instance of class LocalAttribute from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.LocalAttribute> LocalAttributeFromElement = (
-                AtElement<Aas.LocalAttribute>(
+            internal static readonly ElementReader<Our.LocalAttribute> LocalAttributeFromElement = (
+                AtElement<Our.LocalAttribute>(
                     LocalAttributeFromSequence, "localAttribute"));
 
             /// <summary>
             /// Read an instance of class AttributeOperand from its XML element.
             /// </summary>
             internal static readonly ElementReader<
-                Aas.AttributeOperand
+                Our.AttributeOperand
             > AttributeOperandFromElement = (
-                AtElement<Aas.AttributeOperand>(
+                AtElement<Our.AttributeOperand>(
                     AttributeOperandFromSequence, "attributeOperand"));
 
             /// <summary>
             /// Read an instance of class StringLiteral from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.StringLiteral> StringLiteralFromElement = (
-                AtElement<Aas.StringLiteral>(
+            internal static readonly ElementReader<Our.StringLiteral> StringLiteralFromElement = (
+                AtElement<Our.StringLiteral>(
                     StringLiteralFromSequence, "stringLiteral"));
 
             /// <summary>
             /// Read an instance of class NumberLiteral from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.NumberLiteral> NumberLiteralFromElement = (
-                AtElement<Aas.NumberLiteral>(
+            internal static readonly ElementReader<Our.NumberLiteral> NumberLiteralFromElement = (
+                AtElement<Our.NumberLiteral>(
                     NumberLiteralFromSequence, "numberLiteral"));
 
             /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
-            internal static readonly ElementReader<Aas.Something> SomethingFromElement = (
-                AtElement<Aas.Something>(
+            internal static readonly ElementReader<Our.Something> SomethingFromElement = (
+                AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
 
             private static readonly ContentReader<string> Read_string = (
@@ -518,18 +518,18 @@ namespace dummy
                 AsText<bool>(ReadContentAsBoolean));
 
             private static readonly ContentReader<AttributeItem> Read_AttributeItem = (
-                AsElement<Aas.AttributeItem>(
+                AsElement<Our.AttributeItem>(
                     AttributeItemFromElement));
 
             private static readonly ContentReader<double> Read_double = (
                 AsText<double>(ReadContentAsDouble));
 
             private static readonly ContentReader<IElement> Read_IElement = (
-                AsElement<Aas.IElement>(
+                AsElement<Our.IElement>(
                     IElementFromElement));
 
             private static readonly ContentReader<Value> Read_Value = (
-                AsElement<Aas.Value>(
+                AsElement<Our.Value>(
                     ValueFromElement));
 
             private static readonly ContentReader<List<Value>> Read_ListOf_Value = (
@@ -540,7 +540,7 @@ namespace dummy
             /// Deserialize an instance of IElement from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IElement IElementFromElement(
+            internal static Our.IElement IElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -567,7 +567,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IElement? IElementFromElement
+            }  // internal static Our.IElement? IElementFromElement
 
             /// <summary>
             /// Deserialize an instance of class Leaf from a sequence of XML elements.
@@ -577,7 +577,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Leaf LeafFromSequence(
+            internal static Our.Leaf LeafFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -677,20 +677,20 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Leaf(
+                return new Our.Leaf(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.Leaf? LeafFromSequence
+            }  // internal static Our.Leaf? LeafFromSequence
 
             /// <summary>
             /// Deserialize an instance of IContainer from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IContainer IContainerFromElement(
+            internal static Our.IContainer IContainerFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -714,7 +714,7 @@ namespace dummy
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.IContainer? IContainerFromElement
+            }  // internal static Our.IContainer? IContainerFromElement
 
             /// <summary>
             /// Deserialize an instance of class OrderedContainer from a sequence of XML elements.
@@ -724,7 +724,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.OrderedContainer OrderedContainerFromSequence(
+            internal static Our.OrderedContainer OrderedContainerFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -842,7 +842,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.OrderedContainer(
+                return new Our.OrderedContainer(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -852,7 +852,7 @@ namespace dummy
                     theIsSorted
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.OrderedContainer? OrderedContainerFromSequence
+            }  // internal static Our.OrderedContainer? OrderedContainerFromSequence
 
             /// <summary>
             /// Deserialize an instance of class UnorderedContainer from a sequence of XML elements.
@@ -862,7 +862,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.UnorderedContainer UnorderedContainerFromSequence(
+            internal static Our.UnorderedContainer UnorderedContainerFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -962,14 +962,14 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.UnorderedContainer(
+                return new Our.UnorderedContainer(
                     theIdentifier
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theChildren
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.UnorderedContainer? UnorderedContainerFromSequence
+            }  // internal static Our.UnorderedContainer? UnorderedContainerFromSequence
 
             /// <summary>
             /// Deserialize an instance of class GlobalAttribute from a sequence of XML elements.
@@ -979,7 +979,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.GlobalAttribute GlobalAttributeFromSequence(
+            internal static Our.GlobalAttribute GlobalAttributeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1061,11 +1061,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.GlobalAttribute(
+                return new Our.GlobalAttribute(
                     theKind
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.GlobalAttribute? GlobalAttributeFromSequence
+            }  // internal static Our.GlobalAttribute? GlobalAttributeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class LocalAttribute from a sequence of XML elements.
@@ -1075,7 +1075,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.LocalAttribute LocalAttributeFromSequence(
+            internal static Our.LocalAttribute LocalAttributeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1157,11 +1157,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.LocalAttribute(
+                return new Our.LocalAttribute(
                     theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.LocalAttribute? LocalAttributeFromSequence
+            }  // internal static Our.LocalAttribute? LocalAttributeFromSequence
 
             /// <summary>
             /// Deserialize an instance of class AttributeOperand from a sequence of XML elements.
@@ -1171,7 +1171,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.AttributeOperand AttributeOperandFromSequence(
+            internal static Our.AttributeOperand AttributeOperandFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1253,11 +1253,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.AttributeOperand(
+                return new Our.AttributeOperand(
                     theAttribute
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.AttributeOperand? AttributeOperandFromSequence
+            }  // internal static Our.AttributeOperand? AttributeOperandFromSequence
 
             /// <summary>
             /// Deserialize an instance of class StringLiteral from a sequence of XML elements.
@@ -1267,7 +1267,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.StringLiteral StringLiteralFromSequence(
+            internal static Our.StringLiteral StringLiteralFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1349,11 +1349,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.StringLiteral(
+                return new Our.StringLiteral(
                     theText
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.StringLiteral? StringLiteralFromSequence
+            }  // internal static Our.StringLiteral? StringLiteralFromSequence
 
             /// <summary>
             /// Deserialize an instance of class NumberLiteral from a sequence of XML elements.
@@ -1363,7 +1363,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.NumberLiteral NumberLiteralFromSequence(
+            internal static Our.NumberLiteral NumberLiteralFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1445,11 +1445,11 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.NumberLiteral(
+                return new Our.NumberLiteral(
                     theNumber
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
-            }  // internal static Aas.NumberLiteral? NumberLiteralFromSequence
+            }  // internal static Our.NumberLiteral? NumberLiteralFromSequence
 
             /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
@@ -1459,7 +1459,7 @@ namespace dummy
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.Something SomethingFromSequence(
+            internal static Our.Something SomethingFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
@@ -1587,7 +1587,7 @@ namespace dummy
                     return default!;
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     theRoot
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -1598,12 +1598,12 @@ namespace dummy
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theOptionalElement);
-            }  // internal static Aas.Something? SomethingFromSequence
+            }  // internal static Our.Something? SomethingFromSequence
 
             /// <summary>
             /// Deserialize an instance of AttributeItem from an XML element.
             /// </summary>
-            internal static Aas.AttributeItem AttributeItemFromElement(
+            internal static Our.AttributeItem AttributeItemFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1618,35 +1618,35 @@ namespace dummy
                 {
                     case "globalAttribute":
                     {
-                        Aas.GlobalAttribute instance = GlobalAttributeFromElement(
+                        Our.GlobalAttribute instance = GlobalAttributeFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.AttributeItem.FromGlobalAttribute(instance);
+                        return Our.AttributeItem.FromGlobalAttribute(instance);
                     }
                     case "localAttribute":
                     {
-                        Aas.LocalAttribute instance = LocalAttributeFromElement(
+                        Our.LocalAttribute instance = LocalAttributeFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.AttributeItem.FromLocalAttribute(instance);
+                        return Our.AttributeItem.FromLocalAttribute(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.AttributeItem? AttributeItemFromElement
+            }  // internal static Our.AttributeItem? AttributeItemFromElement
 
             /// <summary>
             /// Deserialize an instance of StringValue from an XML element.
             /// </summary>
-            internal static Aas.StringValue StringValueFromElement(
+            internal static Our.StringValue StringValueFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1661,35 +1661,35 @@ namespace dummy
                 {
                     case "stringLiteral":
                     {
-                        Aas.StringLiteral instance = StringLiteralFromElement(
+                        Our.StringLiteral instance = StringLiteralFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.StringValue.FromStringLiteral(instance);
+                        return Our.StringValue.FromStringLiteral(instance);
                     }
                     case "attributeOperand":
                     {
-                        Aas.AttributeOperand instance = AttributeOperandFromElement(
+                        Our.AttributeOperand instance = AttributeOperandFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.StringValue.FromAttributeOperand(instance);
+                        return Our.StringValue.FromAttributeOperand(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.StringValue? StringValueFromElement
+            }  // internal static Our.StringValue? StringValueFromElement
 
             /// <summary>
             /// Deserialize an instance of Value from an XML element.
             /// </summary>
-            internal static Aas.Value ValueFromElement(
+            internal static Our.Value ValueFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -1704,40 +1704,40 @@ namespace dummy
                 {
                     case "stringLiteral":
                     {
-                        Aas.StringLiteral instance = StringLiteralFromElement(
+                        Our.StringLiteral instance = StringLiteralFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.Value.FromStringLiteral(instance);
+                        return Our.Value.FromStringLiteral(instance);
                     }
                     case "attributeOperand":
                     {
-                        Aas.AttributeOperand instance = AttributeOperandFromElement(
+                        Our.AttributeOperand instance = AttributeOperandFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.Value.FromAttributeOperand(instance);
+                        return Our.Value.FromAttributeOperand(instance);
                     }
                     case "numberLiteral":
                     {
-                        Aas.NumberLiteral instance = NumberLiteralFromElement(
+                        Our.NumberLiteral instance = NumberLiteralFromElement(
                             reader, out error);
                         if (error != null)
                         {
                             return default!;
                         }
-                        return Aas.Value.FromNumberLiteral(instance);
+                        return Our.Value.FromNumberLiteral(instance);
                     }
                     default:
                         error = new Reporting.Error(
                             $"Unexpected element with the name {elementName}");
                         return default!;
                 }
-            }  // internal static Aas.Value? ValueFromElement
+            }  // internal static Our.Value? ValueFromElement
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -1762,7 +1762,7 @@ namespace dummy
         /// Here is an example how to parse an instance of class IElement:
         /// <code>
         /// var reader = new System.Xml.XmlReader(/* some arguments */);
-        /// Aas.IElement anInstance = Deserialize.IElementFrom(
+        /// Our.IElement anInstance = Deserialize.IElementFrom(
         ///     reader);
         /// </code>
         /// </example>
@@ -1781,7 +1781,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IElement.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IElement IElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IElement IElementFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1795,7 +1795,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IElement result = DeserializeImplementation.IElementFromElement(
+                Our.IElement result = DeserializeImplementation.IElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1815,7 +1815,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Leaf.
             /// </exception>
-            public static Aas.Leaf LeafFrom(
+            public static Our.Leaf LeafFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1829,7 +1829,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Leaf result = DeserializeImplementation.LeafFromElement(
+                Our.Leaf result = DeserializeImplementation.LeafFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1849,7 +1849,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of IContainer.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IContainer IContainerFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IContainer IContainerFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1863,7 +1863,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.IContainer result = DeserializeImplementation.IContainerFromElement(
+                Our.IContainer result = DeserializeImplementation.IContainerFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1883,7 +1883,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of OrderedContainer.
             /// </exception>
-            public static Aas.OrderedContainer OrderedContainerFrom(
+            public static Our.OrderedContainer OrderedContainerFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1897,7 +1897,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.OrderedContainer result = DeserializeImplementation.OrderedContainerFromElement(
+                Our.OrderedContainer result = DeserializeImplementation.OrderedContainerFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1917,7 +1917,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of UnorderedContainer.
             /// </exception>
-            public static Aas.UnorderedContainer UnorderedContainerFrom(
+            public static Our.UnorderedContainer UnorderedContainerFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1931,7 +1931,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.UnorderedContainer result = DeserializeImplementation.UnorderedContainerFromElement(
+                Our.UnorderedContainer result = DeserializeImplementation.UnorderedContainerFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1951,7 +1951,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of GlobalAttribute.
             /// </exception>
-            public static Aas.GlobalAttribute GlobalAttributeFrom(
+            public static Our.GlobalAttribute GlobalAttributeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1965,7 +1965,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.GlobalAttribute result = DeserializeImplementation.GlobalAttributeFromElement(
+                Our.GlobalAttribute result = DeserializeImplementation.GlobalAttributeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1985,7 +1985,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of LocalAttribute.
             /// </exception>
-            public static Aas.LocalAttribute LocalAttributeFrom(
+            public static Our.LocalAttribute LocalAttributeFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -1999,7 +1999,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.LocalAttribute result = DeserializeImplementation.LocalAttributeFromElement(
+                Our.LocalAttribute result = DeserializeImplementation.LocalAttributeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2019,7 +2019,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of AttributeOperand.
             /// </exception>
-            public static Aas.AttributeOperand AttributeOperandFrom(
+            public static Our.AttributeOperand AttributeOperandFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2033,7 +2033,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AttributeOperand result = DeserializeImplementation.AttributeOperandFromElement(
+                Our.AttributeOperand result = DeserializeImplementation.AttributeOperandFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2053,7 +2053,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of StringLiteral.
             /// </exception>
-            public static Aas.StringLiteral StringLiteralFrom(
+            public static Our.StringLiteral StringLiteralFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2067,7 +2067,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.StringLiteral result = DeserializeImplementation.StringLiteralFromElement(
+                Our.StringLiteral result = DeserializeImplementation.StringLiteralFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2087,7 +2087,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of NumberLiteral.
             /// </exception>
-            public static Aas.NumberLiteral NumberLiteralFrom(
+            public static Our.NumberLiteral NumberLiteralFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2101,7 +2101,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.NumberLiteral result = DeserializeImplementation.NumberLiteralFromElement(
+                Our.NumberLiteral result = DeserializeImplementation.NumberLiteralFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2121,7 +2121,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Something.
             /// </exception>
-            public static Aas.Something SomethingFrom(
+            public static Our.Something SomethingFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2135,7 +2135,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Something result = DeserializeImplementation.SomethingFromElement(
+                Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2155,7 +2155,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of AttributeItem.
             /// </exception>
-            public static Aas.AttributeItem AttributeItemFrom(
+            public static Our.AttributeItem AttributeItemFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2169,7 +2169,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.AttributeItem result = DeserializeImplementation.AttributeItemFromElement(
+                Our.AttributeItem result = DeserializeImplementation.AttributeItemFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2189,7 +2189,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of StringValue.
             /// </exception>
-            public static Aas.StringValue StringValueFrom(
+            public static Our.StringValue StringValueFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2203,7 +2203,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.StringValue result = DeserializeImplementation.StringValueFromElement(
+                Our.StringValue result = DeserializeImplementation.StringValueFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2223,7 +2223,7 @@ namespace dummy
             /// Thrown when the element is not a valid XML
             /// representation of Value.
             /// </exception>
-            public static Aas.Value ValueFrom(
+            public static Our.Value ValueFrom(
                 Xml.XmlReader reader)
             {
                 XmlCommon.SkipNoneWhitespaceAndComments(reader);
@@ -2237,7 +2237,7 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
-                Aas.Value result = DeserializeImplementation.ValueFromElement(
+                Our.Value result = DeserializeImplementation.ValueFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -2387,7 +2387,7 @@ namespace dummy
             /// or of a tuple of any of them.
             /// </remarks>
             internal static void WriteIClass(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 that.Accept(_instance, writer);
@@ -2398,16 +2398,16 @@ namespace dummy
             /// element.
             /// </summary>
             /// <remarks>
-            /// A named union is not itself an <c>Aas.IClass</c>, so it can not be
+            /// A named union is not itself an <c>Our.IClass</c>, so it can not be
             /// dispatched by <see cref="WriteIClass" /> directly. Going through
-            /// the common, non-generic <c>Aas.IUnion</c> instead of the union's own
+            /// the common, non-generic <c>Our.IUnion</c> instead of the union's own
             /// type means one writer for *all* the named unions, not one per union.
             ///
             /// Should a named union ever be allowed to flatten a primitive or
             /// an enumeration alternative, only this body has to change.
             /// </remarks>
             private static void WriteIUnion(
-                Aas.IUnion that,
+                Our.IUnion that,
                 Xml.XmlWriter writer)
             {
                 WriteIClass(that.Underlying, writer);
@@ -2440,7 +2440,7 @@ namespace dummy
                     WriteIUnion));
 
             private static void LeafToSequence(
-                Aas.ILeaf that,
+                Our.ILeaf that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2451,7 +2451,7 @@ namespace dummy
             }  // private static void LeafToSequence
 
             public override void VisitLeaf(
-                Aas.ILeaf that,
+                Our.ILeaf that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2464,7 +2464,7 @@ namespace dummy
             }
 
             private static void OrderedContainerToSequence(
-                Aas.IOrderedContainer that,
+                Our.IOrderedContainer that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2478,7 +2478,7 @@ namespace dummy
             }  // private static void OrderedContainerToSequence
 
             public override void VisitOrderedContainer(
-                Aas.IOrderedContainer that,
+                Our.IOrderedContainer that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2491,7 +2491,7 @@ namespace dummy
             }
 
             private static void UnorderedContainerToSequence(
-                Aas.IUnorderedContainer that,
+                Our.IUnorderedContainer that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2502,7 +2502,7 @@ namespace dummy
             }  // private static void UnorderedContainerToSequence
 
             public override void VisitUnorderedContainer(
-                Aas.IUnorderedContainer that,
+                Our.IUnorderedContainer that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2515,7 +2515,7 @@ namespace dummy
             }
 
             private static void GlobalAttributeToSequence(
-                Aas.IGlobalAttribute that,
+                Our.IGlobalAttribute that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2523,7 +2523,7 @@ namespace dummy
             }  // private static void GlobalAttributeToSequence
 
             public override void VisitGlobalAttribute(
-                Aas.IGlobalAttribute that,
+                Our.IGlobalAttribute that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2536,7 +2536,7 @@ namespace dummy
             }
 
             private static void LocalAttributeToSequence(
-                Aas.ILocalAttribute that,
+                Our.ILocalAttribute that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2544,7 +2544,7 @@ namespace dummy
             }  // private static void LocalAttributeToSequence
 
             public override void VisitLocalAttribute(
-                Aas.ILocalAttribute that,
+                Our.ILocalAttribute that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2557,7 +2557,7 @@ namespace dummy
             }
 
             private static void AttributeOperandToSequence(
-                Aas.IAttributeOperand that,
+                Our.IAttributeOperand that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2565,7 +2565,7 @@ namespace dummy
             }  // private static void AttributeOperandToSequence
 
             public override void VisitAttributeOperand(
-                Aas.IAttributeOperand that,
+                Our.IAttributeOperand that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2578,7 +2578,7 @@ namespace dummy
             }
 
             private static void StringLiteralToSequence(
-                Aas.IStringLiteral that,
+                Our.IStringLiteral that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2586,7 +2586,7 @@ namespace dummy
             }  // private static void StringLiteralToSequence
 
             public override void VisitStringLiteral(
-                Aas.IStringLiteral that,
+                Our.IStringLiteral that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2599,7 +2599,7 @@ namespace dummy
             }
 
             private static void NumberLiteralToSequence(
-                Aas.INumberLiteral that,
+                Our.INumberLiteral that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2607,7 +2607,7 @@ namespace dummy
             }  // private static void NumberLiteralToSequence
 
             public override void VisitNumberLiteral(
-                Aas.INumberLiteral that,
+                Our.INumberLiteral that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2620,7 +2620,7 @@ namespace dummy
             }
 
             private static void SomethingToSequence(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 WriteProperty(
@@ -2644,7 +2644,7 @@ namespace dummy
             }  // private static void SomethingToSequence
 
             public override void VisitSomething(
-                Aas.ISomething that,
+                Our.ISomething that,
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
@@ -2663,7 +2663,7 @@ namespace dummy
         /// <example>
         /// Here is an example how to serialize an instance of IElement:
         /// <code>
-        /// var anInstance = new Aas.IElement(
+        /// var anInstance = new Our.IElement(
         ///     /* ... some constructor arguments ... */
         /// );
         /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
@@ -2682,7 +2682,7 @@ namespace dummy
             /// represented in XML
             /// </exception>
             public static void To(
-                Aas.IClass that,
+                Our.IClass that,
                 Xml.XmlWriter writer)
             {
                 try

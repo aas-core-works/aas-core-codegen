@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -33,9 +33,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -169,7 +169,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -179,7 +179,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -336,7 +336,7 @@ def _list_from_jsonable(
     :return: parsed list
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is None:
         raise DeserializationException(
             f"Expected something array-like, but got: {type(jsonable)}"
@@ -377,7 +377,7 @@ def _tuple3_from_jsonable(
     :return: parsed tuple
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
-    array_like = aas_common.try_to_cast_to_array_like(jsonable)
+    array_like = our_common.try_to_cast_to_array_like(jsonable)
     if array_like is None:
         raise DeserializationException(
             f"Expected something array-like, but got: {type(jsonable)}"
@@ -426,7 +426,7 @@ def _tuple3_from_jsonable(
 
 def _list_of__mixed_union_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.MixedUnion]:
+) -> List[our_types.MixedUnion]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.MixedUnion`.
@@ -443,7 +443,7 @@ def _list_of__mixed_union_from_jsonable(
 
 def _list_of__model_typed_union_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.ModelTypedUnion]:
+) -> List[our_types.ModelTypedUnion]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.ModelTypedUnion`.
@@ -460,7 +460,7 @@ def _list_of__model_typed_union_from_jsonable(
 
 def _list_of__overlapping_union_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.OverlappingUnion]:
+) -> List[our_types.OverlappingUnion]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.OverlappingUnion`.
@@ -477,7 +477,7 @@ def _list_of__overlapping_union_from_jsonable(
 
 def _list_of__structural_union_from_jsonable(
     jsonable: Jsonable
-) -> List[aas_types.StructuralUnion]:
+) -> List[our_types.StructuralUnion]:
     """
     Parse :paramref:`jsonable` as a list of
     :py:class:`.types.StructuralUnion`.
@@ -494,7 +494,7 @@ def _list_of__structural_union_from_jsonable(
 
 def _tuple3_of__structural_union__mixed_union__model_typed_union_from_jsonable(
     jsonable: Jsonable
-) -> Tuple[aas_types.StructuralUnion, aas_types.MixedUnion, aas_types.ModelTypedUnion]:
+) -> Tuple[our_types.StructuralUnion, our_types.MixedUnion, our_types.ModelTypedUnion]:
     """
     Parse :paramref:`jsonable` as a tuple of 3 item(s).
 
@@ -512,7 +512,7 @@ def _tuple3_of__structural_union__mixed_union__model_typed_union_from_jsonable(
 
 def structural_first_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.StructuralFirst:
+) -> our_types.StructuralFirst:
     """
     Parse an instance of :py:class:`.types.StructuralFirst` from the JSON-able
     structure :paramref:`jsonable`.
@@ -547,14 +547,14 @@ def structural_first_from_jsonable(
             "The required property 'uniqueToFirst' is missing"
         )
 
-    return aas_types.StructuralFirst(
+    return our_types.StructuralFirst(
         the_unique_to_first
     )
 
 
 def structural_second_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.StructuralSecond:
+) -> our_types.StructuralSecond:
     """
     Parse an instance of :py:class:`.types.StructuralSecond` from the JSON-able
     structure :paramref:`jsonable`.
@@ -589,14 +589,14 @@ def structural_second_from_jsonable(
             "The required property 'uniqueToSecond' is missing"
         )
 
-    return aas_types.StructuralSecond(
+    return our_types.StructuralSecond(
         the_unique_to_second
     )
 
 
 def structural_union_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.StructuralUnion:
+) -> our_types.StructuralUnion:
     """
     Parse an instance of :py:class:`.types.StructuralUnion` from the JSON-able
     structure :paramref:`jsonable`.
@@ -621,7 +621,7 @@ def structural_union_from_jsonable(
 
 def mixed_abstract_member_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedAbstractMember:
+) -> our_types.MixedAbstractMember:
     """
     Parse an instance of :py:class:`.types.MixedAbstractMember` from the JSON-able
     structure :paramref:`jsonable`.
@@ -639,7 +639,7 @@ def mixed_abstract_member_from_jsonable(
 
 def mixed_abstract_descendant_one_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedAbstractDescendantOne:
+) -> our_types.MixedAbstractDescendantOne:
     """
     Parse an instance of :py:class:`.types.MixedAbstractDescendantOne` from the JSON-able
     structure :paramref:`jsonable`.
@@ -674,14 +674,14 @@ def mixed_abstract_descendant_one_from_jsonable(
             "The required property 'uniqueToAbstractDescendantOne' is missing"
         )
 
-    return aas_types.MixedAbstractDescendantOne(
+    return our_types.MixedAbstractDescendantOne(
         the_unique_to_abstract_descendant_one
     )
 
 
 def mixed_abstract_descendant_two_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedAbstractDescendantTwo:
+) -> our_types.MixedAbstractDescendantTwo:
     """
     Parse an instance of :py:class:`.types.MixedAbstractDescendantTwo` from the JSON-able
     structure :paramref:`jsonable`.
@@ -716,14 +716,14 @@ def mixed_abstract_descendant_two_from_jsonable(
             "The required property 'uniqueToAbstractDescendantTwo' is missing"
         )
 
-    return aas_types.MixedAbstractDescendantTwo(
+    return our_types.MixedAbstractDescendantTwo(
         the_unique_to_abstract_descendant_two
     )
 
 
 def mixed_concrete_with_descendants_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Parse an instance of :py:class:`.types.MixedConcreteWithDescendants` from the JSON-able
     structure :paramref:`jsonable`.
@@ -741,7 +741,7 @@ def mixed_concrete_with_descendants_from_jsonable(
 
 def _mixed_concrete_with_descendants_from_jsonable_without_dispatch(
         jsonable: Jsonable
-) -> aas_types.MixedConcreteWithDescendants:
+) -> our_types.MixedConcreteWithDescendants:
     """
     Parse an instance of :py:class:`.types.MixedConcreteWithDescendants` from the JSON-able
     structure :paramref:`jsonable`.
@@ -783,14 +783,14 @@ def _mixed_concrete_with_descendants_from_jsonable_without_dispatch(
             "The required property 'someBaseProperty' is missing"
         )
 
-    return aas_types.MixedConcreteWithDescendants(
+    return our_types.MixedConcreteWithDescendants(
         the_some_base_property
     )
 
 
 def mixed_concrete_with_descendants_child_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedConcreteWithDescendantsChild:
+) -> our_types.MixedConcreteWithDescendantsChild:
     """
     Parse an instance of :py:class:`.types.MixedConcreteWithDescendantsChild` from the JSON-able
     structure :paramref:`jsonable`.
@@ -840,7 +840,7 @@ def mixed_concrete_with_descendants_child_from_jsonable(
             "The required property 'someChildProperty' is missing"
         )
 
-    return aas_types.MixedConcreteWithDescendantsChild(
+    return our_types.MixedConcreteWithDescendantsChild(
         the_some_base_property,
         the_some_child_property
     )
@@ -848,7 +848,7 @@ def mixed_concrete_with_descendants_child_from_jsonable(
 
 def mixed_concrete_leaf_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedConcreteLeaf:
+) -> our_types.MixedConcreteLeaf:
     """
     Parse an instance of :py:class:`.types.MixedConcreteLeaf` from the JSON-able
     structure :paramref:`jsonable`.
@@ -883,14 +883,14 @@ def mixed_concrete_leaf_from_jsonable(
             "The required property 'uniqueToConcreteLeaf' is missing"
         )
 
-    return aas_types.MixedConcreteLeaf(
+    return our_types.MixedConcreteLeaf(
         the_unique_to_concrete_leaf
     )
 
 
 def mixed_union_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.MixedUnion:
+) -> our_types.MixedUnion:
     """
     Parse an instance of :py:class:`.types.MixedUnion` from the JSON-able
     structure :paramref:`jsonable`.
@@ -925,7 +925,7 @@ def mixed_union_from_jsonable(
 
 def model_typed_first_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ModelTypedFirst:
+) -> our_types.ModelTypedFirst:
     """
     Parse an instance of :py:class:`.types.ModelTypedFirst` from the JSON-able
     structure :paramref:`jsonable`.
@@ -967,14 +967,14 @@ def model_typed_first_from_jsonable(
             "The required property 'someProperty' is missing"
         )
 
-    return aas_types.ModelTypedFirst(
+    return our_types.ModelTypedFirst(
         the_some_property
     )
 
 
 def model_typed_second_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ModelTypedSecond:
+) -> our_types.ModelTypedSecond:
     """
     Parse an instance of :py:class:`.types.ModelTypedSecond` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1016,14 +1016,14 @@ def model_typed_second_from_jsonable(
             "The required property 'someProperty' is missing"
         )
 
-    return aas_types.ModelTypedSecond(
+    return our_types.ModelTypedSecond(
         the_some_property
     )
 
 
 def model_typed_union_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.ModelTypedUnion:
+) -> our_types.ModelTypedUnion:
     """
     Parse an instance of :py:class:`.types.ModelTypedUnion` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1049,7 +1049,7 @@ def model_typed_union_from_jsonable(
 
 def overlapping_union_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.OverlappingUnion:
+) -> our_types.OverlappingUnion:
     """
     Parse an instance of :py:class:`.types.OverlappingUnion` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1075,7 +1075,7 @@ def overlapping_union_from_jsonable(
 
 def something_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Parse an instance of :py:class:`.types.Something` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1086,23 +1086,23 @@ def something_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_structural_property: Optional[aas_types.StructuralUnion] = None
-    the_mixed_property: Optional[aas_types.MixedUnion] = None
-    the_model_typed_property: Optional[aas_types.ModelTypedUnion] = None
-    the_list_structural_property: Optional[List[aas_types.StructuralUnion]] = None
-    the_list_mixed_property: Optional[List[aas_types.MixedUnion]] = None
-    the_list_model_typed_property: Optional[List[aas_types.ModelTypedUnion]] = None
+    the_structural_property: Optional[our_types.StructuralUnion] = None
+    the_mixed_property: Optional[our_types.MixedUnion] = None
+    the_model_typed_property: Optional[our_types.ModelTypedUnion] = None
+    the_list_structural_property: Optional[List[our_types.StructuralUnion]] = None
+    the_list_mixed_property: Optional[List[our_types.MixedUnion]] = None
+    the_list_model_typed_property: Optional[List[our_types.ModelTypedUnion]] = None
     the_tuple_property: Optional[
         Tuple[
-            aas_types.StructuralUnion,
-            aas_types.MixedUnion,
-            aas_types.ModelTypedUnion,
+            our_types.StructuralUnion,
+            our_types.MixedUnion,
+            our_types.ModelTypedUnion,
         ]
     ] = None
-    the_optional_structural_property: Optional[aas_types.StructuralUnion] = None
-    the_optional_mixed_property: Optional[aas_types.MixedUnion] = None
-    the_optional_model_typed_property: Optional[aas_types.ModelTypedUnion] = None
-    the_optional_list_overlapping_property: Optional[List[aas_types.OverlappingUnion]] = None
+    the_optional_structural_property: Optional[our_types.StructuralUnion] = None
+    the_optional_mixed_property: Optional[our_types.MixedUnion] = None
+    the_optional_model_typed_property: Optional[our_types.ModelTypedUnion] = None
+    the_optional_list_overlapping_property: Optional[List[our_types.OverlappingUnion]] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1190,7 +1190,7 @@ def something_from_jsonable(
             "The required property 'tupleProperty' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_structural_property,
         the_mixed_property,
         the_model_typed_property,
@@ -1209,7 +1209,7 @@ def something_from_jsonable(
 #: :py:class:`.types.MixedAbstractMember`, by its model type
 _MIXED_ABSTRACT_MEMBER_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.MixedAbstractMember]
+    _Parser[our_types.MixedAbstractMember]
 ] = {
     'MixedAbstractDescendantOne': mixed_abstract_descendant_one_from_jsonable,
     'MixedAbstractDescendantTwo': mixed_abstract_descendant_two_from_jsonable,
@@ -1220,7 +1220,7 @@ _MIXED_ABSTRACT_MEMBER_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.MixedConcreteWithDescendants`, by its model type
 _MIXED_CONCRETE_WITH_DESCENDANTS_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.MixedConcreteWithDescendants]
+    _Parser[our_types.MixedConcreteWithDescendants]
 ] = {
     'MixedConcreteWithDescendants': _mixed_concrete_with_descendants_from_jsonable_without_dispatch,
     'MixedConcreteWithDescendantsChild': mixed_concrete_with_descendants_child_from_jsonable,
@@ -1231,7 +1231,7 @@ _MIXED_CONCRETE_WITH_DESCENDANTS_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.MixedUnion`, by its model type
 _MIXED_UNION_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.MixedUnion]
+    _Parser[our_types.MixedUnion]
 ] = {
     'MixedConcreteWithDescendantsChild': mixed_concrete_with_descendants_child_from_jsonable,
     'MixedConcreteWithDescendants': mixed_concrete_with_descendants_from_jsonable,
@@ -1242,7 +1242,7 @@ _MIXED_UNION_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.ModelTypedUnion`, by its model type
 _MODEL_TYPED_UNION_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.ModelTypedUnion]
+    _Parser[our_types.ModelTypedUnion]
 ] = {
     'ModelTypedFirst': model_typed_first_from_jsonable,
     'ModelTypedSecond': model_typed_second_from_jsonable,
@@ -1253,7 +1253,7 @@ _MODEL_TYPED_UNION_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.OverlappingUnion`, by its model type
 _OVERLAPPING_UNION_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.OverlappingUnion]
+    _Parser[our_types.OverlappingUnion]
 ] = {
     'ModelTypedFirst': model_typed_first_from_jsonable,
     'ModelTypedSecond': model_typed_second_from_jsonable,
@@ -1320,7 +1320,7 @@ class SerializationException(Exception):
 
 
 def _list_of__mixed_union_to_jsonable(
-    that: List[aas_types.MixedUnion]
+    that: List[our_types.MixedUnion]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -1342,7 +1342,7 @@ def _list_of__mixed_union_to_jsonable(
 
 
 def _list_of__model_typed_union_to_jsonable(
-    that: List[aas_types.ModelTypedUnion]
+    that: List[our_types.ModelTypedUnion]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -1364,7 +1364,7 @@ def _list_of__model_typed_union_to_jsonable(
 
 
 def _list_of__overlapping_union_to_jsonable(
-    that: List[aas_types.OverlappingUnion]
+    that: List[our_types.OverlappingUnion]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -1386,7 +1386,7 @@ def _list_of__overlapping_union_to_jsonable(
 
 
 def _list_of__structural_union_to_jsonable(
-    that: List[aas_types.StructuralUnion]
+    that: List[our_types.StructuralUnion]
 ) -> List[MutableJsonable]:
     """
     Serialize :paramref:`that` as a list of
@@ -1409,9 +1409,9 @@ def _list_of__structural_union_to_jsonable(
 
 def _tuple3_of__structural_union__mixed_union__model_typed_union_to_jsonable(
     that: Tuple[
-        aas_types.StructuralUnion,
-        aas_types.MixedUnion,
-        aas_types.ModelTypedUnion,
+        our_types.StructuralUnion,
+        our_types.MixedUnion,
+        our_types.ModelTypedUnion,
     ]
 ) -> List[MutableJsonable]:
     """
@@ -1446,7 +1446,7 @@ def _tuple3_of__structural_union__mixed_union__model_typed_union_to_jsonable(
 
 
 def _structural_first_to_jsonable(
-    that: aas_types.StructuralFirst
+    that: our_types.StructuralFirst
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1459,7 +1459,7 @@ def _structural_first_to_jsonable(
 
 
 def _structural_second_to_jsonable(
-    that: aas_types.StructuralSecond
+    that: our_types.StructuralSecond
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1472,7 +1472,7 @@ def _structural_second_to_jsonable(
 
 
 def _mixed_abstract_descendant_one_to_jsonable(
-    that: aas_types.MixedAbstractDescendantOne
+    that: our_types.MixedAbstractDescendantOne
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1485,7 +1485,7 @@ def _mixed_abstract_descendant_one_to_jsonable(
 
 
 def _mixed_abstract_descendant_two_to_jsonable(
-    that: aas_types.MixedAbstractDescendantTwo
+    that: our_types.MixedAbstractDescendantTwo
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1498,7 +1498,7 @@ def _mixed_abstract_descendant_two_to_jsonable(
 
 
 def _mixed_concrete_with_descendants_to_jsonable(
-    that: aas_types.MixedConcreteWithDescendants
+    that: our_types.MixedConcreteWithDescendants
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1512,7 +1512,7 @@ def _mixed_concrete_with_descendants_to_jsonable(
 
 
 def _mixed_concrete_with_descendants_child_to_jsonable(
-    that: aas_types.MixedConcreteWithDescendantsChild
+    that: our_types.MixedConcreteWithDescendantsChild
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1531,7 +1531,7 @@ def _mixed_concrete_with_descendants_child_to_jsonable(
 
 
 def _mixed_concrete_leaf_to_jsonable(
-    that: aas_types.MixedConcreteLeaf
+    that: our_types.MixedConcreteLeaf
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1544,7 +1544,7 @@ def _mixed_concrete_leaf_to_jsonable(
 
 
 def _model_typed_first_to_jsonable(
-    that: aas_types.ModelTypedFirst
+    that: our_types.ModelTypedFirst
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1558,7 +1558,7 @@ def _model_typed_first_to_jsonable(
 
 
 def _model_typed_second_to_jsonable(
-    that: aas_types.ModelTypedSecond
+    that: our_types.ModelTypedSecond
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1572,7 +1572,7 @@ def _model_typed_second_to_jsonable(
 
 
 def _something_to_jsonable(
-    that: aas_types.Something
+    that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -1649,7 +1649,7 @@ def _something_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -1695,12 +1695,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

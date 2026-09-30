@@ -3,8 +3,8 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy; // renamed
-using AasEnhancing = dummy.Enhancing; // renamed
+using Our = dummy; // renamed
+using OurEnhancing = dummy.Enhancing; // renamed
 
 using System.Collections.Generic; // can't alias
 using System.Linq; // can't alias
@@ -25,7 +25,7 @@ namespace dummy.Tests
             }
         }
 
-        private static AasEnhancing.Enhancer<Enhancement> CreateEnhancer()
+        private static OurEnhancing.Enhancer<Enhancement> CreateEnhancer()
         {
             long lastCustomId = 0;
 
@@ -37,14 +37,14 @@ namespace dummy.Tests
                 }
             );
 
-            return new AasEnhancing.Enhancer<Enhancement>(enhancementFactory);
+            return new OurEnhancing.Enhancer<Enhancement>(enhancementFactory);
         }
 
         [Test]
         public void Test_Leaf()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLeaf()
+                Our.Tests.CommonJsonization.LoadMaximalLeaf()
             );
 
             var enhancer = CreateEnhancer();
@@ -74,7 +74,7 @@ namespace dummy.Tests
         public void Test_OrderedContainer()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalOrderedContainer()
+                Our.Tests.CommonJsonization.LoadMaximalOrderedContainer()
             );
 
             var enhancer = CreateEnhancer();
@@ -104,7 +104,7 @@ namespace dummy.Tests
         public void Test_UnorderedContainer()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalUnorderedContainer()
+                Our.Tests.CommonJsonization.LoadMaximalUnorderedContainer()
             );
 
             var enhancer = CreateEnhancer();
@@ -134,7 +134,7 @@ namespace dummy.Tests
         public void Test_GlobalAttribute()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalGlobalAttribute()
+                Our.Tests.CommonJsonization.LoadMaximalGlobalAttribute()
             );
 
             var enhancer = CreateEnhancer();
@@ -164,7 +164,7 @@ namespace dummy.Tests
         public void Test_LocalAttribute()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalLocalAttribute()
+                Our.Tests.CommonJsonization.LoadMaximalLocalAttribute()
             );
 
             var enhancer = CreateEnhancer();
@@ -194,7 +194,7 @@ namespace dummy.Tests
         public void Test_AttributeOperand()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalAttributeOperand()
+                Our.Tests.CommonJsonization.LoadMaximalAttributeOperand()
             );
 
             var enhancer = CreateEnhancer();
@@ -224,7 +224,7 @@ namespace dummy.Tests
         public void Test_StringLiteral()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalStringLiteral()
+                Our.Tests.CommonJsonization.LoadMaximalStringLiteral()
             );
 
             var enhancer = CreateEnhancer();
@@ -254,7 +254,7 @@ namespace dummy.Tests
         public void Test_NumberLiteral()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalNumberLiteral()
+                Our.Tests.CommonJsonization.LoadMaximalNumberLiteral()
             );
 
             var enhancer = CreateEnhancer();
@@ -284,7 +284,7 @@ namespace dummy.Tests
         public void Test_Something()
         {
             var instance = (
-                Aas.Tests.CommonJsonization.LoadMaximalSomething()
+                Our.Tests.CommonJsonization.LoadMaximalSomething()
             );
 
             var enhancer = CreateEnhancer();

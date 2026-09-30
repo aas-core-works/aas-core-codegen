@@ -418,7 +418,7 @@ class _TranspilableVerificationTranspiler(python_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_name = python_naming.constant_name(node.identifier)
-            return Stripped(f"aas_constants.{constant_name}"), None
+            return Stripped(f"our_constants.{constant_name}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(python_naming.function_name(node.identifier)), None
@@ -426,7 +426,7 @@ class _TranspilableVerificationTranspiler(python_transpilation.Transpiler):
         our_type = self._symbol_table.find_our_type(name=node.identifier)
         if isinstance(our_type, intermediate.Enumeration):
             return (
-                Stripped(f"aas_types.{python_naming.enum_name(node.identifier)}"),
+                Stripped(f"our_types.{python_naming.enum_name(node.identifier)}"),
                 None,
             )
 
@@ -489,13 +489,13 @@ def _transpile_transpilable_verification(
         return_type = "None"
     else:
         return_type = python_common.generate_type(
-            type_annotation=verification.returns, types_module=Identifier("aas_types")
+            type_annotation=verification.returns, types_module=Identifier("our_types")
         )
 
     arg_defs = []  # type: List[Stripped]
     for arg in verification.arguments:
         arg_type = python_common.generate_argument_type(
-            arg, types_module=Identifier("aas_types")
+            arg, types_module=Identifier("our_types")
         )
         arg_name = python_naming.argument_name(arg.name)
         arg_defs.append(Stripped(f"{arg_name}: {arg_type}"))
@@ -588,7 +588,7 @@ class _InvariantTranspiler(python_transpilation.Transpiler):
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_name = python_naming.constant_name(node.identifier)
-            return Stripped(f"aas_constants.{constant_name}"), None
+            return Stripped(f"our_constants.{constant_name}"), None
 
         if node.identifier in self._symbol_table.verification_functions_by_name:
             return Stripped(python_naming.function_name(node.identifier)), None
@@ -596,7 +596,7 @@ class _InvariantTranspiler(python_transpilation.Transpiler):
         our_type = self._symbol_table.find_our_type(name=node.identifier)
         if isinstance(our_type, intermediate.Enumeration):
             return (
-                Stripped(f"aas_types.{python_naming.enum_name(node.identifier)}"),
+                Stripped(f"our_types.{python_naming.enum_name(node.identifier)}"),
                 None,
             )
 
@@ -961,15 +961,15 @@ for error in self.transform(
         ):
             if isinstance(type_anno.items, intermediate.JsonValueTypeAnnotation):
                 item_verify_function = Stripped(
-                    "aas_json_value_verification.verify_json_value"
+                    "our_json_value_verification.verify_json_value"
                 )
             elif isinstance(type_anno.items, intermediate.JsonArrayTypeAnnotation):
                 item_verify_function = Stripped(
-                    "aas_json_value_verification.verify_json_array"
+                    "our_json_value_verification.verify_json_array"
                 )
             else:
                 item_verify_function = Stripped(
-                    "aas_json_value_verification.verify_json_object"
+                    "our_json_value_verification.verify_json_object"
                 )
 
             for_error = Stripped(
@@ -1119,15 +1119,15 @@ for error in self.transform(
             ):
                 if isinstance(item_type_anno, intermediate.JsonValueTypeAnnotation):
                     item_verify_function = Stripped(
-                        "aas_json_value_verification.verify_json_value"
+                        "our_json_value_verification.verify_json_value"
                     )
                 elif isinstance(item_type_anno, intermediate.JsonArrayTypeAnnotation):
                     item_verify_function = Stripped(
-                        "aas_json_value_verification.verify_json_array"
+                        "our_json_value_verification.verify_json_array"
                     )
                 else:
                     item_verify_function = Stripped(
-                        "aas_json_value_verification.verify_json_object"
+                        "our_json_value_verification.verify_json_object"
                     )
 
                 for_error_in_verification = Stripped(
@@ -1173,11 +1173,11 @@ for error in {item_verify_function}(
         ),
     ):
         if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-            verify_function = Stripped("aas_json_value_verification.verify_json_value")
+            verify_function = Stripped("our_json_value_verification.verify_json_value")
         elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-            verify_function = Stripped("aas_json_value_verification.verify_json_array")
+            verify_function = Stripped("our_json_value_verification.verify_json_array")
         else:
-            verify_function = Stripped("aas_json_value_verification.verify_json_object")
+            verify_function = Stripped("our_json_value_verification.verify_json_object")
 
         stmts.append(
             Stripped(
@@ -1377,7 +1377,7 @@ yield"""
 # noinspection PyMethodMayBeStatic
 def {transform_name}(
 {II}self,
-{II}that: aas_types.{cls_name}
+{II}that: our_types.{cls_name}
 ) -> Iterator[Error]:
 """
     )
@@ -1420,7 +1420,7 @@ def _generate_transformer(
     writer.write(
         f"""\
 class _Transformer(
-{II}aas_types.AbstractTransformer[
+{II}our_types.AbstractTransformer[
 {III}Iterator[Error]
 {II}]
 ):
@@ -1551,14 +1551,14 @@ Here is an example how to verify an instance of :py:class:`{qualified_module_nam
 
 .. code-block::
 
-    import {qualified_module_name}.types as aas_types
-    import {qualified_module_name}.verification as aas_verification
+    import {qualified_module_name}.types as our_types
+    import {qualified_module_name}.verification as our_verification
 
-    {an_instance_variable} = aas_types.{cls_name}(
+    {an_instance_variable} = our_types.{cls_name}(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify({an_instance_variable}):
+    for error in our_verification.verify({an_instance_variable}):
         print(f"{{error.cause}} at: {{error.path}}")"""
             )
         )
@@ -1601,7 +1601,7 @@ def generate(
     # generated where the meta-model actually has such a value.
     json_value_verification_import = (
         f"\nimport {qualified_module_name}.jsonvalueverification"
-        f" as aas_json_value_verification"
+        f" as our_json_value_verification"
         if intermediate_uses.json_types(symbol_table)
         else ""
     )
@@ -1610,12 +1610,12 @@ def generate(
     # The helpers of the transpiled code live in the common module, so that both
     # the types and the verification can use them.
     imported_modules = [
-        "constants as aas_constants",
-        "reporting as aas_reporting",
-        "types as aas_types",
+        "constants as our_constants",
+        "reporting as our_reporting",
+        "types as our_types",
     ]
     if intermediate_uses.int_call(symbol_table):
-        imported_modules.insert(0, "common as aas_common")
+        imported_modules.insert(0, "common as our_common")
 
     imported_modules_joined = "\n".join(
         f"{I}{imported_module}," for imported_module in imported_modules
@@ -1676,13 +1676,13 @@ from {qualified_module_name} import (
         # before the two were split apart.
         Stripped(
             """\
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error"""
+Error = our_reporting.Error"""
         ),
     ]  # type: List[Stripped]
 
@@ -1754,7 +1754,7 @@ Error = aas_reporting.Error"""
         Stripped(
             f"""\
 def verify(
-{II}that: aas_types.Class
+{II}that: our_types.Class
 ) -> Iterator[Error]:
 {I}\"\"\"
 {I}Verify the constraints of :paramref:`that` recursively.

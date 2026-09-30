@@ -1,5 +1,5 @@
 """
-Read and write AAS models as XML.
+Read and write model instances as XML.
 
 For reading, we provide different reading functions, each handling a different kind
 of input. All the reading functions operate in one pass, *i.e.*, the source is read
@@ -42,10 +42,10 @@ Here is an example usage how to de-serialize from a file:
     import pathlib
     import xml.etree.ElementTree as ET
 
-    import dummy.xmlization as aas_xmlization
+    import dummy.xmlization as our_xmlization
 
     path = pathlib.Path(...)
-    instance = aas_xmlization.read_some_item_from_file(
+    instance = our_xmlization.read_some_item_from_file(
         path
     )
 
@@ -57,8 +57,8 @@ Here is another code example where we serialize the instance:
 
     import pathlib
 
-    import dummy.types as aas_types
-    import dummy.xmlization as aas_xmlization
+    import dummy.types as our_types
+    import dummy.xmlization as our_xmlization
 
     instance = SomeItem(
        ... # some constructor arguments
@@ -66,7 +66,7 @@ Here is another code example where we serialize the instance:
 
     pth = pathlib.Path(...)
     with pth.open("wt") as fid:
-        aas_xmlization.write(instance, fid)
+        our_xmlization.write(instance, fid)
 """
 
 
@@ -103,9 +103,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
-import dummy.xmlcommon as aas_xmlcommon
+import dummy.stringification as our_stringification
+import dummy.types as our_types
+import dummy.xmlcommon as our_xmlcommon
 from dummy.xmlcommon import (
     XS_WHITESPACE_RE,
     collapse_whitespace,
@@ -125,23 +125,23 @@ else:
 
 
 #: XML namespace in which all the elements are expected to reside
-NAMESPACE = aas_xmlcommon.NAMESPACE
+NAMESPACE = our_xmlcommon.NAMESPACE
 
 
 # region De-serialization
 
 
-Element = aas_xmlcommon.Element
-HasIterparse = aas_xmlcommon.HasIterparse
+Element = our_xmlcommon.Element
+HasIterparse = our_xmlcommon.HasIterparse
 
-ElementSegment = aas_xmlcommon.ElementSegment
-IndexSegment = aas_xmlcommon.IndexSegment
-KeySegment = aas_xmlcommon.KeySegment
-Segment = aas_xmlcommon.Segment
-Path = aas_xmlcommon.Path
+ElementSegment = our_xmlcommon.ElementSegment
+IndexSegment = our_xmlcommon.IndexSegment
+KeySegment = our_xmlcommon.KeySegment
+Segment = our_xmlcommon.Segment
+Path = our_xmlcommon.Path
 
-DeserializationException = aas_xmlcommon.DeserializationException
-SerializationException = aas_xmlcommon.SerializationException
+DeserializationException = our_xmlcommon.DeserializationException
+SerializationException = our_xmlcommon.SerializationException
 
 
 def _with_elements_cleared_after_yield(
@@ -161,7 +161,7 @@ def _with_elements_cleared_after_yield(
 
 def abstract_item_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.AbstractItem:
+) -> our_types.AbstractItem:
     """
     Read an instance of :py:class:`.types.AbstractItem` from
     the :paramref:`iterator`.
@@ -173,7 +173,7 @@ def abstract_item_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -181,7 +181,7 @@ def abstract_item_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.abstract_item_from_iterparse(
+            instance = our_xmlization.abstract_item_from_iterparse(
                 iterator
             )
 
@@ -206,7 +206,7 @@ def abstract_item_from_iterparse(
 def abstract_item_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AbstractItem:
+) -> our_types.AbstractItem:
     """
     Read an instance of :py:class:`.types.AbstractItem` from
     the :paramref:`stream`.
@@ -215,10 +215,10 @@ def abstract_item_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.abstract_item_from_stream(
+            instance = our_xmlization.abstract_item_from_stream(
                 stream
             )
 
@@ -250,7 +250,7 @@ def abstract_item_from_stream(
 def abstract_item_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AbstractItem:
+) -> our_types.AbstractItem:
     """
     Read an instance of :py:class:`.types.AbstractItem` from
     the :paramref:`path`.
@@ -260,10 +260,10 @@ def abstract_item_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.abstract_item_from_file(
+        instance = our_xmlization.abstract_item_from_file(
             path
         )
 
@@ -296,7 +296,7 @@ def abstract_item_from_file(
 def abstract_item_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AbstractItem:
+) -> our_types.AbstractItem:
     """
     Read an instance of :py:class:`.types.AbstractItem` from
     the :paramref:`text`.
@@ -306,10 +306,10 @@ def abstract_item_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.abstract_item_from_str(
+        instance = our_xmlization.abstract_item_from_str(
             text
         )
 
@@ -340,7 +340,7 @@ def abstract_item_from_str(
 
 def some_item_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem` from
     the :paramref:`iterator`.
@@ -352,7 +352,7 @@ def some_item_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -360,7 +360,7 @@ def some_item_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.some_item_from_iterparse(
+            instance = our_xmlization.some_item_from_iterparse(
                 iterator
             )
 
@@ -385,7 +385,7 @@ def some_item_from_iterparse(
 def some_item_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem` from
     the :paramref:`stream`.
@@ -394,10 +394,10 @@ def some_item_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.some_item_from_stream(
+            instance = our_xmlization.some_item_from_stream(
                 stream
             )
 
@@ -429,7 +429,7 @@ def some_item_from_stream(
 def some_item_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem` from
     the :paramref:`path`.
@@ -439,10 +439,10 @@ def some_item_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.some_item_from_file(
+        instance = our_xmlization.some_item_from_file(
             path
         )
 
@@ -475,7 +475,7 @@ def some_item_from_file(
 def some_item_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem` from
     the :paramref:`text`.
@@ -485,10 +485,10 @@ def some_item_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.some_item_from_str(
+        instance = our_xmlization.some_item_from_str(
             text
         )
 
@@ -519,7 +519,7 @@ def some_item_from_str(
 
 def another_item_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem` from
     the :paramref:`iterator`.
@@ -531,7 +531,7 @@ def another_item_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -539,7 +539,7 @@ def another_item_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.another_item_from_iterparse(
+            instance = our_xmlization.another_item_from_iterparse(
                 iterator
             )
 
@@ -564,7 +564,7 @@ def another_item_from_iterparse(
 def another_item_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem` from
     the :paramref:`stream`.
@@ -573,10 +573,10 @@ def another_item_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.another_item_from_stream(
+            instance = our_xmlization.another_item_from_stream(
                 stream
             )
 
@@ -608,7 +608,7 @@ def another_item_from_stream(
 def another_item_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem` from
     the :paramref:`path`.
@@ -618,10 +618,10 @@ def another_item_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.another_item_from_file(
+        instance = our_xmlization.another_item_from_file(
             path
         )
 
@@ -654,7 +654,7 @@ def another_item_from_file(
 def another_item_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem` from
     the :paramref:`text`.
@@ -664,10 +664,10 @@ def another_item_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.another_item_from_str(
+        instance = our_xmlization.another_item_from_str(
             text
         )
 
@@ -698,7 +698,7 @@ def another_item_from_str(
 
 def simple_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple` from
     the :paramref:`iterator`.
@@ -710,7 +710,7 @@ def simple_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -718,7 +718,7 @@ def simple_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.simple_from_iterparse(
+            instance = our_xmlization.simple_from_iterparse(
                 iterator
             )
 
@@ -743,7 +743,7 @@ def simple_from_iterparse(
 def simple_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple` from
     the :paramref:`stream`.
@@ -752,10 +752,10 @@ def simple_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.simple_from_stream(
+            instance = our_xmlization.simple_from_stream(
                 stream
             )
 
@@ -787,7 +787,7 @@ def simple_from_stream(
 def simple_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple` from
     the :paramref:`path`.
@@ -797,10 +797,10 @@ def simple_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.simple_from_file(
+        instance = our_xmlization.simple_from_file(
             path
         )
 
@@ -833,7 +833,7 @@ def simple_from_file(
 def simple_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple` from
     the :paramref:`text`.
@@ -843,10 +843,10 @@ def simple_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.simple_from_str(
+        instance = our_xmlization.simple_from_str(
             text
         )
 
@@ -877,7 +877,7 @@ def simple_from_str(
 
 def something_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`iterator`.
@@ -889,7 +889,7 @@ def something_from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -897,7 +897,7 @@ def something_from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.something_from_iterparse(
+            instance = our_xmlization.something_from_iterparse(
                 iterator
             )
 
@@ -922,7 +922,7 @@ def something_from_iterparse(
 def something_from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`stream`.
@@ -931,10 +931,10 @@ def something_from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.something_from_stream(
+            instance = our_xmlization.something_from_stream(
                 stream
             )
 
@@ -966,7 +966,7 @@ def something_from_stream(
 def something_from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`path`.
@@ -976,10 +976,10 @@ def something_from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.something_from_file(
+        instance = our_xmlization.something_from_file(
             path
         )
 
@@ -1012,7 +1012,7 @@ def something_from_file(
 def something_from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     the :paramref:`text`.
@@ -1022,10 +1022,10 @@ def something_from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.something_from_str(
+        instance = our_xmlization.something_from_str(
             text
         )
 
@@ -1056,7 +1056,7 @@ def something_from_str(
 
 def from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`iterator`.
 
@@ -1069,7 +1069,7 @@ def from_iterparse(
         import pathlib
         import xml.etree.ElementTree as ET
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
         with path.open("rt") as fid:
@@ -1077,7 +1077,7 @@ def from_iterparse(
                 source=fid,
                 events=['start', 'end']
             )
-            instance = aas_xmlization.from_iterparse(
+            instance = our_xmlization.from_iterparse(
                 iterator
             )
 
@@ -1101,7 +1101,7 @@ def from_iterparse(
 def from_stream(
     stream: TextIO,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`stream`.
 
@@ -1111,10 +1111,10 @@ def from_stream(
 
     .. code-block::
 
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         with open_some_stream_over_network(...) as stream:
-            instance = aas_xmlization.from_stream(
+            instance = our_xmlization.from_stream(
                 stream
             )
 
@@ -1144,7 +1144,7 @@ def from_stream(
 def from_file(
     path: PathLike,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the file at the :paramref:`path`.
 
@@ -1153,10 +1153,10 @@ def from_file(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         path = pathlib.Path(...)
-        instance = aas_xmlization.from_file(
+        instance = our_xmlization.from_file(
             path
         )
 
@@ -1187,7 +1187,7 @@ def from_file(
 def from_str(
     text: str,
     has_iterparse: HasIterparse = xml.etree.ElementTree
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from the :paramref:`text`.
 
@@ -1196,10 +1196,10 @@ def from_str(
     .. code-block::
 
         import pathlib
-        import dummy.xmlization as aas_xmlization
+        import dummy.xmlization as our_xmlization
 
         text = "<...>...</...>"
-        instance = aas_xmlization.from_str(
+        instance = our_xmlization.from_str(
             text
         )
 
@@ -1592,7 +1592,7 @@ def _read_int_from_element_text(
 def _read_list_of__abstract_item(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.AbstractItem]:
+) -> List[our_types.AbstractItem]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.AbstractItem`.
@@ -1607,7 +1607,7 @@ def _read_list_of__abstract_item(
 def _read_list_of__simple(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> List[aas_types.Simple]:
+) -> List[our_types.Simple]:
     """
     Read the items of :paramref:`element` as a list of
     :py:class:`.types.Simple`.
@@ -1622,7 +1622,7 @@ def _read_list_of__simple(
 def _read_abstract_item_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.AbstractItem:
+) -> our_types.AbstractItem:
     """
     Read an instance of :py:class:`.types.AbstractItem` from
     :paramref:`iterator`, including the end element.
@@ -1646,7 +1646,7 @@ def _read_abstract_item_as_element(
 def _read_some_item_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem`
     as a sequence of XML-encoded properties.
@@ -1675,7 +1675,7 @@ def _read_some_item_as_sequence(
             "The required property 'name' is missing"
         )
 
-    return aas_types.SomeItem(
+    return our_types.SomeItem(
         the_name
     )
 
@@ -1683,7 +1683,7 @@ def _read_some_item_as_sequence(
 def _read_some_item_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.SomeItem:
+) -> our_types.SomeItem:
     """
     Read an instance of :py:class:`.types.SomeItem` from
     :paramref:`iterator`, including the end element.
@@ -1707,7 +1707,7 @@ def _read_some_item_as_element(
 def _read_another_item_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem`
     as a sequence of XML-encoded properties.
@@ -1736,7 +1736,7 @@ def _read_another_item_as_sequence(
             "The required property 'serialNumber' is missing"
         )
 
-    return aas_types.AnotherItem(
+    return our_types.AnotherItem(
         the_serial_number
     )
 
@@ -1744,7 +1744,7 @@ def _read_another_item_as_sequence(
 def _read_another_item_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.AnotherItem:
+) -> our_types.AnotherItem:
     """
     Read an instance of :py:class:`.types.AnotherItem` from
     :paramref:`iterator`, including the end element.
@@ -1768,7 +1768,7 @@ def _read_another_item_as_element(
 def _read_simple_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple`
     as a sequence of XML-encoded properties.
@@ -1797,7 +1797,7 @@ def _read_simple_as_sequence(
             "The required property 'name' is missing"
         )
 
-    return aas_types.Simple(
+    return our_types.Simple(
         the_name
     )
 
@@ -1805,7 +1805,7 @@ def _read_simple_as_sequence(
 def _read_simple_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Simple:
+) -> our_types.Simple:
     """
     Read an instance of :py:class:`.types.Simple` from
     :paramref:`iterator`, including the end element.
@@ -1829,7 +1829,7 @@ def _read_simple_as_element(
 def _read_something_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something`
     as a sequence of XML-encoded properties.
@@ -1851,9 +1851,9 @@ def _read_something_as_sequence(
         _READERS_FOR_SOMETHING
     )
 
-    the_item: Optional[aas_types.Simple] = values.get('item')
-    the_some_items: Optional[List[aas_types.AbstractItem]] = values.get('someItems')
-    the_some_simples: Optional[List[aas_types.Simple]] = values.get('someSimples')
+    the_item: Optional[our_types.Simple] = values.get('item')
+    the_some_items: Optional[List[our_types.AbstractItem]] = values.get('someItems')
+    the_some_simples: Optional[List[our_types.Simple]] = values.get('someSimples')
 
     if the_item is None:
         raise DeserializationException(
@@ -1870,7 +1870,7 @@ def _read_something_as_sequence(
             "The required property 'someSimples' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_item,
         the_some_items,
         the_some_simples
@@ -1880,7 +1880,7 @@ def _read_something_as_sequence(
 def _read_something_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Read an instance of :py:class:`.types.Something` from
     :paramref:`iterator`, including the end element.
@@ -1904,7 +1904,7 @@ def _read_something_as_element(
 def _read_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
-) -> aas_types.Class:
+) -> our_types.Class:
     """
     Read an instance from :paramref:`iterator`, including the end element.
 
@@ -1933,7 +1933,7 @@ _DISPATCH_FOR_ABSTRACT_ITEM: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.AbstractItem
+        our_types.AbstractItem
     ]
 ] = {
     'anotherItem': _read_another_item_as_sequence,
@@ -1950,7 +1950,7 @@ _GENERAL_DISPATCH: Mapping[
             Element,
             Iterator[Tuple[str, Element]]
         ],
-        aas_types.Class
+        our_types.Class
     ]
 ] = {
     'someItem': _read_some_item_as_sequence,
@@ -2158,7 +2158,7 @@ def _write_str_as_element(
 def _write_list_of_instances(
     name: str,
     prop_name: Optional[str],
-    items: Sequence[aas_types.Class],
+    items: Sequence[our_types.Class],
     serializer: '_Serializer'
 ) -> None:
     """
@@ -2196,7 +2196,7 @@ def _write_list_of_instances(
 def _write_some_item_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.SomeItem,
+    that: our_types.SomeItem,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -2221,7 +2221,7 @@ def _write_some_item_as_element(
 def _write_another_item_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.AnotherItem,
+    that: our_types.AnotherItem,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -2248,7 +2248,7 @@ def _write_another_item_as_element(
 def _write_simple_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.Simple,
+    that: our_types.Simple,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -2273,7 +2273,7 @@ def _write_simple_as_element(
 def _write_something_as_element(
     name: str,
     prop_name: Optional[str],
-    that: aas_types.Something,
+    that: our_types.Something,
     serializer: '_Serializer'
 ) -> None:
     """
@@ -2299,11 +2299,11 @@ def _write_something_as_element(
         _attribute_to_property(exception, prop_name)
 
 
-class _Serializer(aas_types.AbstractVisitor):
+class _Serializer(our_types.AbstractVisitor):
     """Encode instances as XML and write them to :py:attr:`~writer`."""
 
     #: Frame the XML elements of the document which we are writing
-    writer: Final[aas_xmlcommon.Writer]
+    writer: Final[our_xmlcommon.Writer]
 
     def __init__(
         self,
@@ -2317,11 +2317,11 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param stream: where to write to
         """
-        self.writer = aas_xmlcommon.Writer(stream)
+        self.writer = our_xmlcommon.Writer(stream)
 
     def visit_some_item(
         self,
-        that: aas_types.SomeItem
+        that: our_types.SomeItem
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -2335,7 +2335,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_another_item(
         self,
-        that: aas_types.AnotherItem
+        that: our_types.AnotherItem
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -2349,7 +2349,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_simple(
         self,
-        that: aas_types.Simple
+        that: our_types.Simple
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -2363,7 +2363,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
     def visit_something(
         self,
-        that: aas_types.Something
+        that: our_types.Something
     ) -> None:
         """
         Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
@@ -2376,7 +2376,7 @@ class _Serializer(aas_types.AbstractVisitor):
         _write_something_as_element('something', None, that, self)
 
 
-def write(instance: aas_types.Class, stream: TextIO) -> None:
+def write(instance: our_types.Class, stream: TextIO) -> None:
     """
     Write the XML representation of :paramref:`instance` to :paramref:`stream`.
 
@@ -2386,8 +2386,8 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
 
         import pathlib
 
-        import dummy.types as aas_types
-        import dummy.xmlization as aas_xmlization
+        import dummy.types as our_types
+        import dummy.xmlization as our_xmlization
 
         instance = SomeItem(
            ... # some constructor arguments
@@ -2395,7 +2395,7 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
 
         pth = pathlib.Path(...)
         with pth.open("wt") as fid:
-            aas_xmlization.write(instance, fid)
+            our_xmlization.write(instance, fid)
 
     :param instance: to be serialized
     :param stream: to write to
@@ -2411,7 +2411,7 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
         _attribute_to_property(exception, None)
 
 
-def to_str(that: aas_types.Class) -> str:
+def to_str(that: our_types.Class) -> str:
     """
     Serialize :paramref:`that` to an XML-encoded text.
 

@@ -138,17 +138,17 @@ public class TestXmlizationOfConcreteClasses {
     xmlInputFactory.createXMLEventReader(new StringReader(outputText));
   final Map<XMLEvent, String> outputMap = buildElementsMap(outputReader);
 
-  // check output for aas-name-space
+  // check the namespace of the output
   for (XMLEvent event : outputMap.keySet()) {
     if (event.isStartElement()) {
       assertTrue(
-        Xmlization.AAS_NAME_SPACE.equals(event.asStartElement().getName().getNamespaceURI())
+        Xmlization.NAMESPACE.equals(event.asStartElement().getName().getNamespaceURI())
           || event.asStartElement().getName().getNamespaceURI().isEmpty(),
         "Unexpected namespace of " + event.asStartElement().getName());
     }
     if (event.isEndElement()) {
       assertTrue(
-        Xmlization.AAS_NAME_SPACE.equals(event.asEndElement().getName().getNamespaceURI())
+        Xmlization.NAMESPACE.equals(event.asEndElement().getName().getNamespaceURI())
           || event.asEndElement().getName().getNamespaceURI().isEmpty(),
         "Unexpected namespace of " + event.asEndElement().getName());
     }

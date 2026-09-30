@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
@@ -31,13 +31,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedExtension<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IExtension
+            : Enhanced<TEnhancement>, Our.IExtension
             where TEnhancement : class
         {
-            private readonly Aas.IExtension _instance;
+            private readonly Our.IExtension _instance;
 
             public EnhancedExtension(
-                Aas.IExtension instance,
+                Our.IExtension instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -80,32 +80,32 @@ namespace AasCore.Aas3_0
                 set => _instance.RefersTo = value;
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverRefersToOrEmpty()
+            public IEnumerable<Our.IReference> OverRefersToOrEmpty()
             {
                 return _instance.OverRefersToOrEmpty();
             }
 
-            public Aas.DataTypeDefXsd ValueTypeOrDefault()
+            public Our.DataTypeDefXsd ValueTypeOrDefault()
             {
                 return _instance.ValueTypeOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitExtension(_instance);
             }
@@ -133,13 +133,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedAdministrativeInformation<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IAdministrativeInformation
+            : Enhanced<TEnhancement>, Our.IAdministrativeInformation
             where TEnhancement : class
         {
-            private readonly Aas.IAdministrativeInformation _instance;
+            private readonly Our.IAdministrativeInformation _instance;
 
             public EnhancedAdministrativeInformation(
-                Aas.IAdministrativeInformation instance,
+                Our.IAdministrativeInformation instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -176,22 +176,22 @@ namespace AasCore.Aas3_0
                 set => _instance.TemplateId = value;
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitAdministrativeInformation(_instance);
             }
@@ -219,13 +219,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedQualifier<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IQualifier
+            : Enhanced<TEnhancement>, Our.IQualifier
             where TEnhancement : class
         {
-            private readonly Aas.IQualifier _instance;
+            private readonly Our.IQualifier _instance;
 
             public EnhancedQualifier(
-                Aas.IQualifier instance,
+                Our.IQualifier instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -274,27 +274,27 @@ namespace AasCore.Aas3_0
                 set => _instance.ValueId = value;
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public Aas.QualifierKind KindOrDefault()
+            public Our.QualifierKind KindOrDefault()
             {
                 return _instance.KindOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitQualifier(_instance);
             }
@@ -322,13 +322,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedAssetAdministrationShell<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IAssetAdministrationShell
+            : Enhanced<TEnhancement>, Our.IAssetAdministrationShell
             where TEnhancement : class
         {
-            private readonly Aas.IAssetAdministrationShell _instance;
+            private readonly Our.IAssetAdministrationShell _instance;
 
             public EnhancedAssetAdministrationShell(
-                Aas.IAssetAdministrationShell instance,
+                Our.IAssetAdministrationShell instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -401,42 +401,42 @@ namespace AasCore.Aas3_0
                 set => _instance.Submodels = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSubmodelsOrEmpty()
+            public IEnumerable<Our.IReference> OverSubmodelsOrEmpty()
             {
                 return _instance.OverSubmodelsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitAssetAdministrationShell(_instance);
             }
@@ -464,13 +464,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedAssetInformation<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IAssetInformation
+            : Enhanced<TEnhancement>, Our.IAssetInformation
             where TEnhancement : class
         {
-            private readonly Aas.IAssetInformation _instance;
+            private readonly Our.IAssetInformation _instance;
 
             public EnhancedAssetInformation(
-                Aas.IAssetInformation instance,
+                Our.IAssetInformation instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -507,22 +507,22 @@ namespace AasCore.Aas3_0
                 set => _instance.DefaultThumbnail = value;
             }
 
-            public IEnumerable<Aas.ISpecificAssetId> OverSpecificAssetIdsOrEmpty()
+            public IEnumerable<Our.ISpecificAssetId> OverSpecificAssetIdsOrEmpty()
             {
                 return _instance.OverSpecificAssetIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitAssetInformation(_instance);
             }
@@ -550,13 +550,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedResource<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IResource
+            : Enhanced<TEnhancement>, Our.IResource
             where TEnhancement : class
         {
-            private readonly Aas.IResource _instance;
+            private readonly Our.IResource _instance;
 
             public EnhancedResource(
-                Aas.IResource instance,
+                Our.IResource instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -575,17 +575,17 @@ namespace AasCore.Aas3_0
                 set => _instance.ContentType = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitResource(_instance);
             }
@@ -613,13 +613,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedSpecificAssetId<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISpecificAssetId
+            : Enhanced<TEnhancement>, Our.ISpecificAssetId
             where TEnhancement : class
         {
-            private readonly Aas.ISpecificAssetId _instance;
+            private readonly Our.ISpecificAssetId _instance;
 
             public EnhancedSpecificAssetId(
-                Aas.ISpecificAssetId instance,
+                Our.ISpecificAssetId instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -656,22 +656,22 @@ namespace AasCore.Aas3_0
                 set => _instance.ExternalSubjectId = value;
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSpecificAssetId(_instance);
             }
@@ -699,13 +699,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedSubmodel<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISubmodel
+            : Enhanced<TEnhancement>, Our.ISubmodel
             where TEnhancement : class
         {
-            private readonly Aas.ISubmodel _instance;
+            private readonly Our.ISubmodel _instance;
 
             public EnhancedSubmodel(
-                Aas.ISubmodel instance,
+                Our.ISubmodel instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -790,57 +790,57 @@ namespace AasCore.Aas3_0
                 set => _instance.SubmodelElements = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISubmodelElement> OverSubmodelElementsOrEmpty()
+            public IEnumerable<Our.ISubmodelElement> OverSubmodelElementsOrEmpty()
             {
                 return _instance.OverSubmodelElementsOrEmpty();
             }
 
-            public Aas.ModellingKind KindOrDefault()
+            public Our.ModellingKind KindOrDefault()
             {
                 return _instance.KindOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSubmodel(_instance);
             }
@@ -868,13 +868,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedRelationshipElement<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IRelationshipElement
+            : Enhanced<TEnhancement>, Our.IRelationshipElement
             where TEnhancement : class
         {
-            private readonly Aas.IRelationshipElement _instance;
+            private readonly Our.IRelationshipElement _instance;
 
             public EnhancedRelationshipElement(
-                Aas.IRelationshipElement instance,
+                Our.IRelationshipElement instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -947,47 +947,47 @@ namespace AasCore.Aas3_0
                 set => _instance.Second = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitRelationshipElement(_instance);
             }
@@ -1015,13 +1015,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedSubmodelElementList<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISubmodelElementList
+            : Enhanced<TEnhancement>, Our.ISubmodelElementList
             where TEnhancement : class
         {
-            private readonly Aas.ISubmodelElementList _instance;
+            private readonly Our.ISubmodelElementList _instance;
 
             public EnhancedSubmodelElementList(
-                Aas.ISubmodelElementList instance,
+                Our.ISubmodelElementList instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1112,37 +1112,37 @@ namespace AasCore.Aas3_0
                 set => _instance.Value = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISubmodelElement> OverValueOrEmpty()
+            public IEnumerable<Our.ISubmodelElement> OverValueOrEmpty()
             {
                 return _instance.OverValueOrEmpty();
             }
@@ -1152,17 +1152,17 @@ namespace AasCore.Aas3_0
                 return _instance.OrderRelevantOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSubmodelElementList(_instance);
             }
@@ -1190,13 +1190,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedSubmodelElementCollection<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ISubmodelElementCollection
+            : Enhanced<TEnhancement>, Our.ISubmodelElementCollection
             where TEnhancement : class
         {
-            private readonly Aas.ISubmodelElementCollection _instance;
+            private readonly Our.ISubmodelElementCollection _instance;
 
             public EnhancedSubmodelElementCollection(
-                Aas.ISubmodelElementCollection instance,
+                Our.ISubmodelElementCollection instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1263,52 +1263,52 @@ namespace AasCore.Aas3_0
                 set => _instance.Value = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISubmodelElement> OverValueOrEmpty()
+            public IEnumerable<Our.ISubmodelElement> OverValueOrEmpty()
             {
                 return _instance.OverValueOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitSubmodelElementCollection(_instance);
             }
@@ -1336,13 +1336,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedProperty<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IProperty
+            : Enhanced<TEnhancement>, Our.IProperty
             where TEnhancement : class
         {
-            private readonly Aas.IProperty _instance;
+            private readonly Our.IProperty _instance;
 
             public EnhancedProperty(
-                Aas.IProperty instance,
+                Our.IProperty instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1421,32 +1421,32 @@ namespace AasCore.Aas3_0
                 set => _instance.ValueId = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
@@ -1456,17 +1456,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitProperty(_instance);
             }
@@ -1494,13 +1494,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedMultiLanguageProperty<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IMultiLanguageProperty
+            : Enhanced<TEnhancement>, Our.IMultiLanguageProperty
             where TEnhancement : class
         {
-            private readonly Aas.IMultiLanguageProperty _instance;
+            private readonly Our.IMultiLanguageProperty _instance;
 
             public EnhancedMultiLanguageProperty(
-                Aas.IMultiLanguageProperty instance,
+                Our.IMultiLanguageProperty instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1573,37 +1573,37 @@ namespace AasCore.Aas3_0
                 set => _instance.ValueId = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverValueOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverValueOrEmpty()
             {
                 return _instance.OverValueOrEmpty();
             }
@@ -1613,17 +1613,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitMultiLanguageProperty(_instance);
             }
@@ -1651,13 +1651,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedRange<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IRange
+            : Enhanced<TEnhancement>, Our.IRange
             where TEnhancement : class
         {
-            private readonly Aas.IRange _instance;
+            private readonly Our.IRange _instance;
 
             public EnhancedRange(
-                Aas.IRange instance,
+                Our.IRange instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1736,32 +1736,32 @@ namespace AasCore.Aas3_0
                 set => _instance.Max = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
@@ -1771,17 +1771,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitRange(_instance);
             }
@@ -1809,13 +1809,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedReferenceElement<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IReferenceElement
+            : Enhanced<TEnhancement>, Our.IReferenceElement
             where TEnhancement : class
         {
-            private readonly Aas.IReferenceElement _instance;
+            private readonly Our.IReferenceElement _instance;
 
             public EnhancedReferenceElement(
-                Aas.IReferenceElement instance,
+                Our.IReferenceElement instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -1882,32 +1882,32 @@ namespace AasCore.Aas3_0
                 set => _instance.Value = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
@@ -1917,17 +1917,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitReferenceElement(_instance);
             }
@@ -1955,13 +1955,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedBlob<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IBlob
+            : Enhanced<TEnhancement>, Our.IBlob
             where TEnhancement : class
         {
-            private readonly Aas.IBlob _instance;
+            private readonly Our.IBlob _instance;
 
             public EnhancedBlob(
-                Aas.IBlob instance,
+                Our.IBlob instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2034,32 +2034,32 @@ namespace AasCore.Aas3_0
                 set => _instance.ContentType = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
@@ -2069,17 +2069,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitBlob(_instance);
             }
@@ -2107,13 +2107,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedFile<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IFile
+            : Enhanced<TEnhancement>, Our.IFile
             where TEnhancement : class
         {
-            private readonly Aas.IFile _instance;
+            private readonly Our.IFile _instance;
 
             public EnhancedFile(
-                Aas.IFile instance,
+                Our.IFile instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2186,32 +2186,32 @@ namespace AasCore.Aas3_0
                 set => _instance.ContentType = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
@@ -2221,17 +2221,17 @@ namespace AasCore.Aas3_0
                 return _instance.CategoryOrDefault();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitFile(_instance);
             }
@@ -2259,13 +2259,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedAnnotatedRelationshipElement<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IAnnotatedRelationshipElement
+            : Enhanced<TEnhancement>, Our.IAnnotatedRelationshipElement
             where TEnhancement : class
         {
-            private readonly Aas.IAnnotatedRelationshipElement _instance;
+            private readonly Our.IAnnotatedRelationshipElement _instance;
 
             public EnhancedAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement instance,
+                Our.IAnnotatedRelationshipElement instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2344,52 +2344,52 @@ namespace AasCore.Aas3_0
                 set => _instance.Annotations = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IDataElement> OverAnnotationsOrEmpty()
+            public IEnumerable<Our.IDataElement> OverAnnotationsOrEmpty()
             {
                 return _instance.OverAnnotationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitAnnotatedRelationshipElement(_instance);
             }
@@ -2417,13 +2417,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedEntity<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IEntity
+            : Enhanced<TEnhancement>, Our.IEntity
             where TEnhancement : class
         {
-            private readonly Aas.IEntity _instance;
+            private readonly Our.IEntity _instance;
 
             public EnhancedEntity(
-                Aas.IEntity instance,
+                Our.IEntity instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2508,57 +2508,57 @@ namespace AasCore.Aas3_0
                 set => _instance.SpecificAssetIds = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISubmodelElement> OverStatementsOrEmpty()
+            public IEnumerable<Our.ISubmodelElement> OverStatementsOrEmpty()
             {
                 return _instance.OverStatementsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISpecificAssetId> OverSpecificAssetIdsOrEmpty()
+            public IEnumerable<Our.ISpecificAssetId> OverSpecificAssetIdsOrEmpty()
             {
                 return _instance.OverSpecificAssetIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitEntity(_instance);
             }
@@ -2586,13 +2586,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedEventPayload<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IEventPayload
+            : Enhanced<TEnhancement>, Our.IEventPayload
             where TEnhancement : class
         {
-            private readonly Aas.IEventPayload _instance;
+            private readonly Our.IEventPayload _instance;
 
             public EnhancedEventPayload(
-                Aas.IEventPayload instance,
+                Our.IEventPayload instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2647,17 +2647,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Payload = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitEventPayload(_instance);
             }
@@ -2685,13 +2685,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedBasicEventElement<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IBasicEventElement
+            : Enhanced<TEnhancement>, Our.IBasicEventElement
             where TEnhancement : class
         {
-            private readonly Aas.IBasicEventElement _instance;
+            private readonly Our.IBasicEventElement _instance;
 
             public EnhancedBasicEventElement(
-                Aas.IBasicEventElement instance,
+                Our.IBasicEventElement instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2800,47 +2800,47 @@ namespace AasCore.Aas3_0
                 set => _instance.MaxInterval = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitBasicEventElement(_instance);
             }
@@ -2868,13 +2868,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedOperation<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IOperation
+            : Enhanced<TEnhancement>, Our.IOperation
             where TEnhancement : class
         {
-            private readonly Aas.IOperation _instance;
+            private readonly Our.IOperation _instance;
 
             public EnhancedOperation(
-                Aas.IOperation instance,
+                Our.IOperation instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -2953,62 +2953,62 @@ namespace AasCore.Aas3_0
                 set => _instance.InoutputVariables = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IOperationVariable> OverInputVariablesOrEmpty()
+            public IEnumerable<Our.IOperationVariable> OverInputVariablesOrEmpty()
             {
                 return _instance.OverInputVariablesOrEmpty();
             }
 
-            public IEnumerable<Aas.IOperationVariable> OverOutputVariablesOrEmpty()
+            public IEnumerable<Our.IOperationVariable> OverOutputVariablesOrEmpty()
             {
                 return _instance.OverOutputVariablesOrEmpty();
             }
 
-            public IEnumerable<Aas.IOperationVariable> OverInoutputVariablesOrEmpty()
+            public IEnumerable<Our.IOperationVariable> OverInoutputVariablesOrEmpty()
             {
                 return _instance.OverInoutputVariablesOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitOperation(_instance);
             }
@@ -3036,13 +3036,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedOperationVariable<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IOperationVariable
+            : Enhanced<TEnhancement>, Our.IOperationVariable
             where TEnhancement : class
         {
-            private readonly Aas.IOperationVariable _instance;
+            private readonly Our.IOperationVariable _instance;
 
             public EnhancedOperationVariable(
-                Aas.IOperationVariable instance,
+                Our.IOperationVariable instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3055,17 +3055,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Value = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitOperationVariable(_instance);
             }
@@ -3093,13 +3093,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedCapability<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ICapability
+            : Enhanced<TEnhancement>, Our.ICapability
             where TEnhancement : class
         {
-            private readonly Aas.ICapability _instance;
+            private readonly Our.ICapability _instance;
 
             public EnhancedCapability(
-                Aas.ICapability instance,
+                Our.ICapability instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3160,47 +3160,47 @@ namespace AasCore.Aas3_0
                 set => _instance.EmbeddedDataSpecifications = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverSupplementalSemanticIdsOrEmpty()
+            public IEnumerable<Our.IReference> OverSupplementalSemanticIdsOrEmpty()
             {
                 return _instance.OverSupplementalSemanticIdsOrEmpty();
             }
 
-            public IEnumerable<Aas.IQualifier> OverQualifiersOrEmpty()
+            public IEnumerable<Our.IQualifier> OverQualifiersOrEmpty()
             {
                 return _instance.OverQualifiersOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitCapability(_instance);
             }
@@ -3228,13 +3228,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedConceptDescription<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IConceptDescription
+            : Enhanced<TEnhancement>, Our.IConceptDescription
             where TEnhancement : class
         {
-            private readonly Aas.IConceptDescription _instance;
+            private readonly Our.IConceptDescription _instance;
 
             public EnhancedConceptDescription(
-                Aas.IConceptDescription instance,
+                Our.IConceptDescription instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3295,42 +3295,42 @@ namespace AasCore.Aas3_0
                 set => _instance.IsCaseOf = value;
             }
 
-            public IEnumerable<Aas.IExtension> OverExtensionsOrEmpty()
+            public IEnumerable<Our.IExtension> OverExtensionsOrEmpty()
             {
                 return _instance.OverExtensionsOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringNameType> OverDisplayNameOrEmpty()
+            public IEnumerable<Our.ILangStringNameType> OverDisplayNameOrEmpty()
             {
                 return _instance.OverDisplayNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringTextType> OverDescriptionOrEmpty()
+            public IEnumerable<Our.ILangStringTextType> OverDescriptionOrEmpty()
             {
                 return _instance.OverDescriptionOrEmpty();
             }
 
-            public IEnumerable<Aas.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+            public IEnumerable<Our.IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
             {
                 return _instance.OverEmbeddedDataSpecificationsOrEmpty();
             }
 
-            public IEnumerable<Aas.IReference> OverIsCaseOfOrEmpty()
+            public IEnumerable<Our.IReference> OverIsCaseOfOrEmpty()
             {
                 return _instance.OverIsCaseOfOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitConceptDescription(_instance);
             }
@@ -3358,13 +3358,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedReference<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IReference
+            : Enhanced<TEnhancement>, Our.IReference
             where TEnhancement : class
         {
-            private readonly Aas.IReference _instance;
+            private readonly Our.IReference _instance;
 
             public EnhancedReference(
-                Aas.IReference instance,
+                Our.IReference instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3389,17 +3389,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Keys = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitReference(_instance);
             }
@@ -3427,13 +3427,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedKey<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IKey
+            : Enhanced<TEnhancement>, Our.IKey
             where TEnhancement : class
         {
-            private readonly Aas.IKey _instance;
+            private readonly Our.IKey _instance;
 
             public EnhancedKey(
-                Aas.IKey instance,
+                Our.IKey instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3452,17 +3452,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Value = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitKey(_instance);
             }
@@ -3490,13 +3490,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLangStringNameType<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILangStringNameType
+            : Enhanced<TEnhancement>, Our.ILangStringNameType
             where TEnhancement : class
         {
-            private readonly Aas.ILangStringNameType _instance;
+            private readonly Our.ILangStringNameType _instance;
 
             public EnhancedLangStringNameType(
-                Aas.ILangStringNameType instance,
+                Our.ILangStringNameType instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3515,17 +3515,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLangStringNameType(_instance);
             }
@@ -3553,13 +3553,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLangStringTextType<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILangStringTextType
+            : Enhanced<TEnhancement>, Our.ILangStringTextType
             where TEnhancement : class
         {
-            private readonly Aas.ILangStringTextType _instance;
+            private readonly Our.ILangStringTextType _instance;
 
             public EnhancedLangStringTextType(
-                Aas.ILangStringTextType instance,
+                Our.ILangStringTextType instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3578,17 +3578,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLangStringTextType(_instance);
             }
@@ -3616,13 +3616,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedEnvironment<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IEnvironment
+            : Enhanced<TEnhancement>, Our.IEnvironment
             where TEnhancement : class
         {
-            private readonly Aas.IEnvironment _instance;
+            private readonly Our.IEnvironment _instance;
 
             public EnhancedEnvironment(
-                Aas.IEnvironment instance,
+                Our.IEnvironment instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3647,32 +3647,32 @@ namespace AasCore.Aas3_0
                 set => _instance.ConceptDescriptions = value;
             }
 
-            public IEnumerable<Aas.IAssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
+            public IEnumerable<Our.IAssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
             {
                 return _instance.OverAssetAdministrationShellsOrEmpty();
             }
 
-            public IEnumerable<Aas.ISubmodel> OverSubmodelsOrEmpty()
+            public IEnumerable<Our.ISubmodel> OverSubmodelsOrEmpty()
             {
                 return _instance.OverSubmodelsOrEmpty();
             }
 
-            public IEnumerable<Aas.IConceptDescription> OverConceptDescriptionsOrEmpty()
+            public IEnumerable<Our.IConceptDescription> OverConceptDescriptionsOrEmpty()
             {
                 return _instance.OverConceptDescriptionsOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitEnvironment(_instance);
             }
@@ -3700,13 +3700,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedEmbeddedDataSpecification<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IEmbeddedDataSpecification
+            : Enhanced<TEnhancement>, Our.IEmbeddedDataSpecification
             where TEnhancement : class
         {
-            private readonly Aas.IEmbeddedDataSpecification _instance;
+            private readonly Our.IEmbeddedDataSpecification _instance;
 
             public EnhancedEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification instance,
+                Our.IEmbeddedDataSpecification instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3725,17 +3725,17 @@ namespace AasCore.Aas3_0
                 set => _instance.DataSpecificationContent = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitEmbeddedDataSpecification(_instance);
             }
@@ -3763,13 +3763,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLevelType<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILevelType
+            : Enhanced<TEnhancement>, Our.ILevelType
             where TEnhancement : class
         {
-            private readonly Aas.ILevelType _instance;
+            private readonly Our.ILevelType _instance;
 
             public EnhancedLevelType(
-                Aas.ILevelType instance,
+                Our.ILevelType instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3800,17 +3800,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Max = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLevelType(_instance);
             }
@@ -3838,13 +3838,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedValueReferencePair<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IValueReferencePair
+            : Enhanced<TEnhancement>, Our.IValueReferencePair
             where TEnhancement : class
         {
-            private readonly Aas.IValueReferencePair _instance;
+            private readonly Our.IValueReferencePair _instance;
 
             public EnhancedValueReferencePair(
-                Aas.IValueReferencePair instance,
+                Our.IValueReferencePair instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3863,17 +3863,17 @@ namespace AasCore.Aas3_0
                 set => _instance.ValueId = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitValueReferencePair(_instance);
             }
@@ -3901,13 +3901,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedValueList<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IValueList
+            : Enhanced<TEnhancement>, Our.IValueList
             where TEnhancement : class
         {
-            private readonly Aas.IValueList _instance;
+            private readonly Our.IValueList _instance;
 
             public EnhancedValueList(
-                Aas.IValueList instance,
+                Our.IValueList instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3920,17 +3920,17 @@ namespace AasCore.Aas3_0
                 set => _instance.ValueReferencePairs = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitValueList(_instance);
             }
@@ -3958,13 +3958,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLangStringPreferredNameTypeIec61360<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILangStringPreferredNameTypeIec61360
+            : Enhanced<TEnhancement>, Our.ILangStringPreferredNameTypeIec61360
             where TEnhancement : class
         {
-            private readonly Aas.ILangStringPreferredNameTypeIec61360 _instance;
+            private readonly Our.ILangStringPreferredNameTypeIec61360 _instance;
 
             public EnhancedLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 instance,
+                Our.ILangStringPreferredNameTypeIec61360 instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -3983,17 +3983,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLangStringPreferredNameTypeIec61360(_instance);
             }
@@ -4021,13 +4021,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLangStringShortNameTypeIec61360<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILangStringShortNameTypeIec61360
+            : Enhanced<TEnhancement>, Our.ILangStringShortNameTypeIec61360
             where TEnhancement : class
         {
-            private readonly Aas.ILangStringShortNameTypeIec61360 _instance;
+            private readonly Our.ILangStringShortNameTypeIec61360 _instance;
 
             public EnhancedLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 instance,
+                Our.ILangStringShortNameTypeIec61360 instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -4046,17 +4046,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLangStringShortNameTypeIec61360(_instance);
             }
@@ -4084,13 +4084,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedLangStringDefinitionTypeIec61360<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.ILangStringDefinitionTypeIec61360
+            : Enhanced<TEnhancement>, Our.ILangStringDefinitionTypeIec61360
             where TEnhancement : class
         {
-            private readonly Aas.ILangStringDefinitionTypeIec61360 _instance;
+            private readonly Our.ILangStringDefinitionTypeIec61360 _instance;
 
             public EnhancedLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 instance,
+                Our.ILangStringDefinitionTypeIec61360 instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -4109,17 +4109,17 @@ namespace AasCore.Aas3_0
                 set => _instance.Text = value;
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitLangStringDefinitionTypeIec61360(_instance);
             }
@@ -4147,13 +4147,13 @@ namespace AasCore.Aas3_0
         }
 
         public class EnhancedDataSpecificationIec61360<TEnhancement>
-            : Enhanced<TEnhancement>, Aas.IDataSpecificationIec61360
+            : Enhanced<TEnhancement>, Our.IDataSpecificationIec61360
             where TEnhancement : class
         {
-            private readonly Aas.IDataSpecificationIec61360 _instance;
+            private readonly Our.IDataSpecificationIec61360 _instance;
 
             public EnhancedDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 instance,
+                Our.IDataSpecificationIec61360 instance,
                 TEnhancement enhancement
             ) : base(enhancement)
             {
@@ -4232,27 +4232,27 @@ namespace AasCore.Aas3_0
                 set => _instance.LevelType = value;
             }
 
-            public IEnumerable<Aas.ILangStringShortNameTypeIec61360> OverShortNameOrEmpty()
+            public IEnumerable<Our.ILangStringShortNameTypeIec61360> OverShortNameOrEmpty()
             {
                 return _instance.OverShortNameOrEmpty();
             }
 
-            public IEnumerable<Aas.ILangStringDefinitionTypeIec61360> OverDefinitionOrEmpty()
+            public IEnumerable<Our.ILangStringDefinitionTypeIec61360> OverDefinitionOrEmpty()
             {
                 return _instance.OverDefinitionOrEmpty();
             }
 
-            public IEnumerable<Aas.IClass> DescendOnce()
+            public IEnumerable<Our.IClass> DescendOnce()
             {
                 return _instance.DescendOnce();
             }
 
-            public IEnumerable<Aas.IClass> Descend()
+            public IEnumerable<Our.IClass> Descend()
             {
                 return _instance.Descend();
             }
 
-            public void Accept(Aas.Visitation.IVisitor visitor)
+            public void Accept(Our.Visitation.IVisitor visitor)
             {
                 visitor.VisitDataSpecificationIec61360(_instance);
             }
@@ -4280,20 +4280,20 @@ namespace AasCore.Aas3_0
         }
 
         internal class Wrapper<TEnhancement>
-            : Aas.Visitation.AbstractTransformer<Aas.IClass>
+            : Our.Visitation.AbstractTransformer<Our.IClass>
             where TEnhancement : class
         {
-            private readonly System.Func<Aas.IClass, TEnhancement?> _enhancementFactory;
+            private readonly System.Func<Our.IClass, TEnhancement?> _enhancementFactory;
 
             internal Wrapper(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _enhancementFactory = enhancementFactory;
             }
 
-            public override Aas.IClass TransformExtension(
-                Aas.IExtension that
+            public override Our.IClass TransformExtension(
+                Our.IExtension that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4309,7 +4309,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -4325,7 +4325,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4343,7 +4343,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4362,8 +4362,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformAdministrativeInformation(
-                Aas.IAdministrativeInformation that
+            public override Our.IClass TransformAdministrativeInformation(
+                Our.IAdministrativeInformation that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4381,7 +4381,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -4397,7 +4397,7 @@ namespace AasCore.Aas3_0
                         that.Creator
                     );
                     var castedCreator = (
-                        transformedCreator as Aas.IReference
+                        transformedCreator as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedCreator}"
@@ -4414,8 +4414,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformQualifier(
-                Aas.IQualifier that
+            public override Our.IClass TransformQualifier(
+                Our.IQualifier that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4431,7 +4431,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -4447,7 +4447,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4463,7 +4463,7 @@ namespace AasCore.Aas3_0
                         that.ValueId
                     );
                     var castedValueId = (
-                        transformedValueId as Aas.IReference
+                        transformedValueId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedValueId}"
@@ -4480,8 +4480,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformAssetAdministrationShell(
-                Aas.IAssetAdministrationShell that
+            public override Our.IClass TransformAssetAdministrationShell(
+                Our.IAssetAdministrationShell that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4499,7 +4499,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -4517,7 +4517,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -4535,7 +4535,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -4551,7 +4551,7 @@ namespace AasCore.Aas3_0
                         that.Administration
                     );
                     var castedAdministration = (
-                        transformedAdministration as Aas.IAdministrativeInformation
+                        transformedAdministration as Our.IAdministrativeInformation
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IAdministrativeInformation, " +
                         $"but got: {transformedAdministration}"
@@ -4567,7 +4567,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -4583,7 +4583,7 @@ namespace AasCore.Aas3_0
                         that.DerivedFrom
                     );
                     var castedDerivedFrom = (
-                        transformedDerivedFrom as Aas.IReference
+                        transformedDerivedFrom as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedDerivedFrom}"
@@ -4595,7 +4595,7 @@ namespace AasCore.Aas3_0
                     that.AssetInformation
                 );
                 var castedAssetInformation = (
-                    transformedAssetInformation as Aas.IAssetInformation
+                    transformedAssetInformation as Our.IAssetInformation
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IAssetInformation, " +
                     $"but got: {transformedAssetInformation}"
@@ -4610,7 +4610,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4629,8 +4629,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformAssetInformation(
-                Aas.IAssetInformation that
+            public override Our.IClass TransformAssetInformation(
+                Our.IAssetInformation that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4648,7 +4648,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISpecificAssetId
+                                    transformed as Our.ISpecificAssetId
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISpecificAssetId, " +
                                     $"but got: {transformed}"
@@ -4664,7 +4664,7 @@ namespace AasCore.Aas3_0
                         that.DefaultThumbnail
                     );
                     var castedDefaultThumbnail = (
-                        transformedDefaultThumbnail as Aas.IResource
+                        transformedDefaultThumbnail as Our.IResource
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IResource, " +
                         $"but got: {transformedDefaultThumbnail}"
@@ -4681,8 +4681,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformResource(
-                Aas.IResource that
+            public override Our.IClass TransformResource(
+                Our.IResource that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4701,8 +4701,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformSpecificAssetId(
-                Aas.ISpecificAssetId that
+            public override Our.IClass TransformSpecificAssetId(
+                Our.ISpecificAssetId that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4718,7 +4718,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -4734,7 +4734,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4750,7 +4750,7 @@ namespace AasCore.Aas3_0
                         that.ExternalSubjectId
                     );
                     var castedExternalSubjectId = (
-                        transformedExternalSubjectId as Aas.IReference
+                        transformedExternalSubjectId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedExternalSubjectId}"
@@ -4767,8 +4767,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformSubmodel(
-                Aas.ISubmodel that
+            public override Our.IClass TransformSubmodel(
+                Our.ISubmodel that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4786,7 +4786,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -4804,7 +4804,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -4822,7 +4822,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -4838,7 +4838,7 @@ namespace AasCore.Aas3_0
                         that.Administration
                     );
                     var castedAdministration = (
-                        transformedAdministration as Aas.IAdministrativeInformation
+                        transformedAdministration as Our.IAdministrativeInformation
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IAdministrativeInformation, " +
                         $"but got: {transformedAdministration}"
@@ -4852,7 +4852,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -4868,7 +4868,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -4886,7 +4886,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -4904,7 +4904,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -4922,7 +4922,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISubmodelElement
+                                    transformed as Our.ISubmodelElement
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISubmodelElement, " +
                                     $"but got: {transformed}"
@@ -4941,8 +4941,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformRelationshipElement(
-                Aas.IRelationshipElement that
+            public override Our.IClass TransformRelationshipElement(
+                Our.IRelationshipElement that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -4960,7 +4960,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -4978,7 +4978,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -4996,7 +4996,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5012,7 +5012,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5028,7 +5028,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5046,7 +5046,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5064,7 +5064,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5078,7 +5078,7 @@ namespace AasCore.Aas3_0
                     that.First
                 );
                 var castedFirst = (
-                    transformedFirst as Aas.IReference
+                    transformedFirst as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedFirst}"
@@ -5089,7 +5089,7 @@ namespace AasCore.Aas3_0
                     that.Second
                 );
                 var castedSecond = (
-                    transformedSecond as Aas.IReference
+                    transformedSecond as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedSecond}"
@@ -5105,8 +5105,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformSubmodelElementList(
-                Aas.ISubmodelElementList that
+            public override Our.IClass TransformSubmodelElementList(
+                Our.ISubmodelElementList that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5124,7 +5124,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5142,7 +5142,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5160,7 +5160,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5176,7 +5176,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5192,7 +5192,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5210,7 +5210,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5228,7 +5228,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5244,7 +5244,7 @@ namespace AasCore.Aas3_0
                         that.SemanticIdListElement
                     );
                     var castedSemanticIdListElement = (
-                        transformedSemanticIdListElement as Aas.IReference
+                        transformedSemanticIdListElement as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticIdListElement}"
@@ -5260,7 +5260,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISubmodelElement
+                                    transformed as Our.ISubmodelElement
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISubmodelElement, " +
                                     $"but got: {transformed}"
@@ -5279,8 +5279,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformSubmodelElementCollection(
-                Aas.ISubmodelElementCollection that
+            public override Our.IClass TransformSubmodelElementCollection(
+                Our.ISubmodelElementCollection that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5298,7 +5298,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5316,7 +5316,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5334,7 +5334,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5350,7 +5350,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5366,7 +5366,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5384,7 +5384,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5402,7 +5402,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5420,7 +5420,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISubmodelElement
+                                    transformed as Our.ISubmodelElement
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISubmodelElement, " +
                                     $"but got: {transformed}"
@@ -5439,8 +5439,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformProperty(
-                Aas.IProperty that
+            public override Our.IClass TransformProperty(
+                Our.IProperty that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5458,7 +5458,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5476,7 +5476,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5494,7 +5494,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5510,7 +5510,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5526,7 +5526,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5544,7 +5544,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5562,7 +5562,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5578,7 +5578,7 @@ namespace AasCore.Aas3_0
                         that.ValueId
                     );
                     var castedValueId = (
-                        transformedValueId as Aas.IReference
+                        transformedValueId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedValueId}"
@@ -5595,8 +5595,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformMultiLanguageProperty(
-                Aas.IMultiLanguageProperty that
+            public override Our.IClass TransformMultiLanguageProperty(
+                Our.IMultiLanguageProperty that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5614,7 +5614,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5632,7 +5632,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5650,7 +5650,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5666,7 +5666,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5682,7 +5682,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5700,7 +5700,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5718,7 +5718,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5736,7 +5736,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5752,7 +5752,7 @@ namespace AasCore.Aas3_0
                         that.ValueId
                     );
                     var castedValueId = (
-                        transformedValueId as Aas.IReference
+                        transformedValueId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedValueId}"
@@ -5769,8 +5769,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformRange(
-                Aas.IRange that
+            public override Our.IClass TransformRange(
+                Our.IRange that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5788,7 +5788,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5806,7 +5806,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5824,7 +5824,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5840,7 +5840,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5856,7 +5856,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -5874,7 +5874,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -5892,7 +5892,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -5911,8 +5911,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformReferenceElement(
-                Aas.IReferenceElement that
+            public override Our.IClass TransformReferenceElement(
+                Our.IReferenceElement that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -5930,7 +5930,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -5948,7 +5948,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -5966,7 +5966,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -5982,7 +5982,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -5998,7 +5998,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6016,7 +6016,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6034,7 +6034,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6050,7 +6050,7 @@ namespace AasCore.Aas3_0
                         that.Value
                     );
                     var castedValue = (
-                        transformedValue as Aas.IReference
+                        transformedValue as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedValue}"
@@ -6067,8 +6067,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformBlob(
-                Aas.IBlob that
+            public override Our.IClass TransformBlob(
+                Our.IBlob that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6086,7 +6086,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6104,7 +6104,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -6122,7 +6122,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -6138,7 +6138,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -6154,7 +6154,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6172,7 +6172,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6190,7 +6190,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6209,8 +6209,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformFile(
-                Aas.IFile that
+            public override Our.IClass TransformFile(
+                Our.IFile that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6228,7 +6228,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6246,7 +6246,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -6264,7 +6264,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -6280,7 +6280,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -6296,7 +6296,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6314,7 +6314,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6332,7 +6332,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6351,8 +6351,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement that
+            public override Our.IClass TransformAnnotatedRelationshipElement(
+                Our.IAnnotatedRelationshipElement that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6370,7 +6370,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6388,7 +6388,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -6406,7 +6406,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -6422,7 +6422,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -6438,7 +6438,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6456,7 +6456,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6474,7 +6474,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6488,7 +6488,7 @@ namespace AasCore.Aas3_0
                     that.First
                 );
                 var castedFirst = (
-                    transformedFirst as Aas.IReference
+                    transformedFirst as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedFirst}"
@@ -6499,7 +6499,7 @@ namespace AasCore.Aas3_0
                     that.Second
                 );
                 var castedSecond = (
-                    transformedSecond as Aas.IReference
+                    transformedSecond as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedSecond}"
@@ -6514,7 +6514,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IDataElement
+                                    transformed as Our.IDataElement
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IDataElement, " +
                                     $"but got: {transformed}"
@@ -6533,8 +6533,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformEntity(
-                Aas.IEntity that
+            public override Our.IClass TransformEntity(
+                Our.IEntity that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6552,7 +6552,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6570,7 +6570,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -6588,7 +6588,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -6604,7 +6604,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -6620,7 +6620,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6638,7 +6638,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6656,7 +6656,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6674,7 +6674,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISubmodelElement
+                                    transformed as Our.ISubmodelElement
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISubmodelElement, " +
                                     $"but got: {transformed}"
@@ -6692,7 +6692,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISpecificAssetId
+                                    transformed as Our.ISpecificAssetId
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISpecificAssetId, " +
                                     $"but got: {transformed}"
@@ -6711,8 +6711,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformEventPayload(
-                Aas.IEventPayload that
+            public override Our.IClass TransformEventPayload(
+                Our.IEventPayload that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6726,7 +6726,7 @@ namespace AasCore.Aas3_0
                     that.Source
                 );
                 var castedSource = (
-                    transformedSource as Aas.IReference
+                    transformedSource as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedSource}"
@@ -6739,7 +6739,7 @@ namespace AasCore.Aas3_0
                         that.SourceSemanticId
                     );
                     var castedSourceSemanticId = (
-                        transformedSourceSemanticId as Aas.IReference
+                        transformedSourceSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSourceSemanticId}"
@@ -6751,7 +6751,7 @@ namespace AasCore.Aas3_0
                     that.ObservableReference
                 );
                 var castedObservableReference = (
-                    transformedObservableReference as Aas.IReference
+                    transformedObservableReference as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedObservableReference}"
@@ -6764,7 +6764,7 @@ namespace AasCore.Aas3_0
                         that.ObservableSemanticId
                     );
                     var castedObservableSemanticId = (
-                        transformedObservableSemanticId as Aas.IReference
+                        transformedObservableSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedObservableSemanticId}"
@@ -6778,7 +6778,7 @@ namespace AasCore.Aas3_0
                         that.SubjectId
                     );
                     var castedSubjectId = (
-                        transformedSubjectId as Aas.IReference
+                        transformedSubjectId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSubjectId}"
@@ -6795,8 +6795,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformBasicEventElement(
-                Aas.IBasicEventElement that
+            public override Our.IClass TransformBasicEventElement(
+                Our.IBasicEventElement that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6814,7 +6814,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6832,7 +6832,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -6850,7 +6850,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -6866,7 +6866,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -6882,7 +6882,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -6900,7 +6900,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -6918,7 +6918,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -6932,7 +6932,7 @@ namespace AasCore.Aas3_0
                     that.Observed
                 );
                 var castedObserved = (
-                    transformedObserved as Aas.IReference
+                    transformedObserved as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedObserved}"
@@ -6945,7 +6945,7 @@ namespace AasCore.Aas3_0
                         that.MessageBroker
                     );
                     var castedMessageBroker = (
-                        transformedMessageBroker as Aas.IReference
+                        transformedMessageBroker as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedMessageBroker}"
@@ -6962,8 +6962,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformOperation(
-                Aas.IOperation that
+            public override Our.IClass TransformOperation(
+                Our.IOperation that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -6981,7 +6981,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -6999,7 +6999,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -7017,7 +7017,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -7033,7 +7033,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -7049,7 +7049,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -7067,7 +7067,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -7085,7 +7085,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -7103,7 +7103,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IOperationVariable
+                                    transformed as Our.IOperationVariable
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IOperationVariable, " +
                                     $"but got: {transformed}"
@@ -7121,7 +7121,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IOperationVariable
+                                    transformed as Our.IOperationVariable
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IOperationVariable, " +
                                     $"but got: {transformed}"
@@ -7139,7 +7139,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IOperationVariable
+                                    transformed as Our.IOperationVariable
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IOperationVariable, " +
                                     $"but got: {transformed}"
@@ -7158,8 +7158,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformOperationVariable(
-                Aas.IOperationVariable that
+            public override Our.IClass TransformOperationVariable(
+                Our.IOperationVariable that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7173,7 +7173,7 @@ namespace AasCore.Aas3_0
                     that.Value
                 );
                 var castedValue = (
-                    transformedValue as Aas.ISubmodelElement
+                    transformedValue as Our.ISubmodelElement
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a ISubmodelElement, " +
                     $"but got: {transformedValue}"
@@ -7189,8 +7189,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformCapability(
-                Aas.ICapability that
+            public override Our.IClass TransformCapability(
+                Our.ICapability that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7208,7 +7208,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -7226,7 +7226,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -7244,7 +7244,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -7260,7 +7260,7 @@ namespace AasCore.Aas3_0
                         that.SemanticId
                     );
                     var castedSemanticId = (
-                        transformedSemanticId as Aas.IReference
+                        transformedSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedSemanticId}"
@@ -7276,7 +7276,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -7294,7 +7294,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IQualifier
+                                    transformed as Our.IQualifier
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IQualifier, " +
                                     $"but got: {transformed}"
@@ -7312,7 +7312,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -7331,8 +7331,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformConceptDescription(
-                Aas.IConceptDescription that
+            public override Our.IClass TransformConceptDescription(
+                Our.IConceptDescription that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7350,7 +7350,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IExtension
+                                    transformed as Our.IExtension
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IExtension, " +
                                     $"but got: {transformed}"
@@ -7368,7 +7368,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringNameType
+                                    transformed as Our.ILangStringNameType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringNameType, " +
                                     $"but got: {transformed}"
@@ -7386,7 +7386,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringTextType
+                                    transformed as Our.ILangStringTextType
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringTextType, " +
                                     $"but got: {transformed}"
@@ -7402,7 +7402,7 @@ namespace AasCore.Aas3_0
                         that.Administration
                     );
                     var castedAdministration = (
-                        transformedAdministration as Aas.IAdministrativeInformation
+                        transformedAdministration as Our.IAdministrativeInformation
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IAdministrativeInformation, " +
                         $"but got: {transformedAdministration}"
@@ -7418,7 +7418,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IEmbeddedDataSpecification
+                                    transformed as Our.IEmbeddedDataSpecification
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IEmbeddedDataSpecification, " +
                                     $"but got: {transformed}"
@@ -7436,7 +7436,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IReference
+                                    transformed as Our.IReference
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IReference, " +
                                     $"but got: {transformed}"
@@ -7455,8 +7455,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformReference(
-                Aas.IReference that
+            public override Our.IClass TransformReference(
+                Our.IReference that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7472,7 +7472,7 @@ namespace AasCore.Aas3_0
                         that.ReferredSemanticId
                     );
                     var castedReferredSemanticId = (
-                        transformedReferredSemanticId as Aas.IReference
+                        transformedReferredSemanticId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedReferredSemanticId}"
@@ -7486,7 +7486,7 @@ namespace AasCore.Aas3_0
                         (item) => {
                             var transformed = Transform(item);
                             return (
-                                transformed as Aas.IKey
+                                transformed as Our.IKey
                             ) ?? throw new System.InvalidOperationException(
                                 "Expected the transformed item to be a IKey, " +
                                 $"but got: {transformed}"
@@ -7504,8 +7504,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformKey(
-                Aas.IKey that
+            public override Our.IClass TransformKey(
+                Our.IKey that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7524,8 +7524,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLangStringNameType(
-                Aas.ILangStringNameType that
+            public override Our.IClass TransformLangStringNameType(
+                Our.ILangStringNameType that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7544,8 +7544,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLangStringTextType(
-                Aas.ILangStringTextType that
+            public override Our.IClass TransformLangStringTextType(
+                Our.ILangStringTextType that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7564,8 +7564,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformEnvironment(
-                Aas.IEnvironment that
+            public override Our.IClass TransformEnvironment(
+                Our.IEnvironment that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7583,7 +7583,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IAssetAdministrationShell
+                                    transformed as Our.IAssetAdministrationShell
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IAssetAdministrationShell, " +
                                     $"but got: {transformed}"
@@ -7601,7 +7601,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ISubmodel
+                                    transformed as Our.ISubmodel
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ISubmodel, " +
                                     $"but got: {transformed}"
@@ -7619,7 +7619,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.IConceptDescription
+                                    transformed as Our.IConceptDescription
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a IConceptDescription, " +
                                     $"but got: {transformed}"
@@ -7638,8 +7638,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification that
+            public override Our.IClass TransformEmbeddedDataSpecification(
+                Our.IEmbeddedDataSpecification that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7653,7 +7653,7 @@ namespace AasCore.Aas3_0
                     that.DataSpecification
                 );
                 var castedDataSpecification = (
-                    transformedDataSpecification as Aas.IReference
+                    transformedDataSpecification as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedDataSpecification}"
@@ -7664,7 +7664,7 @@ namespace AasCore.Aas3_0
                     that.DataSpecificationContent
                 );
                 var castedDataSpecificationContent = (
-                    transformedDataSpecificationContent as Aas.IDataSpecificationContent
+                    transformedDataSpecificationContent as Our.IDataSpecificationContent
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IDataSpecificationContent, " +
                     $"but got: {transformedDataSpecificationContent}"
@@ -7680,8 +7680,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLevelType(
-                Aas.ILevelType that
+            public override Our.IClass TransformLevelType(
+                Our.ILevelType that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7700,8 +7700,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformValueReferencePair(
-                Aas.IValueReferencePair that
+            public override Our.IClass TransformValueReferencePair(
+                Our.IValueReferencePair that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7715,7 +7715,7 @@ namespace AasCore.Aas3_0
                     that.ValueId
                 );
                 var castedValueId = (
-                    transformedValueId as Aas.IReference
+                    transformedValueId as Our.IReference
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the transformed value to be a IReference, " +
                     $"but got: {transformedValueId}"
@@ -7731,8 +7731,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformValueList(
-                Aas.IValueList that
+            public override Our.IClass TransformValueList(
+                Our.IValueList that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7748,7 +7748,7 @@ namespace AasCore.Aas3_0
                         (item) => {
                             var transformed = Transform(item);
                             return (
-                                transformed as Aas.IValueReferencePair
+                                transformed as Our.IValueReferencePair
                             ) ?? throw new System.InvalidOperationException(
                                 "Expected the transformed item to be a IValueReferencePair, " +
                                 $"but got: {transformed}"
@@ -7766,8 +7766,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 that
+            public override Our.IClass TransformLangStringPreferredNameTypeIec61360(
+                Our.ILangStringPreferredNameTypeIec61360 that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7786,8 +7786,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 that
+            public override Our.IClass TransformLangStringShortNameTypeIec61360(
+                Our.ILangStringShortNameTypeIec61360 that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7806,8 +7806,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 that
+            public override Our.IClass TransformLangStringDefinitionTypeIec61360(
+                Our.ILangStringDefinitionTypeIec61360 that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7826,8 +7826,8 @@ namespace AasCore.Aas3_0
                     );
             }
 
-            public override Aas.IClass TransformDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 that
+            public override Our.IClass TransformDataSpecificationIec61360(
+                Our.IDataSpecificationIec61360 that
             )
             {
                 if (that is Enhanced<TEnhancement>)
@@ -7843,7 +7843,7 @@ namespace AasCore.Aas3_0
                         (item) => {
                             var transformed = Transform(item);
                             return (
-                                transformed as Aas.ILangStringPreferredNameTypeIec61360
+                                transformed as Our.ILangStringPreferredNameTypeIec61360
                             ) ?? throw new System.InvalidOperationException(
                                 "Expected the transformed item to be a ILangStringPreferredNameTypeIec61360, " +
                                 $"but got: {transformed}"
@@ -7860,7 +7860,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringShortNameTypeIec61360
+                                    transformed as Our.ILangStringShortNameTypeIec61360
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringShortNameTypeIec61360, " +
                                     $"but got: {transformed}"
@@ -7876,7 +7876,7 @@ namespace AasCore.Aas3_0
                         that.UnitId
                     );
                     var castedUnitId = (
-                        transformedUnitId as Aas.IReference
+                        transformedUnitId as Our.IReference
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IReference, " +
                         $"but got: {transformedUnitId}"
@@ -7892,7 +7892,7 @@ namespace AasCore.Aas3_0
                             (item) => {
                                 var transformed = Transform(item);
                                 return (
-                                    transformed as Aas.ILangStringDefinitionTypeIec61360
+                                    transformed as Our.ILangStringDefinitionTypeIec61360
                                 ) ?? throw new System.InvalidOperationException(
                                     "Expected the transformed item to be a ILangStringDefinitionTypeIec61360, " +
                                     $"but got: {transformed}"
@@ -7908,7 +7908,7 @@ namespace AasCore.Aas3_0
                         that.ValueList
                     );
                     var castedValueList = (
-                        transformedValueList as Aas.IValueList
+                        transformedValueList as Our.IValueList
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a IValueList, " +
                         $"but got: {transformedValueList}"
@@ -7922,7 +7922,7 @@ namespace AasCore.Aas3_0
                         that.LevelType
                     );
                     var castedLevelType = (
-                        transformedLevelType as Aas.ILevelType
+                        transformedLevelType as Our.ILevelType
                     ) ?? throw new System.InvalidOperationException(
                         "Expected the transformed value to be a ILevelType, " +
                         $"but got: {transformedLevelType}"
@@ -7954,7 +7954,7 @@ namespace AasCore.Aas3_0
             /// Enhancement, or <c>null</c> if <paramref name="that" />
             /// has not been wrapped yet.
             /// </returns>
-            public TEnhancement? Unwrap(Aas.IClass that)
+            public TEnhancement? Unwrap(Our.IClass that)
             {
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 var enhanced = that as Enhanced<TEnhancement>;
@@ -7971,7 +7971,7 @@ namespace AasCore.Aas3_0
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has not been wrapped yet
             /// </exception>
-            public TEnhancement MustUnwrap(Aas.IClass that)
+            public TEnhancement MustUnwrap(Our.IClass that)
             {
                 return Unwrap(that) ?? throw new System.ArgumentException(
                     $"Expected the instance to have been wrapped, but it was not: {that}"
@@ -7996,7 +7996,7 @@ namespace AasCore.Aas3_0
             /// the wrapping will continue recursively.</para>
             ///</param>
             public Enhancer(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+                System.Func<Our.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -8018,8 +8018,8 @@ namespace AasCore.Aas3_0
             /// <exception cref="System.ArgumentException">
             /// Thrown when <paramref name="that" /> has been already wrapped
             /// </exception>
-            public Aas.IClass Wrap(
-                Aas.IClass that
+            public Our.IClass Wrap(
+                Our.IClass that
             )
             {
                 var wrapped = _wrapper.Transform(that);

@@ -6,16 +6,16 @@ package types_descend_test
 import (
 	"path/filepath"
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
 )
 
 func TestDescendOnceOnAnInstanceOfLeaf(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLeaf()
+	instance := ourtesting.MustLoadMaximalLeaf()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Leaf",
 		"maximal.json.trace",
@@ -36,10 +36,10 @@ func TestDescendOnceOnAnInstanceOfLeaf(
 func TestDescendOnceOnAnInstanceOfOrderedContainer(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalOrderedContainer()
+	instance := ourtesting.MustLoadMaximalOrderedContainer()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"OrderedContainer",
 		"maximal.json.trace",
@@ -60,10 +60,10 @@ func TestDescendOnceOnAnInstanceOfOrderedContainer(
 func TestDescendOnceOnAnInstanceOfUnorderedContainer(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalUnorderedContainer()
+	instance := ourtesting.MustLoadMaximalUnorderedContainer()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"UnorderedContainer",
 		"maximal.json.trace",
@@ -84,10 +84,10 @@ func TestDescendOnceOnAnInstanceOfUnorderedContainer(
 func TestDescendOnceOnAnInstanceOfGlobalAttribute(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalGlobalAttribute()
+	instance := ourtesting.MustLoadMaximalGlobalAttribute()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"GlobalAttribute",
 		"maximal.json.trace",
@@ -108,10 +108,10 @@ func TestDescendOnceOnAnInstanceOfGlobalAttribute(
 func TestDescendOnceOnAnInstanceOfLocalAttribute(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalLocalAttribute()
+	instance := ourtesting.MustLoadMaximalLocalAttribute()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"LocalAttribute",
 		"maximal.json.trace",
@@ -132,10 +132,10 @@ func TestDescendOnceOnAnInstanceOfLocalAttribute(
 func TestDescendOnceOnAnInstanceOfAttributeOperand(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalAttributeOperand()
+	instance := ourtesting.MustLoadMaximalAttributeOperand()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"AttributeOperand",
 		"maximal.json.trace",
@@ -156,10 +156,10 @@ func TestDescendOnceOnAnInstanceOfAttributeOperand(
 func TestDescendOnceOnAnInstanceOfStringLiteral(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalStringLiteral()
+	instance := ourtesting.MustLoadMaximalStringLiteral()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"StringLiteral",
 		"maximal.json.trace",
@@ -180,10 +180,10 @@ func TestDescendOnceOnAnInstanceOfStringLiteral(
 func TestDescendOnceOnAnInstanceOfNumberLiteral(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalNumberLiteral()
+	instance := ourtesting.MustLoadMaximalNumberLiteral()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"NumberLiteral",
 		"maximal.json.trace",
@@ -204,10 +204,10 @@ func TestDescendOnceOnAnInstanceOfNumberLiteral(
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {
-	instance := aastesting.MustLoadMaximalSomething()
+	instance := ourtesting.MustLoadMaximalSomething()
 
 	expectedPth := filepath.Join(
-		aastesting.TestDataDir,
+		ourtesting.TestDataDir,
 		"DescendOnce",
 		"Something",
 		"maximal.json.trace",

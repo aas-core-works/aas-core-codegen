@@ -10,42 +10,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace aas = aas_core::aas_3_0;
+namespace our = aas_core::aas_3_0;
 
 TEST_CASE("Test the round-trip of an expected IReferable") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > concrete_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IReferable
+      our::types::IReferable
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::ReferableFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::ReferableFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IReferable "
         "from a minimal IRelationshipElement: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -57,7 +57,7 @@ TEST_CASE("Test the round-trip of an expected IReferable") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IReferable "
         "over a minimal IRelationshipElement: ",
         *patch_message
@@ -69,38 +69,38 @@ TEST_CASE("Test the round-trip of an expected IReferable") {
 
 TEST_CASE("Test the round-trip of an expected IIdentifiable") {
   const std::shared_ptr<
-    aas::types::IAssetAdministrationShell
+    our::types::IAssetAdministrationShell
   > concrete_instance(
     test::common::examples::LoadMinAssetAdministrationShell()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IIdentifiable
+      our::types::IIdentifiable
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::IdentifiableFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::IdentifiableFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IIdentifiable "
         "from a minimal IAssetAdministrationShell: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -112,7 +112,7 @@ TEST_CASE("Test the round-trip of an expected IIdentifiable") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IIdentifiable "
         "over a minimal IAssetAdministrationShell: ",
         *patch_message
@@ -124,38 +124,38 @@ TEST_CASE("Test the round-trip of an expected IIdentifiable") {
 
 TEST_CASE("Test the round-trip of an expected IQualifiable") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > concrete_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IQualifiable
+      our::types::IQualifiable
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::QualifiableFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::QualifiableFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IQualifiable "
         "from a minimal IRelationshipElement: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -167,7 +167,7 @@ TEST_CASE("Test the round-trip of an expected IQualifiable") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IQualifiable "
         "over a minimal IRelationshipElement: ",
         *patch_message
@@ -179,38 +179,38 @@ TEST_CASE("Test the round-trip of an expected IQualifiable") {
 
 TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
   const std::shared_ptr<
-    aas::types::IRelationshipElement
+    our::types::IRelationshipElement
   > concrete_instance(
     test::common::examples::LoadMinRelationshipElement()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::ISubmodelElement
+      our::types::ISubmodelElement
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::SubmodelElementFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::SubmodelElementFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a ISubmodelElement "
         "from a minimal IRelationshipElement: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -222,7 +222,7 @@ TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a ISubmodelElement "
         "over a minimal IRelationshipElement: ",
         *patch_message
@@ -234,38 +234,38 @@ TEST_CASE("Test the round-trip of an expected ISubmodelElement") {
 
 TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
   const std::shared_ptr<
-    aas::types::IAnnotatedRelationshipElement
+    our::types::IAnnotatedRelationshipElement
   > concrete_instance(
     test::common::examples::LoadMinAnnotatedRelationshipElement()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IRelationshipElement
+      our::types::IRelationshipElement
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::RelationshipElementFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::RelationshipElementFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IRelationshipElement "
         "from a minimal IAnnotatedRelationshipElement: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -277,7 +277,7 @@ TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IRelationshipElement "
         "over a minimal IAnnotatedRelationshipElement: ",
         *patch_message
@@ -289,38 +289,38 @@ TEST_CASE("Test the round-trip of an expected IRelationshipElement") {
 
 TEST_CASE("Test the round-trip of an expected IDataElement") {
   const std::shared_ptr<
-    aas::types::IBlob
+    our::types::IBlob
   > concrete_instance(
     test::common::examples::LoadMinBlob()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IDataElement
+      our::types::IDataElement
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::DataElementFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::DataElementFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IDataElement "
         "from a minimal IBlob: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -332,7 +332,7 @@ TEST_CASE("Test the round-trip of an expected IDataElement") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IDataElement "
         "over a minimal IBlob: ",
         *patch_message
@@ -344,38 +344,38 @@ TEST_CASE("Test the round-trip of an expected IDataElement") {
 
 TEST_CASE("Test the round-trip of an expected IEventElement") {
   const std::shared_ptr<
-    aas::types::IBasicEventElement
+    our::types::IBasicEventElement
   > concrete_instance(
     test::common::examples::LoadMinBasicEventElement()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IEventElement
+      our::types::IEventElement
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::EventElementFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::EventElementFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IEventElement "
         "from a minimal IBasicEventElement: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -387,7 +387,7 @@ TEST_CASE("Test the round-trip of an expected IEventElement") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IEventElement "
         "over a minimal IBasicEventElement: ",
         *patch_message
@@ -399,38 +399,38 @@ TEST_CASE("Test the round-trip of an expected IEventElement") {
 
 TEST_CASE("Test the round-trip of an expected IDataSpecificationContent") {
   const std::shared_ptr<
-    aas::types::IDataSpecificationIec61360
+    our::types::IDataSpecificationIec61360
   > concrete_instance(
     test::common::examples::LoadMinDataSpecificationIec61360()
   );
 
-  const nlohmann::json json = aas::jsonization::Serialize(
+  const nlohmann::json json = our::jsonization::Serialize(
     *concrete_instance
   );
 
-  aas::common::expected<
+  our::common::expected<
     std::shared_ptr<
-      aas::types::IDataSpecificationContent
+      our::types::IDataSpecificationContent
     >,
-    aas::jsonization::DeserializationError
-  > instance = aas::jsonization::DataSpecificationContentFrom(
+    our::jsonization::DeserializationError
+  > instance = our::jsonization::DataSpecificationContentFrom(
     json
   );
 
   if (!instance.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to deserialize a IDataSpecificationContent "
         "from a minimal IDataSpecificationIec61360: ",
-        aas::common::WstringToUtf8(instance.error().path.ToWstring()),
+        our::common::WstringToUtf8(instance.error().path.ToWstring()),
         ": ",
-        aas::common::WstringToUtf8(instance.error().cause)
+        our::common::WstringToUtf8(instance.error().cause)
       )
     )
     CHECK(instance.has_value());
   }
 
-  const nlohmann::json another_json = aas::jsonization::Serialize(
+  const nlohmann::json another_json = our::jsonization::Serialize(
     **instance
   );
 
@@ -442,7 +442,7 @@ TEST_CASE("Test the round-trip of an expected IDataSpecificationContent") {
   );
   if (patch_message.has_value()) {
     INFO(
-      aas::common::Concat(
+      our::common::Concat(
         "Failed to make a round-trip of a IDataSpecificationContent "
         "over a minimal IDataSpecificationIec61360: ",
         *patch_message

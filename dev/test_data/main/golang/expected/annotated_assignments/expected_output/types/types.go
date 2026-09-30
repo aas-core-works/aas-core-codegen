@@ -13,7 +13,7 @@ package types
 
 import (
 	"fmt"
-	aascommon "github.com/dummy-works/dummy/common"
+	ourcommon "github.com/dummy-works/dummy/common"
 )
 
 // Enumerate the model types for faster type switches.
@@ -28,7 +28,7 @@ const (
 	ModelTypeSomething
 )
 
-// Represent the most general interface of an AAS model.
+// Represent the most general interface of the meta-model.
 type IClass interface {
 	// Return the concrete model type at run-time.
 	//
@@ -82,7 +82,7 @@ type IItem interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IItem]
+// Check whether the instance corresponds to [ourtypes.IItem]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -165,7 +165,7 @@ type IParent interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IParent]
+// Check whether the instance corresponds to [ourtypes.IParent]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -192,7 +192,7 @@ type IChildA interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IChildA]
+// Check whether the instance corresponds to [ourtypes.IChildA]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -288,7 +288,7 @@ type IChildB interface {
 	);
 }
 
-// Check whether the instance corresponds to [aastypes.IChildB]
+// Check whether the instance corresponds to [ourtypes.IChildB]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -689,7 +689,7 @@ type ISomething interface {
 	FirstChildBIsNotFortyTwo() bool;
 }
 
-// Check whether the instance corresponds to [aastypes.ISomething]
+// Check whether the instance corresponds to [ourtypes.ISomething]
 // based on its run-time model type.
 //
 // The implementation uses a switch statements which is
@@ -920,10 +920,10 @@ func (s *Something) SetMemberToChildA(
 func (s *Something) TextOrNone(
 	limit int64,
 ) *string {
-	if int64(aascommon.LenStr(s.Text())) > limit {
+	if int64(ourcommon.LenStr(s.Text())) > limit {
 		return nil
 	}
-	return aascommon.NewAndPointTo(s.Text())
+	return ourcommon.NewAndPointTo(s.Text())
 }
 
 // Return the optional text, or alternative, or a default.
@@ -946,7 +946,7 @@ func (s *Something) NumberOrAlternative(
 ) int64 {
 	var result *int64 = alternative
 	if result == nil {
-		result = aascommon.NewAndPointTo(s.Number())
+		result = ourcommon.NewAndPointTo(s.Number())
 	}
 	return *result
 }
@@ -975,7 +975,7 @@ func (s *Something) TextsAreShort() bool {
 	var ownTexts []string = s.Texts()
 	var limit int64 = int64(20)
 	for _, ownText := range ownTexts {
-		if int64(aascommon.LenStr(ownText)) > limit {
+		if int64(ourcommon.LenStr(ownText)) > limit {
 			return false
 		}
 	}

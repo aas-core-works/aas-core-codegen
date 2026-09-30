@@ -298,7 +298,7 @@ import * as path from "path";
 {xmldom_import}
 import type {{ Document }} from "@xmldom/xmldom";
 
-import * as AasXmlization from "../src/xmlization";
+import * as OurXmlization from "../src/xmlization";
 
 import * as TestCommon from "./common";
 
@@ -317,7 +317,7 @@ function parseXml(xmlText: string): [Document, null] | [null, string] {{
 }}
 
 function expectDeserializationError(xmlText: string): void {{
-{I}const instanceOrError = AasXmlization.fromXmlString(xmlText);
+{I}const instanceOrError = OurXmlization.fromXmlString(xmlText);
 {I}expect(instanceOrError.error).not.toBeNull();
 }}"""
         ),

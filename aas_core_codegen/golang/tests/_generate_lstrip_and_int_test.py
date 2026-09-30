@@ -88,7 +88,7 @@ func Test{function_name}(t *testing.T) {{
 {I}}}
 
 {I}for _, c := range cases {{
-{II}got := aascommon.{function_name}(c.text)
+{II}got := ourcommon.{function_name}(c.text)
 {II}if got != c.expected {{
 {III}t.Errorf(
 {IIII}"Expected {function_name}(%q) to be %d, but got %d",
@@ -108,7 +108,7 @@ func mustPanicOn{function_name}(t *testing.T, text string) {{
 {II}}}
 {I}}}()
 
-{I}aascommon.{function_name}(text)
+{I}ourcommon.{function_name}(text)
 }}"""
         ),
         Stripped(
@@ -158,8 +158,8 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
 
     import_lines.append(f'{I}"testing"')
 
-    if golang_common.names_package(test_blocks, "aascommon"):
-        import_lines.append(f'{I}aascommon "{repo_url}/common"')
+    if golang_common.names_package(test_blocks, "ourcommon"):
+        import_lines.append(f'{I}ourcommon "{repo_url}/common"')
 
     import_lines_joined = "\n".join(import_lines)
 
@@ -182,7 +182,7 @@ import (
 // (runes).
 //
 // The built-in `int` is transpiled to
-// aascommon.{golang_transpilation.PARSE_SAFE_INT_FUNCTION_NAME}, which is stricter than
+// ourcommon.{golang_transpilation.PARSE_SAFE_INT_FUNCTION_NAME}, which is stricter than
 // the Python `int`. It accepts only an optional sign followed by the ASCII digits,
 // and only the safe integers, i.e., the integers within -(2^53 - 1) and 2^53 - 1.
 // Otherwise, it panics.

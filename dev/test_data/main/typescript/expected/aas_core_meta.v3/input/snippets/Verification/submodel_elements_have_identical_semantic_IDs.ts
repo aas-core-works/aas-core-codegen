@@ -6,9 +6,9 @@
  * @returns `true` if all the semantic IDs are identical
  */
 export function submodelElementsHaveIdenticalSemanticIds(
-  elements: Iterable<AasTypes.ISubmodelElement>
+  elements: Iterable<OurTypes.ISubmodelElement>
 ): boolean {
-  let thatSemanticId: AasTypes.Reference | null = null;
+  let thatSemanticId: OurTypes.Reference | null = null;
   for (const element of elements) {
     if (element.semanticId === null) {
       continue;

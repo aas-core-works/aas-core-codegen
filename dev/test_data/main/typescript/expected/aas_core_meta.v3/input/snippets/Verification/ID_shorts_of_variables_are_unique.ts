@@ -9,9 +9,9 @@
  * @returns `true` if the check passes
  */
 export function idShortsOfVariablesAreUnique(
-  inputVariables: Iterable<AasTypes.OperationVariable> | null,
-  outputVariables: Iterable<AasTypes.OperationVariable> | null,
-  inoutputVariables: Iterable<AasTypes.OperationVariable> | null,
+  inputVariables: Iterable<OurTypes.OperationVariable> | null,
+  outputVariables: Iterable<OurTypes.OperationVariable> | null,
+  inoutputVariables: Iterable<OurTypes.OperationVariable> | null,
 ): boolean {
   const idShortSet = new Set<string>();
 

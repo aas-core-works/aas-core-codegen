@@ -1,5 +1,5 @@
 """
-Provide de/serialization of AAS classes to/from JSON.
+Provide de/serialization of meta-model classes to/from JSON.
 
 We can not use one-pass deserialization for JSON since the object
 properties do not have fixed order, and hence we can not read
@@ -33,9 +33,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import dummy.common as aas_common
-import dummy.stringification as aas_stringification
-import dummy.types as aas_types
+import dummy.common as our_common
+import dummy.stringification as our_stringification
+import dummy.types as our_types
 
 
 # NOTE (mristin):
@@ -169,7 +169,7 @@ class Path:
         elif isinstance(first, KeySegment):
             parts.append(f"[{first.key!r}]")
         else:
-            aas_common.assert_never(first)
+            our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
@@ -179,7 +179,7 @@ class Path:
             elif isinstance(segment, KeySegment):
                 parts.append(f"[{segment.key!r}]")
             else:
-                aas_common.assert_never(segment)
+                our_common.assert_never(segment)
 
         return "".join(parts)
 
@@ -345,7 +345,7 @@ def _str_from_jsonable(
 
 def node_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Node:
+) -> our_types.Node:
     """
     Parse an instance of :py:class:`.types.Node` from the JSON-able
     structure :paramref:`jsonable`.
@@ -363,7 +363,7 @@ def node_from_jsonable(
 
 def branch_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Branch:
+) -> our_types.Branch:
     """
     Parse an instance of :py:class:`.types.Branch` from the JSON-able
     structure :paramref:`jsonable`.
@@ -381,7 +381,7 @@ def branch_from_jsonable(
 
 def _branch_from_jsonable_without_dispatch(
         jsonable: Jsonable
-) -> aas_types.Branch:
+) -> our_types.Branch:
     """
     Parse an instance of :py:class:`.types.Branch` from the JSON-able
     structure :paramref:`jsonable`.
@@ -431,7 +431,7 @@ def _branch_from_jsonable_without_dispatch(
             "The required property 'description' is missing"
         )
 
-    return aas_types.Branch(
+    return our_types.Branch(
         the_identifier,
         the_description
     )
@@ -439,7 +439,7 @@ def _branch_from_jsonable_without_dispatch(
 
 def leaf_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Leaf:
+) -> our_types.Leaf:
     """
     Parse an instance of :py:class:`.types.Leaf` from the JSON-able
     structure :paramref:`jsonable`.
@@ -457,7 +457,7 @@ def leaf_from_jsonable(
 
 def _leaf_from_jsonable_without_dispatch(
         jsonable: Jsonable
-) -> aas_types.Leaf:
+) -> our_types.Leaf:
     """
     Parse an instance of :py:class:`.types.Leaf` from the JSON-able
     structure :paramref:`jsonable`.
@@ -515,7 +515,7 @@ def _leaf_from_jsonable_without_dispatch(
             "The required property 'value' is missing"
         )
 
-    return aas_types.Leaf(
+    return our_types.Leaf(
         the_identifier,
         the_description,
         the_value
@@ -524,7 +524,7 @@ def _leaf_from_jsonable_without_dispatch(
 
 def blossom_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Blossom:
+) -> our_types.Blossom:
     """
     Parse an instance of :py:class:`.types.Blossom` from the JSON-able
     structure :paramref:`jsonable`.
@@ -590,7 +590,7 @@ def blossom_from_jsonable(
             "The required property 'details' is missing"
         )
 
-    return aas_types.Blossom(
+    return our_types.Blossom(
         the_identifier,
         the_description,
         the_value,
@@ -600,7 +600,7 @@ def blossom_from_jsonable(
 
 def something_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Something:
+) -> our_types.Something:
     """
     Parse an instance of :py:class:`.types.Something` from the JSON-able
     structure :paramref:`jsonable`.
@@ -611,8 +611,8 @@ def something_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_some_choice: Optional[aas_types.Node] = None
-    the_something_without_choice: Optional[aas_types.Branch] = None
+    the_some_choice: Optional[our_types.Node] = None
+    the_something_without_choice: Optional[our_types.Branch] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -643,7 +643,7 @@ def something_from_jsonable(
             "The required property 'somethingWithoutChoice' is missing"
         )
 
-    return aas_types.Something(
+    return our_types.Something(
         the_some_choice,
         the_something_without_choice
     )
@@ -651,7 +651,7 @@ def something_from_jsonable(
 
 def container_from_jsonable(
         jsonable: Jsonable
-) -> aas_types.Container:
+) -> our_types.Container:
     """
     Parse an instance of :py:class:`.types.Container` from the JSON-able
     structure :paramref:`jsonable`.
@@ -662,8 +662,8 @@ def container_from_jsonable(
     """
     mapping = _as_mapping(jsonable)
 
-    the_node: Optional[aas_types.Node] = None
-    the_something: Optional[aas_types.Something] = None
+    the_node: Optional[our_types.Node] = None
+    the_something: Optional[our_types.Something] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -694,7 +694,7 @@ def container_from_jsonable(
             "The required property 'something' is missing"
         )
 
-    return aas_types.Container(
+    return our_types.Container(
         the_node,
         the_something
     )
@@ -704,7 +704,7 @@ def container_from_jsonable(
 #: :py:class:`.types.Node`, by its model type
 _NODE_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Node]
+    _Parser[our_types.Node]
 ] = {
     'Branch': branch_from_jsonable,
     'Leaf': leaf_from_jsonable,
@@ -716,7 +716,7 @@ _NODE_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.Branch`, by its model type
 _BRANCH_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Branch]
+    _Parser[our_types.Branch]
 ] = {
     'Branch': _branch_from_jsonable_without_dispatch,
     'Leaf': leaf_from_jsonable,
@@ -728,7 +728,7 @@ _BRANCH_FROM_JSONABLE_DISPATCH: Mapping[
 #: :py:class:`.types.Leaf`, by its model type
 _LEAF_FROM_JSONABLE_DISPATCH: Mapping[
     str,
-    _Parser[aas_types.Leaf]
+    _Parser[our_types.Leaf]
 ] = {
     'Leaf': _leaf_from_jsonable_without_dispatch,
     'Blossom': blossom_from_jsonable,
@@ -816,7 +816,7 @@ def _int_to_jsonable(
 
 
 def _branch_to_jsonable(
-    that: aas_types.Branch
+    that: our_types.Branch
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -835,7 +835,7 @@ def _branch_to_jsonable(
 
 
 def _leaf_to_jsonable(
-    that: aas_types.Leaf
+    that: our_types.Leaf
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -861,7 +861,7 @@ def _leaf_to_jsonable(
 
 
 def _blossom_to_jsonable(
-    that: aas_types.Blossom
+    that: our_types.Blossom
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -892,7 +892,7 @@ def _blossom_to_jsonable(
 
 
 def _something_to_jsonable(
-    that: aas_types.Something
+    that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -910,7 +910,7 @@ def _something_to_jsonable(
 
 
 def _container_to_jsonable(
-    that: aas_types.Container
+    that: our_types.Container
 ) -> MutableMapping[str, MutableJsonable]:
     """Serialize :paramref:`that` to a JSON-able representation."""
     jsonable: MutableMapping[str, MutableJsonable] = dict()
@@ -930,7 +930,7 @@ def _container_to_jsonable(
 
 
 class _Serializer(
-        aas_types.AbstractTransformer[MutableJsonable]
+        our_types.AbstractTransformer[MutableJsonable]
 ):
     """
     Dispatch on the class of an instance to serialize it.
@@ -961,12 +961,12 @@ class _Serializer(
 _SERIALIZER = _Serializer()
 
 
-def to_jsonable(that: aas_types.Class) -> MutableJsonable:
+def to_jsonable(that: our_types.Class) -> MutableJsonable:
     """
     Convert :paramref:`that` to a JSON-able structure.
 
     :param that:
-        AAS data to be recursively converted to a JSON-able structure
+        Model instance to be recursively converted to a JSON-able structure
     :return:
         JSON-able structure which can be further encoded with, *e.g.*, :py:mod:`json`
     :raise:

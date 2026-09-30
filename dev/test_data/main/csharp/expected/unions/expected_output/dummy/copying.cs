@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 
 namespace dummy
 {
     /// <summary>
-    /// Allow for making shallow and deep copies of AAS model instances.
+    /// Allow for making shallow and deep copies of model instances.
     /// </summary>
     public static class Copying
     {
@@ -29,7 +29,7 @@ namespace dummy
         /// </remarks>.
         /// <param name="that">to be copied in a shallow manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Shallow<T>(T that) where T : Aas.IClass
+        public static T Shallow<T>(T that) where T : Our.IClass
         {
             return (T)ShallowCopierInstance.Transform(that);
         }
@@ -39,92 +39,92 @@ namespace dummy
         /// </summary>
         /// <param name="that">to be deeply copied in a recursive manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Deep<T>(T that) where T : Aas.IClass
+        public static T Deep<T>(T that) where T : Our.IClass
         {
             return (T)DeepCopierInstance.Transform(that);
         }
 
-        public static T Deep<T>(Aas.IUnion<T> that) where T : Aas.IUnion<T>
+        public static T Deep<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
         {
             return that.WithUnderlying(
                 Deep(that.Underlying));
         }
 
         /// <summary>Dispatch the making of shallow copies.</summary>
-        internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+        internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
-            public override Aas.IClass TransformStructuralFirst(
-                Aas.IStructuralFirst that
+            public override Our.IClass TransformStructuralFirst(
+                Our.IStructuralFirst that
             )
             {
-                return new Aas.StructuralFirst(that.UniqueToFirst);
+                return new Our.StructuralFirst(that.UniqueToFirst);
             }
 
-            public override Aas.IClass TransformStructuralSecond(
-                Aas.IStructuralSecond that
+            public override Our.IClass TransformStructuralSecond(
+                Our.IStructuralSecond that
             )
             {
-                return new Aas.StructuralSecond(that.UniqueToSecond);
+                return new Our.StructuralSecond(that.UniqueToSecond);
             }
 
-            public override Aas.IClass TransformMixedAbstractDescendantOne(
-                Aas.IMixedAbstractDescendantOne that
+            public override Our.IClass TransformMixedAbstractDescendantOne(
+                Our.IMixedAbstractDescendantOne that
             )
             {
-                return new Aas.MixedAbstractDescendantOne(
+                return new Our.MixedAbstractDescendantOne(
                     that.UniqueToAbstractDescendantOne);
             }
 
-            public override Aas.IClass TransformMixedAbstractDescendantTwo(
-                Aas.IMixedAbstractDescendantTwo that
+            public override Our.IClass TransformMixedAbstractDescendantTwo(
+                Our.IMixedAbstractDescendantTwo that
             )
             {
-                return new Aas.MixedAbstractDescendantTwo(
+                return new Our.MixedAbstractDescendantTwo(
                     that.UniqueToAbstractDescendantTwo);
             }
 
-            public override Aas.IClass TransformMixedConcreteWithDescendants(
-                Aas.IMixedConcreteWithDescendants that
+            public override Our.IClass TransformMixedConcreteWithDescendants(
+                Our.IMixedConcreteWithDescendants that
             )
             {
-                return new Aas.MixedConcreteWithDescendants(that.SomeBaseProperty);
+                return new Our.MixedConcreteWithDescendants(that.SomeBaseProperty);
             }
 
-            public override Aas.IClass TransformMixedConcreteWithDescendantsChild(
-                Aas.IMixedConcreteWithDescendantsChild that
+            public override Our.IClass TransformMixedConcreteWithDescendantsChild(
+                Our.IMixedConcreteWithDescendantsChild that
             )
             {
-                return new Aas.MixedConcreteWithDescendantsChild(
+                return new Our.MixedConcreteWithDescendantsChild(
                     that.SomeBaseProperty,
                     that.SomeChildProperty);
             }
 
-            public override Aas.IClass TransformMixedConcreteLeaf(
-                Aas.IMixedConcreteLeaf that
+            public override Our.IClass TransformMixedConcreteLeaf(
+                Our.IMixedConcreteLeaf that
             )
             {
-                return new Aas.MixedConcreteLeaf(that.UniqueToConcreteLeaf);
+                return new Our.MixedConcreteLeaf(that.UniqueToConcreteLeaf);
             }
 
-            public override Aas.IClass TransformModelTypedFirst(
-                Aas.IModelTypedFirst that
+            public override Our.IClass TransformModelTypedFirst(
+                Our.IModelTypedFirst that
             )
             {
-                return new Aas.ModelTypedFirst(that.SomeProperty);
+                return new Our.ModelTypedFirst(that.SomeProperty);
             }
 
-            public override Aas.IClass TransformModelTypedSecond(
-                Aas.IModelTypedSecond that
+            public override Our.IClass TransformModelTypedSecond(
+                Our.IModelTypedSecond that
             )
             {
-                return new Aas.ModelTypedSecond(that.SomeProperty);
+                return new Our.ModelTypedSecond(that.SomeProperty);
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
-                return new Aas.Something(
+                return new Our.Something(
                     that.StructuralProperty,
                     that.MixedProperty,
                     that.ModelTypedProperty,
@@ -140,91 +140,91 @@ namespace dummy
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
-        internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass TransformStructuralFirst(
-                Aas.IStructuralFirst that
+        internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
+        {    public override Our.IClass TransformStructuralFirst(
+                Our.IStructuralFirst that
             )
             {
-                return new Aas.StructuralFirst(
+                return new Our.StructuralFirst(
                     that.UniqueToFirst
                 );
             }
 
-            public override Aas.IClass TransformStructuralSecond(
-                Aas.IStructuralSecond that
+            public override Our.IClass TransformStructuralSecond(
+                Our.IStructuralSecond that
             )
             {
-                return new Aas.StructuralSecond(
+                return new Our.StructuralSecond(
                     that.UniqueToSecond
                 );
             }
 
-            public override Aas.IClass TransformMixedAbstractDescendantOne(
-                Aas.IMixedAbstractDescendantOne that
+            public override Our.IClass TransformMixedAbstractDescendantOne(
+                Our.IMixedAbstractDescendantOne that
             )
             {
-                return new Aas.MixedAbstractDescendantOne(
+                return new Our.MixedAbstractDescendantOne(
                     that.UniqueToAbstractDescendantOne
                 );
             }
 
-            public override Aas.IClass TransformMixedAbstractDescendantTwo(
-                Aas.IMixedAbstractDescendantTwo that
+            public override Our.IClass TransformMixedAbstractDescendantTwo(
+                Our.IMixedAbstractDescendantTwo that
             )
             {
-                return new Aas.MixedAbstractDescendantTwo(
+                return new Our.MixedAbstractDescendantTwo(
                     that.UniqueToAbstractDescendantTwo
                 );
             }
 
-            public override Aas.IClass TransformMixedConcreteWithDescendants(
-                Aas.IMixedConcreteWithDescendants that
+            public override Our.IClass TransformMixedConcreteWithDescendants(
+                Our.IMixedConcreteWithDescendants that
             )
             {
-                return new Aas.MixedConcreteWithDescendants(
+                return new Our.MixedConcreteWithDescendants(
                     that.SomeBaseProperty
                 );
             }
 
-            public override Aas.IClass TransformMixedConcreteWithDescendantsChild(
-                Aas.IMixedConcreteWithDescendantsChild that
+            public override Our.IClass TransformMixedConcreteWithDescendantsChild(
+                Our.IMixedConcreteWithDescendantsChild that
             )
             {
-                return new Aas.MixedConcreteWithDescendantsChild(
+                return new Our.MixedConcreteWithDescendantsChild(
                     that.SomeBaseProperty,
                     that.SomeChildProperty
                 );
             }
 
-            public override Aas.IClass TransformMixedConcreteLeaf(
-                Aas.IMixedConcreteLeaf that
+            public override Our.IClass TransformMixedConcreteLeaf(
+                Our.IMixedConcreteLeaf that
             )
             {
-                return new Aas.MixedConcreteLeaf(
+                return new Our.MixedConcreteLeaf(
                     that.UniqueToConcreteLeaf
                 );
             }
 
-            public override Aas.IClass TransformModelTypedFirst(
-                Aas.IModelTypedFirst that
+            public override Our.IClass TransformModelTypedFirst(
+                Our.IModelTypedFirst that
             )
             {
-                return new Aas.ModelTypedFirst(
+                return new Our.ModelTypedFirst(
                     that.SomeProperty
                 );
             }
 
-            public override Aas.IClass TransformModelTypedSecond(
-                Aas.IModelTypedSecond that
+            public override Our.IClass TransformModelTypedSecond(
+                Our.IModelTypedSecond that
             )
             {
-                return new Aas.ModelTypedSecond(
+                return new Our.ModelTypedSecond(
                     that.SomeProperty
                 );
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
                 var theListStructuralProperty = new List<StructuralUnion>(
@@ -259,7 +259,7 @@ namespace dummy
                     }
                 }
 
-                return new Aas.Something(
+                return new Our.Something(
                     Deep(that.StructuralProperty),
                     Deep(that.MixedProperty),
                     Deep(that.ModelTypedProperty),

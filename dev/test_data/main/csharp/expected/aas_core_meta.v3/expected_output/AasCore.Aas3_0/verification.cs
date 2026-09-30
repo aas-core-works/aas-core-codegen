@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-using Aas = AasCore.Aas3_0;  // renamed
+using Our = AasCore.Aas3_0;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 
@@ -18,7 +18,7 @@ namespace AasCore.Aas3_0
     /// <example>
     /// Here is an example how to verify an instance of IHasSemantics:
     /// <code>
-    /// var anInstance = new Aas.IHasSemantics(
+    /// var anInstance = new Our.IHasSemantics(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -289,7 +289,7 @@ namespace AasCore.Aas3_0
         /// language.
         /// </summary>
         public static bool LangStringsHaveUniqueLanguages(
-            IEnumerable<Aas.IAbstractLangString> langStrings
+            IEnumerable<Our.IAbstractLangString> langStrings
         )
         {
             var languageSet = new HashSet<string>();
@@ -305,11 +305,11 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that there are no duplicate <see cref="Aas.IQualifier.Type" />'s
+        /// Check that there are no duplicate <see cref="Our.IQualifier.Type" />'s
         /// in the <paramref name="qualifiers" />.
         /// </summary>
         public static bool QualifierTypesAreUnique(
-            IEnumerable<Aas.IQualifier> qualifiers
+            IEnumerable<Our.IQualifier> qualifiers
         )
         {
             var typeSet = new HashSet<string>();
@@ -1496,24 +1496,24 @@ namespace AasCore.Aas3_0
         /// </summary>
         public static bool ValueConsistentWithXsdType(
             string value,
-            Aas.DataTypeDefXsd valueType
+            Our.DataTypeDefXsd valueType
         )
         {
             switch (valueType)
             {
-                case Aas.DataTypeDefXsd.AnyUri:
+                case Our.DataTypeDefXsd.AnyUri:
                 {
                     return MatchesXsAnyUri(value);
                 }
-                case Aas.DataTypeDefXsd.Base64Binary:
+                case Our.DataTypeDefXsd.Base64Binary:
                 {
                     return MatchesXsBase64Binary(value);
                 }
-                case Aas.DataTypeDefXsd.Boolean:
+                case Our.DataTypeDefXsd.Boolean:
                 {
                     return MatchesXsBoolean(value);
                 }
-                case Aas.DataTypeDefXsd.Byte:
+                case Our.DataTypeDefXsd.Byte:
                 {
                     try
                     {
@@ -1530,7 +1530,7 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.Date:
+                case Our.DataTypeDefXsd.Date:
                 {
                     if (!MatchesXsDate(value))
                     {
@@ -1539,7 +1539,7 @@ namespace AasCore.Aas3_0
 
                     return IsPrefixedWithValidDate(value);
                 }
-                case Aas.DataTypeDefXsd.DateTime:
+                case Our.DataTypeDefXsd.DateTime:
                 {
                     if (!MatchesXsDateTime(value))
                     {
@@ -1551,11 +1551,11 @@ namespace AasCore.Aas3_0
                     // correct in sense of the day/month combination.
                     return IsPrefixedWithValidDate(value);
                 }
-                case Aas.DataTypeDefXsd.Decimal:
+                case Our.DataTypeDefXsd.Decimal:
                 {
                     return MatchesXsDecimal(value);
                 }
-                case Aas.DataTypeDefXsd.Double:
+                case Our.DataTypeDefXsd.Double:
                 {
                     // We need to check explicitly for the regular expression since
                     // System.Xml.XmlConvert.ToDouble is too permissive. For example,
@@ -1602,11 +1602,11 @@ namespace AasCore.Aas3_0
                     }
                     return true;
                 }
-                case Aas.DataTypeDefXsd.Duration:
+                case Our.DataTypeDefXsd.Duration:
                 {
                     return MatchesXsDuration(value);
                 }
-                case Aas.DataTypeDefXsd.Float:
+                case Our.DataTypeDefXsd.Float:
                 {
                     // We need to check explicitly for the regular expression since
                     // System.Xml.XmlConvert.ToSingle is too permissive. For example,
@@ -1653,15 +1653,15 @@ namespace AasCore.Aas3_0
                     }
                     return true;
                 }
-                case Aas.DataTypeDefXsd.GDay:
+                case Our.DataTypeDefXsd.GDay:
                 {
                     return MatchesXsGDay(value);
                 }
-                case Aas.DataTypeDefXsd.GMonth:
+                case Our.DataTypeDefXsd.GMonth:
                 {
                     return MatchesXsGMonth(value);
                 }
-                case Aas.DataTypeDefXsd.GMonthDay:
+                case Our.DataTypeDefXsd.GMonthDay:
                 {
                     if (!MatchesXsGMonthDay(value))
                     {
@@ -1685,19 +1685,19 @@ namespace AasCore.Aas3_0
                             );
                     }
                 }
-                case Aas.DataTypeDefXsd.GYear:
+                case Our.DataTypeDefXsd.GYear:
                 {
                     return MatchesXsGYear(value);
                 }
-                case Aas.DataTypeDefXsd.GYearMonth:
+                case Our.DataTypeDefXsd.GYearMonth:
                 {
                     return MatchesXsGYearMonth(value);
                 }
-                case Aas.DataTypeDefXsd.HexBinary:
+                case Our.DataTypeDefXsd.HexBinary:
                 {
                     return MatchesXsHexBinary(value);
                 }
-                case Aas.DataTypeDefXsd.Int:
+                case Our.DataTypeDefXsd.Int:
                 {
                     try
                     {
@@ -1714,11 +1714,11 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.Integer:
+                case Our.DataTypeDefXsd.Integer:
                 {
                     return MatchesXsInteger(value);
                 }
-                case Aas.DataTypeDefXsd.Long:
+                case Our.DataTypeDefXsd.Long:
                 {
                     try
                     {
@@ -1735,23 +1735,23 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.NegativeInteger:
+                case Our.DataTypeDefXsd.NegativeInteger:
                 {
                     return MatchesXsNegativeInteger(value);
                 }
-                case Aas.DataTypeDefXsd.NonNegativeInteger:
+                case Our.DataTypeDefXsd.NonNegativeInteger:
                 {
                     return MatchesXsNonNegativeInteger(value);
                 }
-                case Aas.DataTypeDefXsd.NonPositiveInteger:
+                case Our.DataTypeDefXsd.NonPositiveInteger:
                 {
                     return MatchesXsNonPositiveInteger(value);
                 }
-                case Aas.DataTypeDefXsd.PositiveInteger:
+                case Our.DataTypeDefXsd.PositiveInteger:
                 {
                     return MatchesXsPositiveInteger(value);
                 }
-                case Aas.DataTypeDefXsd.Short:
+                case Our.DataTypeDefXsd.Short:
                 {
                     try
                     {
@@ -1768,15 +1768,15 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.String:
+                case Our.DataTypeDefXsd.String:
                 {
                     return MatchesXsString(value);
                 }
-                case Aas.DataTypeDefXsd.Time:
+                case Our.DataTypeDefXsd.Time:
                 {
                     return MatchesXsTime(value);
                 }
-                case Aas.DataTypeDefXsd.UnsignedByte:
+                case Our.DataTypeDefXsd.UnsignedByte:
                 {
                     if (value.Length == 0)
                     {
@@ -1817,7 +1817,7 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.UnsignedInt:
+                case Our.DataTypeDefXsd.UnsignedInt:
                 {
                     if (value.Length == 0)
                     {
@@ -1858,7 +1858,7 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.UnsignedLong:
+                case Our.DataTypeDefXsd.UnsignedLong:
                 {
                     if (value.Length == 0)
                     {
@@ -1899,7 +1899,7 @@ namespace AasCore.Aas3_0
                         return false;
                     }
                 }
-                case Aas.DataTypeDefXsd.UnsignedShort:
+                case Our.DataTypeDefXsd.UnsignedShort:
                 {
                     if (value.Length == 0)
                     {
@@ -1961,7 +1961,7 @@ namespace AasCore.Aas3_0
         }  // public static bool IsModelReferenceTo
 
         /// <summary>
-        /// Check that the target of the reference matches a <see cref="Aas.Constants.AasReferables" />.
+        /// Check that the target of the reference matches a <see cref="Our.Constants.AasReferables" />.
         /// </summary>
         public static bool IsModelReferenceToReferable(
             IReference reference
@@ -1969,15 +1969,15 @@ namespace AasCore.Aas3_0
         {
             return reference.Type == ReferenceTypes.ModelReference
             && reference.Keys.Count != 0
-            && Aas.Constants.AasReferables.Contains(reference.Keys[^1].Type);
+            && Our.Constants.AasReferables.Contains(reference.Keys[^1].Type);
         }  // public static bool IsModelReferenceToReferable
 
         /// <summary>
-        /// Check that all <see cref="Aas.IReferable.IdShort" /> are unique among
+        /// Check that all <see cref="Our.IReferable.IdShort" /> are unique among
         /// <paramref name="referables" />.
         /// </summary>
         public static bool IdShortsAreUnique(
-            IEnumerable<Aas.IReferable> referables
+            IEnumerable<Our.IReferable> referables
         )
         {
             var idShortSet = new HashSet<string>();
@@ -1996,14 +1996,14 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that all <see cref="Aas.IReferable.IdShort" />'s are among all the
+        /// Check that all <see cref="Our.IReferable.IdShort" />'s are among all the
         /// <paramref name="inputVariables" />, <paramref name="outputVariables" /> and
         /// <paramref name="inoutputVariables" /> are unique.
         /// </summary>
         public static bool IdShortsOfVariablesAreUnique(
-            IEnumerable<Aas.IOperationVariable>? inputVariables,
-            IEnumerable<Aas.IOperationVariable>? outputVariables,
-            IEnumerable<Aas.IOperationVariable>? inoutputVariables
+            IEnumerable<Our.IOperationVariable>? inputVariables,
+            IEnumerable<Our.IOperationVariable>? outputVariables,
+            IEnumerable<Our.IOperationVariable>? inoutputVariables
         )
         {
             var idShortSet = new HashSet<string>();
@@ -2057,11 +2057,11 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that all <see cref="Aas.IExtension.Name" /> are unique among
+        /// Check that all <see cref="Our.IExtension.Name" /> are unique among
         /// <paramref name="extensions" />.
         /// </summary>
         public static bool ExtensionNamesAreUnique(
-            IEnumerable<Aas.IExtension> extensions
+            IEnumerable<Our.IExtension> extensions
         )
         {
             var nameSet = new HashSet<string>();
@@ -2078,13 +2078,13 @@ namespace AasCore.Aas3_0
 
         /// <summary>
         /// Check that all <paramref name="elements" /> have the identical
-        /// <see cref="Aas.IHasSemantics.SemanticId" />'s.
+        /// <see cref="Our.IHasSemantics.SemanticId" />'s.
         /// </summary>
         public static bool SubmodelElementsHaveIdenticalSemanticIds(
-            IEnumerable<Aas.ISubmodelElement> elements
+            IEnumerable<Our.ISubmodelElement> elements
         )
         {
-                Aas.IReference? thatSemanticId = null;
+                Our.IReference? thatSemanticId = null;
 
                 foreach (var element in elements)
                 {
@@ -2119,64 +2119,64 @@ namespace AasCore.Aas3_0
         }
 
         public static bool SubmodelElementIsOfType(
-            Aas.ISubmodelElement element,
-            Aas.AasSubmodelElements expectedType
+            Our.ISubmodelElement element,
+            Our.AasSubmodelElements expectedType
         )
         {
             switch (expectedType)
             {
-                case Aas.AasSubmodelElements.AnnotatedRelationshipElement:
-                    return element is Aas.IAnnotatedRelationshipElement;
+                case Our.AasSubmodelElements.AnnotatedRelationshipElement:
+                    return element is Our.IAnnotatedRelationshipElement;
 
-                case Aas.AasSubmodelElements.BasicEventElement:
-                    return element is Aas.IBasicEventElement;
+                case Our.AasSubmodelElements.BasicEventElement:
+                    return element is Our.IBasicEventElement;
 
-                case Aas.AasSubmodelElements.Blob:
-                    return element is Aas.IBlob;
+                case Our.AasSubmodelElements.Blob:
+                    return element is Our.IBlob;
 
-                case Aas.AasSubmodelElements.Capability:
-                    return element is Aas.ICapability;
+                case Our.AasSubmodelElements.Capability:
+                    return element is Our.ICapability;
 
-                case Aas.AasSubmodelElements.DataElement:
-                    return element is Aas.IDataElement;
+                case Our.AasSubmodelElements.DataElement:
+                    return element is Our.IDataElement;
 
-                case Aas.AasSubmodelElements.Entity:
-                    return element is Aas.IEntity;
+                case Our.AasSubmodelElements.Entity:
+                    return element is Our.IEntity;
 
-                case Aas.AasSubmodelElements.EventElement:
-                    return element is Aas.IEventElement;
+                case Our.AasSubmodelElements.EventElement:
+                    return element is Our.IEventElement;
 
-                case Aas.AasSubmodelElements.File:
-                    return element is Aas.IFile;
+                case Our.AasSubmodelElements.File:
+                    return element is Our.IFile;
 
-                case Aas.AasSubmodelElements.MultiLanguageProperty:
-                    return element is Aas.IMultiLanguageProperty;
+                case Our.AasSubmodelElements.MultiLanguageProperty:
+                    return element is Our.IMultiLanguageProperty;
 
-                case Aas.AasSubmodelElements.Operation:
-                    return element is Aas.IOperation;
+                case Our.AasSubmodelElements.Operation:
+                    return element is Our.IOperation;
 
-                case Aas.AasSubmodelElements.Property:
-                    return element is Aas.IProperty;
+                case Our.AasSubmodelElements.Property:
+                    return element is Our.IProperty;
 
-                case Aas.AasSubmodelElements.Range:
-                    return element is Aas.IRange;
+                case Our.AasSubmodelElements.Range:
+                    return element is Our.IRange;
 
-                case Aas.AasSubmodelElements.ReferenceElement:
-                    return element is Aas.IReferenceElement;
+                case Our.AasSubmodelElements.ReferenceElement:
+                    return element is Our.IReferenceElement;
 
-                case Aas.AasSubmodelElements.RelationshipElement:
-                    return element is Aas.IRelationshipElement;
+                case Our.AasSubmodelElements.RelationshipElement:
+                    return element is Our.IRelationshipElement;
 
-                case Aas.AasSubmodelElements.SubmodelElement:
+                case Our.AasSubmodelElements.SubmodelElement:
                     // ReSharper disable once IsExpressionAlwaysTrue
                     // ReSharper disable once ConvertTypeCheckToNullCheck
-                    return element is Aas.ISubmodelElement;
+                    return element is Our.ISubmodelElement;
 
-                case Aas.AasSubmodelElements.SubmodelElementList:
-                    return element is Aas.ISubmodelElementList;
+                case Our.AasSubmodelElements.SubmodelElementList:
+                    return element is Our.ISubmodelElementList;
 
-                case Aas.AasSubmodelElements.SubmodelElementCollection:
-                    return element is Aas.ISubmodelElementCollection;
+                case Our.AasSubmodelElements.SubmodelElementCollection:
+                    return element is Our.ISubmodelElementCollection;
 
                 default:
                     throw new System.ArgumentException(
@@ -2187,7 +2187,7 @@ namespace AasCore.Aas3_0
 
         /// <summary>
         /// Check that the <paramref name="elements" /> which are
-        /// <see cref="Aas.IProperty" /> or <see cref="Aas.IRange" />
+        /// <see cref="Our.IProperty" /> or <see cref="Our.IRange" />
         /// have the given <paramref name="valueType" />.
         /// </summary>
         /// <remarks>
@@ -2197,21 +2197,21 @@ namespace AasCore.Aas3_0
         /// See https://endjin.com/blog/2022/02/csharp-10-generics-nullable-references-improvements-allownull
         /// </remarks>
         public static bool PropertiesOrRangesHaveValueType(
-            IEnumerable<Aas.ISubmodelElement> elements,
-            Aas.DataTypeDefXsd? valueType
+            IEnumerable<Our.ISubmodelElement> elements,
+            Our.DataTypeDefXsd? valueType
         )
         {
             foreach (var element in elements)
             {
                 switch (element)
                 {
-                    case Aas.IProperty prop:
+                    case Our.IProperty prop:
                         if (prop.ValueType != valueType)
                         {
                             return false;
                         }
                         break;
-                    case Aas.IRange range:
+                    case Our.IRange range:
                         if (range.ValueType != valueType)
                         {
                             return false;
@@ -2225,12 +2225,12 @@ namespace AasCore.Aas3_0
         /// <summary>
         /// Check that the two references, <paramref name="that" /> and
         /// <paramref name="other" />, are equal by comparing
-        /// their <see cref="Aas.IReference.Keys" /> by
-        /// <see cref="Aas.IKey.Value" />'s.
+        /// their <see cref="Our.IReference.Keys" /> by
+        /// <see cref="Our.IKey.Value" />'s.
         /// </summary>
         public static bool ReferenceKeyValuesEqual(
-            Aas.IReference that,
-            Aas.IReference other
+            Our.IReference that,
+            Our.IReference other
         )
         {
             if (that.Keys.Count != other.Keys.Count)
@@ -2250,19 +2250,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForPropertyOrValueHaveAppropriateDataType(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2281,19 +2281,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForReferenceHaveAppropriateDataType(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2312,19 +2312,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForDocumentHaveAppropriateDataType(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2343,19 +2343,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.DataType" /> is defined
         /// for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveDataType(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2370,19 +2370,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.Value" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.Value" /> is defined
         /// for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveValue(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2397,19 +2397,19 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.IDataSpecificationIec61360.Definition" /> is defined
+        /// Check that the <see cref="Our.IDataSpecificationIec61360.Definition" /> is defined
         /// for all data specifications whose content is given as IEC 61360 at least in English.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
-            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Our.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as Aas.IDataSpecificationIec61360
+                        as Our.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2466,162 +2466,162 @@ namespace AasCore.Aas3_0
             internal static readonly HashSet<int> ForModellingKind = new HashSet<int>
             {
 
-                (int)Aas.ModellingKind.Template,
-                (int)Aas.ModellingKind.Instance
+                (int)Our.ModellingKind.Template,
+                (int)Our.ModellingKind.Instance
             };
 
             internal static readonly HashSet<int> ForQualifierKind = new HashSet<int>
             {
 
-                (int)Aas.QualifierKind.ValueQualifier,
-                (int)Aas.QualifierKind.ConceptQualifier,
-                (int)Aas.QualifierKind.TemplateQualifier
+                (int)Our.QualifierKind.ValueQualifier,
+                (int)Our.QualifierKind.ConceptQualifier,
+                (int)Our.QualifierKind.TemplateQualifier
             };
 
             internal static readonly HashSet<int> ForAssetKind = new HashSet<int>
             {
 
-                (int)Aas.AssetKind.Type,
-                (int)Aas.AssetKind.Instance,
-                (int)Aas.AssetKind.NotApplicable
+                (int)Our.AssetKind.Type,
+                (int)Our.AssetKind.Instance,
+                (int)Our.AssetKind.NotApplicable
             };
 
             internal static readonly HashSet<int> ForAasSubmodelElements = new HashSet<int>
             {
 
-                (int)Aas.AasSubmodelElements.AnnotatedRelationshipElement,
-                (int)Aas.AasSubmodelElements.BasicEventElement,
-                (int)Aas.AasSubmodelElements.Blob,
-                (int)Aas.AasSubmodelElements.Capability,
-                (int)Aas.AasSubmodelElements.DataElement,
-                (int)Aas.AasSubmodelElements.Entity,
-                (int)Aas.AasSubmodelElements.EventElement,
-                (int)Aas.AasSubmodelElements.File,
-                (int)Aas.AasSubmodelElements.MultiLanguageProperty,
-                (int)Aas.AasSubmodelElements.Operation,
-                (int)Aas.AasSubmodelElements.Property,
-                (int)Aas.AasSubmodelElements.Range,
-                (int)Aas.AasSubmodelElements.ReferenceElement,
-                (int)Aas.AasSubmodelElements.RelationshipElement,
-                (int)Aas.AasSubmodelElements.SubmodelElement,
-                (int)Aas.AasSubmodelElements.SubmodelElementList,
-                (int)Aas.AasSubmodelElements.SubmodelElementCollection
+                (int)Our.AasSubmodelElements.AnnotatedRelationshipElement,
+                (int)Our.AasSubmodelElements.BasicEventElement,
+                (int)Our.AasSubmodelElements.Blob,
+                (int)Our.AasSubmodelElements.Capability,
+                (int)Our.AasSubmodelElements.DataElement,
+                (int)Our.AasSubmodelElements.Entity,
+                (int)Our.AasSubmodelElements.EventElement,
+                (int)Our.AasSubmodelElements.File,
+                (int)Our.AasSubmodelElements.MultiLanguageProperty,
+                (int)Our.AasSubmodelElements.Operation,
+                (int)Our.AasSubmodelElements.Property,
+                (int)Our.AasSubmodelElements.Range,
+                (int)Our.AasSubmodelElements.ReferenceElement,
+                (int)Our.AasSubmodelElements.RelationshipElement,
+                (int)Our.AasSubmodelElements.SubmodelElement,
+                (int)Our.AasSubmodelElements.SubmodelElementList,
+                (int)Our.AasSubmodelElements.SubmodelElementCollection
             };
 
             internal static readonly HashSet<int> ForEntityType = new HashSet<int>
             {
 
-                (int)Aas.EntityType.CoManagedEntity,
-                (int)Aas.EntityType.SelfManagedEntity
+                (int)Our.EntityType.CoManagedEntity,
+                (int)Our.EntityType.SelfManagedEntity
             };
 
             internal static readonly HashSet<int> ForDirection = new HashSet<int>
             {
 
-                (int)Aas.Direction.Input,
-                (int)Aas.Direction.Output
+                (int)Our.Direction.Input,
+                (int)Our.Direction.Output
             };
 
             internal static readonly HashSet<int> ForStateOfEvent = new HashSet<int>
             {
 
-                (int)Aas.StateOfEvent.On,
-                (int)Aas.StateOfEvent.Off
+                (int)Our.StateOfEvent.On,
+                (int)Our.StateOfEvent.Off
             };
 
             internal static readonly HashSet<int> ForReferenceTypes = new HashSet<int>
             {
 
-                (int)Aas.ReferenceTypes.ExternalReference,
-                (int)Aas.ReferenceTypes.ModelReference
+                (int)Our.ReferenceTypes.ExternalReference,
+                (int)Our.ReferenceTypes.ModelReference
             };
 
             internal static readonly HashSet<int> ForKeyTypes = new HashSet<int>
             {
 
-                (int)Aas.KeyTypes.AnnotatedRelationshipElement,
-                (int)Aas.KeyTypes.AssetAdministrationShell,
-                (int)Aas.KeyTypes.BasicEventElement,
-                (int)Aas.KeyTypes.Blob,
-                (int)Aas.KeyTypes.Capability,
-                (int)Aas.KeyTypes.ConceptDescription,
-                (int)Aas.KeyTypes.DataElement,
-                (int)Aas.KeyTypes.Entity,
-                (int)Aas.KeyTypes.EventElement,
-                (int)Aas.KeyTypes.File,
-                (int)Aas.KeyTypes.FragmentReference,
-                (int)Aas.KeyTypes.GlobalReference,
-                (int)Aas.KeyTypes.Identifiable,
-                (int)Aas.KeyTypes.MultiLanguageProperty,
-                (int)Aas.KeyTypes.Operation,
-                (int)Aas.KeyTypes.Property,
-                (int)Aas.KeyTypes.Range,
-                (int)Aas.KeyTypes.Referable,
-                (int)Aas.KeyTypes.ReferenceElement,
-                (int)Aas.KeyTypes.RelationshipElement,
-                (int)Aas.KeyTypes.Submodel,
-                (int)Aas.KeyTypes.SubmodelElement,
-                (int)Aas.KeyTypes.SubmodelElementCollection,
-                (int)Aas.KeyTypes.SubmodelElementList
+                (int)Our.KeyTypes.AnnotatedRelationshipElement,
+                (int)Our.KeyTypes.AssetAdministrationShell,
+                (int)Our.KeyTypes.BasicEventElement,
+                (int)Our.KeyTypes.Blob,
+                (int)Our.KeyTypes.Capability,
+                (int)Our.KeyTypes.ConceptDescription,
+                (int)Our.KeyTypes.DataElement,
+                (int)Our.KeyTypes.Entity,
+                (int)Our.KeyTypes.EventElement,
+                (int)Our.KeyTypes.File,
+                (int)Our.KeyTypes.FragmentReference,
+                (int)Our.KeyTypes.GlobalReference,
+                (int)Our.KeyTypes.Identifiable,
+                (int)Our.KeyTypes.MultiLanguageProperty,
+                (int)Our.KeyTypes.Operation,
+                (int)Our.KeyTypes.Property,
+                (int)Our.KeyTypes.Range,
+                (int)Our.KeyTypes.Referable,
+                (int)Our.KeyTypes.ReferenceElement,
+                (int)Our.KeyTypes.RelationshipElement,
+                (int)Our.KeyTypes.Submodel,
+                (int)Our.KeyTypes.SubmodelElement,
+                (int)Our.KeyTypes.SubmodelElementCollection,
+                (int)Our.KeyTypes.SubmodelElementList
             };
 
             internal static readonly HashSet<int> ForDataTypeDefXsd = new HashSet<int>
             {
 
-                (int)Aas.DataTypeDefXsd.AnyUri,
-                (int)Aas.DataTypeDefXsd.Base64Binary,
-                (int)Aas.DataTypeDefXsd.Boolean,
-                (int)Aas.DataTypeDefXsd.Byte,
-                (int)Aas.DataTypeDefXsd.Date,
-                (int)Aas.DataTypeDefXsd.DateTime,
-                (int)Aas.DataTypeDefXsd.Decimal,
-                (int)Aas.DataTypeDefXsd.Double,
-                (int)Aas.DataTypeDefXsd.Duration,
-                (int)Aas.DataTypeDefXsd.Float,
-                (int)Aas.DataTypeDefXsd.GDay,
-                (int)Aas.DataTypeDefXsd.GMonth,
-                (int)Aas.DataTypeDefXsd.GMonthDay,
-                (int)Aas.DataTypeDefXsd.GYear,
-                (int)Aas.DataTypeDefXsd.GYearMonth,
-                (int)Aas.DataTypeDefXsd.HexBinary,
-                (int)Aas.DataTypeDefXsd.Int,
-                (int)Aas.DataTypeDefXsd.Integer,
-                (int)Aas.DataTypeDefXsd.Long,
-                (int)Aas.DataTypeDefXsd.NegativeInteger,
-                (int)Aas.DataTypeDefXsd.NonNegativeInteger,
-                (int)Aas.DataTypeDefXsd.NonPositiveInteger,
-                (int)Aas.DataTypeDefXsd.PositiveInteger,
-                (int)Aas.DataTypeDefXsd.Short,
-                (int)Aas.DataTypeDefXsd.String,
-                (int)Aas.DataTypeDefXsd.Time,
-                (int)Aas.DataTypeDefXsd.UnsignedByte,
-                (int)Aas.DataTypeDefXsd.UnsignedInt,
-                (int)Aas.DataTypeDefXsd.UnsignedLong,
-                (int)Aas.DataTypeDefXsd.UnsignedShort
+                (int)Our.DataTypeDefXsd.AnyUri,
+                (int)Our.DataTypeDefXsd.Base64Binary,
+                (int)Our.DataTypeDefXsd.Boolean,
+                (int)Our.DataTypeDefXsd.Byte,
+                (int)Our.DataTypeDefXsd.Date,
+                (int)Our.DataTypeDefXsd.DateTime,
+                (int)Our.DataTypeDefXsd.Decimal,
+                (int)Our.DataTypeDefXsd.Double,
+                (int)Our.DataTypeDefXsd.Duration,
+                (int)Our.DataTypeDefXsd.Float,
+                (int)Our.DataTypeDefXsd.GDay,
+                (int)Our.DataTypeDefXsd.GMonth,
+                (int)Our.DataTypeDefXsd.GMonthDay,
+                (int)Our.DataTypeDefXsd.GYear,
+                (int)Our.DataTypeDefXsd.GYearMonth,
+                (int)Our.DataTypeDefXsd.HexBinary,
+                (int)Our.DataTypeDefXsd.Int,
+                (int)Our.DataTypeDefXsd.Integer,
+                (int)Our.DataTypeDefXsd.Long,
+                (int)Our.DataTypeDefXsd.NegativeInteger,
+                (int)Our.DataTypeDefXsd.NonNegativeInteger,
+                (int)Our.DataTypeDefXsd.NonPositiveInteger,
+                (int)Our.DataTypeDefXsd.PositiveInteger,
+                (int)Our.DataTypeDefXsd.Short,
+                (int)Our.DataTypeDefXsd.String,
+                (int)Our.DataTypeDefXsd.Time,
+                (int)Our.DataTypeDefXsd.UnsignedByte,
+                (int)Our.DataTypeDefXsd.UnsignedInt,
+                (int)Our.DataTypeDefXsd.UnsignedLong,
+                (int)Our.DataTypeDefXsd.UnsignedShort
             };
 
             internal static readonly HashSet<int> ForDataTypeIec61360 = new HashSet<int>
             {
 
-                (int)Aas.DataTypeIec61360.Date,
-                (int)Aas.DataTypeIec61360.String,
-                (int)Aas.DataTypeIec61360.StringTranslatable,
-                (int)Aas.DataTypeIec61360.IntegerMeasure,
-                (int)Aas.DataTypeIec61360.IntegerCount,
-                (int)Aas.DataTypeIec61360.IntegerCurrency,
-                (int)Aas.DataTypeIec61360.RealMeasure,
-                (int)Aas.DataTypeIec61360.RealCount,
-                (int)Aas.DataTypeIec61360.RealCurrency,
-                (int)Aas.DataTypeIec61360.Boolean,
-                (int)Aas.DataTypeIec61360.Iri,
-                (int)Aas.DataTypeIec61360.Irdi,
-                (int)Aas.DataTypeIec61360.Rational,
-                (int)Aas.DataTypeIec61360.RationalMeasure,
-                (int)Aas.DataTypeIec61360.Time,
-                (int)Aas.DataTypeIec61360.Timestamp,
-                (int)Aas.DataTypeIec61360.File,
-                (int)Aas.DataTypeIec61360.Html,
-                (int)Aas.DataTypeIec61360.Blob
+                (int)Our.DataTypeIec61360.Date,
+                (int)Our.DataTypeIec61360.String,
+                (int)Our.DataTypeIec61360.StringTranslatable,
+                (int)Our.DataTypeIec61360.IntegerMeasure,
+                (int)Our.DataTypeIec61360.IntegerCount,
+                (int)Our.DataTypeIec61360.IntegerCurrency,
+                (int)Our.DataTypeIec61360.RealMeasure,
+                (int)Our.DataTypeIec61360.RealCount,
+                (int)Our.DataTypeIec61360.RealCurrency,
+                (int)Our.DataTypeIec61360.Boolean,
+                (int)Our.DataTypeIec61360.Iri,
+                (int)Our.DataTypeIec61360.Irdi,
+                (int)Our.DataTypeIec61360.Rational,
+                (int)Our.DataTypeIec61360.RationalMeasure,
+                (int)Our.DataTypeIec61360.Time,
+                (int)Our.DataTypeIec61360.Timestamp,
+                (int)Our.DataTypeIec61360.File,
+                (int)Our.DataTypeIec61360.Html,
+                (int)Our.DataTypeIec61360.Blob
             };
         }  // internal static class EnumValueSet
 
@@ -2634,7 +2634,7 @@ namespace AasCore.Aas3_0
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformExtension(
-                Aas.IExtension that
+                Our.IExtension that
             )
             {
                 if (!(
@@ -2716,7 +2716,7 @@ namespace AasCore.Aas3_0
                 if (that.ValueType != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.DataTypeDefXsd value = that.ValueType
+                    Our.DataTypeDefXsd value = that.ValueType
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyDataTypeDefXsd(value))
                     {
@@ -2760,7 +2760,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAdministrativeInformation(
-                Aas.IAdministrativeInformation that
+                Our.IAdministrativeInformation that
             )
             {
                 if (!(
@@ -2851,7 +2851,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformQualifier(
-                Aas.IQualifier that
+                Our.IQualifier that
             )
             {
                 if (!(
@@ -2917,7 +2917,7 @@ namespace AasCore.Aas3_0
                 if (that.Kind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.QualifierKind value = that.Kind
+                    Our.QualifierKind value = that.Kind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyQualifierKind(value))
                     {
@@ -2969,7 +2969,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAssetAdministrationShell(
-                Aas.IAssetAdministrationShell that
+                Our.IAssetAdministrationShell that
             )
             {
                 if (!(
@@ -3230,7 +3230,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAssetInformation(
-                Aas.IAssetInformation that
+                Our.IAssetInformation that
             )
             {
                 if (!(
@@ -3342,7 +3342,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformResource(
-                Aas.IResource that
+                Our.IResource that
             )
             {
                 foreach (var error in Verification.VerifyPathType(that.Path))
@@ -3367,7 +3367,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSpecificAssetId(
-                Aas.ISpecificAssetId that
+                Our.ISpecificAssetId that
             )
             {
                 if (!(
@@ -3460,7 +3460,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSubmodel(
-                Aas.ISubmodel that
+                Our.ISubmodel that
             )
             {
                 if (!(
@@ -3748,7 +3748,7 @@ namespace AasCore.Aas3_0
                 if (that.Kind != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.ModellingKind value = that.Kind
+                    Our.ModellingKind value = that.Kind
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModellingKind(value))
                     {
@@ -3849,7 +3849,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformRelationshipElement(
-                Aas.IRelationshipElement that
+                Our.IRelationshipElement that
             )
             {
                 if (!(
@@ -4124,7 +4124,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSubmodelElementList(
-                Aas.ISubmodelElementList that
+                Our.ISubmodelElementList that
             )
             {
                 if (!(
@@ -4490,7 +4490,7 @@ namespace AasCore.Aas3_0
                 if (that.ValueTypeListElement != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.DataTypeDefXsd value = that.ValueTypeListElement
+                    Our.DataTypeDefXsd value = that.ValueTypeListElement
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyDataTypeDefXsd(value))
                     {
@@ -4523,7 +4523,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSubmodelElementCollection(
-                Aas.ISubmodelElementCollection that
+                Our.ISubmodelElementCollection that
             )
             {
                 if (!(
@@ -4834,7 +4834,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformProperty(
-                Aas.IProperty that
+                Our.IProperty that
             )
             {
                 if (!(
@@ -4945,7 +4945,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -5143,7 +5143,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformMultiLanguageProperty(
-                Aas.IMultiLanguageProperty that
+                Our.IMultiLanguageProperty that
             )
             {
                 if (!(
@@ -5254,7 +5254,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -5461,7 +5461,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformRange(
-                Aas.IRange that
+                Our.IRange that
             )
             {
                 if (!(
@@ -5572,7 +5572,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -5779,7 +5779,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformReferenceElement(
-                Aas.IReferenceElement that
+                Our.IReferenceElement that
             )
             {
                 if (!(
@@ -5890,7 +5890,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -6060,7 +6060,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBlob(
-                Aas.IBlob that
+                Our.IBlob that
             )
             {
                 if (!(
@@ -6171,7 +6171,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -6349,7 +6349,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformFile(
-                Aas.IFile that
+                Our.IFile that
             )
             {
                 if (!(
@@ -6460,7 +6460,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Category != null)
-                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
+                    || Our.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -6638,7 +6638,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformAnnotatedRelationshipElement(
-                Aas.IAnnotatedRelationshipElement that
+                Our.IAnnotatedRelationshipElement that
             )
             {
                 if (!(
@@ -6957,7 +6957,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformEntity(
-                Aas.IEntity that
+                Our.IEntity that
             )
             {
                 if (!(
@@ -7335,7 +7335,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformEventPayload(
-                Aas.IEventPayload that
+                Our.IEventPayload that
             )
             {
                 if (!(
@@ -7438,7 +7438,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformBasicEventElement(
-                Aas.IBasicEventElement that
+                Our.IBasicEventElement that
             )
             {
                 if (!(
@@ -7802,7 +7802,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformOperation(
-                Aas.IOperation that
+                Our.IOperation that
             )
             {
                 if (!(
@@ -8160,7 +8160,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformOperationVariable(
-                Aas.IOperationVariable that
+                Our.IOperationVariable that
             )
             {
                 if (!(that.Value.IdShort != null))
@@ -8184,7 +8184,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformCapability(
-                Aas.ICapability that
+                Our.ICapability that
             )
             {
                 if (!(
@@ -8443,7 +8443,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformConceptDescription(
-                Aas.IConceptDescription that
+                Our.IConceptDescription that
             )
             {
                 if (!(
@@ -8746,7 +8746,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformReference(
-                Aas.IReference that
+                Our.IReference that
             )
             {
                 if (!(that.Keys.Count >= 1))
@@ -8758,7 +8758,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Keys.Count >= 1)
-                    || Aas.Constants.GloballyIdentifiables.Contains(that.Keys[0].Type)))
+                    || Our.Constants.GloballyIdentifiables.Contains(that.Keys[0].Type)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -8772,7 +8772,7 @@ namespace AasCore.Aas3_0
                         that.Type == ReferenceTypes.ExternalReference
                         && that.Keys.Count >= 1
                     )
-                    || Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[0].Type)))
+                    || Our.Constants.GenericGloballyIdentifiables.Contains(that.Keys[0].Type)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -8786,7 +8786,7 @@ namespace AasCore.Aas3_0
                         that.Type == ReferenceTypes.ModelReference
                         && that.Keys.Count >= 1
                     )
-                    || Aas.Constants.AasIdentifiables.Contains(that.Keys[0].Type)))
+                    || Our.Constants.AasIdentifiables.Contains(that.Keys[0].Type)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -8800,8 +8800,8 @@ namespace AasCore.Aas3_0
                         && that.Keys.Count >= 1
                     )
                     || (
-                        Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[^1].Type)
-                        || Aas.Constants.GenericFragmentKeys.Contains(that.Keys[^1].Type)
+                        Our.Constants.GenericGloballyIdentifiables.Contains(that.Keys[^1].Type)
+                        || Our.Constants.GenericFragmentKeys.Contains(that.Keys[^1].Type)
                     )))
                 {
                     yield return new Reporting.Error(
@@ -8821,7 +8821,7 @@ namespace AasCore.Aas3_0
                             1,
                             System.Math.Max(0, that.Keys.Count - 1)
                         ).All(
-                            i => Aas.Constants.FragmentKeys.Contains(that.Keys[i].Type))
+                            i => Our.Constants.FragmentKeys.Contains(that.Keys[i].Type))
                     )))
                 {
                     yield return new Reporting.Error(
@@ -8842,7 +8842,7 @@ namespace AasCore.Aas3_0
                             0,
                             that.Keys.Count - 1
                         ).All(
-                            i => !Aas.Constants.GenericFragmentKeys.Contains(that.Keys[i].Type))
+                            i => !Our.Constants.GenericFragmentKeys.Contains(that.Keys[i].Type))
                     )))
                 {
                     yield return new Reporting.Error(
@@ -8932,7 +8932,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformKey(
-                Aas.IKey that
+                Our.IKey that
             )
             {
                 foreach (var error in Verification.VerifyKeyTypes(that.Type))
@@ -8954,7 +8954,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringNameType(
-                Aas.ILangStringNameType that
+                Our.ILangStringNameType that
             )
             {
                 if (!(Common.StringHelpers.Len(that.Text) <= 128))
@@ -8985,7 +8985,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringTextType(
-                Aas.ILangStringTextType that
+                Our.ILangStringTextType that
             )
             {
                 if (!(Common.StringHelpers.Len(that.Text) <= 1023))
@@ -9016,7 +9016,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformEnvironment(
-                Aas.IEnvironment that
+                Our.IEnvironment that
             )
             {
                 if (!(
@@ -9108,7 +9108,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformEmbeddedDataSpecification(
-                Aas.IEmbeddedDataSpecification that
+                Our.IEmbeddedDataSpecification that
             )
             {
                 foreach (var error in Verification.Verify(that.DataSpecification))
@@ -9130,7 +9130,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLevelType(
-                Aas.ILevelType that
+                Our.ILevelType that
             )
             {
                 // No verification has been defined for LevelType.
@@ -9139,7 +9139,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformValueReferencePair(
-                Aas.IValueReferencePair that
+                Our.IValueReferencePair that
             )
             {
                 foreach (var error in Verification.VerifyValueTypeIec61360(that.Value))
@@ -9161,7 +9161,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformValueList(
-                Aas.IValueList that
+                Our.IValueList that
             )
             {
                 if (!(that.ValueReferencePairs.Count >= 1))
@@ -9190,7 +9190,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringPreferredNameTypeIec61360(
-                Aas.ILangStringPreferredNameTypeIec61360 that
+                Our.ILangStringPreferredNameTypeIec61360 that
             )
             {
                 if (!(Common.StringHelpers.Len(that.Text) <= 255))
@@ -9221,7 +9221,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringShortNameTypeIec61360(
-                Aas.ILangStringShortNameTypeIec61360 that
+                Our.ILangStringShortNameTypeIec61360 that
             )
             {
                 if (!(Common.StringHelpers.Len(that.Text) <= 18))
@@ -9252,7 +9252,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformLangStringDefinitionTypeIec61360(
-                Aas.ILangStringDefinitionTypeIec61360 that
+                Our.ILangStringDefinitionTypeIec61360 that
             )
             {
                 if (!(Common.StringHelpers.Len(that.Text) <= 1023))
@@ -9283,7 +9283,7 @@ namespace AasCore.Aas3_0
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformDataSpecificationIec61360(
-                Aas.IDataSpecificationIec61360 that
+                Our.IDataSpecificationIec61360 that
             )
             {
                 if (!(
@@ -9299,7 +9299,7 @@ namespace AasCore.Aas3_0
                 if (!(
                     !(
                         (that.DataType != null)
-                        && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType.Value)
+                        && Our.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType.Value)
                     )
                     || (
                         (that.Unit != null)
@@ -9462,7 +9462,7 @@ namespace AasCore.Aas3_0
                 if (that.DataType != null)
                 {
                     // We need to help the static analyzer with a null coalescing.
-                    Aas.DataTypeIec61360 value = that.DataType
+                    Our.DataTypeIec61360 value = that.DataType
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyDataTypeIec61360(value))
                     {
@@ -9546,7 +9546,7 @@ namespace AasCore.Aas3_0
         /// <param name="that">
         /// The instance of the meta-model to be verified
         /// </param>
-        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
         {
             foreach (var error in _transformer.Transform(that))
             {
@@ -10038,7 +10038,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyModellingKind(
-            Aas.ModellingKind that)
+            Our.ModellingKind that)
         {
             if (!EnumValueSet.ForModellingKind.Contains(
                 (int)that))
@@ -10052,7 +10052,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyQualifierKind(
-            Aas.QualifierKind that)
+            Our.QualifierKind that)
         {
             if (!EnumValueSet.ForQualifierKind.Contains(
                 (int)that))
@@ -10066,7 +10066,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyAssetKind(
-            Aas.AssetKind that)
+            Our.AssetKind that)
         {
             if (!EnumValueSet.ForAssetKind.Contains(
                 (int)that))
@@ -10080,7 +10080,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyAasSubmodelElements(
-            Aas.AasSubmodelElements that)
+            Our.AasSubmodelElements that)
         {
             if (!EnumValueSet.ForAasSubmodelElements.Contains(
                 (int)that))
@@ -10094,7 +10094,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyEntityType(
-            Aas.EntityType that)
+            Our.EntityType that)
         {
             if (!EnumValueSet.ForEntityType.Contains(
                 (int)that))
@@ -10108,7 +10108,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyDirection(
-            Aas.Direction that)
+            Our.Direction that)
         {
             if (!EnumValueSet.ForDirection.Contains(
                 (int)that))
@@ -10122,7 +10122,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyStateOfEvent(
-            Aas.StateOfEvent that)
+            Our.StateOfEvent that)
         {
             if (!EnumValueSet.ForStateOfEvent.Contains(
                 (int)that))
@@ -10136,7 +10136,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyReferenceTypes(
-            Aas.ReferenceTypes that)
+            Our.ReferenceTypes that)
         {
             if (!EnumValueSet.ForReferenceTypes.Contains(
                 (int)that))
@@ -10150,7 +10150,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKeyTypes(
-            Aas.KeyTypes that)
+            Our.KeyTypes that)
         {
             if (!EnumValueSet.ForKeyTypes.Contains(
                 (int)that))
@@ -10164,7 +10164,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyDataTypeDefXsd(
-            Aas.DataTypeDefXsd that)
+            Our.DataTypeDefXsd that)
         {
             if (!EnumValueSet.ForDataTypeDefXsd.Contains(
                 (int)that))
@@ -10178,7 +10178,7 @@ namespace AasCore.Aas3_0
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyDataTypeIec61360(
-            Aas.DataTypeIec61360 that)
+            Our.DataTypeIec61360 that)
         {
             if (!EnumValueSet.ForDataTypeIec61360.Contains(
                 (int)that))

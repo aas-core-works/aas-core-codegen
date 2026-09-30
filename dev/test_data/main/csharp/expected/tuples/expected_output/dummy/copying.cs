@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-using Aas = dummy;  // renamed
+using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
 
 namespace dummy
 {
     /// <summary>
-    /// Allow for making shallow and deep copies of AAS model instances.
+    /// Allow for making shallow and deep copies of model instances.
     /// </summary>
     public static class Copying
     {
@@ -29,7 +29,7 @@ namespace dummy
         /// </remarks>.
         /// <param name="that">to be copied in a shallow manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Shallow<T>(T that) where T : Aas.IClass
+        public static T Shallow<T>(T that) where T : Our.IClass
         {
             return (T)ShallowCopierInstance.Transform(that);
         }
@@ -39,33 +39,33 @@ namespace dummy
         /// </summary>
         /// <param name="that">to be deeply copied in a recursive manner</param>
         /// <typeparam name="T">type to cast the result to</typeparam>
-        public static T Deep<T>(T that) where T : Aas.IClass
+        public static T Deep<T>(T that) where T : Our.IClass
         {
             return (T)DeepCopierInstance.Transform(that);
         }
 
         /// <summary>Dispatch the making of shallow copies.</summary>
-        internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
+        internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
-            public override Aas.IClass TransformSomeItem(
-                Aas.ISomeItem that
+            public override Our.IClass TransformSomeItem(
+                Our.ISomeItem that
             )
             {
-                return new Aas.SomeItem(that.Name);
+                return new Our.SomeItem(that.Name);
             }
 
-            public override Aas.IClass TransformAnotherItem(
-                Aas.IAnotherItem that
+            public override Our.IClass TransformAnotherItem(
+                Our.IAnotherItem that
             )
             {
-                return new Aas.AnotherItem(that.SerialNumber);
+                return new Our.AnotherItem(that.SerialNumber);
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
-                return new Aas.Something(
+                return new Our.Something(
                     that.Pair,
                     that.Items,
                     that.Tricky,
@@ -74,30 +74,30 @@ namespace dummy
         }  // internal class ShallowCopier
 
         /// <summary>Dispatch the making of deep copies.</summary>
-        internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass TransformSomeItem(
-                Aas.ISomeItem that
+        internal class DeepCopier : Visitation.AbstractTransformer<Our.IClass>
+        {    public override Our.IClass TransformSomeItem(
+                Our.ISomeItem that
             )
             {
-                return new Aas.SomeItem(
+                return new Our.SomeItem(
                     that.Name
                 );
             }
 
-            public override Aas.IClass TransformAnotherItem(
-                Aas.IAnotherItem that
+            public override Our.IClass TransformAnotherItem(
+                Our.IAnotherItem that
             )
             {
-                return new Aas.AnotherItem(
+                return new Our.AnotherItem(
                     that.SerialNumber
                 );
             }
 
-            public override Aas.IClass TransformSomething(
-                Aas.ISomething that
+            public override Our.IClass TransformSomething(
+                Our.ISomething that
             )
             {
-                return new Aas.Something(
+                return new Our.Something(
                     (
                         that.Pair.Item1,
                         that.Pair.Item2

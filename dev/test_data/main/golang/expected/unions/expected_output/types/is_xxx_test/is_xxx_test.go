@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
-	instance := aastesting.MustLoadMinimalStructuralFirst()
+	instance := ourtesting.MustLoadMinimalStructuralFirst()
 
-	if !aastypes.IsStructuralFirst(instance) {
+	if !ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be true on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -44,7 +44,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -52,7 +52,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -60,7 +60,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -68,7 +68,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -76,7 +76,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -84,7 +84,7 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IStructuralFirst with runtime type %T and with model type %v",
@@ -94,9 +94,9 @@ func TestIsXxxOnAnInstanceOfStructuralFirst(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
-	instance := aastesting.MustLoadMinimalStructuralSecond()
+	instance := ourtesting.MustLoadMinimalStructuralSecond()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -104,7 +104,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsStructuralSecond(instance) {
+	if !ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be true on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -112,7 +112,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -120,7 +120,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -128,7 +128,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -136,7 +136,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -144,7 +144,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -152,7 +152,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -160,7 +160,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -168,7 +168,7 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IStructuralSecond with runtime type %T and with model type %v",
@@ -178,9 +178,9 @@ func TestIsXxxOnAnInstanceOfStructuralSecond(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedAbstractDescendantOne()
+	instance := ourtesting.MustLoadMinimalMixedAbstractDescendantOne()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -188,7 +188,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -196,7 +196,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedAbstractDescendantOne(instance) {
+	if !ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be true on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -204,7 +204,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -212,7 +212,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -220,7 +220,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -228,7 +228,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -236,7 +236,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -244,7 +244,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -252,7 +252,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IMixedAbstractDescendantOne with runtime type %T and with model type %v",
@@ -262,9 +262,9 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantOne(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedAbstractDescendantTwo()
+	instance := ourtesting.MustLoadMinimalMixedAbstractDescendantTwo()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -272,7 +272,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -280,7 +280,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -288,7 +288,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if !ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be true on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -296,7 +296,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -304,7 +304,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -312,7 +312,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -320,7 +320,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -328,7 +328,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -336,7 +336,7 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IMixedAbstractDescendantTwo with runtime type %T and with model type %v",
@@ -346,9 +346,9 @@ func TestIsXxxOnAnInstanceOfMixedAbstractDescendantTwo(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedConcreteWithDescendants()
+	instance := ourtesting.MustLoadMinimalMixedConcreteWithDescendants()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -356,7 +356,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -364,7 +364,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -372,7 +372,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -380,7 +380,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedConcreteWithDescendants(instance) {
+	if !ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be true on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -388,7 +388,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -396,7 +396,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -404,7 +404,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -412,7 +412,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -420,7 +420,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IMixedConcreteWithDescendants with runtime type %T and with model type %v",
@@ -430,9 +430,9 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendants(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedConcreteWithDescendantsChild()
+	instance := ourtesting.MustLoadMinimalMixedConcreteWithDescendantsChild()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -440,7 +440,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -448,7 +448,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -456,7 +456,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -464,7 +464,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedConcreteWithDescendants(instance) {
+	if !ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be true on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -472,7 +472,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if !ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be true on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -480,7 +480,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -488,7 +488,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -496,7 +496,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -504,7 +504,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IMixedConcreteWithDescendantsChild with runtime type %T and with model type %v",
@@ -514,9 +514,9 @@ func TestIsXxxOnAnInstanceOfMixedConcreteWithDescendantsChild(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
-	instance := aastesting.MustLoadMinimalMixedConcreteLeaf()
+	instance := ourtesting.MustLoadMinimalMixedConcreteLeaf()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -524,7 +524,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -532,7 +532,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -540,7 +540,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -548,7 +548,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -556,7 +556,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -564,7 +564,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsMixedConcreteLeaf(instance) {
+	if !ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be true on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -572,7 +572,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -580,7 +580,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -588,7 +588,7 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IMixedConcreteLeaf with runtime type %T and with model type %v",
@@ -598,9 +598,9 @@ func TestIsXxxOnAnInstanceOfMixedConcreteLeaf(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
-	instance := aastesting.MustLoadMinimalModelTypedFirst()
+	instance := ourtesting.MustLoadMinimalModelTypedFirst()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -608,7 +608,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -616,7 +616,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -624,7 +624,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -632,7 +632,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -640,7 +640,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -648,7 +648,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -656,7 +656,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsModelTypedFirst(instance) {
+	if !ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be true on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -664,7 +664,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -672,7 +672,7 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IModelTypedFirst with runtime type %T and with model type %v",
@@ -682,9 +682,9 @@ func TestIsXxxOnAnInstanceOfModelTypedFirst(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
-	instance := aastesting.MustLoadMinimalModelTypedSecond()
+	instance := ourtesting.MustLoadMinimalModelTypedSecond()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -692,7 +692,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -700,7 +700,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -708,7 +708,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -716,7 +716,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -724,7 +724,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -732,7 +732,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -740,7 +740,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -748,7 +748,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsModelTypedSecond(instance) {
+	if !ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be true on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -756,7 +756,7 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IModelTypedSecond with runtime type %T and with model type %v",
@@ -766,9 +766,9 @@ func TestIsXxxOnAnInstanceOfModelTypedSecond(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if aastypes.IsStructuralFirst(instance) {
+	if ourtypes.IsStructuralFirst(instance) {
 		t.Errorf(
 			"Expected IsStructuralFirst to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -776,7 +776,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsStructuralSecond(instance) {
+	if ourtypes.IsStructuralSecond(instance) {
 		t.Errorf(
 			"Expected IsStructuralSecond to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -784,7 +784,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantOne(instance) {
+	if ourtypes.IsMixedAbstractDescendantOne(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantOne to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -792,7 +792,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedAbstractDescendantTwo(instance) {
+	if ourtypes.IsMixedAbstractDescendantTwo(instance) {
 		t.Errorf(
 			"Expected IsMixedAbstractDescendantTwo to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -800,7 +800,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendants(instance) {
+	if ourtypes.IsMixedConcreteWithDescendants(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendants to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -808,7 +808,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteWithDescendantsChild(instance) {
+	if ourtypes.IsMixedConcreteWithDescendantsChild(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteWithDescendantsChild to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -816,7 +816,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsMixedConcreteLeaf(instance) {
+	if ourtypes.IsMixedConcreteLeaf(instance) {
 		t.Errorf(
 			"Expected IsMixedConcreteLeaf to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -824,7 +824,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedFirst(instance) {
+	if ourtypes.IsModelTypedFirst(instance) {
 		t.Errorf(
 			"Expected IsModelTypedFirst to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -832,7 +832,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsModelTypedSecond(instance) {
+	if ourtypes.IsModelTypedSecond(instance) {
 		t.Errorf(
 			"Expected IsModelTypedSecond to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -840,7 +840,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",

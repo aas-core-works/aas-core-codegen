@@ -134,12 +134,12 @@ def _generate_static_type_name(cls: intermediate.ConcreteClass) -> Stripped:
         f"""\
 template<>
 struct StaticTypeName<
-{I}aas::types::{interface_name}
+{I}our::types::{interface_name}
 > {{
   static const char* name;
 }};
 const char* StaticTypeName<
-{I}aas::types::{interface_name}
+{I}our::types::{interface_name}
 >::name = "{interface_name}";"""
     )
 
@@ -160,23 +160,23 @@ def _generate_load_min_max_implementations(
         Stripped(
             f"""\
 std::shared_ptr<
-{I}aas::types::{interface_name}
+{I}our::types::{interface_name}
 > {load}(
 {I}const std::filesystem::path& path
 ) {{
 {I}
 
 {I}std::shared_ptr<
-{II}aas::types::IClass
+{II}our::types::IClass
 {I}> abstract = test::common::xmlization::MustReadInstance(
 {II}path
 {I});
 
 {I}std::shared_ptr<
-{II}aas::types::{interface_name}
+{II}our::types::{interface_name}
 {I}> instance(
 {II}std::dynamic_pointer_cast<
-{III}aas::types::{interface_name}
+{III}our::types::{interface_name}
 {II}>(
 {III}abstract
 {II})
@@ -184,7 +184,7 @@ std::shared_ptr<
 
 {I}if (instance == nullptr) {{
 {II}throw std::runtime_error(
-{III}aas::common::Concat(
+{III}our::common::Concat(
 {IIII}"Failed to cast the instance to {interface_name} from ",
 {IIII}path.string()
 {III})
@@ -197,7 +197,7 @@ std::shared_ptr<
         Stripped(
             f"""\
 std::shared_ptr<
-{I}aas::types::{interface_name}
+{I}our::types::{interface_name}
 > {load_min}() {{
 {I}const std::filesystem::path path(
 {II}test::common::DetermineTestDataDir()
@@ -215,7 +215,7 @@ std::shared_ptr<
         Stripped(
             f"""\
 std::shared_ptr<
-{I}aas::types::{interface_name}
+{I}our::types::{interface_name}
 > {load_max}() {{
 {I}const std::filesystem::path path(
 {II}test::common::DetermineTestDataDir()
@@ -259,7 +259,7 @@ def generate_implementation(
 
 #include <filesystem>
 
-namespace aas = {library_namespace};
+namespace our = {library_namespace};
 
 namespace test {{
 namespace common {{

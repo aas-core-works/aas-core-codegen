@@ -550,7 +550,7 @@ def _generate_parse_tuple_helper(arity: int) -> Stripped:
     type_params = [f"T{i}" for i in range(arity)]
     type_params_joined = ", ".join(f"{t} any" for t in type_params)
 
-    tuple_type = f"aascommon.Tuple{arity}[{', '.join(type_params)}]"
+    tuple_type = f"ourcommon.Tuple{arity}[{', '.join(type_params)}]"
 
     params_joined = ",\n".join(
         f"parseItem{i} func(jsonable interface{{}}) ({type_params[i]}, error)"
@@ -635,18 +635,18 @@ def _generate_enumeration_from_jsonable(
 
     return Stripped(
         f"""\
-// Parse `jsonable` as a literal of [aastypes.{enum_name}],
+// Parse `jsonable` as a literal of [ourtypes.{enum_name}],
 // or return an error.
 func {function_name}(
 {I}jsonable interface{{}},
-) (result aastypes.{enum_name}, err error) {{
+) (result ourtypes.{enum_name}, err error) {{
 {I}text, ok := jsonable.(string)
 {I}if !ok {{
 {II}err = notAnEnumTextError(jsonable, {enum_name_literal})
 {II}return
 {I}}}
 
-{I}result, ok = aasstringification.{enum_from_str}(text)
+{I}result, ok = ourstringification.{enum_from_str}(text)
 {I}if !ok {{
 {II}err = unexpectedEnumLiteralError(text, {enum_name_literal})
 {I}}}
@@ -721,12 +721,12 @@ default:
 
     return Stripped(
         f"""\
-// De-serialize an instance of [aastypes.{interface_name}]
+// De-serialize an instance of [ourtypes.{interface_name}]
 // from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
 func {function_name}(
 {I}m map[string]interface{{}},
 ) (
-{I}result aastypes.{interface_name},
+{I}result ourtypes.{interface_name},
 {I}err error,
 ) {{
 {I}var modelType string
@@ -775,7 +775,7 @@ def _generate_return_union_from_map(
     )
 
     if root is implementer:
-        arguments = ["m", from_map_name, f"aastypes.{new_union_name}"]
+        arguments = ["m", from_map_name, f"ourtypes.{new_union_name}"]
     else:
         interface_name = golang_naming.interface_name(implementer.name)
         union_name = golang_naming.union_name(named_union.name)
@@ -785,8 +785,8 @@ def _generate_return_union_from_map(
 return unionFromMap(
 {I}m,
 {I}{from_map_name},
-{I}func(that aastypes.{interface_name}) *aastypes.{union_name} {{
-{II}return aastypes.{new_union_name}(that)
+{I}func(that ourtypes.{interface_name}) *ourtypes.{union_name} {{
+{II}return ourtypes.{new_union_name}(that)
 {I}}},
 )"""
         )
@@ -957,12 +957,12 @@ return"""
 
     return Stripped(
         f"""\
-// Parse `jsonable` as an instance of [aastypes.{name}],
+// Parse `jsonable` as an instance of [ourtypes.{name}],
 // or return an error.
 func {function_name}(
 {I}jsonable interface{{}},
 ) (
-{I}result *aastypes.{name},
+{I}result *ourtypes.{name},
 {I}err error,
 ) {{
 {I}{indent_but_first_line(body, I)}
@@ -1029,12 +1029,12 @@ if err != nil {{
 
     return Stripped(
         f"""\
-// Parse `jsonable` as an instance of [aastypes.{interface_name}],
+// Parse `jsonable` as an instance of [ourtypes.{interface_name}],
 // or return an error.
 func {function_name}(
 {I}jsonable interface{{}},
 ) (
-{I}result aastypes.{interface_name},
+{I}result ourtypes.{interface_name},
 {I}err error,
 ) {{
 {I}{indent_but_first_line(body, I)}
@@ -1368,7 +1368,7 @@ def _generate_concrete_class_from_map_without_dispatch(
         prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
 
         prop_var_type = golang_common.generate_type(
-            type_annotation=prop.type_annotation, types_package=Identifier("aastypes")
+            type_annotation=prop.type_annotation, types_package=Identifier("ourtypes")
         )
 
         prop_var_initializations.append(Stripped(f"var {prop_var} {prop_var_type}"))
@@ -1469,13 +1469,13 @@ if !{found_var} {{
         constructing_statements.append(
             Stripped(
                 f"""\
-result = aastypes.{new_function}(
+result = ourtypes.{new_function}(
 {I}{indent_but_first_line(constructor_arguments_joined, I)}
 )"""
             )
         )
     else:
-        constructing_statements.append(Stripped(f"result = aastypes.{new_function}()"))
+        constructing_statements.append(Stripped(f"result = ourtypes.{new_function}()"))
 
     for arg in cls.constructor.arguments:
         if not isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -1508,7 +1508,7 @@ result.{setter_name}(
     documentation_blocks = [
         Stripped(
             f"""\
-Parse [aastypes.{interface_name}] from a map,
+Parse [ourtypes.{interface_name}] from a map,
 or return an error, if any."""
         )
     ]  # type: List[Stripped]
@@ -1525,7 +1525,7 @@ This function performs no dispatch! It is used to parse the properties
 as-are, and already assumes the exact model type. Usually, this function
 is called from within a from-jsonable or from-map function, and you never
 call it directly. If you want to de-serialize an instance of
-[aastypes.{interface_name}], call
+[ourtypes.{interface_name}], call
 [{function_name_from_jsonable}]."""
             )
         )
@@ -1540,7 +1540,7 @@ call it directly. If you want to de-serialize an instance of
 func {function_name}(
 {I}m map[string]interface{{}},
 ) (
-{I}result aastypes.{interface_name},
+{I}result ourtypes.{interface_name},
 {I}err error,
 ) {{
 {I}{indent_but_first_line(body, I)}
@@ -1705,10 +1705,10 @@ def _generate_json_able_as_jsonable_interface() -> Stripped:
         f"""\
 // Serialize the JSON-able `item` as a JSON-able value.
 //
-// ``jsonValueToJsonable`` takes an ``aastypes.JsonValue``, so a *function*
-// which takes an ``aastypes.JsonArray`` or an ``aastypes.JsonObject`` is
+// ``jsonValueToJsonable`` takes an ``ourtypes.JsonValue``, so a *function*
+// which takes an ``ourtypes.JsonArray`` or an ``ourtypes.JsonObject`` is
 // a different type altogether, even though either value is assignable to
-// an ``aastypes.JsonValue``. This wrapper gives the one signature which
+// an ``ourtypes.JsonValue``. This wrapper gives the one signature which
 // ``serializeArray``/``serializeTupleN`` expect for every shape.
 func jsonAbleToJsonable[T any](item T) (interface{{}}, error) {{
 {I}return jsonValueToJsonable(item)
@@ -1722,18 +1722,18 @@ def _generate_class_as_jsonable_interface() -> Stripped:
         f"""\
 // Serialize `that` to a JSON-able value, or return an error.
 //
-// `ToJsonable` takes an `aastypes.IClass`, but a list or a tuple item's own
-// (more specific) interface type, e.g., `aastypes.ISomeItem`, can not be
+// `ToJsonable` takes an `ourtypes.IClass`, but a list or a tuple item's own
+// (more specific) interface type, e.g., `ourtypes.ISomeItem`, can not be
 // unified with that when passing `ToJsonable` itself as a
 // `func(item T) (interface{{}}, error)` value -- Go function values are
 // invariant in their parameter type (no contravariance, unlike, say, a C#
 // delegate). Making this wrapper itself generic (instead of fixing its
-// parameter to `aastypes.IClass`) lets the very same one be passed on bare,
+// parameter to `ourtypes.IClass`) lets the very same one be passed on bare,
 // uninstantiated, for every class-typed item regardless of its
 // concrete interface: Go infers both the item's type and this
 // wrapper's own type parameter together from the context of the
 // `serializeArray`/`serializeTupleN` call.
-func classAsJsonableInterface[T aastypes.IClass](that T) (interface{{}}, error) {{
+func classAsJsonableInterface[T ourtypes.IClass](that T) (interface{{}}, error) {{
 {I}return ToJsonable(that)
 }}"""
     )
@@ -1762,7 +1762,7 @@ def _generate_enum_as_jsonable_interface(
 // it can not be passed on directly wherever a `func(item T) (interface{{}},
 // error)` is expected, e.g. as an item serializer in a list or a tuple.
 // This wrapper exists solely to have the right signature.
-func {function_name}(that aastypes.{enum_name}) (interface{{}}, error) {{
+func {function_name}(that ourtypes.{enum_name}) (interface{{}}, error) {{
 {I}return {to_jsonable}(that)
 }}"""
     )
@@ -1772,7 +1772,7 @@ def _generate_union_as_jsonable_interface() -> Stripped:
     """
     Generate the wrapper so a named-union item is a bare function reference.
 
-    ``ToJsonable`` takes an ``aastypes.IClass``, which a named union is
+    ``ToJsonable`` takes an ``ourtypes.IClass``, which a named union is
     deliberately not, but every named union exposes its underlying instance
     through ``Underlying`` -- constraining this wrapper's type parameter to
     that single method (instead of a fixed union type) lets the very same
@@ -1784,7 +1784,7 @@ def _generate_union_as_jsonable_interface() -> Stripped:
 // Constrain a generic type to a named union, giving access to its
 // underlying instance for serialization.
 type namedUnion interface {{
-{I}Underlying() aastypes.IClass
+{I}Underlying() ourtypes.IClass
 }}
 
 // Serialize `that` union to a JSON-able value, or return an error.
@@ -1826,7 +1826,7 @@ def _generate_json_able_helpers(
 // to prepend the way to it.
 func jsonValueFromJsonable(
 {I}jsonable interface{{}},
-) (result aastypes.JsonValue, err error) {{
+) (result ourtypes.JsonValue, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected a JSON-able value, but got a nil",
@@ -1862,9 +1862,9 @@ func jsonValueFromJsonable(
 {III}return
 
 {II}case []interface{{}}:
-{III}items := make(aastypes.JsonArray, 0, len(casted))
+{III}items := make(ourtypes.JsonArray, 0, len(casted))
 {III}for i, item := range casted {{
-{IIII}var parsed aastypes.JsonValue
+{IIII}var parsed ourtypes.JsonValue
 {IIII}parsed, err = jsonValueFromJsonable(item)
 {IIII}if err != nil {{
 {IIIII}mustDeserializationError(err).prependIndex(i)
@@ -1876,9 +1876,9 @@ func jsonValueFromJsonable(
 {III}return
 
 {II}case map[string]interface{{}}:
-{III}members := make(aastypes.JsonObject, len(casted))
+{III}members := make(ourtypes.JsonObject, len(casted))
 {III}for key, value := range casted {{
-{IIII}var parsed aastypes.JsonValue
+{IIII}var parsed ourtypes.JsonValue
 {IIII}parsed, err = jsonValueFromJsonable(value)
 {IIII}if err != nil {{
 {IIIII}mustDeserializationError(err).prependKey(key)
@@ -1906,7 +1906,7 @@ func jsonValueFromJsonable(
 // Parse `jsonable` as a JSON-able array.
 func jsonArrayFromJsonable(
 {I}jsonable interface{{}},
-) (result aastypes.JsonArray, err error) {{
+) (result ourtypes.JsonArray, err error) {{
 {I}if _, ok := jsonable.([]interface{{}}); !ok {{
 {II}err = newDeserializationError(
 {III}fmt.Sprintf("Expected a JSON-able array, but got: %T", jsonable),
@@ -1914,13 +1914,13 @@ func jsonArrayFromJsonable(
 {II}return
 {I}}}
 
-{I}var value aastypes.JsonValue
+{I}var value ourtypes.JsonValue
 {I}value, err = jsonValueFromJsonable(jsonable)
 {I}if err != nil {{
 {II}return
 {I}}}
 
-{I}result = value.(aastypes.JsonArray)
+{I}result = value.(ourtypes.JsonArray)
 {I}return
 }}"""
         ),
@@ -1929,7 +1929,7 @@ func jsonArrayFromJsonable(
 // Parse `jsonable` as a JSON-able object.
 func jsonObjectFromJsonable(
 {I}jsonable interface{{}},
-) (result aastypes.JsonObject, err error) {{
+) (result ourtypes.JsonObject, err error) {{
 {I}if _, ok := jsonable.(map[string]interface{{}}); !ok {{
 {II}err = newDeserializationError(
 {III}fmt.Sprintf("Expected a JSON-able object, but got: %T", jsonable),
@@ -1937,13 +1937,13 @@ func jsonObjectFromJsonable(
 {II}return
 {I}}}
 
-{I}var value aastypes.JsonValue
+{I}var value ourtypes.JsonValue
 {I}value, err = jsonValueFromJsonable(jsonable)
 {I}if err != nil {{
 {II}return
 {I}}}
 
-{I}result = value.(aastypes.JsonObject)
+{I}result = value.(ourtypes.JsonObject)
 {I}return
 }}"""
         ),
@@ -1958,7 +1958,7 @@ func jsonObjectFromJsonable(
 // The result is a new structure, and never `value` itself, so that
 // the serialized document does not alias the instance it came from.
 func jsonValueToJsonable(
-{I}value aastypes.JsonValue,
+{I}value ourtypes.JsonValue,
 ) (result interface{{}}, err error) {{
 {I}if value == nil {{
 {II}err = newSerializationError(
@@ -1990,7 +1990,7 @@ func jsonValueToJsonable(
 {III}result = casted
 {III}return
 
-{II}case aastypes.JsonArray:
+{II}case ourtypes.JsonArray:
 {III}items := make([]interface{{}}, 0, len(casted))
 {III}for i, item := range casted {{
 {IIII}var serialized interface{{}}
@@ -2004,7 +2004,7 @@ func jsonValueToJsonable(
 {III}result = items
 {III}return
 
-{II}case aastypes.JsonObject:
+{II}case ourtypes.JsonObject:
 {III}members := make(map[string]interface{{}}, len(casted))
 {III}for key, item := range casted {{
 {IIII}var serialized interface{{}}
@@ -2083,7 +2083,7 @@ def _item_serializer_function(
             # since mypy can not narrow a literal type through ``in``
             # membership tests the way it can through ``isinstance``.
             item_type = golang_common.generate_type(
-                type_annotation=type_annotation, types_package=Identifier("aastypes")
+                type_annotation=type_annotation, types_package=Identifier("ourtypes")
             )
             return Stripped(f"directToJsonable[{item_type}]")
 
@@ -2099,7 +2099,7 @@ def _item_serializer_function(
         ),
     ):
         item_type = golang_common.generate_type(
-            type_annotation=type_annotation, types_package=Identifier("aastypes")
+            type_annotation=type_annotation, types_package=Identifier("ourtypes")
         )
         return Stripped(f"jsonAbleToJsonable[{item_type}]")
 
@@ -2112,12 +2112,12 @@ def _item_serializer_function(
         )
     elif isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
         item_type = golang_common.generate_type(
-            type_annotation=type_annotation, types_package=Identifier("aastypes")
+            type_annotation=type_annotation, types_package=Identifier("ourtypes")
         )
         return Stripped(f"classAsJsonableInterface[{item_type}]")
     elif isinstance(our_type, intermediate.NamedUnion):
         item_type = golang_common.generate_type(
-            type_annotation=type_annotation, types_package=Identifier("aastypes")
+            type_annotation=type_annotation, types_package=Identifier("ourtypes")
         )
         return Stripped(f"unionAsJsonableInterface[{item_type}]")
     elif isinstance(our_type, intermediate.ConstrainedPrimitive):
@@ -2232,7 +2232,7 @@ def _generate_serialize_tuple_helper(arity: int) -> Stripped:
     type_params = [f"T{i}" for i in range(arity)]
     type_params_joined = ", ".join(f"{t} any" for t in type_params)
 
-    tuple_type = f"aascommon.Tuple{arity}[{', '.join(type_params)}]"
+    tuple_type = f"ourcommon.Tuple{arity}[{', '.join(type_params)}]"
 
     params_joined = ",\n".join(
         f"serializeItem{i} func(item {type_params[i]}) (interface{{}}, error)"
@@ -2291,10 +2291,10 @@ def _generate_enumeration_to_jsonable(
         f"""\
 // Serialize `that` to a string, or return an error.
 func {function_name}(
-{I}that aastypes.{enum_name},
+{I}that ourtypes.{enum_name},
 ) (result string, err error) {{
 {I}var ok bool
-{I}result, ok = aasstringification.{enum_to_str}(
+{I}result, ok = ourstringification.{enum_to_str}(
 {II}that,
 {I})
 {I}if !ok {{
@@ -2636,14 +2636,14 @@ if {access_expression} != nil {{
 
     return Stripped(
         f"""\
-// Serialize [aastypes.{interface_name}] as a JSON-able map.
+// Serialize [ourtypes.{interface_name}] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
 // the properties. If you want to serialize an instance of
-// [aastypes.{interface_name}] with proper dispatch, call
+// [ourtypes.{interface_name}] with proper dispatch, call
 // [{to_jsonable}].
 func {function_name}(
-{I}that aastypes.{interface_name},
+{I}that ourtypes.{interface_name},
 ) (result map[string]interface{{}}, err error) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
@@ -2666,9 +2666,9 @@ def _generate_to_jsonable(symbol_table: intermediate.SymbolTable) -> Stripped:
         case_blocks.append(
             Stripped(
                 f"""\
-case aastypes.{literal}:
+case ourtypes.{literal}:
 {I}result, err = {to_map}(
-{II}that.(aastypes.{interface_name}),
+{II}that.(ourtypes.{interface_name}),
 {I})"""
             )
         )
@@ -2702,7 +2702,7 @@ switch that.{model_type_getter}() {{
 // Return a structure which can be readily converted to JSON,
 // or an error if some value could not be converted.
 func ToJsonable(
-{I}that aastypes.IClass,
+{I}that ourtypes.IClass,
 ) (result map[string]interface{{}}, err error) {{
 {I}{indent_but_first_line(switch_statement, I)}
 {I}return
@@ -2731,13 +2731,13 @@ def generate(
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code for JSON de/serialization."""
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
-    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+    ourcommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
-    aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
+    ourreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
-    aasstringification_url_literal = golang_common.string_literal(
+    ourstringification_url_literal = golang_common.string_literal(
         f"{repo_url}/stringification"
     )
 
@@ -2764,7 +2764,7 @@ package jsonization"""
 //
 // Implements `error`.
 type DeserializationError struct{{
-{I}Path *aasreporting.Path
+{I}Path *ourreporting.Path
 {I}Message string
 }}"""
         ),
@@ -2772,7 +2772,7 @@ type DeserializationError struct{{
             f"""\
 func newDeserializationError(message string) *DeserializationError {{
 {I}return &DeserializationError{{
-{II}Path: &aasreporting.Path{{}},
+{II}Path: &ourreporting.Path{{}},
 {II}Message: message,
 {I}}}
 }}"""
@@ -2791,7 +2791,7 @@ func (de *DeserializationError) Error() string {{
             f"""\
 // Render the path as a string.
 func (de *DeserializationError) PathString() string {{
-{I}return aasreporting.ToJSONPath(de.Path)
+{I}return ourreporting.ToJSONPath(de.Path)
 }}"""
         ),
         Stripped(
@@ -2802,7 +2802,7 @@ func (de *DeserializationError) prependName(
 {I}name string,
 ) *DeserializationError {{
 {I}de.Path.PrependName(
-{II}&aasreporting.NameSegment{{Name: name}},
+{II}&ourreporting.NameSegment{{Name: name}},
 {I})
 {I}return de
 }}"""
@@ -2815,7 +2815,7 @@ func (de *DeserializationError) prependIndex(
 {I}index int,
 ) *DeserializationError {{
 {I}de.Path.PrependIndex(
-{II}&aasreporting.IndexSegment{{Index: index}},
+{II}&ourreporting.IndexSegment{{Index: index}},
 {I})
 {I}return de
 }}"""
@@ -2828,7 +2828,7 @@ func (de *DeserializationError) prependKey(
 {I}key string,
 ) *DeserializationError {{
 {I}de.Path.PrependKey(
-{II}&aasreporting.KeySegment{{Key: key}},
+{II}&ourreporting.KeySegment{{Key: key}},
 {I})
 {I}return de
 }}"""
@@ -2926,7 +2926,7 @@ func mustDeserializationError(err error) *DeserializationError {{
 //
 // Implements `error`.
 type SerializationError struct{{
-{I}Path *aasreporting.Path
+{I}Path *ourreporting.Path
 {I}Message string
 }}"""
             ),
@@ -2934,7 +2934,7 @@ type SerializationError struct{{
                 f"""\
 func newSerializationError(message string) *SerializationError {{
 {I}return &SerializationError{{
-{II}Path: &aasreporting.Path{{}},
+{II}Path: &ourreporting.Path{{}},
 {II}Message: message,
 {I}}}
 }}"""
@@ -2953,7 +2953,7 @@ func (se *SerializationError) Error() string {{
                 f"""\
 // Render the path as a string.
 func (se *SerializationError) PathString() string {{
-{I}return aasreporting.ToGolangPath(se.Path)
+{I}return ourreporting.ToGolangPath(se.Path)
 }}"""
             ),
             Stripped(
@@ -2964,7 +2964,7 @@ func (se *SerializationError) prependName(
 {I}name string,
 ) *SerializationError {{
 {I}se.Path.PrependName(
-{II}&aasreporting.NameSegment{{Name: name}},
+{II}&ourreporting.NameSegment{{Name: name}},
 {I})
 {I}return se
 }}"""
@@ -2977,7 +2977,7 @@ func (se *SerializationError) prependIndex(
 {I}index int,
 ) *SerializationError {{
 {I}se.Path.PrependIndex(
-{II}&aasreporting.IndexSegment{{Index: index}},
+{II}&ourreporting.IndexSegment{{Index: index}},
 {I})
 {I}return se
 }}"""
@@ -2990,7 +2990,7 @@ func (se *SerializationError) prependKey(
 {I}key string,
 ) *SerializationError {{
 {I}se.Path.PrependKey(
-{II}&aasreporting.KeySegment{{Key: key}},
+{II}&ourreporting.KeySegment{{Key: key}},
 {I})
 {I}return se
 }}"""
@@ -3072,15 +3072,15 @@ func mustSerializationError(err error) *SerializationError {{
         f'{I}b64 "encoding/base64"',
     ]  # type: List[str]
 
-    if golang_common.names_package(blocks, "aascommon"):
-        import_lines.append(f"{I}aascommon {aascommon_url_literal}")
+    if golang_common.names_package(blocks, "ourcommon"):
+        import_lines.append(f"{I}ourcommon {ourcommon_url_literal}")
 
-    import_lines.append(f"{I}aasreporting {aasreporting_url_literal}")
+    import_lines.append(f"{I}ourreporting {ourreporting_url_literal}")
 
-    if golang_common.names_package(blocks, "aasstringification"):
-        import_lines.append(f"{I}aasstringification {aasstringification_url_literal}")
+    if golang_common.names_package(blocks, "ourstringification"):
+        import_lines.append(f"{I}ourstringification {ourstringification_url_literal}")
 
-    import_lines.append(f"{I}aastypes {aastypes_url_literal}")
+    import_lines.append(f"{I}ourtypes {ourtypes_url_literal}")
 
     blocks[import_index] = Stripped("import (\n" + "\n".join(import_lines) + "\n)")
 

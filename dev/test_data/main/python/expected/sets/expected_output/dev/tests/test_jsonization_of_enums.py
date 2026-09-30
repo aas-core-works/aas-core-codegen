@@ -11,7 +11,7 @@
 import unittest
 
 
-import dummy.jsonization as aas_jsonization
+import dummy.jsonization as our_jsonization
 
 
 class TestRoundTrips(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestRoundTrips(unittest.TestCase):
             'beta',
             'gamma'
         ]:
-            enum_literal = aas_jsonization.kind_from_jsonable(jsonable)
+            enum_literal = our_jsonization.kind_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 
@@ -31,7 +31,7 @@ class TestRoundTrips(unittest.TestCase):
             'down',
             'right'
         ]:
-            enum_literal = aas_jsonization.direction_from_jsonable(jsonable)
+            enum_literal = our_jsonization.direction_from_jsonable(jsonable)
 
             self.assertEqual(enum_literal.value, jsonable)
 

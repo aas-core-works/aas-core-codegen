@@ -646,7 +646,7 @@ public static <T extends IClass> T deep(T that) {{
     copying_writer.write(
         """\
 /**
- * Allow for making shallow and deep copies of AAS model instances.
+ * Allow for making shallow and deep copies of model instances.
  */
 public class Copying
 {

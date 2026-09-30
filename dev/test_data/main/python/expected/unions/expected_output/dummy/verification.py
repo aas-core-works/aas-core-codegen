@@ -5,14 +5,14 @@ Here is an example how to verify an instance of :py:class:`dummy.types.Structura
 
 .. code-block::
 
-    import dummy.types as aas_types
-    import dummy.verification as aas_verification
+    import dummy.types as our_types
+    import dummy.verification as our_verification
 
-    an_instance = aas_types.StructuralFirst(
+    an_instance = our_types.StructuralFirst(
         # ... some constructor arguments ...
     )
 
-    for error in aas_verification.verify(an_instance):
+    for error in our_verification.verify(an_instance):
         print(f"{error.cause} at: {error.path}")
 """
 
@@ -47,30 +47,30 @@ else:
     from typing_extensions import Final
 
 from dummy import (
-    constants as aas_constants,
-    reporting as aas_reporting,
-    types as aas_types,
+    constants as our_constants,
+    reporting as our_reporting,
+    types as our_types,
 )
 
 
-PropertySegment = aas_reporting.PropertySegment
-IndexSegment = aas_reporting.IndexSegment
-KeySegment = aas_reporting.KeySegment
-Segment = aas_reporting.Segment
-Path = aas_reporting.Path
+PropertySegment = our_reporting.PropertySegment
+IndexSegment = our_reporting.IndexSegment
+KeySegment = our_reporting.KeySegment
+Segment = our_reporting.Segment
+Path = our_reporting.Path
 
-Error = aas_reporting.Error
+Error = our_reporting.Error
 
 
 class _Transformer(
-        aas_types.AbstractTransformer[
+        our_types.AbstractTransformer[
             Iterator[Error]
         ]
 ):
     # noinspection PyMethodMayBeStatic
     def transform_structural_first(
             self,
-            that: aas_types.StructuralFirst
+            that: our_types.StructuralFirst
     ) -> Iterator[Error]:
         if not (len(that.unique_to_first) > 0):
             yield Error(
@@ -80,7 +80,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_structural_second(
             self,
-            that: aas_types.StructuralSecond
+            that: our_types.StructuralSecond
     ) -> Iterator[Error]:
         if not (len(that.unique_to_second) > 0):
             yield Error(
@@ -90,7 +90,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_mixed_abstract_descendant_one(
             self,
-            that: aas_types.MixedAbstractDescendantOne
+            that: our_types.MixedAbstractDescendantOne
     ) -> Iterator[Error]:
         if not (len(that.unique_to_abstract_descendant_one) > 0):
             yield Error(
@@ -100,7 +100,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_mixed_abstract_descendant_two(
             self,
-            that: aas_types.MixedAbstractDescendantTwo
+            that: our_types.MixedAbstractDescendantTwo
     ) -> Iterator[Error]:
         if not (len(that.unique_to_abstract_descendant_two) > 0):
             yield Error(
@@ -110,7 +110,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_mixed_concrete_with_descendants(
             self,
-            that: aas_types.MixedConcreteWithDescendants
+            that: our_types.MixedConcreteWithDescendants
     ) -> Iterator[Error]:
         if not (len(that.some_base_property) > 0):
             yield Error(
@@ -120,7 +120,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_mixed_concrete_with_descendants_child(
             self,
-            that: aas_types.MixedConcreteWithDescendantsChild
+            that: our_types.MixedConcreteWithDescendantsChild
     ) -> Iterator[Error]:
         if not (len(that.some_base_property) > 0):
             yield Error(
@@ -135,7 +135,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_mixed_concrete_leaf(
             self,
-            that: aas_types.MixedConcreteLeaf
+            that: our_types.MixedConcreteLeaf
     ) -> Iterator[Error]:
         if not (len(that.unique_to_concrete_leaf) > 0):
             yield Error(
@@ -145,7 +145,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_model_typed_first(
             self,
-            that: aas_types.ModelTypedFirst
+            that: our_types.ModelTypedFirst
     ) -> Iterator[Error]:
         if not (len(that.some_property) > 0):
             yield Error(
@@ -155,7 +155,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_model_typed_second(
             self,
-            that: aas_types.ModelTypedSecond
+            that: our_types.ModelTypedSecond
     ) -> Iterator[Error]:
         if not (len(that.some_property) > 0):
             yield Error(
@@ -165,7 +165,7 @@ class _Transformer(
     # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
-            that: aas_types.Something
+            that: our_types.Something
     ) -> Iterator[Error]:
         for error in self.transform(that.structural_property):
             error.path._prepend(
@@ -339,7 +339,7 @@ _TRANSFORMER = _Transformer()
 
 
 def verify(
-        that: aas_types.Class
+        that: our_types.Class
 ) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.

@@ -5,14 +5,14 @@ package types_is_xxx_test
 
 import (
 	"testing"
-	aastesting "github.com/dummy-works/dummy/aastesting"
-	aastypes "github.com/dummy-works/dummy/types"
+	ourtesting "github.com/dummy-works/dummy/ourtesting"
+	ourtypes "github.com/dummy-works/dummy/types"
 )
 
 func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBranch()
+	instance := ourtesting.MustLoadMinimalBranch()
 
-	if !aastypes.IsBranch(instance) {
+	if !ourtypes.IsBranch(instance) {
 		t.Errorf(
 			"Expected IsBranch to be true on an instance " +
 			"of IBranch with runtime type %T and with model type %v",
@@ -20,7 +20,7 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IBranch with runtime type %T and with model type %v",
@@ -28,7 +28,7 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlossom(instance) {
+	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
 			"of IBranch with runtime type %T and with model type %v",
@@ -36,7 +36,7 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IBranch with runtime type %T and with model type %v",
@@ -44,7 +44,7 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of IBranch with runtime type %T and with model type %v",
@@ -54,9 +54,9 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
-	instance := aastesting.MustLoadMinimalLeaf()
+	instance := ourtesting.MustLoadMinimalLeaf()
 
-	if !aastypes.IsBranch(instance) {
+	if !ourtypes.IsBranch(instance) {
 		t.Errorf(
 			"Expected IsBranch to be true on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -64,7 +64,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLeaf(instance) {
+	if !ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be true on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -72,7 +72,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlossom(instance) {
+	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -80,7 +80,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -88,7 +88,7 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
@@ -98,9 +98,9 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
-	instance := aastesting.MustLoadMinimalBlossom()
+	instance := ourtesting.MustLoadMinimalBlossom()
 
-	if !aastypes.IsBranch(instance) {
+	if !ourtypes.IsBranch(instance) {
 		t.Errorf(
 			"Expected IsBranch to be true on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
@@ -108,7 +108,7 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsLeaf(instance) {
+	if !ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be true on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
@@ -116,7 +116,7 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsBlossom(instance) {
+	if !ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be true on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
@@ -124,7 +124,7 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
@@ -132,7 +132,7 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
@@ -142,9 +142,9 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
-	instance := aastesting.MustLoadMinimalSomething()
+	instance := ourtesting.MustLoadMinimalSomething()
 
-	if aastypes.IsBranch(instance) {
+	if ourtypes.IsBranch(instance) {
 		t.Errorf(
 			"Expected IsBranch to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -152,7 +152,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -160,7 +160,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlossom(instance) {
+	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -168,7 +168,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsSomething(instance) {
+	if !ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -176,7 +176,7 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsContainer(instance) {
+	if ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
@@ -186,9 +186,9 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 }
 
 func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
-	instance := aastesting.MustLoadMinimalContainer()
+	instance := ourtesting.MustLoadMinimalContainer()
 
-	if aastypes.IsBranch(instance) {
+	if ourtypes.IsBranch(instance) {
 		t.Errorf(
 			"Expected IsBranch to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -196,7 +196,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsLeaf(instance) {
+	if ourtypes.IsLeaf(instance) {
 		t.Errorf(
 			"Expected IsLeaf to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -204,7 +204,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsBlossom(instance) {
+	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -212,7 +212,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if aastypes.IsSomething(instance) {
+	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
@@ -220,7 +220,7 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 		)
 	}
 
-	if !aastypes.IsContainer(instance) {
+	if !ourtypes.IsContainer(instance) {
 		t.Errorf(
 			"Expected IsContainer to be true on an instance " +
 			"of IContainer with runtime type %T and with model type %v",

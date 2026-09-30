@@ -42,7 +42,7 @@ package common_string_helpers_test"""
             f"""\
 import (
 {I}"testing"
-{I}aascommon "{repo_url}/common"
+{I}ourcommon "{repo_url}/common"
 )"""
         ),
     ]  # type: List[Stripped]
@@ -59,7 +59,7 @@ import (
             Stripped(
                 f"""\
 func {_function_name("Len", len_case.description)}(t *testing.T) {{
-{I}got := aascommon.LenStr({golang_common.string_literal(len_case.text)})
+{I}got := ourcommon.LenStr({golang_common.string_literal(len_case.text)})
 {I}if got != {len_case.expected} {{
 {II}t.Errorf({explanation}, got)
 {I}}}
@@ -74,9 +74,9 @@ func {_function_name("Len", len_case.description)}(t *testing.T) {{
         # NOTE (mristin):
         # We call the helper just as the transpiled code does.
         call = (
-            f"aascommon.SliceStrFrom({text}, {start})"
+            f"ourcommon.SliceStrFrom({text}, {start})"
             if slice_case.end is None
-            else f"aascommon.SliceStr({text}, {start}, {slice_case.end})"
+            else f"ourcommon.SliceStr({text}, {start}, {slice_case.end})"
         )
 
         explanation = golang_common.string_literal(
@@ -103,7 +103,7 @@ func {_function_name("Slice", slice_case.description)}(t *testing.T) {{
         # NOTE (mristin):
         # We call the helper just as the transpiled code does.
         start = "0" if find_case.start is None else str(find_case.start)
-        call = f"aascommon.FindStr({text}, {sub}, {start})"
+        call = f"ourcommon.FindStr({text}, {sub}, {start})"
 
         explanation = golang_common.string_literal(
             f"Expected {find_case.python_expression()} to give "
