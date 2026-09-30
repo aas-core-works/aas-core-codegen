@@ -1376,7 +1376,9 @@ common::{contains_function}(
 
         assert instance is not None
 
-        if method is intermediate_type_inference.STR_FIND:
+        kind = method.kind
+
+        if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
             # NOTE (mristin):
             # We do not use the native ``find`` as it counts the UTF-16 code units
             # instead of the characters on Windows, gives ``npos`` instead of -1,
@@ -1390,7 +1392,7 @@ common::{contains_function}(
                 None,
             )
 
-        if method is intermediate_type_inference.STR_LSTRIP:
+        elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
             # NOTE (mristin):
             # We do not use the native ``find_first_not_of`` as it strips
             # the UTF-16 code units instead of the characters on Windows, unlike
@@ -1400,7 +1402,7 @@ common::{contains_function}(
                 None,
             )
 
-        if method is intermediate_type_inference.SET_ADD:
+        elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
             # NOTE (mristin):
             # The lengths are ``size_t``'s, so we convert them to our integers.
             item = self._as_int64_position(node.args[0], args[0])
@@ -1410,18 +1412,20 @@ common::{contains_function}(
 
             return Stripped(f"{instance}.insert({item})"), None
 
-        if (
-            method is intermediate_type_inference.SET_INTERSECTION
-            or method is intermediate_type_inference.SET_DIFFERENCE
+        elif (
+            kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+            or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
         ):
             # NOTE (mristin):
             # See ``Intersection`` and ``Difference`` in the generated common
             # module, which give a new set as Python does.
-            function_name = (
-                "Intersection"
-                if method is intermediate_type_inference.SET_INTERSECTION
-                else "Difference"
-            )
+            function_name: str
+            if kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION:
+                function_name = "Intersection"
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE:
+                function_name = "Difference"
+            else:
+                assert_never(kind)
 
             return (
                 Stripped(
@@ -1434,11 +1438,8 @@ common::{function_name}(
                 None,
             )
 
-        return None, Error(
-            node.original_node,
-            f"The handling of the built-in method {method.name!r} "
-            f"has not been implemented",
-        )
+        else:
+            assert_never(kind)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_call_arguments(

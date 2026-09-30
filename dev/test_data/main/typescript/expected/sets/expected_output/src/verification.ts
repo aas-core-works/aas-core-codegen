@@ -427,7 +427,7 @@ export function numbersAreAllSmall(
 }
 
 /**
- * Check the intersection of a local set with a constant set.
+ * Check the intersection of a constant set with a local set.
  */
 export function atMostOneTextIsReserved(
   texts: Array<string>
@@ -435,7 +435,7 @@ export function atMostOneTextIsReserved(
   const seen: Set<string> = new Set<string>();
   addTexts(texts, seen);
   const reserved = (
-    AasCommon.setIntersection(seen, AasConstants.RESERVED_TEXTS));
+    AasCommon.setIntersection(AasConstants.RESERVED_TEXTS, seen));
   return reserved.size <= 1;
 }
 

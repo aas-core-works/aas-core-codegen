@@ -255,6 +255,35 @@ class BuiltinFunctionTypeAnnotation(FunctionTypeAnnotation):
         return self.func.name
 
 
+@enum.unique
+class BuiltinMethodKind(enum.Enum):
+    """
+    Enumerate the built-in methods of the primitive types which we understand.
+
+    The value is qualified with the receiver, so that the methods of the same name
+    on different types are distinct kinds. Otherwise, Python would make them
+    aliases of each other.
+
+    We dispatch on the kind, not on the method itself, so that mypy can check
+    that the dispatch is exhaustive. For example:
+
+    .. code-block:: python
+
+        if method.kind is BuiltinMethodKind.SET_INTERSECTION:
+            operator = "&"
+        elif method.kind is BuiltinMethodKind.SET_DIFFERENCE:
+            operator = "-"
+        else:
+            assert_never(method.kind)
+    """
+
+    STR_FIND = "str.find"
+    STR_LSTRIP = "str.lstrip"
+    SET_ADD = "set.add"
+    SET_INTERSECTION = "set.intersection"
+    SET_DIFFERENCE = "set.difference"
+
+
 class BuiltinMethod:
     """
     Represent a built-in method of a primitive type such as ``str.find``.
@@ -266,6 +295,7 @@ class BuiltinMethod:
 
     def __init__(
         self,
+        kind: BuiltinMethodKind,
         name: Identifier,
         returns: Optional["TypeAnnotationUnion"],
         min_arg_count: int,
@@ -277,6 +307,7 @@ class BuiltinMethod:
         If ``returns`` is None, the returned type depends on the instance, and is
         inferred at the call site (*e.g.*, ``set.intersection``).
         """
+        self.kind = kind
         self.name = name
         self.returns = returns
         self.min_arg_count = min_arg_count
@@ -284,11 +315,66 @@ class BuiltinMethod:
 
 
 class BuiltinMethodTypeAnnotation(AtomicTypeAnnotation):
-    """Represent a type of built-in method bound to an instance of a primitive."""
+    """
+    Represent a type of built-in method bound to an instance of a primitive.
 
-    def __init__(self, method: BuiltinMethod) -> None:
+    We mark the methods bound to a set which is declared read-only, *i.e.*,
+    a constant set, a read-only set argument or a local set declared as
+    ``Final[...]``, with :attr:`read_only_receiver`.
+    The targets need it if they generate such sets with a type of their own.
+    For example, Python generates them as ``AbstractSet``, which has neither
+    ``intersection`` nor ``difference``.
+
+    A set property is declared mutable (``Set[...]``). Hence, it is not a read-only
+    receiver, even if the instance is read-only, *e.g.*, in an invariant or in
+    a ``@non_mutating`` method.
+
+    The ``intersection`` and the ``difference`` give a new set, which is mutable
+    even if the receiver is read-only. For example:
+
+    .. code-block:: python
+
+        Reserved_texts: AbstractSet[str] = constant_set(
+            values=["reserved", "forbidden"]
+        )
+
+        @verification
+        def check(texts: AbstractSet[str], seen: Set[str]) -> bool:
+            # Passes, read-only receiver as the constant set is read-only
+            reserved = Reserved_texts.intersection(seen)
+
+            # Passes, the new set is mutable
+            reserved.add("another")
+
+            # Passes, read-only receiver as the argument is read-only
+            unseen = texts.difference(seen)
+
+            # Passes, the receiver is not read-only as the argument is mutable
+            both = seen.intersection(texts)
+
+            # Fails: "The ``add`` mutates the set, but the constant set
+            # 'Reserved_texts' is immutable."
+            Reserved_texts.add("another")
+
+            ...
+
+        class Something(DBC):
+            texts: Set[str]
+
+            @non_mutating
+            def check(self, others: AbstractSet[str]) -> bool:
+                # Passes, the receiver is not read-only as the property is
+                # declared mutable
+                return len(self.texts.difference(others)) > 0
+    """
+
+    def __init__(self, method: BuiltinMethod, read_only_receiver: bool = False) -> None:
         """Initialize with the given values."""
         self.method = method
+
+        #: Set if the method is bound to a set declared read-only, *i.e.*,
+        #: a constant set, a read-only set argument or a ``Final[...]`` local set
+        self.read_only_receiver = read_only_receiver
 
     def __str__(self) -> str:
         return self.method.name
@@ -304,6 +390,7 @@ class BuiltinMethodTypeAnnotation(AtomicTypeAnnotation):
 #: count the characters (code points), a negative ``start`` counts from the end
 #: of the string, and a ``start`` beyond the end of the string gives -1.
 STR_FIND = BuiltinMethod(
+    kind=BuiltinMethodKind.STR_FIND,
     name=Identifier("find"),
     returns=PrimitiveTypeAnnotation(PrimitiveType.INT),
     min_arg_count=1,
@@ -321,6 +408,7 @@ STR_FIND = BuiltinMethod(
 #: an argument, since what counts as a white space differs among the target
 #: languages.
 STR_LSTRIP = BuiltinMethod(
+    kind=BuiltinMethodKind.STR_LSTRIP,
     name=Identifier("lstrip"),
     returns=PrimitiveTypeAnnotation(PrimitiveType.STR),
     min_arg_count=1,
@@ -340,6 +428,7 @@ STR_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
 #: The item has to be assignable to the items of the set, and the set has to be
 #: mutable. The call returns nothing, so it can only be a statement on its own.
 SET_ADD = BuiltinMethod(
+    kind=BuiltinMethodKind.SET_ADD,
     name=Identifier("add"),
     returns=PrimitiveTypeAnnotation(PrimitiveType.NONE),
     min_arg_count=1,
@@ -352,6 +441,7 @@ SET_ADD = BuiltinMethod(
 #: The result is a new set with the items which are in both sets. The other set
 #: has to hold the items of the same type.
 SET_INTERSECTION = BuiltinMethod(
+    kind=BuiltinMethodKind.SET_INTERSECTION,
     name=Identifier("intersection"),
     returns=None,
     min_arg_count=1,
@@ -364,6 +454,7 @@ SET_INTERSECTION = BuiltinMethod(
 #: The result is a new set with the items which are not in the other set.
 #: The other set has to hold the items of the same type.
 SET_DIFFERENCE = BuiltinMethod(
+    kind=BuiltinMethodKind.SET_DIFFERENCE,
     name=Identifier("difference"),
     returns=None,
     min_arg_count=1,
@@ -2190,7 +2281,8 @@ def _is_new_set(
 
     member_type = type_map.get(node.member, None)
     return isinstance(member_type, BuiltinMethodTypeAnnotation) and (
-        member_type.method is SET_INTERSECTION or member_type.method is SET_DIFFERENCE
+        member_type.method.kind is BuiltinMethodKind.SET_INTERSECTION
+        or member_type.method.kind is BuiltinMethodKind.SET_DIFFERENCE
     )
 
 
@@ -2898,7 +2990,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
-            set_method_type = BuiltinMethodTypeAnnotation(method=set_method)
+            set_method_type = BuiltinMethodTypeAnnotation(
+                method=set_method,
+                read_only_receiver=(
+                    isinstance(node.instance, parse_tree.Name)
+                    and self._read_only_reason(node.instance) is not None
+                ),
+            )
             self.type_map[node] = set_method_type
             return set_method_type
 
@@ -3621,7 +3719,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        if method is STR_FIND:
+        if method.kind is BuiltinMethodKind.STR_FIND:
             success = True
 
             if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
@@ -3645,7 +3743,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             if not success:
                 return None
 
-        elif method is STR_LSTRIP:
+        elif method.kind is BuiltinMethodKind.STR_LSTRIP:
             if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
                 self.errors.append(
                     Error(
@@ -3656,7 +3754,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
-        elif method is SET_ADD:
+        elif method.kind is BuiltinMethodKind.SET_ADD:
             set_type = self.type_map[node.member.instance]
             assert isinstance(set_type, SetTypeAnnotation)
 
@@ -3680,7 +3778,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
-        elif method is SET_INTERSECTION or method is SET_DIFFERENCE:
+        elif (
+            method.kind is BuiltinMethodKind.SET_INTERSECTION
+            or method.kind is BuiltinMethodKind.SET_DIFFERENCE
+        ):
             set_type = self.type_map[node.member.instance]
             assert isinstance(set_type, SetTypeAnnotation)
 
@@ -3696,7 +3797,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
         else:
-            raise AssertionError(f"Unexpected built-in method: {method.name!r}")
+            assert_never(method.kind)
 
         result: TypeAnnotationUnion
         if method.returns is not None:
@@ -6426,7 +6527,7 @@ def _check_sets(
                 member_type = type_map.get(node.member, None)
                 if (
                     isinstance(member_type, BuiltinMethodTypeAnnotation)
-                    and member_type.method is SET_ADD
+                    and member_type.method.kind is BuiltinMethodKind.SET_ADD
                 ):
                     adds.append(node)
 

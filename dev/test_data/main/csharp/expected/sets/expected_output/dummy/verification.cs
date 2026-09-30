@@ -297,7 +297,7 @@ namespace dummy
         }  // public static bool NumbersAreAllSmall
 
         /// <summary>
-        /// Check the intersection of a local set with a constant set.
+        /// Check the intersection of a constant set with a local set.
         /// </summary>
         public static bool AtMostOneTextIsReserved(
             List<string> texts
@@ -306,7 +306,7 @@ namespace dummy
             HashSet<string> seen = new HashSet<string>();
             Verification.AddTexts(texts, seen);
             var reserved = (
-                new HashSet<string>(seen.Intersect(Aas.Constants.ReservedTexts)));
+                new HashSet<string>(Aas.Constants.ReservedTexts.Intersect(seen)));
             return reserved.Count <= 1;
         }  // public static bool AtMostOneTextIsReserved
 

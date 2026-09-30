@@ -232,11 +232,11 @@ def numbers_are_all_small(numbers: Sequence[int]) -> bool:
 
 @verification
 def at_most_one_text_is_reserved(texts: Sequence[str]) -> bool:
-    """Check the intersection of a local set with a constant set."""
+    """Check the intersection of a constant set with a local set."""
     seen: Set[str] = set()
     add_texts(texts, seen)
 
-    reserved = seen.intersection(Reserved_texts)
+    reserved = Reserved_texts.intersection(seen)
     return len(reserved) <= 1
 
 

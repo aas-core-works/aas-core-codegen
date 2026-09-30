@@ -362,7 +362,8 @@ class _Collector(parse_tree.Visitor):
             isinstance(
                 method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
             )
-            and method_type.method is intermediate_type_inference.SET_ADD
+            and method_type.method.kind
+            is intermediate_type_inference.BuiltinMethodKind.SET_ADD
         ):
             self.mutated.append(node.member.instance)
             self.mutates_in_place = True

@@ -300,7 +300,7 @@ class Collection(Class):
         return (
             (
                 len(self.texts) == 0
-                or len(self.texts.difference(others)) > 0
+                or len(self.texts - others) > 0
             ))
 
     def descend_once(self) -> Iterator[Class]:

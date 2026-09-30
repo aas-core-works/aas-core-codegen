@@ -989,7 +989,9 @@ aascommon.MapContains(
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
-            if member_type.method is intermediate_type_inference.STR_FIND:
+            kind = member_type.method.kind
+
+            if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
                 # NOTE (mristin):
                 # We do not use the native ``strings.Index`` as it counts the UTF-8
                 # bytes instead of the characters, and has no start, unlike Python.
@@ -1004,7 +1006,7 @@ aascommon.MapContains(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.STR_LSTRIP:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
                 # NOTE (mristin):
                 # The native ``strings.TrimLeft`` strips the characters (runes) as
                 # the Python ``str.lstrip`` does.
@@ -1013,19 +1015,26 @@ aascommon.MapContains(
                     None,
                 )
 
-            if (
-                member_type.method is intermediate_type_inference.SET_INTERSECTION
-                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
             ):
                 # NOTE (mristin):
                 # See ``SetIntersection`` and ``SetDifference`` in the generated
                 # common package, which give a new set as Python does.
-                function_name = (
-                    "SetIntersection"
-                    if member_type.method
-                    is intermediate_type_inference.SET_INTERSECTION
-                    else "SetDifference"
-                )
+                function_name: str
+                if (
+                    kind
+                    is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                ):
+                    function_name = "SetIntersection"
+                elif (
+                    kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
+                ):
+                    function_name = "SetDifference"
+                else:
+                    assert_never(kind)
+
                 return (
                     Stripped(
                         f"""\
@@ -1037,7 +1046,7 @@ aascommon.{function_name}(
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.SET_ADD:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 # NOTE (mristin):
                 # A set is a map to empty structs. A narrowed optional is still
                 # a pointer, so we de-reference it, and the lengths are ``int``'s,
@@ -1050,11 +1059,8 @@ aascommon.{function_name}(
                 item = self._as_int64_position(node.args[0], item)
                 return Stripped(f"{instance}[{item}] = struct{{}}{{}}"), None
 
-            return None, Error(
-                node.original_node,
-                f"The handling of the built-in method {member_type.method.name!r} "
-                f"has not been implemented",
-            )
+            else:
+                assert_never(kind)
 
         if not isinstance(node.member.instance, (parse_tree.Name, parse_tree.Member)):
             instance = Stripped(f"({instance})")

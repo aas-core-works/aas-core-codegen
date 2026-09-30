@@ -846,34 +846,21 @@ class Transpiler(
 
         member_type = self.type_map[node.member]
 
-        if (
-            isinstance(
-                member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+        parenthesized_instance = (
+            instance
+            if isinstance(
+                node.member.instance,
+                (parse_tree.Name, parse_tree.Member, parse_tree.Slice),
             )
-            and member_type.method is intermediate_type_inference.STR_LSTRIP
-        ):
-            # NOTE (mristin):
-            # We do not use the native ``TrimStart`` as it strips the UTF-16 code
-            # units instead of the characters, unlike Python. See
-            # ``StringHelpers.LStrip`` in the generated common class.
-            return (
-                Stripped(
-                    f"{csharp_common.COMMON_CLASS}.StringHelpers.LStrip"
-                    f"({instance}, {args[0]})"
-                ),
-                None,
-            )
-
-        if not isinstance(
-            node.member.instance,
-            (parse_tree.Name, parse_tree.Member, parse_tree.Slice),
-        ):
-            instance = Stripped(f"({instance})")
+            else Stripped(f"({instance})")
+        )
 
         if isinstance(
             member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
         ):
-            if member_type.method is intermediate_type_inference.STR_FIND:
+            kind = member_type.method.kind
+
+            if kind is intermediate_type_inference.BuiltinMethodKind.STR_FIND:
                 # NOTE (mristin):
                 # We do not use the native ``IndexOf`` as it counts the UTF-16
                 # code units instead of the characters, throws on a start out of
@@ -881,12 +868,25 @@ class Transpiler(
                 # Python. See ``Common.StringHelpers.Find`` in the generated common module.
                 return (
                     Stripped(
-                        f"{csharp_common.COMMON_CLASS}.StringHelpers.Find({instance}, {', '.join(args)})"
+                        f"{csharp_common.COMMON_CLASS}.StringHelpers.Find({parenthesized_instance}, {', '.join(args)})"
                     ),
                     None,
                 )
 
-            if member_type.method is intermediate_type_inference.SET_ADD:
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP:
+                # NOTE (mristin):
+                # We do not use the native ``TrimStart`` as it strips the UTF-16 code
+                # units instead of the characters, unlike Python. See
+                # ``StringHelpers.LStrip`` in the generated common class.
+                return (
+                    Stripped(
+                        f"{csharp_common.COMMON_CLASS}.StringHelpers.LStrip"
+                        f"({instance}, {args[0]})"
+                    ),
+                    None,
+                )
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 # NOTE (mristin):
                 # A set of value types does not hold nullables, so we unwrap
                 # a narrowed item.
@@ -897,11 +897,11 @@ class Transpiler(
                     return None, error
 
                 assert item is not None
-                return Stripped(f"{instance}.Add({item})"), None
+                return Stripped(f"{parenthesized_instance}.Add({item})"), None
 
-            if (
-                member_type.method is intermediate_type_inference.SET_INTERSECTION
-                or member_type.method is intermediate_type_inference.SET_DIFFERENCE
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
             ):
                 set_type, error_message = generate_type(self.type_map[node])
                 if error_message is not None:
@@ -910,22 +910,29 @@ class Transpiler(
                 # NOTE (mristin):
                 # We copy the result of LINQ into a new set, as Python gives
                 # a new set as well.
-                linq_method = (
-                    "Intersect"
-                    if member_type.method
-                    is intermediate_type_inference.SET_INTERSECTION
-                    else "Except"
-                )
+                linq_method: str
+                if (
+                    kind
+                    is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
+                ):
+                    linq_method = "Intersect"
+                elif (
+                    kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE
+                ):
+                    linq_method = "Except"
+                else:
+                    assert_never(kind)
+
                 return (
-                    Stripped(f"new {set_type}({instance}.{linq_method}({args[0]}))"),
+                    Stripped(
+                        f"new {set_type}"
+                        f"({parenthesized_instance}.{linq_method}({args[0]}))"
+                    ),
                     None,
                 )
 
-            return None, Error(
-                node.original_node,
-                f"The handling of the built-in method {member_type.method.name!r} "
-                f"has not been implemented",
-            )
+            else:
+                assert_never(kind)
 
         method_name = csharp_naming.method_name(node.member.name)
 
@@ -934,7 +941,7 @@ class Transpiler(
         # Apply heuristic for breaking the lines
         if len(joined_args) > 50:
             writer = io.StringIO()
-            writer.write(f"{instance}.{method_name}(\n")
+            writer.write(f"{parenthesized_instance}.{method_name}(\n")
 
             for i, arg in enumerate(args):
                 writer.write(f"{I}{arg}")
@@ -946,7 +953,10 @@ class Transpiler(
 
             return Stripped(writer.getvalue()), None
         else:
-            return Stripped(f"{instance}.{method_name}({joined_args})"), None
+            return (
+                Stripped(f"{parenthesized_instance}.{method_name}({joined_args})"),
+                None,
+            )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(

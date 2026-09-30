@@ -281,11 +281,11 @@ def numbers_are_all_small(
 def at_most_one_text_is_reserved(
     texts: List[str]
 ) -> bool:
-    """Check the intersection of a local set with a constant set."""
+    """Check the intersection of a constant set with a local set."""
     # pylint: disable=all
     seen: Set[str] = set()
     add_texts(texts, seen)
-    reserved = seen.intersection(aas_constants.RESERVED_TEXTS)
+    reserved = set(aas_constants.RESERVED_TEXTS & seen)
     return len(reserved) <= 1
 
 
@@ -308,7 +308,7 @@ def some_kind_is_not_special(
     return (
         (
             len(seen) == 0
-            or len(seen.difference(aas_constants.SPECIAL_KINDS)) > 0
+            or len(seen - aas_constants.SPECIAL_KINDS) > 0
         ))
 
 
@@ -454,7 +454,7 @@ class _Transformer(
 
         if not (
             not (that.optional_texts is not None)
-            or (len(that.optional_texts.intersection(that.texts)) == 0)
+            or (len(that.optional_texts & that.texts) == 0)
         ):
             yield Error(
                 'Optional texts must not share any text with texts.'

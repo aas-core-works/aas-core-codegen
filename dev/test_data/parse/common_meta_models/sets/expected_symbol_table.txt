@@ -2713,13 +2713,13 @@ UnverifiedSymbolTable(
             value=MethodCall(
               member=Member(
                 instance=Name(
-                  identifier='seen',
+                  identifier='Reserved_texts',
                   original_node=...),
                 name='intersection',
                 original_node=...),
               args=[
                 Name(
-                  identifier='Reserved_texts',
+                  identifier='seen',
                   original_node=...)],
               original_node=...),
             annotation=None,

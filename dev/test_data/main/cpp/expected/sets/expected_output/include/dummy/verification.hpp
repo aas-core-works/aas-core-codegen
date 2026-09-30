@@ -302,7 +302,7 @@ bool NumbersAreAllSmall(
   const std::vector<int64_t>& numbers
 );
 
-/// \brief Check the intersection of a local set with a constant set.
+/// \brief Check the intersection of a constant set with a local set.
 bool AtMostOneTextIsReserved(
   const std::vector<std::wstring>& texts
 );
