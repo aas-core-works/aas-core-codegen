@@ -1337,6 +1337,88 @@ def some_func(numbers: List[int], other_numbers: List[int]) -> bool:
             )
         )
 
+    def test_redefining_variable_in_the_body_of_a_later_loop(self) -> None:
+        # NOTE (mristin):
+        # Each loop body is a block of its own in the targets, so each loop
+        # declares its own ``y``. This is allowed, since neither loop can observe
+        # the ``y`` of the other loop, and the behavior is the same as in Python.
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int], other_numbers: List[int]) -> bool:
+    for x in numbers:
+        y = x + 1
+        if y > 3:
+            return False
+
+    for x in other_numbers:
+        y = x + 2
+        if y > 3:
+            return False
+
+    return True"""
+            )
+        )
+
+    def test_using_variable_of_the_previous_iteration_fails(self) -> None:
+        # NOTE (mristin):
+        # In Python, ``y`` holds the value of the previous iteration from
+        # the second iteration on, while in the targets ``y`` is declared anew in
+        # each iteration. Hence, reading ``y`` before it is assigned in the loop
+        # body must fail.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int]) -> bool:
+    for x in numbers:
+        if x > 0:
+            y = y + x
+
+        y = x
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "The variable 'y' is read here before it is assigned in the body "
+                "of the for-loop. While Python keeps the value of the previous "
+                "iteration, the other targets define the variable anew in each "
+                "iteration. Please define the variable before the for-loop."
+            ),
+        )
+
+    def test_using_variable_of_the_previous_iteration_of_nested_loop_fails(
+        self,
+    ) -> None:
+        # NOTE (mristin):
+        # The ``y`` is assigned only in the inner loop, but read in the body of
+        # the outer loop before the inner loop. In Python, the read observes
+        # the ``y`` of the previous iteration of the outer loop, which is not
+        # visible in the targets, so it must fail.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(numbers: List[int], other_numbers: List[int]) -> bool:
+    for x in numbers:
+        if x > 0:
+            if y > x:
+                return False
+
+        for z in other_numbers:
+            y = z
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "The variable 'y' is read here before it is assigned in the body "
+                "of the for-loop. While Python keeps the value of the previous "
+                "iteration, the other targets define the variable anew in each "
+                "iteration. Please define the variable before the for-loop."
+            ),
+        )
+
     def test_reusing_loop_variable_with_another_type_fails(self) -> None:
         Test_with_smoke().expect_type_inference_to_fail(
             source=Test_for_statement.source_with_verification(
@@ -2218,6 +2300,92 @@ def some_func(number: int) -> bool:
         x = 2
 
     return x > 0"""
+            ),
+            expected_joined_message=(
+                "The variable 'x' has been defined in a nested block before, "
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
+            ),
+        )
+
+    def test_redefining_variable_in_a_later_if(self) -> None:
+        # NOTE (mristin):
+        # Each if-statement is a block of its own in the targets, so each one
+        # declares its own ``x``. This is allowed, since the later if-statement
+        # assigns ``x`` before reading it, and never observes the ``x`` of
+        # the earlier one.
+        Test_with_smoke.execute(
+            Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(number: int) -> bool:
+    if number > 0:
+        x = 1
+        if x > number:
+            return False
+
+    if number > 1:
+        x = 2
+        if x > number:
+            return False
+
+    return True"""
+            )
+        )
+
+    def test_using_variable_of_an_earlier_if_in_a_later_if_fails(self) -> None:
+        # NOTE (mristin):
+        # In Python, the later if-statement reads the ``x`` of the earlier one,
+        # while in the targets that ``x`` is not visible outside its block.
+        # Hence, reading ``x`` before it is assigned in the later block must fail.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(number: int) -> bool:
+    if number > 0:
+        x = 1
+        if x > number:
+            return False
+
+    if number > 1:
+        return x > number
+
+    return True"""
+            ),
+            expected_joined_message=(
+                "The variable 'x' has been defined in a nested block before, "
+                "such as a for-loop or a branch of a switch or of an if-statement, "
+                "and is not visible here. While Python keeps the variable after "
+                "the block, the other targets scope it to the block. Please define "
+                "the variable before the block."
+            ),
+        )
+
+    def test_incrementing_variable_of_an_earlier_if_in_a_later_if_fails(
+        self,
+    ) -> None:
+        # NOTE (mristin):
+        # Re-assigning ``x`` in the later block would be allowed, but ``x + 1``
+        # reads ``x`` before it is assigned in the block. In Python, it would read
+        # the ``x`` of the earlier if-statement, which is not visible in
+        # the targets, so it must fail.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_for_statement.source_with_verification(
+                """\
+@verification
+def some_func(number: int) -> bool:
+    if number > 0:
+        x = 1
+        if x > number:
+            return False
+
+    if number > 1:
+        x = x + 1
+
+    return True"""
             ),
             expected_joined_message=(
                 "The variable 'x' has been defined in a nested block before, "
