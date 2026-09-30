@@ -245,6 +245,11 @@ bool SwitchOnStr(
   const std::wstring& text
 );
 
+/// \brief Check the switch on the length of a string.
+bool SwitchOnLength(
+  const std::wstring& text
+);
+
 /// \brief Check the switch on a constrained primitive.
 bool SwitchOnConstrainedStr(
   const std::wstring& text

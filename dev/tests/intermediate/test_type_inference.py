@@ -856,7 +856,7 @@ __xml_namespace__ = "https://dummy.com"
             source=source,
             expected_joined_message=(
                 "Expected the subject of the switch to be an enumeration, a "
-                "string or an integer, but got: bool"
+                "string, an integer or a length, but got: bool"
             ),
         )
 
@@ -954,6 +954,30 @@ __xml_namespace__ = "https://dummy.com"
             expected_joined_message=(
                 "Expected the label to be a str literal, the type of the "
                 "subject of the switch, but got: int"
+            ),
+        )
+
+    def test_switch_negative_label_on_length_subject_fails(self) -> None:
+        source = """\
+@verification
+def some_func(text: str) -> bool:
+    if len(text) == -1:
+        return False
+    elif len(text) == 1:
+        return True
+
+    return True
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the label to be a non-negative int literal, as "
+                "the subject of the switch is a length, but got: -1"
             ),
         )
 

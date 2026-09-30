@@ -131,6 +131,20 @@ func SwitchOnStr(
 	}
 }
 
+// Check the switch on the length of a string.
+func SwitchOnLength(
+	text string,
+) bool {
+	switch ourcommon.LenStr(text) {
+	case 2:
+		return false
+	case 3, 30:
+		return false
+	default:
+		return true
+	}
+}
+
 // Check the switch on a constrained primitive.
 func SwitchOnConstrainedStr(
 	text string,
@@ -251,6 +265,16 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Name must not be forbidden",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !SwitchOnLength(that.Text()) {
+		abort = onError(
+			newVerificationError(
+				"Text must have neither two, three nor thirty characters",),
 		)
 		if abort {
 			return

@@ -5958,12 +5958,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             enumeration = subject_type.our_type
         else:
             primitive_type = try_primitive_type(subject_type)
-            if primitive_type not in (PrimitiveType.STR, PrimitiveType.INT):
+            if primitive_type not in (
+                PrimitiveType.STR,
+                PrimitiveType.INT,
+                PrimitiveType.LENGTH,
+            ):
                 self.errors.append(
                     Error(
                         node.subject.original_node,
                         f"Expected the subject of the switch to be an enumeration, "
-                        f"a string or an integer, but got: {subject_type}",
+                        f"a string, an integer or a length, but got: {subject_type}",
                     )
                 )
                 return None
@@ -6002,6 +6006,28 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                                 f"Expected the label to be a literal of "
                                 f"the enumeration {enumeration.name!r}, the type of "
                                 f"the subject of the switch, but got: {label_type}",
+                            )
+                        )
+                        success = False
+
+                elif primitive_type is PrimitiveType.LENGTH:
+                    # NOTE (mristin):
+                    # We refuse the negative labels as a length is never negative,
+                    # and C++ does not narrow them to the unsigned lengths.
+                    if not (
+                        isinstance(label, parse_tree.Constant)
+                        and isinstance(label_type, PrimitiveTypeAnnotation)
+                        and label_type.a_type is PrimitiveType.INT
+                        and isinstance(label.value, int)
+                        and label.value >= 0
+                    ):
+                        self.errors.append(
+                            Error(
+                                label.original_node,
+                                f"Expected the label to be a non-negative int "
+                                f"literal, as the subject of the switch is "
+                                f"a length, but got: "
+                                f"{ast.unparse(label.original_node)}",
                             )
                         )
                         success = False

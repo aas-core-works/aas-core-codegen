@@ -137,6 +137,24 @@ public class Verification {
   }
 
   /**
+   * Check the switch on the length of a string.
+   */
+  public static Boolean switchOnLength(
+    String text) {
+    switch (StringHelpers.len(text)) {
+        case 2 -> {
+            return false;
+        }
+        case 3, 30 -> {
+            return false;
+        }
+        default -> {
+            return true;
+        }
+    }
+  }
+
+  /**
    * Check the switch on a constrained primitive.
    */
   public static Boolean switchOnConstrainedStr(
@@ -274,6 +292,13 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Name must not be forbidden")));
+      }
+
+      if (!switchOnLength(that.getText())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Text must have neither two, three nor thirty characters")));
       }
 
       if (!switchOnStr(that.getText())) {

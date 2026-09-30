@@ -146,6 +146,19 @@ def switch_on_str(
         return len(text) > 0
 
 
+def switch_on_length(
+    text: str
+) -> bool:
+    """Check the switch on the length of a string."""
+    # pylint: disable=all
+    if len(text) == 2:
+        return False
+    elif len(text) in (3, 30):
+        return False
+    else:
+        return True
+
+
 def switch_on_constrained_str(
     text: str
 ) -> bool:
@@ -243,6 +256,11 @@ class _Transformer(
         if not switch_on_constrained_str(that.name):
             yield Error(
                 'Name must not be forbidden'
+            )
+
+        if not switch_on_length(that.text):
+            yield Error(
+                'Text must have neither two, three nor thirty characters'
             )
 
         if not switch_on_str(that.text):
