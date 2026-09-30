@@ -424,7 +424,8 @@ Each top-level sub-directory of ``dev/test_data/`` serves a distinct purpose:
     Each case has ``expected/`` and ``unexpected/`` sub-trees, following the same convention as ``intermediate/``.
 
 ``smoke/``
-    Golden data for ``dev/tests/smoke/``, which runs a smoke transpilation over every meta-model under ``smoke/test_main/expected/`` and verifies that the transpilation either succeeds or fails with a known error.
+    Golden data for ``dev/tests/smoke/``, which runs the smoke test over every meta-model under ``smoke/test_main/expected/`` and ``common_meta_models/``, and verifies that it either succeeds or fails with a known error.
+    The smoke test runs the full generation of every target with dummy snippets into a temporary directory, so that ``aas-core-meta`` can check a meta-model against all the targets at once.
     ``unexpected/`` cases each contain a ``meta_model.py`` and an ``expected_stderr.txt``.
 
 ``main/``
