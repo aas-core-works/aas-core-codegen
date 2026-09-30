@@ -17,7 +17,7 @@ and the literals of ``Direction`` differently by their names or by their
 declaration than by their values.
 """
 from enum import Enum
-from typing import AbstractSet, List, Optional, Sequence, Set
+from typing import AbstractSet, Final, List, Optional, Sequence, Set
 
 from icontract import DBC, invariant
 
@@ -39,17 +39,17 @@ class Code(str):
     """Represent a non-empty code."""
 
 
-Reserved_texts: AbstractSet[str] = constant_set(
+Reserved_texts: Final[AbstractSet[str]] = constant_set(
     values=["reserved", "forbidden"],
     description="""List the texts which must not be used.""",
 )
 
-Lucky_numbers: AbstractSet[int] = constant_set(
+Lucky_numbers: Final[AbstractSet[int]] = constant_set(
     values=[7, 42],
     description="""List the numbers which bring luck.""",
 )
 
-Special_kinds: AbstractSet[Kind] = constant_set(
+Special_kinds: Final[AbstractSet[Kind]] = constant_set(
     values=[Kind.Beta, Kind.Gamma],
     description="""List the special kinds.""",
 )

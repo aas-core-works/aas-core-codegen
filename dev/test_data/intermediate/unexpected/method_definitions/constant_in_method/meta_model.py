@@ -1,4 +1,4 @@
-Maximum_count: int = constant_int(value=10, description="Maximum count")
+Maximum_count: Final[int] = constant_int(value=10, description="Maximum count")
 
 
 class Something:

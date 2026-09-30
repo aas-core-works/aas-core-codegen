@@ -4,7 +4,7 @@ class Some_enum(Enum):
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
 
-Something: AbstractSet[Some_enum] = constant_set(
+Something: Final[AbstractSet[Some_enum]] = constant_set(
     values=[Some_enum.Some_literal, Some_enum.Another_literal]
 )
 

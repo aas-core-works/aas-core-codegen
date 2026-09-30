@@ -1,4 +1,4 @@
-Something: Final[str] = constant_str(
+Something: str = constant_str(
     value="some value",
 )
 

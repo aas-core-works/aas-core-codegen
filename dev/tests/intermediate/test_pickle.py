@@ -199,7 +199,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_primitive(self) -> None:
         source = """\
-Some_constant: str = constant_str(
+Some_constant: Final[str] = constant_str(
     value="some_value",
 )
 
@@ -232,7 +232,7 @@ from aas_core_meta.marker import (
     constant_set
 )
 
-Some_constant_set: AbstractSet[str] = constant_set(
+Some_constant_set: Final[AbstractSet[str]] = constant_set(
     values=["value1", "value2"]
 )
 
@@ -446,7 +446,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_description_of_constant(self) -> None:
         source = """\
-Some_constant: str = constant_str(
+Some_constant: Final[str] = constant_str(
     value="some_value",
     description="This is some constant."
 )
@@ -1216,7 +1216,7 @@ from aas_core_meta.marker import (
     constant_set
 )
 
-Some_constant_set: AbstractSet[str] = constant_set(
+Some_constant_set: Final[AbstractSet[str]] = constant_set(
     values=["value1", "value2"]
 )
 
@@ -1716,7 +1716,7 @@ class Some_enum(Enum):
     Literal1 = "lit1"
     Literal2 = "lit2"
 
-Some_constant_set: AbstractSet[Some_enum] = constant_set(
+Some_constant_set: Final[AbstractSet[Some_enum]] = constant_set(
     values=[
         Some_enum.Literal1
     ]

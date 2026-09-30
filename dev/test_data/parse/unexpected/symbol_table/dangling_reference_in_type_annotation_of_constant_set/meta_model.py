@@ -1,4 +1,4 @@
-Something: AbstractSet["Some_dangling_enum"] = constant_set(
+Something: Final[AbstractSet["Some_dangling_enum"]] = constant_set(
     values=[],
 )
 

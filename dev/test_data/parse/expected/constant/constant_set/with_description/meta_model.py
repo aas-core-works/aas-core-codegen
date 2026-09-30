@@ -1,4 +1,4 @@
-Something: AbstractSet[str] = constant_set(
+Something: Final[AbstractSet[str]] = constant_set(
     values=["some literal", "another literal"], description="Represent some set."
 )
 

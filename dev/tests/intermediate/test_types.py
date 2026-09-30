@@ -716,7 +716,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant(self) -> None:
         source = """\
-Something: int = constant_int(value=1984)
+Something: Final[int] = constant_int(value=1984)
 
 __version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"
@@ -732,7 +732,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_primitive(self) -> None:
         source = """\
-Something: int = constant_int(value=1984)
+Something: Final[int] = constant_int(value=1984)
 
 __version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"
@@ -758,7 +758,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_set_of_primitives(self) -> None:
         source = """\
-Something: AbstractSet[str] = constant_set(
+Something: Final[AbstractSet[str]] = constant_set(
     values=["hello", "world"]
 )
 
@@ -792,7 +792,7 @@ class SomeEnum(Enum):
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
 
-Something: AbstractSet[SomeEnum] = constant_set(
+Something: Final[AbstractSet[SomeEnum]] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 
@@ -895,7 +895,7 @@ class SomeEnum(Enum):
     Another_literal = "ANOTHER-LITERAL"
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
-SomeSet: AbstractSet[SomeEnum] = constant_set(
+SomeSet: Final[AbstractSet[SomeEnum]] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 
@@ -968,7 +968,7 @@ __xml_namespace__ = "https://dummy.com"
 class SomeEnum(Enum):
     Some_literal = "SOME-LITERAL"
 
-SomeConstant: int = constant_int(value=42)
+SomeConstant: Final[int] = constant_int(value=42)
 
 __version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"
@@ -993,7 +993,7 @@ __xml_namespace__ = "https://dummy.com"
 class SomeEnum(Enum):
     Some_literal = "SOME-LITERAL"
 
-SomeSet: AbstractSet[str] = constant_set(
+SomeSet: Final[AbstractSet[str]] = constant_set(
     values=["hello", "world"]
 )
 
@@ -1044,7 +1044,7 @@ __xml_namespace__ = "https://dummy.com"
 
     def test_constant_set_of_primitives(self) -> None:
         source = """\
-SomeSet: AbstractSet[str] = constant_set(
+SomeSet: Final[AbstractSet[str]] = constant_set(
     values=["hello", "world", "test"]
 )
 
@@ -1072,7 +1072,7 @@ class SomeEnum(Enum):
     Another_literal = "ANOTHER-LITERAL"
     Yet_another_literal = "YET-ANOTHER-LITERAL"
 
-SomeSet: AbstractSet[SomeEnum] = constant_set(
+SomeSet: Final[AbstractSet[SomeEnum]] = constant_set(
     values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
 )
 

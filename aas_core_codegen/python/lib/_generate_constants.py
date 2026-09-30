@@ -79,12 +79,12 @@ def _generate_constant_primitive(
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         literal = "True" if constant.value else "False"
 
-        writer.write(f"{constant_name}: bool = {literal}")
+        writer.write(f"{constant_name}: Final[bool] = {literal}")
 
     elif constant.a_type is intermediate.PrimitiveType.INT:
         literal = str(constant.value)
 
-        writer.write(f"{constant_name}: int = {literal}")
+        writer.write(f"{constant_name}: Final[int] = {literal}")
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
         # NOTE (mristin):
@@ -94,13 +94,13 @@ def _generate_constant_primitive(
         # change.
         literal = str(constant.value)
 
-        writer.write(f"{constant_name}: float = {literal}")
+        writer.write(f"{constant_name}: Final[float] = {literal}")
 
     elif constant.a_type is intermediate.PrimitiveType.STR:
         assert isinstance(constant.value, str)
         literal = python_common.string_literal(constant.value)
 
-        writer.write(f"{constant_name}: str = {literal}")
+        writer.write(f"{constant_name}: Final[str] = {literal}")
 
     elif constant.a_type is intermediate.PrimitiveType.BYTEARRAY:
         assert isinstance(constant.value, bytearray)
@@ -109,7 +109,7 @@ def _generate_constant_primitive(
 
         writer.write(
             f"""\
-{constant_name}: bytes = (
+{constant_name}: Final[bytes] = (
 {I}{indent_but_first_line(literal, I)}
 )"""
         )
@@ -153,7 +153,7 @@ def _generate_constant_set_of_primitives(
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         writer.write(
             f"""\
-{constant_name}: AbstractSet[bool] = {{
+{constant_name}: Final[AbstractSet[bool]] = {{
 """
         )
 
@@ -170,7 +170,7 @@ def _generate_constant_set_of_primitives(
     elif constant.a_type is intermediate.PrimitiveType.INT:
         writer.write(
             f"""\
-{constant_name}: AbstractSet[int] = {{
+{constant_name}: Final[AbstractSet[int]] = {{
 """
         )
 
@@ -193,7 +193,7 @@ def _generate_constant_set_of_primitives(
 
         writer.write(
             f"""\
-{constant_name}: AbstractSet[float] = {{
+{constant_name}: Final[AbstractSet[float]] = {{
 """
         )
 
@@ -210,7 +210,7 @@ def _generate_constant_set_of_primitives(
     elif constant.a_type is intermediate.PrimitiveType.STR:
         writer.write(
             f"""\
-{constant_name}: AbstractSet[str] = {{
+{constant_name}: Final[AbstractSet[str]] = {{
 """
         )
 
@@ -231,7 +231,7 @@ def _generate_constant_set_of_primitives(
     elif constant.a_type is intermediate.PrimitiveType.BYTEARRAY:
         writer.write(
             f"""\
-{constant_name}: AbstractSet[bytes] = {{
+{constant_name}: Final[AbstractSet[bytes]] = {{
 """
         )
 
@@ -288,7 +288,7 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer.write(
         f"""\
-{constant_name}: AbstractSet[aas_types.{enum_name}] = {{
+{constant_name}: Final[AbstractSet[aas_types.{enum_name}]] = {{
 """
     )
 
@@ -331,7 +331,13 @@ def generate(
         python_common.WARNING,
         Stripped(
             f"""\
+import sys
 from typing import AbstractSet
+
+if sys.version_info >= (3, 8):
+{I}from typing import Final
+else:
+{I}from typing_extensions import Final
 
 import {qualified_module_name}.types as aas_types"""
         ),
