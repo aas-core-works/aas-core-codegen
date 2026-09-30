@@ -98,16 +98,31 @@ bool IfInDefaultOfSwitch(
   switch (kind) {
     case types::Kind::kAlpha:
       return number < 10;
+    case types::Kind::kGamma:
+      return true;
     default:
       if (number < -5) {
-        switch (kind) {
-          case types::Kind::kBeta:
-            return false;
-          default:
-            break;
+        if (kind == types::Kind::kBeta) {
+          return false;
         }
       }
       break;
+  }
+  return true;
+}
+
+bool LoneIfOnLength(
+  const std::wstring& text,
+  bool flag,
+  int64_t number
+) {
+  if (common::LenStr(text) == 0) {
+    return (
+      (
+        flag
+        || number == 0
+      )
+    );
   }
   return true;
 }
@@ -403,13 +418,26 @@ bool Something_3(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
+  return verification::LoneIfOnLength(
+    that->text(),
+    that->flag(),
+    that->number()
+  );
+}
+
+bool Something_4(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
   return verification::IfInDefaultOfSwitch(
     that->kind(),
     that->number()
   );
 }
 
-bool Something_4(
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -421,7 +449,7 @@ bool Something_4(
   );
 }
 
-bool Something_5(
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -433,7 +461,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -444,7 +472,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -456,7 +484,7 @@ bool Something_7(
   ));
 }
 
-bool Something_8(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -472,7 +500,7 @@ bool Something_8(
   );
 }
 
-bool Something_9(
+bool Something_10(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -484,7 +512,7 @@ bool Something_9(
   );
 }
 
-bool Something_10(
+bool Something_11(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -496,7 +524,7 @@ bool Something_10(
   );
 }
 
-bool Something_11(
+bool Something_12(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -508,7 +536,7 @@ bool Something_11(
   );
 }
 
-bool Something_12(
+bool Something_13(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -519,7 +547,7 @@ bool Something_12(
   );
 }
 
-bool Something_13(
+bool Something_14(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -530,7 +558,7 @@ bool Something_13(
   );
 }
 
-bool Something_14(
+bool Something_15(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -541,7 +569,7 @@ bool Something_14(
   );
 }
 
-bool Something_15(
+bool Something_16(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -573,55 +601,59 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         },
         {
           &Something_3,
-          L"Number must be consistent with the kind"
+          L"Empty text requires the flag or the number zero"
         },
         {
           &Something_4,
-          L"Number must be small without the flag"
+          L"Number must be consistent with the kind"
         },
         {
           &Something_5,
-          L"Number and text must be acceptable"
+          L"Number must be small without the flag"
         },
         {
           &Something_6,
-          L"Text must be at most 10 characters long"
+          L"Number and text must be acceptable"
         },
         {
           &Something_7,
-          L"Optional parent must have no marker in its tree"
+          L"Text must be at most 10 characters long"
         },
         {
           &Something_8,
-          L"Parents as Child_a must have a_only below one thousand"
+          L"Optional parent must have no marker in its tree"
         },
         {
           &Something_9,
-          L"Text of the optional parent must be short"
+          L"Parents as Child_a must have a_only below one thousand"
         },
         {
           &Something_10,
-          L"Texts of parents before the first container must be short"
+          L"Text of the optional parent must be short"
         },
         {
           &Something_11,
-          L"Parents as Child_a must have non-empty texts"
+          L"Texts of parents before the first container must be short"
         },
         {
           &Something_12,
-          L"Optional parent as Child_a must have a_only above minus ten"
+          L"Parents as Child_a must have non-empty texts"
         },
         {
           &Something_13,
-          L"Optional parent as Child_b must have a small b_only"
+          L"Optional parent as Child_a must have a_only above minus ten"
         },
         {
           &Something_14,
+          L"Optional parent as Child_b must have a small b_only"
+        },
+        {
+          &Something_15,
           L"Optional parent must have an allowed text or a positive "
           L"b_only"
         },
         {
-          &Something_15,
+          &Something_16,
           L"Optional parent as Child_a must have a small a_only"
         }
       };

@@ -299,10 +299,9 @@ namespace dummy
             if (parent is Our.IChildA)
             {
                 current = Our.ParentOrItem.FromParent(((Our.IChildA)parent));
-                switch (((Our.IChildA)current.Underlying).AOnly)
+                if (((Our.IChildA)current.Underlying).AOnly == 13)
                 {
-                    case 13:
-                        return false;
+                    return false;
                 }
             }
             current = Our.ParentOrItem.FromItem(item);
@@ -320,10 +319,9 @@ namespace dummy
                 && optionalMember.Underlying is Our.IChildB
             )
             {
-                switch (((Our.IChildB)optionalMember.Underlying).BOnly)
+                if (((Our.IChildB)optionalMember.Underlying).BOnly == 13)
                 {
-                    case 13:
-                        return false;
+                    return false;
                 }
             }
             Our.WideUnion wide = Our.WideUnion.FromItem(item);
@@ -397,10 +395,9 @@ namespace dummy
             }
             foreach (var item in allTexts)
             {
-                switch (item)
+                if (item == "forbidden")
                 {
-                    case "forbidden":
-                        return false;
+                    return false;
                 }
             }
             if (

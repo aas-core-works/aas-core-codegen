@@ -1417,16 +1417,18 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Name(
-                  identifier='number',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='number',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=0,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Assignment(
                         target=Name(

@@ -710,7 +710,8 @@ class Switch(Statement):
     Represent a switch over a subject whose cases are constants.
 
     We understand the chains of ``if``, ``elif`` and ``else`` where all the conditions
-    compare the same subject for equality against constants as switches.
+    compare the same subject for equality against constants as switches. The chain
+    needs at least two labels; ``if x == C:`` alone is an :py:class:`If`.
 
     A switch never contains a ``break`` of the enclosing loop, since the ``break``
     exits the native switch instead of the loop in most of the targets. We

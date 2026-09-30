@@ -110,14 +110,13 @@ namespace dummy
                 Common.ParseSafeInt(Common.StringHelpers.Slice(digits, 0, 10)));
             long tail = (
                 Common.ParseSafeInt(Common.StringHelpers.Slice(digits, 10)));
-            switch (Common.StringHelpers.Slice(text, 0, 1))
+            if (Common.StringHelpers.Slice(text, 0, 1) == "-")
             {
-                case "-":
-                    return head < 9223372036
-                    || (
-                        head == 9223372036
-                        && tail <= 854775808
-                    );
+                return head < 9223372036
+                || (
+                    head == 9223372036
+                    && tail <= 854775808
+                );
             }
             return head < 9223372036
             || (

@@ -10,6 +10,8 @@ class Kind(Enum):
 def some_func(kind: Kind, other: Kind) -> bool:
     if kind == other:
         return False
+    elif kind == Kind.Beta:
+        return True
 
     return True
 

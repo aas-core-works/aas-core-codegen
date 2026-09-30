@@ -442,9 +442,8 @@ export function unionLocalsAreConsistent(
   let current: OurTypes.ParentOrItem = parent;
   if (OurTypes.isChildA(parent)) {
     current = (parent as OurTypes.ChildA);
-    switch ((current as OurTypes.ChildA).aOnly) {
-      case 13:
-        return false;
+    if ((current as OurTypes.ChildA).aOnly == 13) {
+      return false;
     }
   }
   current = item;
@@ -461,9 +460,8 @@ export function unionLocalsAreConsistent(
       && OurTypes.isChildB(optionalMember)
     )
   ) {
-    switch ((optionalMember as OurTypes.ChildB).bOnly) {
-      case 13:
-        return false;
+    if ((optionalMember as OurTypes.ChildB).bOnly == 13) {
+      return false;
     }
   }
   let wide: OurTypes.WideUnion = item;
@@ -531,9 +529,8 @@ export function finalLocalsAreConsistent(
     return false;
   }
   for (const item of allTexts) {
-    switch (item) {
-      case "forbidden":
-        return false;
+    if (item == "forbidden") {
+      return false;
     }
   }
   if (

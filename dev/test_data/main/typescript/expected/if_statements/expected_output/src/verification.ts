@@ -262,7 +262,7 @@ export function ifWithPass(
  * @remarks
  *
  * The `elif` becomes an if-statement in the default of the switch, and nests
- * a switch in turn.
+ * a lone `if` in turn, which is an if-statement as well.
  */
 export function ifInDefaultOfSwitch(
   kind: OurTypes.Kind,
@@ -271,14 +271,37 @@ export function ifInDefaultOfSwitch(
   switch (kind) {
     case OurTypes.Kind.Alpha:
       return number < 10;
+    case OurTypes.Kind.Gamma:
+      return true;
     default:
       if (number < -5) {
-        switch (kind) {
-          case OurTypes.Kind.Beta:
-            return false;
+        if (kind == OurTypes.Kind.Beta) {
+          return false;
         }
       }
       break;
+  }
+  return true;
+}
+
+/**
+ * Check the lone `if` which compares against a constant.
+ *
+ * @remarks
+ *
+ * The lone `if` is not a switch, so its subject needs not be an enumeration,
+ * a string or an integer.
+ */
+export function loneIfOnLength(
+  text: string,
+  flag: boolean,
+  number: number
+): boolean {
+  if (OurCommon.lenStr(text) == 0) {
+    return (
+      flag
+      || number == 0
+    );
   }
   return true;
 }
@@ -596,6 +619,12 @@ class Verifier
     if (!ifWithNonNullInCondition(that.item)) {
       yield new VerificationError(
         "Optional text of the item must be at most 5 characters long"
+      )
+    }
+
+    if (!loneIfOnLength(that.text, that.flag, that.number)) {
+      yield new VerificationError(
+        "Empty text requires the flag or the number zero"
       )
     }
 

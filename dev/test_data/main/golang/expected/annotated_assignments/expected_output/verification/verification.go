@@ -253,8 +253,7 @@ func UnionLocalsAreConsistent(
 	if ourtypes.IsChildA(parent) {
 		current =
 			ourtypes.NewParentOrItemFromParent(parent.(ourtypes.IChildA))
-		switch current.Underlying().(ourtypes.IChildA).AOnly() {
-		case 13:
+		if current.Underlying().(ourtypes.IChildA).AOnly() == 13 {
 			return false
 		}
 	}
@@ -270,8 +269,7 @@ func UnionLocalsAreConsistent(
 	if (
 		(optionalMember != nil) &&
 		ourtypes.IsChildB(optionalMember.Underlying())) {
-		switch optionalMember.Underlying().(ourtypes.IChildB).BOnly() {
-		case 13:
+		if optionalMember.Underlying().(ourtypes.IChildB).BOnly() == 13 {
 			return false
 		}
 	}
@@ -336,8 +334,7 @@ func FinalLocalsAreConsistent(
 		return false
 	}
 	for _, item := range allTexts {
-		switch item {
-		case "forbidden":
+		if item == "forbidden" {
 			return false
 		}
 	}

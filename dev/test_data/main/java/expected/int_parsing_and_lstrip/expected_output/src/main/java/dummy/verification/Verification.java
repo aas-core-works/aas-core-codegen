@@ -94,14 +94,12 @@ public class Verification {
         StringHelpers.parseSafeInt(StringHelpers.slice(digits, 0, 10)));
     long tail = (
         StringHelpers.parseSafeInt(StringHelpers.slice(digits, 10)));
-    switch (StringHelpers.slice(text, 0, 1)) {
-        case "-" -> {
-            return head < 9223372036L
-            || (
-                head == 9223372036L
-                && tail <= 854775808
-            );
-        }
+    if (Objects.equals(StringHelpers.slice(text, 0, 1), "-")) {
+        return head < 9223372036L
+        || (
+            head == 9223372036L
+            && tail <= 854775808
+        );
     }
     return head < 9223372036L
     || (

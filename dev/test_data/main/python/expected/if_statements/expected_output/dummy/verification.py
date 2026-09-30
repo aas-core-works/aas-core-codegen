@@ -131,15 +131,38 @@ def if_in_default_of_switch(
     Check the ``elif`` which does not compare the subject of the switch.
 
     The ``elif`` becomes an if-statement in the default of the switch, and nests
-    a switch in turn.
+    a lone ``if`` in turn, which is an if-statement as well.
     """
     # pylint: disable=all
     if kind == our_types.Kind.ALPHA:
         return number < 10
+    elif kind == our_types.Kind.GAMMA:
+        return True
     else:
         if number < -5:
             if kind == our_types.Kind.BETA:
                 return False
+    return True
+
+
+def lone_if_on_length(
+    text: str,
+    flag: bool,
+    number: int
+) -> bool:
+    """
+    Check the lone ``if`` which compares against a constant.
+
+    The lone ``if`` is not a switch, so its subject needs not be an enumeration,
+    a string or an integer.
+    """
+    # pylint: disable=all
+    if len(text) == 0:
+        return (
+            (
+                flag
+                or number == 0
+            ))
     return True
 
 
@@ -437,6 +460,13 @@ class _Transformer(
         if not if_with_non_null_in_condition(that.item):
             yield Error(
                 'Optional text of the item must be at most 5 characters long'
+            )
+
+        if not (
+            lone_if_on_length(that.text, that.flag, that.number)
+        ):
+            yield Error(
+                'Empty text requires the flag or the number zero'
             )
 
         if not if_in_default_of_switch(that.kind, that.number):

@@ -7,8 +7,8 @@ class Kind(Enum):
 
 
 @verification
-def some_func(kind: Kind) -> bool:
-    if Kind.Alpha == kind:
+def some_func(kind: Kind, other: Kind) -> bool:
+    if Kind.Alpha == kind or Kind.Alpha == other:
         return False
 
     return True

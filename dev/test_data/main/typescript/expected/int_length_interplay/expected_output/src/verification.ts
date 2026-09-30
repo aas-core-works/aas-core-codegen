@@ -216,25 +216,22 @@ export function noNumberIsSeven(
 ): boolean {
   for (let i = 0; i < count; i++) {
     const number = OurCommon.at(numbers, i);
-    switch (number) {
-      case 7:
-        return false;
+    if (number == 7) {
+      return false;
     }
     const mirrored = OurCommon.at(
       numbers,
       (numbers.length - 1) - i
     );
-    switch (mirrored) {
-      case 7:
-        return false;
+    if (mirrored == 7) {
+      return false;
     }
     const rotated = OurCommon.at(
       numbers,
       OurCommon.floorMod(i + 1, numbers.length)
     );
-    switch (rotated) {
-      case 7:
-        return false;
+    if (rotated == 7) {
+      return false;
     }
   }
   return true;
@@ -249,9 +246,8 @@ export function noSevenFrom(
 ): boolean {
   for (let i = start; i < numbers.length; i++) {
     const number = OurCommon.at(numbers, i);
-    switch (number) {
-      case 7:
-        return false;
+    if (number == 7) {
+      return false;
     }
   }
   return OurCommon.every(

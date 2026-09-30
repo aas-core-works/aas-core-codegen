@@ -32,19 +32,21 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
-        /// Check the switch with a single case and no default.
+        /// Check the switch with no default.
         /// </summary>
-        public static bool SwitchOnEnumWithASingleCase(
+        public static bool SwitchOnEnumWithoutDefault(
             Kind kind
         )
         {
             switch (kind)
             {
+                case Kind.Alpha:
+                    return true;
                 case Kind.Delta:
                     return false;
             }
             return true;
-        }  // public static bool SwitchOnEnumWithASingleCase
+        }  // public static bool SwitchOnEnumWithoutDefault
 
         /// <summary>
         /// Check the switch with a case per form of labels and a default.
@@ -194,6 +196,9 @@ namespace dummy
         /// <summary>
         /// Check the nested switches, including an <c>elif</c> on another subject.
         /// </summary>
+        /// <remarks>
+        /// The lone <c>if</c>'s are if-statements, not switches.
+        /// </remarks>
         public static bool NestedSwitches(
             Kind kind,
             long number
@@ -206,21 +211,21 @@ namespace dummy
                     {
                         case 0:
                             return true;
+                        case 5:
+                            return false;
                         default:
                             return number > 10;
                     }
                 case Kind.Beta:
-                    switch (number)
+                    if (number == 1)
                     {
-                        case 1:
-                            return false;
+                        return false;
                     }
                     break;
                 default:
-                    switch (number)
+                    if (number == 2)
                     {
-                        case 2:
-                            return false;
+                        return false;
                     }
                     break;
             }
@@ -241,6 +246,9 @@ namespace dummy
             {
                 case Kind.Beta:
                     result = number;
+                    break;
+                case Kind.Gamma:
+                    result = 1;
                     break;
             }
             return result < 1000;
@@ -340,8 +348,7 @@ namespace dummy
                         "Kind must be neither beta nor gamma");
                 }
 
-                if (!(
-                    Verification.SwitchOnEnumWithASingleCase(that.Kind)))
+                if (!Verification.SwitchOnEnumWithoutDefault(that.Kind))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +

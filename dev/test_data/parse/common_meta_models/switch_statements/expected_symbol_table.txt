@@ -293,7 +293,7 @@ UnverifiedSymbolTable(
           description='Kind must not be delta',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='switch_on_enum_with_a_single_case',
+              name='switch_on_enum_without_default',
               args=[
                 Member(
                   instance=Name(
@@ -312,7 +312,7 @@ UnverifiedSymbolTable(
   constants=[],
   verification_functions=[
     UnderstoodMethod(
-      name='switch_on_enum_with_a_single_case',
+      name='switch_on_enum_without_default',
       verification=True,
       visibility='PUBLIC',
       arguments=[
@@ -341,6 +341,21 @@ UnverifiedSymbolTable(
               identifier='kind',
               original_node=...),
             cases=[
+              SwitchCase(
+                labels=[
+                  Member(
+                    instance=Name(
+                      identifier='Kind',
+                      original_node=...),
+                    name='Alpha',
+                    original_node=...)],
+                body=[
+                  Return(
+                    value=Constant(
+                      value=True,
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               SwitchCase(
                 labels=[
                   Member(
@@ -1000,6 +1015,18 @@ UnverifiedSymbolTable(
                               value=True,
                               original_node=...),
                             original_node=...)],
+                        original_node=...),
+                      SwitchCase(
+                        labels=[
+                          Constant(
+                            value=5,
+                            original_node=...)],
+                        body=[
+                          Return(
+                            value=Constant(
+                              value=False,
+                              original_node=...),
+                            original_node=...)],
                         original_node=...)],
                     default=[
                       Return(
@@ -1024,16 +1051,18 @@ UnverifiedSymbolTable(
                     name='Beta',
                     original_node=...)],
                 body=[
-                  Switch(
-                    subject=Name(
-                      identifier='number',
-                      original_node=...),
-                    cases=[
-                      SwitchCase(
-                        labels=[
-                          Constant(
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=Name(
+                            identifier='number',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
                             value=1,
-                            original_node=...)],
+                            original_node=...),
+                          original_node=...),
                         body=[
                           Return(
                             value=Constant(
@@ -1045,16 +1074,18 @@ UnverifiedSymbolTable(
                     original_node=...)],
                 original_node=...)],
             default=[
-              Switch(
-                subject=Name(
-                  identifier='number',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='number',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=2,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -1135,6 +1166,25 @@ UnverifiedSymbolTable(
                       original_node=...),
                     value=Name(
                       identifier='number',
+                      original_node=...),
+                    annotation=None,
+                    original_node=...)],
+                original_node=...),
+              SwitchCase(
+                labels=[
+                  Member(
+                    instance=Name(
+                      identifier='Kind',
+                      original_node=...),
+                    name='Gamma',
+                    original_node=...)],
+                body=[
+                  Assignment(
+                    target=Name(
+                      identifier='result',
+                      original_node=...),
+                    value=Constant(
+                      value=1,
                       original_node=...),
                     annotation=None,
                     original_node=...)],

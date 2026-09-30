@@ -60,8 +60,7 @@ func NoNumberIsZero(
 	numbers []int64,
 ) bool {
 	for _, number := range numbers {
-		switch number {
-		case 0:
+		if number == 0 {
 			return false
 		}
 	}
@@ -74,8 +73,7 @@ func NoNumberIsMinusOne(
 ) bool {
 	for i := 0; i < len(numbers); i++ {
 		number := numbers[i]
-		switch number {
-		case -1:
+		if number == -1 {
 			return false
 		}
 	}
@@ -87,8 +85,7 @@ func NoNumberAfterTheFirstIsOne(
 	numbers []int64,
 ) bool {
 	for i := 1; i < len(numbers); i++ {
-		switch numbers[i] {
-		case 1:
+		if numbers[i] == 1 {
 			return false
 		}
 	}
@@ -113,8 +110,7 @@ func NoItemHasAnEmptyText(
 	for _, item := range items {
 		texts := item.Texts()
 		for _, text := range texts {
-			switch text {
-			case "":
+			if text == "" {
 				return false
 			}
 		}
@@ -127,14 +123,12 @@ func IsNeitherThirteenNorUnlucky(
 	texts []string,
 ) bool {
 	for _, x := range texts {
-		switch x {
-		case "thirteen":
+		if x == "thirteen" {
 			return false
 		}
 	}
 	for _, x := range texts {
-		switch x {
-		case "unlucky":
+		if x == "unlucky" {
 			return false
 		}
 	}
@@ -146,11 +140,9 @@ func AlphaHasNoNegativeNumbers(
 	kind ourtypes.Kind,
 	numbers []int64,
 ) bool {
-	switch kind {
-	case ourtypes.KindAlpha:
+	if kind == ourtypes.KindAlpha {
 		for _, number := range numbers {
-			switch number {
-			case -2:
+			if number == -2 {
 				return false
 			}
 		}
@@ -164,8 +156,7 @@ func SumOfOddNumbersIsSmall(
 ) bool {
 	total := int64(0)
 	for _, number := range numbers {
-		switch ourcommon.FloorMod(number, 2) {
-		case 0:
+		if ourcommon.FloorMod(number, 2) == 0 {
 			continue
 		}
 		total = total + number
@@ -244,10 +235,8 @@ func TextsBeforeStopAreFew(
 				if item.Texts()[i] == "stop" {
 					break
 				}
-			} else {
-				if ourcommon.LenStr(item.Texts()[i]) > 10 {
-					break
-				}
+			} else if ourcommon.LenStr(item.Texts()[i]) > 10 {
+				break
 			}
 			count = count + 1
 		}

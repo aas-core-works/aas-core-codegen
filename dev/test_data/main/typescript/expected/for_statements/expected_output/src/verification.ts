@@ -208,9 +208,8 @@ export function noNumberIsZero(
   numbers: Array<number>
 ): boolean {
   for (const number of numbers) {
-    switch (number) {
-      case 0:
-        return false;
+    if (number == 0) {
+      return false;
     }
   }
   return true;
@@ -224,9 +223,8 @@ export function noNumberIsMinusOne(
 ): boolean {
   for (let i = 0; i < numbers.length; i++) {
     const number = OurCommon.at(numbers, i);
-    switch (number) {
-      case -1:
-        return false;
+    if (number == -1) {
+      return false;
     }
   }
   return true;
@@ -239,9 +237,8 @@ export function noNumberAfterTheFirstIsOne(
   numbers: Array<number>
 ): boolean {
   for (let i = 1; i < numbers.length; i++) {
-    switch (OurCommon.at(numbers, i)) {
-      case 1:
-        return false;
+    if (OurCommon.at(numbers, i) == 1) {
+      return false;
     }
   }
   return true;
@@ -269,9 +266,8 @@ export function noItemHasAnEmptyText(
   for (const item of items) {
     const texts = item.texts;
     for (const text of texts) {
-      switch (text) {
-        case "":
-          return false;
+      if (text == "") {
+        return false;
       }
     }
   }
@@ -285,15 +281,13 @@ export function isNeitherThirteenNorUnlucky(
   texts: Array<string>
 ): boolean {
   for (const x of texts) {
-    switch (x) {
-      case "thirteen":
-        return false;
+    if (x == "thirteen") {
+      return false;
     }
   }
   for (const x of texts) {
-    switch (x) {
-      case "unlucky":
-        return false;
+    if (x == "unlucky") {
+      return false;
     }
   }
   return true;
@@ -306,15 +300,12 @@ export function alphaHasNoNegativeNumbers(
   kind: OurTypes.Kind,
   numbers: Array<number>
 ): boolean {
-  switch (kind) {
-    case OurTypes.Kind.Alpha:
-      for (const number of numbers) {
-        switch (number) {
-          case -2:
-            return false;
-        }
+  if (kind == OurTypes.Kind.Alpha) {
+    for (const number of numbers) {
+      if (number == -2) {
+        return false;
       }
-      break;
+    }
   }
   return true;
 }
@@ -327,9 +318,8 @@ export function sumOfOddNumbersIsSmall(
 ): boolean {
   let total = 0;
   for (const number of numbers) {
-    switch (OurCommon.floorMod(number, 2)) {
-      case 0:
-        continue;
+    if ((OurCommon.floorMod(number, 2)) == (0)) {
+      continue;
     }
     total = total + number;
   }
@@ -422,10 +412,8 @@ export function textsBeforeStopAreFew(
         if (OurCommon.at(item.texts, i) == "stop") {
           break;
         }
-      } else {
-        if (OurCommon.lenStr(OurCommon.at(item.texts, i)) > 10) {
-          break;
-        }
+      } else if (OurCommon.lenStr(OurCommon.at(item.texts, i)) > 10) {
+        break;
       }
       count = count + 1;
     }

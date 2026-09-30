@@ -298,9 +298,8 @@ bool UnionLocalsAreConsistent(
         std::static_pointer_cast<types::IParent>(std::dynamic_pointer_cast<types::IChildA>(parent))
       )
     );
-    switch (std::dynamic_pointer_cast<types::IChildA>(types::UnderlyingOfParentOrItem(current))->a_only()) {
-      case 13:
-        return false;
+    if (std::dynamic_pointer_cast<types::IChildA>(types::UnderlyingOfParentOrItem(current))->a_only() == 13) {
+      return false;
     }
   }
   current = types::ParentOrItem(item);
@@ -323,9 +322,8 @@ bool UnionLocalsAreConsistent(
       )
     )
   ) {
-    switch (std::dynamic_pointer_cast<types::IChildB>(types::UnderlyingOfParentOrItem(*optional_member))->b_only()) {
-      case 13:
-        return false;
+    if (std::dynamic_pointer_cast<types::IChildB>(types::UnderlyingOfParentOrItem(*optional_member))->b_only() == 13) {
+      return false;
     }
   }
   types::WideUnion wide = types::WideUnion(item);

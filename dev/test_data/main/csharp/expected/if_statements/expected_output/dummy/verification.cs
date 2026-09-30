@@ -109,7 +109,7 @@ namespace dummy
         /// </summary>
         /// <remarks>
         /// The <c>elif</c> becomes an if-statement in the default of the switch, and nests
-        /// a switch in turn.
+        /// a lone <c>if</c> in turn, which is an if-statement as well.
         /// </remarks>
         public static bool IfInDefaultOfSwitch(
             Kind kind,
@@ -120,19 +120,41 @@ namespace dummy
             {
                 case Kind.Alpha:
                     return number < 10;
+                case Kind.Gamma:
+                    return true;
                 default:
                     if (number < -5)
                     {
-                        switch (kind)
+                        if (kind == Kind.Beta)
                         {
-                            case Kind.Beta:
-                                return false;
+                            return false;
                         }
                     }
                     break;
             }
             return true;
         }  // public static bool IfInDefaultOfSwitch
+
+        /// <summary>
+        /// Check the lone <c>if</c> which compares against a constant.
+        /// </summary>
+        /// <remarks>
+        /// The lone <c>if</c> is not a switch, so its subject needs not be an enumeration,
+        /// a string or an integer.
+        /// </remarks>
+        public static bool LoneIfOnLength(
+            string text,
+            bool flag,
+            long number
+        )
+        {
+            if (Common.StringHelpers.Len(text) == 0)
+            {
+                return flag
+                || number == 0;
+            }
+            return true;
+        }  // public static bool LoneIfOnLength
 
         /// <summary>
         /// Check the condition which guards an optional value itself.
@@ -480,6 +502,14 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Optional text of the item must be at most 5 characters long");
+                }
+
+                if (!(
+                    Verification.LoneIfOnLength(that.Text, that.Flag, that.Number)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Empty text requires the flag or the number zero");
                 }
 
                 if (!(

@@ -304,8 +304,7 @@ func TextsAreNotEmpty(
 ) bool {
 	for _, item := range items {
 		for _, text := range item.Texts() {
-			switch text {
-			case "":
+			if text == "" {
 				return false
 			}
 		}

@@ -170,7 +170,7 @@ def sum_of_odd_numbers_is_small(
     # pylint: disable=all
     total = 0
     for number in numbers:
-        if (number % 2) == 0:
+        if (number % 2) == (0):
             continue
         total = total + number
     return total < 50
@@ -256,9 +256,8 @@ def texts_before_stop_are_few(
             if kind == our_types.Kind.ALPHA:
                 if item.texts[i] == 'stop':
                     break
-            else:
-                if len(item.texts[i]) > 10:
-                    break
+            elif len(item.texts[i]) > 10:
+                break
             count = count + 1
     return count < 3
 

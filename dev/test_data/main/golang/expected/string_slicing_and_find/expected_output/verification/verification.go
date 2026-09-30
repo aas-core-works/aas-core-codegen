@@ -50,8 +50,7 @@ func DateBeforeTimeIsLongEnough(
 	text string,
 ) bool {
 	position := ourcommon.FindStr(text, "T", 0)
-	switch position {
-	case -1:
+	if position == -1 {
 		return true
 	}
 	return ourcommon.LenStr(ourcommon.SliceStr(text, 0, position)) == 10
@@ -62,8 +61,7 @@ func TimeAfterDateIsLongEnough(
 	text string,
 ) bool {
 	position := ourcommon.FindStr(text, "T", 0)
-	switch position {
-	case -1:
+	if position == -1 {
 		return true
 	}
 	return ourcommon.LenStr(ourcommon.SliceStrFrom(text, position + 1)) == 8
@@ -74,13 +72,11 @@ func MonthIsSeptember(
 	text string,
 ) bool {
 	first := ourcommon.FindStr(text, "-", 0)
-	switch first {
-	case -1:
+	if first == -1 {
 		return true
 	}
 	second := ourcommon.FindStr(text, "-", first + 1)
-	switch second {
-	case -1:
+	if second == -1 {
 		return false
 	}
 	return ourcommon.SliceStr(text, first + 1, second) == "09"
@@ -91,8 +87,7 @@ func SecondsFollowColon(
 	text string,
 ) bool {
 	position := ourcommon.FindStr(text, "T", 0)
-	switch position {
-	case -1:
+	if position == -1 {
 		return true
 	}
 	return ourcommon.LenStr(text) < 10 ||

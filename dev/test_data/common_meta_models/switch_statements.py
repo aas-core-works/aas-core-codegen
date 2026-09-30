@@ -16,9 +16,11 @@ class Non_empty_string(str, DBC):
 
 
 @verification
-def switch_on_enum_with_a_single_case(kind: Kind) -> bool:
-    """Check the switch with a single case and no default."""
-    if kind == Kind.Delta:
+def switch_on_enum_without_default(kind: Kind) -> bool:
+    """Check the switch with no default."""
+    if kind == Kind.Alpha:
+        return True
+    elif kind == Kind.Delta:
         return False
 
     return True
@@ -109,10 +111,16 @@ def switch_on_int(number: int) -> bool:
 
 @verification
 def nested_switches(kind: Kind, number: int) -> bool:
-    """Check the nested switches, including an ``elif`` on another subject."""
+    """
+    Check the nested switches, including an ``elif`` on another subject.
+
+    The lone ``if``'s are if-statements, not switches.
+    """
     if kind == Kind.Alpha:
         if number == 0:
             return True
+        elif number == 5:
+            return False
         else:
             return number > 10
     elif kind == Kind.Beta:
@@ -133,12 +141,14 @@ def switch_with_reassigned_int(kind: Kind, number: int) -> bool:
     result = 0
     if kind == Kind.Beta:
         result = number
+    elif kind == Kind.Gamma:
+        result = 1
 
     return result < 1000
 
 
 @invariant(
-    lambda self: switch_on_enum_with_a_single_case(self.kind),
+    lambda self: switch_on_enum_without_default(self.kind),
     "Kind must not be delta",
 )
 @invariant(

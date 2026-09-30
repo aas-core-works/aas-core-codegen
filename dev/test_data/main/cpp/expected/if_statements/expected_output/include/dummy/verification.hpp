@@ -237,9 +237,19 @@ bool IfWithPass(
 /// \brief Check the `elif` which does not compare the subject of the switch.
 ///
 /// The `elif` becomes an if-statement in the default of the switch, and nests
-/// a switch in turn.
+/// a lone `if` in turn, which is an if-statement as well.
 bool IfInDefaultOfSwitch(
   types::Kind kind,
+  int64_t number
+);
+
+/// \brief Check the lone `if` which compares against a constant.
+///
+/// The lone `if` is not a switch, so its subject needs not be an enumeration,
+/// a string or an integer.
+bool LoneIfOnLength(
+  const std::wstring& text,
+  bool flag,
   int64_t number
 );
 

@@ -812,6 +812,33 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Something',
           parsed=...),
         Invariant(
+          description='Empty text requires the flag or the number zero',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='lone_if_on_length',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='text',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='flag',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='number',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Number must be consistent with the kind',
           body=textwrap.dedent("""\
             FunctionCall(
@@ -1257,7 +1284,53 @@ SymbolTable(
         remarks=[
           textwrap.dedent("""\
             <paragraph>The <literal>elif</literal> becomes an if-statement in the default of the switch, and nests
-            a switch in turn.</paragraph>""")],
+            a lone <literal>if</literal> in turn, which is an if-statement as well.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='lone_if_on_length',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='flag',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='number',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the lone <literal>if</literal> which compares against a constant.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The lone <literal>if</literal> is not a switch, so its subject needs not be an enumeration,
+            a string or an integer.</paragraph>""")],
         arguments_by_name=[],
         returns=None,
         parsed=...),

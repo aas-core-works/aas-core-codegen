@@ -213,10 +213,9 @@ export function numbersAreUniqueBetweenZeros(
 ): boolean {
   let seen: Set<number> = new Set<number>();
   for (const number of numbers) {
-    switch (number) {
-      case 0:
-        seen = new Set<number>();
-        continue;
+    if (number == 0) {
+      seen = new Set<number>();
+      continue;
     }
     if (seen.has(number)) {
       return false;

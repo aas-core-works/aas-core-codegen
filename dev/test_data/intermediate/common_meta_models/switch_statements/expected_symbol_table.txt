@@ -356,7 +356,7 @@ SymbolTable(
           description='Kind must not be delta',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='switch_on_enum_with_a_single_case',
+              name='switch_on_enum_without_default',
               args=[
                 Member(
                   instance=Name(
@@ -392,7 +392,7 @@ SymbolTable(
   constants_by_name=...,
   verification_functions=[
     TranspilableVerification(
-      name='switch_on_enum_with_a_single_case',
+      name='switch_on_enum_without_default',
       visibility='PUBLIC',
       arguments=[
         Argument(
@@ -407,7 +407,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check the switch with a single case and no default.</paragraph>',
+        summary='<paragraph>Check the switch with no default.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
@@ -640,7 +640,8 @@ SymbolTable(
         parsed=...),
       description=DescriptionOfSignature(
         summary='<paragraph>Check the nested switches, including an <literal>elif</literal> on another subject.</paragraph>',
-        remarks=[],
+        remarks=[
+          "<paragraph>The lone <literal>if</literal>'s are if-statements, not switches.</paragraph>"],
         arguments_by_name=[],
         returns=None,
         parsed=...),

@@ -101,10 +101,8 @@ public class Verification {
     for (var item : items) {
         var texts = item.getTexts();
         for (var text : texts) {
-            switch (text) {
-                case "" -> {
-                    return false;
-                }
+            if (Objects.equals(text, "")) {
+                return false;
             }
         }
     }
@@ -117,17 +115,13 @@ public class Verification {
   public static Boolean isNeitherThirteenNorUnlucky(
     List<String> texts) {
     for (var x : texts) {
-        switch (x) {
-            case "thirteen" -> {
-                return false;
-            }
+        if (Objects.equals(x, "thirteen")) {
+            return false;
         }
     }
     for (var x : texts) {
-        switch (x) {
-            case "unlucky" -> {
-                return false;
-            }
+        if (Objects.equals(x, "unlucky")) {
+            return false;
         }
     }
     return true;
@@ -139,12 +133,10 @@ public class Verification {
   public static Boolean alphaHasNoNegativeNumbers(
     Kind kind,
     List<Long> numbers) {
-    switch (kind) {
-        case ALPHA -> {
-            for (var number : numbers) {
-                if (number == -2) {
-                    return false;
-                }
+    if (kind == Kind.ALPHA) {
+        for (var number : numbers) {
+            if (number == -2) {
+                return false;
             }
         }
     }
@@ -158,7 +150,7 @@ public class Verification {
     List<Long> numbers) {
     long total = 0;
     for (var number : numbers) {
-        if ((Math.floorMod(number, 2L)) == 0) {
+        if ((Math.floorMod(number, 2L)) == (0)) {
             continue;
         }
         total = total + number;
@@ -246,10 +238,8 @@ public class Verification {
                 if (Objects.equals(item.getTexts().get(i), "stop")) {
                     break;
                 }
-            } else {
-                if (StringHelpers.len(item.getTexts().get(i)) > 10) {
-                    break;
-                }
+            } else if (StringHelpers.len(item.getTexts().get(i)) > 10) {
+                break;
             }
             count = count + 1;
         }

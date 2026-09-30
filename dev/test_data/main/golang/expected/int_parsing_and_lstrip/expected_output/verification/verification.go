@@ -104,8 +104,7 @@ func IsXsLong(
 		ourcommon.ParseSafeInt(ourcommon.SliceStr(digits, 0, 10))
 	tail :=
 		ourcommon.ParseSafeInt(ourcommon.SliceStrFrom(digits, 10))
-	switch ourcommon.SliceStr(text, 0, 1) {
-	case "-":
+	if ourcommon.SliceStr(text, 0, 1) == "-" {
 		return head < 9223372036 ||
 			(head == 9223372036 &&
 			tail <= 854775808)

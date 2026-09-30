@@ -277,16 +277,18 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='position',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='position',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value=-1,
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Constant(
@@ -364,16 +366,18 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='position',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='position',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value=-1,
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Constant(
@@ -456,16 +460,18 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='first',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='first',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value=-1,
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Constant(
@@ -503,16 +509,18 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='second',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='second',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value=-1,
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Constant(
@@ -593,16 +601,18 @@ UnverifiedSymbolTable(
             annotation=None,
             original_node=...)"""),
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='position',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Constant(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='position',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
                     value=-1,
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   Return(
                     value=Constant(

@@ -489,16 +489,18 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Name(
-                  identifier='number',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='number',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=0,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -577,16 +579,18 @@ UnverifiedSymbolTable(
                   original_node=...),
                 annotation=None,
                 original_node=...),
-              Switch(
-                subject=Name(
-                  identifier='number',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='number',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=-1,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -651,21 +655,23 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Index(
-                  collection=Name(
-                    identifier='numbers',
-                    original_node=...),
-                  index=Name(
-                    identifier='i',
-                    original_node=...),
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Index(
+                        collection=Name(
+                          identifier='numbers',
+                          original_node=...),
+                        index=Name(
+                          identifier='i',
+                          original_node=...),
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=1,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -823,16 +829,18 @@ UnverifiedSymbolTable(
                     original_node=...),
                   original_node=...),
                 body=[
-                  Switch(
-                    subject=Name(
-                      identifier='text',
-                      original_node=...),
-                    cases=[
-                      SwitchCase(
-                        labels=[
-                          Constant(
+                  If(
+                    branches=[
+                      IfBranch(
+                        condition=Comparison(
+                          left=Name(
+                            identifier='text',
+                            original_node=...),
+                          op='EQ',
+                          right=Constant(
                             value='',
-                            original_node=...)],
+                            original_node=...),
+                          original_node=...),
                         body=[
                           Return(
                             value=Constant(
@@ -891,16 +899,18 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Name(
-                  identifier='x',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='x',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value='thirteen',
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -922,16 +932,18 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Name(
-                  identifier='x',
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Name(
+                        identifier='x',
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value='unlucky',
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Return(
                         value=Constant(
@@ -986,19 +998,21 @@ UnverifiedSymbolTable(
       non_mutating=False,
       body=[
         textwrap.dedent("""\
-          Switch(
-            subject=Name(
-              identifier='kind',
-              original_node=...),
-            cases=[
-              SwitchCase(
-                labels=[
-                  Member(
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='kind',
+                    original_node=...),
+                  op='EQ',
+                  right=Member(
                     instance=Name(
                       identifier='Kind',
                       original_node=...),
                     name='Alpha',
-                    original_node=...)],
+                    original_node=...),
+                  original_node=...),
                 body=[
                   For(
                     generator=ForEach(
@@ -1010,16 +1024,18 @@ UnverifiedSymbolTable(
                         original_node=...),
                       original_node=...),
                     body=[
-                      Switch(
-                        subject=Name(
-                          identifier='number',
-                          original_node=...),
-                        cases=[
-                          SwitchCase(
-                            labels=[
-                              Constant(
+                      If(
+                        branches=[
+                          IfBranch(
+                            condition=Comparison(
+                              left=Name(
+                                identifier='number',
+                                original_node=...),
+                              op='EQ',
+                              right=Constant(
                                 value=-2,
-                                original_node=...)],
+                                original_node=...),
+                              original_node=...),
                             body=[
                               Return(
                                 value=Constant(
@@ -1090,21 +1106,23 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...),
             body=[
-              Switch(
-                subject=Mod(
-                  left=Name(
-                    identifier='number',
-                    original_node=...),
-                  right=Constant(
-                    value=2,
-                    original_node=...),
-                  original_node=...),
-                cases=[
-                  SwitchCase(
-                    labels=[
-                      Constant(
+              If(
+                branches=[
+                  IfBranch(
+                    condition=Comparison(
+                      left=Mod(
+                        left=Name(
+                          identifier='number',
+                          original_node=...),
+                        right=Constant(
+                          value=2,
+                          original_node=...),
+                        original_node=...),
+                      op='EQ',
+                      right=Constant(
                         value=0,
-                        original_node=...)],
+                        original_node=...),
+                      original_node=...),
                     body=[
                       Continue(
                         original_node=...)],
@@ -1675,38 +1693,34 @@ UnverifiedSymbolTable(
                                 original_node=...)],
                             default=None,
                             original_node=...)],
-                        original_node=...)],
-                    default=[
-                      If(
-                        branches=[
-                          IfBranch(
-                            condition=Comparison(
-                              left=FunctionCall(
-                                name='len',
-                                args=[
-                                  Index(
-                                    collection=Member(
-                                      instance=Name(
-                                        identifier='item',
-                                        original_node=...),
-                                      name='texts',
-                                      original_node=...),
-                                    index=Name(
-                                      identifier='i',
-                                      original_node=...),
-                                    original_node=...)],
-                                original_node=...),
-                              op='GT',
-                              right=Constant(
-                                value=10,
-                                original_node=...),
-                              original_node=...),
-                            body=[
-                              Break(
+                        original_node=...),
+                      IfBranch(
+                        condition=Comparison(
+                          left=FunctionCall(
+                            name='len',
+                            args=[
+                              Index(
+                                collection=Member(
+                                  instance=Name(
+                                    identifier='item',
+                                    original_node=...),
+                                  name='texts',
+                                  original_node=...),
+                                index=Name(
+                                  identifier='i',
+                                  original_node=...),
                                 original_node=...)],
+                            original_node=...),
+                          op='GT',
+                          right=Constant(
+                            value=10,
+                            original_node=...),
+                          original_node=...),
+                        body=[
+                          Break(
                             original_node=...)],
-                        default=None,
                         original_node=...)],
+                    default=None,
                     original_node=...),
                   Assignment(
                     target=Name(
