@@ -18,6 +18,7 @@ from aas_core_codegen.csharp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 class NeededCombinators:
@@ -786,7 +787,7 @@ def generate(
     # if no property of it is a float.
     needs_xs_double = (
         intermediate.PrimitiveType.FLOAT in needed.primitive_types
-        or intermediate.uses_json_types(symbol_table)
+        or intermediate_uses.json_types(symbol_table)
     )
 
     needs_xs_base_64_binary = (
@@ -800,7 +801,7 @@ def generate(
         _generate_read_start_element(),
         _generate_consume_end_element(),
         *_generate_element_name_and_framing_wrappers(
-            uses_json_types=intermediate.uses_json_types(symbol_table)
+            uses_json_types=intermediate_uses.json_types(symbol_table)
         ),
         _generate_peek_element_name(),
     ]  # type: List[Stripped]

@@ -21,6 +21,7 @@ from aas_core_codegen.csharp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_delegate_method(method: intermediate.Method) -> Stripped:
@@ -801,7 +802,7 @@ public class Enhancer<TEnhancement>
         csharp_common.generate_using_aas_directive_if_necessary(namespace)
     )
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         using_directives.append(Stripped("using Nodes = System.Text.Json.Nodes;"))
 
     using_directives.append(

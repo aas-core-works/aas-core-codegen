@@ -14,6 +14,7 @@ from aas_core_codegen.common import (
     Stripped,
     indent_but_first_line,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
@@ -920,7 +921,7 @@ def _generate_wrapper(
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         imports.extend(
             Stripped(f"import {json_import};")
             for json_import in java_common.JSON_IMPORTS

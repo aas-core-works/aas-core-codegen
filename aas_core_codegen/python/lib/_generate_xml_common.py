@@ -7,6 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python import common as python_common
 from aas_core_codegen.python.common import (
     INDENT as I,
@@ -104,7 +105,7 @@ def generate(
     # writes its elements in no namespace at all, as the XML-RPC specification
     # prescribes. The primitives which deal with such elements are therefore
     # only generated for a meta-model which actually has a JSON-able type.
-    uses_json_types = intermediate.uses_json_types(symbol_table)
+    uses_json_types = intermediate_uses.json_types(symbol_table)
 
     parse_unqualified_element_tag_block = Stripped(
         f"""\

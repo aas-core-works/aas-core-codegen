@@ -23,6 +23,7 @@ from aas_core_codegen.common import (
     assert_union_without_excluded,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 from aas_core_codegen.typescript import (
     common as typescript_common,
@@ -1429,7 +1430,7 @@ def _generate_verify_json_value(
     JSON object a `KeySegment`, just as a property of one of our classes
     contributes a `PropertySegment`.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [

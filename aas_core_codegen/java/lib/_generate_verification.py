@@ -29,6 +29,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
@@ -1236,7 +1237,7 @@ def _generate_verify_json_value(
     one of our classes and an index segment at an item of one of our lists,
     and a member of an open JSON object is neither.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -1569,7 +1570,7 @@ def generate(
     # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one
     # pay for the import and for the verification which goes with it.
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         imports.extend(
             [
                 Stripped("import com.fasterxml.jackson.databind.JsonNode;"),
@@ -1590,7 +1591,7 @@ def generate(
         for arg in verification.arguments
     ]
 
-    if intermediate.uses_json_types(symbol_table) or any(
+    if intermediate_uses.json_types(symbol_table) or any(
         isinstance(
             intermediate.beneath_optional(type_annotation),
             intermediate.ListTypeAnnotation,

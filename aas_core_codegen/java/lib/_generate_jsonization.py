@@ -14,6 +14,7 @@ from aas_core_codegen.common import (
     assert_never,
     indent_but_first_line,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
@@ -1329,7 +1330,7 @@ def _generate_json_able_helpers(
     a non-finite number, and copied, so that the instance and the document it
     came from do not share a mutable tree.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -1471,7 +1472,7 @@ def _generate_json_able_serializer(
     symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the serializer of the JSON-able values, if the model uses them."""
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -2990,7 +2991,7 @@ def generate(
         Stripped("import com.fasterxml.jackson.databind.JsonNode;"),
     ]  # type: List[Stripped]
 
-    if composes_a_container or intermediate.uses_json_types(symbol_table):
+    if composes_a_container or intermediate_uses.json_types(symbol_table):
         imports.append(
             Stripped("import com.fasterxml.jackson.databind.node.ArrayNode;")
         )

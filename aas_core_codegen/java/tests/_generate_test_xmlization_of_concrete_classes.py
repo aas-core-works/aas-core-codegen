@@ -4,6 +4,7 @@ from typing import Dict, List, Mapping, Tuple
 
 from aas_core_codegen import intermediate, naming
 from aas_core_codegen.common import Identifier, Stripped, indent_but_first_line
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.java import common as java_common, naming as java_naming
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -206,7 +207,7 @@ def generate(
 Xmlization.AAS_NAME_SPACE.equals(EVENT.getName().getNamespaceURI())
 {I}|| EVENT.getName().getNamespaceURI().isEmpty()"""
         )
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else Stripped(
             "Xmlization.AAS_NAME_SPACE.equals(EVENT.getName().getNamespaceURI())"
         )

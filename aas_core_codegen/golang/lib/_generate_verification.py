@@ -28,6 +28,7 @@ from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
     PrimitiveTypeAnnotation,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 from aas_core_codegen.golang import (
     common as golang_common,
@@ -1523,7 +1524,7 @@ def _generate_verify_json_value(
     at a member of a JSON-able object. A key segment is what a name segment is
     not: it names a key which is known only at run time.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [

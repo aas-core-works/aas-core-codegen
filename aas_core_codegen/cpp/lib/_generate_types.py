@@ -43,6 +43,7 @@ from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 
 # region Checks
@@ -1141,17 +1142,17 @@ def generate_header(
 
     nlohmann_json_include = (
         "#include <nlohmann/json.hpp>\n\n"
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 
     unordered_set_include = (
         "#include <unordered_set>\n"
         if (
-            cpp_common.uses_sets(
+            intermediate_uses.sets_in(
                 [method for cls in symbol_table.classes for method in cls.methods]
             )
-            or len(cpp_common.set_types_of_properties(symbol_table)) > 0
+            or intermediate_uses.set_properties(symbol_table)
         )
         else ""
     )

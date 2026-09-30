@@ -10,6 +10,7 @@ from aas_core_codegen.common import (
     Stripped,
     Error,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import (
     common as typescript_common,
     description as typescript_description,
@@ -54,7 +55,7 @@ def generate(
     # it is the only module which this index mentions conditionally.
     xml_rpc_export = (
         '\nexport * as xmlrpc from "./xmlrpc";'
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 

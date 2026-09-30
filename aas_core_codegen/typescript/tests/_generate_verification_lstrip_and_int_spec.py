@@ -7,6 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, tests_common
 from aas_core_codegen.common import Stripped
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import common as typescript_common
 from aas_core_codegen.typescript.common import INDENT as I, INDENT2 as II
 
@@ -14,7 +15,7 @@ from aas_core_codegen.typescript.common import INDENT as I, INDENT2 as II
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_lstrip(symbol_table) or intermediate.uses_int(symbol_table)
+    intermediate_uses.lstrip_call(symbol_table) or intermediate_uses.int_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -55,7 +56,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
 
     blocks.append(Stripped('import * as AasCommon from "../src/common";'))
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         for text, chars, expected in tests_common.LSTRIP_CASES:
             title = typescript_common.string_literal(
                 f"{text!r}.lstrip({chars!r}) gives {expected!r}"
@@ -76,7 +77,7 @@ test({title}, () => {{
                 )
             )
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         for text, expected_int in tests_common.PARSE_INT_CASES:
             title = typescript_common.string_literal(
                 f"int({text!r}) gives {expected_int}"

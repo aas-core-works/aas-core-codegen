@@ -27,6 +27,7 @@ from aas_core_codegen import (
     run,
     infer_for_schema,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import retree as parse_retree
 from aas_core_codegen.common import (
     Stripped,
@@ -1136,7 +1137,7 @@ def generate(
     if len(errors) > 0:
         return None, errors
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         update_error = definitions.update(_define_json_type_definitions())
         if update_error is not None:
             errors.append(update_error)

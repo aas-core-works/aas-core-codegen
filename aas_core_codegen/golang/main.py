@@ -6,6 +6,7 @@ from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 from aas_core_codegen import run, intermediate, specific_implementations, golang
 from aas_core_codegen.common import Stripped, Error
 from aas_core_codegen.golang import lib as golang_lib, tests as golang_tests
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
@@ -299,7 +300,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # a JSON-able type (``JSONValue``, ``JSONArray`` or ``JSONObject[K]``) --
     # unlike the other packages above, which are always generated regardless of
     # the model.
-    if intermediate.uses_json_types(context.symbol_table):
+    if intermediate_uses.json_types(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 base_rel_path / "xmlrpc/xmlrpc.go",
@@ -310,7 +311,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # The helpers for ``len``, slicing strings and ``find`` are only generated for
     # a meta-model which uses them, and so are their tests.
-    if intermediate.uses_len_slicing_or_find(context.symbol_table):
+    if intermediate_uses.len_slicing_or_find(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 base_rel_path / "common/string_helpers_test/string_helpers_test.go",
@@ -324,7 +325,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # We test the arithmetic operations only if the meta-model uses them, as we
     # generate the helper functions only in that case.
-    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+    if intermediate_uses.modulo(context.symbol_table) or intermediate_uses.abs_call(
         context.symbol_table
     ):
         rel_paths_generators = list(rel_paths_generators) + [
@@ -342,9 +343,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
     # generate the helper function for ``int`` only in that case.
-    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+    if intermediate_uses.lstrip_call(
         context.symbol_table
-    ):
+    ) or intermediate_uses.int_call(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 base_rel_path / "common/lstrip_and_int_test/lstrip_and_int_test.go",

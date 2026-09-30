@@ -14,6 +14,7 @@ from aas_core_codegen.csharp.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 #: The lexical forms which no recorded example can hold, by the primitive
@@ -207,7 +208,7 @@ def generate(
 child.GetDefaultNamespace().NamespaceName == {xml_namespace_literal}
 {I}|| child.GetDefaultNamespace().NamespaceName.Length == 0"""
         )
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else Stripped(
             f"child.GetDefaultNamespace().NamespaceName == {xml_namespace_literal}"
         )

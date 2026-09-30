@@ -21,6 +21,7 @@ from aas_core_codegen.cpp.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_deserialize_definitions(
@@ -5434,7 +5435,7 @@ def generate_implementation(
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     xml_rpc_include = (
-        '#include "xml_rpc.hpp"\n' if intermediate.uses_json_types(symbol_table) else ""
+        '#include "xml_rpc.hpp"\n' if intermediate_uses.json_types(symbol_table) else ""
     )
 
     blocks = [
@@ -5520,7 +5521,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
 
     blocks.extend(_generate_functions_to_deserialize_primitives())
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         # NOTE (mristin):
         # Both conversion functions are placed here, early in the file, since
         # ``xml_common::SerializationError`` is already a complete type at this point (it is
@@ -5621,7 +5622,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         ]
     )
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.extend(_generate_write_json_to_xml_rpc_implementation())
 
     # NOTE (mristin):

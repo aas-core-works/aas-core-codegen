@@ -28,6 +28,7 @@ from aas_core_codegen.cpp.common import (
     INDENT6 as IIIIII,
     INDENT7 as IIIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 # region Node kind
@@ -2548,7 +2549,7 @@ def generate_header(
     """Generate header for the low-level XML tokenizer and writer."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XML_COMMON_NAMESPACE}")
 
-    uses_json_types = intermediate.uses_json_types(symbol_table)
+    uses_json_types = intermediate_uses.json_types(symbol_table)
 
     include_guard_var = cpp_common.include_guard_var(namespace)
 
@@ -2633,7 +2634,7 @@ def generate_implementation(
 
     namespace_literal = cpp_common.string_literal(symbol_table.meta_model.xml_namespace)
 
-    uses_json_types = intermediate.uses_json_types(symbol_table)
+    uses_json_types = intermediate_uses.json_types(symbol_table)
 
     blocks = [
         cpp_common.WARNING,

@@ -30,6 +30,7 @@ from aas_core_codegen.csharp.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_read_whole_content_as_base_64() -> Stripped:
@@ -3169,7 +3170,7 @@ using System.Collections.Generic;  // can't alias"""
         )
     )
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         using_directives.append(Stripped("using Nodes = System.Text.Json.Nodes;"))
 
     # pylint: disable=line-too-long

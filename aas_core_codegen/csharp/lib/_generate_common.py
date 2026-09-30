@@ -16,6 +16,7 @@ from aas_core_codegen.csharp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 _TUPLE_HELPERS: Final[Stripped] = Stripped(
@@ -72,7 +73,7 @@ private static bool IsSurrogatePairAt(string text, int offset)
         )
     ]  # type: List[Stripped]
 
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if intermediate_uses.len_slicing_or_find(symbol_table):
         members.append(
             Stripped(
                 f"""\
@@ -218,7 +219,7 @@ public static long Find(string text, string sub, long start = 0)
             )
         )
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         members.append(
             Stripped(
                 f"""\
@@ -603,9 +604,9 @@ def generate(
     """
     blocks = [_TUPLE_HELPERS]  # type: List[Stripped]
 
-    if intermediate.uses_len_slicing_or_find(symbol_table) or intermediate.uses_lstrip(
+    if intermediate_uses.len_slicing_or_find(
         symbol_table
-    ):
+    ) or intermediate_uses.lstrip_call(symbol_table):
         blocks.append(_generate_string_helpers(symbol_table))
 
     if csharp_common.has_set_properties(symbol_table):
@@ -615,13 +616,13 @@ def generate(
     # We add the helper only if the meta-model uses the modulo so that we do not
     # clutter the code otherwise. The helper is public so that the clients can
     # rely on it, and so that we can unit-test it.
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         blocks.append(FLOOR_MOD)
 
     # NOTE (mristin):
     # We add the helper only if the meta-model calls int so that we do not
     # clutter the code otherwise.
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         blocks.append(PARSE_SAFE_INT)
 
     writer = io.StringIO()

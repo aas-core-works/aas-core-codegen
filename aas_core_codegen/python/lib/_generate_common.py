@@ -8,6 +8,7 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     Stripped,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python import (
     common as python_common,
 )
@@ -89,7 +90,7 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     # NOTE (mristin):
     # The helper to parse the integers checks the text with a regular expression.
     import_lines = ["import collections.abc"]
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         import_lines.append("import re")
 
     import_lines_joined = "\n".join(import_lines)
@@ -181,14 +182,14 @@ def try_to_cast_to_array_like(
         python_common.WARNING,
     ]
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         blocks.insert(len(blocks) - 1, _PARSE_SAFE_INT)
 
     # NOTE (mristin):
     # Only a meta-model which uses a JSON-able type ever meets a bare number
     # whose type it does not already know, so the conversion is generated
     # only for such a model.
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.insert(
             len(blocks) - 1,
             Stripped(

@@ -24,6 +24,7 @@ from aas_core_codegen.common import (
     Identifier,
     indent_but_first_line,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python import common as python_common, naming as python_naming
 from aas_core_codegen.python.common import (
     INDENT as I,
@@ -46,7 +47,7 @@ def _generate_module_docstring(
         """ The elements of
 the XML-RPC subset, over which a JSON-able value is de/serialized, are the one
 exception: they live in no namespace at all."""
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 
@@ -4147,7 +4148,7 @@ def generate(
     # which has none neither imports the module nor gets it generated at all.
     xmlrpc_import = (
         f"import {qualified_module_name}.xmlrpc as aas_xmlrpc\n"
-        if intermediate.uses_json_types(symbol_table)
+        if intermediate_uses.json_types(symbol_table)
         else ""
     )
 

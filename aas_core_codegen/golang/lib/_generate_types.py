@@ -34,6 +34,7 @@ from aas_core_codegen.golang import (
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.golang.common import (
     INDENT as I,
@@ -1959,7 +1960,7 @@ def _generate_json_aliases(
     All three are nilable on their own, so an optional one needs no pointer --
     see :py:func:`aas_core_codegen.golang.pointering.is_pointer_type`.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [

@@ -28,6 +28,7 @@ from aas_core_codegen.golang.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 # region De-serialization
@@ -1804,7 +1805,7 @@ def _generate_json_able_helpers(
     type is an ``any`` and rules out nothing, and rebuilt, so that the instance
     and the document it came from do not share a map or a slice.
     """
-    if not intermediate.uses_json_types(symbol_table):
+    if not intermediate_uses.json_types(symbol_table):
         return []
 
     return [
@@ -2873,7 +2874,7 @@ func mustDeserializationError(err error) *DeserializationError {{
         blocks.append(_generate_has_all_properties())
         blocks.append(_generate_union_from_map())
 
-    if golang_common.uses_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_parse_set())
 
     for arity in intermediate.tuple_arities(symbol_table):

@@ -22,6 +22,7 @@ from aas_core_codegen.cpp.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 _MODEL_TYPE_LITERAL = "kModelType"
@@ -5488,7 +5489,7 @@ def generate_implementation(
         *_generate_no_instance_and_error_factories(),
     ]
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.extend(
             [
                 _generate_deserialize_json_value(),
@@ -5515,7 +5516,7 @@ def generate_implementation(
         blocks.append(_generate_deserialize_list())
         blocks.append(_generate_deserialize_list_of_instances())
 
-    has_set_properties = len(cpp_common.set_types_of_properties(symbol_table)) > 0
+    has_set_properties = intermediate_uses.set_properties(symbol_table)
 
     if has_set_properties:
         blocks.append(_generate_deserialize_set())
@@ -5673,7 +5674,7 @@ struct SerializationError {{
         blocks.append(_generate_deref())
         blocks.append(_generate_deref_identity())
 
-    if intermediate.uses_json_types(symbol_table):
+    if intermediate_uses.json_types(symbol_table):
         blocks.extend(
             [
                 _generate_serialize_json_value(),

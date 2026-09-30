@@ -17,6 +17,7 @@ from aas_core_codegen.golang.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_test_lstrip() -> Stripped:
@@ -129,7 +130,7 @@ func Test{function_name}Invalid(t *testing.T) {{
 # fmt: off
 @require(
     lambda symbol_table:
-    intermediate.uses_lstrip(symbol_table) or intermediate.uses_int(symbol_table)
+    intermediate_uses.lstrip_call(symbol_table) or intermediate_uses.int_call(symbol_table)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -145,10 +146,10 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     """
     test_blocks = []  # type: List[Stripped]
 
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         test_blocks.append(_generate_test_lstrip())
 
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         test_blocks.extend(_generate_test_parse_safe_int())
 
     import_lines = []  # type: List[str]

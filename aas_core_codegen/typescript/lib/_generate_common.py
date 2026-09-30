@@ -9,6 +9,7 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     Stripped,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.typescript import (
     common as typescript_common,
 )
@@ -759,7 +760,7 @@ export function base64UrlDecode(text: string): Either<Uint8Array, string> {{
     # not check whether ``indexOf`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
-    if intermediate.uses_len_slicing_or_find(symbol_table):
+    if intermediate_uses.len_slicing_or_find(symbol_table):
         blocks[len(blocks) - 1 : len(blocks) - 1] = [
             Stripped(
                 f"""\
@@ -930,19 +931,19 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # clutter the code otherwise. The helper lives in the common module so that
     # both the verification and the methods in the types can use it. It is exported
     # so that the clients can rely on it, and so that we can unit-test it.
-    if intermediate.uses_modulo(symbol_table):
+    if intermediate_uses.modulo(symbol_table):
         blocks.insert(len(blocks) - 1, FLOOR_MOD)
 
     # NOTE (mristin):
     # Analogous to the modulo, we add the helper only if the meta-model calls
     # the built-in ``int``.
-    if intermediate.uses_int(symbol_table):
+    if intermediate_uses.int_call(symbol_table):
         blocks.insert(len(blocks) - 1, PARSE_SAFE_INT)
 
     # NOTE (mristin):
     # Analogous to the modulo, we add the helpers only if the meta-model computes
     # an intersection or a difference of sets.
-    if intermediate.uses_set_operations(symbol_table):
+    if intermediate_uses.set_operations(symbol_table):
         for block in SET_OPERATIONS:
             blocks.insert(len(blocks) - 1, block)
 
@@ -957,7 +958,7 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # We need a helper which follows the Python implementation of ``str.lstrip``,
     # as TypeScript has no native equivalent which strips the given characters.
     # The helper is generated only for a meta-model which calls ``lstrip``.
-    if intermediate.uses_lstrip(symbol_table):
+    if intermediate_uses.lstrip_call(symbol_table):
         blocks.insert(
             len(blocks) - 1,
             Stripped(

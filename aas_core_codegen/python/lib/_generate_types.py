@@ -28,6 +28,7 @@ from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
     type_inference as intermediate_type_inference,
 )
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.python import (
     common as python_common,
@@ -1956,7 +1957,7 @@ def generate(
     if len(symbol_table.named_unions) > 0:
         typing_imports.append(Identifier("Union"))
 
-    uses_json_types = intermediate.uses_json_types(symbol_table)
+    uses_json_types = intermediate_uses.json_types(symbol_table)
     if uses_json_types:
         typing_imports.extend(
             [

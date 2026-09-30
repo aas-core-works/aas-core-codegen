@@ -5,6 +5,7 @@ from typing import TextIO, Sequence, Callable, Tuple, Optional, List
 
 from aas_core_codegen import specific_implementations, run, intermediate, python
 from aas_core_codegen.common import Error
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.python import (
     common as python_common,
     lib as python_lib,
@@ -293,7 +294,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # uses a JSON-able type (``JSONValue``, ``JSONArray`` or ``JSONObject[K]``)
     # -- unlike the other modules above, which are always generated regardless
     # of the model.
-    if intermediate.uses_json_types(context.symbol_table):
+    if intermediate_uses.json_types(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 module_rel_path / "jsonvalueverification.py",
@@ -336,7 +337,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # The tests of ``len``, slicing strings and ``find`` are only relevant for
     # a meta-model which uses them.
-    if intermediate.uses_len_slicing_or_find(context.symbol_table):
+    if intermediate_uses.len_slicing_or_find(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 tests_rel_path / "test_len_slicing_and_find.py",
@@ -347,7 +348,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # We test the arithmetic operations only if the meta-model uses them so that
     # the other SDKs, which need helper functions, test the very same cases.
-    if intermediate.uses_modulo(context.symbol_table) or intermediate.uses_abs(
+    if intermediate_uses.modulo(context.symbol_table) or intermediate_uses.abs_call(
         context.symbol_table
     ):
         rel_paths_generators = list(rel_paths_generators) + [
@@ -365,9 +366,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # We test ``str.lstrip`` and ``int`` only if the meta-model uses them so that
     # the other SDKs, which need helper functions, test the very same cases.
-    if intermediate.uses_lstrip(context.symbol_table) or intermediate.uses_int(
+    if intermediate_uses.lstrip_call(
         context.symbol_table
-    ):
+    ) or intermediate_uses.int_call(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 tests_rel_path / "test_lstrip_and_int.py",
