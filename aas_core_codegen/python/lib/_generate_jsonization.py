@@ -1333,7 +1333,7 @@ def _generate_concrete_class_from_jsonable(
                 for prop in cls.properties
             )
     ), (
-        "(mristin, 2022-10-03) We assume that the properties and constructor arguments "
+        "(mristin) We assume that the properties and constructor arguments "
         "are identical at this point. If this is not the case, we have to re-write the "
         "logic substantially! Please contact the developers if you see this."
     )

@@ -221,7 +221,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         # See: https://stackoverflow.com/questions/66435475/how-to-escape-the-backtick-character-in-a-rst-file
         text = element.astext()
         assert "`" not in text, (
-            "(mristin, 2022-09-08): Theoretically, we could escape the backticks "
+            "(mristin): Theoretically, we could escape the backticks "
             "properly here, see [how to escape backticks in markdown].\n\n"
             "However, this is not necessary as our meta-model is written in Python, "
             "and escaping backticks in ReST is not well-defined, see [how to escape "

@@ -583,14 +583,14 @@ def _parse_range_char(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]]:
 
     elif cursor.try_literal("\\s") or cursor.try_literal("\\S"):
         return None, Error(
-            "We do not handle whitespace escaping at the moment (2022-06-09), "
+            "We do not handle whitespace escaping at the moment, "
             "as the notion of a whitespace depends on the regex engine",
             cursor,
         )
 
     elif cursor.try_literal("\\d") or cursor.try_literal("\\D"):
         return None, Error(
-            "We do not handle digit escaping at the moment (2022-06-09), "
+            "We do not handle digit escaping at the moment, "
             "as the notion of a digit depends on the regex engine",
             cursor,
         )
@@ -816,21 +816,21 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
 
     elif cursor.try_literal("\\s") or cursor.try_literal("\\S"):
         return None, Error(
-            "We do not handle whitespace escaping at the moment (2022-06-09), "
+            "We do not handle whitespace escaping at the moment, "
             "as the notion of a whitespace depends on the regex engine",
             cursor,
         )
 
     elif cursor.try_literal("\\w") or cursor.try_literal("\\W"):
         return None, Error(
-            "We do not handle word escaping at the moment (2022-06-09), "
+            "We do not handle word escaping at the moment, "
             "as the notion of a word depends on the regex engine",
             cursor,
         )
 
     elif cursor.try_literal("\\d") or cursor.try_literal("\\D"):
         return None, Error(
-            "We do not handle digit escaping at the moment (2022-06-09), "
+            "We do not handle digit escaping at the moment, "
             "as the notion of a digit depends on the regex engine",
             cursor,
         )
@@ -929,7 +929,7 @@ def _parse_concatenation(
         elif cursor.try_literal("("):
             if cursor.try_literal("?"):
                 return None, Error(
-                    "At this moment (2022-06-09), we did not have time to implement "
+                    "At this moment, we did not have time to implement "
                     "the support for the directives in the groups (``?``). "
                     "Please inform the developers if you need this feature.",
                     cursor,
@@ -967,7 +967,7 @@ def _parse_concatenation(
                         f"Complementing character sets with a range {range_str} "
                         f"involving UTF-32 characters can not be supported, "
                         f"since we can not represent them in implementations relying "
-                        f"on UTF-16-only regex engines (such as C# as of 2022-06-11)",
+                        f"on UTF-16-only regex engines (such as C#)",
                         cursor,
                     )
 

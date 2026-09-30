@@ -1083,6 +1083,12 @@ class Test_java(_TestCase):
             case_name="conflict_between_constructor_arguments",
         )
 
+    def test_unexpected_conflict_between_property_and_method(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="conflict_between_property_and_method",
+        )
+
 
 class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:

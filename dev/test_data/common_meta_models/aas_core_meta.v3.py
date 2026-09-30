@@ -1112,7 +1112,7 @@ def ID_shorts_of_variables_are_unique(
     :paramref:`input_variables`, :paramref:`output_variables`
     and :paramref:`inoutput_variables` are unique.
     """
-    # NOTE (s-heppner, 2023-01-25):
+    # NOTE (s-heppner):
     # This implementation will not be transpiled, but is given here as reference.
     id_short_set = set()
     if input_variables is not None:
@@ -2015,7 +2015,7 @@ class Qualifier(Has_semantics):
     @implementation_specific
     @non_mutating
     def kind_or_default(self) -> "Qualifier_kind":
-        # NOTE (mristin, 2022-05-24):
+        # NOTE (mristin):
         # This implementation will not be transpiled, but is given here as reference.
         return self.kind if self.kind is not None else Qualifier_kind.Concept_qualifier
 
@@ -4053,7 +4053,7 @@ class Capability(Submodel_element):
         )
 
 
-# NOTE (mristin, 2022-08-19):
+# NOTE (mristin):
 # We make the following verification functions implementation-specific since the casts
 # are very clumsy to formalize and transpile in a readable way across languages.
 # For example, since Python does not have a null-coalescing operator, formalizing
@@ -4464,7 +4464,7 @@ class Reference_types(Enum):
     "with type Submodel element list is an integer number denoting the position in "
     "the array of the submodel element list."
 )
-# NOTE (mristin, 2022-07-10):
+# NOTE (mristin):
 # We can write AASd-127 in this simpler form assuming that AASd-126 ensures that
 # only the last key can be a fragment reference.
 @invariant(

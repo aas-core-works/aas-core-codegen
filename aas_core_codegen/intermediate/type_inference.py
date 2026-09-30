@@ -938,7 +938,7 @@ def _assignable(
 
     elif isinstance(target_type, EnumerationAsTypeTypeAnnotation):
         raise NotImplementedError(
-            "(mristin, 2022-02-04): Assigning enumeration-as-type to another "
+            "(mristin): Assigning enumeration-as-type to another "
             "enumeration-as-type is a very niche program logic. As we do not have "
             "a concrete example of such an assignment, we currently ignore this case "
             "in determining whether the assignment makes sense. When you have "

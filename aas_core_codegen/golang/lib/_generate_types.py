@@ -961,7 +961,7 @@ def _generate_constructor(
         if arg.default is not None:
             return None, Error(
                 arg.default.parsed.node,
-                f"(mristin, 2023-03-31): "
+                f"(mristin): "
                 f"The argument {arg.name!r} is a required argument, "
                 f"but the default value is also specified. At the moment when we "
                 f"wrote the generator, we did not know how this use case should "

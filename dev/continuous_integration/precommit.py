@@ -274,8 +274,6 @@ def main() -> int:
     if Step.DOCTEST in selects and Step.DOCTEST not in skips:
         print("Doctest'ing...")
 
-        # BEFORE-RELEASE (mristin):
-        #  Add ``{repo_root}/docs/source/**/*.rst`` as well here
         doc_files = ["README.rst"]
 
         exit_code = call_and_report(

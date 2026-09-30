@@ -94,7 +94,6 @@ def _verify_intra_structure_collisions(
         for prop in our_type.properties:
             prop_name = java_naming.property_name(prop.name)
             if prop_name in observed_member_names:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 errors.append(
                     Error(
                         prop.parsed.node,
@@ -132,7 +131,6 @@ def _verify_intra_structure_collisions(
             method_name = java_naming.method_name(method.name)
 
             if method_name in observed_member_names:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 errors.append(
                     Error(
                         method.parsed.node,
