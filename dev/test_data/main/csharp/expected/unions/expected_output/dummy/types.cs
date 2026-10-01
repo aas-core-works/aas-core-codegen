@@ -1295,26 +1295,33 @@ namespace dummy
 
             yield return ModelTypedProperty.Underlying;
 
-            foreach (var anItem in ListStructuralProperty)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_StructuralUnion(
+                    ListStructuralProperty))
             {
-                yield return anItem.Underlying;
+                yield return anItem;
             }
 
-            foreach (var anItem in ListMixedProperty)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_MixedUnion(
+                    ListMixedProperty))
             {
-                yield return anItem.Underlying;
+                yield return anItem;
             }
 
-            foreach (var anItem in ListModelTypedProperty)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_ModelTypedUnion(
+                    ListModelTypedProperty))
             {
-                yield return anItem.Underlying;
+                yield return anItem;
             }
 
-            yield return TupleProperty.Item1.Underlying;
-
-            yield return TupleProperty.Item2.Underlying;
-
-            yield return TupleProperty.Item3.Underlying;
+            foreach (
+                var anItem in Descent.DescendOnce_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                    TupleProperty))
+            {
+                yield return anItem;
+            }
 
             if (OptionalStructuralProperty != null)
             {
@@ -1333,9 +1340,11 @@ namespace dummy
 
             if (OptionalListOverlappingProperty != null)
             {
-                foreach (var anItem in OptionalListOverlappingProperty)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_OverlappingUnion(
+                        OptionalListOverlappingProperty))
                 {
-                    yield return anItem.Underlying;
+                    yield return anItem;
                 }
             }
         }
@@ -1369,59 +1378,30 @@ namespace dummy
                 yield return anItem;
             }
 
-            foreach (var anItem in ListStructuralProperty)
-            {
-                yield return anItem.Underlying;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Underlying.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            foreach (var anItem in ListMixedProperty)
-            {
-                yield return anItem.Underlying;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Underlying.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            foreach (var anItem in ListModelTypedProperty)
-            {
-                yield return anItem.Underlying;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Underlying.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            yield return TupleProperty.Item1.Underlying;
-
-            // Recurse
-            foreach (var anItem in TupleProperty.Item1.Underlying.Descend())
+            foreach (
+                var anItem in Descent.Descend_ListOf_StructuralUnion(
+                    ListStructuralProperty))
             {
                 yield return anItem;
             }
 
-            yield return TupleProperty.Item2.Underlying;
-
-            // Recurse
-            foreach (var anItem in TupleProperty.Item2.Underlying.Descend())
+            foreach (
+                var anItem in Descent.Descend_ListOf_MixedUnion(
+                    ListMixedProperty))
             {
                 yield return anItem;
             }
 
-            yield return TupleProperty.Item3.Underlying;
+            foreach (
+                var anItem in Descent.Descend_ListOf_ModelTypedUnion(
+                    ListModelTypedProperty))
+            {
+                yield return anItem;
+            }
 
-            // Recurse
-            foreach (var anItem in TupleProperty.Item3.Underlying.Descend())
+            foreach (
+                var anItem in Descent.Descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                    TupleProperty))
             {
                 yield return anItem;
             }
@@ -1461,15 +1441,11 @@ namespace dummy
 
             if (OptionalListOverlappingProperty != null)
             {
-                foreach (var anItem in OptionalListOverlappingProperty)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_OverlappingUnion(
+                        OptionalListOverlappingProperty))
                 {
-                    yield return anItem.Underlying;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Underlying.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                    yield return anItem;
                 }
             }
         }
@@ -1540,6 +1516,190 @@ namespace dummy
             OptionalListOverlappingProperty = optionalListOverlappingProperty;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_StructuralUnion(
+            List<StructuralUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+
+                // Recurse
+                foreach (var anItem in item.Underlying.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_StructuralUnion(
+            List<StructuralUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_MixedUnion(
+            List<MixedUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+
+                // Recurse
+                foreach (var anItem in item.Underlying.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_MixedUnion(
+            List<MixedUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ModelTypedUnion(
+            List<ModelTypedUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+
+                // Recurse
+                foreach (var anItem in item.Underlying.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ModelTypedUnion(
+            List<ModelTypedUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            (StructuralUnion, MixedUnion, ModelTypedUnion) that)
+        {
+            yield return that.Item1.Underlying;
+
+            // Recurse
+            foreach (var anItem in that.Item1.Underlying.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return that.Item2.Underlying;
+
+            // Recurse
+            foreach (var anItem in that.Item2.Underlying.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return that.Item3.Underlying;
+
+            // Recurse
+            foreach (var anItem in that.Item3.Underlying.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            (StructuralUnion, MixedUnion, ModelTypedUnion) that)
+        {
+            yield return that.Item1.Underlying;
+
+            yield return that.Item2.Underlying;
+
+            yield return that.Item3.Underlying;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_OverlappingUnion(
+            List<OverlappingUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+
+                // Recurse
+                foreach (var anItem in item.Underlying.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_OverlappingUnion(
+            List<OverlappingUnion> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+            }
+        }
+    }  // internal static class Descent
 }  // namespace dummy
 
 /*

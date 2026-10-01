@@ -196,7 +196,7 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Items)
+            foreach (var anItem in Descent.DescendOnce_ListOf_IItem(Items))
             {
                 yield return anItem;
             }
@@ -212,15 +212,9 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Items)
+            foreach (var anItem in Descent.Descend_ListOf_IItem(Items))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
 
             if (MaybeItem != null)
@@ -283,6 +277,48 @@ namespace dummy
             MaybeItem = maybeItem;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IItem(
+            List<IItem> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IItem(
+            List<IItem> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+    }  // internal static class Descent
 }  // namespace dummy
 
 /*
