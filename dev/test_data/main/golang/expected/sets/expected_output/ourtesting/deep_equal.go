@@ -35,67 +35,47 @@ func deepEqualSomething(
 
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualListOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for i := range thatTexts {
-		if thatTexts[i] != otherTexts[i] {
-			return false
-		}
 	}
 
 	thatNumbers := that.Numbers()
 	otherNumbers := other.Numbers()
-	if 
-		len(thatNumbers) !=
-		len(otherNumbers) {
+	if !deepEqualListOf_long(
+		thatNumbers,
+		otherNumbers,
+	) {
 		return false
-	}
-	for i := range thatNumbers {
-		if thatNumbers[i] != otherNumbers[i] {
-			return false
-		}
 	}
 
 	thatKinds := that.Kinds()
 	otherKinds := other.Kinds()
-	if 
-		len(thatKinds) !=
-		len(otherKinds) {
+	if !deepEqualListOf_Kind(
+		thatKinds,
+		otherKinds,
+	) {
 		return false
-	}
-	for i := range thatKinds {
-		if thatKinds[i] != otherKinds[i] {
-			return false
-		}
 	}
 
 	thatCodes := that.Codes()
 	otherCodes := other.Codes()
-	if 
-		len(thatCodes) !=
-		len(otherCodes) {
+	if !deepEqualListOf_string(
+		thatCodes,
+		otherCodes,
+	) {
 		return false
-	}
-	for i := range thatCodes {
-		if thatCodes[i] != otherCodes[i] {
-			return false
-		}
 	}
 
 	thatFlags := that.Flags()
 	otherFlags := other.Flags()
-	if 
-		len(thatFlags) !=
-		len(otherFlags) {
+	if !deepEqualListOf_bool(
+		thatFlags,
+		otherFlags,
+	) {
 		return false
-	}
-	for i := range thatFlags {
-		if thatFlags[i] != otherFlags[i] {
-			return false
-		}
 	}
 
 	thatOptionalTexts := that.OptionalTexts()
@@ -106,15 +86,11 @@ func deepEqualSomething(
 		return false
 	}
 	if thatOptionalTexts != nil {
-		if 
-			len(thatOptionalTexts) !=
-			len(otherOptionalTexts) {
+		if !deepEqualListOf_string(
+			thatOptionalTexts,
+			otherOptionalTexts,
+		) {
 			return false
-		}
-		for i := range thatOptionalTexts {
-			if thatOptionalTexts[i] != otherOptionalTexts[i] {
-				return false
-			}
 		}
 	}
 
@@ -143,67 +119,47 @@ func deepEqualCollection(
 ) bool {
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualSetOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for k := range thatTexts {
-		if _, ok := otherTexts[k]; !ok {
-			return false
-		}
 	}
 
 	thatNumbers := that.Numbers()
 	otherNumbers := other.Numbers()
-	if 
-		len(thatNumbers) !=
-		len(otherNumbers) {
+	if !deepEqualSetOf_long(
+		thatNumbers,
+		otherNumbers,
+	) {
 		return false
-	}
-	for k := range thatNumbers {
-		if _, ok := otherNumbers[k]; !ok {
-			return false
-		}
 	}
 
 	thatFlags := that.Flags()
 	otherFlags := other.Flags()
-	if 
-		len(thatFlags) !=
-		len(otherFlags) {
+	if !deepEqualSetOf_bool(
+		thatFlags,
+		otherFlags,
+	) {
 		return false
-	}
-	for k := range thatFlags {
-		if _, ok := otherFlags[k]; !ok {
-			return false
-		}
 	}
 
 	thatDirections := that.Directions()
 	otherDirections := other.Directions()
-	if 
-		len(thatDirections) !=
-		len(otherDirections) {
+	if !deepEqualSetOf_Direction(
+		thatDirections,
+		otherDirections,
+	) {
 		return false
-	}
-	for k := range thatDirections {
-		if _, ok := otherDirections[k]; !ok {
-			return false
-		}
 	}
 
 	thatCodes := that.Codes()
 	otherCodes := other.Codes()
-	if 
-		len(thatCodes) !=
-		len(otherCodes) {
+	if !deepEqualSetOf_string(
+		thatCodes,
+		otherCodes,
+	) {
 		return false
-	}
-	for k := range thatCodes {
-		if _, ok := otherCodes[k]; !ok {
-			return false
-		}
 	}
 
 	thatOptionalTexts := that.OptionalTexts()
@@ -214,15 +170,11 @@ func deepEqualCollection(
 		return false
 	}
 	if thatOptionalTexts != nil {
-		if 
-			len(thatOptionalTexts) !=
-			len(otherOptionalTexts) {
+		if !deepEqualSetOf_string(
+			thatOptionalTexts,
+			otherOptionalTexts,
+		) {
 			return false
-		}
-		for k := range thatOptionalTexts {
-			if _, ok := otherOptionalTexts[k]; !ok {
-				return false
-			}
 		}
 	}
 
@@ -234,15 +186,163 @@ func deepEqualCollection(
 		return false
 	}
 	if thatOptionalDirections != nil {
-		if 
-			len(thatOptionalDirections) !=
-			len(otherOptionalDirections) {
+		if !deepEqualSetOf_Direction(
+			thatOptionalDirections,
+			otherOptionalDirections,
+		) {
 			return false
 		}
-		for k := range thatOptionalDirections {
-			if _, ok := otherOptionalDirections[k]; !ok {
-				return false
-			}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_long(
+	that []int64,
+	other []int64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_Kind(
+	that []ourtypes.Kind,
+	other []ourtypes.Kind,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_bool(
+	that []bool,
+	other []bool,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualSetOf_string(
+	that map[string]struct{},
+	other map[string]struct{},
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k := range that {
+		if _, ok := other[k]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualSetOf_long(
+	that map[int64]struct{},
+	other map[int64]struct{},
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k := range that {
+		if _, ok := other[k]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualSetOf_bool(
+	that map[bool]struct{},
+	other map[bool]struct{},
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k := range that {
+		if _, ok := other[k]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualSetOf_Direction(
+	that map[ourtypes.Direction]struct{},
+	other map[ourtypes.Direction]struct{},
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k := range that {
+		if _, ok := other[k]; !ok {
+			return false
 		}
 	}
 

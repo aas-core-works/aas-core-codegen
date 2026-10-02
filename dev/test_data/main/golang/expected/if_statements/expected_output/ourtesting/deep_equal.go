@@ -123,18 +123,11 @@ func deepEqualContainer(
 		return false
 	}
 	if thatChildren != nil {
-		if 
-			len(thatChildren) !=
-			len(otherChildren) {
+		if !deepEqualListOf_IParent(
+			thatChildren,
+			otherChildren,
+		) {
 			return false
-		}
-		for i := range thatChildren {
-			if !DeepEqual(
-				thatChildren[i],
-				otherChildren[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -205,18 +198,33 @@ func deepEqualSomething(
 		return false
 	}
 	if thatParents != nil {
-		if 
-			len(thatParents) !=
-			len(otherParents) {
+		if !deepEqualListOf_IParent(
+			thatParents,
+			otherParents,
+		) {
 			return false
 		}
-		for i := range thatParents {
-			if !DeepEqual(
-				thatParents[i],
-				otherParents[i],
-			) {
-				return false
-			}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IParent(
+	that []ourtypes.IParent,
+	other []ourtypes.IParent,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
 		}
 	}
 

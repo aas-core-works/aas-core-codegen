@@ -17,15 +17,11 @@ func deepEqualFirst(
 ) bool {
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualListOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for i := range thatTexts {
-		if thatTexts[i] != otherTexts[i] {
-			return false
-		}
 	}
 
 	thatCount := that.Count()
@@ -59,15 +55,11 @@ func deepEqualSecond(
 ) bool {
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualListOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for i := range thatTexts {
-		if thatTexts[i] != otherTexts[i] {
-			return false
-		}
 	}
 
 	thatCount := that.Count()
@@ -93,6 +85,25 @@ func deepEqualSecond(
 	otherNote := other.Note()
 	if thatNote != otherNote {
 		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
 	}
 
 	return true

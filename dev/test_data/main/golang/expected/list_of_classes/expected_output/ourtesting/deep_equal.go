@@ -74,31 +74,61 @@ func deepEqualSomething(
 
 	thatSomeItems := that.SomeItems()
 	otherSomeItems := other.SomeItems()
-	if 
-		len(thatSomeItems) !=
-		len(otherSomeItems) {
+	if !deepEqualListOf_IAbstractItem(
+		thatSomeItems,
+		otherSomeItems,
+	) {
 		return false
 	}
-	for i := range thatSomeItems {
+
+	thatSomeSimples := that.SomeSimples()
+	otherSomeSimples := other.SomeSimples()
+	if !deepEqualListOf_ISimple(
+		thatSomeSimples,
+		otherSomeSimples,
+	) {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IAbstractItem(
+	that []ourtypes.IAbstractItem,
+	other []ourtypes.IAbstractItem,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
 		if !DeepEqual(
-			thatSomeItems[i],
-			otherSomeItems[i],
+			that[i],
+			other[i],
 		) {
 			return false
 		}
 	}
 
-	thatSomeSimples := that.SomeSimples()
-	otherSomeSimples := other.SomeSimples()
-	if 
-		len(thatSomeSimples) !=
-		len(otherSomeSimples) {
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ISimple(
+	that []ourtypes.ISimple,
+	other []ourtypes.ISimple,
+) bool {
+	if len(that) != len(other) {
 		return false
 	}
-	for i := range thatSomeSimples {
+
+	for i := range that {
 		if !DeepEqual(
-			thatSomeSimples[i],
-			otherSomeSimples[i],
+			that[i],
+			other[i],
 		) {
 			return false
 		}

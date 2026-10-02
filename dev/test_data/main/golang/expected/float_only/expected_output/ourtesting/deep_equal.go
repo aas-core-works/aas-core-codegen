@@ -36,24 +36,36 @@ func deepEqualSomething(
 
 	thatSomeFloats := that.SomeFloats()
 	otherSomeFloats := other.SomeFloats()
-	if 
-		len(thatSomeFloats) !=
-		len(otherSomeFloats) {
+	if !deepEqualListOf_double(
+		thatSomeFloats,
+		otherSomeFloats,
+	) {
 		return false
-	}
-	for i := range thatSomeFloats {
-		if thatSomeFloats[i] != otherSomeFloats[i] {
-			return false
-		}
 	}
 
 	thatSomePair := that.SomePair()
 	otherSomePair := other.SomePair()
-	if thatSomePair.Item1 != otherSomePair.Item1 {
+	if thatSomePair != otherSomePair {
 		return false
 	}
-	if thatSomePair.Item2 != otherSomePair.Item2 {
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_double(
+	that []float64,
+	other []float64,
+) bool {
+	if len(that) != len(other) {
 		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
 	}
 
 	return true
