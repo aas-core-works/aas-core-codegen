@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,46 +15,57 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformItem(
                 Our.IItem that,
                 Our.IClass other)
             {
-                if (!(other is Our.Item casted))
+                if (!(other is Our.Item casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.Name == casted.Name
-                    && that.OptionalText == casted.OptionalText);
+                    && ((that.OptionalText != null && casted.OptionalText != null)
+                        ? that.OptionalText == casted.OptionalText
+                        : that.OptionalText == null && casted.OptionalText == null));
             }
 
             public override bool TransformChildA(
                 Our.IChildA that,
                 Our.IClass other)
             {
-                if (!(other is Our.ChildA casted))
+                if (!(other is Our.ChildA casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.OptionalText == casted.OptionalText
+                    ((that.OptionalText != null && casted.OptionalText != null)
+                        ? that.OptionalText == casted.OptionalText
+                        : that.OptionalText == null && casted.OptionalText == null)
                     && that.AOnly == casted.AOnly);
             }
 
@@ -62,13 +73,15 @@ namespace dummy.Tests
                 Our.IChildB that,
                 Our.IClass other)
             {
-                if (!(other is Our.ChildB casted))
+                if (!(other is Our.ChildB casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.OptionalText == casted.OptionalText
+                    ((that.OptionalText != null && casted.OptionalText != null)
+                        ? that.OptionalText == casted.OptionalText
+                        : that.OptionalText == null && casted.OptionalText == null)
                     && that.BOnly == casted.BOnly);
             }
 
@@ -76,21 +89,19 @@ namespace dummy.Tests
                 Our.IContainer that,
                 Our.IClass other)
             {
-                if (!(other is Our.Container casted))
+                if (!(other is Our.Container casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.OptionalText == casted.OptionalText
+                    ((that.OptionalText != null && casted.OptionalText != null)
+                        ? that.OptionalText == casted.OptionalText
+                        : that.OptionalText == null && casted.OptionalText == null)
                     && ((that.Children != null && casted.Children != null)
-                        ? that.Children.Count == casted.Children.Count
-                            && (
-                                that.Children
-                                    .Zip(
-                                        casted.Children,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IParent(
+                            that.Children,
+                            casted.Children)
                         : that.Children == null && casted.Children == null));
             }
 
@@ -98,7 +109,7 @@ namespace dummy.Tests
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -113,22 +124,42 @@ namespace dummy.Tests
                         casted.Item)
                     && ((that.OptionalParent != null && casted.OptionalParent != null)
                         ? Transform(
-                                that.OptionalParent,
-                                casted.OptionalParent)
+                            that.OptionalParent,
+                            casted.OptionalParent)
                         : that.OptionalParent == null && casted.OptionalParent == null)
                     && ((that.Parents != null && casted.Parents != null)
-                        ? that.Parents.Count == casted.Parents.Count
-                            && (
-                                that.Parents
-                                    .Zip(
-                                        casted.Parents,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IParent(
+                            that.Parents,
+                            casted.Parents)
                         : that.Parents == null && casted.Parents == null));
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_IParent(
+                List<Our.IParent> that,
+                List<Our.IParent> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool ItemShallowEquals(
             Our.Item that,
@@ -174,41 +205,6 @@ namespace dummy.Tests
                 && that.Parents == other.Parents);
         }
 
-        private static bool ItemDeepEquals(
-            Our.Item that,
-            Our.Item other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ChildADeepEquals(
-            Our.ChildA that,
-            Our.ChildA other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ChildBDeepEquals(
-            Our.ChildB that,
-            Our.ChildB other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ContainerDeepEquals(
-            Our.Container that,
-            Our.Container other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_Item_shallow_copy()
         {
@@ -232,7 +228,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ItemDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Item");
         }  // public void Test_Item_deep_copy
@@ -260,7 +256,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ChildADeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ChildA");
         }  // public void Test_ChildA_deep_copy
@@ -288,7 +284,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ChildBDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ChildB");
         }  // public void Test_ChildB_deep_copy
@@ -316,7 +312,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ContainerDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Container");
         }  // public void Test_Container_deep_copy
@@ -344,7 +340,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy

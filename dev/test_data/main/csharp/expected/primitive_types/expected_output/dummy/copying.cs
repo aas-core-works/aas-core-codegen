@@ -71,7 +71,7 @@ namespace dummy
                     that.SomeInt,
                     that.SomeFloat,
                     that.SomeString,
-                    that.SomeBytes
+                    (byte[])that.SomeBytes.Clone()
                 );
             }
         }  // internal class DeepCopier

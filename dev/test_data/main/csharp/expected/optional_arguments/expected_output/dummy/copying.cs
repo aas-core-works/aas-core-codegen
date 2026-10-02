@@ -84,13 +84,6 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                List<string>? theOptionalTexts = null;
-                if (that.OptionalTexts != null)
-                {
-                    theOptionalTexts = new List<string>(
-                        that.OptionalTexts);
-                }
-
                 return new Our.Something(
                     Deep(that.Item),
                     that.OptionalText,
@@ -98,7 +91,9 @@ namespace dummy
                     (that.OptionalItem != null)
                         ? Deep(that.OptionalItem)
                         : null,
-                    theOptionalTexts,
+                    (that.OptionalTexts != null)
+                        ? new List<string>(that.OptionalTexts)
+                        : null,
                     that.OptionalKind
                 );
             }

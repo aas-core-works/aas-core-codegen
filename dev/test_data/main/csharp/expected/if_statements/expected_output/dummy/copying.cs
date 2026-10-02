@@ -44,6 +44,21 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IParent> Deep_ListOf_IParent(
+            List<IParent> that)
+        {
+            var result = new List<IParent>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -126,20 +141,11 @@ namespace dummy
                 Our.IContainer that
             )
             {
-                List<IParent>? theChildren = null;
-                if (that.Children != null)
-                {
-                    theChildren = new List<IParent>(
-                        that.Children.Count);
-                    foreach (var item in that.Children)
-                    {
-                        theChildren.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Container(
                     that.OptionalText,
-                    theChildren
+                    (that.Children != null)
+                        ? Deep_ListOf_IParent(that.Children)
+                        : null
                 );
             }
 
@@ -147,17 +153,6 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                List<IParent>? theParents = null;
-                if (that.Parents != null)
-                {
-                    theParents = new List<IParent>(
-                        that.Parents.Count);
-                    foreach (var item in that.Parents)
-                    {
-                        theParents.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Something(
                     that.Kind,
                     that.Text,
@@ -167,7 +162,9 @@ namespace dummy
                     (that.OptionalParent != null)
                         ? Deep(that.OptionalParent)
                         : null,
-                    theParents
+                    (that.Parents != null)
+                        ? Deep_ListOf_IParent(that.Parents)
+                        : null
                 );
             }
         }  // internal class DeepCopier

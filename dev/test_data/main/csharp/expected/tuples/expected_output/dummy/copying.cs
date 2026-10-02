@@ -44,6 +44,46 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static (IAbstractItem, IAbstractItem) Deep_TupleOf2_IAbstractItem_IAbstractItem(
+            (IAbstractItem, IAbstractItem) that)
+        {
+            return (
+                Deep(that.Item1),
+                Deep(that.Item2)
+            );
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static (long, ISomeItem, IAbstractItem, ISomeItem, long, Result) Deep_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+            (long, ISomeItem, IAbstractItem, ISomeItem, long, Result) that)
+        {
+            return (
+                that.Item1,
+                Deep(that.Item2),
+                Deep(that.Item3),
+                Deep(that.Item4),
+                that.Item5,
+                that.Item6
+            );
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static (string, IAbstractItem) Deep_TupleOf2_string_IAbstractItem(
+            (string, IAbstractItem) that)
+        {
+            return (
+                that.Item1,
+                Deep(that.Item2)
+            );
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -98,27 +138,11 @@ namespace dummy
             )
             {
                 return new Our.Something(
-                    (
-                        that.Pair.Item1,
-                        that.Pair.Item2
-                    ),
-                    (
-                        Deep(that.Items.Item1),
-                        Deep(that.Items.Item2)
-                    ),
-                    (
-                        that.Tricky.Item1,
-                        Deep(that.Tricky.Item2),
-                        Deep(that.Tricky.Item3),
-                        Deep(that.Tricky.Item4),
-                        that.Tricky.Item5,
-                        that.Tricky.Item6
-                    ),
+                    that.Pair,
+                    Deep_TupleOf2_IAbstractItem_IAbstractItem(that.Items),
+                    Deep_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(that.Tricky),
                     (that.OptionalPair.HasValue)
-                        ? (
-                            that.OptionalPair.Value.Item1,
-                            Deep(that.OptionalPair.Value.Item2)
-                        )
+                        ? Deep_TupleOf2_string_IAbstractItem(that.OptionalPair.Value)
                         : ((string, IAbstractItem)?)null
                 );
             }

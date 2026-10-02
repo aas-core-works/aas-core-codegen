@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import List, Optional
+from typing import List, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -15,6 +15,7 @@ from aas_core_codegen.common import (
 )
 from aas_core_codegen.csharp import common as csharp_common, naming as csharp_naming
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II, INDENT3 as III
+from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
 def _generate_shallow_equals(cls: intermediate.ConcreteClass) -> Stripped:
@@ -54,379 +55,241 @@ private static bool {cls_name_csharp}ShallowEquals(
     )
 
 
-def _generate_transform_as_deep_equals(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the transform method that checks for deep equality."""
-    cls_name = csharp_naming.class_name(cls.name)
+def _check_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of the ``DeepCopyChecker`` checking the copy of ``type_anno``.
 
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.csharp.common.type_moniker`), so two different
+    containers never share a method.
+    """
+    return Identifier(f"Check_{csharp_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno: not isinstance(type_anno, intermediate.OptionalTypeAnnotation),
+    "The optionals are unwrapped at the properties, and nested optionals "
+    "have been refused in intermediate._translate._verify_only_simple_type_patterns",
+)
+def _generate_check_expr(
+    that_expr: str, other_expr: str, type_anno: intermediate.TypeAnnotationUnion
+) -> Stripped:
+    """
+    Generate the expression checking that ``other_expr`` is a deep copy of ``that_expr``.
+
+    A container is delegated to its method in the ``DeepCopyChecker``, which
+    checks only one level and calls the checks of its items by name.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return Stripped(
+            f"""\
+BytesEqualButDistinct(
+{I}{that_expr},
+{I}{other_expr})"""
+        )
+
+    if primitive_type is not None or (
+        isinstance(type_anno, intermediate.OurTypeAnnotation)
+        and isinstance(type_anno.our_type, intermediate.Enumeration)
+    ):
+        return Stripped(f"{that_expr} == {other_expr}")
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # Only the classes and the named unions are left here. A named union has
+        # its own ``Transform`` overload (see
+        # :py:func:`_generate_union_transform_helper`), so it is checked exactly
+        # like a class instance.
+        return Stripped(
+            f"""\
+Transform(
+{I}{that_expr},
+{I}{other_expr})"""
+        )
+
+    if isinstance(
+        type_anno,
+        (
+            intermediate.JsonValueTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+            intermediate.JsonObjectTypeAnnotation,
+        ),
+    ):
+        return Stripped(
+            f"""\
+JsonNodesEqualButDistinct(
+{I}{that_expr},
+{I}{other_expr})"""
+        )
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Stripped(
+            f"""\
+{_check_container_name(type_anno)}(
+{I}{that_expr},
+{I}{other_expr})"""
+        )
+
+    raise AssertionError(f"Unexpected type annotation: {type_anno}")
+
+
+def _generate_check_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the method of the ``DeepCopyChecker`` for ``type_anno``."""
+    body: Stripped
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_check = _generate_check_expr(
+            that_expr="that[i]", other_expr="other[i]", type_anno=type_anno.items
+        )
+
+        body = Stripped(
+            f"""\
+if (ReferenceEquals(that, other) || that.Count != other.Count)
+{{
+{I}return false;
+}}
+
+for (int i = 0; i < that.Count; i++)
+{{
+{I}if (!(
+{II}{indent_but_first_line(item_check, II)}))
+{I}{{
+{II}return false;
+{I}}}
+}}
+
+return true;"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # A set holds only primitives, constrained primitives and enumeration
+        # literals, which all compare by value.
+        assert (
+            intermediate.try_primitive_type(type_anno.items)
+            is not intermediate.PrimitiveType.BYTEARRAY
+        ), f"Unexpected set of byte arrays: {type_anno}"
+
+        body = Stripped(
+            "return !ReferenceEquals(that, other) && that.SetEquals(other);"
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # A tuple is a ``System.ValueTuple``, which is always copied by value, so
+        # we check only its items.
+        item_checks = "\n&& ".join(
+            _generate_check_expr(
+                that_expr=f"that.Item{i + 1}",
+                other_expr=f"other.Item{i + 1}",
+                type_anno=item,
+            )
+            for i, item in enumerate(type_anno.items)
+        )
+
+        body = Stripped(
+            f"""\
+return (
+{I}{indent_but_first_line(item_checks, I)});"""
+        )
+
+    else:
+        assert_never(type_anno)
+
+    value_type = csharp_common.generate_type(
+        type_anno, our_type_qualifier=Stripped("Our")
+    )
+
+    return Stripped(
+        f"""\
+private bool {_check_container_name(type_anno)}(
+{I}{value_type} that,
+{I}{value_type} other)
+{{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
+def _generate_transform_as_check(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the transform method checking the deep copy of ``cls``."""
     exprs = []  # type: List[Stripped]
 
     for prop in cls.properties:
-        optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
         prop_name = csharp_naming.property_name(prop.name)
 
-        expr = None  # type: Optional[Stripped]
-
-        primitive_type = intermediate.try_primitive_type(type_anno)
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-            isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
-        ):
-            assert primitive_type is not None
-            if (
-                primitive_type is intermediate.PrimitiveType.BOOL
-                or primitive_type is intermediate.PrimitiveType.INT
-                or primitive_type is intermediate.PrimitiveType.FLOAT
-                or primitive_type is intermediate.PrimitiveType.STR
-            ):
-                expr = Stripped(f"that.{prop_name} == casted.{prop_name}")
-            elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                expr = Stripped(
-                    f"""\
-ByteSpansEqual(
-{I}that.{prop_name},
-{I}casted.{prop_name})"""
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            exprs.append(
+                _generate_check_expr(
+                    that_expr=f"that.{prop_name}",
+                    other_expr=f"casted.{prop_name}",
+                    type_anno=prop.type_annotation,
                 )
-            else:
-                # noinspection PyTypeChecker
-                assert_never(primitive_type)
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                expr = Stripped(f"that.{prop_name} == casted.{prop_name}")
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                raise AssertionError("Expected to handle this case above")
-            elif isinstance(
-                type_anno.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            ):
-                # A named union has its own ``Transform`` overload in the
-                # ``DeepEqualiser`` (see
-                # :py:func:`_generate_union_transform_helper`), so it
-                # can be compared exactly like a class instance here.
-                expr = Stripped(
-                    f"""\
-Transform(
-{I}that.{prop_name},
-{I}casted.{prop_name})"""
-                )
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-            if items_primitive_type is not None:
-                # NOTE (mristin):
-                # Mypy 2.1.0 still struggled with ``in`` operator.
-                # pylint: disable=consider-using-in
-                if (
-                    items_primitive_type == intermediate.PrimitiveType.BOOL
-                    or items_primitive_type == intermediate.PrimitiveType.INT
-                    or items_primitive_type == intermediate.PrimitiveType.FLOAT
-                    or items_primitive_type == intermediate.PrimitiveType.STR
-                ):
-                    expr = Stripped(
-                        f"""\
-that.{prop_name}.SequenceEqual(
-{I}casted.{prop_name})"""
-                    )
-                elif items_primitive_type == intermediate.PrimitiveType.BYTEARRAY:
-                    expr = Stripped(
-                        f"""\
-that.{prop_name}.Count == casted.{prop_name}.Count
-&& (
-{I}that.{prop_name}
-{II}.Zip(
-{III}casted.{prop_name},
-{III}(left, right) => ByteSpansEqual(left, right))
-{II}.All(item => item))"""
-                    )
-                else:
-                    assert_never(items_primitive_type)
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                    expr = Stripped(
-                        f"""\
-that.{prop_name}.SequenceEqual(
-{I}casted.{prop_name})"""
-                    )
-                elif isinstance(
-                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
-                ):
-                    raise AssertionError("Expected to handle this case above")
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # A named union has its own ``Transform`` overload in the
-                    # ``DeepEqualiser`` (see
-                    # :py:func:`_generate_union_transform_helper`), so
-                    # it can be passed on as a bare method group just like
-                    # a class item.
-                    expr = Stripped(
-                        f"""\
-that.{prop_name}.Count == casted.{prop_name}.Count
-&& (
-{I}that.{prop_name}
-{II}.Zip(
-{III}casted.{prop_name},
-{III}Transform)
-{II}.All(item => item))"""
-                    )
-                else:
-                    assert_never(type_anno.items.our_type)
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # We compare the canonical JSON text of each item instead of
-                # the ``Nodes.JsonNode`` instances themselves, which would
-                # only ever be reference-equal -- the same reasoning as for
-                # a JSON-able property, see further below.
-                expr = Stripped(
-                    f"""\
-that.{prop_name}.Count == casted.{prop_name}.Count
-&& (
-{I}that.{prop_name}
-{II}.Zip(
-{III}casted.{prop_name},
-{III}(left, right) => left.ToJsonString() == right.ToJsonString())
-{II}.All(item => item))"""
-                )
-
-            else:
-                raise NotImplementedError(
-                    f"(mristin): We handle only lists of atomic values in the deep "
-                    f"equality checks at the moment. The meta-model does not contain "
-                    f"any other lists, so we wanted to keep the code as simple as "
-                    f"possible, and avoid unrolling. Please contact the developers "
-                    f"if you need this feature. The class in question was {cls.name!r} "
-                    f"and the property {prop.name!r}."
-                )
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_exprs = []  # type: List[Stripped]
-
-            # NOTE (mristin):
-            # A tuple is a ``System.ValueTuple``, so an optional tuple is
-            # a ``System.Nullable`` which has to be unwrapped before we can access
-            # its items.
-            if optional:
-                that_expr = Stripped(f"that.{prop_name}.Value")
-                casted_expr = Stripped(f"casted.{prop_name}.Value")
-            else:
-                that_expr = Stripped(f"that.{prop_name}")
-                casted_expr = Stripped(f"casted.{prop_name}")
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                assert isinstance(
-                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-                ), (
-                    f"Expected an atomic tuple item (a primitive, a constrained "
-                    f"primitive, an enumeration, a class or a named union), "
-                    f"but got {item_type_anno}. "
-                    f"This should have already been verified in "
-                    f"intermediate._translate._verify_only_simple_type_patterns."
-                )
-
-                item_that = f"{that_expr}.Item{i + 1}"
-                item_casted = f"{casted_expr}.Item{i + 1}"
-
-                item_primitive_type = intermediate.try_primitive_type(item_type_anno)
-
-                if item_primitive_type is not None:
-                    # NOTE (mristin):
-                    # Mypy 2.1.0 still struggled with ``in`` operator.
-                    # pylint: disable=consider-using-in
-                    if (
-                        item_primitive_type == intermediate.PrimitiveType.BOOL
-                        or item_primitive_type == intermediate.PrimitiveType.INT
-                        or item_primitive_type == intermediate.PrimitiveType.FLOAT
-                        or item_primitive_type == intermediate.PrimitiveType.STR
-                    ):
-                        item_exprs.append(Stripped(f"{item_that} == {item_casted}"))
-                    elif item_primitive_type == intermediate.PrimitiveType.BYTEARRAY:
-                        item_exprs.append(
-                            Stripped(
-                                f"""\
-ByteSpansEqual(
-{I}{item_that},
-{I}{item_casted})"""
-                            )
-                        )
-                    else:
-                        assert_never(item_primitive_type)
-                elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                    if isinstance(item_type_anno.our_type, intermediate.Enumeration):
-                        item_exprs.append(Stripped(f"{item_that} == {item_casted}"))
-                    elif isinstance(
-                        item_type_anno.our_type, intermediate.ConstrainedPrimitive
-                    ):
-                        raise AssertionError("Expected to handle this case above")
-                    elif isinstance(
-                        item_type_anno.our_type,
-                        (
-                            intermediate.AbstractClass,
-                            intermediate.ConcreteClass,
-                            intermediate.NamedUnion,
-                        ),
-                    ):
-                        # A named union has its own ``Transform`` overload in
-                        # the ``DeepEqualiser`` (see
-                        # :py:func:`_generate_union_transform_helper`),
-                        # so it can be compared exactly like a class instance
-                        # here.
-                        item_exprs.append(
-                            Stripped(
-                                f"""\
-Transform(
-{I}{item_that},
-{I}{item_casted})"""
-                            )
-                        )
-                    else:
-                        assert_never(item_type_anno.our_type)
-
-                elif isinstance(
-                    item_type_anno,
-                    (
-                        intermediate.JsonValueTypeAnnotation,
-                        intermediate.JsonArrayTypeAnnotation,
-                        intermediate.JsonObjectTypeAnnotation,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # We compare the canonical JSON text instead of the
-                    # ``Nodes.JsonNode`` instances themselves, which would
-                    # only ever be reference-equal -- the same reasoning as
-                    # for a JSON-able property, see further below.
-                    item_exprs.append(
-                        Stripped(
-                            f"""\
-{item_that}.ToJsonString()
-{I}== {item_casted}.ToJsonString()"""
-                        )
-                    )
-
-                else:
-                    # NOTE (mristin):
-                    # This branch is unreachable in practice (``item_type_anno`` is
-                    # a ``PrimitiveTypeAnnotation`` here, and ``try_primitive_type``
-                    # always resolves those to a non-``None`` primitive type), but
-                    # mypy can not correlate the ``try_primitive_type`` call with
-                    # the ``isinstance`` narrowing above, so we can not use
-                    # ``assert_never`` here.
-                    raise AssertionError(
-                        f"Expected to handle this case above: {item_type_anno}"
-                    )
-
-            item_exprs_writer = io.StringIO()
-            item_exprs_writer.write("(")
-            for i, item_expr in enumerate(item_exprs):
-                item_exprs_writer.write("\n")
-                if i > 0:
-                    item_exprs_writer.write(
-                        f"{I}&& {indent_but_first_line(item_expr, I)}"
-                    )
-                else:
-                    item_exprs_writer.write(f"{I}{indent_but_first_line(item_expr, I)}")
-            item_exprs_writer.write(")")
-
-            expr = Stripped(item_exprs_writer.getvalue())
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # We compare the canonical JSON text instead of the
-            # ``Nodes.JsonNode`` instances themselves, which would only ever
-            # be reference-equal (never overridden to compare by value).
-            expr = Stripped(
-                f"""\
-that.{prop_name}.ToJsonString() == casted.{prop_name}.ToJsonString()"""
             )
+            continue
 
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives, constrained primitives and enumeration
-            # literals, which all compare by value.
-            expr = Stripped(f"that.{prop_name}.SetEquals(casted.{prop_name})")
+        type_anno = prop.type_annotation.value
 
+        # NOTE (mristin):
+        # An optional of a value type is a ``System.Nullable``, which is probed
+        # with ``HasValue`` and unwrapped with ``Value``.
+        if csharp_common.is_value_type(type_anno):
+            if not isinstance(type_anno, intermediate.TupleTypeAnnotation):
+                # NOTE (mristin):
+                # A ``System.Nullable`` of a primitive or an enumeration compares by
+                # value, including the absence.
+                exprs.append(Stripped(f"that.{prop_name} == casted.{prop_name}"))
+                continue
+
+            that_present = f"that.{prop_name}.HasValue"
+            casted_present = f"casted.{prop_name}.HasValue"
+            that_absent = f"!that.{prop_name}.HasValue"
+            casted_absent = f"!casted.{prop_name}.HasValue"
+            that_value = f"that.{prop_name}.Value"
+            casted_value = f"casted.{prop_name}.Value"
         else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
+            that_present = f"that.{prop_name} != null"
+            casted_present = f"casted.{prop_name} != null"
+            that_absent = f"that.{prop_name} == null"
+            casted_absent = f"casted.{prop_name} == null"
+            that_value = f"that.{prop_name}"
+            casted_value = f"casted.{prop_name}"
 
-        if optional and primitive_type is None:
-            # NOTE (mristin):
-            # An optional of a value type, an enumeration or a tuple here, is
-            # a ``System.Nullable``, which is probed with ``HasValue`` instead of
-            # being compared against ``null``.
-            if csharp_common.is_value_type(type_anno):
-                that_check = f"that.{prop_name}.HasValue"
-                casted_check = f"casted.{prop_name}.HasValue"
-                that_absent = f"!that.{prop_name}.HasValue"
-                casted_absent = f"!casted.{prop_name}.HasValue"
-            else:
-                that_check = f"that.{prop_name} != null"
-                casted_check = f"casted.{prop_name} != null"
-                that_absent = f"that.{prop_name} == null"
-                casted_absent = f"casted.{prop_name} == null"
+        check = _generate_check_expr(
+            that_expr=that_value, other_expr=casted_value, type_anno=type_anno
+        )
 
-            # NOTE (mristin):
-            # The conditional has to be parenthesized. Otherwise, it would swallow
-            # the conjunction of all the preceding properties into its condition
-            # as the conditional operator binds weaker than the conjunction.
-            expr = Stripped(
+        # NOTE (mristin):
+        # The conditional has to be parenthesized. Otherwise, it would swallow
+        # the conjunction of all the preceding properties into its condition
+        # as the conditional operator binds weaker than the conjunction.
+        exprs.append(
+            Stripped(
                 f"""\
-(({that_check} && {casted_check})
-{I}? {indent_but_first_line(expr, II)}
+(({that_present} && {casted_present})
+{I}? {indent_but_first_line(check, I)}
 {I}: {that_absent} && {casted_absent})"""
             )
+        )
 
-        exprs.append(expr)
-
-    body_writer = io.StringIO()
     if len(exprs) == 0:
         # NOTE (mristin):
-        # There are no properties to compare, so the instances are trivially
-        # deeply equal as soon as we know ``other`` is of the expected concrete
-        # type (which we already checked above).
-        body_writer.write("return true;")
+        # There are no properties to compare, so the copy is trivially deep as soon
+        # as it is a distinct instance of the expected concrete type.
+        return_statement = Stripped("return true;")
     else:
-        body_writer.write("return (")
-        for i, expr in enumerate(exprs):
-            body_writer.write("\n")
-            if i > 0:
-                body_writer.write(f"{I}&& {indent_but_first_line(expr, I)}")
-            else:
-                body_writer.write(f"{I}{indent_but_first_line(expr, I)}")
+        exprs_joined = "\n&& ".join(exprs)
+        return_statement = Stripped(
+            f"""\
+return (
+{I}{indent_but_first_line(exprs_joined, I)});"""
+        )
 
-        body_writer.write(");")
-
+    cls_name = csharp_naming.class_name(cls.name)
     interface_name = csharp_naming.interface_name(cls.name)
     transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
@@ -436,12 +299,12 @@ public override bool {transform_name}(
 {I}Our.{interface_name} that,
 {I}Our.IClass other)
 {{
-{I}if (!(other is Our.{cls_name} casted))
+{I}if (!(other is Our.{cls_name} casted) || ReferenceEquals(that, other))
 {I}{{
 {II}return false;
 {I}}}
 
-{I}{indent_but_first_line(body_writer.getvalue(), I)}
+{I}{indent_but_first_line(return_statement, I)}
 }}"""
     )
 
@@ -453,9 +316,8 @@ def _generate_union_transform_helper() -> Stripped:
     A named union is not itself an ``Our.IClass``, so it can not be dispatched
     by the inherited, ``Our.IClass``-typed ``Transform`` overload. We add
     this overload, single-purpose and non-virtual, so that call sites can
-    keep passing ``Transform`` around as a plain method group or calling it
-    directly, regardless of whether the value at hand is a class instance or
-    a named union.
+    keep calling ``Transform`` directly, regardless of whether the value at
+    hand is a class instance or a named union.
 
     Dispatching over the common, non-generic ``Our.IUnion`` (see ``generate()``
     in ``_generate_types.py``) instead of the union's own type means we need
@@ -475,65 +337,94 @@ private bool Transform(Our.IUnion that, Our.IUnion other)
     )
 
 
-def _generate_deep_equals_transformer(
+def _generate_deep_copy_checker(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the transformer that checks for deep equality."""
+    """
+    Generate the transformer checking that a deep copy holds its own objects.
+
+    The copy has to equal the original by value, while it must share none of
+    the mutable objects with it, *i.e.*, no instance, list, set, byte array
+    or JSON node.
+    """
     blocks = [
         Stripped(
             f"""\
-/// <summary>Compare two byte spans for equal content.</summary>
-/// <remarks>
-/// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-/// See: https://stackoverflow.com/a/48599119/1600678
-/// </remarks>
-private static bool ByteSpansEqual(
-{I}System.ReadOnlySpan<byte> that,
-{I}System.ReadOnlySpan<byte> other)
+private static bool BytesEqualButDistinct(
+{I}byte[] that,
+{I}byte[] other)
 {{
-{I}return that.SequenceEqual(other);
+{I}// NOTE (mristin):
+{I}// A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+{I}// See: https://stackoverflow.com/a/48599119/1600678
+{I}return (
+{II}!ReferenceEquals(that, other)
+{II}&& ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
 }}"""
         ),
     ]  # type: List[Stripped]
 
+    if intermediate_uses.json_types(symbol_table):
+        blocks.append(
+            Stripped(
+                f"""\
+private static bool JsonNodesEqualButDistinct(
+{I}Nodes.JsonNode that,
+{I}Nodes.JsonNode other)
+{{
+{I}// NOTE (mristin):
+{I}// A JsonNode compares only by reference, so we compare the canonical
+{I}// JSON text.
+{I}return (
+{II}!ReferenceEquals(that, other)
+{II}&& that.ToJsonString() == other.ToJsonString());
+}}"""
+            )
+        )
+
     for concrete_cls in symbol_table.concrete_classes:
-        blocks.append(_generate_transform_as_deep_equals(cls=concrete_cls))
+        blocks.append(_generate_transform_as_check(cls=concrete_cls))
 
     if len(symbol_table.named_unions) > 0:
         blocks.append(_generate_union_transform_helper())
 
-    writer = io.StringIO()
-    writer.write(
-        f"""\
-internal class DeepEqualiser
-{I}: Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
-{{
-"""
-    )
+    observed_monikers = set()  # type: Set[str]
+    for concrete_cls in symbol_table.concrete_classes:
+        for prop in concrete_cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
 
-    for i, block in enumerate(blocks):
-        if i > 0:
-            writer.write("\n\n")
+                moniker = csharp_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
 
-        writer.write(textwrap.indent(block, I))
+                observed_monikers.add(moniker)
 
-    writer.write("\n}  // internal class DeepEqualiser")
+                blocks.append(_generate_check_container(type_anno))
 
-    return Stripped(writer.getvalue())
-
-
-def _generate_deep_equals(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the code for a static deep ``Equals`` method."""
-    cls_name = csharp_naming.class_name(cls.name)
+    blocks_joined = "\n\n".join(blocks)
 
     return Stripped(
         f"""\
-private static bool {cls_name}DeepEquals(
-{I}Our.{cls_name} that,
-{I}Our.{cls_name} other)
+/// <summary>
+/// Check that the context is a deep copy of the visited instance.
+/// </summary>
+/// <remarks>
+/// The copy has to equal the original by value, while it must share none
+/// of the mutable objects with it.
+/// </remarks>
+internal class DeepCopyChecker
+{I}: Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
 {{
-{I}return DeepEqualiserInstance.Transform(that, other);
-}}"""
+{I}{indent_but_first_line(blocks_joined, I)}
+}}  // internal class DeepCopyChecker"""
     )
 
 
@@ -553,18 +444,16 @@ def generate(
     The ``namespace`` indicates the fully-qualified name of the base project.
     """
     blocks = [
-        _generate_deep_equals_transformer(symbol_table=symbol_table),
+        _generate_deep_copy_checker(symbol_table=symbol_table),
         Stripped(
-            """\
-private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();"""
+            f"""\
+private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+{I}new DeepCopyChecker());"""
         ),
     ]  # type: List[Stripped]
 
     for concrete_cls in symbol_table.concrete_classes:
         blocks.append(_generate_shallow_equals(cls=concrete_cls))
-
-    for concrete_cls in symbol_table.concrete_classes:
-        blocks.append(_generate_deep_equals(cls=concrete_cls))
 
     for concrete_cls in symbol_table.concrete_classes:
         cls_name = csharp_naming.class_name(concrete_cls.name)
@@ -600,25 +489,36 @@ public void Test_{cls_name}_deep_copy()
 {I}var instanceCopy = Our.Copying.Deep(instance);
 
 {I}Assert.IsTrue(
-{II}{cls_name}DeepEquals(
+{II}DeepCopyCheckerInstance.Transform(
 {III}instance, instanceCopy),
 {II}{csharp_common.string_literal(cls_name)});
 }}  // public void Test_{cls_name}_deep_copy"""
             )
         )
 
+    using_directives = [
+        Stripped(f"using Our = {namespace};  // renamed"),
+        Stripped(
+            """\
+// We need to use System.MemoryExtension.SequenceEqual.
+using System;  // can't alias
+using System.Collections.Generic;  // can't alias"""
+        ),
+    ]  # type: List[Stripped]
+
+    if intermediate_uses.json_types(symbol_table):
+        using_directives.append(Stripped("using Nodes = System.Text.Json.Nodes;"))
+
+    using_directives.append(Stripped("using NUnit.Framework;  // can't alias"))
+
+    using_directives_joined = "\n\n".join(using_directives)
+
     writer = io.StringIO()
     writer.write(
         f"""\
 {csharp_common.WARNING}
 
-using Our = {namespace};  // renamed
-
-// We need to use System.MemoryExtension.SequenceEqual.
-using System;  // can't alias
-using System.Linq;  // can't alias
-
-using NUnit.Framework;  // can't alias
+{using_directives_joined}
 
 namespace {namespace}.Tests
 {{

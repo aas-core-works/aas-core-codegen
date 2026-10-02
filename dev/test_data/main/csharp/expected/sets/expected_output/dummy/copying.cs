@@ -85,38 +85,18 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theTexts = new List<string>(
-                    that.Texts);
-
-                var theNumbers = new List<long>(
-                    that.Numbers);
-
-                var theKinds = new List<Kind>(
-                    that.Kinds);
-
-                var theCodes = new List<string>(
-                    that.Codes);
-
-                var theFlags = new List<bool>(
-                    that.Flags);
-
-                List<string>? theOptionalTexts = null;
-                if (that.OptionalTexts != null)
-                {
-                    theOptionalTexts = new List<string>(
-                        that.OptionalTexts);
-                }
-
                 return new Our.Something(
                     that.Text,
                     that.Number,
                     that.Kind,
-                    theTexts,
-                    theNumbers,
-                    theKinds,
-                    theCodes,
-                    theFlags,
-                    theOptionalTexts,
+                    new List<string>(that.Texts),
+                    new List<long>(that.Numbers),
+                    new List<Kind>(that.Kinds),
+                    new List<string>(that.Codes),
+                    new List<bool>(that.Flags),
+                    (that.OptionalTexts != null)
+                        ? new List<string>(that.OptionalTexts)
+                        : null,
                     that.OptionalKind
                 );
             }

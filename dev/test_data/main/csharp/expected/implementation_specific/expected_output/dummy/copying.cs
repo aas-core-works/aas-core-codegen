@@ -44,6 +44,21 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IItem> Deep_ListOf_IItem(
+            List<IItem> that)
+        {
+            var result = new List<IItem>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -85,12 +100,9 @@ namespace dummy
                 Our.IBag that
             )
             {
-                var theTags = new List<string>(
-                    that.Tags);
-
                 return new Our.Bag(
                     that.Label,
-                    theTags
+                    new List<string>(that.Tags)
                 );
             }
 
@@ -98,19 +110,9 @@ namespace dummy
                 Our.IContainer that
             )
             {
-                var theNames = new List<string>(
-                    that.Names);
-
-                var theItems = new List<IItem>(
-                    that.Items.Count);
-                foreach (var item in that.Items)
-                {
-                    theItems.Add(Deep(item));
-                }
-
                 return new Our.Container(
-                    theNames,
-                    theItems
+                    new List<string>(that.Names),
+                    Deep_ListOf_IItem(that.Items)
                 );
             }
         }  // internal class DeepCopier

@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,60 +15,87 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformFirst(
                 Our.IFirst that,
                 Our.IClass other)
             {
-                if (!(other is Our.First casted))
+                if (!(other is Our.First casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.Texts.SequenceEqual(
+                    Check_ListOf_string(
+                        that.Texts,
                         casted.Texts)
                     && that.Count == casted.Count
-                    && ((that.Kind.HasValue && casted.Kind.HasValue)
-                        ? that.Kind == casted.Kind
-                        : !that.Kind.HasValue && !casted.Kind.HasValue));
+                    && that.Kind == casted.Kind);
             }
 
             public override bool TransformSecond(
                 Our.ISecond that,
                 Our.IClass other)
             {
-                if (!(other is Our.Second casted))
+                if (!(other is Our.Second casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.Texts.SequenceEqual(
+                    Check_ListOf_string(
+                        that.Texts,
                         casted.Texts)
                     && that.Count == casted.Count
-                    && ((that.Kind.HasValue && casted.Kind.HasValue)
-                        ? that.Kind == casted.Kind
-                        : !that.Kind.HasValue && !casted.Kind.HasValue)
+                    && that.Kind == casted.Kind
                     && that.Note == casted.Note);
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_string(
+                List<string> that,
+                List<string> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        that[i] == other[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool FirstShallowEquals(
             Our.First that,
@@ -89,20 +116,6 @@ namespace dummy.Tests
                 && that.Count == other.Count
                 && that.Kind == other.Kind
                 && that.Note == other.Note);
-        }
-
-        private static bool FirstDeepEquals(
-            Our.First that,
-            Our.First other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SecondDeepEquals(
-            Our.Second that,
-            Our.Second other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
         }
 
         [Test]
@@ -128,7 +141,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                FirstDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "First");
         }  // public void Test_First_deep_copy
@@ -156,7 +169,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SecondDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Second");
         }  // public void Test_Second_deep_copy

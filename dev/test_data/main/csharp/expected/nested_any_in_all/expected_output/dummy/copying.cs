@@ -44,6 +44,51 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangString> Deep_ListOf_ILangString(
+            List<ILangString> that)
+        {
+            var result = new List<ILangString>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringSet> Deep_ListOf_ILangStringSet(
+            List<ILangStringSet> that)
+        {
+            var result = new List<ILangStringSet>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ISpecification> Deep_ListOf_ISpecification(
+            List<ISpecification> that)
+        {
+            var result = new List<ISpecification>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -109,15 +154,8 @@ namespace dummy
                 Our.ILangStringSet that
             )
             {
-                var theLangStrings = new List<ILangString>(
-                    that.LangStrings.Count);
-                foreach (var item in that.LangStrings)
-                {
-                    theLangStrings.Add(Deep(item));
-                }
-
                 return new Our.LangStringSet(
-                    theLangStrings
+                    Deep_ListOf_ILangString(that.LangStrings)
                 );
             }
 
@@ -125,19 +163,10 @@ namespace dummy
                 Our.IIecContent that
             )
             {
-                List<ILangString>? theDefinition = null;
-                if (that.Definition != null)
-                {
-                    theDefinition = new List<ILangString>(
-                        that.Definition.Count);
-                    foreach (var item in that.Definition)
-                    {
-                        theDefinition.Add(Deep(item));
-                    }
-                }
-
                 return new Our.IecContent(
-                    theDefinition
+                    (that.Definition != null)
+                        ? Deep_ListOf_ILangString(that.Definition)
+                        : null
                 );
             }
 
@@ -161,28 +190,12 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theLangStringSets = new List<ILangStringSet>(
-                    that.LangStringSets.Count);
-                foreach (var item in that.LangStringSets)
-                {
-                    theLangStringSets.Add(Deep(item));
-                }
-
-                List<ISpecification>? theSpecifications = null;
-                if (that.Specifications != null)
-                {
-                    theSpecifications = new List<ISpecification>(
-                        that.Specifications.Count);
-                    foreach (var item in that.Specifications)
-                    {
-                        theSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Something(
                     that.DefaultLanguage,
-                    theLangStringSets,
-                    theSpecifications
+                    Deep_ListOf_ILangStringSet(that.LangStringSets),
+                    (that.Specifications != null)
+                        ? Deep_ListOf_ISpecification(that.Specifications)
+                        : null
                 );
             }
         }  // internal class DeepCopier

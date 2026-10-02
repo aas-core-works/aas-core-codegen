@@ -68,11 +68,8 @@ namespace dummy
                 Our.IFirst that
             )
             {
-                var theTexts = new List<string>(
-                    that.Texts);
-
                 return new Our.First(
-                    theTexts,
+                    new List<string>(that.Texts),
                     that.Count,
                     that.Kind
                 );
@@ -82,11 +79,8 @@ namespace dummy
                 Our.ISecond that
             )
             {
-                var theTexts = new List<string>(
-                    that.Texts);
-
                 return new Our.Second(
-                    theTexts,
+                    new List<string>(that.Texts),
                     that.Count,
                     that.Note,
                     that.Kind

@@ -65,16 +65,10 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theSomeFloats = new List<double>(
-                    that.SomeFloats);
-
                 return new Our.Something(
                     that.SomeFloat,
-                    theSomeFloats,
-                    (
-                        that.SomePair.Item1,
-                        that.SomePair.Item2
-                    ),
+                    new List<double>(that.SomeFloats),
+                    that.SomePair,
                     that.SomeOptionalFloat
                 );
             }

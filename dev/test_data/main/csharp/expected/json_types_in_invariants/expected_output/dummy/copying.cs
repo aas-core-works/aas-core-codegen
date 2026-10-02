@@ -70,20 +70,20 @@ namespace dummy
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.Mapping)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property Mapping, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (Nodes.JsonArray)(
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.Values)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property Values, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (that.OptionalMapping != null)
                         ? (Nodes.JsonObject)(
                             System.Text.Json.JsonSerializer.SerializeToNode(
                                 that.OptionalMapping)
                             ?? throw new System.InvalidOperationException(
-                                "Expected SerializeToNode to copy the non-null property OptionalMapping, "
+                                "Expected SerializeToNode to copy a non-null value, "
                                     + "but it returned null"))
                         : null
                 );

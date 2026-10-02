@@ -50,6 +50,21 @@ namespace dummy
                 Deep(that.Underlying));
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IParent> Deep_ListOf_IParent(
+            List<IParent> that)
+        {
+            var result = new List<IParent>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -132,23 +147,6 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theParents = new List<IParent>(
-                    that.Parents.Count);
-                foreach (var item in that.Parents)
-                {
-                    theParents.Add(Deep(item));
-                }
-
-                var theTexts = new List<string>(
-                    that.Texts);
-
-                List<string>? theOptionalTexts = null;
-                if (that.OptionalTexts != null)
-                {
-                    theOptionalTexts = new List<string>(
-                        that.OptionalTexts);
-                }
-
                 return new Our.Something(
                     that.Text,
                     that.Number,
@@ -157,15 +155,19 @@ namespace dummy
                     that.Code,
                     Deep(that.Item),
                     Deep(that.Parent),
-                    theParents,
-                    theTexts,
+                    Deep_ListOf_IParent(that.Parents),
+                    new List<string>(that.Texts),
                     that.OptionalText,
                     that.OptionalKind,
                     (that.OptionalParent != null)
                         ? Deep(that.OptionalParent)
                         : null,
-                    theOptionalTexts,
-                    that.OptionalData,
+                    (that.OptionalTexts != null)
+                        ? new List<string>(that.OptionalTexts)
+                        : null,
+                    (that.OptionalData != null)
+                        ? (byte[])that.OptionalData.Clone()
+                        : null,
                     (that.OptionalMember != null)
                         ? Deep(that.OptionalMember)
                         : null

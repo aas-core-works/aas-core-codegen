@@ -44,6 +44,36 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IAbstractItem> Deep_ListOf_IAbstractItem(
+            List<IAbstractItem> that)
+        {
+            var result = new List<IAbstractItem>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ISimple> Deep_ListOf_ISimple(
+            List<ISimple> that)
+        {
+            var result = new List<ISimple>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -109,24 +139,10 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theSomeItems = new List<IAbstractItem>(
-                    that.SomeItems.Count);
-                foreach (var item in that.SomeItems)
-                {
-                    theSomeItems.Add(Deep(item));
-                }
-
-                var theSomeSimples = new List<ISimple>(
-                    that.SomeSimples.Count);
-                foreach (var item in that.SomeSimples)
-                {
-                    theSomeSimples.Add(Deep(item));
-                }
-
                 return new Our.Something(
                     Deep(that.Item),
-                    theSomeItems,
-                    theSomeSimples
+                    Deep_ListOf_IAbstractItem(that.SomeItems),
+                    Deep_ListOf_ISimple(that.SomeSimples)
                 );
             }
         }  // internal class DeepCopier

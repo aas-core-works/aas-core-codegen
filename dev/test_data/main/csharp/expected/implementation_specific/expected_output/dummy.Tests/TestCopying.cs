@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,49 +15,55 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformBox(
                 Our.IBox that,
                 Our.IClass other)
             {
-                if (!(other is Our.Box casted))
+                if (!(other is Our.Box casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.Label == casted.Label
-                    && ((that.Color.HasValue && casted.Color.HasValue)
-                        ? that.Color == casted.Color
-                        : !that.Color.HasValue && !casted.Color.HasValue));
+                    && that.Color == casted.Color);
             }
 
             public override bool TransformBag(
                 Our.IBag that,
                 Our.IClass other)
             {
-                if (!(other is Our.Bag casted))
+                if (!(other is Our.Bag casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.Label == casted.Label
-                    && that.Tags.SequenceEqual(
+                    && Check_ListOf_string(
+                        that.Tags,
                         casted.Tags));
             }
 
@@ -65,25 +71,67 @@ namespace dummy.Tests
                 Our.IContainer that,
                 Our.IClass other)
             {
-                if (!(other is Our.Container casted))
+                if (!(other is Our.Container casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.Names.SequenceEqual(
+                    Check_ListOf_string(
+                        that.Names,
                         casted.Names)
-                    && that.Items.Count == casted.Items.Count
-                    && (
-                        that.Items
-                            .Zip(
-                                casted.Items,
-                                Transform)
-                            .All(item => item)));
+                    && Check_ListOf_IItem(
+                        that.Items,
+                        casted.Items));
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_string(
+                List<string> that,
+                List<string> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        that[i] == other[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IItem(
+                List<Our.IItem> that,
+                List<Our.IItem> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool BoxShallowEquals(
             Our.Box that,
@@ -104,27 +152,6 @@ namespace dummy.Tests
             Our.Container other)
         {
             return that.Names == other.Names && that.Items == other.Items;
-        }
-
-        private static bool BoxDeepEquals(
-            Our.Box that,
-            Our.Box other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool BagDeepEquals(
-            Our.Bag that,
-            Our.Bag other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ContainerDeepEquals(
-            Our.Container that,
-            Our.Container other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
         }
 
         [Test]
@@ -150,7 +177,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BoxDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Box");
         }  // public void Test_Box_deep_copy
@@ -178,7 +205,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BagDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Bag");
         }  // public void Test_Bag_deep_copy
@@ -206,7 +233,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ContainerDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Container");
         }  // public void Test_Container_deep_copy

@@ -50,6 +50,79 @@ namespace dummy
                 Deep(that.Underlying));
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<StructuralUnion> Deep_ListOf_StructuralUnion(
+            List<StructuralUnion> that)
+        {
+            var result = new List<StructuralUnion>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<MixedUnion> Deep_ListOf_MixedUnion(
+            List<MixedUnion> that)
+        {
+            var result = new List<MixedUnion>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ModelTypedUnion> Deep_ListOf_ModelTypedUnion(
+            List<ModelTypedUnion> that)
+        {
+            var result = new List<ModelTypedUnion>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static (StructuralUnion, MixedUnion, ModelTypedUnion) Deep_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            (StructuralUnion, MixedUnion, ModelTypedUnion) that)
+        {
+            return (
+                Deep(that.Item1),
+                Deep(that.Item2),
+                Deep(that.Item3)
+            );
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<OverlappingUnion> Deep_ListOf_OverlappingUnion(
+            List<OverlappingUnion> that)
+        {
+            var result = new List<OverlappingUnion>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -227,50 +300,14 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theListStructuralProperty = new List<StructuralUnion>(
-                    that.ListStructuralProperty.Count);
-                foreach (var item in that.ListStructuralProperty)
-                {
-                    theListStructuralProperty.Add(Deep(item));
-                }
-
-                var theListMixedProperty = new List<MixedUnion>(
-                    that.ListMixedProperty.Count);
-                foreach (var item in that.ListMixedProperty)
-                {
-                    theListMixedProperty.Add(Deep(item));
-                }
-
-                var theListModelTypedProperty = new List<ModelTypedUnion>(
-                    that.ListModelTypedProperty.Count);
-                foreach (var item in that.ListModelTypedProperty)
-                {
-                    theListModelTypedProperty.Add(Deep(item));
-                }
-
-                List<OverlappingUnion>? theOptionalListOverlappingProperty = null;
-                if (that.OptionalListOverlappingProperty != null)
-                {
-                    theOptionalListOverlappingProperty = new List<OverlappingUnion>(
-                        that.OptionalListOverlappingProperty.Count);
-                    foreach (var item in that.OptionalListOverlappingProperty)
-                    {
-                        theOptionalListOverlappingProperty.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Something(
                     Deep(that.StructuralProperty),
                     Deep(that.MixedProperty),
                     Deep(that.ModelTypedProperty),
-                    theListStructuralProperty,
-                    theListMixedProperty,
-                    theListModelTypedProperty,
-                    (
-                        Deep(that.TupleProperty.Item1),
-                        Deep(that.TupleProperty.Item2),
-                        Deep(that.TupleProperty.Item3)
-                    ),
+                    Deep_ListOf_StructuralUnion(that.ListStructuralProperty),
+                    Deep_ListOf_MixedUnion(that.ListMixedProperty),
+                    Deep_ListOf_ModelTypedUnion(that.ListModelTypedProperty),
+                    Deep_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(that.TupleProperty),
                     (that.OptionalStructuralProperty != null)
                         ? Deep(that.OptionalStructuralProperty)
                         : null,
@@ -280,7 +317,9 @@ namespace dummy
                     (that.OptionalModelTypedProperty != null)
                         ? Deep(that.OptionalModelTypedProperty)
                         : null,
-                    theOptionalListOverlappingProperty
+                    (that.OptionalListOverlappingProperty != null)
+                        ? Deep_ListOf_OverlappingUnion(that.OptionalListOverlappingProperty)
+                        : null
                 );
             }
         }  // internal class DeepCopier

@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,50 +15,55 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformQueryCondition(
                 Our.IQueryCondition that,
                 Our.IClass other)
             {
-                if (!(other is Our.QueryCondition casted))
+                if (!(other is Our.QueryCondition casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.Eq == casted.Eq
-                    && that.NotEq == casted.NotEq);
+                    ((that.Eq != null && casted.Eq != null)
+                        ? that.Eq == casted.Eq
+                        : that.Eq == null && casted.Eq == null)
+                    && ((that.NotEq != null && casted.NotEq != null)
+                        ? that.NotEq == casted.NotEq
+                        : that.NotEq == null && casted.NotEq == null));
             }
-        }  // internal class DeepEqualiser
+        }  // internal class DeepCopyChecker
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool QueryConditionShallowEquals(
             Our.QueryCondition that,
             Our.QueryCondition other)
         {
             return that.Eq == other.Eq && that.NotEq == other.NotEq;
-        }
-
-        private static bool QueryConditionDeepEquals(
-            Our.QueryCondition that,
-            Our.QueryCondition other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
         }
 
         [Test]
@@ -84,7 +89,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                QueryConditionDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "QueryCondition");
         }  // public void Test_QueryCondition_deep_copy
