@@ -380,17 +380,23 @@ public class ReferenceElement implements IReferenceElement {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            ReferenceElement.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            ReferenceElement.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            ReferenceElement.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -400,17 +406,23 @@ public class ReferenceElement implements IReferenceElement {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            ReferenceElement.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(
+            ReferenceElement.this.qualifiers,
+            false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            ReferenceElement.this.embeddedDataSpecifications,
+            false));
       }
 
       if (value != null) {
@@ -449,23 +461,23 @@ public class ReferenceElement implements IReferenceElement {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            ReferenceElement.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            ReferenceElement.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            ReferenceElement.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -476,23 +488,23 @@ public class ReferenceElement implements IReferenceElement {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            ReferenceElement.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(
+            ReferenceElement.this.qualifiers,
+            true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          ReferenceElement.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            ReferenceElement.this.embeddedDataSpecifications,
+            true));
       }
 
       if (value != null) {

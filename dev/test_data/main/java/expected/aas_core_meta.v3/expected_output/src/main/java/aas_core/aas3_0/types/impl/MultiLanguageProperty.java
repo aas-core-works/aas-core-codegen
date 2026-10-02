@@ -412,17 +412,23 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            MultiLanguageProperty.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            MultiLanguageProperty.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            MultiLanguageProperty.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -432,22 +438,30 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            MultiLanguageProperty.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(
+            MultiLanguageProperty.this.qualifiers,
+            false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            MultiLanguageProperty.this.embeddedDataSpecifications,
+            false));
       }
 
       if (value != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.value.stream());
+          Descent.descendListOf_ILangStringTextType(
+            MultiLanguageProperty.this.value,
+            false));
       }
 
       if (valueId != null) {
@@ -486,23 +500,23 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            MultiLanguageProperty.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            MultiLanguageProperty.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            MultiLanguageProperty.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -513,30 +527,30 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            MultiLanguageProperty.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(
+            MultiLanguageProperty.this.qualifiers,
+            true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            MultiLanguageProperty.this.embeddedDataSpecifications,
+            true));
       }
 
       if (value != null) {
         memberStream = Stream.concat(memberStream,
-          MultiLanguageProperty.this.value.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            MultiLanguageProperty.this.value,
+            true));
       }
 
       if (valueId != null) {

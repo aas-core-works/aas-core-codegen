@@ -400,12 +400,16 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
 
       if (preferredName != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.preferredName.stream());
+          Descent.descendListOf_ILangStringPreferredNameTypeIec61360(
+            DataSpecificationIec61360.this.preferredName,
+            false));
       }
 
       if (shortName != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.shortName.stream());
+          Descent.descendListOf_ILangStringShortNameTypeIec61360(
+            DataSpecificationIec61360.this.shortName,
+            false));
       }
 
       if (unitId != null) {
@@ -415,7 +419,9 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
 
       if (definition != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.definition.stream());
+          Descent.descendListOf_ILangStringDefinitionTypeIec61360(
+            DataSpecificationIec61360.this.definition,
+            false));
       }
 
       if (valueList != null) {
@@ -459,16 +465,16 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
 
       if (preferredName != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.preferredName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringPreferredNameTypeIec61360(
+            DataSpecificationIec61360.this.preferredName,
+            true));
       }
 
       if (shortName != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.shortName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringShortNameTypeIec61360(
+            DataSpecificationIec61360.this.shortName,
+            true));
       }
 
       if (unitId != null) {
@@ -479,9 +485,9 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
 
       if (definition != null) {
         memberStream = Stream.concat(memberStream,
-          DataSpecificationIec61360.this.definition.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringDefinitionTypeIec61360(
+            DataSpecificationIec61360.this.definition,
+            true));
       }
 
       if (valueList != null) {

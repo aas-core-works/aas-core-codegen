@@ -432,17 +432,23 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            AnnotatedRelationshipElement.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            AnnotatedRelationshipElement.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            AnnotatedRelationshipElement.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -452,17 +458,23 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            AnnotatedRelationshipElement.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(
+            AnnotatedRelationshipElement.this.qualifiers,
+            false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AnnotatedRelationshipElement.this.embeddedDataSpecifications,
+            false));
       }
 
       if (first != null) {
@@ -477,7 +489,9 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (annotations != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.annotations.stream());
+          Descent.descendListOf_IDataElement(
+            AnnotatedRelationshipElement.this.annotations,
+            false));
       }
 
       return memberStream;
@@ -511,23 +525,23 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            AnnotatedRelationshipElement.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            AnnotatedRelationshipElement.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            AnnotatedRelationshipElement.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -538,23 +552,23 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            AnnotatedRelationshipElement.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(
+            AnnotatedRelationshipElement.this.qualifiers,
+            true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AnnotatedRelationshipElement.this.embeddedDataSpecifications,
+            true));
       }
 
       if (first != null) {
@@ -571,9 +585,9 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
 
       if (annotations != null) {
         memberStream = Stream.concat(memberStream,
-          AnnotatedRelationshipElement.this.annotations.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IDataElement(
+            AnnotatedRelationshipElement.this.annotations,
+            true));
       }
 
       return memberStream;

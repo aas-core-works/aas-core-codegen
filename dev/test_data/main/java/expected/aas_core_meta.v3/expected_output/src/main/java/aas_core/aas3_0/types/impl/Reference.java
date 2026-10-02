@@ -261,7 +261,7 @@ public class Reference implements IReference {
 
       if (keys != null) {
         memberStream = Stream.concat(memberStream,
-          Reference.this.keys.stream());
+          Descent.descendListOf_IKey(Reference.this.keys, false));
       }
 
       return memberStream;
@@ -301,9 +301,7 @@ public class Reference implements IReference {
 
       if (keys != null) {
         memberStream = Stream.concat(memberStream,
-          Reference.this.keys.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IKey(Reference.this.keys, true));
       }
 
       return memberStream;

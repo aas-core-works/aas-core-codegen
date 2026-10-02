@@ -269,7 +269,7 @@ public class Something implements ISomething {
 
       if (parents != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.parents.stream());
+          Descent.descendListOf_IParent(Something.this.parents, false));
       }
 
       return memberStream;
@@ -315,9 +315,7 @@ public class Something implements ISomething {
 
       if (parents != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.parents.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IParent(Something.this.parents, true));
       }
 
       return memberStream;

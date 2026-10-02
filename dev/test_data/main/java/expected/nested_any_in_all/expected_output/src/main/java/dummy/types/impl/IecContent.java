@@ -131,7 +131,7 @@ public class IecContent implements IIecContent {
 
       if (definition != null) {
         memberStream = Stream.concat(memberStream,
-          IecContent.this.definition.stream());
+          Descent.descendListOf_ILangString(IecContent.this.definition, false));
       }
 
       return memberStream;
@@ -165,9 +165,7 @@ public class IecContent implements IIecContent {
 
       if (definition != null) {
         memberStream = Stream.concat(memberStream,
-          IecContent.this.definition.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangString(IecContent.this.definition, true));
       }
 
       return memberStream;

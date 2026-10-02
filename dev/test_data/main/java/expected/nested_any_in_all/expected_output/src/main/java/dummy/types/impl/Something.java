@@ -179,12 +179,16 @@ public class Something implements ISomething {
 
       if (langStringSets != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.langStringSets.stream());
+          Descent.descendListOf_ILangStringSet(
+            Something.this.langStringSets,
+            false));
       }
 
       if (specifications != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.specifications.stream());
+          Descent.descendListOf_ISpecification(
+            Something.this.specifications,
+            false));
       }
 
       return memberStream;
@@ -218,16 +222,16 @@ public class Something implements ISomething {
 
       if (langStringSets != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.langStringSets.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringSet(
+            Something.this.langStringSets,
+            true));
       }
 
       if (specifications != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.specifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ISpecification(
+            Something.this.specifications,
+            true));
       }
 
       return memberStream;

@@ -392,17 +392,23 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            AssetAdministrationShell.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            AssetAdministrationShell.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            AssetAdministrationShell.this.description,
+            false));
       }
 
       if (administration != null) {
@@ -412,7 +418,9 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AssetAdministrationShell.this.embeddedDataSpecifications,
+            false));
       }
 
       if (derivedFrom != null) {
@@ -427,7 +435,9 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (submodels != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.submodels.stream());
+          Descent.descendListOf_IReference(
+            AssetAdministrationShell.this.submodels,
+            false));
       }
 
       return memberStream;
@@ -461,23 +471,23 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            AssetAdministrationShell.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            AssetAdministrationShell.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            AssetAdministrationShell.this.description,
+            true));
       }
 
       if (administration != null) {
@@ -488,9 +498,9 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AssetAdministrationShell.this.embeddedDataSpecifications,
+            true));
       }
 
       if (derivedFrom != null) {
@@ -507,9 +517,9 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
 
       if (submodels != null) {
         memberStream = Stream.concat(memberStream,
-          AssetAdministrationShell.this.submodels.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            AssetAdministrationShell.this.submodels,
+            true));
       }
 
       return memberStream;

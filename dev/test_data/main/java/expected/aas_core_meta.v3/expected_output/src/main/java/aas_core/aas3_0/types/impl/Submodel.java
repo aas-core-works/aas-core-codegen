@@ -455,17 +455,21 @@ public class Submodel implements ISubmodel {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.extensions.stream());
+          Descent.descendListOf_IExtension(Submodel.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Submodel.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Submodel.this.description,
+            false));
       }
 
       if (administration != null) {
@@ -480,22 +484,28 @@ public class Submodel implements ISubmodel {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Submodel.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Submodel.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Submodel.this.embeddedDataSpecifications,
+            false));
       }
 
       if (submodelElements != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.submodelElements.stream());
+          Descent.descendListOf_ISubmodelElement(
+            Submodel.this.submodelElements,
+            false));
       }
 
       return memberStream;
@@ -529,23 +539,21 @@ public class Submodel implements ISubmodel {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Submodel.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            Submodel.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            Submodel.this.description,
+            true));
       }
 
       if (administration != null) {
@@ -562,30 +570,28 @@ public class Submodel implements ISubmodel {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Submodel.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Submodel.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Submodel.this.embeddedDataSpecifications,
+            true));
       }
 
       if (submodelElements != null) {
         memberStream = Stream.concat(memberStream,
-          Submodel.this.submodelElements.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ISubmodelElement(
+            Submodel.this.submodelElements,
+            true));
       }
 
       return memberStream;

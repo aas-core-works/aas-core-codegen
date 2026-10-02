@@ -164,7 +164,7 @@ public class OrderedContainer implements IOrderedContainer {
 
       if (children != null) {
         memberStream = Stream.concat(memberStream,
-          OrderedContainer.this.children.stream());
+          Descent.descendListOf_IElement(OrderedContainer.this.children, false));
       }
 
       return memberStream;
@@ -198,9 +198,7 @@ public class OrderedContainer implements IOrderedContainer {
 
       if (children != null) {
         memberStream = Stream.concat(memberStream,
-          OrderedContainer.this.children.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IElement(OrderedContainer.this.children, true));
       }
 
       return memberStream;

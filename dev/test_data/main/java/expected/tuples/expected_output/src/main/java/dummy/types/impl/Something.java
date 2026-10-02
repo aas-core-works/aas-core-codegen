@@ -223,23 +223,23 @@ public class Something implements ISomething {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.<IClass>of(Something.this.items.item1()),
-            Stream.<IClass>of(Something.this.items.item2())));
+          Descent.descendTupleOf2_IAbstractItem_IAbstractItem(
+            Something.this.items,
+            false));
       }
 
       if (tricky != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.concat(
-              Stream.<IClass>of(Something.this.tricky.item2()),
-              Stream.<IClass>of(Something.this.tricky.item3())),
-            Stream.<IClass>of(Something.this.tricky.item4())));
+          Descent.descendTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+            Something.this.tricky,
+            false));
       }
 
       if (optionalPair != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.<IClass>of(Something.this.optionalPair.item2()));
+          Descent.descendTupleOf2_string_IAbstractItem(
+            Something.this.optionalPair,
+            false));
       }
 
       return memberStream;
@@ -273,29 +273,23 @@ public class Something implements ISomething {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.concat(Stream.<IClass>of(Something.this.items.item1()),
-              StreamSupport.stream(Something.this.items.item1().descend().spliterator(), false)),
-            Stream.concat(Stream.<IClass>of(Something.this.items.item2()),
-              StreamSupport.stream(Something.this.items.item2().descend().spliterator(), false))));
+          Descent.descendTupleOf2_IAbstractItem_IAbstractItem(
+            Something.this.items,
+            true));
       }
 
       if (tricky != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.concat(
-              Stream.concat(Stream.<IClass>of(Something.this.tricky.item2()),
-                StreamSupport.stream(Something.this.tricky.item2().descend().spliterator(), false)),
-              Stream.concat(Stream.<IClass>of(Something.this.tricky.item3()),
-                StreamSupport.stream(Something.this.tricky.item3().descend().spliterator(), false))),
-            Stream.concat(Stream.<IClass>of(Something.this.tricky.item4()),
-              StreamSupport.stream(Something.this.tricky.item4().descend().spliterator(), false))));
+          Descent.descendTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+            Something.this.tricky,
+            true));
       }
 
       if (optionalPair != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(Stream.<IClass>of(Something.this.optionalPair.item2()),
-            StreamSupport.stream(Something.this.optionalPair.item2().descend().spliterator(), false)));
+          Descent.descendTupleOf2_string_IAbstractItem(
+            Something.this.optionalPair,
+            true));
       }
 
       return memberStream;

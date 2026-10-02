@@ -148,7 +148,7 @@ public class Something implements ISomething {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.items.stream());
+          Descent.descendListOf_IItem(Something.this.items, false));
       }
 
       if (maybeItem != null) {
@@ -187,9 +187,7 @@ public class Something implements ISomething {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.items.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IItem(Something.this.items, true));
       }
 
       if (maybeItem != null) {

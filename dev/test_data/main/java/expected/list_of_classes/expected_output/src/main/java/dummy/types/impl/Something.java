@@ -169,12 +169,12 @@ public class Something implements ISomething {
 
       if (someItems != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.someItems.stream());
+          Descent.descendListOf_IAbstractItem(Something.this.someItems, false));
       }
 
       if (someSimples != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.someSimples.stream());
+          Descent.descendListOf_ISimple(Something.this.someSimples, false));
       }
 
       return memberStream;
@@ -214,16 +214,12 @@ public class Something implements ISomething {
 
       if (someItems != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.someItems.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IAbstractItem(Something.this.someItems, true));
       }
 
       if (someSimples != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.someSimples.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ISimple(Something.this.someSimples, true));
       }
 
       return memberStream;

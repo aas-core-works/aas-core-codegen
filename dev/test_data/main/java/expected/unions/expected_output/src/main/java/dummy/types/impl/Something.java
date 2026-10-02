@@ -346,26 +346,30 @@ public class Something implements ISomething {
 
       if (listStructuralProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listStructuralProperty.stream().map(item -> item.getUnderlying()));
+          Descent.descendListOf_StructuralUnion(
+            Something.this.listStructuralProperty,
+            false));
       }
 
       if (listMixedProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listMixedProperty.stream().map(item -> item.getUnderlying()));
+          Descent.descendListOf_MixedUnion(
+            Something.this.listMixedProperty,
+            false));
       }
 
       if (listModelTypedProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listModelTypedProperty.stream().map(item -> item.getUnderlying()));
+          Descent.descendListOf_ModelTypedUnion(
+            Something.this.listModelTypedProperty,
+            false));
       }
 
       if (tupleProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.concat(
-              Stream.<IClass>of(Something.this.tupleProperty.item1().getUnderlying()),
-              Stream.<IClass>of(Something.this.tupleProperty.item2().getUnderlying())),
-            Stream.<IClass>of(Something.this.tupleProperty.item3().getUnderlying())));
+          Descent.descendTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            Something.this.tupleProperty,
+            false));
       }
 
       if (optionalStructuralProperty != null) {
@@ -385,7 +389,9 @@ public class Something implements ISomething {
 
       if (optionalListOverlappingProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.optionalListOverlappingProperty.stream().map(item -> item.getUnderlying()));
+          Descent.descendListOf_OverlappingUnion(
+            Something.this.optionalListOverlappingProperty,
+            false));
       }
 
       return memberStream;
@@ -437,35 +443,30 @@ public class Something implements ISomething {
 
       if (listStructuralProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listStructuralProperty.stream().map(item -> item.getUnderlying())
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_StructuralUnion(
+            Something.this.listStructuralProperty,
+            true));
       }
 
       if (listMixedProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listMixedProperty.stream().map(item -> item.getUnderlying())
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_MixedUnion(
+            Something.this.listMixedProperty,
+            true));
       }
 
       if (listModelTypedProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.listModelTypedProperty.stream().map(item -> item.getUnderlying())
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ModelTypedUnion(
+            Something.this.listModelTypedProperty,
+            true));
       }
 
       if (tupleProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Stream.concat(
-            Stream.concat(
-              Stream.concat(Stream.<IClass>of(Something.this.tupleProperty.item1().getUnderlying()),
-                StreamSupport.stream(Something.this.tupleProperty.item1().getUnderlying().descend().spliterator(), false)),
-              Stream.concat(Stream.<IClass>of(Something.this.tupleProperty.item2().getUnderlying()),
-                StreamSupport.stream(Something.this.tupleProperty.item2().getUnderlying().descend().spliterator(), false))),
-            Stream.concat(Stream.<IClass>of(Something.this.tupleProperty.item3().getUnderlying()),
-              StreamSupport.stream(Something.this.tupleProperty.item3().getUnderlying().descend().spliterator(), false))));
+          Descent.descendTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            Something.this.tupleProperty,
+            true));
       }
 
       if (optionalStructuralProperty != null) {
@@ -488,9 +489,9 @@ public class Something implements ISomething {
 
       if (optionalListOverlappingProperty != null) {
         memberStream = Stream.concat(memberStream,
-          Something.this.optionalListOverlappingProperty.stream().map(item -> item.getUnderlying())
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_OverlappingUnion(
+            Something.this.optionalListOverlappingProperty,
+            true));
       }
 
       return memberStream;

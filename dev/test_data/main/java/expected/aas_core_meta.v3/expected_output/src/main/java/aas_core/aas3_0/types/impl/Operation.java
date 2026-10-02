@@ -437,17 +437,21 @@ public class Operation implements IOperation {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.extensions.stream());
+          Descent.descendListOf_IExtension(Operation.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Operation.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Operation.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -457,32 +461,42 @@ public class Operation implements IOperation {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Operation.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Operation.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Operation.this.embeddedDataSpecifications,
+            false));
       }
 
       if (inputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.inputVariables.stream());
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.inputVariables,
+            false));
       }
 
       if (outputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.outputVariables.stream());
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.outputVariables,
+            false));
       }
 
       if (inoutputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.inoutputVariables.stream());
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.inoutputVariables,
+            false));
       }
 
       return memberStream;
@@ -516,23 +530,21 @@ public class Operation implements IOperation {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Operation.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            Operation.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            Operation.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -543,44 +555,42 @@ public class Operation implements IOperation {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Operation.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Operation.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Operation.this.embeddedDataSpecifications,
+            true));
       }
 
       if (inputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.inputVariables.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.inputVariables,
+            true));
       }
 
       if (outputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.outputVariables.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.outputVariables,
+            true));
       }
 
       if (inoutputVariables != null) {
         memberStream = Stream.concat(memberStream,
-          Operation.this.inoutputVariables.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IOperationVariable(
+            Operation.this.inoutputVariables,
+            true));
       }
 
       return memberStream;
