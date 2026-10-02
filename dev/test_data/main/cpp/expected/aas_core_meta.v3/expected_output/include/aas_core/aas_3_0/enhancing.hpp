@@ -7840,6 +7840,672 @@ class EnhancedDataSpecificationIec61360
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IReference>
+> Wrap_listOf_Reference(
+  const std::vector<
+    std::shared_ptr<types::IReference>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IReference>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IReference>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IEmbeddedDataSpecification>
+> Wrap_listOf_EmbeddedDataSpecification(
+  const std::vector<
+    std::shared_ptr<types::IEmbeddedDataSpecification>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IEmbeddedDataSpecification>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IExtension>
+> Wrap_listOf_Extension(
+  const std::vector<
+    std::shared_ptr<types::IExtension>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IExtension>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IExtension>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringNameType>
+> Wrap_listOf_LangStringNameType(
+  const std::vector<
+    std::shared_ptr<types::ILangStringNameType>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringNameType>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringNameType>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringTextType>
+> Wrap_listOf_LangStringTextType(
+  const std::vector<
+    std::shared_ptr<types::ILangStringTextType>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringTextType>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringTextType>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ISpecificAssetId>
+> Wrap_listOf_SpecificAssetId(
+  const std::vector<
+    std::shared_ptr<types::ISpecificAssetId>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ISpecificAssetId>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ISpecificAssetId>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IQualifier>
+> Wrap_listOf_Qualifier(
+  const std::vector<
+    std::shared_ptr<types::IQualifier>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IQualifier>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IQualifier>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ISubmodelElement>
+> Wrap_listOf_SubmodelElement(
+  const std::vector<
+    std::shared_ptr<types::ISubmodelElement>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ISubmodelElement>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ISubmodelElement>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IDataElement>
+> Wrap_listOf_DataElement(
+  const std::vector<
+    std::shared_ptr<types::IDataElement>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IDataElement>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IDataElement>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IOperationVariable>
+> Wrap_listOf_OperationVariable(
+  const std::vector<
+    std::shared_ptr<types::IOperationVariable>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IOperationVariable>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IOperationVariable>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IKey>
+> Wrap_listOf_Key(
+  const std::vector<
+    std::shared_ptr<types::IKey>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IKey>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IKey>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IAssetAdministrationShell>
+> Wrap_listOf_AssetAdministrationShell(
+  const std::vector<
+    std::shared_ptr<types::IAssetAdministrationShell>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IAssetAdministrationShell>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IAssetAdministrationShell>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ISubmodel>
+> Wrap_listOf_Submodel(
+  const std::vector<
+    std::shared_ptr<types::ISubmodel>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ISubmodel>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ISubmodel>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IConceptDescription>
+> Wrap_listOf_ConceptDescription(
+  const std::vector<
+    std::shared_ptr<types::IConceptDescription>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IConceptDescription>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IConceptDescription>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IValueReferencePair>
+> Wrap_listOf_ValueReferencePair(
+  const std::vector<
+    std::shared_ptr<types::IValueReferencePair>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IValueReferencePair>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IValueReferencePair>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+> Wrap_listOf_LangStringPreferredNameTypeIec61360(
+  const std::vector<
+    std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+> Wrap_listOf_LangStringShortNameTypeIec61360(
+  const std::vector<
+    std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+> Wrap_listOf_LangStringDefinitionTypeIec61360(
+  const std::vector<
+    std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -7861,86 +8527,28 @@ std::shared_ptr<types::IExtension> WrapExtension(
   // in the caller.
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->refers_to().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->refers_to().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_refers_to(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(that->refers_to().value(), factory)
       )
     );
   }
@@ -7980,54 +8588,20 @@ std::shared_ptr<types::IAdministrativeInformation> WrapAdministrativeInformation
   // in the caller.
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->creator().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->creator().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_creator(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->creator().value(), factory)
       )
     );
   }
@@ -8067,75 +8641,28 @@ std::shared_ptr<types::IQualifier> WrapQualifier(
   // in the caller.
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->value_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_value_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->value_id().value(), factory)
       )
     );
   }
@@ -8175,210 +8702,73 @@ std::shared_ptr<types::IAssetAdministrationShell> WrapAssetAdministrationShell(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->administration().has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& value(
-      that->administration().value()
-    );
-
-    std::shared_ptr<
-      types::IAdministrativeInformation
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_administration(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->administration().value(), factory)
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->derived_from().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->derived_from().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_derived_from(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->derived_from().value(), factory)
       )
     );
   }
 
   that->set_asset_information(
-    Wrap<E>(
-      that->asset_information(),
-      factory
-    )
+    Wrap<E>(that->asset_information(), factory)
   );
 
   if (that->submodels().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->submodels().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_submodels(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(that->submodels().value(), factory)
       )
     );
   }
@@ -8418,54 +8808,20 @@ std::shared_ptr<types::IAssetInformation> WrapAssetInformation(
   // in the caller.
 
   if (that->specific_asset_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISpecificAssetId>
-      >& value(
-      that->specific_asset_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISpecificAssetId>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_specific_asset_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SpecificAssetId<E>(
+          that->specific_asset_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->default_thumbnail().has_value()) {
-    const std::shared_ptr<types::IResource>& value(
-      that->default_thumbnail().value()
-    );
-
-    std::shared_ptr<
-      types::IResource
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_default_thumbnail(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->default_thumbnail().value(), factory)
       )
     );
   }
@@ -8541,75 +8897,28 @@ std::shared_ptr<types::ISpecificAssetId> WrapSpecificAssetId(
   // in the caller.
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->external_subject_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->external_subject_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_external_subject_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->external_subject_id().value(), factory)
       )
     );
   }
@@ -8649,267 +8958,94 @@ std::shared_ptr<types::ISubmodel> WrapSubmodel(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->administration().has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& value(
-      that->administration().value()
-    );
-
-    std::shared_ptr<
-      types::IAdministrativeInformation
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_administration(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->administration().value(), factory)
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->submodel_elements().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >& value(
-      that->submodel_elements().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_submodel_elements(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SubmodelElement<E>(
+          that->submodel_elements().value(),
+          factory
+        )
       )
     );
   }
@@ -8949,230 +9085,85 @@ std::shared_ptr<types::IRelationshipElement> WrapRelationshipElement(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   that->set_first(
-    Wrap<E>(
-      that->first(),
-      factory
-    )
+    Wrap<E>(that->first(), factory)
   );
 
   that->set_second(
-    Wrap<E>(
-      that->second(),
-      factory
-    )
+    Wrap<E>(that->second(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -9210,267 +9201,94 @@ std::shared_ptr<types::ISubmodelElementList> WrapSubmodelElementList(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id_list_element().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id_list_element().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id_list_element(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id_list_element().value(), factory)
       )
     );
   }
 
   if (that->value().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >& value(
-      that->value().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_value(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SubmodelElement<E>(
+          that->value().value(),
+          factory
+        )
       )
     );
   }
@@ -9510,246 +9328,86 @@ std::shared_ptr<types::ISubmodelElementCollection> WrapSubmodelElementCollection
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >& value(
-      that->value().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_value(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SubmodelElement<E>(
+          that->value().value(),
+          factory
+        )
       )
     );
   }
@@ -9789,235 +9447,83 @@ std::shared_ptr<types::IProperty> WrapProperty(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->value_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_value_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->value_id().value(), factory)
       )
     );
   }
@@ -10057,267 +9563,94 @@ std::shared_ptr<types::IMultiLanguageProperty> WrapMultiLanguageProperty(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->value().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_value(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->value().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->value_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_value_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->value_id().value(), factory)
       )
     );
   }
@@ -10357,214 +9690,75 @@ std::shared_ptr<types::IRange> WrapRange(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
@@ -10604,235 +9798,83 @@ std::shared_ptr<types::IReferenceElement> WrapReferenceElement(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->value().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_value(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->value().value(), factory)
       )
     );
   }
@@ -10872,214 +9914,75 @@ std::shared_ptr<types::IBlob> WrapBlob(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
@@ -11119,214 +10022,75 @@ std::shared_ptr<types::IFile> WrapFile(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
@@ -11366,260 +10130,94 @@ std::shared_ptr<types::IAnnotatedRelationshipElement> WrapAnnotatedRelationshipE
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   that->set_first(
-    Wrap<E>(
-      that->first(),
-      factory
-    )
+    Wrap<E>(that->first(), factory)
   );
 
   that->set_second(
-    Wrap<E>(
-      that->second(),
-      factory
-    )
+    Wrap<E>(that->second(), factory)
   );
 
   if (that->annotations().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IDataElement>
-      >& value(
-      that->annotations().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IDataElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IDataElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_annotations(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_DataElement<E>(
+          that->annotations().value(),
+          factory
+        )
       )
     );
   }
@@ -11659,278 +10257,97 @@ std::shared_ptr<types::IEntity> WrapEntity(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->statements().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >& value(
-      that->statements().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_statements(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SubmodelElement<E>(
+          that->statements().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->specific_asset_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISpecificAssetId>
-      >& value(
-      that->specific_asset_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISpecificAssetId>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_specific_asset_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_SpecificAssetId<E>(
+          that->specific_asset_ids().value(),
+          factory
+        )
       )
     );
   }
@@ -11970,78 +10387,33 @@ std::shared_ptr<types::IEventPayload> WrapEventPayload(
   // in the caller.
 
   that->set_source(
-    Wrap<E>(
-      that->source(),
-      factory
-    )
+    Wrap<E>(that->source(), factory)
   );
 
   if (that->source_semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->source_semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_source_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->source_semantic_id().value(), factory)
       )
     );
   }
 
   that->set_observable_reference(
-    Wrap<E>(
-      that->observable_reference(),
-      factory
-    )
+    Wrap<E>(that->observable_reference(), factory)
   );
 
   if (that->observable_semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->observable_semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_observable_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->observable_semantic_id().value(), factory)
       )
     );
   }
 
   if (that->subject_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->subject_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_subject_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->subject_id().value(), factory)
       )
     );
   }
@@ -12081,242 +10453,87 @@ std::shared_ptr<types::IBasicEventElement> WrapBasicEventElement(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   that->set_observed(
-    Wrap<E>(
-      that->observed(),
-      factory
-    )
+    Wrap<E>(that->observed(), factory)
   );
 
   if (that->message_broker().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->message_broker().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_message_broker(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->message_broker().value(), factory)
       )
     );
   }
@@ -12356,310 +10573,108 @@ std::shared_ptr<types::IOperation> WrapOperation(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->input_variables().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >& value(
-      that->input_variables().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_input_variables(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_OperationVariable<E>(
+          that->input_variables().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->output_variables().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >& value(
-      that->output_variables().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_output_variables(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_OperationVariable<E>(
+          that->output_variables().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->inoutput_variables().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >& value(
-      that->inoutput_variables().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_inoutput_variables(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_OperationVariable<E>(
+          that->inoutput_variables().value(),
+          factory
+        )
       )
     );
   }
@@ -12699,10 +10714,7 @@ std::shared_ptr<types::IOperationVariable> WrapOperationVariable(
   // in the caller.
 
   that->set_value(
-    Wrap<E>(
-      that->value(),
-      factory
-    )
+    Wrap<E>(that->value(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -12740,214 +10752,75 @@ std::shared_ptr<types::ICapability> WrapCapability(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->semantic_id().value(), factory)
       )
     );
   }
 
   if (that->supplemental_semantic_ids().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->supplemental_semantic_ids().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_supplemental_semantic_ids(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->supplemental_semantic_ids().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->qualifiers().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IQualifier>
-      >& value(
-      that->qualifiers().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IQualifier>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_qualifiers(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Qualifier<E>(
+          that->qualifiers().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
@@ -12987,182 +10860,64 @@ std::shared_ptr<types::IConceptDescription> WrapConceptDescription(
   // in the caller.
 
   if (that->extensions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IExtension>
-      >& value(
-      that->extensions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IExtension>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_extensions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Extension<E>(
+          that->extensions().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->display_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >& value(
-      that->display_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_display_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringNameType<E>(
+          that->display_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->description().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >& value(
-      that->description().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_description(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringTextType<E>(
+          that->description().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->administration().has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& value(
-      that->administration().value()
-    );
-
-    std::shared_ptr<
-      types::IAdministrativeInformation
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_administration(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->administration().value(), factory)
       )
     );
   }
 
   if (that->embedded_data_specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >& value(
-      that->embedded_data_specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_embedded_data_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_EmbeddedDataSpecification<E>(
+          that->embedded_data_specifications().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->is_case_of().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IReference>
-      >& value(
-      that->is_case_of().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IReference>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_is_case_of(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Reference<E>(
+          that->is_case_of().value(),
+          factory
+        )
       )
     );
   }
@@ -13202,55 +10957,16 @@ std::shared_ptr<types::IReference> WrapReference(
   // in the caller.
 
   if (that->referred_semantic_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->referred_semantic_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_referred_semantic_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->referred_semantic_id().value(), factory)
       )
     );
   }
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IKey>
-    >& value(
-      that->keys()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IKey>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IKey>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_keys(
-      std::move(wrapped)
-    );
-  }
+  that->set_keys(
+    Wrap_listOf_Key<E>(that->keys(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -13395,97 +11111,31 @@ std::shared_ptr<types::IEnvironment> WrapEnvironment(
   // in the caller.
 
   if (that->asset_administration_shells().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IAssetAdministrationShell>
-      >& value(
-      that->asset_administration_shells().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IAssetAdministrationShell>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_asset_administration_shells(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_AssetAdministrationShell<E>(
+          that->asset_administration_shells().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->submodels().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISubmodel>
-      >& value(
-      that->submodels().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISubmodel>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISubmodel>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_submodels(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Submodel<E>(that->submodels().value(), factory)
       )
     );
   }
 
   if (that->concept_descriptions().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::IConceptDescription>
-      >& value(
-      that->concept_descriptions().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IConceptDescription>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IConceptDescription>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_concept_descriptions(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_ConceptDescription<E>(
+          that->concept_descriptions().value(),
+          factory
+        )
       )
     );
   }
@@ -13525,17 +11175,11 @@ std::shared_ptr<types::IEmbeddedDataSpecification> WrapEmbeddedDataSpecification
   // in the caller.
 
   that->set_data_specification(
-    Wrap<E>(
-      that->data_specification(),
-      factory
-    )
+    Wrap<E>(that->data_specification(), factory)
   );
 
   that->set_data_specification_content(
-    Wrap<E>(
-      that->data_specification_content(),
-      factory
-    )
+    Wrap<E>(that->data_specification_content(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -13609,10 +11253,7 @@ std::shared_ptr<types::IValueReferencePair> WrapValueReferencePair(
   // in the caller.
 
   that->set_value_id(
-    Wrap<E>(
-      that->value_id(),
-      factory
-    )
+    Wrap<E>(that->value_id(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -13649,35 +11290,12 @@ std::shared_ptr<types::IValueList> WrapValueList(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IValueReferencePair>
-    >& value(
-      that->value_reference_pairs()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IValueReferencePair>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IValueReferencePair>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_value_reference_pairs(
-      std::move(wrapped)
-    );
-  }
+  that->set_value_reference_pairs(
+    Wrap_listOf_ValueReferencePair<E>(
+      that->value_reference_pairs(),
+      factory
+    )
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -13821,159 +11439,55 @@ std::shared_ptr<types::IDataSpecificationIec61360> WrapDataSpecificationIec61360
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >& value(
-      that->preferred_name()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_preferred_name(
-      std::move(wrapped)
-    );
-  }
+  that->set_preferred_name(
+    Wrap_listOf_LangStringPreferredNameTypeIec61360<E>(
+      that->preferred_name(),
+      factory
+    )
+  );
 
   if (that->short_name().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-      >& value(
-      that->short_name().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_short_name(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringShortNameTypeIec61360<E>(
+          that->short_name().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->unit_id().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->unit_id().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_unit_id(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->unit_id().value(), factory)
       )
     );
   }
 
   if (that->definition().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-      >& value(
-      that->definition().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_definition(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangStringDefinitionTypeIec61360<E>(
+          that->definition().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->value_list().has_value()) {
-    const std::shared_ptr<types::IValueList>& value(
-      that->value_list().value()
-    );
-
-    std::shared_ptr<
-      types::IValueList
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_value_list(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->value_list().value(), factory)
       )
     );
   }
 
   if (that->level_type().has_value()) {
-    const std::shared_ptr<types::ILevelType>& value(
-      that->level_type().value()
-    );
-
-    std::shared_ptr<
-      types::ILevelType
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_level_type(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->level_type().value(), factory)
       )
     );
   }

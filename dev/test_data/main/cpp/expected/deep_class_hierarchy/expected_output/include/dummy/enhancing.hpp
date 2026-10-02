@@ -633,17 +633,11 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_some_choice(
-    Wrap<E>(
-      that->some_choice(),
-      factory
-    )
+    Wrap<E>(that->some_choice(), factory)
   );
 
   that->set_something_without_choice(
-    Wrap<E>(
-      that->something_without_choice(),
-      factory
-    )
+    Wrap<E>(that->something_without_choice(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -681,17 +675,11 @@ std::shared_ptr<types::IContainer> WrapContainer(
   // in the caller.
 
   that->set_node(
-    Wrap<E>(
-      that->node(),
-      factory
-    )
+    Wrap<E>(that->node(), factory)
   );
 
   that->set_something(
-    Wrap<E>(
-      that->something(),
-      factory
-    )
+    Wrap<E>(that->something(), factory)
   );
 
   std::shared_ptr<E> enh(

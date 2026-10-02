@@ -939,6 +939,167 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<types::StructuralUnion> Wrap_listOf_StructuralUnion(
+  const std::vector<types::StructuralUnion>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<types::StructuralUnion> result;
+  result.reserve(that.size());
+
+  for (
+    const types::StructuralUnion& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<types::MixedUnion> Wrap_listOf_MixedUnion(
+  const std::vector<types::MixedUnion>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<types::MixedUnion> result;
+  result.reserve(that.size());
+
+  for (
+    const types::MixedUnion& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<types::ModelTypedUnion> Wrap_listOf_ModelTypedUnion(
+  const std::vector<types::ModelTypedUnion>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<types::ModelTypedUnion> result;
+  result.reserve(that.size());
+
+  for (
+    const types::ModelTypedUnion& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::tuple<
+  types::StructuralUnion,
+  types::MixedUnion,
+  types::ModelTypedUnion
+> Wrap_tupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+  const std::tuple<
+    types::StructuralUnion,
+    types::MixedUnion,
+    types::ModelTypedUnion
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  return std::tuple<
+    types::StructuralUnion,
+    types::MixedUnion,
+    types::ModelTypedUnion
+  >(
+    Wrap<E>(std::get<0>(that), factory),
+    Wrap<E>(std::get<1>(that), factory),
+    Wrap<E>(std::get<2>(that), factory)
+  );
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<types::OverlappingUnion> Wrap_listOf_OverlappingUnion(
+  const std::vector<types::OverlappingUnion>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<types::OverlappingUnion> result;
+  result.reserve(that.size());
+
+  for (
+    const types::OverlappingUnion& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -1284,220 +1445,82 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_structural_property(
-    Wrap<E>(
-      that->structural_property(),
-      factory
-    )
+    Wrap<E>(that->structural_property(), factory)
   );
 
   that->set_mixed_property(
-    Wrap<E>(
-      that->mixed_property(),
-      factory
-    )
+    Wrap<E>(that->mixed_property(), factory)
   );
 
   that->set_model_typed_property(
-    Wrap<E>(
-      that->model_typed_property(),
+    Wrap<E>(that->model_typed_property(), factory)
+  );
+
+  that->set_list_structural_property(
+    Wrap_listOf_StructuralUnion<E>(
+      that->list_structural_property(),
       factory
     )
   );
 
-  {
-    const std::vector<types::StructuralUnion>& value(
-      that->list_structural_property()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<types::StructuralUnion> wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const types::StructuralUnion& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_list_structural_property(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::vector<types::MixedUnion>& value(
-      that->list_mixed_property()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<types::MixedUnion> wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const types::MixedUnion& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_list_mixed_property(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::vector<types::ModelTypedUnion>& value(
-      that->list_model_typed_property()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<types::ModelTypedUnion> wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const types::ModelTypedUnion& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_list_model_typed_property(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::tuple<
-      types::StructuralUnion,
-      types::MixedUnion,
-      types::ModelTypedUnion
-    >& value(
-      that->tuple_property()
-    );
-
-    std::tuple<
-      types::StructuralUnion,
-      types::MixedUnion,
-      types::ModelTypedUnion
-    > wrapped(value);
-
-    std::get<0>(wrapped) = Wrap<E>(
-      std::get<0>(value),
+  that->set_list_mixed_property(
+    Wrap_listOf_MixedUnion<E>(
+      that->list_mixed_property(),
       factory
-    );
+    )
+  );
 
-    std::get<1>(wrapped) = Wrap<E>(
-      std::get<1>(value),
+  that->set_list_model_typed_property(
+    Wrap_listOf_ModelTypedUnion<E>(
+      that->list_model_typed_property(),
       factory
-    );
+    )
+  );
 
-    std::get<2>(wrapped) = Wrap<E>(
-      std::get<2>(value),
+  that->set_tuple_property(
+    Wrap_tupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion<E>(
+      that->tuple_property(),
       factory
-    );
-
-    that->set_tuple_property(
-      std::move(wrapped)
-    );
-  }
+    )
+  );
 
   if (that->optional_structural_property().has_value()) {
-    const types::StructuralUnion& value(
-      that->optional_structural_property().value()
-    );
-
-    types::StructuralUnion wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_structural_property(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(
+          that->optional_structural_property().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->optional_mixed_property().has_value()) {
-    const types::MixedUnion& value(
-      that->optional_mixed_property().value()
-    );
-
-    types::MixedUnion wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_mixed_property(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_mixed_property().value(), factory)
       )
     );
   }
 
   if (that->optional_model_typed_property().has_value()) {
-    const types::ModelTypedUnion& value(
-      that->optional_model_typed_property().value()
-    );
-
-    types::ModelTypedUnion wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_model_typed_property(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(
+          that->optional_model_typed_property().value(),
+          factory
+        )
       )
     );
   }
 
   if (that->optional_list_overlapping_property().has_value()) {
-    const std::vector<types::OverlappingUnion>& value(
-      that->optional_list_overlapping_property().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<types::OverlappingUnion> wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const types::OverlappingUnion& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_optional_list_overlapping_property(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_OverlappingUnion<E>(
+          that->optional_list_overlapping_property().value(),
+          factory
+        )
       )
     );
   }

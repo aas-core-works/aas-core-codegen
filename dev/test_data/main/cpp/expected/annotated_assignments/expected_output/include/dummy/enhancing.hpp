@@ -651,6 +651,43 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IParent>
+> Wrap_listOf_Parent(
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IParent>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IParent>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -780,85 +817,29 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_item(
-    Wrap<E>(
-      that->item(),
-      factory
-    )
+    Wrap<E>(that->item(), factory)
   );
 
   that->set_parent(
-    Wrap<E>(
-      that->parent(),
-      factory
-    )
+    Wrap<E>(that->parent(), factory)
   );
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IParent>
-    >& value(
-      that->parents()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IParent>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IParent>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_parents(
-      std::move(wrapped)
-    );
-  }
+  that->set_parents(
+    Wrap_listOf_Parent<E>(that->parents(), factory)
+  );
 
   if (that->optional_parent().has_value()) {
-    const std::shared_ptr<types::IParent>& value(
-      that->optional_parent().value()
-    );
-
-    std::shared_ptr<
-      types::IParent
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_parent(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_parent().value(), factory)
       )
     );
   }
 
   if (that->optional_member().has_value()) {
-    const types::ParentOrItem& value(
-      that->optional_member().value()
-    );
-
-    types::ParentOrItem wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_member(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_member().value(), factory)
       )
     );
   }

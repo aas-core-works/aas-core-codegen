@@ -225,6 +225,43 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IItem>
+> Wrap_listOf_Item(
+  const std::vector<
+    std::shared_ptr<types::IItem>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IItem>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IItem>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -281,35 +318,9 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IItem>
-    >& value(
-      that->items()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IItem>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IItem>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_items(
-      std::move(wrapped)
-    );
-  }
+  that->set_items(
+    Wrap_listOf_Item<E>(that->items(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)

@@ -1,7 +1,7 @@
 """Generate code for enhancing model classes."""
 
 import io
-from typing import Tuple, Optional, List, Sequence
+from typing import Tuple, Optional, List, Mapping, Sequence, Set
 
 from icontract import ensure, require
 
@@ -16,6 +16,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.cpp import (
     common as cpp_common,
     naming as cpp_naming,
+    over as cpp_over,
 )
 from aas_core_codegen.cpp.common import (
     INDENT as I,
@@ -413,602 +414,215 @@ class {enhanced_cls_name}
     )
 
 
-# NOTE (mristin):
-# We write two separate functions, ``_generate_wrap_snippet_for_required_property`` and
-# ``_generate_wrap_snippet_for_optional_property``, as the complexity grew over the top.
-# This resulted in a much more readable code than if we tried to de-DRY the logic
-# in a single function.
+def _wrap_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function wrapping the instances held by ``type_anno``.
+
+    The moniker is unique by construction (see :py:func:`cpp_over.moniker`), so
+    two different containers never share a function.
+    """
+    return Identifier(f"Wrap_{cpp_over.moniker(type_anno)}")
 
 
-def _generate_wrap_snippet_for_required_list_of_referencable_items(
-    prop: intermediate.Property,
-    type_anno: intermediate.ListTypeAnnotation,
-    setter_name: Identifier,
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_expr(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
 ) -> Stripped:
     """
-    Generate the snippet to recursively wrap a required list of referencable items.
+    Generate the expression wrapping the instances held by the value at ``expr``.
 
-    The list items may be a class or a named union -- ``Wrap<E>`` already
-    has a dedicated overload for each, so the loop body is identical either
-    way. We call this separately from a class-typed items branch and a
-    named-union-typed items branch, and we keep those branches separate so
-    each can diverge independently, *e.g.* if primitive items are ever
-    allowed into a named union.
+    An instance and a named union are wrapped by the overloaded ``Wrap<E>``.
+    A container is delegated to its wrapping function, which wraps only one level
+    and calls the function of its items by name. This way the wrapping is
+    composed of plain functions, to any depth.
     """
-    getter_name = cpp_naming.getter_name(prop.name)
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union has its own ``Wrap<E>`` overload (see
+        # :py:func:`_generate_wrap_for_named_union`), so it can be wrapped exactly
+        # like a class instance.
+        return cpp_over.generate_call("Wrap<E>", [expr, "factory"])
 
-    const_ref_prop_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=type_anno, types_namespace=Identifier("types")
-    )
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _wrap_container_name(type_anno)
+        return cpp_over.generate_call(f"{name}<E>", [expr, "factory"])
 
-    prop_type = cpp_common.generate_type(
-        type_annotation=type_anno,
-        types_namespace=cpp_common.TYPES_NAMESPACE,
-    )
-
-    item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
-    )
-
-    return Stripped(
-        f"""\
-{{
-{I}{indent_but_first_line(const_ref_prop_type, I)} value(
-{II}that->{getter_name}()
-{I});
-{I}const std::size_t size = value.size();
-
-{I}{indent_but_first_line(prop_type, I)} wrapped;
-{I}wrapped.reserve(size);
-
-{I}for (
-{II}{indent_but_first_line(item_type, II)} item
-{II}: value
-{I}) {{
-{II}wrapped.emplace_back(
-{III}Wrap<E>(
-{IIII}item,
-{IIII}factory
-{III})
-{II});
-{I}}}
-
-{I}that->{setter_name}(
-{II}std::move(wrapped)
-{I});
-}}"""
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
     )
 
 
-@require(lambda prop: not isinstance(prop, intermediate.OptionalTypeAnnotation))
-def _generate_wrap_snippet_for_required_property(
-    prop: intermediate.Property,
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
 ) -> Stripped:
     """
-    Generate the snippet to recursively wrap the required property.
+    Generate the function wrapping the instances held by ``type_anno``.
 
-    We return an empty string if there is no snippet for the property.
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
     """
-    type_anno = prop.type_annotation
+    value_type = cpp_common.generate_type(
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
 
-    # NOTE (mristin):
-    # Duplicate the pre-condition for mypy.
-    assert not isinstance(type_anno, intermediate.OptionalTypeAnnotation)
+    body: Stripped
 
-    setter_name = cpp_naming.setter_name(prop.name)
-
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # Nothing to recurse into.
-        return Stripped("")
-
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(type_anno.our_type, intermediate.Enumeration):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(
-            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            # NOTE (mristin):
-            # The non-mutating getter means here that we will not change the reference,
-            # but we want to recurse into the object.
-            getter_name = cpp_naming.getter_name(prop.name)
-
-            return Stripped(
-                f"""\
-that->{setter_name}(
-{I}Wrap<E>(
-{II}that->{getter_name}(),
-{II}factory
-{I})
-);"""
-            )
-
-        elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-            # NOTE (mristin):
-            # The non-mutating getter means here that we will not change the reference,
-            # but we want to recurse into the object. ``Wrap<E>`` already has a
-            # dedicated overload for the union's own value type (see
-            # ``_generate_wrap_for_named_union``), so this call resolves
-            # correctly regardless of the union's alternatives.
-            getter_name = cpp_naming.getter_name(prop.name)
-
-            return Stripped(
-                f"""\
-that->{setter_name}(
-{I}Wrap<E>(
-{II}that->{getter_name}(),
-{II}factory
-{I})
-);"""
-            )
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.our_type)
-
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                # Nothing to recurse into.
-                return Stripped("")
-
-            elif isinstance(
-                type_anno.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                # Nothing to recurse into.
-                return Stripped("")
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                return _generate_wrap_snippet_for_required_list_of_referencable_items(
-                    prop=prop, type_anno=type_anno, setter_name=setter_name
-                )
-
-            elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                return _generate_wrap_snippet_for_required_list_of_referencable_items(
-                    prop=prop, type_anno=type_anno, setter_name=setter_name
-                )
-
-            else:
-                assert_never(type_anno.items.our_type)
-
-        elif isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            raise NotImplementedError(
-                f"NOTE (mristin): We do not currently support "
-                f"the generation of enhancing code for lists of optionals, "
-                f"but you specified {type_anno}. Please contact the developers if "
-                f"you need this feature."
-            )
-
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            raise NotImplementedError(
-                f"NOTE (mristin): We do not currently support "
-                f"the generation of enhancing code for lists of lists, "
-                f"but you specified {type_anno}. Please contact the developers if "
-                f"you need this feature."
-            )
-
-        elif isinstance(type_anno.items, intermediate.TupleTypeAnnotation):
-            raise NotImplementedError(
-                f"NOTE (mristin): We do not currently support "
-                f"the generation of enhancing code for lists of tuples, "
-                f"but you specified {type_anno}. Please contact the developers if "
-                f"you need this feature."
-            )
-
-        elif isinstance(
-            type_anno.items,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set nested in a list, as the parser refuses the nested sets: "
-                f"{type_anno}"
-            )
-
-        else:
-            assert_never(type_anno.items)
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        class_indices = []  # type: List[int]
-        for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
-
-            is_class_item = isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                item_type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            )
-
-            is_named_union_item = isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion)
-
-            if is_class_item or is_named_union_item:
-                class_indices.append(i)
-
-        if len(class_indices) == 0:
-            # Nothing to recurse into.
-            return Stripped("")
-
-        getter_name = cpp_naming.getter_name(prop.name)
-
-        const_ref_prop_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno, types_namespace=Identifier("types")
-        )
-
-        prop_type = cpp_common.generate_type(
-            type_annotation=type_anno,
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_type = cpp_common.generate_type_with_const_ref_if_applicable(
+            type_annotation=type_anno.items,
             types_namespace=cpp_common.TYPES_NAMESPACE,
         )
 
-        wrap_stmts = [
-            Stripped(
-                f"""\
-std::get<{i}>(wrapped) = Wrap<E>(
-{I}std::get<{i}>(value),
-{I}factory
-);"""
-            )
-            for i in class_indices
-        ]
-
-        wrap_stmts_joined = "\n\n".join(wrap_stmts)
-
-        return Stripped(
-            f"""\
-{{
-{I}{indent_but_first_line(const_ref_prop_type, I)} value(
-{II}that->{getter_name}()
-{I});
-
-{I}{indent_but_first_line(prop_type, I)} wrapped(value);
-
-{I}{indent_but_first_line(wrap_stmts_joined, I)}
-
-{I}that->{setter_name}(
-{II}std::move(wrapped)
-{I});
-}}"""
+        item_wrap_expr = _generate_wrap_expr(
+            expr="item", type_anno=type_anno.items, descendability=descendability
         )
 
-    elif isinstance(
-        type_anno,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        # NOTE (mristin):
-        # A JSON-able value is plain data (``nlohmann::json``), never
-        # a reference to one of our own classes, so there is nothing to
-        # recurse into.
-        return Stripped("")
+        emplace_call = cpp_over.generate_call("result.emplace_back", [item_wrap_expr])
+
+        body = Stripped(
+            f"""\
+{value_type} result;
+result.reserve(that.size());
+
+for (
+{I}{indent_but_first_line(item_type, I)} item :
+{I}that
+) {{
+{I}{indent_but_first_line(emplace_call, I)};
+}}
+
+return result;"""
+        )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set holds only primitives and enumeration literals, never a reference
-        # to one of our own classes, so there is nothing to recurse into.
-        return Stripped("")
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_anno)
-
-
-# fmt: off
-@require(
-    lambda prop:
-    isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-)
-# fmt: on
-def _generate_wrap_snippet_for_optional_property(
-    prop: intermediate.Property,
-) -> Stripped:
-    """
-    Generate the snippet to recursively wrap the optional property.
-
-    We return an empty string if there is no snippet for the property.
-    """
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-    setter_name = cpp_naming.setter_name(prop.name)
-
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # Nothing to recurse into.
-        return Stripped("")
-
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(type_anno.our_type, intermediate.Enumeration):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-            # Nothing to recurse into.
-            return Stripped("")
-
-        elif isinstance(
-            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            # NOTE (mristin):
-            # The non-mutating getter means here that we will not change the reference,
-            # but we want to recurse into the object.
-            getter_name = cpp_naming.getter_name(prop.name)
-
-            value_type = cpp_common.generate_type(
-                type_annotation=type_anno, types_namespace=Identifier("types")
-            )
-
-            value_interface_name = cpp_naming.interface_name(type_anno.our_type.name)
-
-            return Stripped(
-                f"""\
-if (that->{getter_name}().has_value()) {{
-{I}const {indent_but_first_line(value_type, II)}& value(
-{II}that->{getter_name}().value()
-{I});
-
-{I}std::shared_ptr<
-{II}types::{value_interface_name}
-{I}> wrapped(
-{II}Wrap<E>(
-{III}value,
-{III}factory
-{II})
-{I});
-
-{I}that->{setter_name}(
-{II}common::make_optional(
-{III}std::move(wrapped)
-{II})
-{I});
-}}"""
-            )
-        elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-            # NOTE (mristin):
-            # Unlike a class, a named union's value is not a pointer, so the
-            # wrapped result is not itself wrapped in a further shared_ptr.
-            getter_name = cpp_naming.getter_name(prop.name)
-
-            value_type = cpp_common.generate_type(
-                type_annotation=type_anno, types_namespace=Identifier("types")
-            )
-
-            return Stripped(
-                f"""\
-if (that->{getter_name}().has_value()) {{
-{I}const {indent_but_first_line(value_type, II)}& value(
-{II}that->{getter_name}().value()
-{I});
-
-{I}{indent_but_first_line(value_type, I)} wrapped(
-{II}Wrap<E>(
-{III}value,
-{III}factory
-{II})
-{I});
-
-{I}that->{setter_name}(
-{II}common::make_optional(
-{III}std::move(wrapped)
-{II})
-{I});
-}}"""
-            )
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.our_type)
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        is_list_of_classes = isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        raise AssertionError(
+            f"Unexpected set holding instances: {type_anno}. A set holds only "
+            f"primitives, constrained primitives and enumeration literals, so "
+            f"it should have never been descendable."
         )
 
-        is_list_of_named_unions = isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(type_anno.items.our_type, intermediate.NamedUnion)
-
-        if not (is_list_of_classes or is_list_of_named_unions):
-            if isinstance(
-                type_anno.items,
-                (
-                    intermediate.OptionalTypeAnnotation,
-                    intermediate.ListTypeAnnotation,
-                    intermediate.TupleTypeAnnotation,
-                ),
-            ):
-                raise NotImplementedError(
-                    f"NOTE (mristin): We do not currently support "
-                    f"the generation of enhancing code for optional lists of "
-                    f"optionals, of lists or of tuples, but you specified "
-                    f"{prop.type_annotation}. Please contact the developers if "
-                    f"you need this feature."
-                )
-
-            # NOTE (mristin):
-            # Only an instance is wrapped, so a list which holds none -- of
-            # primitives, of constrained primitives, of enumeration literals or
-            # of JSON-able values -- has nothing to recurse into. This mirrors
-            # :py:func:`_generate_wrap_snippet_for_required_property`, which has
-            # spelled the very same taxonomy out from the beginning.
-            return Stripped("")
-
-        getter_name = cpp_naming.getter_name(prop.name)
-        value_type = cpp_common.generate_type(
-            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
-        )
-
-        item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
-        )
-
-        return Stripped(
-            f"""\
-if (that->{getter_name}().has_value()) {{
-{I}const {indent_but_first_line(value_type, II)}& value(
-{II}that->{getter_name}().value()
-{I});
-{I}const std::size_t size = value.size();
-
-{I}{indent_but_first_line(value_type, I)} wrapped;
-{I}wrapped.reserve(size);
-
-{I}for (
-{II}{indent_but_first_line(item_type, II)} item
-{II}: value
-{I}) {{
-{II}wrapped.emplace_back(
-{III}Wrap<E>(
-{IIII}item,
-{IIII}factory
-{III})
-{II});
-{I}}}
-
-{I}that->{setter_name}(
-{II}common::make_optional(
-{III}std::move(wrapped)
-{II})
-{I});
-}}"""
-        )
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        class_indices = []  # type: List[int]
-        for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
+        item_exprs = [
+            (
+                _generate_wrap_expr(
+                    expr=f"std::get<{i}>(that)",
+                    type_anno=item,
+                    descendability=descendability,
+                )
+                if descendability[item]
+                else Stripped(f"std::get<{i}>(that)")
             )
-
-            is_class_item = isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                item_type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            )
-
-            is_named_union_item = isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion)
-
-            if is_class_item or is_named_union_item:
-                class_indices.append(i)
-
-        if len(class_indices) == 0:
-            # Nothing to recurse into.
-            return Stripped("")
-
-        getter_name = cpp_naming.getter_name(prop.name)
-
-        value_type = cpp_common.generate_type(
-            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
-        )
-
-        wrap_stmts = [
-            Stripped(
-                f"""\
-std::get<{i}>(wrapped) = Wrap<E>(
-{I}std::get<{i}>(value),
-{I}factory
-);"""
-            )
-            for i in class_indices
+            for i, item in enumerate(type_anno.items)
         ]
 
-        wrap_stmts_joined = "\n\n".join(wrap_stmts)
+        item_exprs_joined = ",\n".join(item_exprs)
 
-        return Stripped(
+        body = Stripped(
             f"""\
-if (that->{getter_name}().has_value()) {{
-{I}const {indent_but_first_line(value_type, II)}& value(
-{II}that->{getter_name}().value()
-{I});
-
-{I}{indent_but_first_line(value_type, I)} wrapped(value);
-
-{I}{indent_but_first_line(wrap_stmts_joined, I)}
-
-{I}that->{setter_name}(
-{II}common::make_optional(
-{III}std::move(wrapped)
-{II})
-{I});
-}}"""
+return {value_type}(
+{I}{indent_but_first_line(item_exprs_joined, I)}
+);"""
         )
 
-    elif isinstance(
-        type_anno,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        # NOTE (mristin):
-        # A JSON-able value is plain data (``nlohmann::json``), never
-        # a reference to one of our own classes, so there is nothing to
-        # recurse into.
-        return Stripped("")
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set holds only primitives and enumeration literals, never a reference
-        # to one of our own classes, so there is nothing to recurse into.
-        return Stripped("")
-
     else:
-        # noinspection PyTypeChecker
         assert_never(type_anno)
+
+    name = _wrap_container_name(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * Wrap recursively the instances held by \\p that.
+ *
+ * \\param that container of the instances to be wrapped
+ * \\param factory to produce an enhancement based on an instance
+ * \\return a copy of \\p that with the wrapped instances
+ *
+ * \\tparam E type of the enhancement
+ */
+template<typename E>
+{value_type} {name}(
+{I}const {indent_but_first_line(value_type, I)}& that,
+{I}const std::function<
+{II}std::shared_ptr<E>(
+{III}const std::shared_ptr<types::IClass>&
+{II})
+{I}>& factory
+) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
 
 
 def _generate_concrete_wrap(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the concrete wrapping function for the concrete class."""
     recurse_blocks = []  # type: List[Stripped]
     for prop in cls.properties:
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            recurse_block = _generate_wrap_snippet_for_optional_property(
-                prop=prop,
-            )
-        else:
-            recurse_block = _generate_wrap_snippet_for_required_property(
-                prop=prop,
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            # Nothing to recurse into.
+            continue
+
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+        # NOTE (mristin):
+        # The non-mutating getter means here that we will not change the reference,
+        # but we want to recurse into the object.
+        getter_name = cpp_naming.getter_name(prop.name)
+        setter_name = cpp_naming.setter_name(prop.name)
+
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            wrap_expr = _generate_wrap_expr(
+                expr=f"that->{getter_name}()",
+                type_anno=type_anno,
+                descendability=descendability,
             )
 
-        if len(recurse_block) != 0:
-            recurse_blocks.append(recurse_block)
+            recurse_blocks.append(
+                Stripped(
+                    f"""\
+that->{setter_name}(
+{I}{indent_but_first_line(wrap_expr, I)}
+);"""
+                )
+            )
+            continue
+
+        wrap_expr = _generate_wrap_expr(
+            expr=f"that->{getter_name}().value()",
+            type_anno=type_anno,
+            descendability=descendability,
+        )
+
+        recurse_blocks.append(
+            Stripped(
+                f"""\
+if (that->{getter_name}().has_value()) {{
+{I}that->{setter_name}(
+{II}common::make_optional(
+{III}{indent_but_first_line(wrap_expr, III)}
+{II})
+{I});
+}}"""
+            )
+        )
 
     recurse_blocks_joined = Stripped(
         "\n\n".join(recurse_blocks)
@@ -1327,6 +941,35 @@ def generate_header(
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
+    wrap_container_functions = []  # type: List[Stripped]
+    observed_monikers = set()  # type: Set[str]
+
+    # NOTE (mristin):
+    # The descendability maps the nested type annotations before the type
+    # annotations which hold them. Hence, a wrapping function always comes after
+    # the functions it calls, as C++ requires.
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = cpp_over.moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                wrap_container_functions.append(
+                    _generate_wrap_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
+
     blocks = [
         Stripped(
             f"""\
@@ -1364,6 +1007,7 @@ namespace impl {"""
         ),
         _generate_enhanced_interface_definition(),
         *[_generate_enhanced_class(cls) for cls in symbol_table.concrete_classes],
+        *wrap_container_functions,
         *[_generate_concrete_wrap(cls=cls) for cls in symbol_table.concrete_classes],
         Stripped(
             f"""\

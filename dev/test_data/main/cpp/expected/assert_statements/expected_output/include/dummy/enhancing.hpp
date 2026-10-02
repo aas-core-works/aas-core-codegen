@@ -425,10 +425,7 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_parent(
-    Wrap<E>(
-      that->parent(),
-      factory
-    )
+    Wrap<E>(that->parent(), factory)
   );
 
   std::shared_ptr<E> enh(

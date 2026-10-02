@@ -365,6 +365,80 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IAbstractItem>
+> Wrap_listOf_AbstractItem(
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IAbstractItem>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ISimple>
+> Wrap_listOf_Simple(
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ISimple>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ISimple>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -494,71 +568,16 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_item(
-    Wrap<E>(
-      that->item(),
-      factory
-    )
+    Wrap<E>(that->item(), factory)
   );
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IAbstractItem>
-    >& value(
-      that->some_items()
-    );
-    const std::size_t size = value.size();
+  that->set_some_items(
+    Wrap_listOf_AbstractItem<E>(that->some_items(), factory)
+  );
 
-    std::vector<
-      std::shared_ptr<types::IAbstractItem>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IAbstractItem>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_some_items(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::vector<
-      std::shared_ptr<types::ISimple>
-    >& value(
-      that->some_simples()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISimple>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISimple>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_some_simples(
-      std::move(wrapped)
-    );
-  }
+  that->set_some_simples(
+    Wrap_listOf_Simple<E>(that->some_simples(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
