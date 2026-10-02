@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -55,20 +54,7 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<ILangString> langStrings = that.getLangStrings();
-    List<ILangString> transformedLangStrings = langStrings.stream()
-      .map(langStringsItem -> {
-        IClass transformedLangStringsItem =
-          transform(langStringsItem);
-        if (!(transformedLangStringsItem instanceof ILangString)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a ILangString " +
-            ", but got: " + transformedLangStringsItem
-          );
-        }
-        return (ILangString) transformedLangStringsItem;
-      }).collect(Collectors.toList());
-    that.setLangStrings(transformedLangStrings);
+    that.setLangStrings(wrapListOf_ILangString(that.getLangStrings()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -91,20 +77,8 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     }
 
     if (that.getDefinition().isPresent()) {
-      List<ILangString> definition = that.getDefinition().get();
-      List<ILangString> transformedDefinition = definition.stream()
-        .map(definitionItem -> {
-          IClass transformedDefinitionItem =
-            transform(definitionItem);
-          if (!(transformedDefinitionItem instanceof ILangString)) {
-            throw new UnsupportedOperationException(
-              "Expected the transformed value to be a ILangString " +
-              ", but got: " + transformedDefinitionItem
-            );
-          }
-          return (ILangString) transformedDefinitionItem;
-        }).collect(Collectors.toList());
-      that.setDefinition(transformedDefinition);
+      that.setDefinition(
+        wrapListOf_ILangString(that.getDefinition().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -147,16 +121,7 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    IContent content = that.getContent();
-    IClass transformedContent = transform(content);
-    if (!(transformedContent instanceof IContent)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IContent " +
-        ", but got: " + transformedContent
-      );
-    }
-    IContent castedContent = (IContent) transformedContent;
-    that.setContent(castedContent);
+    that.setContent(wrap(that.getContent()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -178,36 +143,12 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<ILangStringSet> langStringSets = that.getLangStringSets();
-    List<ILangStringSet> transformedLangStringSets = langStringSets.stream()
-      .map(langStringSetsItem -> {
-        IClass transformedLangStringSetsItem =
-          transform(langStringSetsItem);
-        if (!(transformedLangStringSetsItem instanceof ILangStringSet)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a ILangStringSet " +
-            ", but got: " + transformedLangStringSetsItem
-          );
-        }
-        return (ILangStringSet) transformedLangStringSetsItem;
-      }).collect(Collectors.toList());
-    that.setLangStringSets(transformedLangStringSets);
+    that.setLangStringSets(
+      wrapListOf_ILangStringSet(that.getLangStringSets()));
 
     if (that.getSpecifications().isPresent()) {
-      List<ISpecification> specifications = that.getSpecifications().get();
-      List<ISpecification> transformedSpecifications = specifications.stream()
-        .map(specificationsItem -> {
-          IClass transformedSpecificationsItem =
-            transform(specificationsItem);
-          if (!(transformedSpecificationsItem instanceof ISpecification)) {
-            throw new UnsupportedOperationException(
-              "Expected the transformed value to be a ISpecification " +
-              ", but got: " + transformedSpecificationsItem
-            );
-          }
-          return (ISpecification) transformedSpecificationsItem;
-        }).collect(Collectors.toList());
-      that.setSpecifications(transformedSpecifications);
+      that.setSpecifications(
+        wrapListOf_ISpecification(that.getSpecifications().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -217,6 +158,47 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<ILangString> wrapListOf_ILangString(
+    List<ILangString> that) {
+    List<ILangString> result = new ArrayList<>(that.size());
+    for (ILangString item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<ILangStringSet> wrapListOf_ILangStringSet(
+    List<ILangStringSet> that) {
+    List<ILangStringSet> result = new ArrayList<>(that.size());
+    for (ILangStringSet item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<ISpecification> wrapListOf_ISpecification(
+    List<ISpecification> that) {
+    List<ISpecification> result = new ArrayList<>(that.size());
+    for (ISpecification item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 

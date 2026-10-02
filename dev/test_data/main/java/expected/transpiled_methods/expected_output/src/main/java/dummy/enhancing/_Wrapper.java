@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -62,6 +61,11 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
   }
 }
 

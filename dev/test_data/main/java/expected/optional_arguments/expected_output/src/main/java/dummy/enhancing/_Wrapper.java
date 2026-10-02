@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -55,28 +54,10 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    IItem item = that.getItem();
-    IClass transformedItem = transform(item);
-    if (!(transformedItem instanceof IItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IItem " +
-        ", but got: " + transformedItem
-      );
-    }
-    IItem castedItem = (IItem) transformedItem;
-    that.setItem(castedItem);
+    that.setItem(wrap(that.getItem()));
 
     if (that.getOptionalItem().isPresent()) {
-      IItem optionalItem = that.getOptionalItem().get();
-      IClass transformedOptionalItem = transform(optionalItem);
-      if (!(transformedOptionalItem instanceof IItem)) {
-        throw new UnsupportedOperationException(
-          "Expected the transformed value to be a IItem " +
-          ", but got: " + transformedOptionalItem
-        );
-      }
-      IItem castedOptionalItem = (IItem) transformedOptionalItem;
-      that.setOptionalItem(castedOptionalItem);
+      that.setOptionalItem(wrap(that.getOptionalItem().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -86,6 +67,11 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
   }
 }
 

@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Mapping, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -496,33 +496,156 @@ def _generate_enhanced(
     return files, None
 
 
-def _generate_union_transform_helper() -> Stripped:
+def _generate_wrap_helpers(with_union: bool) -> List[Stripped]:
     """
-    Generate a single ``transform`` overload shared by every named union.
+    Generate the ``wrap`` overloads for an instance and, if needed, a named union.
 
-    A named union is not itself an ``IClass``, so it can not be dispatched
-    by the inherited, ``IClass``-typed ``transform`` overload, and its
-    underlying instance has to be unwrapped, enhanced and wrapped back up.
-    We add this overload, single-purpose, next to the per-class ``transform``
-    overrides, so that call sites can keep calling ``transform`` directly,
-    regardless of whether the value at hand is a class instance or a named
-    union.
+    A transformation gives back an ``IClass``, so the ``wrap`` of an instance casts
+    it back to the caller's own type. The cast is unchecked as the type is erased,
+    but the compiler checks it on the call site, where the type is known.
 
-    ``T`` is bounded by ``IUnion<T>`` (see ``_generate_iunion`` in
-    ``_generate_types.py``) instead of by the union's own type, so we need
-    only this one overload for *all* named unions, not one per union --
-    while ``T.withUnderlying(...)`` still lets the result come back as the
-    caller's own concrete union type, so call sites need no downcast.
-
-    Should a named union ever be allowed to flatten primitive or enumeration
-    alternatives, only the body of this method has to change (to dispatch on
-    the underlying value's kind) -- every call site stays the same.
+    A named union is not itself an ``IClass``, so it can not be dispatched by
+    the inherited, ``IClass``-typed ``transform``, and its underlying instance
+    has to be unwrapped, enhanced and wrapped back up. ``T`` is bounded by
+    ``IUnion<T>`` (see ``_generate_iunion`` in ``_generate_types.py``) instead of
+    by the union's own type, so we need only this one overload for *all* named
+    unions, while ``T.withUnderlying(...)`` still lets the result come back as
+    the caller's own concrete union type.
     """
+    helpers = [
+        Stripped(
+            f"""\
+@SuppressWarnings("unchecked")
+private <T extends IClass> T wrap(T that) {{
+{I}return (T) transform(that);
+}}"""
+        )
+    ]  # type: List[Stripped]
+
+    if with_union:
+        helpers.append(
+            Stripped(
+                f"""\
+private <T extends IUnion<T>> T wrap(T that) {{
+{I}return that.withUnderlying(
+{II}wrap(that.getUnderlying()));
+}}"""
+            )
+        )
+
+    return helpers
+
+
+def _wrap_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of ``_Wrapper`` wrapping the instances held by ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.java.common.type_moniker`), so two different
+    containers never share a method. The moniker contains an underscore, so
+    the name never collides with ``wrap``.
+    """
+    return Identifier(f"wrap{java_common.type_moniker(type_anno)}")
+
+
+@require(lambda type_anno, descendability: type_anno in descendability)
+def _generate_wrap_expr(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the expression wrapping the instances held by the value at ``expr``.
+
+    A container is delegated to its method in ``_Wrapper``, which wraps only one
+    level and calls the method of its items by name. This way the wrapping is
+    composed of plain functions, to any depth.
+
+    A value which holds no instances is given back as-is.
+    """
+    if not descendability[type_anno]:
+        return Stripped(expr)
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union has its own ``wrap`` overload (see
+        # :py:func:`_generate_wrap_helpers`), so it is wrapped exactly like
+        # a class instance.
+        return Stripped(f"wrap({expr})")
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Stripped(f"{_wrap_container_name(type_anno)}({expr})")
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the method of ``_Wrapper`` wrapping the instances held by ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    value_type = java_common.generate_type(type_anno)
+
+    body: Stripped
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        container_class = (
+            "ArrayList"
+            if isinstance(type_anno, intermediate.ListTypeAnnotation)
+            else "HashSet"
+        )
+        item_type = java_common.generate_type(type_anno.items)
+        item_wrap = _generate_wrap_expr("item", type_anno.items, descendability)
+
+        body = Stripped(
+            f"""\
+{value_type} result = new {container_class}<>(that.size());
+for ({item_type} item : that) {{
+{I}result.add({indent_but_first_line(item_wrap, I)});
+}}
+return result;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        tuple_literal = java_common.generate_tuple_literal(
+            item_exprs=[
+                _generate_wrap_expr(
+                    f"that.item{i + 1}()", item_type_anno, descendability
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+            ]
+        )
+
+        body = Stripped(f"return {tuple_literal};")
+
+    else:
+        assert_never(type_anno)
+
     return Stripped(
         f"""\
-private <T extends IUnion<T>> T transform(T that) {{
-{I}return that.withUnderlying(
-{II}transform(that.getUnderlying()));
+/**
+ * Wrap the instances held by {{@code that}} recursively in a new container.
+ */
+private {value_type} {_wrap_container_name(type_anno)}(
+{I}{indent_but_first_line(value_type, I)} that) {{
+{I}{indent_but_first_line(body, I)}
 }}"""
     )
 
@@ -542,335 +665,39 @@ if (that instanceof Enhanced)
     ]  # type: List[Stripped]
 
     for prop in cls.properties:
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-        prop_name = java_naming.property_name(prop.name)
+        descendability = intermediate.map_descendability(prop.type_annotation)
+        if not descendability[prop.type_annotation]:
+            continue
+
+        getter_name = java_naming.getter_name(prop.name)
+        setter_name = java_naming.setter_name(prop.name)
 
         optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
 
-        wrap_stmt: Stripped
+        value_wrap = _generate_wrap_expr(
+            f"that.{getter_name}().get()" if optional else f"that.{getter_name}()",
+            intermediate.beneath_optional(prop.type_annotation),
+            descendability,
+        )
 
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            # We can not enhance primitive types; nothing to do here.
-            continue
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                # We can not enhance enumerations; nothing to do here.
-                continue
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                # We can not enhance primitive types; nothing to do here.
-                continue
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                getter_name = java_naming.getter_name(prop.name)
-                setter_name = java_naming.setter_name(prop.name)
-                value_interface_name = java_naming.interface_name(
-                    type_anno.our_type.name
-                )
-                transformed_name = java_naming.variable_name(
-                    Identifier(f"transformed_{prop.name}")
-                )
-                casted_name = java_naming.variable_name(
-                    Identifier(f"casted_{prop.name}")
-                )
-
-                stmt = Stripped(
-                    f"""\
-IClass {transformed_name} = transform({prop_name});
-if (!({transformed_name} instanceof {value_interface_name})) {{
-{I}throw new UnsupportedOperationException(
-{II}"Expected the transformed value to be a {value_interface_name} " +
-{II}", but got: " + {transformed_name}
-{I});
-}}
-{value_interface_name} {casted_name} = ({value_interface_name}) {transformed_name};
-that.{setter_name}({casted_name});"""
-                )
-
-                writer = io.StringIO()
-
-                if optional:
-                    writer.write(
-                        f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}{value_interface_name} {prop_name} = that.{getter_name}().get();
-{I}{indent_but_first_line(stmt, I)}
-}}"""
-                    )
-                else:
-                    writer.write(
-                        f"""\
-{value_interface_name} {prop_name} = that.{getter_name}();
-{stmt}"""
-                    )
-
-                wrap_stmt = Stripped(writer.getvalue())
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union has its own ``transform`` overload (see
-                # :py:func:`_generate_union_transform_helper`), which
-                # already returns the union's own type, so no downcast is
-                # needed here, unlike the class branch above.
-                getter_name = java_naming.getter_name(prop.name)
-                setter_name = java_naming.setter_name(prop.name)
-                union_name = java_naming.union_name(type_anno.our_type.name)
-
-                stmt = Stripped(f"that.{setter_name}(transform({prop_name}));")
-
-                writer = io.StringIO()
-
-                if optional:
-                    writer.write(
-                        f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}{union_name} {prop_name} = that.{getter_name}().get();
-{I}{indent_but_first_line(stmt, I)}
-}}"""
-                    )
-                else:
-                    writer.write(
-                        f"""\
-{union_name} {prop_name} = that.{getter_name}();
-{stmt}"""
-                    )
-
-                wrap_stmt = Stripped(writer.getvalue())
-            else:
-                assert_never(type_anno.our_type)
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            # fmt: off
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "We handle only lists of atomic values (primitives, constrained "
-                "primitives, enumeration literals) or lists of classes in the "
-                "enhancing at the moment. Lists of lists or lists of optionals "
-                "are not supported. Please contact the developers if you need "
-                "this feature."
-            )
-            # fmt: on
-
-            if not isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) or not isinstance(
-                type_anno.items.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            ):
-                # We can not enhance lists of primitives, constrained
-                # primitives, enumeration literals or JSON-able values;
-                # nothing to do here.
-                continue
-
-            item_type = java_common.generate_type(type_anno.items)
-            transformed_name = java_naming.variable_name(
-                Identifier(f"transformed_{prop.name}")
-            )
-
-            getter_name = java_naming.getter_name(prop.name)
-
-            setter_name = java_naming.setter_name(prop.name)
-
-            if isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union has its own ``transform`` overload (see
-                # :py:func:`_generate_union_transform_helper`), which
-                # already returns the union's own type, so it can be passed
-                # on as a bare method reference with no wrapping lambda,
-                # unlike the class branch below, which needs one to downcast.
-                stmt = Stripped(
-                    f"""\
-List<{item_type}> {transformed_name} = {prop_name}.stream()
-{I}.map(this::transform).collect(Collectors.toList());
-that.{setter_name}({transformed_name});"""
-                )
-            else:
-                # NOTE (mristin):
-                # A lambda parameter must not shadow a local variable in Java, and
-                # we define a local variable for each property of the class,
-                # *e.g.*, ``item`` for a property named ``item``. Hence, we derive
-                # the names of the lambda parameter and of its transformed value
-                # from the property, the same way as we derive the names of
-                # the other local variables such as ``transformed_{prop.name}``.
-                item_name = java_naming.variable_name(Identifier(f"{prop.name}_item"))
-                transformed_item_name = java_naming.variable_name(
-                    Identifier(f"transformed_{prop.name}_item")
-                )
-
-                item_transform_stmt = Stripped(
-                    f"""\
-IClass {transformed_item_name} =
-{I}transform({item_name});
-if (!({transformed_item_name} instanceof {item_type})) {{
-{I}throw new UnsupportedOperationException(
-{II}"Expected the transformed value to be a {item_type} " +
-{II}", but got: " + {transformed_item_name}
-{I});
-}}
-return ({item_type}) {transformed_item_name};"""
-                )
-
-                stmt = Stripped(
-                    f"""\
-List<{item_type}> {transformed_name} = {prop_name}.stream()
-{I}.map({item_name} -> {{
-{II}{indent_but_first_line(item_transform_stmt, II)}
-{I}}}).collect(Collectors.toList());
-that.{setter_name}({transformed_name});"""
-                )
-
-            writer = io.StringIO()
-
-            if optional:
-                writer.write(
-                    f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}List<{item_type}> {prop_name} = that.{getter_name}().get();
-{I}{indent_but_first_line(stmt, I)}
-}}"""
-                )
-            else:
-                writer.write(
-                    f"""\
-List<{item_type}> {prop_name} = that.{getter_name}();
-{stmt}"""
-                )
-
-            wrap_stmt = Stripped(writer.getvalue())
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            if not any(
-                isinstance(item, intermediate.OurTypeAnnotation)
-                and isinstance(
-                    item.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                )
-                for item in type_anno.items
-            ):
-                # We can not enhance tuples none of whose items are classes
-                # or named unions; nothing to do here.
-                continue
-
-            tuple_type = java_common.generate_type(type_anno)
-
-            getter_name = java_naming.getter_name(prop.name)
-            setter_name = java_naming.setter_name(prop.name)
-
-            item_stmts = []  # type: List[Stripped]
-            item_exprs = []  # type: List[Stripped]
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                item_access = Stripped(f"{prop_name}.item{i + 1}()")
-
-                if isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_interface_name = java_naming.interface_name(
-                        item_type_anno.our_type.name
-                    )
-                    transformed_name = java_naming.variable_name(
-                        Identifier(f"transformed_{prop.name}_{i}")
-                    )
-                    casted_name = java_naming.variable_name(
-                        Identifier(f"casted_{prop.name}_{i}")
-                    )
-
-                    item_stmts.append(
-                        Stripped(
-                            f"""\
-IClass {transformed_name} = transform({item_access});
-if (!({transformed_name} instanceof {item_interface_name})) {{
-{I}throw new UnsupportedOperationException(
-{II}"Expected the transformed value to be a {item_interface_name} " +
-{II}", but got: " + {transformed_name}
-{I});
-}}
-{item_interface_name} {casted_name} = ({item_interface_name}) {transformed_name};"""
-                        )
-                    )
-
-                    item_exprs.append(Stripped(casted_name))
-                elif isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union has its own ``transform`` overload (see
-                    # :py:func:`_generate_union_transform_helper`),
-                    # which already returns the union's own type, so no
-                    # downcast (and hence no pre-statement) is needed here,
-                    # unlike the class branch above.
-                    item_exprs.append(Stripped(f"transform({item_access})"))
-                else:
-                    item_exprs.append(item_access)
-
-            tuple_literal = java_common.generate_tuple_literal(item_exprs=item_exprs)
-
-            stmt_parts = item_stmts + [
-                Stripped(
-                    f"""\
+        stmt = Stripped(f"that.{setter_name}({value_wrap});")
+        # Heuristic to break the lines, very rudimentary
+        if len(stmt) > 70:
+            stmt = Stripped(
+                f"""\
 that.{setter_name}(
-{I}{indent_but_first_line(tuple_literal, I)});"""
-                )
-            ]
+{I}{indent_but_first_line(value_wrap, I)});"""
+            )
 
-            stmt = Stripped("\n".join(stmt_parts))
-
-            writer = io.StringIO()
-
-            if optional:
-                writer.write(
-                    f"""\
+        if optional:
+            stmt = Stripped(
+                f"""\
 if (that.{getter_name}().isPresent()) {{
-{I}{tuple_type} {prop_name} = that.{getter_name}().get();
 {I}{indent_but_first_line(stmt, I)}
 }}"""
-                )
-            else:
-                writer.write(
-                    f"""\
-{tuple_type} {prop_name} = that.{getter_name}();
-{stmt}"""
-                )
+            )
 
-            wrap_stmt = Stripped(writer.getvalue())
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data, never one of our own classes,
-            # so there is nothing to enhance.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives, constrained primitives and enumeration
-            # literals, never one of our own classes, so there is nothing to
-            # enhance.
-            continue
-
-        else:
-            assert_never(type_anno.our_type)
-
-        blocks.append(wrap_stmt)
+        blocks.append(stmt)
 
     enhanced_name = java_naming.class_name(Identifier(f"enhanced_{cls.name}"))
 
@@ -910,11 +737,10 @@ def _generate_wrapper(
 ) -> Tuple[Optional[java_common.JavaFile], Optional[List[Error]]]:
     """Generate the transformer that wraps an instance with the enhancement."""
     imports = [
+        Stripped("import java.util.ArrayList;"),
         Stripped("import java.util.List;"),
         Stripped("import java.util.Optional;"),
         Stripped("import java.util.function.Function;"),
-        Stripped("import java.util.stream.Collectors;"),
-        Stripped("import java.util.stream.Stream;"),
         Stripped(f"import {package}.common.*;"),
         Stripped(f"import {package}.types.enums.*;"),
         Stripped(f"import {package}.types.model.*;"),
@@ -945,8 +771,37 @@ _Wrapper(
     for cls in symbol_table.concrete_classes:
         body.append(_generate_transform(cls=cls))
 
-    if len(symbol_table.named_unions) > 0:
-        body.append(_generate_union_transform_helper())
+    body.extend(_generate_wrap_helpers(with_union=len(symbol_table.named_unions) > 0))
+
+    # NOTE (mristin):
+    # We wrap the instances held by the containers through methods of their own,
+    # one per type moniker.
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = java_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                if isinstance(type_anno, intermediate.SetTypeAnnotation):
+                    imports.append(Stripped("import java.util.HashSet;"))
+                    imports.append(Stripped("import java.util.Set;"))
+
+                body.append(
+                    _generate_wrap_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
 
     writer = io.StringIO()
     writer.write(

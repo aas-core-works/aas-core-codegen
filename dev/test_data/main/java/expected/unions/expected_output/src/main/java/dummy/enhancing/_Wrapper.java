@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -215,57 +214,42 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    StructuralUnion structuralProperty = that.getStructuralProperty();
-    that.setStructuralProperty(transform(structuralProperty));
+    that.setStructuralProperty(wrap(that.getStructuralProperty()));
 
-    MixedUnion mixedProperty = that.getMixedProperty();
-    that.setMixedProperty(transform(mixedProperty));
+    that.setMixedProperty(wrap(that.getMixedProperty()));
 
-    ModelTypedUnion modelTypedProperty = that.getModelTypedProperty();
-    that.setModelTypedProperty(transform(modelTypedProperty));
+    that.setModelTypedProperty(wrap(that.getModelTypedProperty()));
 
-    List<StructuralUnion> listStructuralProperty = that.getListStructuralProperty();
-    List<StructuralUnion> transformedListStructuralProperty = listStructuralProperty.stream()
-      .map(this::transform).collect(Collectors.toList());
-    that.setListStructuralProperty(transformedListStructuralProperty);
+    that.setListStructuralProperty(
+      wrapListOf_StructuralUnion(that.getListStructuralProperty()));
 
-    List<MixedUnion> listMixedProperty = that.getListMixedProperty();
-    List<MixedUnion> transformedListMixedProperty = listMixedProperty.stream()
-      .map(this::transform).collect(Collectors.toList());
-    that.setListMixedProperty(transformedListMixedProperty);
+    that.setListMixedProperty(
+      wrapListOf_MixedUnion(that.getListMixedProperty()));
 
-    List<ModelTypedUnion> listModelTypedProperty = that.getListModelTypedProperty();
-    List<ModelTypedUnion> transformedListModelTypedProperty = listModelTypedProperty.stream()
-      .map(this::transform).collect(Collectors.toList());
-    that.setListModelTypedProperty(transformedListModelTypedProperty);
+    that.setListModelTypedProperty(
+      wrapListOf_ModelTypedUnion(that.getListModelTypedProperty()));
 
-    Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> tupleProperty = that.getTupleProperty();
     that.setTupleProperty(
-      new Tuple3<>(
-        transform(tupleProperty.item1()),
-        transform(tupleProperty.item2()),
-        transform(tupleProperty.item3())));
+      wrapTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(that.getTupleProperty()));
 
     if (that.getOptionalStructuralProperty().isPresent()) {
-      StructuralUnion optionalStructuralProperty = that.getOptionalStructuralProperty().get();
-      that.setOptionalStructuralProperty(transform(optionalStructuralProperty));
+      that.setOptionalStructuralProperty(
+        wrap(that.getOptionalStructuralProperty().get()));
     }
 
     if (that.getOptionalMixedProperty().isPresent()) {
-      MixedUnion optionalMixedProperty = that.getOptionalMixedProperty().get();
-      that.setOptionalMixedProperty(transform(optionalMixedProperty));
+      that.setOptionalMixedProperty(
+        wrap(that.getOptionalMixedProperty().get()));
     }
 
     if (that.getOptionalModelTypedProperty().isPresent()) {
-      ModelTypedUnion optionalModelTypedProperty = that.getOptionalModelTypedProperty().get();
-      that.setOptionalModelTypedProperty(transform(optionalModelTypedProperty));
+      that.setOptionalModelTypedProperty(
+        wrap(that.getOptionalModelTypedProperty().get()));
     }
 
     if (that.getOptionalListOverlappingProperty().isPresent()) {
-      List<OverlappingUnion> optionalListOverlappingProperty = that.getOptionalListOverlappingProperty().get();
-      List<OverlappingUnion> transformedOptionalListOverlappingProperty = optionalListOverlappingProperty.stream()
-        .map(this::transform).collect(Collectors.toList());
-      that.setOptionalListOverlappingProperty(transformedOptionalListOverlappingProperty);
+      that.setOptionalListOverlappingProperty(
+        wrapListOf_OverlappingUnion(that.getOptionalListOverlappingProperty().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -277,9 +261,73 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
   }
 
-  private <T extends IUnion<T>> T transform(T that) {
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  private <T extends IUnion<T>> T wrap(T that) {
     return that.withUnderlying(
-      transform(that.getUnderlying()));
+      wrap(that.getUnderlying()));
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<StructuralUnion> wrapListOf_StructuralUnion(
+    List<StructuralUnion> that) {
+    List<StructuralUnion> result = new ArrayList<>(that.size());
+    for (StructuralUnion item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<MixedUnion> wrapListOf_MixedUnion(
+    List<MixedUnion> that) {
+    List<MixedUnion> result = new ArrayList<>(that.size());
+    for (MixedUnion item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<ModelTypedUnion> wrapListOf_ModelTypedUnion(
+    List<ModelTypedUnion> that) {
+    List<ModelTypedUnion> result = new ArrayList<>(that.size());
+    for (ModelTypedUnion item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> wrapTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+    Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> that) {
+    return new Tuple3<>(
+      wrap(that.item1()),
+      wrap(that.item2()),
+      wrap(that.item3()));
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<OverlappingUnion> wrapListOf_OverlappingUnion(
+    List<OverlappingUnion> that) {
+    List<OverlappingUnion> result = new ArrayList<>(that.size());
+    for (OverlappingUnion item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 
