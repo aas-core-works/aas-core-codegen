@@ -238,7 +238,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.aReadonly;
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -247,9 +247,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.aReadonly;
-
-    yield * this.aReadonly.descend();
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -311,6 +309,21 @@ export class Something extends Class {
     super();
     this.aReadonly = aReadonly;
     this.aRecord = aRecord;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.aReadonly;
+
+  if (recurse) {
+    yield * that.aReadonly.descend();
   }
 }
 

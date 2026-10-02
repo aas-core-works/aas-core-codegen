@@ -440,9 +440,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.someChoice;
-
-    yield this.somethingWithoutChoice;
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -451,13 +449,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.someChoice;
-
-    yield * this.someChoice.descend();
-
-    yield this.somethingWithoutChoice;
-
-    yield * this.somethingWithoutChoice.descend();
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -522,6 +514,27 @@ export class Something extends Class {
   }
 }
 
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.someChoice;
+
+  if (recurse) {
+    yield * that.someChoice.descend();
+  }
+
+  yield that.somethingWithoutChoice;
+
+  if (recurse) {
+    yield * that.somethingWithoutChoice.descend();
+  }
+}
+
 export class Container extends Class {
   /**
    * Indicate the runtime model type of the instance.
@@ -545,9 +558,7 @@ export class Container extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.node;
-
-    yield this.something;
+    yield * descend_Container(this, false);
   }
 
   /**
@@ -556,13 +567,7 @@ export class Container extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.node;
-
-    yield * this.node.descend();
-
-    yield this.something;
-
-    yield * this.something.descend();
+    yield * descend_Container(this, true);
   }
 
   /**
@@ -624,6 +629,27 @@ export class Container extends Class {
     super();
     this.node = node;
     this.something = something;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Container(
+  that: Container,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.node;
+
+  if (recurse) {
+    yield * that.node.descend();
+  }
+
+  yield that.something;
+
+  if (recurse) {
+    yield * that.something.descend();
   }
 }
 

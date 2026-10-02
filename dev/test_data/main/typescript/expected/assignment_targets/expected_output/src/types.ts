@@ -253,11 +253,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.items;
-
-    if (this.maybeItem !== null) {
-      yield this.maybeItem;
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -266,17 +262,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.items) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
-
-    if (this.maybeItem !== null) {
-      yield this.maybeItem;
-
-      yield * this.maybeItem.descend();
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -338,6 +324,46 @@ export class Something extends Class {
     super();
     this.items = items;
     this.maybeItem = maybeItem;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_Item(that.items, recurse);
+
+  if (that.maybeItem !== null) {
+    yield that.maybeItem;
+
+    if (recurse) {
+      yield * that.maybeItem.descend();
+    }
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Item(
+  that: Array<Item>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

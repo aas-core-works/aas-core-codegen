@@ -237,7 +237,7 @@ export class OrderedContainer
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.children;
+    yield * descend_OrderedContainer(this, false);
   }
 
   /**
@@ -246,11 +246,7 @@ export class OrderedContainer
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.children) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_OrderedContainer(this, true);
   }
 
   /**
@@ -317,6 +313,17 @@ export class OrderedContainer
   }
 }
 
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_OrderedContainer(
+  that: OrderedContainer,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_IElement(that.children, recurse);
+}
+
 export class UnorderedContainer
   extends Class
   implements IContainer {
@@ -342,7 +349,7 @@ export class UnorderedContainer
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.children;
+    yield * descend_UnorderedContainer(this, false);
   }
 
   /**
@@ -351,11 +358,7 @@ export class UnorderedContainer
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.children) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_UnorderedContainer(this, true);
   }
 
   /**
@@ -418,6 +421,17 @@ export class UnorderedContainer
     this.identifier = identifier;
     this.children = children;
   }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_UnorderedContainer(
+  that: UnorderedContainer,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_IElement(that.children, recurse);
 }
 
 export class GlobalAttribute extends Class {
@@ -625,7 +639,7 @@ export class AttributeOperand extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.attribute;
+    yield * descend_AttributeOperand(this, false);
   }
 
   /**
@@ -634,9 +648,7 @@ export class AttributeOperand extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.attribute;
-
-    yield * this.attribute.descend();
+    yield * descend_AttributeOperand(this, true);
   }
 
   /**
@@ -694,6 +706,21 @@ export class AttributeOperand extends Class {
   constructor(attribute: AttributeItem) {
     super();
     this.attribute = attribute;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_AttributeOperand(
+  that: AttributeOperand,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.attribute;
+
+  if (recurse) {
+    yield * that.attribute.descend();
   }
 }
 
@@ -910,15 +937,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.root;
-
-    if (this.optionalElement !== null) {
-      yield this.optionalElement;
-    }
-
-    yield this.value;
-
-    yield * this.values;
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -927,25 +946,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.root;
-
-    yield * this.root.descend();
-
-    if (this.optionalElement !== null) {
-      yield this.optionalElement;
-
-      yield * this.optionalElement.descend();
-    }
-
-    yield this.value;
-
-    yield * this.value.descend();
-
-    for (const anItem of this.values) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -1011,6 +1012,79 @@ export class Something extends Class {
     this.value = value;
     this.values = values;
     this.optionalElement = optionalElement;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.root;
+
+  if (recurse) {
+    yield * that.root.descend();
+  }
+
+  if (that.optionalElement !== null) {
+    yield that.optionalElement;
+
+    if (recurse) {
+      yield * that.optionalElement.descend();
+    }
+  }
+
+  yield that.value;
+
+  if (recurse) {
+    yield * that.value.descend();
+  }
+
+  yield * descend_ListOf_Value(that.values, recurse);
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_IElement(
+  that: Array<IElement>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Value(
+  that: Array<Value>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

@@ -386,17 +386,7 @@ export class Extension
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.refersTo !== null) {
-      yield * this.refersTo;
-    }
+    yield * descend_Extension(this, false);
   }
 
   /**
@@ -405,27 +395,7 @@ export class Extension
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const anItem of this.supplementalSemanticIds) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.refersTo !== null) {
-      for (const anotherItem of this.refersTo) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
+    yield * descend_Extension(this, true);
   }
 
   /**
@@ -495,6 +465,34 @@ export class Extension
     this.valueType = valueType;
     this.value = value;
     this.refersTo = refersTo;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Extension(
+  that: Extension,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.refersTo !== null) {
+    yield * descend_ListOf_Reference(that.refersTo, recurse);
   }
 }
 
@@ -762,13 +760,7 @@ export class AdministrativeInformation
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.creator !== null) {
-      yield this.creator;
-    }
+    yield * descend_AdministrativeInformation(this, false);
   }
 
   /**
@@ -777,19 +769,7 @@ export class AdministrativeInformation
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.embeddedDataSpecifications !== null) {
-      for (const anItem of this.embeddedDataSpecifications) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.creator !== null) {
-      yield this.creator;
-
-      yield * this.creator.descend();
-    }
+    yield * descend_AdministrativeInformation(this, true);
   }
 
   /**
@@ -857,6 +837,30 @@ export class AdministrativeInformation
     this.revision = revision;
     this.creator = creator;
     this.templateId = templateId;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_AdministrativeInformation(
+  that: AdministrativeInformation,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.creator !== null) {
+    yield that.creator;
+
+    if (recurse) {
+      yield * that.creator.descend();
+    }
   }
 }
 
@@ -1050,17 +1054,7 @@ export class Qualifier
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-    }
+    yield * descend_Qualifier(this, false);
   }
 
   /**
@@ -1069,25 +1063,7 @@ export class Qualifier
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const anItem of this.supplementalSemanticIds) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-
-      yield * this.valueId.descend();
-    }
+    yield * descend_Qualifier(this, true);
   }
 
   /**
@@ -1159,6 +1135,38 @@ export class Qualifier
     this.kind = kind;
     this.value = value;
     this.valueId = valueId;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Qualifier(
+  that: Qualifier,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.valueId !== null) {
+    yield that.valueId;
+
+    if (recurse) {
+      yield * that.valueId.descend();
+    }
   }
 }
 
@@ -1333,35 +1341,7 @@ export class AssetAdministrationShell
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.derivedFrom !== null) {
-      yield this.derivedFrom;
-    }
-
-    yield this.assetInformation;
-
-    if (this.submodels !== null) {
-      yield * this.submodels;
-    }
+    yield * descend_AssetAdministrationShell(this, false);
   }
 
   /**
@@ -1370,61 +1350,7 @@ export class AssetAdministrationShell
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-
-      yield * this.administration.descend();
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.derivedFrom !== null) {
-      yield this.derivedFrom;
-
-      yield * this.derivedFrom.descend();
-    }
-
-    yield this.assetInformation;
-
-    yield * this.assetInformation.descend();
-
-    if (this.submodels !== null) {
-      for (const yetYetYetAnotherItem of this.submodels) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_AssetAdministrationShell(this, true);
   }
 
   /**
@@ -1504,6 +1430,60 @@ export class AssetAdministrationShell
     this.derivedFrom = derivedFrom;
     this.assetInformation = assetInformation;
     this.submodels = submodels;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_AssetAdministrationShell(
+  that: AssetAdministrationShell,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.administration !== null) {
+    yield that.administration;
+
+    if (recurse) {
+      yield * that.administration.descend();
+    }
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.derivedFrom !== null) {
+    yield that.derivedFrom;
+
+    if (recurse) {
+      yield * that.derivedFrom.descend();
+    }
+  }
+
+  yield that.assetInformation;
+
+  if (recurse) {
+    yield * that.assetInformation.descend();
+  }
+
+  if (that.submodels !== null) {
+    yield * descend_ListOf_Reference(that.submodels, recurse);
   }
 }
 
@@ -1619,13 +1599,7 @@ export class AssetInformation extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.specificAssetIds !== null) {
-      yield * this.specificAssetIds;
-    }
-
-    if (this.defaultThumbnail !== null) {
-      yield this.defaultThumbnail;
-    }
+    yield * descend_AssetInformation(this, false);
   }
 
   /**
@@ -1634,19 +1608,7 @@ export class AssetInformation extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.specificAssetIds !== null) {
-      for (const anItem of this.specificAssetIds) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.defaultThumbnail !== null) {
-      yield this.defaultThumbnail;
-
-      yield * this.defaultThumbnail.descend();
-    }
+    yield * descend_AssetInformation(this, true);
   }
 
   /**
@@ -1714,6 +1676,30 @@ export class AssetInformation extends Class {
     this.specificAssetIds = specificAssetIds;
     this.assetType = assetType;
     this.defaultThumbnail = defaultThumbnail;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_AssetInformation(
+  that: AssetInformation,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.specificAssetIds !== null) {
+    yield * descend_ListOf_SpecificAssetId(
+      that.specificAssetIds,
+      recurse
+    );
+  }
+
+  if (that.defaultThumbnail !== null) {
+    yield that.defaultThumbnail;
+
+    if (recurse) {
+      yield * that.defaultThumbnail.descend();
+    }
   }
 }
 
@@ -1948,17 +1934,7 @@ export class SpecificAssetId
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.externalSubjectId !== null) {
-      yield this.externalSubjectId;
-    }
+    yield * descend_SpecificAssetId(this, false);
   }
 
   /**
@@ -1967,25 +1943,7 @@ export class SpecificAssetId
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const anItem of this.supplementalSemanticIds) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.externalSubjectId !== null) {
-      yield this.externalSubjectId;
-
-      yield * this.externalSubjectId.descend();
-    }
+    yield * descend_SpecificAssetId(this, true);
   }
 
   /**
@@ -2053,6 +2011,38 @@ export class SpecificAssetId
     this.name = name;
     this.value = value;
     this.externalSubjectId = externalSubjectId;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_SpecificAssetId(
+  that: SpecificAssetId,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.externalSubjectId !== null) {
+    yield that.externalSubjectId;
+
+    if (recurse) {
+      yield * that.externalSubjectId.descend();
+    }
   }
 }
 
@@ -2285,41 +2275,7 @@ export class Submodel
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.submodelElements !== null) {
-      yield * this.submodelElements;
-    }
+    yield * descend_Submodel(this, false);
   }
 
   /**
@@ -2328,73 +2284,7 @@ export class Submodel
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-
-      yield * this.administration.descend();
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.submodelElements !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.submodelElements) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Submodel(this, true);
   }
 
   /**
@@ -2478,6 +2368,68 @@ export class Submodel
     this.qualifiers = qualifiers;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.submodelElements = submodelElements;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Submodel(
+  that: Submodel,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.administration !== null) {
+    yield that.administration;
+
+    if (recurse) {
+      yield * that.administration.descend();
+    }
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.submodelElements !== null) {
+    yield * descend_ListOf_ISubmodelElement(
+      that.submodelElements,
+      recurse
+    );
   }
 }
 
@@ -2704,37 +2656,7 @@ export class RelationshipElement
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    yield this.first;
-
-    yield this.second;
+    yield * descend_RelationshipElement(this, false);
   }
 
   /**
@@ -2743,67 +2665,7 @@ export class RelationshipElement
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    yield this.first;
-
-    yield * this.first.descend();
-
-    yield this.second;
-
-    yield * this.second.descend();
+    yield * descend_RelationshipElement(this, true);
   }
 
   /**
@@ -2883,6 +2745,65 @@ export class RelationshipElement
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.first = first;
     this.second = second;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_RelationshipElement(
+  that: RelationshipElement,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  yield that.first;
+
+  if (recurse) {
+    yield * that.first.descend();
+  }
+
+  yield that.second;
+
+  if (recurse) {
+    yield * that.second.descend();
   }
 }
 
@@ -3202,41 +3123,7 @@ export class SubmodelElementList
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.semanticIdListElement !== null) {
-      yield this.semanticIdListElement;
-    }
-
-    if (this.value !== null) {
-      yield * this.value;
-    }
+    yield * descend_SubmodelElementList(this, false);
   }
 
   /**
@@ -3245,73 +3132,7 @@ export class SubmodelElementList
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticIdListElement !== null) {
-      yield this.semanticIdListElement;
-
-      yield * this.semanticIdListElement.descend();
-    }
-
-    if (this.value !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.value) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_SubmodelElementList(this, true);
   }
 
   /**
@@ -3397,6 +3218,65 @@ export class SubmodelElementList
     this.semanticIdListElement = semanticIdListElement;
     this.valueTypeListElement = valueTypeListElement;
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_SubmodelElementList(
+  that: SubmodelElementList,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.semanticIdListElement !== null) {
+    yield that.semanticIdListElement;
+
+    if (recurse) {
+      yield * that.semanticIdListElement.descend();
+    }
+  }
+
+  if (that.value !== null) {
+    yield * descend_ListOf_ISubmodelElement(that.value, recurse);
   }
 }
 
@@ -3588,37 +3468,7 @@ export class SubmodelElementCollection
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.value !== null) {
-      yield * this.value;
-    }
+    yield * descend_SubmodelElementCollection(this, false);
   }
 
   /**
@@ -3627,67 +3477,7 @@ export class SubmodelElementCollection
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.value !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.value) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_SubmodelElementCollection(this, true);
   }
 
   /**
@@ -3765,6 +3555,57 @@ export class SubmodelElementCollection
     this.qualifiers = qualifiers;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_SubmodelElementCollection(
+  that: SubmodelElementCollection,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.value !== null) {
+    yield * descend_ListOf_ISubmodelElement(that.value, recurse);
   }
 }
 
@@ -3992,37 +3833,7 @@ export class Property
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-    }
+    yield * descend_Property(this, false);
   }
 
   /**
@@ -4031,65 +3842,7 @@ export class Property
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-
-      yield * this.valueId.descend();
-    }
+    yield * descend_Property(this, true);
   }
 
   /**
@@ -4171,6 +3924,61 @@ export class Property
     this.valueType = valueType;
     this.value = value;
     this.valueId = valueId;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Property(
+  that: Property,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.valueId !== null) {
+    yield that.valueId;
+
+    if (recurse) {
+      yield * that.valueId.descend();
+    }
   }
 }
 
@@ -4384,41 +4192,7 @@ export class MultiLanguageProperty
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.value !== null) {
-      yield * this.value;
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-    }
+    yield * descend_MultiLanguageProperty(this, false);
   }
 
   /**
@@ -4427,73 +4201,7 @@ export class MultiLanguageProperty
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.value !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.value) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.valueId !== null) {
-      yield this.valueId;
-
-      yield * this.valueId.descend();
-    }
+    yield * descend_MultiLanguageProperty(this, true);
   }
 
   /**
@@ -4573,6 +4281,65 @@ export class MultiLanguageProperty
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.value = value;
     this.valueId = valueId;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_MultiLanguageProperty(
+  that: MultiLanguageProperty,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.value !== null) {
+    yield * descend_ListOf_LangStringTextType(that.value, recurse);
+  }
+
+  if (that.valueId !== null) {
+    yield that.valueId;
+
+    if (recurse) {
+      yield * that.valueId.descend();
+    }
   }
 }
 
@@ -4778,33 +4545,7 @@ export class Range
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
+    yield * descend_Range(this, false);
   }
 
   /**
@@ -4813,59 +4554,7 @@ export class Range
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Range(this, true);
   }
 
   /**
@@ -4947,6 +4636,53 @@ export class Range
     this.valueType = valueType;
     this.min = min;
     this.max = max;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Range(
+  that: Range,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
   }
 }
 
@@ -5140,37 +4876,7 @@ export class ReferenceElement
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.value !== null) {
-      yield this.value;
-    }
+    yield * descend_ReferenceElement(this, false);
   }
 
   /**
@@ -5179,65 +4885,7 @@ export class ReferenceElement
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.value !== null) {
-      yield this.value;
-
-      yield * this.value.descend();
-    }
+    yield * descend_ReferenceElement(this, true);
   }
 
   /**
@@ -5315,6 +4963,61 @@ export class ReferenceElement
     this.qualifiers = qualifiers;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_ReferenceElement(
+  that: ReferenceElement,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.value !== null) {
+    yield that.value;
+
+    if (recurse) {
+      yield * that.value.descend();
+    }
   }
 }
 
@@ -5523,33 +5226,7 @@ export class Blob
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
+    yield * descend_Blob(this, false);
   }
 
   /**
@@ -5558,59 +5235,7 @@ export class Blob
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Blob(this, true);
   }
 
   /**
@@ -5690,6 +5315,53 @@ export class Blob
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.contentType = contentType;
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Blob(
+  that: Blob,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
   }
 }
 
@@ -5893,33 +5565,7 @@ export class File
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
+    yield * descend_File(this, false);
   }
 
   /**
@@ -5928,59 +5574,7 @@ export class File
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_File(this, true);
   }
 
   /**
@@ -6060,6 +5654,53 @@ export class File
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.contentType = contentType;
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_File(
+  that: File,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
   }
 }
 
@@ -6262,41 +5903,7 @@ export class AnnotatedRelationshipElement
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    yield this.first;
-
-    yield this.second;
-
-    if (this.annotations !== null) {
-      yield * this.annotations;
-    }
+    yield * descend_AnnotatedRelationshipElement(this, false);
   }
 
   /**
@@ -6305,75 +5912,7 @@ export class AnnotatedRelationshipElement
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    yield this.first;
-
-    yield * this.first.descend();
-
-    yield this.second;
-
-    yield * this.second.descend();
-
-    if (this.annotations !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.annotations) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_AnnotatedRelationshipElement(this, true);
   }
 
   /**
@@ -6455,6 +5994,69 @@ export class AnnotatedRelationshipElement
     this.first = first;
     this.second = second;
     this.annotations = annotations;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_AnnotatedRelationshipElement(
+  that: AnnotatedRelationshipElement,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  yield that.first;
+
+  if (recurse) {
+    yield * that.first.descend();
+  }
+
+  yield that.second;
+
+  if (recurse) {
+    yield * that.second.descend();
+  }
+
+  if (that.annotations !== null) {
+    yield * descend_ListOf_IDataElement(that.annotations, recurse);
   }
 }
 
@@ -6681,41 +6283,7 @@ export class Entity
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.statements !== null) {
-      yield * this.statements;
-    }
-
-    if (this.specificAssetIds !== null) {
-      yield * this.specificAssetIds;
-    }
+    yield * descend_Entity(this, false);
   }
 
   /**
@@ -6724,75 +6292,7 @@ export class Entity
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.statements !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.statements) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.specificAssetIds !== null) {
-      for (const yetYetYetYetYetYetAnotherItem of this.specificAssetIds) {
-        yield yetYetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Entity(this, true);
   }
 
   /**
@@ -6876,6 +6376,64 @@ export class Entity
     this.entityType = entityType;
     this.globalAssetId = globalAssetId;
     this.specificAssetIds = specificAssetIds;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Entity(
+  that: Entity,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.statements !== null) {
+    yield * descend_ListOf_ISubmodelElement(that.statements, recurse);
+  }
+
+  if (that.specificAssetIds !== null) {
+    yield * descend_ListOf_SpecificAssetId(
+      that.specificAssetIds,
+      recurse
+    );
   }
 }
 
@@ -7079,21 +6637,7 @@ export class EventPayload extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.source;
-
-    if (this.sourceSemanticId !== null) {
-      yield this.sourceSemanticId;
-    }
-
-    yield this.observableReference;
-
-    if (this.observableSemanticId !== null) {
-      yield this.observableSemanticId;
-    }
-
-    if (this.subjectId !== null) {
-      yield this.subjectId;
-    }
+    yield * descend_EventPayload(this, false);
   }
 
   /**
@@ -7102,31 +6646,7 @@ export class EventPayload extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.source;
-
-    yield * this.source.descend();
-
-    if (this.sourceSemanticId !== null) {
-      yield this.sourceSemanticId;
-
-      yield * this.sourceSemanticId.descend();
-    }
-
-    yield this.observableReference;
-
-    yield * this.observableReference.descend();
-
-    if (this.observableSemanticId !== null) {
-      yield this.observableSemanticId;
-
-      yield * this.observableSemanticId.descend();
-    }
-
-    if (this.subjectId !== null) {
-      yield this.subjectId;
-
-      yield * this.subjectId.descend();
-    }
+    yield * descend_EventPayload(this, true);
   }
 
   /**
@@ -7200,6 +6720,51 @@ export class EventPayload extends Class {
     this.topic = topic;
     this.subjectId = subjectId;
     this.payload = payload;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_EventPayload(
+  that: EventPayload,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.source;
+
+  if (recurse) {
+    yield * that.source.descend();
+  }
+
+  if (that.sourceSemanticId !== null) {
+    yield that.sourceSemanticId;
+
+    if (recurse) {
+      yield * that.sourceSemanticId.descend();
+    }
+  }
+
+  yield that.observableReference;
+
+  if (recurse) {
+    yield * that.observableReference.descend();
+  }
+
+  if (that.observableSemanticId !== null) {
+    yield that.observableSemanticId;
+
+    if (recurse) {
+      yield * that.observableSemanticId.descend();
+    }
+  }
+
+  if (that.subjectId !== null) {
+    yield that.subjectId;
+
+    if (recurse) {
+      yield * that.subjectId.descend();
+    }
   }
 }
 
@@ -7471,39 +7036,7 @@ export class BasicEventElement
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    yield this.observed;
-
-    if (this.messageBroker !== null) {
-      yield this.messageBroker;
-    }
+    yield * descend_BasicEventElement(this, false);
   }
 
   /**
@@ -7512,69 +7045,7 @@ export class BasicEventElement
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    yield this.observed;
-
-    yield * this.observed.descend();
-
-    if (this.messageBroker !== null) {
-      yield this.messageBroker;
-
-      yield * this.messageBroker.descend();
-    }
+    yield * descend_BasicEventElement(this, true);
   }
 
   /**
@@ -7666,6 +7137,67 @@ export class BasicEventElement
     this.lastUpdate = lastUpdate;
     this.minInterval = minInterval;
     this.maxInterval = maxInterval;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_BasicEventElement(
+  that: BasicEventElement,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  yield that.observed;
+
+  if (recurse) {
+    yield * that.observed.descend();
+  }
+
+  if (that.messageBroker !== null) {
+    yield that.messageBroker;
+
+    if (recurse) {
+      yield * that.messageBroker.descend();
+    }
   }
 }
 
@@ -7892,45 +7424,7 @@ export class Operation
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.inputVariables !== null) {
-      yield * this.inputVariables;
-    }
-
-    if (this.outputVariables !== null) {
-      yield * this.outputVariables;
-    }
-
-    if (this.inoutputVariables !== null) {
-      yield * this.inoutputVariables;
-    }
+    yield * descend_Operation(this, false);
   }
 
   /**
@@ -7939,83 +7433,7 @@ export class Operation
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.inputVariables !== null) {
-      for (const yetYetYetYetYetAnotherItem of this.inputVariables) {
-        yield yetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.outputVariables !== null) {
-      for (const yetYetYetYetYetYetAnotherItem of this.outputVariables) {
-        yield yetYetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.inoutputVariables !== null) {
-      for (const yetYetYetYetYetYetYetAnotherItem of this.inoutputVariables) {
-        yield yetYetYetYetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Operation(this, true);
   }
 
   /**
@@ -8101,6 +7519,74 @@ export class Operation
 }
 
 /**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Operation(
+  that: Operation,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.inputVariables !== null) {
+    yield * descend_ListOf_OperationVariable(
+      that.inputVariables,
+      recurse
+    );
+  }
+
+  if (that.outputVariables !== null) {
+    yield * descend_ListOf_OperationVariable(
+      that.outputVariables,
+      recurse
+    );
+  }
+
+  if (that.inoutputVariables !== null) {
+    yield * descend_ListOf_OperationVariable(
+      that.inoutputVariables,
+      recurse
+    );
+  }
+}
+
+/**
  * The value of an operation variable is a submodel element that is used as input
  * and/or output variable of an operation.
  */
@@ -8128,7 +7614,7 @@ export class OperationVariable extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.value;
+    yield * descend_OperationVariable(this, false);
   }
 
   /**
@@ -8137,9 +7623,7 @@ export class OperationVariable extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.value;
-
-    yield * this.value.descend();
+    yield * descend_OperationVariable(this, true);
   }
 
   /**
@@ -8197,6 +7681,21 @@ export class OperationVariable extends Class {
   constructor(value: ISubmodelElement) {
     super();
     this.value = value;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_OperationVariable(
+  that: OperationVariable,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.value;
+
+  if (recurse) {
+    yield * that.value.descend();
   }
 }
 
@@ -8378,33 +7877,7 @@ export class Capability
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      yield * this.supplementalSemanticIds;
-    }
-
-    if (this.qualifiers !== null) {
-      yield * this.qualifiers;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
+    yield * descend_Capability(this, false);
   }
 
   /**
@@ -8413,59 +7886,7 @@ export class Capability
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.semanticId !== null) {
-      yield this.semanticId;
-
-      yield * this.semanticId.descend();
-    }
-
-    if (this.supplementalSemanticIds !== null) {
-      for (const yetYetAnotherItem of this.supplementalSemanticIds) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.qualifiers !== null) {
-      for (const yetYetYetAnotherItem of this.qualifiers) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetYetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetYetYetAnotherItem;
-
-        yield * yetYetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Capability(this, true);
   }
 
   /**
@@ -8541,6 +7962,53 @@ export class Capability
     this.supplementalSemanticIds = supplementalSemanticIds;
     this.qualifiers = qualifiers;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Capability(
+  that: Capability,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.semanticId !== null) {
+    yield that.semanticId;
+
+    if (recurse) {
+      yield * that.semanticId.descend();
+    }
+  }
+
+  if (that.supplementalSemanticIds !== null) {
+    yield * descend_ListOf_Reference(
+      that.supplementalSemanticIds,
+      recurse
+    );
+  }
+
+  if (that.qualifiers !== null) {
+    yield * descend_ListOf_Qualifier(that.qualifiers, recurse);
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
   }
 }
 
@@ -8768,29 +8236,7 @@ export class ConceptDescription
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      yield * this.extensions;
-    }
-
-    if (this.displayName !== null) {
-      yield * this.displayName;
-    }
-
-    if (this.description !== null) {
-      yield * this.description;
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      yield * this.embeddedDataSpecifications;
-    }
-
-    if (this.isCaseOf !== null) {
-      yield * this.isCaseOf;
-    }
+    yield * descend_ConceptDescription(this, false);
   }
 
   /**
@@ -8799,51 +8245,7 @@ export class ConceptDescription
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.extensions !== null) {
-      for (const anItem of this.extensions) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.displayName !== null) {
-      for (const anotherItem of this.displayName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.description !== null) {
-      for (const yetAnotherItem of this.description) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.administration !== null) {
-      yield this.administration;
-
-      yield * this.administration.descend();
-    }
-
-    if (this.embeddedDataSpecifications !== null) {
-      for (const yetYetAnotherItem of this.embeddedDataSpecifications) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
-
-    if (this.isCaseOf !== null) {
-      for (const yetYetYetAnotherItem of this.isCaseOf) {
-        yield yetYetYetAnotherItem;
-
-        yield * yetYetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_ConceptDescription(this, true);
   }
 
   /**
@@ -8919,6 +8321,46 @@ export class ConceptDescription
     this.administration = administration;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.isCaseOf = isCaseOf;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_ConceptDescription(
+  that: ConceptDescription,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.extensions !== null) {
+    yield * descend_ListOf_Extension(that.extensions, recurse);
+  }
+
+  if (that.displayName !== null) {
+    yield * descend_ListOf_LangStringNameType(that.displayName, recurse);
+  }
+
+  if (that.description !== null) {
+    yield * descend_ListOf_LangStringTextType(that.description, recurse);
+  }
+
+  if (that.administration !== null) {
+    yield that.administration;
+
+    if (recurse) {
+      yield * that.administration.descend();
+    }
+  }
+
+  if (that.embeddedDataSpecifications !== null) {
+    yield * descend_ListOf_EmbeddedDataSpecification(
+      that.embeddedDataSpecifications,
+      recurse
+    );
+  }
+
+  if (that.isCaseOf !== null) {
+    yield * descend_ListOf_Reference(that.isCaseOf, recurse);
   }
 }
 
@@ -9073,11 +8515,7 @@ export class Reference extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.referredSemanticId !== null) {
-      yield this.referredSemanticId;
-    }
-
-    yield * this.keys;
+    yield * descend_Reference(this, false);
   }
 
   /**
@@ -9086,17 +8524,7 @@ export class Reference extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.referredSemanticId !== null) {
-      yield this.referredSemanticId;
-
-      yield * this.referredSemanticId.descend();
-    }
-
-    for (const anItem of this.keys) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_Reference(this, true);
   }
 
   /**
@@ -9161,6 +8589,25 @@ export class Reference extends Class {
     this.keys = keys;
     this.referredSemanticId = referredSemanticId;
   }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Reference(
+  that: Reference,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.referredSemanticId !== null) {
+    yield that.referredSemanticId;
+
+    if (recurse) {
+      yield * that.referredSemanticId.descend();
+    }
+  }
+
+  yield * descend_ListOf_Key(that.keys, recurse);
 }
 
 /**
@@ -9793,17 +9240,7 @@ export class Environment extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.assetAdministrationShells !== null) {
-      yield * this.assetAdministrationShells;
-    }
-
-    if (this.submodels !== null) {
-      yield * this.submodels;
-    }
-
-    if (this.conceptDescriptions !== null) {
-      yield * this.conceptDescriptions;
-    }
+    yield * descend_Environment(this, false);
   }
 
   /**
@@ -9812,29 +9249,7 @@ export class Environment extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.assetAdministrationShells !== null) {
-      for (const anItem of this.assetAdministrationShells) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
-
-    if (this.submodels !== null) {
-      for (const anotherItem of this.submodels) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.conceptDescriptions !== null) {
-      for (const yetAnotherItem of this.conceptDescriptions) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
+    yield * descend_Environment(this, true);
   }
 
   /**
@@ -9902,6 +9317,33 @@ export class Environment extends Class {
 }
 
 /**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Environment(
+  that: Environment,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.assetAdministrationShells !== null) {
+    yield * descend_ListOf_AssetAdministrationShell(
+      that.assetAdministrationShells,
+      recurse
+    );
+  }
+
+  if (that.submodels !== null) {
+    yield * descend_ListOf_Submodel(that.submodels, recurse);
+  }
+
+  if (that.conceptDescriptions !== null) {
+    yield * descend_ListOf_ConceptDescription(
+      that.conceptDescriptions,
+      recurse
+    );
+  }
+}
+
+/**
  * Data specification content is part of a data specification template and defines
  * which additional attributes shall be added to the element instance that references
  * the data specification template and meta information about the template itself.
@@ -9951,9 +9393,7 @@ export class EmbeddedDataSpecification extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.dataSpecification;
-
-    yield this.dataSpecificationContent;
+    yield * descend_EmbeddedDataSpecification(this, false);
   }
 
   /**
@@ -9962,13 +9402,7 @@ export class EmbeddedDataSpecification extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.dataSpecification;
-
-    yield * this.dataSpecification.descend();
-
-    yield this.dataSpecificationContent;
-
-    yield * this.dataSpecificationContent.descend();
+    yield * descend_EmbeddedDataSpecification(this, true);
   }
 
   /**
@@ -10030,6 +9464,27 @@ export class EmbeddedDataSpecification extends Class {
     super();
     this.dataSpecification = dataSpecification;
     this.dataSpecificationContent = dataSpecificationContent;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_EmbeddedDataSpecification(
+  that: EmbeddedDataSpecification,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.dataSpecification;
+
+  if (recurse) {
+    yield * that.dataSpecification.descend();
+  }
+
+  yield that.dataSpecificationContent;
+
+  if (recurse) {
+    yield * that.dataSpecificationContent.descend();
   }
 }
 
@@ -10390,7 +9845,7 @@ export class ValueReferencePair extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.valueId;
+    yield * descend_ValueReferencePair(this, false);
   }
 
   /**
@@ -10399,9 +9854,7 @@ export class ValueReferencePair extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.valueId;
-
-    yield * this.valueId.descend();
+    yield * descend_ValueReferencePair(this, true);
   }
 
   /**
@@ -10467,6 +9920,21 @@ export class ValueReferencePair extends Class {
 }
 
 /**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_ValueReferencePair(
+  that: ValueReferencePair,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.valueId;
+
+  if (recurse) {
+    yield * that.valueId.descend();
+  }
+}
+
+/**
  * A set of value reference pairs.
  */
 export class ValueList extends Class {
@@ -10493,7 +9961,7 @@ export class ValueList extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.valueReferencePairs;
+    yield * descend_ValueList(this, false);
   }
 
   /**
@@ -10502,11 +9970,7 @@ export class ValueList extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.valueReferencePairs) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_ValueList(this, true);
   }
 
   /**
@@ -10565,6 +10029,20 @@ export class ValueList extends Class {
     super();
     this.valueReferencePairs = valueReferencePairs;
   }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_ValueList(
+  that: ValueList,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_ValueReferencePair(
+    that.valueReferencePairs,
+    recurse
+  );
 }
 
 /**
@@ -11060,27 +10538,7 @@ export class DataSpecificationIec61360
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.preferredName;
-
-    if (this.shortName !== null) {
-      yield * this.shortName;
-    }
-
-    if (this.unitId !== null) {
-      yield this.unitId;
-    }
-
-    if (this.definition !== null) {
-      yield * this.definition;
-    }
-
-    if (this.valueList !== null) {
-      yield this.valueList;
-    }
-
-    if (this.levelType !== null) {
-      yield this.levelType;
-    }
+    yield * descend_DataSpecificationIec61360(this, false);
   }
 
   /**
@@ -11089,45 +10547,7 @@ export class DataSpecificationIec61360
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.preferredName) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
-
-    if (this.shortName !== null) {
-      for (const anotherItem of this.shortName) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
-
-    if (this.unitId !== null) {
-      yield this.unitId;
-
-      yield * this.unitId.descend();
-    }
-
-    if (this.definition !== null) {
-      for (const yetAnotherItem of this.definition) {
-        yield yetAnotherItem;
-
-        yield * yetAnotherItem.descend();
-      }
-    }
-
-    if (this.valueList !== null) {
-      yield this.valueList;
-
-      yield * this.valueList.descend();
-    }
-
-    if (this.levelType !== null) {
-      yield this.levelType;
-
-      yield * this.levelType.descend();
-    }
+    yield * descend_DataSpecificationIec61360(this, true);
   }
 
   /**
@@ -11209,6 +10629,436 @@ export class DataSpecificationIec61360
     this.valueList = valueList;
     this.value = value;
     this.levelType = levelType;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_DataSpecificationIec61360(
+  that: DataSpecificationIec61360,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_LangStringPreferredNameTypeIec61360(
+    that.preferredName,
+    recurse
+  );
+
+  if (that.shortName !== null) {
+    yield * descend_ListOf_LangStringShortNameTypeIec61360(
+      that.shortName,
+      recurse
+    );
+  }
+
+  if (that.unitId !== null) {
+    yield that.unitId;
+
+    if (recurse) {
+      yield * that.unitId.descend();
+    }
+  }
+
+  if (that.definition !== null) {
+    yield * descend_ListOf_LangStringDefinitionTypeIec61360(
+      that.definition,
+      recurse
+    );
+  }
+
+  if (that.valueList !== null) {
+    yield that.valueList;
+
+    if (recurse) {
+      yield * that.valueList.descend();
+    }
+  }
+
+  if (that.levelType !== null) {
+    yield that.levelType;
+
+    if (recurse) {
+      yield * that.levelType.descend();
+    }
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Reference(
+  that: Array<Reference>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_EmbeddedDataSpecification(
+  that: Array<EmbeddedDataSpecification>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Extension(
+  that: Array<Extension>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringNameType(
+  that: Array<LangStringNameType>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringTextType(
+  that: Array<LangStringTextType>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_SpecificAssetId(
+  that: Array<SpecificAssetId>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Qualifier(
+  that: Array<Qualifier>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_ISubmodelElement(
+  that: Array<ISubmodelElement>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_IDataElement(
+  that: Array<IDataElement>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_OperationVariable(
+  that: Array<OperationVariable>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Key(
+  that: Array<Key>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_AssetAdministrationShell(
+  that: Array<AssetAdministrationShell>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Submodel(
+  that: Array<Submodel>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_ConceptDescription(
+  that: Array<ConceptDescription>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_ValueReferencePair(
+  that: Array<ValueReferencePair>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringPreferredNameTypeIec61360(
+  that: Array<LangStringPreferredNameTypeIec61360>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringShortNameTypeIec61360(
+  that: Array<LangStringShortNameTypeIec61360>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringDefinitionTypeIec61360(
+  that: Array<LangStringDefinitionTypeIec61360>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

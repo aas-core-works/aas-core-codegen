@@ -569,45 +569,6 @@ WARNING = Stripped(
 )
 
 
-class GeneratorForLoopVariables:
-    """
-    Generate a unique variable name based on ``item`` stem.
-
-    >>> generator = GeneratorForLoopVariables()
-
-    >>> next(generator)
-    'anItem'
-
-    >>> next(generator)
-    'anotherItem'
-
-    >>> next(generator)
-    'yetAnotherItem'
-
-    >>> next(generator)
-    'yetYetAnotherItem'
-    """
-
-    def __init__(self) -> None:
-        """Initialize with the zero counter."""
-        self.counter = 0
-
-    def __next__(self) -> Identifier:
-        """Generate the next variable name."""
-        if self.counter == 0:
-            result = Identifier("anItem")
-        elif self.counter == 1:
-            result = Identifier("anotherItem")
-        elif self.counter == 2:
-            result = Identifier("yetAnotherItem")
-        else:
-            result = Identifier("yet" + ("Yet" * (self.counter - 2)) + "AnotherItem")
-
-        self.counter += 1
-
-        return result
-
-
 #: Name of the module where all the types are defined
 TYPES_MODULE = Identifier("types")
 

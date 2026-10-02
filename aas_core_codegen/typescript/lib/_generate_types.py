@@ -7,6 +7,7 @@ from typing import (
     Dict,
     List,
     Mapping,
+    Set,
     Tuple,
     cast,
     Union,
@@ -575,186 +576,200 @@ export function *{function_name}(
     )
 
 
-def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> Stripped:
+def _descend_into_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
     """
-    Generate the body of the ``descend`` and ``descendOnce`` methods.
+    Name the function descending into ``type_anno``.
 
-    In the recursive case, we in-line the descent into the directly referenced
-    instances instead of delegating to ``descendOnce``, as a simple optimization.
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.typescript.common.type_moniker`), so two different
+    containers never share a function. We name the function with an underscore so
+    that it can not collide with any of the other names in the module, which never
+    contain one.
+    """
+    return Identifier(f"descend_{typescript_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the statements yielding the instances held by the value at ``expr``.
+
+    An instance is yielded in-line. A container is delegated to its function,
+    which descends only one level and calls the function of its items by name.
+    This way the descent is composed of plain functions, to any depth.
+
+    The generated code recurses only if the TypeScript variable ``recurse`` is set.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union is a plain union type alias in TypeScript, so its values
+        # are already instances of the member classes, and we descend into them
+        # exactly as we do into the class-typed ones.
+        return Stripped(
+            f"""\
+yield {expr};
+
+if (recurse) {{
+{I}yield * {expr}.descend();
+}}"""
+        )
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _descend_into_container_name(type_anno)
+
+        call = f"yield * {name}({expr}, recurse);"
+        # Heuristic to break the lines, very rudimentary
+        if len(call) > 70:
+            call = f"""\
+yield * {name}(
+{I}{expr},
+{I}recurse
+);"""
+
+        return Stripped(call)
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the function descending into ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    body: Stripped
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            # NOTE (mristin):
+            # We yield the instances directly if we do not recurse, so that we
+            # do not check the flag for every single item.
+            body = Stripped(
+                f"""\
+if (!recurse) {{
+{I}yield * that;
+{I}return;
+}}
+
+for (const item of that) {{
+{I}yield item;
+
+{I}yield * item.descend();
+}}"""
+            )
+        else:
+            item_stmts = _generate_descend_into(
+                expr="item",
+                type_anno=type_anno.items,
+                descendability=descendability,
+            )
+
+            body = Stripped(
+                f"""\
+for (const item of that) {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
+            )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_descend_into(
+                    expr=f"that[{i}]",
+                    type_anno=item_type_anno,
+                    descendability=descendability,
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if descendability[item_type_anno]
+            )
+        )
+
+    else:
+        assert_never(type_anno)
+
+    name = _descend_into_container_name(type_anno)
+    value_type = typescript_common.generate_type(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *{name}(
+{I}that: {value_type},
+{I}recurse: boolean
+): IterableIterator<Class> {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
+def _descend_function_name(cls: intermediate.ConcreteClass) -> Identifier:
+    """
+    Name the function descending into the instances of ``cls``.
+
+    We name the function with an underscore so that it can not collide with any of
+    the other names in the module, which never contain one.
+    """
+    return Identifier(f"descend_{typescript_naming.class_name(cls.name)}")
+
+
+def _generate_descend_function(cls: intermediate.ConcreteClass) -> Optional[Stripped]:
+    """
+    Generate the function descending into the instances of ``cls``.
+
+    The recursion is a run-time flag, so that the ``descendOnce`` and ``descend``
+    methods share a single body.
+
+    Return ``None`` if ``cls`` has no descendable properties.
     """
     blocks = []  # type: List[Stripped]
 
-    generator_for_loop_variables = typescript_common.GeneratorForLoopVariables()
-
     for prop in cls.properties:
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            continue
+
         prop_name = typescript_naming.property_name(prop.name)
 
-        prop_blocks = []  # type: List[Stripped]
-
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            continue
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                continue
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                continue
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                prop_blocks.append(Stripped(f"yield this.{prop_name};"))
-
-                if recurse:
-                    prop_blocks.append(Stripped(f"yield * this.{prop_name}.descend();"))
-
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union is a plain union type alias in TypeScript, so its
-                # values are already instances of the member classes. We keep this
-                # as its own branch, separate from the class branch above, even
-                # though the code is identical at the moment, so that it can
-                # diverge independently, *e.g.*, if primitive alternatives are
-                # ever allowed into a named union.
-                prop_blocks.append(Stripped(f"yield this.{prop_name};"))
-
-                if recurse:
-                    prop_blocks.append(Stripped(f"yield * this.{prop_name}.descend();"))
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We currently generate only the code to descend into "
-                f"lists of atomic values, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                continue
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                ):
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # A named union is a plain union type alias in TypeScript, so
-                    # we descend into a union-typed item exactly as we do into
-                    # a class-typed one.
-                    if not recurse:
-                        prop_blocks.append(Stripped(f"yield * this.{prop_name};"))
-                    else:
-                        loop_var = next(generator_for_loop_variables)
-
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for (const {loop_var} of this.{prop_name}) {{
-{I}yield {loop_var};
-
-{I}yield * {loop_var}.descend();
-}}"""
-                            )
-                        )
-
-                else:
-                    # noinspection PyTypeChecker
-                    assert_never(type_anno.items.our_type)
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # A JSON-able value is plain data, never a reference to one of
-                # our own classes, so there is nothing to descend into.
-                continue
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items)
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            for i, item_type_anno in enumerate(type_anno.items):
-                if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                    continue
-
-                if isinstance(
-                    item_type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # A named union is a plain union type alias in TypeScript, so
-                    # we descend into a union-typed tuple item exactly as we do
-                    # into a class-typed one.
-                    item_expr = Stripped(f"this.{prop_name}[{i}]")
-                else:
-                    continue
-
-                prop_blocks.append(Stripped(f"yield {item_expr};"))
-
-                if recurse:
-                    prop_blocks.append(Stripped(f"yield * {item_expr}.descend();"))
-
-            if len(prop_blocks) == 0:
-                continue
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data, never a reference to one of our
-            # own classes, so there is nothing to descend into.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives, constrained primitives and enumeration
-            # literals, so there is nothing to descend into.
-            continue
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
-
-        block = Stripped("\n\n".join(prop_blocks))
+        block = _generate_descend_into(
+            expr=f"that.{prop_name}",
+            type_anno=intermediate.beneath_optional(prop.type_annotation),
+            descendability=descendability,
+        )
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(
                 f"""\
-if (this.{prop_name} !== null) {{
+if (that.{prop_name} !== null) {{
 {I}{indent_but_first_line(block, I)}
 }}"""
             )
@@ -762,18 +777,51 @@ if (this.{prop_name} !== null) {{
         blocks.append(block)
 
     if len(blocks) == 0:
-        blocks.append(Stripped("// No descendable properties"))
+        return None
 
-    return Stripped("\n\n".join(blocks))
+    body = "\n\n".join(blocks)
 
-
-def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the ``descend_once`` method for the concrete class ``cls``."""
-
-    body = _generate_descend_body(cls=cls, recurse=False)
+    name = _descend_function_name(cls)
+    cls_name = typescript_naming.class_name(cls.name)
 
     return Stripped(
         f"""\
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *{name}(
+{I}that: {cls_name},
+{I}recurse: boolean
+): IterableIterator<Class> {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
+def _generate_descend_methods(
+    cls: intermediate.ConcreteClass, descendable: bool
+) -> List[Stripped]:
+    """
+    Generate the ``descendOnce`` and ``descend`` methods for ``cls``.
+
+    If ``descendable`` is set, both methods delegate to the function of ``cls``,
+    see :py:func:`_generate_descend_function`.
+    """
+    once_body: Stripped
+    recursive_body: Stripped
+
+    if descendable:
+        name = _descend_function_name(cls)
+        once_body = Stripped(f"yield * {name}(this, false);")
+        recursive_body = Stripped(f"yield * {name}(this, true);")
+    else:
+        once_body = Stripped("// No descendable properties")
+        recursive_body = once_body
+
+    return [
+        Stripped(
+            f"""\
 /**
  * Iterate over the instances referenced from this instance.
  *
@@ -782,27 +830,21 @@ def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
  * @returns Iterator over the referenced instances
  */
 *descendOnce(): IterableIterator<Class> {{
-{I}{indent_but_first_line(body, I)}
+{I}{once_body}
 }}"""
-    )
-
-
-def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the recursive ``descend`` method for the concrete class ``cls``."""
-
-    body = _generate_descend_body(cls=cls, recurse=True)
-
-    return Stripped(
-        f"""\
+        ),
+        Stripped(
+            f"""\
 /**
  * Iterate recursively over the instances referenced from this instance.
  *
  * @returns Iterator over the referenced instances
  */
 *descend(): IterableIterator<Class> {{
-{I}{indent_but_first_line(body, I)}
+{I}{recursive_body}
 }}"""
-    )
+        ),
+    ]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1446,6 +1488,7 @@ def _generate_class(
     inference_by_method: Mapping[
         intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
     ],
+    descendable: bool,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate code for the given concrete class ``cls``.
@@ -1454,6 +1497,9 @@ def _generate_class(
     the ``concrete_classes`` of the symbol table.
 
     ``inference_by_method`` holds the type inference of all the understood methods.
+
+    ``descendable`` indicates that the descent function has been generated for
+    ``cls``, see :py:func:`_generate_descend_function`.
     """
     # NOTE (mristin):
     # Code blocks of the class body separated by double newlines and indented once.
@@ -1580,9 +1626,7 @@ def _generate_class(
         else:
             assert_never(method)
 
-    blocks.append(_generate_descend_once_method(cls=cls))
-
-    blocks.append(_generate_descend_method(cls=cls))
+    blocks.extend(_generate_descend_methods(cls=cls, descendable=descendable))
 
     visit_name = typescript_naming.method_name(Identifier(f"visit_{cls.name}"))
 
@@ -2649,17 +2693,23 @@ export abstract class Class {{
                     blocks.append(block)
 
             if isinstance(our_type, intermediate.ConcreteClass):
+                descend_function = _generate_descend_function(cls=our_type)
+
                 block, error = _generate_class(
                     cls=our_type,
                     spec_impls=spec_impls,
                     concrete_cls_index=concrete_class_to_index[our_type],
                     inference_by_method=inference_by_method,
+                    descendable=descend_function is not None,
                 )
                 if error is not None:
                     errors.append(error)
                 else:
                     assert block is not None
                     blocks.append(block)
+
+                    if descend_function is not None:
+                        blocks.append(descend_function)
         elif isinstance(our_type, intermediate.NamedUnion):
             blocks.append(_generate_named_union_type_alias(named_union=our_type))
 
@@ -2669,6 +2719,30 @@ export abstract class Class {{
 
     if len(errors) > 0:
         return None, errors
+
+    observed_monikers = set()  # type: Set[str]
+
+    for concrete_cls in symbol_table.concrete_classes:
+        for prop in concrete_cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = typescript_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                blocks.append(
+                    _generate_descend_into_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
 
     # NOTE (mristin):
     # The transpiled methods might use the helpers from the common module, *e.g.*,

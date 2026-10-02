@@ -251,11 +251,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.item;
-
-    if (this.optionalItem !== null) {
-      yield this.optionalItem;
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -264,15 +260,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.item;
-
-    yield * this.item.descend();
-
-    if (this.optionalItem !== null) {
-      yield this.optionalItem;
-
-      yield * this.optionalItem.descend();
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -342,6 +330,29 @@ export class Something extends Class {
     this.optionalItem = optionalItem;
     this.optionalTexts = optionalTexts;
     this.optionalKind = optionalKind;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.item;
+
+  if (recurse) {
+    yield * that.item.descend();
+  }
+
+  if (that.optionalItem !== null) {
+    yield that.optionalItem;
+
+    if (recurse) {
+      yield * that.optionalItem.descend();
+    }
   }
 }
 
