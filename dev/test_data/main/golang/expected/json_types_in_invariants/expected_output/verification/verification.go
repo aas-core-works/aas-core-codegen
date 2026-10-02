@@ -68,6 +68,17 @@ func IsAcceptable(
 	return true
 }
 
+// Sort the keys of `that` so that the errors come in a stable order,
+// as the iteration order of a Go map is deliberately random.
+func sortedKeysOfJsonObject(that ourtypes.JsonObject) []string {
+	keys := make([]string, 0, len(that))
+	for key := range that {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 // Verify that `value` is a JSON-able value, at any depth.
 //
 // The path of an error is relative to `value`, and the caller is expected to
@@ -129,16 +140,7 @@ func verifyJsonValue(
 			return false
 
 		case ourtypes.JsonObject:
-			// NOTE (mristin):
-			// The keys are sorted so that the errors come in a stable order,
-			// as the iteration order of a Go map is deliberately random.
-			keys := make([]string, 0, len(casted))
-			for key := range casted {
-				keys = append(keys, key)
-			}
-			sort.Strings(keys)
-
-			for _, key := range keys {
+			for _, key := range sortedKeysOfJsonObject(casted) {
 				abort = verifyJsonValue(
 					casted[key],
 					func(err *VerificationError) bool {

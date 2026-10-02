@@ -137,21 +137,14 @@ func VerifySomething(
 		}
 	}
 
-	abort = Verify(
-		that.Items().Item1,
+	abort = verifyTupleOf2_IAbstractItem_IAbstractItem(
+		that.Items(),
 		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 0,
-				},
-			)
-
 			err.Path.PrependName(
 				&ourreporting.NameSegment{
 					Name: "Items",
 				},
 			)
-
 			return onError(err)
 		},
 	)
@@ -159,131 +152,14 @@ func VerifySomething(
 		return
 	}
 
-	abort = Verify(
-		that.Items().Item2,
+	abort = verifyTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_PositiveInt_Result(
+		that.Tricky(),
 		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 1,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Items",
-				},
-			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = Verify(
-		that.Tricky().Item2,
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 1,
-				},
-			)
-
 			err.Path.PrependName(
 				&ourreporting.NameSegment{
 					Name: "Tricky",
 				},
 			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = Verify(
-		that.Tricky().Item3,
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 2,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Tricky",
-				},
-			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = Verify(
-		that.Tricky().Item4,
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 3,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Tricky",
-				},
-			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = VerifyPositiveInt(
-		that.Tricky().Item5,
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 4,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Tricky",
-				},
-			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = VerifyResult(
-		that.Tricky().Item6,
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 5,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Tricky",
-				},
-			)
-
 			return onError(err)
 		},
 	)
@@ -292,27 +168,164 @@ func VerifySomething(
 	}
 
 	if that.OptionalPair() != nil {
-		abort = Verify(
-			that.OptionalPair().Item2,
+		abort = verifyTupleOf2_string_IAbstractItem(
+			*that.OptionalPair(),
 			func(err *VerificationError) bool {
-				err.Path.PrependIndex(
-					&ourreporting.IndexSegment{
-						Index: 1,
-					},
-				)
-
 				err.Path.PrependName(
 					&ourreporting.NameSegment{
 						Name: "OptionalPair",
 					},
 				)
-
 				return onError(err)
 			},
 		)
 		if abort {
 			return
 		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyTupleOf2_IAbstractItem_IAbstractItem(
+	that ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = Verify(
+		that.Item1,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 0,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = Verify(
+		that.Item2,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 1,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_PositiveInt_Result(
+	that ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = Verify(
+		that.Item2,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 1,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = Verify(
+		that.Item3,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 2,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = Verify(
+		that.Item4,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 3,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = VerifyPositiveInt(
+		that.Item5,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 4,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = VerifyResult(
+		that.Item6,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 5,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyTupleOf2_string_IAbstractItem(
+	that ourcommon.Tuple2[string, ourtypes.IAbstractItem],
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = Verify(
+		that.Item2,
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 1,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	return

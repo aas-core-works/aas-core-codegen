@@ -2849,28 +2849,19 @@ func VerifyExtension(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -2924,28 +2915,19 @@ func VerifyExtension(
 	}
 
 	if that.RefersTo() != nil {
-		for i, v := range that.RefersTo() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "RefersTo",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.RefersTo(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "RefersTo",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -2995,28 +2977,19 @@ func VerifyAdministrativeInformation(
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3166,28 +3139,19 @@ func VerifyQualifier(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3429,28 +3393,19 @@ func VerifyAssetAdministrationShell(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3489,54 +3444,36 @@ func VerifyAssetAdministrationShell(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3573,28 +3510,19 @@ func VerifyAssetAdministrationShell(
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3642,28 +3570,19 @@ func VerifyAssetAdministrationShell(
 	}
 
 	if that.Submodels() != nil {
-		for i, v := range that.Submodels() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Submodels",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.Submodels(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Submodels",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3769,28 +3688,19 @@ func VerifyAssetInformation(
 	}
 
 	if that.SpecificAssetIDs() != nil {
-		for i, v := range that.SpecificAssetIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SpecificAssetIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISpecificAssetID(
+			that.SpecificAssetIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SpecificAssetIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3950,28 +3860,19 @@ func VerifySpecificAssetID(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4286,28 +4187,19 @@ func VerifySubmodel(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4346,54 +4238,36 @@ func VerifySubmodel(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4464,106 +4338,70 @@ func VerifySubmodel(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.SubmodelElements() != nil {
-		for i, v := range that.SubmodelElements() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SubmodelElements",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISubmodelElement(
+			that.SubmodelElements(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SubmodelElements",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4729,28 +4567,19 @@ func VerifyRelationshipElement(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4789,54 +4618,36 @@ func VerifyRelationshipElement(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4858,80 +4669,53 @@ func VerifyRelationshipElement(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5267,28 +5051,19 @@ func VerifySubmodelElementList(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5327,54 +5102,36 @@ func VerifySubmodelElementList(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5396,80 +5153,53 @@ func VerifySubmodelElementList(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5523,28 +5253,19 @@ func VerifySubmodelElementList(
 	}
 
 	if that.Value() != nil {
-		for i, v := range that.Value() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Value",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISubmodelElement(
+			that.Value(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Value",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5755,28 +5476,19 @@ func VerifySubmodelElementCollection(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5815,54 +5527,36 @@ func VerifySubmodelElementCollection(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5884,106 +5578,70 @@ func VerifySubmodelElementCollection(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Value() != nil {
-		for i, v := range that.Value() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Value",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISubmodelElement(
+			that.Value(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Value",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6182,28 +5840,19 @@ func VerifyProperty(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6242,54 +5891,36 @@ func VerifyProperty(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6311,80 +5942,53 @@ func VerifyProperty(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6641,28 +6245,19 @@ func VerifyMultiLanguageProperty(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6701,54 +6296,36 @@ func VerifyMultiLanguageProperty(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6770,106 +6347,70 @@ func VerifyMultiLanguageProperty(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Value() != nil {
-		for i, v := range that.Value() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Value",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Value(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Value",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7100,28 +6641,19 @@ func VerifyRange(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7160,54 +6692,36 @@ func VerifyRange(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7229,80 +6743,53 @@ func VerifyRange(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7535,28 +7022,19 @@ func VerifyReferenceElement(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7595,54 +7073,36 @@ func VerifyReferenceElement(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7664,80 +7124,53 @@ func VerifyReferenceElement(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7938,28 +7371,19 @@ func VerifyBlob(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7998,54 +7422,36 @@ func VerifyBlob(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8067,80 +7473,53 @@ func VerifyBlob(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8356,28 +7735,19 @@ func VerifyFile(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8416,54 +7786,36 @@ func VerifyFile(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8485,80 +7837,53 @@ func VerifyFile(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8791,28 +8116,19 @@ func VerifyAnnotatedRelationshipElement(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8851,54 +8167,36 @@ func VerifyAnnotatedRelationshipElement(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8920,80 +8218,53 @@ func VerifyAnnotatedRelationshipElement(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9050,28 +8321,19 @@ func VerifyAnnotatedRelationshipElement(
 	}
 
 	if that.Annotations() != nil {
-		for i, v := range that.Annotations() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Annotations",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IDataElement(
+			that.Annotations(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Annotations",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9306,28 +8568,19 @@ func VerifyEntity(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9366,54 +8619,36 @@ func VerifyEntity(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9435,106 +8670,70 @@ func VerifyEntity(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Statements() != nil {
-		for i, v := range that.Statements() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Statements",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISubmodelElement(
+			that.Statements(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Statements",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9571,28 +8770,19 @@ func VerifyEntity(
 	}
 
 	if that.SpecificAssetIDs() != nil {
-		for i, v := range that.SpecificAssetIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SpecificAssetIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISpecificAssetID(
+			that.SpecificAssetIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SpecificAssetIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9992,28 +9182,19 @@ func VerifyBasicEventElement(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10052,54 +9233,36 @@ func VerifyBasicEventElement(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10121,80 +9284,53 @@ func VerifyBasicEventElement(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10560,28 +9696,19 @@ func VerifyOperation(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10620,54 +9747,36 @@ func VerifyOperation(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10689,158 +9798,104 @@ func VerifyOperation(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.InputVariables() != nil {
-		for i, v := range that.InputVariables() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "InputVariables",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IOperationVariable(
+			that.InputVariables(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "InputVariables",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.OutputVariables() != nil {
-		for i, v := range that.OutputVariables() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "OutputVariables",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IOperationVariable(
+			that.OutputVariables(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "OutputVariables",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.InoutputVariables() != nil {
-		for i, v := range that.InoutputVariables() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "InoutputVariables",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IOperationVariable(
+			that.InoutputVariables(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "InoutputVariables",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11061,28 +10116,19 @@ func VerifyCapability(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11121,54 +10167,36 @@ func VerifyCapability(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11190,80 +10218,53 @@ func VerifyCapability(
 	}
 
 	if that.SupplementalSemanticIDs() != nil {
-		for i, v := range that.SupplementalSemanticIDs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SupplementalSemanticIDs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.SupplementalSemanticIDs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SupplementalSemanticIDs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Qualifiers() != nil {
-		for i, v := range that.Qualifiers() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Qualifiers",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IQualifier(
+			that.Qualifiers(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Qualifiers",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11492,28 +10493,19 @@ func VerifyConceptDescription(
 	}
 
 	if that.Extensions() != nil {
-		for i, v := range that.Extensions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Extensions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IExtension(
+			that.Extensions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Extensions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11552,54 +10544,36 @@ func VerifyConceptDescription(
 	}
 
 	if that.DisplayName() != nil {
-		for i, v := range that.DisplayName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "DisplayName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringNameType(
+			that.DisplayName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "DisplayName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Description() != nil {
-		for i, v := range that.Description() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Description",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringTextType(
+			that.Description(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Description",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11636,54 +10610,36 @@ func VerifyConceptDescription(
 	}
 
 	if that.EmbeddedDataSpecifications() != nil {
-		for i, v := range that.EmbeddedDataSpecifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "EmbeddedDataSpecifications",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IEmbeddedDataSpecification(
+			that.EmbeddedDataSpecifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "EmbeddedDataSpecifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.IsCaseOf() != nil {
-		for i, v := range that.IsCaseOf() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "IsCaseOf",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IReference(
+			that.IsCaseOf(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "IsCaseOf",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11929,28 +10885,19 @@ func VerifyReference(
 			return
 		}
 	} else {
-		for i, v := range that.Keys() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Keys",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IKey(
+			that.Keys(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Keys",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -12165,80 +11112,53 @@ func VerifyEnvironment(
 	}
 
 	if that.AssetAdministrationShells() != nil {
-		for i, v := range that.AssetAdministrationShells() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "AssetAdministrationShells",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IAssetAdministrationShell(
+			that.AssetAdministrationShells(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "AssetAdministrationShells",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Submodels() != nil {
-		for i, v := range that.Submodels() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Submodels",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ISubmodel(
+			that.Submodels(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Submodels",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.ConceptDescriptions() != nil {
-		for i, v := range that.ConceptDescriptions() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ConceptDescriptions",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IConceptDescription(
+			that.ConceptDescriptions(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ConceptDescriptions",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -12417,28 +11337,19 @@ func VerifyValueList(
 			return
 		}
 	} else {
-		for i, v := range that.ValueReferencePairs() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ValueReferencePairs",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IValueReferencePair(
+			that.ValueReferencePairs(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ValueReferencePairs",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -12753,54 +11664,36 @@ func VerifyDataSpecificationIEC61360(
 			return
 		}
 	} else {
-		for i, v := range that.PreferredName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "PreferredName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringPreferredNameTypeIEC61360(
+			that.PreferredName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "PreferredName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.ShortName() != nil {
-		for i, v := range that.ShortName() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ShortName",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringShortNameTypeIEC61360(
+			that.ShortName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ShortName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -12890,28 +11783,19 @@ func VerifyDataSpecificationIEC61360(
 	}
 
 	if that.Definition() != nil {
-		for i, v := range that.Definition() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Definition",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringDefinitionTypeIEC61360(
+			that.Definition(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Definition",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -12973,6 +11857,456 @@ func VerifyDataSpecificationIEC61360(
 				err.Path.PrependName(
 					&ourreporting.NameSegment{
 						Name: "LevelType",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IReference(
+	that []ourtypes.IReference,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IEmbeddedDataSpecification(
+	that []ourtypes.IEmbeddedDataSpecification,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IExtension(
+	that []ourtypes.IExtension,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringNameType(
+	that []ourtypes.ILangStringNameType,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringTextType(
+	that []ourtypes.ILangStringTextType,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ISpecificAssetID(
+	that []ourtypes.ISpecificAssetID,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IQualifier(
+	that []ourtypes.IQualifier,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ISubmodelElement(
+	that []ourtypes.ISubmodelElement,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IDataElement(
+	that []ourtypes.IDataElement,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IOperationVariable(
+	that []ourtypes.IOperationVariable,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IKey(
+	that []ourtypes.IKey,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IAssetAdministrationShell(
+	that []ourtypes.IAssetAdministrationShell,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ISubmodel(
+	that []ourtypes.ISubmodel,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IConceptDescription(
+	that []ourtypes.IConceptDescription,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_IValueReferencePair(
+	that []ourtypes.IValueReferencePair,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringPreferredNameTypeIEC61360(
+	that []ourtypes.ILangStringPreferredNameTypeIEC61360,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringShortNameTypeIEC61360(
+	that []ourtypes.ILangStringShortNameTypeIEC61360,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringDefinitionTypeIEC61360(
+	that []ourtypes.ILangStringDefinitionTypeIEC61360,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
 					},
 				)
 				return onError(err)

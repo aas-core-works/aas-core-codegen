@@ -67,28 +67,44 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.SomeNames() {
-			abort = VerifyName(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_Name(
+			that.SomeNames(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SomeNames",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SomeNames",
-						},
-					)
+	return
+}
 
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+// Verify the items of `that` recursively.
+func verifyListOf_Name(
+	that []string,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = VerifyName(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

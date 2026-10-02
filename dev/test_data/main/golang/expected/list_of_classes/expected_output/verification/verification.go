@@ -143,28 +143,19 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.SomeItems() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SomeItems",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IAbstractItem(
+			that.SomeItems(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SomeItems",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -178,28 +169,69 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.SomeSimples() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_ISimple(
+			that.SomeSimples(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "SomeSimples",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "SomeSimples",
-						},
-					)
+	return
+}
 
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+// Verify the items of `that` recursively.
+func verifyListOf_IAbstractItem(
+	that []ourtypes.IAbstractItem,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ISimple(
+	that []ourtypes.ISimple,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

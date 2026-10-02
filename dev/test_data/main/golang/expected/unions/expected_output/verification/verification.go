@@ -382,28 +382,19 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.ListStructuralProperty() {
-			abort = Verify(
-				v.Underlying(),
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ListStructuralProperty",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_StructuralUnion(
+			that.ListStructuralProperty(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ListStructuralProperty",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -417,28 +408,19 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.ListMixedProperty() {
-			abort = Verify(
-				v.Underlying(),
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ListMixedProperty",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_MixedUnion(
+			that.ListMixedProperty(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ListMixedProperty",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -452,90 +434,30 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.ListModelTypedProperty() {
-			abort = Verify(
-				v.Underlying(),
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "ListModelTypedProperty",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ModelTypedUnion(
+			that.ListModelTypedProperty(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ListModelTypedProperty",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
-	abort = Verify(
-		that.TupleProperty().Item1.Underlying(),
+	abort = verifyTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+		that.TupleProperty(),
 		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 0,
-				},
-			)
-
 			err.Path.PrependName(
 				&ourreporting.NameSegment{
 					Name: "TupleProperty",
 				},
 			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = Verify(
-		that.TupleProperty().Item2.Underlying(),
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 1,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "TupleProperty",
-				},
-			)
-
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	abort = Verify(
-		that.TupleProperty().Item3.Underlying(),
-		func(err *VerificationError) bool {
-			err.Path.PrependIndex(
-				&ourreporting.IndexSegment{
-					Index: 2,
-				},
-			)
-
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "TupleProperty",
-				},
-			)
-
 			return onError(err)
 		},
 	)
@@ -595,28 +517,172 @@ func VerifySomething(
 	}
 
 	if that.OptionalListOverlappingProperty() != nil {
-		for i, v := range that.OptionalListOverlappingProperty() {
-			abort = Verify(
-				v.Underlying(),
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_OverlappingUnion(
+			that.OptionalListOverlappingProperty(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "OptionalListOverlappingProperty",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "OptionalListOverlappingProperty",
-						},
-					)
+	return
+}
 
-					return onError(err)
+// Verify the items of `that` recursively.
+func verifyListOf_StructuralUnion(
+	that []*ourtypes.StructuralUnion,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item.Underlying(),
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_MixedUnion(
+	that []*ourtypes.MixedUnion,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item.Underlying(),
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ModelTypedUnion(
+	that []*ourtypes.ModelTypedUnion,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item.Underlying(),
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+	that ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = Verify(
+		that.Item1.Underlying(),
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 0,
 				},
 			)
-			if abort {
-				return
-			}
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = Verify(
+		that.Item2.Underlying(),
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 1,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	abort = Verify(
+		that.Item3.Underlying(),
+		func(err *VerificationError) bool {
+			err.Path.PrependIndex(
+				&ourreporting.IndexSegment{
+					Index: 2,
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_OverlappingUnion(
+	that []*ourtypes.OverlappingUnion,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item.Underlying(),
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
