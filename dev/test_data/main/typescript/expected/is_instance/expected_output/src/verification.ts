@@ -344,6 +344,25 @@ export function isStringValue(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -364,24 +383,14 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      let childrenIndex = 0;
-      for (const item of that.children) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.children,
-              childrenIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "children"
-            )
-          );
-          yield error;
-        }
-        childrenIndex++;
+      for (const error of verify_ListOf_class(that.children)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "children"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -391,24 +400,14 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      let childrenIndex = 0;
-      for (const item of that.children) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.children,
-              childrenIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "children"
-            )
-          );
-          yield error;
-        }
-        childrenIndex++;
+      for (const error of verify_ListOf_class(that.children)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "children"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -436,9 +435,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.attribute, context)
-      ) {
+      for (const error of verify(that.attribute)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -543,7 +540,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.root, context)) {
+      for (const error of verify(that.root)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -554,9 +551,7 @@ class Verifier
       }
 
       if (that.optionalElement !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalElement, context)
-        ) {
+        for (const error of verify(that.optionalElement)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -567,7 +562,7 @@ class Verifier
         }
       }
 
-      for (const error of this.transformWithContext(that.value, context)) {
+      for (const error of verify(that.value)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -577,24 +572,14 @@ class Verifier
         yield error;
       }
 
-      let valuesIndex = 0;
-      for (const item of that.values) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.values,
-              valuesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "values"
-            )
-          );
-          yield error;
-        }
-        valuesIndex++;
+      for (const error of verify_ListOf_class(that.values)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "values"
+          )
+        );
+        yield error;
       }
     }
   }

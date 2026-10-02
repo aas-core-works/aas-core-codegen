@@ -260,6 +260,25 @@ export function iecContentsHaveDefinitionInEnglish(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -280,24 +299,14 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      let langStringsIndex = 0;
-      for (const item of that.langStrings) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.langStrings,
-              langStringsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "langStrings"
-            )
-          );
-          yield error;
-        }
-        langStringsIndex++;
+      for (const error of verify_ListOf_class(that.langStrings)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "langStrings"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -308,24 +317,14 @@ class Verifier
   ): IterableIterator<VerificationError> {
     if (context === true) {
       if (that.definition !== null) {
-        let definitionIndex = 0;
-        for (const item of that.definition) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.definition,
-                definitionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "definition"
-              )
-            );
-            yield error;
-          }
-          definitionIndex++;
+        for (const error of verify_ListOf_class(that.definition)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "definition"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -345,7 +344,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(that.content, context)) {
+      for (const error of verify(that.content)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -401,45 +400,25 @@ class Verifier
     }
 
     if (context === true) {
-      let langStringSetsIndex = 0;
-      for (const item of that.langStringSets) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.langStringSets,
-              langStringSetsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "langStringSets"
-            )
-          );
-          yield error;
-        }
-        langStringSetsIndex++;
+      for (const error of verify_ListOf_class(that.langStringSets)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "langStringSets"
+          )
+        );
+        yield error;
       }
 
       if (that.specifications !== null) {
-        let specificationsIndex = 0;
-        for (const item of that.specifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.specifications,
-                specificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "specifications"
-              )
-            );
-            yield error;
-          }
-          specificationsIndex++;
+        for (const error of verify_ListOf_class(that.specifications)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "specifications"
+            )
+          );
+          yield error;
         }
       }
     }

@@ -8,6 +8,7 @@ from typing import (
     Sequence,
     Mapping,
     Union,
+    Set,
 )
 
 from icontract import ensure, require
@@ -738,518 +739,399 @@ assert_union_without_excluded(
 )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_verify_property_snippet(
-    prop: intermediate.Property,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+def _needs_verification(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
     """
-    Generate the snippet to transform a property to verification errors.
+    Check whether a value of ``type_annotation`` has anything to verify at any depth.
 
-    Return an empty string if there is nothing to be verified for the given property.
+    In TypeScript, we verify the constrained primitives, the instances of our classes
+    and all the JSON-able values. We rely on the TypeScript compiler to spot invalid
+    enumeration literals, so we do not verify the enumerations at all.
     """
-    # NOTE (mristin):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
-
-    type_anno = (
-        prop.type_annotation
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        else prop.type_annotation.value
-    )
-
-    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        return None, Error(
-            prop.parsed.node,
-            "We currently implemented verification based on a very limited "
-            "pattern matching due to code simplicity. We did not handle "
-            "the case of nested optional values. Please contact "
-            "the developers if you need this functionality.",
+    return any(
+        (
+            isinstance(type_anno, intermediate.OurTypeAnnotation)
+            and not isinstance(type_anno.our_type, intermediate.Enumeration)
         )
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of optional values. Please contact "
-                "the developers if you need this functionality.",
-            )
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of lists. Please contact "
-                "the developers if you need this functionality.",
-            )
-        else:
-            pass
-    else:
-        pass
-
-    stmts = []  # type: List[Stripped]
-
-    prop_name = typescript_naming.property_name(prop.name)
-    prop_name_literal = typescript_common.string_literal(prop_name)
-
-    primitive_type = intermediate.try_primitive_type(type_anno)
-    if primitive_type is not None and primitive_type is intermediate.PrimitiveType.INT:
-        stmts.append(
-            Stripped(
-                f"""\
-if (!Number.isInteger(that.{prop_name})) {{
-{I}const error = new VerificationError(
-{II}"Expected an integer, but got a floating-point number"
-{I});
-{I}error.path.prepend(
-{II}new PropertySegment(
-{III}that,
-{III}{prop_name_literal}
-{II})
-{I});
-{I}yield error;
-}}"""
-            )
-        )
-
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # There is nothing more that we check for primitive types explicitly. The values
-        # of the primitive properties are checked at the level of class invariants.
-        return Stripped(""), None
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(type_anno.our_type, intermediate.Enumeration):
-            # We rely on TypeScript compiler to check for valid enumerations, so we do
-            # not check the enumerations on our side.
-            return Stripped(""), None
-
-        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-            function_name = typescript_naming.function_name(
-                Identifier(f"verify_{type_anno.our_type.name}")
-            )
-
-            # fmt: off
-            for_error_of_verify = (
-                f"for (const error of {function_name}(that.{prop_name}))"
-            )
-            # fmt: on
-
-            # Heuristic to break the lines, very rudimentary
-            if len(for_error_of_verify) > 70:
-                for_error_of_verify = f"""\
-for (const error of {function_name}(
-{II}that.{prop_name})
-)"""
-
-            stmts.append(
-                Stripped(
-                    f"""\
-{for_error_of_verify} {{
-{I}error.path.prepend(
-{II}new PropertySegment(
-{III}that,
-{III}{prop_name_literal}
-{II})
-{I});
-{I}yield error;
-}}"""
-                )
-            )
-
-        elif isinstance(
-            type_anno.our_type,
-            (
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-                intermediate.NamedUnion,
-            ),
-        ):
-            for_error_of_this_transform = f"""\
-for (const error of this.transformWithContext(that.{prop_name}, context))"""
-
-            # Heuristic to break the lines, very rudimentary
-            if len(for_error_of_this_transform) > 70:
-                for_error_of_this_transform = f"""\
-for (const error of this.transformWithContext(
-{II}that.{prop_name}, context)
-)"""
-
-            stmts.append(
-                Stripped(
-                    f"""\
-{for_error_of_this_transform} {{
-{I}error.path.prepend(
-{II}new PropertySegment(
-{III}that,
-{III}{prop_name_literal}
-{II})
-{I});
-{I}yield error;
-}}"""
-                )
-            )
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.our_type)
-
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        item_error_generation_expr: Stripped
-
-        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-            # Lists of primitives are verified at the level of class invariants.
-            return Stripped(""), None
-
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                # We rely on TypeScript compiler to check for valid enumerations, so we
-                # do not check the lists of enumerations on our side.
-                return Stripped(""), None
-
-            elif isinstance(
-                type_anno.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                verify_function = typescript_naming.function_name(
-                    Identifier(f"verify_{type_anno.items.our_type.name}")
-                )
-
-                item_error_generation_expr = Stripped(f"{verify_function}(item)")
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            ):
-                item_error_generation_expr = Stripped(
-                    "this.transformWithContext(item, context)"
-                )
-
-            else:
-                assert_never(type_anno.items.our_type)
-
-        elif isinstance(
-            type_anno.items,
+        or isinstance(
+            type_anno,
             (
                 intermediate.JsonValueTypeAnnotation,
                 intermediate.JsonArrayTypeAnnotation,
                 intermediate.JsonObjectTypeAnnotation,
             ),
-        ):
-            json_item_verify_function: str
-            if isinstance(type_anno.items, intermediate.JsonValueTypeAnnotation):
-                json_item_verify_function = "verifyJsonValue"
-            elif isinstance(type_anno.items, intermediate.JsonArrayTypeAnnotation):
-                json_item_verify_function = "verifyJsonArray"
-            else:
-                json_item_verify_function = "verifyJsonObject"
-
-            item_error_generation_expr = Stripped(f"{json_item_verify_function}(item)")
-
-        else:
-            raise NotImplementedError(
-                "(mristin) We currently generate only the code to verify lists of "
-                f"atomic values, but we got a list of type {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-        index_var = typescript_naming.variable_name(Identifier(f"{prop.name}_index"))
-
-        stmts.append(
-            Stripped(
-                f"""\
-let {index_var} = 0;
-for (const item of that.{prop_name}) {{
-{I}for (const error of {item_error_generation_expr}) {{
-{II}error.path.prepend(
-{III}new IndexSegment(
-{IIII}that.{prop_name},
-{IIII}{index_var}
-{III})
-{II});
-{II}error.path.prepend(
-{III}new PropertySegment(
-{IIII}that,
-{IIII}{prop_name_literal}
-{III})
-{II});
-{II}yield error;
-{I}}}
-{I}{index_var}++;
-}}"""
-            )
         )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
 
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        # NOTE (mristin):
-        # Unlike lists, tuples are heterogeneous and fixed-length, so we
-        # verify every item at its own fixed index instead of looping.
-        for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
 
-            item_access = Stripped(f"that.{prop_name}[{i}]")
-
-            for_error_of_item: Optional[Stripped]
-
-            if isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
-                # There is nothing to verify about the primitive types.
-                for_error_of_item = None
-
-            elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                if isinstance(item_type_anno.our_type, intermediate.Enumeration):
-                    # We rely on the TypeScript compiler to check for valid
-                    # enumerations, so there is nothing to verify here.
-                    for_error_of_item = None
-
-                elif isinstance(
-                    item_type_anno.our_type, intermediate.ConstrainedPrimitive
-                ):
-                    verify_function = typescript_naming.function_name(
-                        Identifier(f"verify_{item_type_anno.our_type.name}")
-                    )
-
-                    for_error_of_item = Stripped(
-                        f"for (const error of {verify_function}({item_access})) {{"
-                    )
-
-                    if len(for_error_of_item) > 70:
-                        for_error_of_item = Stripped(
-                            f"""\
-for (const error of {verify_function}(
-{II}{item_access})
-) {{"""
-                        )
-
-                elif isinstance(
-                    item_type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    for_error_of_item = Stripped(
-                        f"""\
-for (const error of this.transformWithContext({item_access}, context)) {{"""
-                    )
-
-                    if len(for_error_of_item) > 70:
-                        for_error_of_item = Stripped(
-                            f"""\
-for (const error of this.transformWithContext(
-{II}{item_access}, context)
-) {{"""
-                        )
-
-                else:
-                    assert_never(item_type_anno.our_type)
-
-            elif isinstance(
-                item_type_anno,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                item_verify_function: str
-                if isinstance(item_type_anno, intermediate.JsonValueTypeAnnotation):
-                    item_verify_function = "verifyJsonValue"
-                elif isinstance(item_type_anno, intermediate.JsonArrayTypeAnnotation):
-                    item_verify_function = "verifyJsonArray"
-                else:
-                    item_verify_function = "verifyJsonObject"
-
-                for_error_of_item = Stripped(
-                    f"""\
-for (const error of {item_verify_function}(
-{II}{item_access})
-) {{"""
-                )
-
-            else:
-                assert_never(item_type_anno)
-
-            if for_error_of_item is None:
-                continue
-
-            stmts.append(
-                Stripped(
-                    f"""\
-{for_error_of_item}
-{I}error.path.prepend(
-{II}new IndexSegment(
-{III}that.{prop_name},
-{III}{i}
-{II})
-{I});
-{I}error.path.prepend(
-{II}new PropertySegment(
-{III}that,
-{III}{prop_name_literal}
-{II})
-{I});
-{I}yield error;
-}}"""
-                )
-            )
-
-    elif isinstance(
-        type_anno,
+def _is_instance(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """Check whether ``type_anno`` denotes an instance of one of our classes."""
+    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type,
         (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
         ),
-    ):
-        json_verify_function: str
-        if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-            json_verify_function = "verifyJsonValue"
-        elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-            json_verify_function = "verifyJsonArray"
-        else:
-            json_verify_function = "verifyJsonObject"
+    )
 
-        stmts.append(
-            Stripped(
-                f"""\
-for (const error of {json_verify_function}(that.{prop_name})) {{
-{I}error.path.prepend(
-{II}new PropertySegment(
-{III}that,
-{III}{prop_name_literal}
-{II})
-{I});
+
+def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Name ``type_anno`` by what its verification depends on.
+
+    We follow the Polish notation of
+    :py:func:`aas_core_codegen.typescript.common.type_moniker`, except that we name
+    all the instances of our classes and named unions ``class``, a constrained
+    primitive by itself (*e.g.*, ``NonEmptyString``) instead of its constrainee
+    (``str``), and a JSON object by its constrained key, if any
+    (*e.g.*, ``jsonObjectByNonEmptyString``).
+
+    All the instances are verified with the very same call to ``verify``, so
+    the containers of different classes can share one verification function.
+    On the other hand, the constrained primitives share a TypeScript type, but are
+    verified differently, so each needs a moniker of its own.
+
+    The leaf monikers spelled in lower case can never be confused with our types,
+    which all go through :py:func:`aas_core_codegen.naming.capitalized_camel_case`.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return f"ListOf_{_verification_moniker(type_anno.items)}"
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"SetOf_{_verification_moniker(type_anno.items)}"
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        monikers = "_".join(_verification_moniker(item) for item in type_anno.items)
+        return f"TupleOf{len(type_anno.items)}_{monikers}"
+
+    if _is_instance(type_anno):
+        return "class"
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.ConstrainedPrimitive
+    ):
+        return typescript_naming.class_name(type_anno.our_type.name)
+
+    if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        key_constrained_primitive = intermediate.try_constrained_primitive(
+            type_anno.key
+        )
+        if key_constrained_primitive is not None:
+            return (
+                f"jsonObjectBy"
+                f"{typescript_naming.class_name(key_constrained_primitive.name)}"
+            )
+
+    return typescript_common.atomic_moniker(type_anno)
+
+
+def _verification_parameter_type(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Generate the type of the value at ``type_anno`` as a function parameter.
+
+    We use the read-only containers so that a single function accepts
+    the containers of different classes, all given as ``OurTypes.Class``.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return f"ReadonlyArray<{_verification_parameter_type(type_anno.items)}>"
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"ReadonlySet<{_verification_parameter_type(type_anno.items)}>"
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_types = [_verification_parameter_type(item) for item in type_anno.items]
+
+        one_liner = f"readonly [{', '.join(item_types)}]"
+        # Heuristic to break the lines, very rudimentary
+        if len(one_liner) <= 60:
+            return one_liner
+
+        joined = ",\n".join(item_types)
+        return f"""\
+readonly [
+{I}{indent_but_first_line(joined, I)}
+]"""
+
+    if _is_instance(type_anno):
+        return "OurTypes.Class"
+
+    return typescript_common.generate_type(type_anno, types_module=Stripped("OurTypes"))
+
+
+def _verify_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the module-level function verifying ``type_anno``.
+
+    We name the function with an underscore so that it can not collide with any of
+    the other names in the module, which never contain one.
+    """
+    return Identifier(f"verify_{_verification_moniker(type_anno)}")
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_into(
+    expr: str, type_anno: intermediate.TypeAnnotationUnion, segments: Sequence[str]
+) -> Stripped:
+    """
+    Generate the statements yielding the errors of the value at ``expr``.
+
+    The ``segments`` are prepended to the path of each error, the innermost first.
+
+    An atomic value is verified by its own function. A container is delegated to
+    its module-level function, which verifies only one level and calls
+    the function of its items by name. This way the verification is composed of
+    plain functions, to any depth.
+    """
+    blocks = []  # type: List[Stripped]
+
+    function: str
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
+            function = typescript_naming.function_name(
+                Identifier(f"verify_{type_anno.our_type.name}")
+            )
+        else:
+            assert _is_instance(type_anno), (
+                f"Unexpected our type with something to verify: "
+                f"{type_anno.our_type}"
+            )
+            function = "verify"
+
+    elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
+        function = "verifyJsonValue"
+
+    elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
+        function = "verifyJsonArray"
+
+    elif isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        function = "verifyJsonObject"
+
+    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        function = _verify_container_name(type_anno)
+
+    else:
+        raise AssertionError(
+            f"Unexpected type annotation with something to verify: {type_anno}. "
+            f"The optionals nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+    for_header = f"for (const error of {function}({expr}))"
+    # Heuristic to break the lines, very rudimentary
+    if len(for_header) > 70:
+        for_header = f"""\
+for (const error of {function}(
+{II}{expr})
+)"""
+
+    prepend_stmts = "\n".join(
+        f"""\
+error.path.prepend(
+{I}{indent_but_first_line(segment, I)}
+);"""
+        for segment in segments
+    )
+
+    blocks.append(
+        Stripped(
+            f"""\
+{for_header} {{
+{I}{indent_but_first_line(prepend_stmts, I)}
 {I}yield error;
 }}"""
-            )
+        )
+    )
+
+    # NOTE (mristin):
+    # A bare ``str`` key has nothing to verify.
+    if isinstance(
+        type_anno, intermediate.JsonObjectTypeAnnotation
+    ) and _needs_verification(type_anno.key):
+        key_stmts = _generate_verify_into(
+            expr="key",
+            type_anno=type_anno.key,
+            segments=[
+                f"""\
+new KeySegment(
+{I}{expr},
+{I}key
+)""",
+                *segments,
+            ],
         )
 
-        key_constrained_primitive = (
-            intermediate.try_constrained_primitive(type_anno.key)
-            if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation)
-            else None
-        )
-
-        # NOTE (mristin):
-        # A bare ``str`` key has nothing to verify.
-        if key_constrained_primitive is not None:
-            key_verify_function = typescript_naming.function_name(
-                Identifier(f"verify_{key_constrained_primitive.name}")
-            )
-
-            stmts.append(
-                Stripped(
-                    f"""\
-for (const key of Object.keys(that.{prop_name})) {{
-{I}for (const error of {key_verify_function}(key)) {{
-{II}// NOTE (mristin):
-{II}// The key segment names the member whose key is erroneous. The path
-{II}// thus leads to the member, and the message says what is wrong with
-{II}// the key which names it.
-{II}error.path.prepend(
-{III}new KeySegment(
-{IIII}that.{prop_name},
-{IIII}key
-{III})
-{II});
-{II}error.path.prepend(
-{III}new PropertySegment(
-{IIII}that,
-{IIII}{prop_name_literal}
-{III})
-{II});
-{II}yield error;
-{I}}}
+        blocks.append(
+            Stripped(
+                f"""\
+for (const key of Object.keys({expr})) {{
+{I}// NOTE (mristin):
+{I}// The key segment names the member whose key is erroneous. The path
+{I}// thus leads to the member, and the message says what is wrong with
+{I}// the key which names it.
+{I}{indent_but_first_line(key_stmts, I)}
 }}"""
-                )
             )
+        )
+
+    return Stripped("\n".join(blocks))
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the module-level function verifying ``type_anno``."""
+    body: Stripped
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_stmts = _generate_verify_into(
+            expr="that[i]",
+            type_anno=type_anno.items,
+            segments=[
+                f"""\
+new IndexSegment(
+{I}that,
+{I}i
+)"""
+            ],
+        )
+
+        body = Stripped(
+            f"""\
+for (let i = 0; i < that.length; i++) {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
+        )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        constrained_primitive = intermediate.try_constrained_primitive(type_anno.items)
+        item_stmts = _generate_verify_into(
+            expr="sortedThat[i]",
+            type_anno=type_anno.items,
+            segments=[
+                f"""\
+new IndexSegment(
+{I}sortedThat,
+{I}i
+)"""
+            ],
+        )
 
-        if constrained_primitive is None:
-            # NOTE (mristin):
-            # The sets of primitives are verified at the level of class invariants,
-            # and we rely on the TypeScript compiler to check for valid
-            # enumerations, analogous to the lists.
-            return Stripped(""), None
-
-        verify_function = typescript_naming.function_name(
-            Identifier(f"verify_{constrained_primitive.name}")
+        sorted_items = typescript_common.generate_sorted_set_items(
+            type_anno=type_anno, set_expression=Stripped("that")
         )
 
         # NOTE (mristin):
         # A set has no index, so we verify the items in the sorted order in which
         # they are serialized. Thus, the path of an error resolves in
         # the serialized array.
-        sorted_var = typescript_naming.variable_name(Identifier(f"sorted_{prop.name}"))
-        index_var = typescript_naming.variable_name(Identifier(f"{prop.name}_index"))
-
-        sorted_items = typescript_common.generate_sorted_set_items(
-            type_anno=type_anno, set_expression=Stripped(f"that.{prop_name}")
+        body = Stripped(
+            f"""\
+const sortedThat = {sorted_items};
+for (let i = 0; i < sortedThat.length; i++) {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
         )
 
-        stmts.append(
-            Stripped(
-                f"""\
-const {sorted_var} = {sorted_items};
-for (
-{I}let {index_var} = 0;
-{I}{index_var} < {sorted_var}.length;
-{I}{index_var}++
-) {{
-{I}for (const error of {verify_function}({sorted_var}[{index_var}])) {{
-{II}error.path.prepend(
-{III}new IndexSegment(
-{IIII}{sorted_var},
-{IIII}{index_var}
-{III})
-{II});
-{II}error.path.prepend(
-{III}new PropertySegment(
-{IIII}that,
-{IIII}{prop_name_literal}
-{III})
-{II});
-{II}yield error;
-{I}}}
-}}"""
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_verify_into(
+                    expr=f"that[{i}]",
+                    type_anno=item_type_anno,
+                    segments=[
+                        f"""\
+new IndexSegment(
+{I}that,
+{I}{i}
+)"""
+                    ],
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if _needs_verification(item_type_anno)
             )
         )
 
     else:
         assert_never(type_anno)
 
-    verify_block = Stripped("\n".join(stmts))
+    name = _verify_container_name(type_anno)
+    parameter_type = _verification_parameter_type(type_anno)
 
-    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        return (
-            Stripped(
-                f"""\
-if (that.{prop_name} !== null) {{
-{I}{indent_but_first_line(verify_block, I)}
+    return Stripped(
+        f"""\
+/**
+ * Verify the items of `that` recursively.
+ */
+function *{name}(
+{I}that: {indent_but_first_line(parameter_type, I)}
+): IterableIterator<VerificationError> {{
+{I}{indent_but_first_line(body, I)}
 }}"""
-            ),
-            None,
+    )
+
+
+def _generate_verify_property(prop: intermediate.Property) -> Optional[Stripped]:
+    """
+    Generate the snippet to transform a property to verification errors.
+
+    Return ``None`` if there is nothing to be verified for the given property.
+    """
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    if not _needs_verification(type_anno):
+        return None
+
+    prop_name = typescript_naming.property_name(prop.name)
+    prop_name_literal = typescript_common.string_literal(prop_name)
+
+    property_segment = f"""\
+new PropertySegment(
+{I}that,
+{I}{prop_name_literal}
+)"""
+
+    block = _generate_verify_into(
+        expr=f"that.{prop_name}", type_anno=type_anno, segments=[property_segment]
+    )
+
+    # NOTE (mristin):
+    # A JavaScript number does not distinguish between an integer and
+    # a floating-point number, so we check the integer-ness of the constrained
+    # primitives explicitly.
+    if (
+        isinstance(type_anno, intermediate.OurTypeAnnotation)
+        and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+        and type_anno.our_type.constrainee is intermediate.PrimitiveType.INT
+    ):
+        block = Stripped(
+            f"""\
+if (!Number.isInteger(that.{prop_name})) {{
+{I}const error = new VerificationError(
+{II}"Expected an integer, but got a floating-point number"
+{I});
+{I}error.path.prepend(
+{II}{indent_but_first_line(property_segment, II)}
+{I});
+{I}yield error;
+}}
+{block}"""
         )
 
-    return verify_block, None
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        block = Stripped(
+            f"""\
+if (that.{prop_name} !== null) {{
+{I}{indent_but_first_line(block, I)}
+}}"""
+        )
+
+    return block
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1294,64 +1176,30 @@ def _generate_transform_for_class(
 
     # endregion
 
-    # region Split properties in two, constrained primitives and others
-
-    # We split the properties in two, those of constrained primitives and others.
-    # We do this in a separate step instead of duplicating the code to avoid bugs
-    # related to DRY on the splitting logic.
-
-    properties_constrained_primitives = []  # type: List[intermediate.Property]
-    properties_non_constrained_primitives = []  # type: List[intermediate.Property]
-    for prop in cls.properties:
-        prop_type = intermediate.beneath_optional(prop.type_annotation)
-        if isinstance(prop_type, intermediate.OurTypeAnnotation) and isinstance(
-            prop_type.our_type, intermediate.ConstrainedPrimitive
-        ):
-            properties_constrained_primitives.append(prop)
-        else:
-            properties_non_constrained_primitives.append(prop)
-
-    # endregion
-
-    # region Include constrained primitive verification in non-recusrive part
-
-    # Since constrained primitives are not included in the recursion, we verify
-    # properties of constrained primitives at the non-recurse block as well.
-    for prop in properties_constrained_primitives:
-        prop_type = intermediate.beneath_optional(prop.type_annotation)
-        if isinstance(prop_type, intermediate.OurTypeAnnotation) and isinstance(
-            prop_type.our_type, intermediate.ConstrainedPrimitive
-        ):
-            constrained_primitive_block, error = _generate_verify_property_snippet(
-                prop=prop
-            )
-            if error is not None:
-                errors.append(error)
-            else:
-                assert constrained_primitive_block is not None
-                if constrained_primitive_block != "":
-                    blocks.append(constrained_primitive_block)
-
     if len(errors) > 0:
         return None, errors
 
-    # endregion
+    # region Verify the properties
 
-    # region Generate the recursive part
-
+    # NOTE (mristin):
+    # The constrained primitives are not included in the recursion, so we verify
+    # the properties of constrained primitives in the non-recursive part as well.
     recurse_prop_blocks = []  # type: List[Stripped]
 
-    for prop in properties_non_constrained_primitives:
-        prop_block, error = _generate_verify_property_snippet(prop=prop)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert prop_block is not None
-            if prop_block != "":
-                recurse_prop_blocks.append(prop_block)
+    for prop in cls.properties:
+        prop_block = _generate_verify_property(prop)
+        if prop_block is None:
+            continue
 
-    if len(errors) > 0:
-        return None, errors
+        if (
+            intermediate.try_constrained_primitive(
+                intermediate.beneath_optional(prop.type_annotation)
+            )
+            is not None
+        ):
+            blocks.append(prop_block)
+        else:
+            recurse_prop_blocks.append(prop_block)
 
     if len(recurse_prop_blocks) > 0:
         joined_prop_blocks = "\n\n".join(recurse_prop_blocks)
@@ -1998,6 +1846,28 @@ export class VerificationError {{
             assert_never(verification)
 
     blocks.extend(_generate_verify_json_value(symbol_table=symbol_table))
+
+    observed_container_names = set()  # type: Set[Identifier]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ) or not _needs_verification(type_anno):
+                    continue
+
+                name = _verify_container_name(type_anno)
+                if name in observed_container_names:
+                    continue
+
+                observed_container_names.add(name)
+
+                blocks.append(_generate_verify_container(type_anno=type_anno))
 
     transformer_block, transformer_errors = _generate_transformer(
         symbol_table=symbol_table,

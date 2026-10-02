@@ -356,11 +356,11 @@ class Verifier
         yield error;
       }
       for (const key of Object.keys(that.mappingWithConstrainedKey)) {
+        // NOTE (mristin):
+        // The key segment names the member whose key is erroneous. The path
+        // thus leads to the member, and the message says what is wrong with
+        // the key which names it.
         for (const error of verifyNonEmptyString(key)) {
-          // NOTE (mristin):
-          // The key segment names the member whose key is erroneous. The path
-          // thus leads to the member, and the message says what is wrong with
-          // the key which names it.
           error.path.prepend(
             new KeySegment(
               that.mappingWithConstrainedKey,

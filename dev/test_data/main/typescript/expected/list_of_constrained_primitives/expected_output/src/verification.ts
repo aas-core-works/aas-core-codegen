@@ -190,6 +190,25 @@ export class VerificationError {
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_Name(
+  that: ReadonlyArray<string>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verifyName(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -201,24 +220,14 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      let someNamesIndex = 0;
-      for (const item of that.someNames) {
-        for (const error of verifyName(item)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.someNames,
-              someNamesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "someNames"
-            )
-          );
-          yield error;
-        }
-        someNamesIndex++;
+      for (const error of verify_ListOf_Name(that.someNames)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "someNames"
+          )
+        );
+        yield error;
       }
     }
   }

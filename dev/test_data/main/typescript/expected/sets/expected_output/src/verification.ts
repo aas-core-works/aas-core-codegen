@@ -464,6 +464,45 @@ export function someKindIsNotSpecial(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_Code(
+  that: ReadonlyArray<string>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verifyCode(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_SetOf_Code(
+  that: ReadonlySet<string>
+): IterableIterator<VerificationError> {
+  const sortedThat = Array.from(that).sort(OurCommon.compareByCodePoints);
+  for (let i = 0; i < sortedThat.length; i++) {
+    for (const error of verifyCode(sortedThat[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          sortedThat,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -587,24 +626,14 @@ class Verifier
     }
 
     if (context === true) {
-      let codesIndex = 0;
-      for (const item of that.codes) {
-        for (const error of verifyCode(item)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.codes,
-              codesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "codes"
-            )
-          );
-          yield error;
-        }
-        codesIndex++;
+      for (const error of verify_ListOf_Code(that.codes)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "codes"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -664,27 +693,14 @@ class Verifier
     }
 
     if (context === true) {
-      const sortedCodes = Array.from(that.codes).sort(OurCommon.compareByCodePoints);
-      for (
-        let codesIndex = 0;
-        codesIndex < sortedCodes.length;
-        codesIndex++
-      ) {
-        for (const error of verifyCode(sortedCodes[codesIndex])) {
-          error.path.prepend(
-            new IndexSegment(
-              sortedCodes,
-              codesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "codes"
-            )
-          );
-          yield error;
-        }
+      for (const error of verify_SetOf_Code(that.codes)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "codes"
+          )
+        );
+        yield error;
       }
     }
   }

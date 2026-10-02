@@ -228,9 +228,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.someChoice, context)
-      ) {
+      for (const error of verify(that.someChoice)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -240,9 +238,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.somethingWithoutChoice, context)
-      ) {
+      for (const error of verify(that.somethingWithoutChoice)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -259,7 +255,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(that.node, context)) {
+      for (const error of verify(that.node)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -269,9 +265,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.something, context)
-      ) {
+      for (const error of verify(that.something)) {
         error.path.prepend(
           new PropertySegment(
             that,

@@ -364,7 +364,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.parent, context)) {
+      for (const error of verify(that.parent)) {
         error.path.prepend(
           new PropertySegment(
             that,

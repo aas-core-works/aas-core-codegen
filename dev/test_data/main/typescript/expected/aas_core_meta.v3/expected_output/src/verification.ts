@@ -2189,6 +2189,25 @@ export function isBcp47ForEnglish(text: string): boolean {
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -2264,9 +2283,7 @@ class Verifier
 
     if (context === true) {
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2278,46 +2295,26 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.refersTo !== null) {
-        let refersToIndex = 0;
-        for (const item of that.refersTo) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.refersTo,
-                refersToIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "refersTo"
-              )
-            );
-            yield error;
-          }
-          refersToIndex++;
+        for (const error of verify_ListOf_class(that.refersTo)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "refersTo"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -2387,29 +2384,21 @@ class Verifier
 
     if (context === true) {
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.creator !== null) {
-        for (const error of this.transformWithContext(that.creator, context)) {
+        for (const error of verify(that.creator)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2483,9 +2472,7 @@ class Verifier
 
     if (context === true) {
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2497,29 +2484,19 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.valueId !== null) {
-        for (const error of this.transformWithContext(that.valueId, context)) {
+        for (const error of verify(that.valueId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2681,75 +2658,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.administration !== null) {
-        for (const error of this.transformWithContext(
-            that.administration, context)
-        ) {
+        for (const error of verify(that.administration)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2761,31 +2706,21 @@ class Verifier
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.derivedFrom !== null) {
-        for (const error of this.transformWithContext(
-            that.derivedFrom, context)
-        ) {
+        for (const error of verify(that.derivedFrom)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -2796,9 +2731,7 @@ class Verifier
         }
       }
 
-      for (const error of this.transformWithContext(
-          that.assetInformation, context)
-      ) {
+      for (const error of verify(that.assetInformation)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -2809,24 +2742,14 @@ class Verifier
       }
 
       if (that.submodels !== null) {
-        let submodelsIndex = 0;
-        for (const item of that.submodels) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.submodels,
-                submodelsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "submodels"
-              )
-            );
-            yield error;
-          }
-          submodelsIndex++;
+        for (const error of verify_ListOf_class(that.submodels)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "submodels"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -2921,31 +2844,19 @@ class Verifier
 
     if (context === true) {
       if (that.specificAssetIds !== null) {
-        let specificAssetIdsIndex = 0;
-        for (const item of that.specificAssetIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.specificAssetIds,
-                specificAssetIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "specificAssetIds"
-              )
-            );
-            yield error;
-          }
-          specificAssetIdsIndex++;
+        for (const error of verify_ListOf_class(that.specificAssetIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "specificAssetIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.defaultThumbnail !== null) {
-        for (const error of this.transformWithContext(
-            that.defaultThumbnail, context)
-        ) {
+        for (const error of verify(that.defaultThumbnail)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3042,9 +2953,7 @@ class Verifier
 
     if (context === true) {
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3056,31 +2965,19 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.externalSubjectId !== null) {
-        for (const error of this.transformWithContext(
-            that.externalSubjectId, context)
-        ) {
+        for (const error of verify(that.externalSubjectId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3337,75 +3234,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.administration !== null) {
-        for (const error of this.transformWithContext(
-            that.administration, context)
-        ) {
+        for (const error of verify(that.administration)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3417,9 +3282,7 @@ class Verifier
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3431,90 +3294,52 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.submodelElements !== null) {
-        let submodelElementsIndex = 0;
-        for (const item of that.submodelElements) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.submodelElements,
-                submodelElementsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "submodelElements"
-              )
-            );
-            yield error;
-          }
-          submodelElementsIndex++;
+        for (const error of verify_ListOf_class(that.submodelElements)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "submodelElements"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -3656,75 +3481,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -3736,72 +3529,44 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
-      for (const error of this.transformWithContext(that.first, context)) {
+      for (const error of verify(that.first)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -3811,7 +3576,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(that.second, context)) {
+      for (const error of verify(that.second)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -4077,75 +3842,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -4157,75 +3890,45 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticIdListElement !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticIdListElement, context)
-        ) {
+        for (const error of verify(that.semanticIdListElement)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -4237,24 +3940,14 @@ class Verifier
       }
 
       if (that.value !== null) {
-        let valueIndex = 0;
-        for (const item of that.value) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.value,
-                valueIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "value"
-              )
-            );
-            yield error;
-          }
-          valueIndex++;
+        for (const error of verify_ListOf_class(that.value)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "value"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -4434,75 +4127,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -4514,90 +4175,52 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.value !== null) {
-        let valueIndex = 0;
-        for (const item of that.value) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.value,
-                valueIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "value"
-              )
-            );
-            yield error;
-          }
-          valueIndex++;
+        for (const error of verify_ListOf_class(that.value)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "value"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -4774,75 +4397,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -4854,73 +4445,45 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.valueId !== null) {
-        for (const error of this.transformWithContext(that.valueId, context)) {
+        for (const error of verify(that.valueId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -5098,75 +4661,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -5178,95 +4709,57 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.value !== null) {
-        let valueIndex = 0;
-        for (const item of that.value) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.value,
-                valueIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "value"
-              )
-            );
-            yield error;
-          }
-          valueIndex++;
+        for (const error of verify_ListOf_class(that.value)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "value"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.valueId !== null) {
-        for (const error of this.transformWithContext(that.valueId, context)) {
+        for (const error of verify(that.valueId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -5468,75 +4961,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -5548,68 +5009,40 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -5762,75 +5195,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -5842,73 +5243,45 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.value !== null) {
-        for (const error of this.transformWithContext(that.value, context)) {
+        for (const error of verify(that.value)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -6090,75 +5463,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -6170,68 +5511,40 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -6406,75 +5719,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -6486,68 +5767,40 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -6719,75 +5972,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -6799,72 +6020,44 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
-      for (const error of this.transformWithContext(that.first, context)) {
+      for (const error of verify(that.first)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -6874,7 +6067,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(that.second, context)) {
+      for (const error of verify(that.second)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -6885,24 +6078,14 @@ class Verifier
       }
 
       if (that.annotations !== null) {
-        let annotationsIndex = 0;
-        for (const item of that.annotations) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.annotations,
-                annotationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "annotations"
-              )
-            );
-            yield error;
-          }
-          annotationsIndex++;
+        for (const error of verify_ListOf_class(that.annotations)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "annotations"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -7135,75 +6318,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -7215,112 +6366,64 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.statements !== null) {
-        let statementsIndex = 0;
-        for (const item of that.statements) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.statements,
-                statementsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "statements"
-              )
-            );
-            yield error;
-          }
-          statementsIndex++;
+        for (const error of verify_ListOf_class(that.statements)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "statements"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.specificAssetIds !== null) {
-        let specificAssetIdsIndex = 0;
-        for (const item of that.specificAssetIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.specificAssetIds,
-                specificAssetIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "specificAssetIds"
-              )
-            );
-            yield error;
-          }
-          specificAssetIdsIndex++;
+        for (const error of verify_ListOf_class(that.specificAssetIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "specificAssetIds"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -7393,7 +6496,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.source, context)) {
+      for (const error of verify(that.source)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -7404,9 +6507,7 @@ class Verifier
       }
 
       if (that.sourceSemanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.sourceSemanticId, context)
-        ) {
+        for (const error of verify(that.sourceSemanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -7417,9 +6518,7 @@ class Verifier
         }
       }
 
-      for (const error of this.transformWithContext(
-          that.observableReference, context)
-      ) {
+      for (const error of verify(that.observableReference)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -7430,9 +6529,7 @@ class Verifier
       }
 
       if (that.observableSemanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.observableSemanticId, context)
-        ) {
+        for (const error of verify(that.observableSemanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -7444,9 +6541,7 @@ class Verifier
       }
 
       if (that.subjectId !== null) {
-        for (const error of this.transformWithContext(
-            that.subjectId, context)
-        ) {
+        for (const error of verify(that.subjectId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -7667,75 +6762,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -7747,72 +6810,44 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
-      for (const error of this.transformWithContext(that.observed, context)) {
+      for (const error of verify(that.observed)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -7823,9 +6858,7 @@ class Verifier
       }
 
       if (that.messageBroker !== null) {
-        for (const error of this.transformWithContext(
-            that.messageBroker, context)
-        ) {
+        for (const error of verify(that.messageBroker)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -8017,75 +7050,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -8097,134 +7098,76 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.inputVariables !== null) {
-        let inputVariablesIndex = 0;
-        for (const item of that.inputVariables) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.inputVariables,
-                inputVariablesIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "inputVariables"
-              )
-            );
-            yield error;
-          }
-          inputVariablesIndex++;
+        for (const error of verify_ListOf_class(that.inputVariables)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "inputVariables"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.outputVariables !== null) {
-        let outputVariablesIndex = 0;
-        for (const item of that.outputVariables) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.outputVariables,
-                outputVariablesIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "outputVariables"
-              )
-            );
-            yield error;
-          }
-          outputVariablesIndex++;
+        for (const error of verify_ListOf_class(that.outputVariables)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "outputVariables"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.inoutputVariables !== null) {
-        let inoutputVariablesIndex = 0;
-        for (const item of that.inoutputVariables) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.inoutputVariables,
-                inoutputVariablesIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "inoutputVariables"
-              )
-            );
-            yield error;
-          }
-          inoutputVariablesIndex++;
+        for (const error of verify_ListOf_class(that.inoutputVariables)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "inoutputVariables"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -8244,7 +7187,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.value, context)) {
+      for (const error of verify(that.value)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -8392,75 +7335,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.semanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.semanticId, context)
-        ) {
+        for (const error of verify(that.semanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -8472,68 +7383,40 @@ class Verifier
       }
 
       if (that.supplementalSemanticIds !== null) {
-        let supplementalSemanticIdsIndex = 0;
-        for (const item of that.supplementalSemanticIds) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.supplementalSemanticIds,
-                supplementalSemanticIdsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "supplementalSemanticIds"
-              )
-            );
-            yield error;
-          }
-          supplementalSemanticIdsIndex++;
+        for (const error of verify_ListOf_class(that.supplementalSemanticIds)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "supplementalSemanticIds"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.qualifiers !== null) {
-        let qualifiersIndex = 0;
-        for (const item of that.qualifiers) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.qualifiers,
-                qualifiersIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "qualifiers"
-              )
-            );
-            yield error;
-          }
-          qualifiersIndex++;
+        for (const error of verify_ListOf_class(that.qualifiers)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "qualifiers"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -8764,75 +7647,43 @@ class Verifier
 
     if (context === true) {
       if (that.extensions !== null) {
-        let extensionsIndex = 0;
-        for (const item of that.extensions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.extensions,
-                extensionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "extensions"
-              )
-            );
-            yield error;
-          }
-          extensionsIndex++;
+        for (const error of verify_ListOf_class(that.extensions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "extensions"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.displayName !== null) {
-        let displayNameIndex = 0;
-        for (const item of that.displayName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.displayName,
-                displayNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "displayName"
-              )
-            );
-            yield error;
-          }
-          displayNameIndex++;
+        for (const error of verify_ListOf_class(that.displayName)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "displayName"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.description !== null) {
-        let descriptionIndex = 0;
-        for (const item of that.description) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.description,
-                descriptionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "description"
-              )
-            );
-            yield error;
-          }
-          descriptionIndex++;
+        for (const error of verify_ListOf_class(that.description)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "description"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.administration !== null) {
-        for (const error of this.transformWithContext(
-            that.administration, context)
-        ) {
+        for (const error of verify(that.administration)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -8844,46 +7695,28 @@ class Verifier
       }
 
       if (that.embeddedDataSpecifications !== null) {
-        let embeddedDataSpecificationsIndex = 0;
-        for (const item of that.embeddedDataSpecifications) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.embeddedDataSpecifications,
-                embeddedDataSpecificationsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "embeddedDataSpecifications"
-              )
-            );
-            yield error;
-          }
-          embeddedDataSpecificationsIndex++;
+        for (const error of verify_ListOf_class(
+            that.embeddedDataSpecifications)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "embeddedDataSpecifications"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.isCaseOf !== null) {
-        let isCaseOfIndex = 0;
-        for (const item of that.isCaseOf) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.isCaseOf,
-                isCaseOfIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "isCaseOf"
-              )
-            );
-            yield error;
-          }
-          isCaseOfIndex++;
+        for (const error of verify_ListOf_class(that.isCaseOf)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "isCaseOf"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -9074,9 +7907,7 @@ class Verifier
 
     if (context === true) {
       if (that.referredSemanticId !== null) {
-        for (const error of this.transformWithContext(
-            that.referredSemanticId, context)
-        ) {
+        for (const error of verify(that.referredSemanticId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -9087,24 +7918,14 @@ class Verifier
         }
       }
 
-      let keysIndex = 0;
-      for (const item of that.keys) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.keys,
-              keysIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "keys"
-            )
-          );
-          yield error;
-        }
-        keysIndex++;
+      for (const error of verify_ListOf_class(that.keys)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "keys"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -9224,68 +8045,40 @@ class Verifier
 
     if (context === true) {
       if (that.assetAdministrationShells !== null) {
-        let assetAdministrationShellsIndex = 0;
-        for (const item of that.assetAdministrationShells) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.assetAdministrationShells,
-                assetAdministrationShellsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "assetAdministrationShells"
-              )
-            );
-            yield error;
-          }
-          assetAdministrationShellsIndex++;
+        for (const error of verify_ListOf_class(
+            that.assetAdministrationShells)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "assetAdministrationShells"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.submodels !== null) {
-        let submodelsIndex = 0;
-        for (const item of that.submodels) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.submodels,
-                submodelsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "submodels"
-              )
-            );
-            yield error;
-          }
-          submodelsIndex++;
+        for (const error of verify_ListOf_class(that.submodels)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "submodels"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.conceptDescriptions !== null) {
-        let conceptDescriptionsIndex = 0;
-        for (const item of that.conceptDescriptions) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.conceptDescriptions,
-                conceptDescriptionsIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "conceptDescriptions"
-              )
-            );
-            yield error;
-          }
-          conceptDescriptionsIndex++;
+        for (const error of verify_ListOf_class(that.conceptDescriptions)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "conceptDescriptions"
+            )
+          );
+          yield error;
         }
       }
     }
@@ -9296,9 +8089,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.dataSpecification, context)
-      ) {
+      for (const error of verify(that.dataSpecification)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -9308,9 +8099,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.dataSpecificationContent, context)
-      ) {
+      for (const error of verify(that.dataSpecificationContent)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -9346,7 +8135,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.valueId, context)) {
+      for (const error of verify(that.valueId)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -9369,24 +8158,14 @@ class Verifier
     }
 
     if (context === true) {
-      let valueReferencePairsIndex = 0;
-      for (const item of that.valueReferencePairs) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.valueReferencePairs,
-              valueReferencePairsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "valueReferencePairs"
-            )
-          );
-          yield error;
-        }
-        valueReferencePairsIndex++;
+      for (const error of verify_ListOf_class(that.valueReferencePairs)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "valueReferencePairs"
+          )
+        );
+        yield error;
       }
     }
   }
@@ -9652,50 +8431,30 @@ class Verifier
     }
 
     if (context === true) {
-      let preferredNameIndex = 0;
-      for (const item of that.preferredName) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.preferredName,
-              preferredNameIndex
-            )
-          );
+      for (const error of verify_ListOf_class(that.preferredName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "preferredName"
+          )
+        );
+        yield error;
+      }
+
+      if (that.shortName !== null) {
+        for (const error of verify_ListOf_class(that.shortName)) {
           error.path.prepend(
             new PropertySegment(
               that,
-              "preferredName"
+              "shortName"
             )
           );
           yield error;
         }
-        preferredNameIndex++;
-      }
-
-      if (that.shortName !== null) {
-        let shortNameIndex = 0;
-        for (const item of that.shortName) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.shortName,
-                shortNameIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "shortName"
-              )
-            );
-            yield error;
-          }
-          shortNameIndex++;
-        }
       }
 
       if (that.unitId !== null) {
-        for (const error of this.transformWithContext(that.unitId, context)) {
+        for (const error of verify(that.unitId)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -9707,31 +8466,19 @@ class Verifier
       }
 
       if (that.definition !== null) {
-        let definitionIndex = 0;
-        for (const item of that.definition) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.definition,
-                definitionIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "definition"
-              )
-            );
-            yield error;
-          }
-          definitionIndex++;
+        for (const error of verify_ListOf_class(that.definition)) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "definition"
+            )
+          );
+          yield error;
         }
       }
 
       if (that.valueList !== null) {
-        for (const error of this.transformWithContext(
-            that.valueList, context)
-        ) {
+        for (const error of verify(that.valueList)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -9743,9 +8490,7 @@ class Verifier
       }
 
       if (that.levelType !== null) {
-        for (const error of this.transformWithContext(
-            that.levelType, context)
-        ) {
+        for (const error of verify(that.levelType)) {
           error.path.prepend(
             new PropertySegment(
               that,

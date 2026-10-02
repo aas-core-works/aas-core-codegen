@@ -305,6 +305,67 @@ export function *verifyJsonObject(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_jsonValue(
+  that: ReadonlyArray<OurTypes.JsonValue>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verifyJsonValue(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_TupleOf4_str_jsonValue_jsonArray_jsonObject(
+  that: readonly [
+    string,
+    OurTypes.JsonValue,
+    OurTypes.JsonArray,
+    OurTypes.JsonObject
+  ]
+): IterableIterator<VerificationError> {
+  for (const error of verifyJsonValue(that[1])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        1
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verifyJsonArray(that[2])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        2
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verifyJsonObject(that[3])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        3
+      )
+    );
+    yield error;
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -316,69 +377,19 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      let valuesIndex = 0;
-      for (const item of that.values) {
-        for (const error of verifyJsonValue(item)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.values,
-              valuesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "values"
-            )
-          );
-          yield error;
-        }
-        valuesIndex++;
+      for (const error of verify_ListOf_jsonValue(that.values)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "values"
+          )
+        );
+        yield error;
       }
 
-      for (const error of verifyJsonValue(
-          that.tupleWithJson[1])
+      for (const error of verify_TupleOf4_str_jsonValue_jsonArray_jsonObject(
+          that.tupleWithJson)
       ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tupleWithJson,
-            1
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "tupleWithJson"
-          )
-        );
-        yield error;
-      }
-      for (const error of verifyJsonArray(
-          that.tupleWithJson[2])
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tupleWithJson,
-            2
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "tupleWithJson"
-          )
-        );
-        yield error;
-      }
-      for (const error of verifyJsonObject(
-          that.tupleWithJson[3])
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tupleWithJson,
-            3
-          )
-        );
         error.path.prepend(
           new PropertySegment(
             that,
